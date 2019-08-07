@@ -1,11 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const db = require('./db');
+const config = require('./src/config/config');
 
 const Post = require('./src/model/post');
 
 const app = express();
-const PORT = 3000;
+const { PORT } = config;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

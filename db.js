@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
+const config = require('./src/config/config');
 
-const password = process.env.mongoPassword;
-
-mongoose.connect(`mongodb+srv://Darkzarich:${password}@expressrestblogtest-esklf.mongodb.net/test?retryWrites=true&w=majority`,
-  { useNewUrlParser: true });
+mongoose.connect(config.DB_URL, { useNewUrlParser: true });
 
 const db = mongoose.connection;
 
