@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const schema = new Schema({
   login: {
     type: String,
-    required: true,
+    required: [true, 'can\'t be blank.'],
     unique: true,
   },
   hash: {

@@ -10,4 +10,4 @@ db.on('error', global.console.error.bind(console, 'connection error:'))
     global.console.log('Successfully connected to MongoDB database');
   });
 
-module.exports.db = db;
+module.exports = db;
