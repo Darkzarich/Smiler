@@ -1,3 +1,4 @@
+const slugLib = require('slug');
 const Post = require('../models/Post');
 
 module.exports = {
@@ -11,11 +12,20 @@ module.exports = {
   },
   create: async (req, res, next) => {
     try {
+      const { userId } = req.session;
+
+      const { title } = req.body;
+      const { body } = req.body;
+      const slug = `${slugLib(title)}-${(Math.random() * Math.pow(36, 6) | 0).toString(36)}`;
+
       const post = await Post.create({
-        ...req.body,
+        title,
+        body,
+        slug,
+        author: userId,
       });
-      global.console.log(post);
-      res.status(200).json(JSON.stringify(req.body));
+
+      res.status(200).json(req.body);
     } catch (e) {
       next(e);
     }

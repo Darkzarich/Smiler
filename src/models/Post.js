@@ -9,6 +9,14 @@ const schema = new Schema({
   },
   body: {
     type: String,
+    required: true,
+  },
+  slug: {
+    type: String,
+  },
+  author: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
   },
 }, {
   timestamps: true,
