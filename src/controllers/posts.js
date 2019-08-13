@@ -25,7 +25,31 @@ module.exports = {
     }
   },
   getBySlug: async (req, res, next) => {
-    global.console.log(req.params.slug);
+    const slug = req.params.slug.trim();
+
+    if (!slug) {
+      next({
+        status: 400,
+        error: new Error('Bad Request'),
+      });
+    }
+
+    try {
+      const post = await Post.findOne({
+        slug,
+      });
+
+      if (!post) {
+        next({
+          status: 404,
+          error: new Error('Not Found'),
+        });
+      } else {
+        res.status(200).json(post);
+      }
+    } catch (e) {
+      next(e);
+    }
   },
   create: async (req, res, next) => {
     try {
