@@ -23,7 +23,9 @@ const schema = new Schema({
 });
 
 schema.set('toJSON', {
-  virtuals: true,
+  virtuals: false,
+  versionKey: false,
 });
+
 
 module.exports = mongoose.model('Post', schema);

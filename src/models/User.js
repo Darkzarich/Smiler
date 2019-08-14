@@ -7,6 +7,7 @@ const schema = new Schema({
     type: String,
     required: [true, 'can\'t be blank.'],
     unique: true,
+    index: true,
   },
   hash: {
     type: String,
@@ -21,7 +22,8 @@ const schema = new Schema({
 });
 
 schema.set('toJSON', {
-  virtuals: true,
+  virtuals: false,
+  versionKey: false,
 });
 
 module.exports = mongoose.model('User', schema);
