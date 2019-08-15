@@ -1,6 +1,7 @@
 const slugLib = require('slug');
 const Post = require('../models/Post');
 const User = require('../models/User');
+const { generateError, success } = require('./utils/utils');
 
 module.exports = {
   getAll: async (req, res, next) => {
@@ -9,7 +10,7 @@ module.exports = {
     const author = req.query.author || '';
 
     if (limit > 100) {
-      next(Error('Limit can\'t be more than 100'));
+      generateError('Limit can\'t be more than 100', 422, next);
     }
 
     try {
@@ -20,10 +21,7 @@ module.exports = {
           login: author,
         });
         if (!result) {
-          next({
-            status: 404,
-            error: new Error('User doesn\'t exist'),
-          });
+          generateError('User doesn\'t exist', 404, next);
         } else {
           query.author = result.id;
         }
@@ -37,7 +35,7 @@ module.exports = {
 
       const pages = Math.ceil(await Post.countDocuments() / limit);
 
-      res.status(200).json({
+      success(res, {
         pages,
         posts,
       });
@@ -49,10 +47,7 @@ module.exports = {
     const slug = req.params.slug.trim();
 
     if (!slug) {
-      next({
-        status: 400,
-        error: new Error('Slug is required'),
-      });
+      generateError('Slug is required', 422, next);
     }
 
     try {
@@ -62,12 +57,9 @@ module.exports = {
         .populate('author', 'login');
 
       if (!post) {
-        next({
-          status: 404,
-          error: new Error('Post doesn\'t exist'),
-        });
+        generateError('Post doesn\'t exist', 404, next);
       } else {
-        res.status(200).json(post);
+        success(res, post);
       }
     } catch (e) {
       next(e);
@@ -88,7 +80,7 @@ module.exports = {
         author: userId,
       });
 
-      res.status(200).json(req.body);
+      success(res, req.body);
     } catch (e) {
       next(e);
     }

@@ -22,7 +22,7 @@ const schema = new Schema({
 });
 
 schema.set('toJSON', {
-  virtuals: false,
+  virtuals: true,
   versionKey: false,
 });
 

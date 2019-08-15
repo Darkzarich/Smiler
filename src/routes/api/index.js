@@ -2,6 +2,7 @@ const router = require('express').Router();
 
 router.use('/users', require('./users'));
 router.use('/posts', require('./posts'));
+router.use('/comments', require('./comments'));
 
 router.use((err, req, res, next) => {
   if (err.status) {
@@ -11,7 +12,7 @@ router.use((err, req, res, next) => {
       },
     });
   } else {
-    res.status(422).json({
+    res.status(500).json({
       error: {
         message: err.message,
       },
