@@ -13,7 +13,7 @@ const validateUser = (user, next) => {
     if (user.password !== user.confirm) {
       generateError('Password and password confirm must be equal', 422, next);
     }
-    return null;
+    return 0;
   }
   return generateError('All fields must be filled.', 422, next);
 };
@@ -53,7 +53,9 @@ module.exports = {
       confirm: req.body.password,
     };
 
-    validateUser(user, next);
+    if (validateUser(user, next) !== 0) {
+      return;
+    }
 
     try {
       const foundUser = await User.findOne({
@@ -61,7 +63,8 @@ module.exports = {
       });
 
       if (!foundUser) {
-        generateError('Invalid username or password');
+        generateError('Invalid username or password', 401, next);
+        return;
       }
 
       const hash = crypto.pbkdf2Sync(user.password, foundUser.salt, 10000, 512, 'sha512').toString('hex');
@@ -72,7 +75,8 @@ module.exports = {
 
         success(res);
       } else {
-        next(new Error('Invalid username or password'));
+        generateError('Invalid username or password', 401, next);
+        return;
       }
     } catch (e) {
       next(e);

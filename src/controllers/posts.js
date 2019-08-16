@@ -9,9 +9,7 @@ module.exports = {
     const offset = +req.query.offset || 0;
     const author = req.query.author || '';
 
-    if (limit > 100) {
-      generateError('Limit can\'t be more than 100', 422, next);
-    }
+    if (limit > 100) { generateError('Limit can\'t be more than 100', 422, next); return; }
 
     try {
       const query = {};
@@ -22,9 +20,9 @@ module.exports = {
         });
         if (!result) {
           generateError('User doesn\'t exist', 404, next);
-        } else {
-          query.author = result.id;
+          return;
         }
+        query.author = result.id;
       }
 
       const posts = await Post.find(query)
@@ -46,9 +44,7 @@ module.exports = {
   getBySlug: async (req, res, next) => {
     const slug = req.params.slug.trim();
 
-    if (!slug) {
-      generateError('Slug is required', 422, next);
-    }
+    if (!slug) { generateError('Slug is required', 422, next); return; }
 
     try {
       const post = await Post.findOne({
@@ -58,9 +54,9 @@ module.exports = {
 
       if (!post) {
         generateError('Post doesn\'t exist', 404, next);
-      } else {
-        success(res, post);
+        return;
       }
+      success(res, post);
     } catch (e) {
       next(e);
     }

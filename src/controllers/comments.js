@@ -5,19 +5,19 @@ const { generateError, success } = require('./utils/utils');
 module.exports = {
   getComment: async (req, res, next) => {
     const { post } = req.query;
-    const limit = req.query.limit || 10;
-    const offset = req.query.offset || 0;
+    const limit = +req.query.limit || 10;
+    const offset = +req.query.offset || 0;
     const { author } = req.query;
     const query = {};
 
-    if (limit > 30) generateError('Limit can\'t be more than 30', 422, next);
-    if (!post) generateError('Can\'t get commens without set post', 422, next);
+    if (limit > 30) { generateError('Limit can\'t be more than 30', 422, next); return; }
+    if (!post) { generateError('Can\'t get commens without set post', 422, next); return; }
 
     if (author) {
       const foundAuthor = await User.findOne({
         login: author,
       });
-      if (!foundAuthor) generateError('User is not found', 404, next);
+      if (!foundAuthor) { generateError('User is not found', 404, next); return; }
 
       query.author = foundAuthor.id;
     }
@@ -26,7 +26,50 @@ module.exports = {
       const comments = await Comment.find(query)
         .sort('-createdAt')
         .skip(offset)
-        .populate('author', 'login')
+        // .populate([
+        //   {
+        //     path: 'author',
+        //     select: 'login',
+        //   },
+        //   {
+        //     path: 'children',
+        //     populate: {
+        //       path: 'children author',
+        //       select: 'login',
+        //       populate: {
+        //         path: 'children author',
+        //         select: 'login body',
+        //       },
+        //     },
+        //   },
+        // ])
+        .populate([
+          {
+            path: 'author',
+            select: 'login',
+          },
+          {
+            path: 'children',
+            populate: [
+              {
+                path: 'author',
+                select: 'login',
+              },
+              {
+                path: 'children',
+                populate: [
+                  {
+                    path: 'author',
+                    select: 'login',
+                  },
+                  {
+                    path: 'children',
+                  },
+                ],
+              },
+            ],
+          },
+        ])
         .limit(limit);
 
       success(res, comments);
@@ -40,8 +83,8 @@ module.exports = {
     const { post } = req.body;
     const { userId } = req.session;
 
-    if (!body) generateError('Body must be filled', 422, next);
-    if (!post) generateError('Comment must be assigned to a post', 422, next);
+    if (!body) { generateError('Body must be filled', 422, next); return; }
+    if (!post) { generateError('Comment must be assigned to a post', 422, next); return; }
 
     try {
       if (!parent) {
@@ -52,6 +95,26 @@ module.exports = {
         });
 
         success(res, comment);
+      } else {
+        const parentCommentary = await Comment.findOne({
+          _id: parent,
+          post,
+        });
+
+        if (!parentCommentary) { generateError('Parent commentary is not found', 404, next); return; }
+
+        const comment = await Comment.create({
+          post,
+          body,
+          parent,
+          author: userId,
+        });
+
+        const { children } = parentCommentary;
+        children.push(comment.id);
+        parentCommentary.children = children;
+        await parentCommentary.save();
+        success(res);
       }
     } catch (e) {
       next(e);
