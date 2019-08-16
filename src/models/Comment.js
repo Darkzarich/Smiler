@@ -16,6 +16,7 @@ const schema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: 'Comment',
+      autopopulate: true,
     },
   ],
   parent: {
@@ -26,12 +27,15 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
+    autopopulate: { select: 'login' },
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
+
+schema.plugin(require('mongoose-autopopulate'));
 
 schema.set('toJSON', {
   virtuals: true,

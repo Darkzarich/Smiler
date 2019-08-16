@@ -26,51 +26,8 @@ module.exports = {
       const comments = await Comment.find(query)
         .sort('-createdAt')
         .skip(offset)
-        // .populate([
-        //   {
-        //     path: 'author',
-        //     select: 'login',
-        //   },
-        //   {
-        //     path: 'children',
-        //     populate: {
-        //       path: 'children author',
-        //       select: 'login',
-        //       populate: {
-        //         path: 'children author',
-        //         select: 'login body',
-        //       },
-        //     },
-        //   },
-        // ])
-        .populate([
-          {
-            path: 'author',
-            select: 'login',
-          },
-          {
-            path: 'children',
-            populate: [
-              {
-                path: 'author',
-                select: 'login',
-              },
-              {
-                path: 'children',
-                populate: [
-                  {
-                    path: 'author',
-                    select: 'login',
-                  },
-                  {
-                    path: 'children',
-                  },
-                ],
-              },
-            ],
-          },
-        ])
-        .limit(limit);
+        .limit(limit)
+        .exists('parent', false);
 
       success(res, comments);
     } catch (e) {
