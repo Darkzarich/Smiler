@@ -1,4 +1,6 @@
+/* eslint-disable func-names */
 const mongoose = require('mongoose');
+const Post = require('./Post');
 
 const { Schema } = mongoose;
 
@@ -33,6 +35,13 @@ const schema = new Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+schema.pre('save', async function (next) {
+  if (this.isNew) {
+    await Post.commentCountInc(this.post);
+  }
+  next();
 });
 
 schema.plugin(require('mongoose-autopopulate'));

@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 const config = require('./src/config/config');
 
-mongoose.connect(config.DB_URL, { useNewUrlParser: true });
+mongoose.connect(config.DB_URL, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+});
 
 const db = mongoose.connection;
 
