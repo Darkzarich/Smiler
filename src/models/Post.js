@@ -19,6 +19,11 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
+  uploads: [
+    {
+      type: String,
+    },
+  ],
   commentCount: {
     type: Number,
     default: 0,
