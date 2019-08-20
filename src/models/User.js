@@ -17,6 +17,14 @@ const schema = new Schema({
     type: String,
     require: true,
   },
+  template: {
+    type: Schema.Types.Mixed,
+    default: {
+      title: '',
+      body: '',
+      attachments: [],
+    },
+  },
 }, {
   timestamps: true,
 });

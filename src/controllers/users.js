@@ -1,6 +1,9 @@
 const crypto = require('crypto');
+
 const User = require('../models/User');
+
 const { generateError, success } = require('./utils/utils');
+const consts = require('../const/const');
 
 const validateUser = (user, next) => {
   if (user.login && user.password && user.confirm) {
@@ -84,6 +87,46 @@ module.exports = {
   },
   logout: async (req, res) => {
     req.session.destroy();
+    success(res);
+  },
+  getUserPostTemplate: async (req, res, next) => {
+    if (req.session.userLogin !== req.params.login) {
+      generateError('Can see only your own template', 401, next); return;
+    }
+
+    const template = await User.findById(req.session.userId).select('template');
+
+    success(res, template.template);
+  },
+  updateUserPostTemplate: async (req, res, next) => {
+    if (req.body.delete.length > consts.POST_ATTACHMENTS_LIMIT) {
+      generateError('Too big delete array', 422, next); return;
+    }
+
+    const toDeleteArray = [].concat(req.body.delete);
+
+    if (req.session.userLogin !== req.params.login) {
+      generateError('Can save template only for yourself', 401, next); return;
+    }
+
+    const template = await User.findById(req.session.userId).select('template');
+
+    template.template.title = req.body.title ? req.body.title : template.template.title;
+    template.template.body = req.body.body ? req.body.body : template.template.body;
+
+    toDeleteArray.forEach((el) => {
+      if (el && template.template.attachments.length !== 0) {
+        const index = template.template.attachments.indexOf(el);
+
+        if (index !== -1) {
+          template.template.attachments.splice(index, 1);
+        }
+      }
+    });
+
+    template.markModified('template');
+    await template.save();
+
     success(res);
   },
 };

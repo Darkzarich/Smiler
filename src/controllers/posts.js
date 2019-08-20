@@ -1,16 +1,18 @@
 const slugLib = require('slug');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 const Post = require('../models/Post');
 const User = require('../models/User');
 
 const { generateError, success } = require('./utils/utils');
+const consts = require('../const/const');
 
 const uploader = multer({
   storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, path.join(__dirname, '../..', '/uploads'));
+    destination: async (req, file, cb) => {
+      cb(null, path.join(__dirname, '../..', '/uploads', req.session.userLogin));
     },
     filename: (req, file, cb) => {
       cb(null, `${Date.now()}${path.extname(file.originalname)}`);
@@ -27,7 +29,28 @@ const uploader = multer({
       cb(null, true);
     }
   },
-}).array('attachments', 3);
+}).array('attachments', consts.POST_ATTACHMENTS_LIMIT);
+
+function startUpload(req, res, next) {
+  uploader(req, res, async (err) => {
+    if (err) {
+      generateError(err.message, 413, next);
+    } else {
+      const user = await User.findById(req.session.userId).select('template');
+
+      req.files.forEach((file) => {
+        user.template.attachments.push(file.path);
+      });
+
+      user.markModified('template');
+      await user.save();
+
+      success(res, {
+        files: user.template.attachments,
+      });
+    }
+  });
+}
 
 module.exports = {
   getAll: async (req, res, next) => {
@@ -108,16 +131,45 @@ module.exports = {
         author: userId,
       });
 
+      const user = await User.findById(userId).select('template');
+
+      user.template.title = '';
+      user.template.body = '';
+      user.template.attachments = [];
+
+      user.markModified('template');
+      await user.save();
+
       success(res, req.body);
     } catch (e) {
       next(e);
     }
   },
-  upload: (req, res, next) => {
-    uploader(req, res, (err) => {
-      if (err) {
-        generateError(err.message, 413, next);
+  upload: async (req, res, next) => {
+    try {
+      const user = await User.findById(req.session.userId).select('template');
+      let alright = true;
+
+      if (user.template.attachments.length === consts.POST_ATTACHMENTS_LIMIT) {
+        generateError(`Exceed limit of post attachments: ${consts.POST_ATTACHMENTS_LIMIT}`, 409, next);
+        return;
       }
-    });
+
+      await !fs.exists(path.join(__dirname, '../..', '/uploads', req.session.userLogin), async (exists) => {
+        if (!exists) {
+          await fs.mkdir(path.join(__dirname, '../..', '/uploads', req.session.userLogin), (err) => {
+            if (err) {
+              next(new Error(`Something went wrong while uploading... : ${err}`));
+            } else {
+              startUpload(req, res, next);
+            }
+          });
+        } else {
+          startUpload(req, res, next);
+        }
+      });
+    } catch (e) {
+      next(e);
+    }
   },
 };
