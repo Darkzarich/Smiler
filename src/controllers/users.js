@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const fs = require('fs');
 
 const User = require('../models/User');
 
@@ -91,7 +92,7 @@ module.exports = {
   },
   getUserPostTemplate: async (req, res, next) => {
     if (req.session.userLogin !== req.params.login) {
-      generateError('Can see only your own template', 401, next); return;
+      generateError('Can see only your own template', 403, next); return;
     }
 
     const template = await User.findById(req.session.userId).select('template');
@@ -99,6 +100,8 @@ module.exports = {
     success(res, template.template);
   },
   updateUserPostTemplate: async (req, res, next) => {
+    let error = false;
+
     if (req.body.delete.length > consts.POST_ATTACHMENTS_LIMIT) {
       generateError('Too big delete array', 422, next); return;
     }
@@ -106,27 +109,41 @@ module.exports = {
     const toDeleteArray = [].concat(req.body.delete);
 
     if (req.session.userLogin !== req.params.login) {
-      generateError('Can save template only for yourself', 401, next); return;
+      generateError('Can save template only for yourself', 403, next); return;
     }
 
     const template = await User.findById(req.session.userId).select('template');
 
-    template.template.title = req.body.title ? req.body.title : template.template.title;
-    template.template.body = req.body.body ? req.body.body : template.template.body;
+    template.template.title = req.body.title || req.body.title === '' ? req.body.title : template.template.title;
+    template.template.body = req.body.body || req.body.body === '' ? req.body.body : template.template.body;
 
     toDeleteArray.forEach((el) => {
       if (el && template.template.attachments.length !== 0) {
         const index = template.template.attachments.indexOf(el);
 
         if (index !== -1) {
-          template.template.attachments.splice(index, 1);
+          const deleted = template.template.attachments.splice(index, 1);
+          fs.exists(deleted[0], (exists) => {
+            if (exists) {
+              fs.unlink(deleted[0], (err) => {
+                if (err) {
+                  error = true;
+                  template.template.attachments.push(deleted[0]);
+                  template.markModified('template');
+                  template.save();
+                  generateError(`Could't delete an attachment: ${deleted[0]}`, 500, next);
+                }
+              });
+            }
+          });
         }
       }
     });
 
-    template.markModified('template');
-    await template.save();
-
-    success(res);
+    if (!error) {
+      template.markModified('template');
+      await template.save();
+      success(res);
+    }
   },
 };

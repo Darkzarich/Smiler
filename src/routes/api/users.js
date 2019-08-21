@@ -6,9 +6,9 @@ router.get('/:login/template', auth.required, usersController.getUserPostTemplat
 
 router.post('/', usersController.register);
 router.post('/auth', usersController.auth);
+router.post('/logout', auth.required, usersController.logout);
 
 router.put('/:login/template', auth.required, usersController.updateUserPostTemplate);
 
-router.delete('/', auth.required, usersController.logout);
 
 module.exports = router;

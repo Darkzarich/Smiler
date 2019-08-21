@@ -111,15 +111,14 @@ module.exports = {
     }
   },
   create: async (req, res, next) => {
+    // TODO: rework this
+
     const { userId } = req.session;
     const { title } = req.body;
     const { body } = req.body;
 
     if (!title) { generateError('Title is required', 422, next); return; }
     if (!body) { generateError('Body is required', 422, next); return; }
-    // it's possible to send both form-data and json
-    // TODO: every user will have template for post, it's created as soon
-    // as image is uploaded or button save as template is used
 
     const slug = `${slugLib(title)}-${(Math.random() * Math.pow(36, 6) | 0).toString(36)}`;
 
@@ -148,7 +147,6 @@ module.exports = {
   upload: async (req, res, next) => {
     try {
       const user = await User.findById(req.session.userId).select('template');
-      let alright = true;
 
       if (user.template.attachments.length === consts.POST_ATTACHMENTS_LIMIT) {
         generateError(`Exceed limit of post attachments: ${consts.POST_ATTACHMENTS_LIMIT}`, 409, next);
