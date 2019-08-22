@@ -101,8 +101,9 @@ module.exports = {
   },
   updateUserPostTemplate: async (req, res, next) => {
     let error = false;
+    const deleteParam = req.body.delete || [];
 
-    if (req.body.delete.length > consts.POST_ATTACHMENTS_LIMIT) {
+    if (deleteParam.length > consts.POST_ATTACHMENTS_LIMIT) {
       generateError('Too big delete array', 422, next); return;
     }
 

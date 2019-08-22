@@ -122,15 +122,16 @@ module.exports = {
 
     const slug = `${slugLib(title)}-${(Math.random() * Math.pow(36, 6) | 0).toString(36)}`;
 
+    const user = await User.findById(userId).select('template');
+
     try {
       const post = await Post.create({
         title,
         body,
         slug,
+        uploads: user.template.attachments,
         author: userId,
       });
-
-      const user = await User.findById(userId).select('template');
 
       user.template.title = '';
       user.template.body = '';
