@@ -1,5 +1,6 @@
 const slugLib = require('slug');
 const multer = require('multer');
+const Sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
 
@@ -7,15 +8,29 @@ const Post = require('../models/Post');
 const User = require('../models/User');
 
 const { generateError, success } = require('./utils/utils');
+const diskStorage = require('./utils/DiskStorage');
 const consts = require('../const/const');
 
 const uploader = multer({
-  storage: multer.diskStorage({
+  storage: diskStorage({
     destination: async (req, file, cb) => {
       cb(null, path.join(__dirname, '../..', '/uploads', req.session.userLogin));
     },
     filename: (req, file, cb) => {
       cb(null, `${Date.now()}${path.extname(file.originalname)}`);
+    },
+    sharp: (req, file, cb) => {
+      const resizer = Sharp()
+        .resize(640, 360, {
+          fit: 'cover',
+          withoutEnlargement: true,
+        })
+        .jpeg({
+          quality: 40,
+          progressive: true,
+        });
+
+      cb(null, resizer);
     },
   }),
   limits: {
