@@ -1,32 +1,25 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
-const db = require('./db');
+const cluster = require('cluster');
+const numCPUs = require('os').cpus().length;
 const config = require('./src/config/config');
 
+const amountOfWorkers = config.IS_PRODUCTION ? numCPUs : 1;
 
-const router = require('./src/routes');
+if (cluster.isMaster) {
+  global.console.log(`Master cluster setting up ${amountOfWorkers} workers...`);
 
-const app = express();
-const { PORT } = config;
+  for (let i = 0; i < amountOfWorkers; i += 1) {
+    cluster.fork();
+  }
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+  cluster.on('online', (worker) => {
+    global.console.log(`Worker ${worker.process.pid} is online`);
+  });
 
-app.use(
-  session({
-    secret: config.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: false,
-    store: new MongoStore({
-      mongooseConnection: db,
-    }),
-  }),
-);
-
-app.use(router);
-
-app.listen(PORT, () => {
-  global.console.log(`Server is listening on the port ${PORT}`);
-});
+  cluster.on('exit', (worker, code, signal) => {
+    global.console.log(`Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`);
+    global.console.log('Starting a new worker');
+    cluster.fork();
+  });
+} else {
+  require('./worker');
+}
