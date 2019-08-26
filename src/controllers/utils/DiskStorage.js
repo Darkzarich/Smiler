@@ -10,8 +10,6 @@ function DiskStorage(opts) {
 DiskStorage.prototype._handleFile = function _handleFile(req, file, cb) {
   const that = this;
 
-  console.log('file', file);
-
   that.getDestination(req, file, (err, destination) => {
     if (err) return cb(err);
     that.getFilename(req, file, (err, filename) => {
