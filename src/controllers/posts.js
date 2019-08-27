@@ -108,6 +108,8 @@ module.exports = {
   getBySlug: async (req, res, next) => {
     const slug = req.params.slug.trim();
 
+    // TODO: predownload using params
+
     if (!slug) { generateError('Slug is required', 422, next); return; }
 
     try {

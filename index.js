@@ -2,7 +2,7 @@ const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 const config = require('./src/config/config');
 
-const amountOfWorkers = config.IS_PRODUCTION ? numCPUs : 1;
+const amountOfWorkers = config.IS_PRODUCTION ? numCPUs : 2;
 
 if (cluster.isMaster) {
   global.console.log(`Master cluster setting up ${amountOfWorkers} workers...`);
