@@ -5,7 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "gen-doc": "npx swagger-jsdoc -d src/swagger/swaggerDef.js -o \"src/swagger/swagger.json\""
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "src/swagger/swagger.json"
+    ],
+    "events": {
+      "restart": "npm run gen-doc"
+    }
   },
   "keywords": [
     "express",
@@ -36,6 +45,7 @@
     "multer": "^1.4.2",
     "sharp": "^0.23.0",
     "slug": "^1.1.0",
+    "swagger-jsdoc": "^3.4.0",
     "swagger-ui-express": "^4.0.7"
   }
 }

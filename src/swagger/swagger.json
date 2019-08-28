@@ -1,3 +1,73 @@
 {
-    
+  "swagger": "2.0",
+  "info": {
+    "title": "Express Blog",
+    "version": "1.0.0",
+    "description": "An open API to my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.com or pikabu.ru (mostly copies many pikabu features) with many different and awesome features, open swagger API documentation. Main reason of making this site is fun and learning new things while making it"
+  },
+  "basePath": "/api",
+  "paths": {
+    "/users/auth": {
+      "post": {
+        "summary": "Login to the application",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "Users"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "user",
+            "description": "user's credential",
+            "schema": {
+              "type": "object",
+              "required": [
+                "login",
+                "password"
+              ],
+              "properties": {
+                "login": {
+                  "type": "string",
+                  "example": "user123"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "u1234"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid."
+          },
+          "422": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {},
+  "responses": {},
+  "parameters": {},
+  "securityDefinitions": {},
+  "tags": [
+    {
+      "name": "Users",
+      "description": "Actions with Users collection"
+    }
+  ]
 }
