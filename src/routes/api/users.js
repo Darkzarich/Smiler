@@ -50,6 +50,18 @@ router.post('/', usersController.register);
  *         description: Authorization information is missing or invalid.
  */
 router.post('/auth', usersController.auth);
+/**
+ * @swagger
+ * /users/logout:
+ *    post:
+ *       summary: Log out the current user
+ *       security:
+ *         - myCookie: []
+ *       tags: [Users]
+ *       responses:
+ *          200:
+ *             description: OK
+ */
 router.post('/logout', auth.required, usersController.logout);
 
 router.put('/:login/template', auth.required, usersController.updateUserPostTemplate);

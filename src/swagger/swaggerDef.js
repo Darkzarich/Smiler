@@ -8,4 +8,11 @@ module.exports = {
   },
   basePath: '/api', // Base path (optional)
   apis: ['src/routes/api/*.js'],
+  securityDefinitions: {
+    myCookie: {
+      type: 'apiKey',
+      name: 'Cookie',
+      in: 'header',
+    },
+  },
 };
