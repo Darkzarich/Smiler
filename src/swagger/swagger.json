@@ -6,6 +6,16 @@
     "description": "An open API to my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.com or pikabu.ru (mostly copies many pikabu features) with many different and awesome features, open swagger API documentation. Main reason of making this site is fun and learning new things while making it"
   },
   "basePath": "/api",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
   "securityDefinitions": {
     "myCookie": {
       "type": "apiKey",
@@ -14,6 +24,108 @@
     }
   },
   "paths": {
+    "/users/{login}/template": {
+      "get": {
+        "summary": "Get user saved template",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "myCookie": []
+          }
+        ],
+        "description": "Returns user's saved template for post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "login",
+            "type": "string",
+            "required": true,
+            "description": "User name",
+            "example": "user1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                },
+                "attachments": {
+                  "description": "Array of pic paths",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "summary": "Register a user",
+        "tags": [
+          "Users"
+        ],
+        "description": "Register a new user and return its cookie token (connect.sid)",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "user",
+            "schema": {
+              "type": "object",
+              "required": [
+                "login",
+                "password",
+                "confirm"
+              ],
+              "description": "user's credential",
+              "properties": {
+                "login": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 10
+                },
+                "password": {
+                  "type": "string",
+                  "minLength": 6
+                },
+                "confirm": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/OK"
+            }
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
     "/users/auth": {
       "post": {
         "summary": "Login to the application",
@@ -85,8 +197,59 @@
       }
     }
   },
-  "definitions": {},
-  "responses": {},
+  "definitions": {
+    "Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "message"
+      ]
+    },
+    "OK": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "example": true
+        }
+      }
+    }
+  },
+  "responses": {
+    "NotFound": {
+      "description": "The specified resource was not found",
+      "schema": {
+        "$ref": "#/definitions/Error"
+      }
+    },
+    "Unauthorized": {
+      "description": "Unauthorized",
+      "schema": {
+        "$ref": "#/definitions/Error"
+      }
+    },
+    "Forbidden": {
+      "description": "Not enough rights",
+      "schema": {
+        "$ref": "#/definitions/Error"
+      }
+    },
+    "UnprocessableEntity": {
+      "description": "Validation error",
+      "schema": {
+        "$ref": "#/definitions/Error"
+      }
+    }
+  },
   "parameters": {},
   "tags": [
     {

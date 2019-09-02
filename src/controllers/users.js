@@ -10,17 +10,19 @@ const validateUser = (user, next) => {
   if (user.login && user.password && user.confirm) {
     if (user.login.length < 3 || user.login.length > 10) {
       generateError('Login length must be 3-10 symbols', 422, next);
-    }
-    if (user.password.length < 6) {
+    } else if (user.password.length < 6) {
       generateError('Password length must be not less than 6', 422, next);
-    }
-    if (user.password !== user.confirm) {
+    } else if (user.password !== user.confirm) {
       generateError('Password and password confirm must be equal', 422, next);
     }
-    return 0;
+  } else {
+    generateError('All fields must be filled.', 422, next);
   }
-  return generateError('All fields must be filled.', 422, next);
+
+  return 1;
 };
+
+// TODO: get user with it's posts
 
 module.exports = {
   register: async (req, res, next) => {
@@ -30,7 +32,11 @@ module.exports = {
       confirm: req.body.confirm,
     };
 
-    validateUser(user, next);
+    const status = validateUser(user, next);
+
+    if (status !== 0) {
+      return;
+    }
 
     const salt = crypto.randomBytes(16).toString('hex');
     const hash = crypto.pbkdf2Sync(user.password, salt, 10000, 512, 'sha512').toString('hex');
@@ -57,7 +63,9 @@ module.exports = {
       confirm: req.body.password,
     };
 
-    if (validateUser(user, next) !== 0) {
+    const status = validateUser(user, next);
+
+    if (status !== 0) {
       return;
     }
 

@@ -7,7 +7,10 @@ module.exports = {
     description: 'An open API to my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.com or pikabu.ru (mostly copies many pikabu features) with many different and awesome features, open swagger API documentation. Main reason of making this site is fun and learning new things while making it', // Description (optional)
   },
   basePath: '/api', // Base path (optional)
-  apis: ['src/routes/api/*.js'],
+  apis: ['src/routes/api/*.js', 'src/routes/*.js'],
+  schemes: ['http', 'https'],
+  consumes: ['application/json'],
+  produces: ['application/json'],
   securityDefinitions: {
     myCookie: {
       type: 'apiKey',

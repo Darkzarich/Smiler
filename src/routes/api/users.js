@@ -7,11 +7,83 @@ const auth = require('../auth');
    * tags:
    *   - name: Users
    *     description: Actions with Users collection
-   */
+*/
+
+/**
+ * @swagger
+ * /users/{login}/template:
+ *    get:
+ *      summary: Get user saved template
+ *      tags: [Users]
+ *      security:
+ *        - myCookie: []
+ *      description: Returns user's saved template for post
+ *      parameters:
+ *        - in: path
+ *          name: login
+ *          type: string
+ *          required: true
+ *          description: User name
+ *          example: user1
+ *      responses:
+ *        200:
+ *          description: ok
+ *          schema:
+ *             type: object
+ *             properties:
+ *                title:
+ *                  type: string
+ *                body:
+ *                  type: string
+ *                attachments:
+ *                  description: Array of pic paths
+ *                  type: array
+ *                  items:
+ *                    type: string
+ *        403:
+ *          $ref: '#/responses/Forbidden'
+ *        401:
+ *          $ref: '#responses/Unauthorized'
+ */
 
 router.get('/:login/template', auth.required, usersController.getUserPostTemplate);
 
+/**
+ * @swagger
+ * /users:
+ *    post:
+ *      summary: Register a user
+ *      tags: [Users]
+ *      description: Register a new user and return its cookie token (connect.sid)
+ *      parameters:
+ *        - in: body
+ *          name: user
+ *          schema:
+ *            type: object
+ *            required: [login, password, confirm]
+ *            description: user's credential
+ *            properties:
+ *              login:
+ *                type: string
+ *                minLength: 3
+ *                maxLength: 10
+ *              password:
+ *                type: string
+ *                minLength: 6
+ *              confirm:
+ *                type: string
+ *      responses:
+ *        200:
+ *          description: ok
+ *          schema:
+ *             $ref: '#/definitions/OK'
+ *        422:
+ *          $ref: '#/responses/UnprocessableEntity'
+ */
+
 router.post('/', usersController.register);
+
+
 /**
  * @swagger
  *
@@ -50,6 +122,7 @@ router.post('/', usersController.register);
  *         description: Authorization information is missing or invalid.
  */
 router.post('/auth', usersController.auth);
+
 /**
  * @swagger
  * /users/logout:
@@ -63,6 +136,7 @@ router.post('/auth', usersController.auth);
  *             description: OK
  */
 router.post('/logout', auth.required, usersController.logout);
+
 
 router.put('/:login/template', auth.required, usersController.updateUserPostTemplate);
 
