@@ -162,6 +162,9 @@ module.exports = {
       next(e);
     }
   },
+  update: async (req, res, next) => {
+    // TODO: being able to update own posts within first 10 min
+  },
   upload: async (req, res, next) => {
     try {
       const user = await User.findById(req.session.userId).select('template');
