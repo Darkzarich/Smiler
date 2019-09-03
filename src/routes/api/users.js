@@ -44,9 +44,48 @@ const auth = require('../auth');
  *          $ref: '#/responses/Forbidden'
  *        401:
  *          $ref: '#responses/Unauthorized'
+ *    put:
+ *      summary: Update user template
+ *      tags: [Users]
+ *      description: Update user post template, delete attachments (pics with following paths)
+ *      security:
+ *        - myCookie: []
+ *      parameters:
+ *       - in: path
+ *         name: login
+ *         type: string
+ *         required: true
+ *         description: User name
+ *         example: user1
+ *       - in: body
+ *         name: template
+ *         schema:
+ *           type: object
+ *           properties:
+ *            title:
+ *              type: string
+ *            body:
+ *              type: string
+ *            delete:
+ *              type: array
+ *              items:
+ *                description: path to pic
+ *                type: string
+ *      responses:
+ *        200:
+ *          description: ok
+ *          schema:
+ *             $ref: '#/definitions/OK'
+ *        403:
+ *          $ref: '#/responses/Forbidden'
+ *        401:
+ *          $ref: '#responses/Unauthorized'
+ *
  */
 
 router.get('/:login/template', auth.required, usersController.getUserPostTemplate);
+
+router.put('/:login/template', auth.required, usersController.updateUserPostTemplate);
 
 /**
  * @swagger
@@ -136,9 +175,6 @@ router.post('/auth', usersController.auth);
  *             description: OK
  */
 router.post('/logout', auth.required, usersController.logout);
-
-
-router.put('/:login/template', auth.required, usersController.updateUserPostTemplate);
 
 
 module.exports = router;
