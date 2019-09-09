@@ -11,7 +11,7 @@ module.exports = {
     const query = {};
 
     if (limit > 30) { generateError('Limit can\'t be more than 30', 422, next); return; }
-    if (!post) { generateError('Can\'t get commens without set post', 422, next); return; }
+    if (!post) { generateError('Can\'t get comments without set post', 422, next); return; }
 
     if (author) {
       const foundAuthor = await User.findOne({

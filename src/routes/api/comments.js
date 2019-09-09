@@ -5,8 +5,9 @@ const auth = require('../auth');
 /**
  * @swagger
  * tags:
- *    - Comments
- *    - description: actions with comments
+ *    - name: Comments
+ *      description: Actions with comments
+ *
  * definitions:
  *    Comment:
  *      type: object
@@ -66,6 +67,38 @@ const auth = require('../auth');
  *      200:
  *        schema:
  *          $ref: '#/definitions/Comment'
+ *      404:
+ *        $ref: '#/responses/NotFound'
+ *      422:
+ *        $ref: '#/responses/UnprocessableEntity'
+ *  post:
+ *    summary: Create a comment
+ *    tags: [Comments]
+ *    description: Create a comment to a post
+ *    security:
+ *      - myCookie: []
+ *    parameters:
+ *      - in: body
+ *        schema:
+ *          type: object
+ *          required:
+ *            - post
+ *          properties:
+ *            body:
+ *              type: string
+ *              example: My body is dry
+ *            post:
+ *              type: string
+ *              example: 5d546c95c0f3a272b2062205
+ *            parent:
+ *              type: string
+ *              example: 5d55daa034c1991762147c2b
+ *    responses:
+ *      404:
+ *        $ref: '#/responses/NotFound'
+ *      422:
+ *        $ref: '#/responses/UnprocessableEntity'
+ *
  */
 router.get('/', commentsController.getComment);
 

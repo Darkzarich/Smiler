@@ -43,7 +43,7 @@ const auth = require('../auth');
  *        403:
  *          $ref: '#/responses/Forbidden'
  *        401:
- *          $ref: '#responses/Unauthorized'
+ *          $ref: '#/responses/Unauthorized'
  *    put:
  *      summary: Update user template
  *      tags: [Users]
