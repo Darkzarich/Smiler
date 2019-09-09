@@ -21,12 +21,7 @@ const auth = require('../auth');
  *        parent:
  *          type: string
  *        author:
- *          type: object
- *          properties:
- *            id:
- *              type: string
- *            login:
- *              type: string
+ *          $ref: '#/definitions/Author'
  *        createdAt:
  *          type: string
  *          example: 2019-08-16T01:04:02.504Z

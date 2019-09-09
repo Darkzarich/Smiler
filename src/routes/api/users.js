@@ -3,10 +3,19 @@ const usersController = require('../../controllers/users');
 const auth = require('../auth');
 
 /**
-   * @swagger
-   * tags:
-   *   - name: Users
-   *     description: Actions with Users collection
+*  @swagger
+*  tags:
+*   - name: Users
+*     description: Actions with Users collection
+* definitions:
+*  Author:
+*     type: object
+*     properties:
+*       id:
+*         type: string
+*       login:
+*         type: string
+*         example: user123
 */
 
 /**
