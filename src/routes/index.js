@@ -29,6 +29,11 @@ module.exports = router;
 *     description: Validation error
 *     schema:
 *       $ref: '#/definitions/Error'
+*   OK:
+*     description: Everything went alright
+*     schema:
+*       $ref: '#/definitions/OK'
+*
 * definitions:
 *   # Schema for error response body
 *   Error:

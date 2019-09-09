@@ -94,15 +94,73 @@ const auth = require('../auth');
  *              type: string
  *              example: 5d55daa034c1991762147c2b
  *    responses:
+ *      200:
+ *        $ref: '#/responses/OK'
  *      404:
  *        $ref: '#/responses/NotFound'
  *      422:
  *        $ref: '#/responses/UnprocessableEntity'
+ *      401:
+ *        $ref: '#/responses/Unauthorized'
  *
  */
 router.get('/', commentsController.getComment);
 
 router.post('/', auth.required, commentsController.createComment);
+
+/**
+ * @swagger
+ * /comments/{id}:
+ *  put:
+ *    summary: Edit comment
+ *    tags: [Comments]
+ *    description: Edit comment by its `id`
+ *    parameters:
+ *      - in: path
+ *        name: comment id
+ *        type: string
+ *        required: true
+ *      - in: body
+ *        name: changes
+ *        schema:
+ *          type: object
+ *          properties:
+ *            body:
+ *              type: string
+ *    security:
+ *      - myCookie[]
+ *    responses:
+ *      200:
+ *        $ref: '#/responses/OK'
+ *      422:
+ *        $ref: '#/responses/UnprocessableEntity'
+ *      401:
+ *        $ref: '#/responses/Unauthorized'
+ *      403:
+ *        $ref: '#/responses/Forbidden'
+ *      404:
+ *        $ref: '#/responses/NotFound'
+ *  delete:
+ *    tags: [Comments]
+ *    summary: Delete comment
+ *    description: Delete comment by its `id`
+ *    parameters:
+ *      - in: path
+ *        name: comment id
+ *        type: string
+ *        required: true
+ *    security:
+ *      - myCookie[]
+ *    responses:
+ *      200:
+ *        $ref: '#/responses/OK'
+ *      403:
+ *        $ref: '#/responses/Forbidden'
+ *      401:
+ *        $ref: '#/responses/Unauthorized'
+ *      404:
+ *        $ref: '#/responses/NotFound'
+*/
 
 router.put('/:id', auth.required, commentsController.editComment);
 

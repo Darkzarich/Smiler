@@ -110,11 +110,98 @@
           }
         ],
         "responses": {
+          "200": {
+            "$ref": "#/responses/OK"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
           "404": {
             "$ref": "#/responses/NotFound"
           },
           "422": {
             "$ref": "#/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/comments/{id}": {
+      "put": {
+        "summary": "Edit comment",
+        "tags": [
+          "Comments"
+        ],
+        "description": "Edit comment by its `id`",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "comment id",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "changes",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "body": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "security": [
+          "myCookie[]"
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/OK"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableEntity"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Delete comment",
+        "description": "Delete comment by its `id`",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "comment id",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "security": [
+          "myCookie[]"
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/OK"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/responses/NotFound"
           }
         }
       }
@@ -438,6 +525,12 @@
       "description": "Validation error",
       "schema": {
         "$ref": "#/definitions/Error"
+      }
+    },
+    "OK": {
+      "description": "Everything went alright",
+      "schema": {
+        "$ref": "#/definitions/OK"
       }
     }
   },
