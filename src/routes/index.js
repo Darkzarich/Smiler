@@ -29,6 +29,18 @@ module.exports = router;
 *     description: Validation error
 *     schema:
 *       $ref: '#/definitions/Error'
+*   Conflict:
+*     description: Conflict
+*     schema:
+*       $ref: '#/definitions/Error'
+*   RequestEntityTooLarge:
+*     description: Request entity too large
+*     schema:
+*       $ref: '#/definitions/Error'
+*   InternalServerError:
+*     description: Internal server error
+*     schema:
+*       $ref: '#/definitions/Error'
 *   OK:
 *     description: Everything went alright
 *     schema:

@@ -356,12 +356,103 @@
       "delete": {
         "tags": [
           "Posts"
-        ]
+        ],
+        "summary": "delete a post by its slug",
+        "description": "delete a post by its `slug`",
+        "security": [
+          "myCookie[]"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/OK"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/responses/NotFound"
+          }
+        }
       },
       "get": {
         "tags": [
           "Posts"
-        ]
+        ],
+        "summary": "get a post by its slug",
+        "description": "Get a post by its `slug`",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Post"
+            }
+          },
+          "404": {
+            "$ref": "#/responses/NotFound"
+          }
+        }
+      }
+    },
+    "posts/upload": {
+      "post": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "upload picture",
+        "description": "Upload the picture to template. Allowed extentions: `jpg|jpeg|png|gif`",
+        "security": [
+          "myCookie[]"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "attachments",
+            "type": "file",
+            "description": "the file to upload"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/OK"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/responses/RequestEntityTooLarge"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableEntity"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
       }
     },
     "/users/{login}/template": {
@@ -725,6 +816,24 @@
     },
     "UnprocessableEntity": {
       "description": "Validation error",
+      "schema": {
+        "$ref": "#/definitions/Error"
+      }
+    },
+    "Conflict": {
+      "description": "Conflict",
+      "schema": {
+        "$ref": "#/definitions/Error"
+      }
+    },
+    "RequestEntityTooLarge": {
+      "description": "Request entity too large",
+      "schema": {
+        "$ref": "#/definitions/Error"
+      }
+    },
+    "InternalServerError": {
+      "description": "Internal server error",
       "schema": {
         "$ref": "#/definitions/Error"
       }

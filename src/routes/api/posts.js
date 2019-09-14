@@ -140,14 +140,75 @@ router.post('/', auth.required, postsController.create);
  *          $ref: '#/responses/NotFound'
  *    delete:
  *      tags: [Posts]
+ *      summary: delete a post by its slug
+ *      description: delete a post by its `slug`
+ *      security:
+ *        - myCookie[]
+ *      parameters:
+ *        - in: path
+ *          name: slug
+ *          type: string
+ *          required: true
+ *      responses:
+ *        200:
+ *          $ref: '#/responses/OK'
+ *        403:
+ *          $ref: '#/responses/Forbidden'
+ *        404:
+ *          $ref: '#/responses/NotFound'
+ *        401:
+ *          $ref: '#/responses/Unauthorized'
  *    get:
  *      tags: [Posts]
+ *      summary: get a post by its slug
+ *      description: Get a post by its `slug`
+ *      parameters:
+ *        - in: path
+ *          name: slug
+ *          type: string
+ *          required: true
+ *      responses:
+ *        200:
+ *          description: OK
+ *          schema:
+ *            $ref: '#/definitions/Post'
+ *        404:
+ *          $ref: '#/responses/NotFound'
  */
 router.put('/:slug', auth.required, postsController.update);
 router.delete('/:slug', auth.required, postsController.delete);
 router.get('/:slug', postsController.getBySlug);
 
-
+/**
+ * @swagger
+ * posts/upload:
+ *  post:
+ *    tags: [Posts]
+ *    summary: upload picture
+ *    description: "Upload the picture to template. Allowed extentions: `jpg|jpeg|png|gif`"
+ *    security:
+ *      - myCookie[]
+ *    consumes:
+ *      - multipart/form-data
+ *    parameters:
+ *      - in: formData
+ *        name: attachments
+ *        type: file
+ *        description: the file to upload
+ *    responses:
+ *      200:
+ *        $ref: '#/responses/OK'
+ *      422:
+ *        $ref: '#/responses/UnprocessableEntity'
+ *      409:
+ *        $ref: '#/responses/Conflict'
+ *      401:
+ *        $ref: '#/responses/Unauthorized'
+ *      413:
+ *        $ref: '#/responses/RequestEntityTooLarge'
+ *      500:
+ *        $ref: '#/responses/InternalServerError'
+ */
 router.post('/upload', auth.required, postsController.upload);
 
 module.exports = router;

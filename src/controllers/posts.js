@@ -137,7 +137,7 @@ module.exports = {
     if (!title) { generateError('Title is required', 422, next); return; }
     if (!body) { generateError('Body is required', 422, next); return; }
 
-    const slug = `${slugLib(title)}-${(Math.random() * Math.pow(36, 6) | 0).toString(36)}`;
+    const slug = `${slugLib(title)}-${new Date().getTime().toString(36)}`;
 
     const user = await User.findById(userId).select('template');
 
