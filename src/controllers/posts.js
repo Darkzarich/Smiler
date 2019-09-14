@@ -157,13 +157,16 @@ module.exports = {
       user.markModified('template');
       await user.save();
 
-      success(res, req.body);
+      success(res, post);
     } catch (e) {
       next(e);
     }
   },
   update: async (req, res, next) => {
     // TODO: being able to update own posts within first 10 min
+  },
+  delete: async (req, res, next) => {
+    // TODO: being able to delete own posts within first 10 min if there is no comments
   },
   upload: async (req, res, next) => {
     try {

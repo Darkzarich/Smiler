@@ -14,12 +14,12 @@ const validateUser = (user, next) => {
       generateError('Password length must be not less than 6', 422, next);
     } else if (user.password !== user.confirm) {
       generateError('Password and password confirm must be equal', 422, next);
+    } else {
+      return 0;
     }
   } else {
     generateError('All fields must be filled.', 422, next);
   }
-
-  return 1;
 };
 
 // TODO: get user with it's posts

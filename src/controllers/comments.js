@@ -78,9 +78,9 @@ module.exports = {
     }
   },
   editComment: async (req, res, next) => {
-
+    success(res);
   },
   deleteComment: async (req, res, next) => {
-
+    success(res, req.params);
   },
 };

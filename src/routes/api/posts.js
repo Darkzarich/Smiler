@@ -72,22 +72,81 @@ const auth = require('../auth');
  *                type: number
  *    post:
  *      tags: [Posts]
- *      description:
- *      summary:
+ *      description: Create a post with title `title` and body `body`. Attachments are taken from the template
+ *      summary: create a post
+ *      security:
+ *        - myCookie[]
  *      parameters:
+ *        - in: body
+ *          name: post
+ *          schema:
+ *            type: object
+ *            required: [title, body]
+ *            properties:
+ *              title:
+ *                type: string
+ *              body:
+ *                type: string
  *      responses:
- *    put:
- *      tags: [Posts]
- *      description:
- *      summary:
- *      parameters:
- *      responses:
+ *        200:
+ *          description: OK
+ *          schema:
+ *            $ref: '#/definitions/Post'
+ *        422:
+ *          $ref: '#/responses/UnprocessableEntity'
+ *        401:
+ *          $ref: '#/responses/Unauthorized'
  */
 router.get('/', postsController.getAll);
 router.post('/', auth.required, postsController.create);
-router.put('/', auth.required, postsController.update);
 
+
+/**
+ * @swagger
+ * /posts/{slug}:
+ *    put:
+ *      tags: [Posts]
+ *      security:
+ *        - myCookie[]
+ *      description: Edit a post. You can edit a post only within certain time after it is created
+ *      summary: edit a post
+ *      parameters:
+ *        - in: path
+ *          name: slug
+ *          required: true
+ *          type: string
+ *        - in: body
+ *          schema:
+ *            type: object
+ *            name: data
+ *            properties:
+ *              title:
+ *                type: string
+ *              body:
+ *                type: string
+ *              toDelete:
+ *                type: array
+ *                items:
+ *                  description: paths to delete
+ *                  type: string
+ *      responses:
+ *        200:
+ *          $ref: '#/responses/OK'
+ *        403:
+ *          $ref: '#/responses/Forbidden'
+ *        401:
+ *          $ref: '#/responses/Unauthorized'
+ *        404:
+ *          $ref: '#/responses/NotFound'
+ *    delete:
+ *      tags: [Posts]
+ *    get:
+ *      tags: [Posts]
+ */
+router.put('/:slug', auth.required, postsController.update);
+router.delete('/:slug', auth.required, postsController.delete);
 router.get('/:slug', postsController.getBySlug);
+
 
 router.post('/upload', auth.required, postsController.upload);
 

@@ -112,7 +112,7 @@ router.post('/', auth.required, commentsController.createComment);
  *    description: Edit comment by its `id`
  *    parameters:
  *      - in: path
- *        name: comment id
+ *        name: id
  *        type: string
  *        required: true
  *      - in: body
@@ -141,7 +141,7 @@ router.post('/', auth.required, commentsController.createComment);
  *    description: Delete comment by its `id`
  *    parameters:
  *      - in: path
- *        name: comment id
+ *        name: id
  *        type: string
  *        required: true
  *    security:

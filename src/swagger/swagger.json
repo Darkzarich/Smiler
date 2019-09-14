@@ -135,7 +135,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "comment id",
+            "name": "id",
             "type": "string",
             "required": true
           },
@@ -182,7 +182,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "comment id",
+            "name": "id",
             "type": "string",
             "required": true
           }
@@ -256,19 +256,112 @@
         "tags": [
           "Posts"
         ],
-        "description": null,
-        "summary": null,
-        "parameters": null,
-        "responses": null
-      },
+        "description": "Create a post with title `title` and body `body`. Attachments are taken from the template",
+        "summary": "create a post",
+        "security": [
+          "myCookie[]"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "post",
+            "schema": {
+              "type": "object",
+              "required": [
+                "title",
+                "body"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Post"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/posts/{slug}": {
       "put": {
         "tags": [
           "Posts"
         ],
-        "description": null,
-        "summary": null,
-        "parameters": null,
-        "responses": null
+        "security": [
+          "myCookie[]"
+        ],
+        "description": "Edit a post. You can edit a post only within certain time after it is created",
+        "summary": "edit a post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "name": "data",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                },
+                "toDelete": {
+                  "type": "array",
+                  "items": {
+                    "description": "paths to delete",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/OK"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Posts"
+        ]
+      },
+      "get": {
+        "tags": [
+          "Posts"
+        ]
       }
     },
     "/users/{login}/template": {
