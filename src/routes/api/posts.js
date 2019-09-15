@@ -61,6 +61,7 @@ const auth = require('../auth');
  *          description: By author
  *      responses:
  *        200:
+ *          description: OK
  *          schema:
  *            type: object
  *            properties:
@@ -75,10 +76,10 @@ const auth = require('../auth');
  *      description: Create a post with title `title` and body `body`. Attachments are taken from the template
  *      summary: create a post
  *      security:
- *        - myCookie[]
+ *        - myCookie: []
  *      parameters:
  *        - in: body
- *          name: post
+ *          name: body
  *          schema:
  *            type: object
  *            required: [title, body]
@@ -107,7 +108,7 @@ router.post('/', auth.required, postsController.create);
  *    put:
  *      tags: [Posts]
  *      security:
- *        - myCookie[]
+ *        - myCookie: []
  *      description: Edit a post. You can edit a post only within certain time after it is created
  *      summary: edit a post
  *      parameters:
@@ -116,9 +117,9 @@ router.post('/', auth.required, postsController.create);
  *          required: true
  *          type: string
  *        - in: body
+ *          name: body
  *          schema:
  *            type: object
- *            name: data
  *            properties:
  *              title:
  *                type: string
@@ -143,7 +144,7 @@ router.post('/', auth.required, postsController.create);
  *      summary: delete a post by its slug
  *      description: delete a post by its `slug`
  *      security:
- *        - myCookie[]
+ *        - myCookie: []
  *      parameters:
  *        - in: path
  *          name: slug
@@ -181,13 +182,13 @@ router.get('/:slug', postsController.getBySlug);
 
 /**
  * @swagger
- * posts/upload:
+ * /posts/upload:
  *  post:
  *    tags: [Posts]
  *    summary: upload picture
  *    description: "Upload the picture to template. Allowed extentions: `jpg|jpeg|png|gif`"
  *    security:
- *      - myCookie[]
+ *      - myCookie: []
  *    consumes:
  *      - multipart/form-data
  *    parameters:

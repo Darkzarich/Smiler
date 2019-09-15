@@ -47,20 +47,19 @@
             "in": "query",
             "name": "login",
             "type": "string",
-            "description": "user which comments you want to see",
-            "example": "user123"
+            "description": "user which comments you want to see"
           },
           {
             "in": "query",
             "name": "post",
             "required": true,
             "type": "string",
-            "description": "post id",
-            "example": "5d546c95c0f3a272b2062205"
+            "description": "post id"
           }
         ],
         "responses": {
           "200": {
+            "description": "OK",
             "schema": {
               "$ref": "#/definitions/Comment"
             }
@@ -87,6 +86,7 @@
         "parameters": [
           {
             "in": "body",
+            "name": "body",
             "schema": {
               "type": "object",
               "required": [
@@ -141,7 +141,7 @@
           },
           {
             "in": "body",
-            "name": "changes",
+            "name": "body",
             "schema": {
               "type": "object",
               "properties": {
@@ -153,7 +153,9 @@
           }
         ],
         "security": [
-          "myCookie[]"
+          {
+            "myCookie": []
+          }
         ],
         "responses": {
           "200": {
@@ -188,7 +190,9 @@
           }
         ],
         "security": [
-          "myCookie[]"
+          {
+            "myCookie": []
+          }
         ],
         "responses": {
           "200": {
@@ -235,6 +239,7 @@
         ],
         "responses": {
           "200": {
+            "description": "OK",
             "schema": {
               "type": "object",
               "properties": {
@@ -259,12 +264,14 @@
         "description": "Create a post with title `title` and body `body`. Attachments are taken from the template",
         "summary": "create a post",
         "security": [
-          "myCookie[]"
+          {
+            "myCookie": []
+          }
         ],
         "parameters": [
           {
             "in": "body",
-            "name": "post",
+            "name": "body",
             "schema": {
               "type": "object",
               "required": [
@@ -304,7 +311,9 @@
           "Posts"
         ],
         "security": [
-          "myCookie[]"
+          {
+            "myCookie": []
+          }
         ],
         "description": "Edit a post. You can edit a post only within certain time after it is created",
         "summary": "edit a post",
@@ -317,9 +326,9 @@
           },
           {
             "in": "body",
+            "name": "body",
             "schema": {
               "type": "object",
-              "name": "data",
               "properties": {
                 "title": {
                   "type": "string"
@@ -360,7 +369,9 @@
         "summary": "delete a post by its slug",
         "description": "delete a post by its `slug`",
         "security": [
-          "myCookie[]"
+          {
+            "myCookie": []
+          }
         ],
         "parameters": [
           {
@@ -412,7 +423,7 @@
         }
       }
     },
-    "posts/upload": {
+    "/posts/upload": {
       "post": {
         "tags": [
           "Posts"
@@ -420,7 +431,9 @@
         "summary": "upload picture",
         "description": "Upload the picture to template. Allowed extentions: `jpg|jpeg|png|gif`",
         "security": [
-          "myCookie[]"
+          {
+            "myCookie": []
+          }
         ],
         "consumes": [
           "multipart/form-data"
@@ -473,8 +486,7 @@
             "name": "login",
             "type": "string",
             "required": true,
-            "description": "User name",
-            "example": "user1"
+            "description": "User name"
           }
         ],
         "responses": {
@@ -524,12 +536,11 @@
             "name": "login",
             "type": "string",
             "required": true,
-            "description": "User name",
-            "example": "user1"
+            "description": "User name"
           },
           {
             "in": "body",
-            "name": "template",
+            "name": "body",
             "schema": {
               "type": "object",
               "properties": {
@@ -576,7 +587,7 @@
         "parameters": [
           {
             "in": "body",
-            "name": "user",
+            "name": "body",
             "schema": {
               "type": "object",
               "required": [
@@ -630,7 +641,7 @@
         "parameters": [
           {
             "in": "body",
-            "name": "user",
+            "name": "body",
             "description": "user's credential",
             "schema": {
               "type": "object",

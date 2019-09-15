@@ -51,15 +51,14 @@ const auth = require('../auth');
  *        name: login
  *        type: string
  *        description: user which comments you want to see
- *        example: user123
  *      - in: query
  *        name: post
  *        required: true
  *        type: string
  *        description: post id
- *        example: 5d546c95c0f3a272b2062205
  *    responses:
  *      200:
+ *        description: OK
  *        schema:
  *          $ref: '#/definitions/Comment'
  *      404:
@@ -74,6 +73,7 @@ const auth = require('../auth');
  *      - myCookie: []
  *    parameters:
  *      - in: body
+ *        name: body
  *        schema:
  *          type: object
  *          required:
@@ -116,14 +116,14 @@ router.post('/', auth.required, commentsController.createComment);
  *        type: string
  *        required: true
  *      - in: body
- *        name: changes
+ *        name: body
  *        schema:
  *          type: object
  *          properties:
  *            body:
  *              type: string
  *    security:
- *      - myCookie[]
+ *      - myCookie: []
  *    responses:
  *      200:
  *        $ref: '#/responses/OK'
@@ -145,7 +145,7 @@ router.post('/', auth.required, commentsController.createComment);
  *        type: string
  *        required: true
  *    security:
- *      - myCookie[]
+ *      - myCookie: []
  *    responses:
  *      200:
  *        $ref: '#/responses/OK'

@@ -33,7 +33,6 @@ const auth = require('../auth');
  *          type: string
  *          required: true
  *          description: User name
- *          example: user1
  *      responses:
  *        200:
  *          description: ok
@@ -65,9 +64,8 @@ const auth = require('../auth');
  *         type: string
  *         required: true
  *         description: User name
- *         example: user1
  *       - in: body
- *         name: template
+ *         name: body
  *         schema:
  *           type: object
  *           properties:
@@ -105,7 +103,7 @@ router.put('/:login/template', auth.required, usersController.updateUserPostTemp
  *      description: Register a new user and return its cookie token (connect.sid)
  *      parameters:
  *        - in: body
- *          name: user
+ *          name: body
  *          schema:
  *            type: object
  *            required: [login, password, confirm]
@@ -145,7 +143,7 @@ router.post('/', usersController.register);
  *       - application/json
  *     parameters:
  *       - in: body
- *         name: user
+ *         name: body
  *         description: user's credential
  *         schema:
  *           type: object
