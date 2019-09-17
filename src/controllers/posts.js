@@ -163,7 +163,58 @@ module.exports = {
     }
   },
   update: async (req, res, next) => {
-    // TODO: being able to update own posts within first 10 min
+
+    const { userId } = req.session;
+    const { slug } = req.params;
+    const { title } = req.body;
+    const { body } = req.body;
+    const { toDelete } = req.body;
+
+    const foundPost = await Post.findOne({
+      slug,
+    });
+
+    if (foundPost) {
+      if (foundPost.author.toString() !== userId) { generateError('The post is not yours', 403, next); return; }
+
+      const curDate = new Date().getTime();
+      const postDate = new Date(foundPost.createdAt.toString()).getTime();
+
+
+      if (curDate - postDate > consts.POST_TIME_TO_UPDATE) {
+        generateError(`You can edit post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`, 422, next);
+      } else {
+        foundPost.body = body || foundPost.body;
+        foundPost.title = title || foundPost.title;
+
+        if (toDelete && toDelete instanceof Array && toDelete.length > 0) {
+          toDelete.forEach((el) => {
+            fs.exists(el, (exist) => {
+              if (exist) {
+                fs.unlink(el, (err) => {
+                  if (err) {
+                    generateError(err, 500, next);
+                  }
+                });
+              }
+            });
+          });
+
+          await foundPost.updateOne({
+            $pull: {
+              uploads: {
+                $in: toDelete,
+              },
+            },
+          });
+
+          await foundPost.save();
+          success(res);
+        }
+      }
+    } else {
+      generateError('Post doesn\'t exist', 404, next);
+    }
   },
   delete: async (req, res, next) => {
     // TODO: being able to delete own posts within first 10 min if there is no comments
