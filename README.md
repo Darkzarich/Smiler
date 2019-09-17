@@ -21,8 +21,8 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 - Comments:
 	- **Hierarchical comment tree to each post**. Nowadays almost any site does this.
 	- **Creating comments**
-	- **Updating comments**. Users are able to update comments within certain time after posting it but only
-	when no one answered on it yet
+	- **Updating comments**. Users are able to update comments within certain time after posting it but only if no one answered on it yet
+	- **Deleting comments**. Users are able to delete comments within certain time after posting it but only if no one answered on it yet
 - Full Swagger documentation to existing end-points (available with path `/api-docs/`)
 
 ### Backend Plans:
@@ -41,5 +41,4 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 	- **Mentions**. Usual @ mentions
 	- **Roles**(regular, moderator, admin)
 - Comments:
-	- **Deleting comments**
 	- **Comment rating** Which will raise user's rating by half of what posts increase when someone rate it

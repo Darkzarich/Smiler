@@ -44,6 +44,16 @@ schema.pre('save', async function (next) {
   next();
 });
 
+schema.pre('remove', async function (next) {
+  await this.updateOne(this.parent, {
+    $pull: {
+      children: this.id,
+    },
+  });
+
+  next();
+});
+
 schema.plugin(require('mongoose-autopopulate'));
 
 schema.set('toJSON', {
