@@ -45,13 +45,19 @@ schema.pre('save', async function (next) {
 });
 
 schema.pre('remove', async function (next) {
-  await this.updateOne(this.parent, {
-    $pull: {
-      children: this.id,
-    },
-  });
+  Promise.all(
+    [
+      this.updateOne(this.parent, {
+        $pull: {
+          children: this.id,
+        },
+      }),
 
-  next();
+      Post.commentCountDec(this.post),
+    ],
+  ).then(() => {
+    next();
+  });
 });
 
 schema.plugin(require('mongoose-autopopulate'));

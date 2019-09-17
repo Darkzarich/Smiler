@@ -40,6 +40,14 @@ schema.static('commentCountInc', function (postId) {
   });
 });
 
+schema.static('commentCountDec', function (postId) {
+  return this.findByIdAndUpdate(postId, {
+    $inc: { commentCount: -1 },
+  }, {
+    new: true,
+  });
+});
+
 schema.set('toJSON', {
   virtuals: true,
   versionKey: false,
