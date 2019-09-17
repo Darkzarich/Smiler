@@ -34,12 +34,16 @@
           {
             "in": "query",
             "name": "offset",
+            "default": 0,
             "type": "integer",
             "description": "The number of items to skip before starting to collect the result set."
           },
           {
             "in": "query",
             "name": "limit",
+            "default": 10,
+            "maximum": 30,
+            "minimum": 1,
             "type": "integer",
             "description": "The numbers of items to return."
           },
@@ -170,6 +174,9 @@
           "404": {
             "$ref": "#/responses/NotFound"
           },
+          "405": {
+            "$ref": "#/responses/MethodNotAllowed"
+          },
           "422": {
             "$ref": "#/responses/UnprocessableEntity"
           }
@@ -206,6 +213,9 @@
           },
           "404": {
             "$ref": "#/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/responses/MethodNotAllowed"
           }
         }
       }
@@ -222,12 +232,16 @@
             "in": "query",
             "name": "limit",
             "type": "string",
+            "default": 100,
+            "maximum": 100,
+            "minimum": 1,
             "description": "posts per page"
           },
           {
             "in": "query",
             "name": "offset",
             "type": "string",
+            "default": 0,
             "description": "offset from element"
           },
           {
@@ -359,6 +373,9 @@
           },
           "404": {
             "$ref": "#/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/responses/MethodNotAllowed"
           }
         }
       },
@@ -393,6 +410,9 @@
           },
           "404": {
             "$ref": "#/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/responses/MethodNotAllowed"
           }
         }
       },

@@ -181,7 +181,7 @@ module.exports = {
 
 
       if (curDate - postDate > consts.POST_TIME_TO_UPDATE) {
-        generateError(`You can edit post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`, 422, next);
+        generateError(`You can edit post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`, 405, next);
       } else {
         foundPost.body = body || foundPost.body;
         foundPost.title = title || foundPost.title;
@@ -230,7 +230,7 @@ module.exports = {
       const postDate = new Date(foundPost.createdAt.toString()).getTime();
 
       if (curDate - postDate > consts.POST_TIME_TO_UPDATE) {
-        generateError(`You can delete post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`, 422, next);
+        generateError(`You can delete post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`, 405, next);
       } else {
         const { uploads } = foundPost;
 

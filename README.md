@@ -9,7 +9,7 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 - Posts:
 	- **Creating posts**. Users can create posts and it will get a slug based on its title
 	- **Uploading pictures**. All posts can have attachments, isn't that nice!
-	- Being able to **update posts within certain time**. Users can update their posts but it's only availabe within *10* min.
+	- Being able to **update posts within certain time**. Users can update their posts but it's only available within *10* min.
 	- Being able to **delete posts within certain time**. Users can delete their posts but it's only available within *10* min.
 	- **Getting all posts**, pagination included, filter by **author**
 	- **Getting a post by its slug**. Instead of `id` I use `slug` for getting a single post.
@@ -21,6 +21,8 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 - Comments:
 	- **Hierarchical comment tree to each post**. Nowadays almost any site does this.
 	- **Creating comments**
+	- **Updating comments**. Users are able to update comments within certain time after posting it but only
+	when no one answered on it yet
 - Full Swagger documentation to existing end-points (available with path `/api-docs/`)
 
 ### Backend Plans:
@@ -39,6 +41,5 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 	- **Mentions**. Usual @ mentions
 	- **Roles**(regular, moderator, admin)
 - Comments:
-	- **Updating comments**
 	- **Deleting comments**
 	- **Comment rating** Which will raise user's rating by half of what posts increase when someone rate it

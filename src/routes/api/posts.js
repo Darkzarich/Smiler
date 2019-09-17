@@ -50,10 +50,14 @@ const auth = require('../auth');
  *        - in: query
  *          name: limit
  *          type: string
+ *          default: 100
+ *          maximum: 100
+ *          minimum: 1
  *          description: posts per page
  *        - in: query
  *          name: offset
  *          type: string
+ *          default: 0
  *          description: offset from element
  *        - in: query
  *          name: author
@@ -139,6 +143,8 @@ router.post('/', auth.required, postsController.create);
  *          $ref: '#/responses/Unauthorized'
  *        404:
  *          $ref: '#/responses/NotFound'
+ *        405:
+ *          $ref: '#/responses/MethodNotAllowed'
  *    delete:
  *      tags: [Posts]
  *      summary: delete a post by its slug
@@ -159,6 +165,8 @@ router.post('/', auth.required, postsController.create);
  *          $ref: '#/responses/NotFound'
  *        401:
  *          $ref: '#/responses/Unauthorized'
+ *        405:
+ *          $ref: '#/responses/MethodNotAllowed'
  *    get:
  *      tags: [Posts]
  *      summary: get a post by its slug

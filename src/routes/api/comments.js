@@ -41,10 +41,14 @@ const auth = require('../auth');
  *    parameters:
  *      - in: query
  *        name: offset
+ *        default: 0
  *        type: integer
  *        description: The number of items to skip before starting to collect the result set.
  *      - in: query
  *        name: limit
+ *        default: 10
+ *        maximum: 30
+ *        minimum: 1
  *        type: integer
  *        description: The numbers of items to return.
  *      - in: query
@@ -135,6 +139,8 @@ router.post('/', auth.required, commentsController.createComment);
  *        $ref: '#/responses/Forbidden'
  *      404:
  *        $ref: '#/responses/NotFound'
+ *      405:
+ *        $ref: '#/responses/MethodNotAllowed'
  *  delete:
  *    tags: [Comments]
  *    summary: Delete comment
@@ -155,6 +161,8 @@ router.post('/', auth.required, commentsController.createComment);
  *        $ref: '#/responses/Unauthorized'
  *      404:
  *        $ref: '#/responses/NotFound'
+ *      405:
+ *        $ref: '#/responses/MethodNotAllowed'
 */
 
 router.put('/:id', auth.required, commentsController.editComment);
