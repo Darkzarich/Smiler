@@ -78,9 +78,11 @@ module.exports = {
     }
   },
   editComment: async (req, res, next) => {
+    // TODO: finish this
     success(res);
   },
   deleteComment: async (req, res, next) => {
-    success(res, req.params);
+    // TODO: finish this
+    success(res);
   },
 };

@@ -216,7 +216,6 @@ module.exports = {
     }
   },
   delete: async (req, res, next) => {
-    // TODO: being able to delete own posts within first 10 min if there is no comments
     const { userId } = req.session;
     const { slug } = req.params;
 
