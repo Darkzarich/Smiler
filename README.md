@@ -16,29 +16,29 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 - Users: 
 	- **Registration**. Does what it says
 	- **Sessions**. As I didn't work with JWT much yet I decided to stick with my nice old friend - sessions, also they are kinda more safe than JWT
-	- ** Auth **. Does what it says
-	- ** Saving draft **. Users are able to save attachments, title and body of the post without posting it, also it was a necessary step to solve file upload dilemma
+	- **Auth**. Does what it says
+	- **Saving draft**. Users are able to save attachments, title and body of the post without posting it, also it was a necessary step to solve file upload dilemma
 - Comments:
-	- ** Hierarchical comment tree to each post**. Nowadays almost any site does this.
-	- ** Creating comments **
+	- **Hierarchical comment tree to each post**. Nowadays almost any site does this.
+	- **Creating comments**
 - Full Swagger documentation to existing end-points (available with path `/api-docs/`)
 
 ### Backend Plans:
 
 - Posts:
-	- ** Rating **
-	- ** Tags **
-	- ** Sockets **
+	- **Rating**
+	- **Tags**
+	- **Sockets**
 - Users:
-	- ** Sum rating for all posts **
-	- ** Adding posts to the list favorite **
-	- ** Settings (?) **
-	- ** Bio **. Users should be able to add small description about themselves 
-	- ** Changing password **
-	- ** Mail (?) **. Mail box, working with emails
-	- ** Mentions **. Usual @ mentions
-	- ** Roles ** (regular, moderator, admin)
+	- **Sum rating for all posts**
+	- **Adding posts to the list favorite**
+	- **Settings (?)**
+	- **Bio**. Users should be able to add small description about themselves 
+	- **Changing password**
+	- **Mail (?)**. Mail box, working with emails
+	- **Mentions**. Usual @ mentions
+	- **Roles**(regular, moderator, admin)
 - Comments:
-	- ** Updating comments **
-	- ** Deleting comments **
-	- ** Comment rating ** Which will raise user's rating by half of what posts increase when someone rate it
+	- **Updating comments**
+	- **Deleting comments**
+	- **Comment rating** Which will raise user's rating by half of what posts increase when someone rate it
