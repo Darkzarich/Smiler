@@ -163,7 +163,6 @@ module.exports = {
     }
   },
   update: async (req, res, next) => {
-
     const { userId } = req.session;
     const { slug } = req.params;
     const { title } = req.body;
@@ -218,6 +217,43 @@ module.exports = {
   },
   delete: async (req, res, next) => {
     // TODO: being able to delete own posts within first 10 min if there is no comments
+    const { userId } = req.session;
+    const { slug } = req.params;
+
+    const foundPost = await Post.findOne({
+      slug,
+    });
+
+    if (foundPost) {
+      if (foundPost.author.toString() !== userId) { generateError('The post is not yours', 403, next); return; }
+
+      const curDate = new Date().getTime();
+      const postDate = new Date(foundPost.createdAt.toString()).getTime();
+
+      if (curDate - postDate > consts.POST_TIME_TO_UPDATE) {
+        generateError(`You can delete post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`, 422, next);
+      } else {
+        const { uploads } = foundPost;
+
+        await foundPost.remove();
+
+        uploads.forEach((el) => {
+          fs.exists(el, (exists) => {
+            if (exists) {
+              fs.unlink(el, (err) => {
+                if (err) {
+                  generateError(err, 500, next);
+                }
+              });
+            }
+          });
+        });
+
+        success(res);
+      }
+    } else {
+      generateError('Post doesn\'t exist', 404, next);
+    }
   },
   upload: async (req, res, next) => {
     try {
