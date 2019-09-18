@@ -1,5 +1,7 @@
+/* eslint-disable no-underscore-dangle */
 const Comment = require('../models/Comment');
 const User = require('../models/User');
+const Rate = require('../models/Rate');
 const { generateError, success } = require('./utils/utils');
 const consts = require('../const/const');
 
@@ -131,6 +133,89 @@ module.exports = {
       }
     } else {
       generateError('Comment is not found', 404, next);
+    }
+  },
+  rate: async (req, res, next) => {
+    const { userId } = req.session;
+    const { id } = req.params;
+    const { negative } = req.body;
+
+    const foundComment = await Comment.findById(id);
+
+    if (foundComment) {
+      if (foundComment.author._id.toString() === userId) {
+        generateError('Can\'t rate your own comment', 405, next);
+        return;
+      }
+
+      const user = await User.findById(userId).populate('rates');
+      const rated = user.isRated(foundComment.id);
+
+      if (!rated.result) {
+        foundComment.rating += negative ? -consts.COMMENT_RATE_VALUE : consts.COMMENT_RATE_VALUE;
+
+        Promise.all([
+          Rate.create({
+            target: foundComment.id,
+            targetModel: 'Comment',
+            negative,
+          }),
+          foundComment.save(),
+          User.findById(foundComment.author),
+        ]).then((result) => {
+          const newRate = result[0];
+          const commentAuthor = result[2];
+
+          user.rates.push(newRate._id);
+          commentAuthor.rating += negative ? -consts.COMMENT_RATE_VALUE : consts.COMMENT_RATE_VALUE;
+
+          user.save();
+          commentAuthor.save();
+
+          success(res);
+        });
+      } else {
+        generateError('Can\'t rate comment you already rated', 405, next);
+      }
+    } else {
+      generateError('Comment doesn\'t exist', 404, next);
+    }
+  },
+  unrate: async (req, res, next) => {
+    const { userId } = req.session;
+    const { id } = req.params;
+
+    const foundComment = await Comment.findById(id);
+
+    if (foundComment) {
+      const user = await User.findById(userId).populate('rates');
+      const rated = user.isRated(foundComment.id);
+
+      if (rated.result) {
+        foundComment.rating += rated.negative ? consts.COMMENT_RATE_VALUE : -consts.COMMENT_RATE_VALUE;
+
+        Promise.all([
+          Rate.deleteOne({
+            target: foundComment.id,
+          }),
+          foundComment.save(),
+          User.findById(foundComment.author),
+        ]).then((result) => {
+          const commentAuthor = result[2];
+
+          user.rates.remove(rated.rated);
+          commentAuthor.rating += rated.negative ? consts.COMMENT_RATE_VALUE : -consts.COMMENT_RATE_VALUE;
+
+          user.save();
+          commentAuthor.save();
+
+          success(res);
+        });
+      } else {
+        generateError('You didn\'t rate this comment', 405, next);
+      }
+    } else {
+      generateError('Comment doesn\'t exist', 404, next);
     }
   },
 };

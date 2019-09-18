@@ -292,6 +292,10 @@ module.exports = {
     });
 
     if (foundPost) {
+      if (foundPost.author.toString() === userId) {
+        generateError('Can\'t rate your own post', 405, next);
+        return;
+      }
       const user = await User.findById(userId).populate('rates');
       const rated = user.isRated(foundPost.id);
 
@@ -347,7 +351,6 @@ module.exports = {
           foundPost.save(),
           User.findById(foundPost.author),
         ]).then((result) => {
-          const rate = result[0];
           const postAuthor = result[2];
 
           user.rates.remove(rated.rated);

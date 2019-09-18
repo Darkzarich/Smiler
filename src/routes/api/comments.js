@@ -168,7 +168,62 @@ router.post('/', auth.required, commentsController.createComment);
 */
 
 router.put('/:id', auth.required, commentsController.editComment);
-
 router.delete('/:id', auth.required, commentsController.deleteComment);
+
+/**
+ * @swagger
+ *  /comments/{id}/rate:
+ *    put:
+ *      summary: Change rate on comment
+ *      description: "Changes rate for comment. `negative` decides direction.
+ * You can't rate comment again before deleting previous rate"
+ *      tags: [Comments]
+ *      security:
+ *        - myCookie: []
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          type: string
+ *        - in: body
+ *          name: body
+ *          schema:
+ *            type: object
+ *            properties:
+ *              negative:
+ *                type: boolean
+ *                default: false
+ *      responses:
+ *        200:
+ *          $ref: '#/responses/OK'
+ *        405:
+ *          $ref: '#/responses/MethodNotAllowed'
+ *        401:
+ *          $ref: '#/responses/Unauthorized'
+ *        404:
+ *          $ref: '#/responses/NotFound'
+ *    delete:
+ *      summary: Unrate comment
+ *      description: Delete already existing rate for user for comment
+ *      tags: [Comments]
+ *      security:
+ *        - myCookie: []
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          type: string
+ *      responses:
+ *        200:
+ *          $ref: '#/responses/OK'
+ *        405:
+ *          $ref: '#/responses/MethodNotAllowed'
+ *        401:
+ *          $ref: '#/responses/Unauthorized'
+ *        404:
+ *          $ref: '#/responses/NotFound'
+ */
+router.delete('/:id/rate', auth.required, commentsController.unrate);
+router.put('/:id/rate', auth.required, commentsController.rate);
 
 module.exports = router;
