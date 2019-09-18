@@ -13,7 +13,7 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 	- Being able to **delete posts within certain time**. Users can delete their posts but it's only available within *10* min.
 	- **Getting all posts**, pagination included, filter by **author**
 	- **Getting a post by its slug**. Instead of `id` I use `slug` for getting a single post.
-	- **Post rating**. Posts have their rating which forms user rating
+	- **Post rating**. Posts have their rating which forms user rating along with Comments rating
 - Users: 
 	- **Registration**. Does what it says
 	- **Sessions**. As I didn't work with JWT much yet I decided to stick with my nice old friend - sessions, also they are kinda more safe than JWT
@@ -26,6 +26,7 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 	- **Creating comments**
 	- **Updating comments**. Users are able to **update comments** within certain time after posting it but only if no one answered on it yet
 	- **Deleting comments**. Users are able to **delete comments** within certain time after posting it but only if no one answered on it yet
+	- **Comment rating**. Comments have their rating which forms user rating along with Posts rating
 - Full Swagger documentation to existing end-points (available with path `/api-docs/`)
 
 ### Backend Plans:
@@ -42,5 +43,3 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 	- **Mail (?)**. Mail box, working with emails
 	- **Mentions**. Usual @ mentions
 	- **Roles**(regular, moderator, admin)
-- Comments:
-	- **Comment rating** Which will raise user's rating by half of what posts increase when someone rate it
