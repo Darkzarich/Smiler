@@ -34,6 +34,7 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 	- **Tags**
 	- **Sockets**
 - Users:
+	- **Profile pic**
 	- **Adding posts to the list favorite**
 	- **Settings (?)**
 	- **Bio**. Users should be able to add small description about themselves 

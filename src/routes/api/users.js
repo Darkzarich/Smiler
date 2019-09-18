@@ -9,16 +9,45 @@ const auth = require('../auth');
 *     description: Actions with Users collection
 * definitions:
 *  Author:
-*     type: object
-*     properties:
-*       id:
-*         type: string
-*       login:
-*         type: string
-*         example: user123
-*       rating:
-*         type: number
+*   type: object
+*   properties:
+*     id:
+*       type: string
+*     login:
+*       type: string
+*       example: user123
+*  UserProfile:
+*   type: object
+*   properties:
+*     id:
+*      type: string
+*     login:
+*      type: string
+*     rating:
+*      type: number
 */
+
+/**
+ * @swagger
+ * /users/{login}:
+ *  get:
+ *    tags: [Users]
+ *    summary: Get user profile
+ *    description: Get user profile
+ *    parameters:
+ *      - in: path
+ *        name: login
+ *        type: string
+ *        required: true
+ *    responses:
+ *      200:
+ *        description: OK
+ *        schema:
+ *          $ref: '#/definitions/UserProfile'
+ *      404:
+ *        $ref: '#/responses/NotFound'
+ */
+router.get('/:login', usersController.getUserProfile);
 
 /**
  * @swagger

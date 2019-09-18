@@ -23,6 +23,17 @@ const validateUser = (user, next) => {
 };
 
 module.exports = {
+  getUserProfile: async (req, res, next) => {
+    const { login } = req.params;
+    const user = await User.findOne({
+      login,
+    }).select('login rating');
+    if (user) {
+      success(res, user);
+    } else {
+      generateError('User is not found', 404, next);
+    }
+  },
   register: async (req, res, next) => {
     const user = {
       login: req.body.login,

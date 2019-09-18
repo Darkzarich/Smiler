@@ -654,6 +654,34 @@
         }
       }
     },
+    "/users/{login}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get user profile",
+        "description": "Get user profile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "login",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/UserProfile"
+            }
+          },
+          "404": {
+            "$ref": "#/responses/NotFound"
+          }
+        }
+      }
+    },
     "/users/{login}/template": {
       "get": {
         "summary": "Get user saved template",
@@ -969,6 +997,17 @@
         "login": {
           "type": "string",
           "example": "user123"
+        }
+      }
+    },
+    "UserProfile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "login": {
+          "type": "string"
         },
         "rating": {
           "type": "number"
