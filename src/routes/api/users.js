@@ -16,6 +16,8 @@ const auth = require('../auth');
 *       login:
 *         type: string
 *         example: user123
+*       rating:
+*         type: number
 */
 
 /**

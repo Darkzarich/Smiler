@@ -29,6 +29,8 @@ const auth = require('../auth');
  *          type: array
  *          items:
  *            $ref: '#/definitions/Comment'
+ *        rating:
+ *          type: number
  *
  */
 

@@ -36,6 +36,8 @@ const auth = require('../auth');
  *        updatedAt:
  *          type: string
  *          example: 2019-09-22T14:02:14.532Z
+ *        rating:
+ *          type: number
  */
 
 
@@ -219,5 +221,61 @@ router.get('/:slug', postsController.getBySlug);
  *        $ref: '#/responses/InternalServerError'
  */
 router.post('/upload', auth.required, postsController.upload);
+
+/**
+ * @swagger
+ *  /posts/{slug}/rate:
+ *    put:
+ *      summary: Change rate on post
+ *      description: "Changes rate for post. `negative` decides direction.
+ * You can't rate post again before deleting previous rate"
+ *      tags: [Posts]
+ *      security:
+ *        - myCookie: []
+ *      parameters:
+ *        - in: path
+ *          name: slug
+ *          required: true
+ *          type: string
+ *        - in: body
+ *          name: body
+ *          schema:
+ *            type: object
+ *            properties:
+ *              negative:
+ *                type: boolean
+ *                default: false
+ *      responses:
+ *        200:
+ *          $ref: '#/responses/OK'
+ *        405:
+ *          $ref: '#/responses/MethodNotAllowed'
+ *        401:
+ *          $ref: '#/responses/Unauthorized'
+ *        404:
+ *          $ref: '#/responses/NotFound'
+ *    delete:
+ *      summary: Unrate post
+ *      description: Delete already existing rate for user for post
+ *      tags: [Posts]
+ *      security:
+ *        - myCookie: []
+ *      parameters:
+ *        - in: path
+ *          name: slug
+ *          required: true
+ *          type: string
+ *      responses:
+ *        200:
+ *          $ref: '#/responses/OK'
+ *        405:
+ *          $ref: '#/responses/MethodNotAllowed'
+ *        401:
+ *          $ref: '#/responses/Unauthorized'
+ *        404:
+ *          $ref: '#/responses/NotFound'
+ */
+router.delete('/:slug/rate', auth.required, postsController.unrate);
+router.put('/:slug/rate', auth.required, postsController.rate);
 
 module.exports = router;

@@ -35,6 +35,10 @@ const schema = new Schema({
     type: Date,
     default: Date.now,
   },
+  rating: {
+    type: Number,
+    default: 0,
+  },
 });
 
 schema.pre('save', async function (next) {

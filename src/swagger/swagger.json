@@ -488,6 +488,89 @@
         }
       }
     },
+    "/posts/{slug}/rate": {
+      "put": {
+        "summary": "Change rate on post",
+        "description": "Changes rate for post. `negative` decides direction. You can't rate post again before deleting previous rate",
+        "tags": [
+          "Posts"
+        ],
+        "security": [
+          {
+            "myCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "negative": {
+                  "type": "boolean",
+                  "default": false
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/OK"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/responses/MethodNotAllowed"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Unrate post",
+        "description": "Delete already existing rate for user for post",
+        "tags": [
+          "Posts"
+        ],
+        "security": [
+          {
+            "myCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/OK"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/responses/MethodNotAllowed"
+          }
+        }
+      }
+    },
     "/users/{login}/template": {
       "get": {
         "summary": "Get user saved template",
@@ -745,6 +828,9 @@
           "items": {
             "$ref": "#/definitions/Comment"
           }
+        },
+        "rating": {
+          "type": "number"
         }
       }
     },
@@ -785,6 +871,9 @@
         "updatedAt": {
           "type": "string",
           "example": "2019-09-22T14:02:14.532Z"
+        },
+        "rating": {
+          "type": "number"
         }
       }
     },
@@ -797,6 +886,9 @@
         "login": {
           "type": "string",
           "example": "user123"
+        },
+        "rating": {
+          "type": "number"
         }
       }
     },
@@ -871,6 +963,12 @@
     },
     "OK": {
       "description": "Everything went alright",
+      "schema": {
+        "$ref": "#/definitions/OK"
+      }
+    },
+    "MethodNotAllowed": {
+      "description": "Method is not available due to certain restrictions",
       "schema": {
         "$ref": "#/definitions/OK"
       }

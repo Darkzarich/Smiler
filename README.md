@@ -13,26 +13,27 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 	- Being able to **delete posts within certain time**. Users can delete their posts but it's only available within *10* min.
 	- **Getting all posts**, pagination included, filter by **author**
 	- **Getting a post by its slug**. Instead of `id` I use `slug` for getting a single post.
+	- **Post rating**. Posts have their rating which forms user rating
 - Users: 
 	- **Registration**. Does what it says
 	- **Sessions**. As I didn't work with JWT much yet I decided to stick with my nice old friend - sessions, also they are kinda more safe than JWT
 	- **Auth**. Does what it says
 	- **Saving draft**. Users are able to save attachments, title and body of the post without posting it, also it was a necessary step to solve file upload dilemma
+	- **Individual rating**. Users have their individual rating which is sum of ratings for each post and 
+	each comment they have ever posted
 - Comments:
 	- **Hierarchical comment tree to each post**. Nowadays almost any site does this.
 	- **Creating comments**
-	- **Updating comments**. Users are able to update comments within certain time after posting it but only if no one answered on it yet
-	- **Deleting comments**. Users are able to delete comments within certain time after posting it but only if no one answered on it yet
+	- **Updating comments**. Users are able to **update comments** within certain time after posting it but only if no one answered on it yet
+	- **Deleting comments**. Users are able to **delete comments** within certain time after posting it but only if no one answered on it yet
 - Full Swagger documentation to existing end-points (available with path `/api-docs/`)
 
 ### Backend Plans:
 
 - Posts:
-	- **Rating**
 	- **Tags**
 	- **Sockets**
 - Users:
-	- **Sum rating for all posts**
 	- **Adding posts to the list favorite**
 	- **Settings (?)**
 	- **Bio**. Users should be able to add small description about themselves 

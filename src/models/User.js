@@ -1,4 +1,7 @@
+/* eslint-disable func-names */
 const mongoose = require('mongoose');
+
+const Rate = require('./Rate');
 
 const { Schema } = mongoose;
 
@@ -25,6 +28,16 @@ const schema = new Schema({
       attachments: [],
     },
   },
+  rating: {
+    type: Number,
+    default: 0,
+  },
+  rates: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Rate',
+    },
+  ],
 }, {
   timestamps: true,
 });
@@ -33,5 +46,19 @@ schema.set('toJSON', {
   virtuals: true,
   versionKey: false,
 });
+
+schema.methods.isRated = function (id) {
+  const rated = this.rates.find(el => el.target.toString() === id);
+  if (rated) {
+    return {
+      result: true,
+      rated,
+      negative: rated.negative,
+    };
+  }
+  return {
+    result: false,
+  };
+};
 
 module.exports = mongoose.model('User', schema);

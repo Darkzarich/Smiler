@@ -45,6 +45,10 @@ module.exports = router;
 *     description: Everything went alright
 *     schema:
 *       $ref: '#/definitions/OK'
+*   MethodNotAllowed:
+*     description: Method is not available due to certain restrictions
+*     schema:
+*       $ref: '#/definitions/OK'
 *
 * definitions:
 *   # Schema for error response body

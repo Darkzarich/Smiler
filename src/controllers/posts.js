@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const slugLib = require('slug');
 const multer = require('multer');
 const Sharp = require('sharp');
@@ -6,6 +7,7 @@ const fs = require('fs');
 
 const Post = require('../models/Post');
 const User = require('../models/User');
+const Rate = require('../models/Rate');
 
 const { generateError, success } = require('./utils/utils');
 const diskStorage = require('./utils/DiskStorage');
@@ -278,6 +280,89 @@ module.exports = {
       });
     } catch (e) {
       next(e);
+    }
+  },
+  rate: async (req, res, next) => {
+    const { userId } = req.session;
+    const { slug } = req.params;
+    const { negative } = req.body;
+
+    const foundPost = await Post.findOne({
+      slug,
+    });
+
+    if (foundPost) {
+      const user = await User.findById(userId).populate('rates');
+      const rated = user.isRated(foundPost.id);
+
+      if (!rated.result) {
+        foundPost.rating += negative ? -consts.POST_RATE_VALUE : consts.POST_RATE_VALUE;
+
+        Promise.all([
+          Rate.create({
+            target: foundPost.id,
+            targetModel: 'Post',
+            negative,
+          }),
+          foundPost.save(),
+          User.findById(foundPost.author),
+        ]).then((result) => {
+          const newRate = result[0];
+          const postAuthor = result[2];
+
+          user.rates.push(newRate._id);
+          postAuthor.rating += negative ? -consts.POST_RATE_VALUE : consts.POST_RATE_VALUE;
+
+          user.save();
+          postAuthor.save();
+
+          success(res);
+        });
+      } else {
+        generateError('Can\'t rate post you already rated', 405, next);
+      }
+    } else {
+      generateError('Post doesn\'t exist', 404, next);
+    }
+  },
+  unrate: async (req, res, next) => {
+    const { userId } = req.session;
+    const { slug } = req.params;
+
+    const foundPost = await Post.findOne({
+      slug,
+    });
+
+    if (foundPost) {
+      const user = await User.findById(userId).populate('rates');
+      const rated = user.isRated(foundPost.id);
+
+      if (rated.result) {
+        foundPost.rating += rated.negative ? consts.POST_RATE_VALUE : -consts.POST_RATE_VALUE;
+
+        Promise.all([
+          Rate.deleteOne({
+            target: foundPost.id,
+          }),
+          foundPost.save(),
+          User.findById(foundPost.author),
+        ]).then((result) => {
+          const rate = result[0];
+          const postAuthor = result[2];
+
+          user.rates.remove(rated.rated);
+          postAuthor.rating += rated.negative ? consts.POST_RATE_VALUE : -consts.POST_RATE_VALUE;
+
+          user.save();
+          postAuthor.save();
+
+          success(res);
+        });
+      } else {
+        generateError('You didn\'t rate this post', 405, next);
+      }
+    } else {
+      generateError('Post doesn\'t exist', 404, next);
     }
   },
 };
