@@ -11,7 +11,7 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 	- **Uploading pictures**. All posts can have attachments, isn't that nice!
 	- Being able to **update posts within certain time**. Users can update their posts but it's only available within *10* min.
 	- Being able to **delete posts within certain time**. Users can delete their posts but it's only available within *10* min.
-	- **Getting all posts**, pagination included, filter by **author**
+	- **Getting all posts**, pagination included, filter by **author**, shows if user already rated a post
 	- **Getting a post by its slug**. Instead of `id` I use `slug` for getting a single post.
 	- **Post rating**. Posts have their rating which forms user rating along with Comments rating
 - Users: 
@@ -22,7 +22,8 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 	- **Individual rating**. Users have their individual rating which is sum of ratings for each post and 
 	each comment they have ever posted
 - Comments:
-	- **Hierarchical comment tree to each post**. Nowadays almost any site does this.
+	- **Hierarchical comment tree to each post**. Nowadays almost any site does this. Also shows if user rated a
+	comment already, **checks recursively**
 	- **Creating comments**
 	- **Updating comments**. Users are able to **update comments** within certain time after posting it but only if no one answered on it yet
 	- **Deleting comments**. Users are able to **delete comments** within certain time after posting it but only if no one answered on it yet
@@ -40,6 +41,7 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 	- **Settings (?)**
 	- **Bio**. Users should be able to add small description about themselves 
 	- **Changing password**
+	- **Password recovery**
 	- **Mail (?)**. Mail box, working with emails
 	- **Mentions**. Usual @ mentions
 	- **Roles**(regular, moderator, admin)
