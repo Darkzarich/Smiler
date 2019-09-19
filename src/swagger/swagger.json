@@ -985,6 +985,20 @@
         },
         "rating": {
           "type": "number"
+        },
+        "rated": {
+          "$ref": "#/definitions/UserRate"
+        }
+      }
+    },
+    "UserRate": {
+      "type": "object",
+      "properties": {
+        "isRated": {
+          "type": "boolean"
+        },
+        "negative": {
+          "type": "boolean"
         }
       }
     },

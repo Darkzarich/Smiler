@@ -70,11 +70,11 @@ function startUpload(req, res, next) {
 }
 
 module.exports = {
-  // TODO: show if it was rated, need to do the same for comments
   getAll: async (req, res, next) => {
     const limit = +req.query.limit || 100;
     const offset = +req.query.offset || 0;
     const author = req.query.author || '';
+    const { userId } = req.session;
 
     if (limit > 100) { generateError('Limit can\'t be more than 100', 422, next); return; }
 
@@ -92,17 +92,25 @@ module.exports = {
         query.author = result.id;
       }
 
-      const posts = await Post.find(query)
-        .sort('-createdAt')
-        .populate('author', 'login')
-        .limit(limit)
-        .skip(offset);
+      Promise.all([
+        Post.find(query)
+          .sort('-createdAt')
+          .populate('author', 'login')
+          .limit(limit)
+          .skip(offset),
+        User.findById(userId).select('rates').populate('rates'),
+        Post.countDocuments(),
+      ]).then((result) => {
+        const posts = result[0];
+        const user = result[1];
+        const pages = Math.ceil(result[2] / limit);
 
-      const pages = Math.ceil(await Post.countDocuments() / limit);
+        const transPosts = posts.map(el => el.toResponse(user));
 
-      success(res, {
-        pages,
-        posts,
+        success(res, {
+          pages,
+          transPosts,
+        });
       });
     } catch (e) {
       next(e);
@@ -110,22 +118,28 @@ module.exports = {
   },
   getBySlug: async (req, res, next) => {
     const slug = req.params.slug.trim();
+    const { userId } = req.session;
 
     // TODO: predownload using params
 
     if (!slug) { generateError('Slug is required', 422, next); return; }
 
     try {
-      const post = await Post.findOne({
-        slug,
-      })
-        .populate('author', 'login');
+      Promise.all([
+        Post.findOne({
+          slug,
+        }).populate('author', 'login'),
+        User.findById(userId).select('rates').populate('rates'),
+      ]).then((result) => {
+        const post = result[0];
+        const user = result[1];
 
-      if (!post) {
-        generateError('Post doesn\'t exist', 404, next);
-        return;
-      }
-      success(res, post);
+        if (!post) {
+          generateError('Post doesn\'t exist', 404, next);
+        } else {
+          success(res, post.toResponse(user));
+        }
+      });
     } catch (e) {
       next(e);
     }

@@ -52,6 +52,24 @@ schema.static('commentCountDec', function (postId) {
   });
 });
 
+schema.methods.toResponse = function (user) {
+  const rated = user ? user.isRated(this.id) : {};
+
+  return {
+    title: this.title,
+    body: this.body,
+    slug: this.slug,
+    author: this.author,
+    uploads: this.uploads,
+    commentCountL: this.commentCount,
+    rating: this.rating,
+    rated: {
+      isRated: rated.result || false,
+      negative: rated.negative || false,
+    },
+  };
+};
+
 schema.set('toJSON', {
   virtuals: true,
   versionKey: false,

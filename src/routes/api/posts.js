@@ -38,6 +38,15 @@ const auth = require('../auth');
  *          example: 2019-09-22T14:02:14.532Z
  *        rating:
  *          type: number
+ *        rated:
+ *          $ref: '#/definitions/UserRate'
+ *   UserRate:
+ *      type: object
+ *      properties:
+ *        isRated:
+ *          type: boolean
+ *        negative:
+ *          type: boolean
  */
 
 
