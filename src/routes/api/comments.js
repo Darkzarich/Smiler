@@ -31,6 +31,8 @@ const auth = require('../auth');
  *            $ref: '#/definitions/Comment'
  *        rating:
  *          type: number
+ *        rated:
+ *          $ref: '#/definitions/UserRate'
  *
  */
 
@@ -54,7 +56,7 @@ const auth = require('../auth');
  *        type: integer
  *        description: The numbers of items to return.
  *      - in: query
- *        name: login
+ *        name: author
  *        type: string
  *        description: user which comments you want to see
  *      - in: query

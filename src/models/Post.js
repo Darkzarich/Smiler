@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable func-names */
 const mongoose = require('mongoose');
 
@@ -61,8 +62,10 @@ schema.methods.toResponse = function (user) {
     slug: this.slug,
     author: this.author,
     uploads: this.uploads,
-    commentCountL: this.commentCount,
+    id: this._id,
+    commentCount: this.commentCount,
     rating: this.rating,
+    createdAt: this.createdAt,
     rated: {
       isRated: rated.result || false,
       negative: rated.negative || false,

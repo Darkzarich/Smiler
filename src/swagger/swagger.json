@@ -49,7 +49,7 @@
           },
           {
             "in": "query",
-            "name": "login",
+            "name": "author",
             "type": "string",
             "description": "user which comments you want to see"
           },
@@ -942,6 +942,9 @@
         },
         "rating": {
           "type": "number"
+        },
+        "rated": {
+          "$ref": "#/definitions/UserRate"
         }
       }
     },

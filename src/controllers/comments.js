@@ -7,6 +7,7 @@ const consts = require('../const/const');
 
 module.exports = {
   getComment: async (req, res, next) => {
+    const { userId } = req.session;
     const { post } = req.query;
     const limit = +req.query.limit || 10;
     const offset = +req.query.offset || 0;
@@ -26,13 +27,46 @@ module.exports = {
     }
     query.post = post;
     try {
-      const comments = await Comment.find(query)
-        .sort('-createdAt')
-        .skip(offset)
-        .limit(limit)
-        .exists('parent', false);
+      Promise.all([
+        Comment.find(query)
+          .sort('-createdAt')
+          .skip(offset)
+          .limit(limit)
+          .exists('parent', false),
+        User.findById(userId).select('rates').populate('rates'),
+      ]).then((result) => {
+        const comments = result[0];
+        const user = result[1];
 
-      success(res, comments);
+        function formRecursive(array) {
+          const newArray = [];
+
+          function deep(nestedArray) {
+            if (nestedArray.children.length > 0) {
+              nestedArray = nestedArray.children.map((el) => {
+                const el2 = el.toResponse(user);
+                el2.children = deep(el);
+                return el2;
+              });
+
+              return nestedArray;
+            }
+            return nestedArray.toResponse(user);
+          }
+
+          array.forEach((el) => {
+            const el2 = el.toResponse(user);
+            el2.children = deep(el2);
+            newArray.push(el2);
+          });
+
+          return newArray;
+        }
+
+        const transComments = formRecursive(comments);
+
+        success(res, transComments);
+      });
     } catch (e) {
       next(e);
     }

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable func-names */
 const mongoose = require('mongoose');
 const Post = require('./Post');
@@ -63,6 +64,24 @@ schema.pre('remove', async function (next) {
     next();
   });
 });
+
+schema.methods.toResponse = function (user) {
+  const rated = user ? user.isRated(this.id) : {};
+
+  return {
+    body: this.body,
+    author: this.author,
+    children: this.children,
+    id: this._id,
+    parent: this.parent,
+    rating: this.rating,
+    createdAt: this.createdAt,
+    rated: {
+      isRated: rated.result || false,
+      negative: rated.negative || false,
+    },
+  };
+};
 
 schema.plugin(require('mongoose-autopopulate'));
 
