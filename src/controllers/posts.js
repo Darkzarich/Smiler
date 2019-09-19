@@ -70,6 +70,7 @@ function startUpload(req, res, next) {
 }
 
 module.exports = {
+  // TODO: show if it was rated, need to do the same for comments
   getAll: async (req, res, next) => {
     const limit = +req.query.limit || 100;
     const offset = +req.query.offset || 0;
