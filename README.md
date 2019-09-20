@@ -6,6 +6,9 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 
 
 ### Backend Features:
+- General:
+	- **Clustering**. If something goes wrong on the server side and something throws an exception the app won't
+	die
 - Posts:
 	- **Creating posts**. Users can create posts and it will get a slug based on its title
 	- **Uploading pictures**. All posts can have attachments, isn't that nice!
