@@ -49,6 +49,9 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 - Posts:
 	- **Tags**
 	- **Sockets**
+	- **Top-5 posts yesterday**
+- Comments:
+	- **Top-5 comments yesterday**
 - Users:
 	- **Adding posts to the list favorite**
 	- **Settings (?)**
