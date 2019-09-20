@@ -680,6 +680,61 @@
             "$ref": "#/responses/NotFound"
           }
         }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update user info",
+        "description": "Update user info with payload",
+        "security": [
+          {
+            "myCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "login",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "bio": {
+                  "type": "string",
+                  "maxLength": 300
+                },
+                "avatar": {
+                  "type": "string",
+                  "maxLength": 150,
+                  "description": "URL"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/OK"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/responses/UnprocessableEntity"
+          }
+        }
       }
     },
     "/users/{login}/template": {
@@ -777,10 +832,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ok",
-            "schema": {
-              "$ref": "#/definitions/OK"
-            }
+            "$ref": "#/responses/OK"
           },
           "401": {
             "$ref": "#/responses/Unauthorized"
@@ -829,10 +881,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ok",
-            "schema": {
-              "$ref": "#/definitions/OK"
-            }
+            "$ref": "#/responses/OK"
           },
           "422": {
             "$ref": "#/responses/UnprocessableEntity"
@@ -878,7 +927,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "$ref": "#/responses/OK"
           },
           "401": {
             "description": "Authorization information is missing or invalid."
@@ -905,7 +954,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "$ref": "#/responses/OK"
           }
         }
       }
@@ -1014,6 +1063,9 @@
         "login": {
           "type": "string",
           "example": "user123"
+        },
+        "avatar": {
+          "type": "string"
         }
       }
     },
@@ -1028,6 +1080,12 @@
         },
         "rating": {
           "type": "number"
+        },
+        "bio": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
         }
       }
     },

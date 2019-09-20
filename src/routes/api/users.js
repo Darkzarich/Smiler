@@ -16,15 +16,21 @@ const auth = require('../auth');
 *     login:
 *       type: string
 *       example: user123
+*     avatar:
+*       type: string
 *  UserProfile:
 *   type: object
 *   properties:
 *     id:
-*      type: string
+*       type: string
 *     login:
-*      type: string
+*       type: string
 *     rating:
-*      type: number
+*       type: number
+*     bio:
+*       type: string
+*     avatar:
+*       type: string
 */
 
 /**
@@ -46,8 +52,43 @@ const auth = require('../auth');
  *          $ref: '#/definitions/UserProfile'
  *      404:
  *        $ref: '#/responses/NotFound'
+ *  put:
+ *    tags: [Users]
+ *    summary: Update user info
+ *    description: Update user info with payload
+ *    security:
+ *      - myCookie: []
+ *    parameters:
+ *      - in: path
+ *        name: login
+ *        type: string
+ *        required: true
+ *      - in: body
+ *        name: body
+ *        schema:
+ *          type: object
+ *          properties:
+ *            bio:
+ *              type: string
+ *              maxLength: 300
+ *            avatar:
+ *              type: string
+ *              maxLength: 150
+ *              description: URL
+ *    responses:
+ *      200:
+ *        $ref: '#/responses/OK'
+ *      404:
+ *        $ref: '#/responses/NotFound'
+ *      401:
+ *        $ref: '#/responses/Unauthorized'
+ *      403:
+ *        $ref: '#/responses/Forbidden'
+ *      422:
+ *        $ref: '#/responses/UnprocessableEntity'
  */
-router.get('/:login', usersController.getUserProfile);
+router.get('/:login', usersController.getUser);
+router.put('/:login', auth.required, usersController.updateUser);
 
 /**
  * @swagger
@@ -111,9 +152,7 @@ router.get('/:login', usersController.getUserProfile);
  *                type: string
  *      responses:
  *        200:
- *          description: ok
- *          schema:
- *             $ref: '#/definitions/OK'
+ *          $ref: '#/responses/OK'
  *        403:
  *          $ref: '#/responses/Forbidden'
  *        401:
@@ -151,9 +190,7 @@ router.put('/:login/template', auth.required, usersController.updateUserPostTemp
  *                type: string
  *      responses:
  *        200:
- *          description: ok
- *          schema:
- *             $ref: '#/definitions/OK'
+ *          $ref: '#/responses/OK'
  *        422:
  *          $ref: '#/responses/UnprocessableEntity'
  */
@@ -190,7 +227,7 @@ router.post('/', usersController.register);
  *                 example: u1234
  *     responses:
  *       200:
- *         description: OK
+ *         $ref: '#/responses/OK'
  *       422:
  *         description: Validation error
  *       500:
@@ -209,8 +246,8 @@ router.post('/auth', usersController.auth);
  *         - myCookie: []
  *       tags: [Users]
  *       responses:
- *          200:
- *             description: OK
+ *        200:
+ *          $ref: '#/responses/OK'
  */
 router.post('/logout', auth.required, usersController.logout);
 

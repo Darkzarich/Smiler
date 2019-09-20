@@ -23,13 +23,44 @@ const validateUser = (user, next) => {
 };
 
 module.exports = {
-  getUserProfile: async (req, res, next) => {
+  getUser: async (req, res, next) => {
     const { login } = req.params;
     const user = await User.findOne({
       login,
-    }).select('login rating');
+    }).select('login rating bio avatar');
     if (user) {
       success(res, user);
+    } else {
+      generateError('User is not found', 404, next);
+    }
+  },
+  updateUser: async (req, res, next) => {
+    const { login } = req.params;
+    const { userId } = req.session;
+    const { bio } = req.body;
+    const { avatar } = req.body;
+
+    if (bio.length > consts.USER_MAX_BIO_LENGTH) {
+      generateError(`bio can't be longer than ${consts.USER_MAX_BIO_LENGTH}`, 422, next); return;
+    } if (avatar.length > consts.USER_MAX_AVATAR_LENGTH) {
+      generateError(`Avatar link can't be longer than ${consts.USER_MAX_AVATAR_LENGTH}`, 422, next); return;
+    }
+
+    const user = await User.findOne({
+      login,
+    });
+
+    if (user) {
+      if (user.id.toString() !== userId) {
+        generateError('Can edit only information for yourself', 403, next);
+      } else {
+        user.bio = user.bio || bio;
+        user.avatar = user.avatar || avatar;
+
+        await user.save();
+
+        success(res);
+      }
     } else {
       generateError('User is not found', 404, next);
     }

@@ -16,6 +16,14 @@ const schema = new Schema({
     type: String,
     required: true,
   },
+  avatar: {
+    type: String,
+    default: '',
+  },
+  bio: {
+    type: String,
+    default: '',
+  },
   salt: {
     type: String,
     require: true,
