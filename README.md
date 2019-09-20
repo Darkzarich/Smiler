@@ -27,6 +27,8 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 	- **Getting a post by its slug**. Instead of `id` I use `slug` for getting a single post.
 	- **Post rating**. Posts have their rating which forms user rating along with Comments rating
 - Users: 
+	- **Profile pic**. It's possible for a user to set profile pic with link to the picture
+	- **Bio**. Users are able to add small description about themselves 
 	- **Registration**. Does what it says
 	- **Sessions**. As I didn't work with JWT much yet I decided to stick with my nice old friend - sessions, also they are kinda more safe than JWT
 	- **Auth**. Does what it says
@@ -48,10 +50,8 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 	- **Tags**
 	- **Sockets**
 - Users:
-	- **Profile pic**
 	- **Adding posts to the list favorite**
 	- **Settings (?)**
-	- **Bio**. Users should be able to add small description about themselves 
 	- **Changing password**
 	- **Password recovery**
 	- **Mail (?)**. Mail box, working with emails

@@ -40,9 +40,9 @@ module.exports = {
     const { bio } = req.body;
     const { avatar } = req.body;
 
-    if (bio.length > consts.USER_MAX_BIO_LENGTH) {
+    if (bio && bio.length > consts.USER_MAX_BIO_LENGTH) {
       generateError(`bio can't be longer than ${consts.USER_MAX_BIO_LENGTH}`, 422, next); return;
-    } if (avatar.length > consts.USER_MAX_AVATAR_LENGTH) {
+    } if (avatar && avatar.length > consts.USER_MAX_AVATAR_LENGTH) {
       generateError(`Avatar link can't be longer than ${consts.USER_MAX_AVATAR_LENGTH}`, 422, next); return;
     }
 
@@ -54,8 +54,8 @@ module.exports = {
       if (user.id.toString() !== userId) {
         generateError('Can edit only information for yourself', 403, next);
       } else {
-        user.bio = user.bio || bio;
-        user.avatar = user.avatar || avatar;
+        user.bio = bio || user.bio;
+        user.avatar = avatar || user.avatar;
 
         await user.save();
 
