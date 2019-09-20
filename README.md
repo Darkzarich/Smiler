@@ -4,6 +4,13 @@ Hello! :smile:
 
 This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.com or pikabu.ru (mostly copies many pikabu features) with many different and awesome features, open Swagger API documentation (as the result of using Design First approach). Main reason of making this site is fun and learning new things while making it.
 
+### How to run it:
+
+0. Get your MongoDB ready. Create user with admin rights
+1. Take `.env.example` file and rename it to `.env`
+2. Fill your `.env` file following the comments
+
+**tip**: For MongoDB you could use [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 
 ### Backend Features:
 - General:
