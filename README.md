@@ -10,7 +10,7 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 1. `npm install`
 2. Take `.env.example` file and rename it to `.env`
 3. Fill your `.env` file following the comments
-4. `npm start`
+4. `npm run run:production`
 
 **tip**: For MongoDB you could use [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 

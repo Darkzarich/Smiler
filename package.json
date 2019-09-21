@@ -8,7 +8,7 @@
     "front:build": "cd client && vue-cli-service build",
     "front:serve": "cd client && vue-cli-service serve",
     "back:serve": "cd server && npm start",
-    "run:production": ""
+    "run:production": "cd server && node index.js"
   },
   "author": "Darkzarich",
   "license": "MIT",
