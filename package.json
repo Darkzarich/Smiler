@@ -1,51 +1,22 @@
 {
-  "name": "express-blog",
+  "name": "express-blog-unit",
   "version": "1.0.0",
-  "description": "",
+  "description": "Bridge connecting frontend and backend for express-blog project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js",
-    "gen-doc": "npx swagger-jsdoc -d src/swagger/swaggerDef.js -o \"src/swagger/swagger.json\""
+    "run:dev": "concurrently --kill-others \"cd server && npm start\" \"cd client && npm run serve\"",
+    "front:build": "cd client && vue-cli-service build",
+    "front:serve": "cd client && vue-cli-service serve",
+    "back:serve": "cd server && npm start",
+    "run:production": ""
   },
-  "nodemonConfig": {
-    "ignore": [
-      "src/swagger/swagger.json"
-    ],
-    "events": {
-      "restart": "npm run gen-doc"
-    }
-  },
-  "keywords": [
-    "express",
-    "blog",
-    "api",
-    "rest"
-  ],
   "author": "Darkzarich",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Darkzarich/express-blog/issues"
+  },
+  "homepage": "https://github.com/Darkzarich/express-blog#readme",
   "devDependencies": {
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb-base": "^13.2.0",
-    "eslint-plugin-import": "^2.18.2",
-    "nodemon": "^1.19.1"
-  },
-  "engines": {
-    "node": ">=v10.15.1"
-  },
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "connect-mongo": "^3.0.0",
-    "crypto": "^1.0.1",
-    "dotenv": "^8.0.0",
-    "express": "^4.17.1",
-    "express-session": "^1.16.2",
-    "mongoose": "^5.6.8",
-    "mongoose-autopopulate": "^0.9.1",
-    "multer": "^1.4.2",
-    "sharp": "^0.23.0",
-    "slug": "^1.1.0",
-    "swagger-jsdoc": "^3.4.0",
-    "swagger-ui-express": "^4.0.7"
+    "concurrently": "^4.1.2"
   }
 }

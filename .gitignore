@@ -1,4 +1,6 @@
+server/node_modules
+client/node_modules
 node_modules
 .env
-uploads/*
-!uploads/.keep
+server/uploads/*
+!server/uploads/.keep

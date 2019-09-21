@@ -1,7 +1,7 @@
 const dotenv = require('dotenv');
 const path = require('path');
 
-const root = path.join.bind(this, path.join(__dirname, '../../'));
+const root = path.join.bind(this, path.join(__dirname, '../../../'));
 dotenv.config({ path: root('.env') });
 
 module.exports = {
