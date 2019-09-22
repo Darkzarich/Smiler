@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
@@ -26,6 +27,8 @@ app.use(
 );
 
 app.use(router);
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.listen(PORT, () => {
   global.console.log(`${process.pid} [pid]: Server is listening on the port ${PORT}`);
