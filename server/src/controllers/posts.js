@@ -109,7 +109,7 @@ module.exports = {
 
         success(res, {
           pages,
-          transPosts,
+          posts: transPosts,
         });
       });
     } catch (e) {
