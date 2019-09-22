@@ -1,12 +1,12 @@
-## Express-blog
+![](https://i.imgur.com/D3AjmGt.png)
+
+# Express-blog
+
+### [Demo](https://dz-express-blog.herokuapp.com) | [Swagger documentation](https://dz-express-blog-api.herokuapp.com/api-docs/)
 
 Hello! :smile: 
 
 This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.com or pikabu.ru (mostly copies many pikabu features) with many different and awesome features, open Swagger API documentation (as the result of using Design First approach). Main reason of making this site is fun and learning new things while making it.
-
-Project DEMO is available at [https://dz-express-blog.herokuapp.com](https://dz-express-blog.herokuapp.com)
-
-Swagger documentation is available at [https://dz-express-blog-api.herokuapp.com/api-docs/][https://dz-express-blog-api.herokuapp.com/api-docs/]
 
 ### How to run it:
 
