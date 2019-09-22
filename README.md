@@ -1,5 +1,5 @@
-<p align="center">
-   &lt;img  width="460" height="300" src="https://i.imgur.com/D3AjmGt.png" &gt;
+<div align="center">
+   <img  width="460" height="300" src="https://i.imgur.com/D3AjmGt.png"/>;
 </p>
 
 # Express-blog
