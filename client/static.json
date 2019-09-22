@@ -1,5 +1,5 @@
 {
-  "root": "dist/",
+  "root": "client/dist/",
   "https_only": true,
   "routes": {
     "/**": "index.html"
