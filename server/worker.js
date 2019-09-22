@@ -28,9 +28,11 @@ app.use(
 
 app.use(router);
 
-if (!config.IS_PRODUCTION) {
-  app.use('/app/uploads', express.static(path.join(__dirname, '/uploads')));
+if (config.IS_PRODUCTION) {
+  console.log('!!!!!!!!!!!!!1');
+  app.use('/app/uploads', express.static(path.join(__dirname, 'uploads')));
 } else {
+  console.log('!!!!!!!!!!!!!2');
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 }
 
