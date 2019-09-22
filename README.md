@@ -1,4 +1,6 @@
-![](https://i.imgur.com/D3AjmGt.png)
+<p align="center">
+   &lt;img  width="460" height="300" src="https://i.imgur.com/D3AjmGt.png" &gt;
+</p>
 
 # Express-blog
 
