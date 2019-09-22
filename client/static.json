@@ -1,0 +1,20 @@
+{
+  "root": "dist/",
+  "https_only": true,
+  "routes": {
+    "/**": "index.html"
+  },
+  "headers": {
+    "/": {
+      "Cache-Control": "no-store, no-cache"
+    },
+    "**.js": {
+      "Cache-Control": "public, max-age=31536000",
+      "Access-Control-Allow-Origin": "cdn-instance.example.com"
+    },
+    "**.css": {
+      "Cache-Control": "public, max-age=31536000",
+      "Access-Control-Allow-Origin": "cdn-instance.example.com"
+    }
+  }
+}
