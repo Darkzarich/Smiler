@@ -28,7 +28,11 @@ app.use(
 
 app.use(router);
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+if (config.IS_PRODUCTION) {
+  app.use('app/uploads', express.static(path.join(__dirname, 'app/uploads')));
+} else {
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+}
 
 app.listen(PORT, () => {
   global.console.log(`${process.pid} [pid]: Server is listening on the port ${PORT}`);
