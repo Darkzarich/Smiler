@@ -1,6 +1,6 @@
 <div align="center">
-   <img  width="460" height="300" src="https://i.imgur.com/D3AjmGt.png"/>;
-</p>
+   <img src="https://i.imgur.com/D3AjmGt.png"/>
+</div>
 
 # Express-blog
 
