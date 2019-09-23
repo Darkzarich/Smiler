@@ -3,6 +3,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
+const cors = require('cors');
 const db = require('./db');
 const config = require('./src/config/config');
 
@@ -11,6 +12,8 @@ const router = require('./src/routes');
 
 const app = express();
 const { PORT } = config;
+
+app.use(cors());
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
