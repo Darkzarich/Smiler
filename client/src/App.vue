@@ -24,10 +24,6 @@ export default {
   components: {
     HeaderElement,
   },
-  created() {
-    console.log(api)
-    api.posts.getPosts();
-  }
 }
 </script>
 
@@ -54,14 +50,12 @@ body {
   padding-right: 10px;
   &__main {
     width: 70%;
-    background: $gray;
     border: 1px solid $light-gray;
     margin-right: $widget-margin;
     border-radius: 2px;
   }
   &__sidebar {
     width: 30%;
-    background: $gray;
     border: 1px solid $light-gray;
     border-radius: 2px;
   }
