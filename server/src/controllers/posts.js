@@ -95,7 +95,7 @@ module.exports = {
       Promise.all([
         Post.find(query)
           .sort('-createdAt')
-          .populate('author', 'login')
+          .populate('author', 'login avatar')
           .limit(limit)
           .skip(offset),
         User.findById(userId).select('rates').populate('rates'),
@@ -128,7 +128,7 @@ module.exports = {
       Promise.all([
         Post.findOne({
           slug,
-        }).populate('author', 'login'),
+        }).populate('author', 'login avatar'),
         User.findById(userId).select('rates').populate('rates'),
       ]).then((result) => {
         const post = result[0];
