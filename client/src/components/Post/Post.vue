@@ -17,11 +17,6 @@
           {{ post.title }}
         </div>
       </router-link>
-      <div class="post-main__meta">
-        <span class="post-main__meta-author">
-          {{ post.author.login }}
-        </span>
-      </div>
       <div class="post-main__body">
         {{ post.body }}
       </div>
@@ -35,14 +30,24 @@
         </div>
       </div>
       <div class="post-main__footer">
-        {{ post.createdAt }} {{ post.createdAt !== post.updatedAt ? 'updated: ' + post.updatedAt : ''}}
+        <div class="post-main__meta">
+          <span class="post-main__meta-date">
+            {{ post.createdAt | fromNow }}
+          </span>
+          <span class="post-main__meta-author">
+            {{ post.author.login }}
+            <img :src="post.author.avatar">
+          </span>
+        </div>
+        <!-- {{ post.createdAt !== post.updatedAt ? 'updated: ' + post.updatedAt : ''}} -->
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import config from '@/config/config'
+import config from '@/config/config';
+import moment from 'moment';
 
 export default {
   data () {
@@ -51,6 +56,11 @@ export default {
     }
   },
   props: ['post'],
+  filters: {
+    fromNow: function (date) {
+      return moment(date).fromNow();
+    }
+  }
 }
 </script>
 
@@ -62,12 +72,49 @@ export default {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  margin-top: $widget-margin;
   margin-bottom: $widget-margin;
 
   .post-main {
-    background: $gray;
+    background: $widget-bg;
     width: 90%;
+    padding: 1rem;
+    color: #fff;
+    border: 1px solid $light-gray;
+    border-radius: 2px;
+
+    a {
+      color: $light-gray;
+      text-decoration: none;
+      div {
+        margin-bottom: 1rem;
+      }
+    }
+
+    &__footer {
+      margin-top: 1rem;
+    }
+
+    &__meta {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      margin: -1rem;
+      padding: 1rem;
+      background: $bg;
+
+      &-author {
+        display: inline-block;
+        img {
+          width: 1rem;
+          height: 1rem;
+          border-radius: 50%;
+        }
+      }
+      &-date {
+        display: inline-block;
+      }
+    }
   }
 
   .post-side {

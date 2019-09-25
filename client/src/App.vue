@@ -31,6 +31,10 @@ export default {
 @import '@/styles/variables.scss';
 @import '@/styles/colors.scss';
 
+html {
+  font-family: "Roboto","Open Sans",Helvetica,Arial,sans-serif,
+}
+
 body {
   margin: 0;
   background: $bg;
@@ -50,13 +54,12 @@ body {
   padding-right: 10px;
   &__main {
     width: 70%;
-    border: 1px solid $light-gray;
     margin-right: $widget-margin;
-    border-radius: 2px;
   }
   &__sidebar {
     width: 30%;
     border: 1px solid $light-gray;
+    background: $widget-bg;
     border-radius: 2px;
   }
 }
