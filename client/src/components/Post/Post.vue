@@ -12,7 +12,7 @@
       </div>
     </div>
     <div class="post-main">
-      <router-link :to="post.slug">
+      <router-link :to="post.slug" target="_blank">
         <div class="post-main__title">
           {{ post.title }}
         </div>
@@ -26,7 +26,7 @@
           v-for="upload in post.uploads"
           :key="upload"
         >
-          <img :src="STATIC_ROUTE + upload">
+          <img @error="$resolveImageError" :src="$resolveImage(upload)">
         </div>
       </div>
       <div class="post-main__footer">
@@ -36,6 +36,7 @@
           </span>
           <span class="post-main__meta-comments">
             <router-link 
+            target="_blank"
             :to="{
               path: post.slug,
               hash: 'comments'
@@ -55,7 +56,6 @@
 </template>
 
 <script>
-import config from '@/config/config';
 import moment from 'moment';
 
 import commentsIcon from '@/library/svg/comments';
@@ -67,11 +67,6 @@ export default {
     commentsIcon,
     plusIcon,
     minusIcon
-  },
-  data () {
-    return {
-      STATIC_ROUTE: config.STATIC_ROUTE
-    }
   },
   props: ['post'],
 }
@@ -111,6 +106,21 @@ export default {
 
     &__body {
       line-height: 1.5rem;
+    }
+
+    &__attachments {
+      &-item {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        border: 1px solid $light-gray;
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
     }
     
     &__meta {

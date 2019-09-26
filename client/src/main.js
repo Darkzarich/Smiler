@@ -3,8 +3,10 @@ import moment from 'moment';
 import App from './App.vue';
 import router from './router';
 import store from './store';
+import config from '@/config/config';
 
 import defaultAvatar from '@/assets/neutral_avatar.png';
+import postNoImage from '@/assets/post_no_image.png';
 
 Vue.config.productionTip = false;
 
@@ -23,6 +25,15 @@ Vue.mixin({
         return path;
       }
       return defaultAvatar;
+    },
+    $resolveImageError(e) {
+      e.target.src = postNoImage;
+    },
+    $resolveImage(path) {
+      if (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/.test(path)) {
+        return path;
+      }
+      return config.STATIC_ROUTE + path;
     },
   },
   filters: {

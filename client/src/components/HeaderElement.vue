@@ -17,7 +17,7 @@ export default {
 @import '@/styles/colors.scss';
 
   .header {
-    background-color: $firm;
+    background-color: $widget-bg;
     height: $header-height;
     width: 100%;
     position: fixed;
