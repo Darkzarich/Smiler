@@ -4,11 +4,13 @@
       <post :post="post"/>
     </div>
 
-    <comments
-      v-if="!commentsLoading"
-      :data="comments"
-      :indent-level="0"
-    />
+    <div class="comments" id="comments">
+      <comments
+        v-if="!commentsLoading"
+        :data="comments"
+        :indent-level="2"
+      />
+    </div>
   </div>
 </template>
 
@@ -57,7 +59,6 @@ export default {
       });
 
       this.comments = res.data;
-      console.log('!')
       this.loading = false;
     }
   }

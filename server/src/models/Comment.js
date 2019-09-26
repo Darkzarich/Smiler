@@ -30,7 +30,7 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    autopopulate: { select: 'login' },
+    autopopulate: { select: 'login avatar' },
   },
   createdAt: {
     type: Date,

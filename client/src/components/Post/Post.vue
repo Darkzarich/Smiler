@@ -35,7 +35,13 @@
             {{ post.createdAt | fromNow }}
           </span>
           <span class="post-main__meta-comments">
-            <comments-icon/> {{ post.commentCount }}
+            <router-link 
+            :to="{
+              path: post.slug,
+              hash: 'comments'
+            }"> 
+              <comments-icon/> {{ post.commentCount }}
+            </router-link>
           </span>
           <span class="post-main__meta-author">
             {{ post.author.login }}
