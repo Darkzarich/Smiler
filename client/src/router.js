@@ -1,6 +1,9 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+
 import PostsContainer from './views/PostsContainer.vue';
+import NotFound from './views/NotFound.vue';
+import SinglePost from './views/SinglePost.vue';
 
 Vue.use(Router);
 
@@ -10,16 +13,26 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
+      name: 'Home',
       component: PostsContainer,
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
+      path: '/error/404',
+      name: '404',
+      component: NotFound,
     },
+    {
+      path: '/:slug',
+      name: 'Single',
+      component: SinglePost,
+    },
+    // {
+    //   path: '/about',
+    //   name: 'about',
+    //   // route level code-splitting
+    //   // this generates a separate chunk (about.[hash].js) for this route
+    //   // which is lazy-loaded when the route is visited.
+    //   component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
+    // },
   ],
 });

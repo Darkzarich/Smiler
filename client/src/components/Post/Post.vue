@@ -2,13 +2,13 @@
   <div class="post-container__item">
     <div class="post-side">
       <div class="post-side__upvote">
-        +
+        <plus-icon/>
       </div>
       <div class="post-side__rating">
         {{ post.rating }}
       </div>
       <div class="post-side__downvote">
-        -
+        <minus-icon/>
       </div>
     </div>
     <div class="post-main">
@@ -34,6 +34,9 @@
           <span class="post-main__meta-date">
             {{ post.createdAt | fromNow }}
           </span>
+          <span class="post-main__meta-comments">
+            <comments-icon/> {{ post.commentCount }}
+          </span>
           <span class="post-main__meta-author">
             {{ post.author.login }}
             <img :src="post.author.avatar">
@@ -49,7 +52,16 @@
 import config from '@/config/config';
 import moment from 'moment';
 
+import commentsIcon from '@/library/svg/comments';
+import plusIcon from '@/library/svg/plus';
+import minusIcon from '@/library/svg/minus';
+
 export default {
+  components: {
+    commentsIcon,
+    plusIcon,
+    minusIcon
+  },
   data () {
     return {
       STATIC_ROUTE: config.STATIC_ROUTE
@@ -78,15 +90,17 @@ export default {
     background: $widget-bg;
     width: 90%;
     padding: 1rem;
-    color: #fff;
+    color: $main-text;
     border: 1px solid $light-gray;
     border-radius: 2px;
 
     a {
       color: $light-gray;
       text-decoration: none;
-      div {
+      .post-main__title {
         margin-bottom: 1rem;
+        font-weight: 400;
+        font-size: 20px;
       }
     }
 
@@ -102,6 +116,18 @@ export default {
       margin: -1rem;
       padding: 1rem;
       background: $bg;
+      margin-top: 1rem;
+      border-top: 1px solid $light-gray;
+
+      &-comments {
+        position: absolute;
+        margin-left: 25%;
+        svg {
+          fill: $main-text;
+          width: 1rem;
+          height: 1rem;
+        }
+      }
 
       &-author {
         display: inline-block;
@@ -119,6 +145,33 @@ export default {
 
   .post-side {
     width: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &__upvote, &__rating, &__downvote {
+      color: $light-gray;
+      svg {
+        fill: $light-gray;
+        width: 5rem;
+      }
+    }
+
+    &__rating {
+      font-size: 20px;
+      margin-bottom: -1rem;
+      margin-top: -1rem;
+    }
+
+    &__upvote:hover svg, &__upvote_active svg {
+      cursor: pointer;
+      fill: $dark-firm;
+    }
+
+    &__downvote:hover svg, &__downvote_active svg {
+      cursor: pointer;
+      fill: $dark-red;
+    }
   }
 }
 

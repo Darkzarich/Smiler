@@ -13,5 +13,7 @@ export default (requestData) => {
     } else {
       console.error(e);
     }
+
+    return e.response;
   });
 };

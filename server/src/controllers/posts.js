@@ -120,7 +120,7 @@ module.exports = {
     const slug = req.params.slug.trim();
     const { userId } = req.session;
 
-    // TODO: predownload using params
+    // TODO: predownload using params, redo slug to id because vue route can send id and use slug as link
 
     if (!slug) { generateError('Slug is required', 422, next); return; }
 

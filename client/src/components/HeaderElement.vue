@@ -1,6 +1,8 @@
 <template>
 <header class="header">
-  111
+  <router-link :to="{ name: 'Home' }">
+    Home
+  </router-link>
 </header>
 </template>
 
@@ -20,6 +22,7 @@ export default {
     width: 100%;
     position: fixed;
     top: 0;
+    z-index: 2;
     padding: 1rem;
   }
 </style>

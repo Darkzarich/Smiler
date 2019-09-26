@@ -40,7 +40,7 @@ module.exports = {
 
         function formRecursive(array) {
           const newArray = [];
-
+// TODO: fix this for the case when no child
           function deep(nestedArray) {
             if (nestedArray.children.length > 0) {
               nestedArray = nestedArray.children.map((el) => {
