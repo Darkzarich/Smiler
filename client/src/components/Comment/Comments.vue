@@ -17,11 +17,14 @@
           <div class="comments__item-main-block-meta-downvote">
             <minus-icon/>
           </div>   
-          <div class="commments__item-main-block-meta-author">
+          <div class="comments__item-main-block-meta-author">
             {{ comment.author.login }}
           </div>
-          <div class="commments__item-main-block-meta-avatar">
-            <img :src="comment.author.avatar"/>
+          <div class="comments__item-main-block-meta-avatar">
+            <img :src="$resolveAvatar(comment.author.avatar)"/>
+          </div>
+          <div class="comments__item-main-block-meta-date">
+            {{ comment.createdAt | $fromNow }}
           </div>
         </div>
         <div class="comments__item-main-block-body">
@@ -63,10 +66,24 @@ export default {
         margin: 1rem;
         padding: 1rem;
         color: $main-text;
+
         &-meta {
           display: flex;
           flex-direction: row;
-          margin-bottom: 1rem;
+
+          &-avatar {
+            img {
+              width: 1rem;
+              height: 1rem;
+              margin-left: 0.5rem;
+              border-radius: 50%;
+            }
+          }
+
+          &-date {
+            margin-left: 0.5rem;
+            color: $light-gray;
+          }
 
           &-upvote, &-rating, &-downvote {
             color: $light-gray;
@@ -93,6 +110,10 @@ export default {
             cursor: pointer;
             fill: $dark-red;
           }
+        }
+
+        &-body {
+          line-height: 1.5rem;
         }
       }
     }

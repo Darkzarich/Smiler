@@ -32,7 +32,7 @@
       <div class="post-main__footer">
         <div class="post-main__meta">
           <span class="post-main__meta-date">
-            {{ post.createdAt | fromNow }}
+            {{ post.createdAt | $fromNow }}
           </span>
           <span class="post-main__meta-comments">
             <router-link 
@@ -45,7 +45,7 @@
           </span>
           <span class="post-main__meta-author">
             {{ post.author.login }}
-            <img :src="post.author.avatar">
+            <img :src="$resolveAvatar(post.author.avatar)">
           </span>
         </div>
         <!-- {{ post.createdAt !== post.updatedAt ? 'updated: ' + post.updatedAt : ''}} -->
@@ -74,11 +74,6 @@ export default {
     }
   },
   props: ['post'],
-  filters: {
-    fromNow: function (date) {
-      return moment(date).fromNow();
-    }
-  }
 }
 </script>
 
@@ -114,13 +109,18 @@ export default {
       margin-top: 1rem;
     }
 
+    &__body {
+      line-height: 1.5rem;
+    }
+    
     &__meta {
       display: flex;
       flex-direction: row;
       flex-wrap: nowrap;
       justify-content: space-between;
       margin: -1rem;
-      padding: 1rem;
+      padding: 0.5rem;
+      align-items: center;
       background: $bg;
       margin-top: 1rem;
       border-top: 1px solid $light-gray;
@@ -136,10 +136,12 @@ export default {
       }
 
       &-author {
-        display: inline-block;
+        display: flex;
+        align-items: center;
         img {
-          width: 1rem;
-          height: 1rem;
+          width: 2rem;
+          height: 2rem;
+          margin-left: 0.5rem;
           border-radius: 50%;
         }
       }
