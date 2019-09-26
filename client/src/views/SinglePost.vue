@@ -8,7 +8,7 @@
       <comments
         v-if="!commentsLoading"
         :data="comments"
-        :indent-level="2"
+        :indent-level="1"
       />
     </div>
   </div>
@@ -66,5 +66,10 @@ export default {
 </script>
 
 <style lang="scss">
+@import '@/styles/colors.scss';
 
+.comments {
+  border: 1px solid $light-gray;
+  padding: 1rem;
+}
 </style>

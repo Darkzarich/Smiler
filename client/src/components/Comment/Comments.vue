@@ -59,8 +59,8 @@ export default {
 .comments {
 
   &__item {
-    border-left: solid 1px $light-gray;
     &-main {
+      border-left: solid 1px $light-gray;
       &-block {
         background: $widget-bg;
         margin: 1rem;
