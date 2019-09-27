@@ -14,7 +14,7 @@
       "src/swagger/swagger.json"
     ],
     "events": {
-      "restart": "npm run gen-doc"
+      "start": "npm run gen-doc"
     }
   },
   "keywords": [

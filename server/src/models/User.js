@@ -12,6 +12,11 @@ const schema = new Schema({
     unique: true,
     index: true,
   },
+  email: {
+    type: String,
+    required: [true, 'can\'t be blank.'],
+    unique: true,
+  },
   hash: {
     type: String,
     required: true,

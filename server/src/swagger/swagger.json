@@ -654,6 +654,23 @@
         }
       }
     },
+    "/users/get-auth": {
+      "get": {
+        "summary": "Check login state",
+        "description": "Return user auth status",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AuthState"
+            }
+          }
+        }
+      }
+    },
     "/users/{login}": {
       "get": {
         "tags": [
@@ -1086,6 +1103,29 @@
         },
         "avatar": {
           "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      }
+    },
+    "AuthState": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "login": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "isAuth": {
+          "type": "boolean"
+        },
+        "rating": {
+          "type": "number"
         }
       }
     },

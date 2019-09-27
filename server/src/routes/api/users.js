@@ -33,7 +33,35 @@ const auth = require('../auth');
 *       type: string
 *     createdAt:
 *       type: string
+*  AuthState:
+*   type: object
+*   properties:
+*     email:
+*       type: string
+*     login:
+*       type: string
+*     avatar:
+*       type: string
+*     isAuth:
+*       type: boolean
+*     rating:
+*       type: number
 */
+
+/**
+ * @swagger
+ * /users/get-auth:
+ *  get:
+ *    summary: Check login state
+ *    description: Return user auth status
+ *    tags: [Users]
+ *    responses:
+ *      200:
+ *        description: OK
+ *        schema:
+ *          $ref: '#/definitions/AuthState'
+ */
+router.get('/get-auth', usersController.getAuth);
 
 /**
  * @swagger
@@ -185,6 +213,8 @@ router.put('/:login/template', auth.required, usersController.updateUserPostTemp
  *                type: string
  *                minLength: 3
  *                maxLength: 10
+ *              email:
+ *                type: string
  *              password:
  *                type: string
  *                minLength: 6
@@ -218,12 +248,11 @@ router.post('/', usersController.register);
  *         schema:
  *           type: object
  *           required:
- *            - login
+ *            - email
  *            - password
  *           properties:
- *              login:
+ *              email:
  *                 type: string
- *                 example: user123
  *              password:
  *                 type: string
  *                 example: u1234
@@ -252,6 +281,5 @@ router.post('/auth', usersController.auth);
  *          $ref: '#/responses/OK'
  */
 router.post('/logout', auth.required, usersController.logout);
-
 
 module.exports = router;

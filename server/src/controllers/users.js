@@ -7,7 +7,7 @@ const { generateError, success } = require('./utils/utils');
 const consts = require('../const/const');
 
 const validateUser = (user, next) => {
-  if (user.login && user.password && user.confirm) {
+  if (user.login && user.password && user.confirm && user.email) {
     if (user.login.length < 3 || user.login.length > 10) {
       generateError('Login length must be 3-10 symbols', 422, next);
     } else if (user.password.length < 6) {
@@ -66,7 +66,9 @@ module.exports = {
     }
   },
   register: async (req, res, next) => {
+    // TODO: Rework validation, rework unique email
     const user = {
+      email: req.body.email,
       login: req.body.login,
       password: req.body.password,
       confirm: req.body.confirm,
@@ -84,6 +86,7 @@ module.exports = {
     try {
       const newUser = await User.create({
         login: user.login,
+        email: user.email,
         hash,
         salt,
       });
@@ -98,7 +101,7 @@ module.exports = {
   },
   auth: async (req, res, next) => {
     const user = {
-      login: req.body.login,
+      email: req.body.email,
       password: req.body.password,
       confirm: req.body.password,
     };
@@ -111,11 +114,11 @@ module.exports = {
 
     try {
       const foundUser = await User.findOne({
-        login: user.login,
-      });
+        email: user.email,
+      }).lean();
 
       if (!foundUser) {
-        generateError('Invalid username or password', 401, next);
+        generateError('Invalid email or password', 401, next);
         return;
       }
 
@@ -127,7 +130,7 @@ module.exports = {
 
         success(res);
       } else {
-        generateError('Invalid username or password', 401, next);
+        generateError('Invalid email or password', 401, next);
         return;
       }
     } catch (e) {
@@ -137,6 +140,26 @@ module.exports = {
   logout: async (req, res) => {
     req.session.destroy();
     success(res);
+  },
+  getAuth: async (req, res) => {
+    const { userId } = req.session;
+    let authState = {};
+
+    if (userId) {
+      const user = await User.findById(userId).lean();
+
+      authState = {
+        login: user.login,
+        isAuth: true,
+        rating: user.rating,
+        avatar: user.avatar,
+        email: user.email,
+      };
+    } else {
+      authState.isAuth = false;
+    }
+
+    success(res, authState);
   },
   getUserPostTemplate: async (req, res, next) => {
     if (req.session.userLogin !== req.params.login) {
