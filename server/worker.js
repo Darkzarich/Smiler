@@ -13,7 +13,7 @@ const router = require('./src/routes');
 const app = express();
 const { PORT } = config;
 
-app.use(cors());
+app.use(cors({ credentials: true }));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
