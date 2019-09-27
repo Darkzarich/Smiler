@@ -151,9 +151,9 @@ module.exports = {
         const userAuth = {
           login: foundUser.login,
           isAuth: true,
-          rating: foundUser.rating,
-          avatar: foundUser.avatar,
-          email: foundUser.email,
+          rating: foundUser.rating || 0,
+          avatar: foundUser.avatar || '',
+          email: foundUser.email || '',
         };
 
         success(res, userAuth);
@@ -174,14 +174,14 @@ module.exports = {
     let authState = {};
 
     if (userId) {
-      const user = await User.findById(userId);
+      const user = await User.findById(userId).lean();
 
       authState = {
         login: user.login,
         isAuth: true,
-        rating: user.rating,
-        avatar: user.avatar,
-        email: user.email,
+        rating: user.rating || 0,
+        avatar: user.avatar || '',
+        email: user.email || '',
       };
     } else {
       authState.isAuth = false;
