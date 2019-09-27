@@ -885,6 +885,9 @@
                   "minLength": 3,
                   "maxLength": 10
                 },
+                "email": {
+                  "type": "string"
+                },
                 "password": {
                   "type": "string",
                   "minLength": 6
@@ -926,13 +929,12 @@
             "schema": {
               "type": "object",
               "required": [
-                "login",
+                "email",
                 "password"
               ],
               "properties": {
-                "login": {
-                  "type": "string",
-                  "example": "user123"
+                "email": {
+                  "type": "string"
                 },
                 "password": {
                   "type": "string",

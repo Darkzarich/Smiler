@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const crypto = require('crypto');
 const fs = require('fs');
 
@@ -136,7 +137,7 @@ module.exports = {
       const hash = crypto.pbkdf2Sync(user.password, foundUser.salt, 10000, 512, 'sha512').toString('hex');
 
       if (hash === foundUser.hash) {
-        req.session.userId = foundUser.id;
+        req.session.userId = foundUser._id;
         req.session.userLogin = foundUser.login;
 
         success(res);
@@ -157,7 +158,7 @@ module.exports = {
     let authState = {};
 
     if (userId) {
-      const user = await User.findById(userId).lean();
+      const user = await User.findById(userId);
 
       authState = {
         login: user.login,
