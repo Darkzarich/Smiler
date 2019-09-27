@@ -7,16 +7,22 @@
       :key="comment.id"
     >
       <div class="comments__item-main-block">
-        <div class="comments__item-main-block-meta">  
+        <div class="comments__item-main-block-meta">
           <div class="comments__item-main-block-meta-rating">
-            {{ comment.rating }} 
-          </div> 
-          <div class="comments__item-main-block-meta-upvote">   
+            {{ comment.rating }}
+          </div>
+          <div
+            class="comments__item-main-block-meta-upvote"
+            :class="comment.rated.isRated && !comment.rated.negative ? 'comments__item-main-block-meta-upvote_active' : ''"
+          >
             <plus-icon/>
           </div>
-          <div class="comments__item-main-block-meta-downvote">
+          <div
+            class="comments__item-main-block-meta-downvote"
+            :class="comment.rated.isRated && comment.rated.negative ? 'comments__item-main-block-meta-downvote_active' : ''"
+          >
             <minus-icon/>
-          </div>   
+          </div>
           <div class="comments__item-main-block-meta-author">
             {{ comment.author.login }}
           </div>

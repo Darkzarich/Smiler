@@ -9,6 +9,12 @@ export default {
       method: 'get',
     });
   },
+  checkAuthState() {
+    return Query({
+      url: `${CONTROLLER_URL}/get-auth`,
+      method: 'get',
+    });
+  },
   updateUserProfile(login, data) {
     return Query({
       url: `${CONTROLLER_URL}/${login}`,

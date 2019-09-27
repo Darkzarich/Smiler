@@ -1,13 +1,17 @@
 <template>
   <div class="post-container__item">
     <div class="post-side">
-      <div class="post-side__upvote">
+      <div
+        class="post-side__upvote"
+        :class="post.rated.isRated && !post.rated.negative ? 'post-side__upvote_active' : ''">
         <plus-icon/>
       </div>
       <div class="post-side__rating">
         {{ post.rating }}
       </div>
-      <div class="post-side__downvote">
+      <div
+        class="post-side__downvote"
+        :class="post.rated.isRated && post.rated.negative ? 'post-side__downvote_active' : ''">
         <minus-icon/>
       </div>
     </div>

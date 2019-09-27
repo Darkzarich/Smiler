@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" v-if="show">
     <header-element/>
       <!-- <div id="nav">
         <router-link to="/">Home</router-link> |
@@ -10,7 +10,7 @@
         <router-view/>
       </content>
       <div class="content-box__sidebar">
-        111
+        <user/>
       </div>
     </div>
   </div>
@@ -18,12 +18,25 @@
 
 <script>
 import HeaderElement from '@/components/HeaderElement'
+import User from '@/components/User/User'
+
 import api from '@/api'
 
 export default {
   components: {
     HeaderElement,
+    User,
   },
+  data() {
+    return {
+      show: false,
+    }
+  },
+  beforeCreate() {
+    this.$store.dispatch('userCheckAuthState').then( () => {
+      this.show = true;
+    });
+  }
 }
 </script>
 
@@ -58,9 +71,6 @@ body {
   }
   &__sidebar {
     width: 30%;
-    border: 1px solid $light-gray;
-    background: $widget-bg;
-    border-radius: 2px;
   }
 }
 

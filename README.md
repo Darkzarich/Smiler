@@ -14,7 +14,7 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 
 0. Get your MongoDB ready. Create user with admin rights
 1. `npm install`
-2. Take `.env.example` file and rename it to `.env`
+2. Take `.env.example` file inside `server` folder and rename it to `.env`
 3. Fill your `.env` file following the comments
 4. `npm run run:production`
 
@@ -51,13 +51,17 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 - Full Swagger documentation to existing end-points (available with path `/api-docs/`)
 
 ### Backend Plans:
-
+- General:
+	- Limit for requests per sec (DDoS protectione)
 - Posts:
+	- **Post sections**. Instead of the current scheme `body + [attachments]` implement `body + attachment + body ...`
+	- **Date filter**. Also default sort by rating instead of default date
+	- **Uploading pictures through links**. Will implement backend check if uploaded image is safe
 	- **Tags**
 	- **Sockets**
-	- **Top-5 posts yesterday**
+	- **Top-1 post yesterday**
 - Comments:
-	- **Top-5 comments yesterday**
+	- **Top-1 comment yesterday**
 - Users:
 	- **Adding posts to the list favorite**
 	- **Settings (?)**

@@ -1,19 +1,19 @@
 <template>
-  <div class="user">
-    <div class="user__offset"/>
-    <div class="user__block">
-      <div class="user__avatar">
+  <div class="user-profile">
+    <div class="user-profile__offset"/>
+    <div class="user-profile__block">
+      <div class="user-profile__avatar">
         <img :src="$resolveAvatar(data.avatar)"/>
       </div>
-      <div class="user__main-info">
-        <div class="user__login"> {{ data.login }} </div>
-        <div class="user__date"> With us already {{ data.createdAt | toDate }} </div>
+      <div class="user-profile__main-info">
+        <div class="user-profile__login"> {{ data.login }} </div>
+        <div class="user-profile__date"> With us already {{ data.createdAt | toDate }} </div>
 
-        <div :class="ratingClass(data.rating)" class="user__rating">
+        <div :class="ratingClass(data.rating)" class="user-profile__rating">
           Rating: <span>{{ data.rating | ratingTransform }} </span>
         </div>
 
-        <div class="user__bio" v-if="data.bio">
+        <div class="user-profile__bio" v-if="data.bio">
           Bio: {{ data.bio }}
         </div>
       </div>
@@ -55,7 +55,7 @@ export default {
 @import '@/styles/colors.scss';
 @import '@/styles/mixins.scss';
 
-.user {
+.user-profile {
   @include flex-row();
   justify-content: flex-end;
   margin-bottom: $widget-margin;
@@ -74,14 +74,14 @@ export default {
     color: $main-text;
   }
 
-  .user__login,
-  .user__date,
-  .user__rating,
-  .user__bio {
+  &__login,
+  &__date,
+  &__rating,
+  &__bio {
     margin-bottom: 0.5rem;
   }
 
-  .user__date {
+  .user-profile__date {
     color: $light-gray;
   }
 

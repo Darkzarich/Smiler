@@ -1,5 +1,14 @@
+@import './colors.scss';
+
 @mixin flex-row {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
+}
+
+@mixin widget {
+  border: 1px solid $light-gray;
+  background: $widget-bg;
+  border-radius: 2px;
+  padding: 1rem;
 }

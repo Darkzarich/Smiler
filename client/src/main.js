@@ -2,7 +2,7 @@ import Vue from 'vue';
 import moment from 'moment';
 import App from './App.vue';
 import router from './router';
-import store from './store';
+import store from '@/store/index';
 import config from '@/config/config';
 
 import defaultAvatar from '@/assets/neutral_avatar.png';

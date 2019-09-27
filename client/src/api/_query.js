@@ -1,6 +1,8 @@
 import axios from 'axios';
 import config from '@/config/config';
 
+axios.defaults.withCredentials = true;
+
 export default (requestData) => {
   const requestDataMod = requestData;
   requestDataMod.url = config.API_ROUTE + requestDataMod.url;
