@@ -31,6 +31,8 @@ const auth = require('../auth');
 *       type: string
 *     avatar:
 *       type: string
+*     createdAt:
+*       type: string
 */
 
 /**

@@ -4,18 +4,18 @@ import Router from 'vue-router';
 import PostsContainer from './views/PostsContainer.vue';
 import NotFound from './views/NotFound.vue';
 import SinglePost from './views/SinglePost.vue';
+import UserPage from './views/UserPage.vue';
 
 Vue.use(Router);
 
 export default new Router({
   mode: 'history',
   base: process.env.BASE_URL,
-  scrollBehavior: function(to, from, savedPosition) {
+  scrollBehavior(to) {
     if (to.hash) {
-        return {selector: to.hash}
-    } else {
-        return { x: 0, y: 0 }
+      return { selector: to.hash };
     }
+    return { x: 0, y: 0 };
   },
   routes: [
     {
@@ -27,6 +27,11 @@ export default new Router({
       path: '/error/404',
       name: '404',
       component: NotFound,
+    },
+    {
+      path: '/user/@:login',
+      name: 'UserPage',
+      component: UserPage,
     },
     {
       path: '/:slug',

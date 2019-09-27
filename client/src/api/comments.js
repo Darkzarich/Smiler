@@ -1,6 +1,6 @@
 import Query from './_query';
 
-const CONTROLLER_URL = '/comments/';
+const CONTROLLER_URL = '/comments';
 
 export default {
   getComments(params) {
@@ -19,27 +19,27 @@ export default {
   },
   updateComment(id, data) {
     return Query({
-      url: CONTROLLER_URL + id,
+      url: `${CONTROLLER_URL}/${id}`,
       method: 'put',
       data,
     });
   },
   deleteComment(id) {
     return Query({
-      url: CONTROLLER_URL + id,
+      url: `${CONTROLLER_URL}/${id}`,
       method: 'delete',
     });
   },
   updateRate(id, data) {
     return Query({
-      url: `${CONTROLLER_URL + id}/rate`,
+      url: `${CONTROLLER_URL}/${id}/rate`,
       method: 'put',
       data,
     });
   },
   removeRate(id) {
     return Query({
-      url: `${CONTROLLER_URL + id}/rate`,
+      url: `${CONTROLLER_URL}/${id}/rate`,
       method: 'delete',
     });
   },

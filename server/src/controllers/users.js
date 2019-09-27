@@ -27,7 +27,7 @@ module.exports = {
     const { login } = req.params;
     const user = await User.findOne({
       login,
-    }).select('login rating bio avatar');
+    }).select('login rating bio avatar createdAt');
     if (user) {
       success(res, user);
     } else {

@@ -35,19 +35,28 @@
             {{ post.createdAt | $fromNow }}
           </span>
           <span class="post-main__meta-comments">
-            <router-link 
+            <router-link
             target="_blank"
             :to="{
               path: post.slug,
               hash: 'comments'
-            }"> 
+            }">
               <comments-icon/> {{ post.commentCount }}
             </router-link>
           </span>
-          <span class="post-main__meta-author">
-            {{ post.author.login }}
-            <img :src="$resolveAvatar(post.author.avatar)">
-          </span>
+            <router-link
+            target="_blank"
+            :to="{
+              name: 'UserPage',
+              params: {
+                login: post.author.login
+              },
+            }">
+              <span class="post-main__meta-author">
+                {{ post.author.login }}
+                <img :src="$resolveAvatar(post.author.avatar)">
+              </span>
+            </router-link>
         </div>
         <!-- {{ post.createdAt !== post.updatedAt ? 'updated: ' + post.updatedAt : ''}} -->
       </div>
@@ -122,7 +131,7 @@ export default {
         }
       }
     }
-    
+
     &__meta {
       display: flex;
       flex-direction: row;
