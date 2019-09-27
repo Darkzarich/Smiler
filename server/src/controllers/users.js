@@ -6,7 +6,7 @@ const User = require('../models/User');
 const { generateError, success } = require('./utils/utils');
 const consts = require('../const/const');
 
-const validateUser = (user, next) => {
+const validateUserRegistration = (user, next) => {
   if (user.login && user.password && user.confirm && user.email) {
     if (user.login.length < 3 || user.login.length > 10) {
       generateError('Login length must be 3-10 symbols', 422, next);
@@ -14,6 +14,18 @@ const validateUser = (user, next) => {
       generateError('Password length must be not less than 6', 422, next);
     } else if (user.password !== user.confirm) {
       generateError('Password and password confirm must be equal', 422, next);
+    } else {
+      return 0;
+    }
+  } else {
+    generateError('All fields must be filled.', 422, next);
+  }
+};
+
+const validateUserAuth = (user, next) => {
+  if (user.password && user.email) {
+    if (user.password.length < 6) {
+      generateError('Password length must be not less than 6', 422, next);
     } else {
       return 0;
     }
@@ -74,7 +86,7 @@ module.exports = {
       confirm: req.body.confirm,
     };
 
-    const status = validateUser(user, next);
+    const status = validateUserRegistration(user, next);
 
     if (status !== 0) {
       return;
@@ -103,10 +115,9 @@ module.exports = {
     const user = {
       email: req.body.email,
       password: req.body.password,
-      confirm: req.body.password,
     };
 
-    const status = validateUser(user, next);
+    const status = validateUserAuth(user, next);
 
     if (status !== 0) {
       return;
