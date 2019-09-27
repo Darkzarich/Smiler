@@ -107,7 +107,15 @@ module.exports = {
       req.session.userId = newUser.id;
       req.session.userLogin = newUser.login;
 
-      success(res);
+      const userAuth = {
+        login: req.session.userLogin,
+        isAuth: true,
+        rating: newUser.rating,
+        avatar: newUser.avatar,
+        email: newUser.email,
+      };
+
+      success(res, userAuth);
     } catch (e) {
       next(e);
     }
@@ -140,7 +148,15 @@ module.exports = {
         req.session.userId = foundUser._id;
         req.session.userLogin = foundUser.login;
 
-        success(res);
+        const userAuth = {
+          login: foundUser.login,
+          isAuth: true,
+          rating: foundUser.rating,
+          avatar: foundUser.avatar,
+          email: foundUser.email,
+        };
+
+        success(res, userAuth);
       } else {
         generateError('Invalid email or password', 401, next);
         return;

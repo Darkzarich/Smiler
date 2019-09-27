@@ -222,7 +222,8 @@ router.put('/:login/template', auth.required, usersController.updateUserPostTemp
  *                type: string
  *      responses:
  *        200:
- *          $ref: '#/responses/OK'
+ *          description: OK
+ *          $ref: '#/definitions/AuthState'
  *        422:
  *          $ref: '#/responses/UnprocessableEntity'
  */
@@ -258,7 +259,9 @@ router.post('/', usersController.register);
  *                 example: u1234
  *     responses:
  *       200:
- *         $ref: '#/responses/OK'
+ *         description: OK
+ *         schema:
+ *          $ref: '#/definitions/AuthState'
  *       422:
  *         description: Validation error
  *       500:
