@@ -53,7 +53,7 @@
               },
             }">
               <span class="post-main__meta-author">
-                {{ post.author.login }}
+                <span> {{ post.author.login }} </span>
                 <img :src="$resolveAvatar(post.author.avatar)">
               </span>
             </router-link>
@@ -157,6 +157,13 @@ export default {
       &-author {
         display: flex;
         align-items: center;
+        color: $main-text;
+        span {
+          border-bottom: 1px solid transparent;
+          &:hover {
+            border-bottom: 1px solid $main-text;
+          }
+        }
         img {
           width: 2rem;
           height: 2rem;
