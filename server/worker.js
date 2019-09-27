@@ -13,7 +13,18 @@ const router = require('./src/routes');
 const app = express();
 const { PORT } = config;
 
-app.use(cors({ credentials: true }));
+const whitelist = [config.FRONT_ORIGIN_LOCAL, config.FRONT_ORIGIN_REMOTE];
+
+app.use(cors({
+  credentials: true,
+  origin(origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+}));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
