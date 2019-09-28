@@ -29,9 +29,9 @@ export default {
   methods: {
     ratingClass(rating) {
       if (rating > 0) {
-        return 'user__rating_positive';
+        return 'user-profile__rating_positive';
       } if (rating < 0) {
-        return 'user__rating_negative';
+        return 'user-profile__rating_negative';
       }
       return '';
     },

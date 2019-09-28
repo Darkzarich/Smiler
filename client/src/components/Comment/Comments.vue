@@ -23,12 +23,19 @@
           >
             <minus-icon/>
           </div>
-          <div class="comments__item-main-block-meta-author">
-            {{ comment.author.login }}
-          </div>
-          <div class="comments__item-main-block-meta-avatar">
-            <img :src="$resolveAvatar(comment.author.avatar)"/>
-          </div>
+          <router-link :to="{
+            name: 'UserPage',
+            params: {
+              login: comment.author.login
+            }
+          }">
+            <div class="comments__item-main-block-meta-author">
+              {{ comment.author.login }}
+            </div>
+            <div class="comments__item-main-block-meta-avatar">
+              <img :src="$resolveAvatar(comment.author.avatar)"/>
+            </div>
+          </router-link>
           <div class="comments__item-main-block-meta-date">
             {{ comment.createdAt | $fromNow }}
           </div>
@@ -84,6 +91,12 @@ export default {
               margin-left: 0.5rem;
               border-radius: 50%;
             }
+          }
+
+          a {
+            display: flex;
+            color: $main-text;
+            text-decoration: none;
           }
 
           &-date {
