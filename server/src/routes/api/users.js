@@ -223,7 +223,8 @@ router.put('/:login/template', auth.required, usersController.updateUserPostTemp
  *      responses:
  *        200:
  *          description: OK
- *          $ref: '#/definitions/AuthState'
+ *          schema:
+ *            $ref: '#/definitions/AuthState'
  *        422:
  *          $ref: '#/responses/UnprocessableEntity'
  */

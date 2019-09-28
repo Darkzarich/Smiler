@@ -12,6 +12,7 @@ router.use((err, req, res, next) => {
       },
     });
   } else {
+    // TODO: validate mongo db error
     res.status(500).json({
       error: {
         message: err.message,
