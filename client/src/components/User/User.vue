@@ -14,11 +14,19 @@
       <div class="user__logged-block">
         <div class="user__logged-meta">
           <div class="user__logged-meta-avatar">
-            <img :src="$resolveAvatar(getUser.avatar)">
-            <div class="user__logged-meta-login">
-              {{ getUser.login }}
-            </div>
+            <router-link :to="{
+              name: 'UserPage',
+                params: {
+                  login: getUser.login
+                }
+            }">
+              <img :src="$resolveAvatar(getUser.avatar)">
+              <div class="user__logged-meta-login">
+                {{ getUser.login }}
+              </div>
+            </router-link>
           </div>
+
         </div>
         <div class="user__logged-info">
             <div class="user__logged-info-rating">
@@ -102,25 +110,29 @@ export default {
     background: $bg;
     justify-content: center;
 
-    &-avatar {
-      justify-content: center;
-      display: flex;
-      flex-direction: column;
-      flex-wrap: nowrap;
-      padding: 1rem;
-      align-items: center;
-      width: 50%;
-      img {
-        border-radius: 50%;
-        width: 8rem;
+      &-avatar {
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        padding: 1rem;
+        align-items: center;
+        width: 50%;
+        img {
+          border-radius: 50%;
+          width: 8rem;
+        }
       }
-    }
-    &-login {
-      color: $main-text;
-      font-size: 1rem;
-      text-align: center;
-      margin: 1rem;
-    }
+      &-login {
+        color: $main-text;
+        font-size: 1rem;
+        text-align: center;
+        margin: 1rem;
+      }
+
+      a {
+        text-decoration: none;
+      }
   }
   &__logged-info {
     display: flex;

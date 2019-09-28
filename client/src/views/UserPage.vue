@@ -46,21 +46,36 @@ export default {
       next(vm => vm.setUserInfo(user.data));
     }
   },
+  async beforeRouteUpdate(to, from, next) {
+    const user = await api.users.getUserProfile(to.params.login);
+
+    if (user.data.error) {
+      next({
+        name: '404',
+      });
+    } else {
+      this.setUserInfo(user.data);
+      this.uploadPosts();
+    }
+  },
   async created() {
-    this.loading = true;
-
-    const res = await api.posts.getPosts({
-      author: this.$route.params.login,
-      limit: consts.POSTS_INITIAL_COUNT,
-    });
-
-    this.posts = res.data.posts;
-
-    this.loading = false;
+    this.uploadPosts();
   },
   methods: {
-    async setUserInfo(user) {
+    setUserInfo(user) {
       this.userInfo = user;
+    },
+    async uploadPosts() {
+      this.loading = true;
+
+      const res = await api.posts.getPosts({
+        author: this.userInfo.login,
+        limit: consts.POSTS_INITIAL_COUNT,
+      });
+
+      this.posts = res.data.posts;
+
+      this.loading = false;
     },
   },
 };
