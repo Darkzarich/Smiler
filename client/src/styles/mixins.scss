@@ -6,6 +6,12 @@
   flex-wrap: nowrap;
 }
 
+@mixin flex-col {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
 @mixin widget {
   border: 1px solid $light-gray;
   background: $widget-bg;

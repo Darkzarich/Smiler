@@ -1,25 +1,15 @@
 <template>
   <div class="user">
+
     <template v-if="!getUserAuthState">
       <template v-if="mode == USER_LOGIN_MODE">
-        <user-login/>
-        <div
-          @click="setMode(USER_REG_MODE)"
-          class="user__mode-toggler"
-        >
-          Registration
-        </div>
+        <user-login @mode-change="setMode(USER_REG_MODE)"/>
       </template>
       <template v-else-if="mode == USER_REG_MODE">
-        <user-registration/>
-        <div
-          @click="setMode(USER_LOGIN_MODE)"
-          class="user__mode-toggler"
-        >
-          Login
-        </div>
+        <user-registration @mode-change="setMode(USER_LOGIN_MODE)"/>
       </template>
     </template>
+
     <template v-else>
       <div class="user__logged-block">
         <div class="user__logged-meta">
