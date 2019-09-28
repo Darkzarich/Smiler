@@ -29,12 +29,12 @@ export default {
   methods: {
     ratingClass(rating) {
       if (rating > 0) {
-        return 'user__rating_positive'
-      } else if (rating < 0) {
+        return 'user__rating_positive';
+      } if (rating < 0) {
         return 'user__rating_negative';
       }
       return '';
-    }
+    },
   },
   filters: {
     toDate(date) {
@@ -42,12 +42,12 @@ export default {
     },
     ratingTransform(rating) {
       if (rating > 0) {
-        return '+' + rating
+        return `+${rating}`;
       }
       return rating;
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style lang="scss">

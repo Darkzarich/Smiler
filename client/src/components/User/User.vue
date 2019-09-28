@@ -53,7 +53,7 @@
 
 <script>
 import consts from '@/const/const';
-import api from '@/api'
+import api from '@/api';
 
 import UserLogin from '@/components/User/UserLogin';
 import UserRegistration from '@/components/User/UserRegistration';
@@ -66,14 +66,14 @@ export default {
     UserLogin,
     UserRegistration,
     exitIcon,
-    addIcon
+    addIcon,
   },
   data() {
     return {
       USER_LOGIN_MODE: consts.USER_LOGIN_MODE,
       USER_REG_MODE: consts.USER_REG_MODE,
       mode: consts.USER_LOGIN_MODE,
-    }
+    };
   },
   computed: {
     getUserAuthState() {
@@ -81,7 +81,7 @@ export default {
     },
     getUser() {
       return this.$store.getters.getUser;
-    }
+    },
   },
   methods: {
     setMode(mode) {
@@ -91,11 +91,11 @@ export default {
       const res = await api.users.logoutUser();
 
       if (res.data.ok) {
-        location.reload();
+        document.location.reload();
       }
     },
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss">

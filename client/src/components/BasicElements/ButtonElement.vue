@@ -1,7 +1,7 @@
 <template>
-  <div>
-    Not found
-  </div>
+<div class="button">
+
+</div>
 </template>
 
 <script>

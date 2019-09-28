@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import api from '@/api'
+import api from '@/api';
 
 export default {
   data() {
@@ -19,9 +19,9 @@ export default {
       login: '',
       password: '',
       confirm: '',
-    }
-  }
-}
+    };
+  },
+};
 </script>
 
 <style>

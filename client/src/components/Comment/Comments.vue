@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import CommentTreeHelper from './CommentTreeHelper'
+import CommentTreeHelper from './CommentTreeHelper';
 import plusIcon from '@/library/svg/plus';
 import minusIcon from '@/library/svg/minus';
 
@@ -53,10 +53,10 @@ export default {
   components: {
     CommentTreeHelper,
     plusIcon,
-    minusIcon
+    minusIcon,
   },
   props: ['data', 'indentLevel'],
-}
+};
 </script>
 
 <style lang="scss">

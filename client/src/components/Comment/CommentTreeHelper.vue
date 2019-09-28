@@ -6,8 +6,8 @@
 
 export default {
   components: {
-    Comments: () => import('./Comments')
+    Comments: () => import('./Comments'),
   },
-  props: ['data', 'indentLevel']
-}
+  props: ['data', 'indentLevel'],
+};
 </script>

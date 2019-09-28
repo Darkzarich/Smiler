@@ -8,14 +8,14 @@
 </template>
 
 <script>
-import api from '@/api'
+import api from '@/api';
 
 export default {
   data() {
     return {
       email: '',
       password: '',
-    }
+    };
   },
   methods: {
     async login() {
@@ -28,8 +28,8 @@ export default {
         this.$store.commit('setUser', res.data);
       }
     },
-  }
-}
+  },
+};
 </script>
 
 <style>

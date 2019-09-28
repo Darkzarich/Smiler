@@ -17,10 +17,10 @@
 </template>
 
 <script>
-import HeaderElement from '@/components/HeaderElement'
-import User from '@/components/User/User'
+import HeaderElement from '@/components/HeaderElement';
+import User from '@/components/User/User';
 
-import api from '@/api'
+import api from '@/api';
 
 export default {
   components: {
@@ -30,14 +30,14 @@ export default {
   data() {
     return {
       show: false,
-    }
+    };
   },
   beforeCreate() {
-    this.$store.dispatch('userCheckAuthState').then( () => {
+    this.$store.dispatch('userCheckAuthState').then(() => {
       this.show = true;
     });
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss">

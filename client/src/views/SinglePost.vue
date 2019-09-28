@@ -18,7 +18,7 @@
 import Post from '@/components/Post/Post.vue';
 import Comments from '@/components/Comment/Comments.vue';
 
-import api from '@/api'
+import api from '@/api';
 
 import consts from '@/const/const';
 
@@ -28,21 +28,21 @@ export default {
       post: {},
       comments: [],
       commentsLoading: false,
-    }
+    };
   },
   components: {
     Post,
     Comments,
   },
-  async beforeRouteEnter( to, from, next) {
+  async beforeRouteEnter(to, from, next) {
     const post = await api.posts.getPostBySlug(to.params.slug);
 
     if (post.data.error) {
       next({
-        name: '404'
-      })
+        name: '404',
+      });
     } else {
-      next( vm => vm.setPost(post.data) );
+      next(vm => vm.setPost(post.data));
     }
   },
   methods: {
@@ -60,8 +60,8 @@ export default {
 
       this.comments = res.data;
       this.loading = false;
-    }
-  }
+    },
+  },
 };
 </script>
 

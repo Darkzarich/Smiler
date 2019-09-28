@@ -69,8 +69,6 @@
 </template>
 
 <script>
-import moment from 'moment';
-
 import commentsIcon from '@/library/svg/comments';
 import plusIcon from '@/library/svg/plus';
 import minusIcon from '@/library/svg/minus';
@@ -79,10 +77,10 @@ export default {
   components: {
     commentsIcon,
     plusIcon,
-    minusIcon
+    minusIcon,
   },
   props: ['post'],
-}
+};
 </script>
 
 <style lang="scss">

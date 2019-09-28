@@ -18,8 +18,8 @@
 
 <script>
 import Post from '@/components/Post/Post.vue';
-import UserProfile from '@/components/UserProfile/UserProfile.vue'
-import api from '@/api'
+import UserProfile from '@/components/UserProfile/UserProfile.vue';
+import api from '@/api';
 
 import consts from '@/const/const';
 
@@ -29,21 +29,21 @@ export default {
       posts: [],
       userInfo: {},
       loading: false,
-    }
+    };
   },
   components: {
     Post,
-    UserProfile
+    UserProfile,
   },
-  async beforeRouteEnter( to, from, next) {
+  async beforeRouteEnter(to, from, next) {
     const user = await api.users.getUserProfile(to.params.login);
 
     if (user.data.error) {
       next({
-        name: '404'
-      })
+        name: '404',
+      });
     } else {
-      next( vm => vm.setUserInfo(user.data) );
+      next(vm => vm.setUserInfo(user.data));
     }
   },
   async created() {
@@ -61,18 +61,8 @@ export default {
   methods: {
     async setUserInfo(user) {
       this.userInfo = user;
-
-      this.loading = true;
-
-      const res = await api.comments.getComments({
-        limit: consts.COMMENTS_INITIAL_COUNT,
-        post: post.id,
-      });
-
-      this.comments = res.data;
-      this.loading = false;
-    }
-  }
+    },
+  },
 };
 </script>
 

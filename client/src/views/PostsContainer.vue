@@ -16,7 +16,7 @@
 
 <script>
 import Post from '@/components/Post/Post.vue';
-import api from '@/api'
+import api from '@/api';
 
 import consts from '@/const/const';
 
@@ -25,7 +25,7 @@ export default {
     return {
       posts: [],
       loading: false,
-    }
+    };
   },
   components: {
     Post,
@@ -40,7 +40,7 @@ export default {
     this.posts = res.data.posts;
 
     this.loading = false;
-  }
+  },
 };
 </script>
 
