@@ -13,11 +13,13 @@
           </div>
           <div
             class="comments__item-main-block-meta-upvote"
+            @click="upvote(comment.id)"
             :class="comment.rated.isRated && !comment.rated.negative ? 'comments__item-main-block-meta-upvote_active' : ''"
           >
             <plus-icon/>
           </div>
           <div
+            @click="downvote(comment.id)"
             class="comments__item-main-block-meta-downvote"
             :class="comment.rated.isRated && comment.rated.negative ? 'comments__item-main-block-meta-downvote_active' : ''"
           >
@@ -52,9 +54,13 @@
 </template>
 
 <script>
+import api from '@/api/index';
+
 import CommentTreeHelper from './CommentTreeHelper';
 import plusIcon from '@/library/svg/plus';
 import minusIcon from '@/library/svg/minus';
+
+import consts from '@/const/const';
 
 export default {
   components: {
@@ -63,6 +69,70 @@ export default {
     minusIcon,
   },
   props: ['data', 'indentLevel'],
+  data() {
+    return {
+      commentData: this.data,
+      loadingRate: false,
+    };
+  },
+  methods: {
+    async upvote(id) {
+      if (!this.loadingRate) {
+        const commentItemData = this.commentData.find(el => el.id === id);
+
+        this.loadingRate = true;
+
+        if (!commentItemData.rated.isRated) {
+          const res = await api.comments.updateRate(id, {
+            negative: false,
+          });
+
+          if (!res.data.error) {
+            commentItemData.rated.isRated = true;
+            commentItemData.rated.negative = false;
+            commentItemData.rating += consts.COMMENT_RATE_VALUE;
+          }
+        } else if (commentItemData.rated.negative) {
+          const res = await api.comments.removeRate(id);
+
+          if (!res.data.error) {
+            commentItemData.rated.isRated = false;
+            commentItemData.rating += consts.COMMENT_RATE_VALUE;
+          }
+        }
+      }
+
+      this.loadingRate = false;
+    },
+    async downvote(id) {
+      if (!this.loadingRate) {
+        const commentItemData = this.commentData.find(el => el.id === id);
+
+        this.loadingRate = true;
+
+        if (!commentItemData.rated.isRated) {
+          const res = await api.comments.updateRate(id, {
+            negative: true,
+          });
+
+          if (!res.data.error) {
+            commentItemData.rated.isRated = true;
+            commentItemData.rated.negative = true;
+            commentItemData.rating -= consts.COMMENT_RATE_VALUE;
+          }
+        } else if (!commentItemData.rated.negative) {
+          const res = await api.comments.removeRate(id);
+
+          if (!res.data.error) {
+            commentItemData.rated.isRated = false;
+            commentItemData.rating -= consts.COMMENT_RATE_VALUE;
+          }
+        }
+      }
+
+      this.loadingRate = false;
+    },
+  },
 };
 </script>
 

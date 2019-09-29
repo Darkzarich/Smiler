@@ -1,5 +1,6 @@
 import axios from 'axios';
 import config from '@/config/config';
+import store from '@/store/index';
 
 axios.defaults.withCredentials = true;
 
@@ -11,6 +12,10 @@ export default (requestData) => {
     if (e.response) {
       if (e.response.data.error) {
         console.error(e.response.data.error.message);
+      }
+
+      if (e.response.status === 401) {
+        store.commit('clearUser');
       }
     } else {
       console.error(e);

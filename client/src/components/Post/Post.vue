@@ -3,31 +3,33 @@
     <div class="post-side">
       <div
         class="post-side__upvote"
-        :class="post.rated.isRated && !post.rated.negative ? 'post-side__upvote_active' : ''">
+        @click="upvote(postData.slug)"
+        :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''">
         <plus-icon/>
       </div>
       <div class="post-side__rating">
-        {{ post.rating }}
+        {{ postData.rating }}
       </div>
       <div
         class="post-side__downvote"
-        :class="post.rated.isRated && post.rated.negative ? 'post-side__downvote_active' : ''">
+        @click="downvote(postData.slug)"
+        :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''">
         <minus-icon/>
       </div>
     </div>
     <div class="post-main">
-      <router-link :to="post.slug" target="_blank">
+      <router-link :to="postData.slug" target="_blank">
         <div class="post-main__title">
-          {{ post.title }}
+          {{ postData.title }}
         </div>
       </router-link>
       <div class="post-main__body">
-        {{ post.body }}
+        {{ postData.body }}
       </div>
       <div class="post-main__attachments">
         <div
           class="post-main__attachments-item"
-          v-for="upload in post.uploads"
+          v-for="upload in postData.uploads"
           :key="upload"
         >
           <img @error="$resolveImageError" :src="$resolveImage(upload)">
@@ -36,16 +38,16 @@
       <div class="post-main__footer">
         <div class="post-main__meta">
           <span class="post-main__meta-date">
-            {{ post.createdAt | $fromNow }}
+            {{ postData.createdAt | $fromNow }}
           </span>
           <span class="post-main__meta-comments">
             <router-link
             target="_blank"
             :to="{
-              path: post.slug,
+              path: postData.slug,
               hash: 'comments'
             }">
-              <comments-icon/> {{ post.commentCount }}
+              <comments-icon/> {{ postData.commentCount }}
             </router-link>
           </span>
             <router-link
@@ -53,12 +55,12 @@
             :to="{
               name: 'UserPage',
               params: {
-                login: post.author.login
+                login: postData.author.login
               },
             }">
               <span class="post-main__meta-author">
-                <span> {{ post.author.login }} </span>
-                <img :src="$resolveAvatar(post.author.avatar)">
+                <span> {{ postData.author.login }} </span>
+                <img :src="$resolveAvatar(postData.author.avatar)">
               </span>
             </router-link>
         </div>
@@ -69,9 +71,13 @@
 </template>
 
 <script>
+import api from '@/api/index';
+
 import commentsIcon from '@/library/svg/comments';
 import plusIcon from '@/library/svg/plus';
 import minusIcon from '@/library/svg/minus';
+
+import consts from '@/const/const';
 
 export default {
   components: {
@@ -80,6 +86,66 @@ export default {
     minusIcon,
   },
   props: ['post'],
+  data() {
+    return {
+      postData: this.post,
+      loadingRate: false,
+    };
+  },
+  methods: {
+    async upvote(slug) {
+      if (!this.loadingRate) {
+        this.loadingRate = true;
+
+        if (!this.postData.rated.isRated) {
+          const res = await api.posts.updateRateBySlug(slug, {
+            negative: false,
+          });
+
+          if (!res.data.error) {
+            this.postData.rated.isRated = true;
+            this.postData.rated.negative = false;
+            this.postData.rating += consts.POST_RATE_VALUE;
+          }
+        } else if (this.postData.rated.negative) {
+          const res = await api.posts.removeRateBySlug(slug);
+
+          if (!res.data.error) {
+            this.postData.rated.isRated = false;
+            this.postData.rating += consts.POST_RATE_VALUE;
+          }
+        }
+      }
+
+      this.loadingRate = false;
+    },
+    async downvote(slug) {
+      if (!this.loadingRate) {
+        this.loadingRate = true;
+
+        if (!this.postData.rated.isRated) {
+          const res = await api.posts.updateRateBySlug(slug, {
+            negative: true,
+          });
+
+          if (!res.data.error) {
+            this.postData.rated.isRated = true;
+            this.postData.rated.negative = true;
+            this.postData.rating -= consts.POST_RATE_VALUE;
+          }
+        } else if (!this.postData.rated.negative) {
+          const res = await api.posts.removeRateBySlug(slug);
+
+          if (!res.data.error) {
+            this.postData.rated.isRated = false;
+            this.postData.rating -= consts.POST_RATE_VALUE;
+          }
+        }
+      }
+
+      this.loadingRate = false;
+    },
+  },
 };
 </script>
 

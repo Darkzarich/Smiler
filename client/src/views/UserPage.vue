@@ -69,7 +69,7 @@ export default {
       this.loading = true;
 
       const res = await api.posts.getPosts({
-        author: this.userInfo.login,
+        author: this.userInfo.login || this.$route.params.login,
         limit: consts.POSTS_INITIAL_COUNT,
       });
 
