@@ -36,9 +36,13 @@
         </div>
         <div class="user__logged-nav">
           <ul class="user__logged-nav-list">
-            <li class="user__logged-nav-item" @click="">
-              <add-icon/> New Post
-            </li>
+            <router-link :to="{
+                name: 'PostCreate'
+            }">
+              <li class="user__logged-nav-item">
+                  <add-icon/> New Post
+              </li>
+            </router-link>
             <li class="user__logged-nav-item" @click="logout">
               <exit-icon/> Logout
             </li>
@@ -154,6 +158,9 @@ export default {
       margin-block-end: 0em;
       list-style: none;
       text-align: center;
+      a {
+        text-decoration: none;
+      }
     }
     &-item {
       cursor: pointer;

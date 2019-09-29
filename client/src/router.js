@@ -1,12 +1,31 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import store from '@/store/index';
+import api from '@/api/index';
 
 import PostsContainer from './views/PostsContainer.vue';
 import NotFound from './views/NotFound.vue';
 import SinglePost from './views/SinglePost.vue';
 import UserPage from './views/UserPage.vue';
+import PostCreate from './views/PostCreate.vue';
 
 Vue.use(Router);
+
+const authGuard = async (to, from, next) => {
+  await store.dispatch('userCheckAuthState');
+
+  if (store.getters.getUserAuthState) {
+    next();
+  } else {
+    console.log(store.getters.getUserAuthState);
+    store.dispatch('newSystemNotification', {
+      error: {
+        message: 'Only authenticated users can acces this page.',
+      },
+    });
+    next(from);
+  }
+};
 
 const router = new Router({
   mode: 'history',
@@ -37,6 +56,14 @@ const router = new Router({
       path: '/:slug',
       name: 'Single',
       component: SinglePost,
+    },
+    {
+      path: '/post/create',
+      name: 'PostCreate',
+      component: PostCreate,
+      beforeEnter(to, from, next) {
+        authGuard(to, from, next);
+      },
     },
     // {
     //   path: '/about',

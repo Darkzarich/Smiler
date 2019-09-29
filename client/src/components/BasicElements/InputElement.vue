@@ -6,6 +6,7 @@
   <input
     :id="label"
     :type="type"
+    v-if="!multiline"
     :name="name"
     @input="setValueAndChanged($event.target.value)"
     :value="value"
@@ -13,6 +14,17 @@
     class="input__element"
     :class="(error || errorOnlyStyle) && wasChanged ? 'input__element_error' : ''"
   >
+  <textarea
+    :id="label"
+    v-else
+    :type="type"
+    :name="name"
+    @input="setValueAndChanged($event.target.value)"
+    :value="value"
+    :placeholder="placeHolder"
+    class="input__element"
+    :class="(error || errorOnlyStyle) && wasChanged ? 'input__element_error' : ''"
+  />
   <span
     class="input__error"
     v-if="wasChanged"
@@ -42,6 +54,10 @@ export default {
       validator(val) {
         return ['text', 'password'].indexOf(val) !== -1;
       },
+    },
+    multiline: {
+      type: Boolean,
+      default: false,
     },
     name: {
       type: String,

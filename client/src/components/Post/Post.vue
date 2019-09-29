@@ -31,8 +31,8 @@
           {{ postData.title }}
         </div>
       </router-link>
-      <div class="post-main__body">
-        {{ postData.body }}
+      <div class="post-main__body" v-html="postData.body">
+        <!-- {{ postData.body }} -->
       </div>
       <div class="post-main__attachments">
         <div

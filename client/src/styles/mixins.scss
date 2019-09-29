@@ -18,3 +18,12 @@
   border-radius: 2px;
   padding: 1rem;
 }
+
+@mixin input {
+  border: 1px solid $light-gray;
+  background: $bg;
+  border-radius: 2px;
+  padding: 1rem;
+  font: 400 13.3333px Arial;
+  margin: 0em;
+}

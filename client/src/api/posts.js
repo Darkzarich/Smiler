@@ -10,7 +10,7 @@ export default {
       params,
     });
   },
-  createdPost(data) {
+  createPost(data) {
     return Query({
       url: CONTROLLER_URL,
       method: 'post',
