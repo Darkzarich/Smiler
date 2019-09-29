@@ -18,7 +18,15 @@
       </div>
     </div>
     <div class="post-main">
-      <router-link :to="postData.slug" target="_blank">
+      <router-link
+        :to="{
+          name: 'Single',
+          params: {
+            slug: postData.slug
+          }
+        }"
+        target="_blank"
+      >
         <div class="post-main__title">
           {{ postData.title }}
         </div>

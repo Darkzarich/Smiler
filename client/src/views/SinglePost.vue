@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="post-container">
-      <post :post="post"/>
+      <post v-if="showPost" :post="post"/>
     </div>
 
     <div class="comments" id="comments">
@@ -26,6 +26,7 @@ export default {
   data() {
     return {
       post: {},
+      showPost: false,
       comments: [],
       commentsLoading: false,
     };
@@ -48,10 +49,10 @@ export default {
   methods: {
     async setPost(post) {
       this.post = post;
-
+      this.showPost = true;
       // comments
 
-      this.loading = true;
+      this.commentsLoading = true;
 
       const res = await api.comments.getComments({
         limit: consts.COMMENTS_INITIAL_COUNT,
@@ -59,7 +60,7 @@ export default {
       });
 
       this.comments = res.data;
-      this.loading = false;
+      this.commentsLoading = false;
     },
   },
 };
