@@ -1,5 +1,6 @@
 <template>
   <div id="app" v-if="show">
+    <system-notification/>
     <header-element/>
       <!-- <div id="nav">
         <router-link to="/">Home</router-link> |
@@ -18,6 +19,7 @@
 
 <script>
 import HeaderElement from '@/components/HeaderElement';
+import SystemNotification from '@/components/SystemNotification/SystemNotification';
 import User from '@/components/User/User';
 
 import api from '@/api';
@@ -25,6 +27,7 @@ import api from '@/api';
 export default {
   components: {
     HeaderElement,
+    SystemNotification,
     User,
   },
   data() {
