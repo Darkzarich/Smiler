@@ -8,7 +8,7 @@ import UserPage from './views/UserPage.vue';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   scrollBehavior(to) {
@@ -48,3 +48,17 @@ export default new Router({
     // },
   ],
 });
+
+router.beforeEach((to, from, next) => {
+  const mathed = router.options.routes.find(el => el.name === to.name);
+
+  if (mathed) {
+    next();
+  } else {
+    next({
+      name: '404',
+    });
+  }
+});
+
+export default router;
