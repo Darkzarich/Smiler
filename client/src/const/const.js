@@ -1,5 +1,11 @@
 const POSTS_INITIAL_COUNT = 20;
 const POST_RATE_VALUE = 1;
+const POST_MAX_SECTIONS = 8;
+const POST_SECTION_TYPES = {
+  TEXT: 'text',
+  PICTURE: 'pic',
+  VIDEO: 'vid',
+};
 
 const COMMENT_RATE_VALUE = 0.5;
 const COMMENTS_INITIAL_COUNT = 10;
@@ -22,4 +28,6 @@ export default {
   LOGIN_MAX_LENGTH,
   POST_RATE_VALUE,
   COMMENT_RATE_VALUE,
+  POST_MAX_SECTIONS,
+  POST_SECTION_TYPES
 };

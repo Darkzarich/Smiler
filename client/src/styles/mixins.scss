@@ -24,6 +24,19 @@
   background: $bg;
   border-radius: 2px;
   padding: 1rem;
-  font: 400 13.3333px Arial;
   margin: 0em;
+}
+
+@mixin scroll {
+  &::-webkit-scrollbar {
+    width: 10px;
+    background-color: #F5F5F5;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: $light-gray;
+  }
+  &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: $widget-bg;
+  }
 }
