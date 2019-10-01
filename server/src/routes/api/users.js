@@ -7,45 +7,46 @@ const auth = require('../auth');
 *  tags:
 *   - name: Users
 *     description: Actions with Users collection
-* definitions:
-*  Author:
-*   type: object
-*   properties:
-*     id:
-*       type: string
-*     login:
-*       type: string
-*       example: user123
-*     avatar:
-*       type: string
-*  UserProfile:
-*   type: object
-*   properties:
-*     id:
-*       type: string
-*     login:
-*       type: string
-*     rating:
-*       type: number
-*     bio:
-*       type: string
-*     avatar:
-*       type: string
-*     createdAt:
-*       type: string
-*  AuthState:
-*   type: object
-*   properties:
-*     email:
-*       type: string
-*     login:
-*       type: string
-*     avatar:
-*       type: string
-*     isAuth:
-*       type: boolean
-*     rating:
-*       type: number
+* components:
+*  schemas:
+*   Author:
+*    type: object
+*    properties:
+*      id:
+*        type: string
+*      login:
+*        type: string
+*        example: user123
+*      avatar:
+*        type: string
+*   UserProfile:
+*    type: object
+*    properties:
+*      id:
+*        type: string
+*      login:
+*        type: string
+*      rating:
+*        type: number
+*      bio:
+*        type: string
+*      avatar:
+*        type: string
+*      createdAt:
+*        type: string
+*   AuthState:
+*    type: object
+*    properties:
+*      email:
+*        type: string
+*      login:
+*        type: string
+*      avatar:
+*        type: string
+*      isAuth:
+*        type: boolean
+*      rating:
+*        type: number
 */
 
 /**
@@ -58,8 +59,10 @@ const auth = require('../auth');
  *    responses:
  *      200:
  *        description: OK
- *        schema:
- *          $ref: '#/definitions/AuthState'
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/AuthState'
  */
 router.get('/get-auth', usersController.getAuth);
 
@@ -73,49 +76,54 @@ router.get('/get-auth', usersController.getAuth);
  *    parameters:
  *      - in: path
  *        name: login
- *        type: string
+ *        schema:
+ *          type: string
  *        required: true
  *    responses:
  *      200:
  *        description: OK
- *        schema:
- *          $ref: '#/definitions/UserProfile'
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/UserProfile'
  *      404:
- *        $ref: '#/responses/NotFound'
+ *        $ref: '#/components/responses/NotFound'
  *  put:
  *    tags: [Users]
  *    summary: Update user info
  *    description: Update user info with payload
  *    security:
- *      - myCookie: []
+ *      - cookieAuth: []
  *    parameters:
  *      - in: path
  *        name: login
- *        type: string
- *        required: true
- *      - in: body
- *        name: body
  *        schema:
- *          type: object
- *          properties:
- *            bio:
- *              type: string
- *              maxLength: 300
- *            avatar:
- *              type: string
- *              maxLength: 150
- *              description: URL
+ *          type: string
+ *        required: true
+ *    requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              bio:
+ *                type: string
+ *                maxLength: 300
+ *              avatar:
+ *                type: string
+ *                maxLength: 150
+ *                description: URL
  *    responses:
  *      200:
- *        $ref: '#/responses/OK'
+ *        $ref: '#/components/responses/OK'
  *      404:
- *        $ref: '#/responses/NotFound'
+ *        $ref: '#/components/responses/NotFound'
  *      401:
- *        $ref: '#/responses/Unauthorized'
+ *        $ref: '#/components/responses/Unauthorized'
  *      403:
- *        $ref: '#/responses/Forbidden'
+ *        $ref: '#/components/responses/Forbidden'
  *      422:
- *        $ref: '#/responses/UnprocessableEntity'
+ *        $ref: '#/components/responses/UnprocessableEntity'
  */
 router.get('/:login', usersController.getUser);
 router.put('/:login', auth.required, usersController.updateUser);
@@ -127,67 +135,68 @@ router.put('/:login', auth.required, usersController.updateUser);
  *      summary: Get user saved template
  *      tags: [Users]
  *      security:
- *        - myCookie: []
- *      description: Returns user's saved template for post
+ *        - cookieAuth: []
+ *      description: Returns user's saved template for post with `title` and `sections`
  *      parameters:
  *        - in: path
  *          name: login
- *          type: string
+ *          schema:
+ *            type: string
  *          required: true
  *          description: User name
  *      responses:
  *        200:
  *          description: ok
- *          schema:
- *             type: object
- *             properties:
- *                title:
- *                  type: string
- *                body:
- *                  type: string
- *                attachments:
- *                  description: Array of pic paths
- *                  type: array
- *                  items:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  title:
  *                    type: string
+ *                  sections:
+ *                    description: Post sections
+ *                    type: array
+ *                    items:
+ *                      $ref: '#/components/schemas/PostSection'
  *        403:
- *          $ref: '#/responses/Forbidden'
+ *          $ref: '#/components/responses/Forbidden'
  *        401:
- *          $ref: '#/responses/Unauthorized'
+ *          $ref: '#/components/responses/Unauthorized'
  *    put:
  *      summary: Update user template
  *      tags: [Users]
- *      description: Update user post template, delete attachments (pics with following paths)
+ *      description: Update user post template `sections` and `title`
  *      security:
- *        - myCookie: []
+ *        - cookieAuth: []
  *      parameters:
  *       - in: path
  *         name: login
- *         type: string
+ *         schema:
+ *          type: string
  *         required: true
  *         description: User name
- *       - in: body
- *         name: body
- *         schema:
- *           type: object
- *           properties:
- *            title:
- *              type: string
- *            body:
- *              type: string
- *            delete:
- *              type: array
- *              items:
- *                description: path to pic
- *                type: string
+ *      requestBody:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                title:
+ *                  type: string
+ *                sections:
+ *                  type: array
+ *                  items:
+ *                    $ref: '#/components/schemas/PostSection'
  *      responses:
  *        200:
- *          $ref: '#/responses/OK'
+ *          $ref: '#/components/responses/OK'
  *        403:
- *          $ref: '#/responses/Forbidden'
+ *          $ref: '#/components/responses/Forbidden'
  *        401:
- *          $ref: '#/responses/Unauthorized'
- *
+ *          $ref: '#/components/responses/Unauthorized'
+ *        422:
+ *          $ref: '#/components/responses/UnprocessableEntity'
  */
 
 router.get('/:login/template', auth.required, usersController.getUserPostTemplate);
@@ -196,37 +205,80 @@ router.put('/:login/template', auth.required, usersController.updateUserPostTemp
 
 /**
  * @swagger
+ * /users/{login}/template/{hash}:
+ *  delete:
+ *    tags: [Users]
+ *    summary: Delete section file picture
+ *    description: Deletes file picture section and the image from the server. Works only for sections with `isFile` set as true
+ *    security:
+ *      - cookieAuth: []
+ *    parameters:
+ *     - in: path
+ *       name: login
+ *       schema:
+ *         type: string
+ *       required: true
+ *       description: User name
+ *     - in: path
+ *       name: hash
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Section hash
+ *    responses:
+ *      200:
+ *        $ref: '#/components/responses/OK'
+ *      422:
+ *        $ref: '#/components/responses/UnprocessableEntity'
+ *      401:
+ *        $ref: '#/components/responses/Unauthorized'
+ *      403:
+ *        $ref: '#/components/responses/Forbidden'
+ *      404:
+ *        $ref: '#/components/responses/NotFound'
+ */
+
+router.delete('/:login/template/:hash', auth.required, usersController.deleteUserPostTemplatePicture);
+
+/**
+ * @swagger
  * /users:
  *    post:
  *      summary: Register a user
  *      tags: [Users]
  *      description: Register a new user and return its cookie token (connect.sid)
- *      parameters:
- *        - in: body
- *          name: body
- *          schema:
- *            type: object
- *            required: [login, password, confirm]
- *            description: user's credential
- *            properties:
- *              login:
- *                type: string
- *                minLength: 3
- *                maxLength: 10
- *              email:
- *                type: string
- *              password:
- *                type: string
- *                minLength: 6
- *              confirm:
- *                type: string
+ *      requestBody:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              required: [login, password, confirm, email]
+ *              properties:
+ *                login:
+ *                  type: string
+ *                  minLength: 3
+ *                  maxLength: 10
+ *                email:
+ *                  type: string
+ *                password:
+ *                  type: string
+ *                  minLength: 6
+ *                confirm:
+ *                  type: string
  *      responses:
  *        200:
  *          description: OK
- *          schema:
- *            $ref: '#/definitions/AuthState'
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/AuthState'
+ *          headers:
+ *           Set-Cookie:
+ *            schema:
+ *              type: string
+ *              example: JSESSIONID=abcde12345; Path=/; HttpOnly
  *        422:
- *          $ref: '#/responses/UnprocessableEntity'
+ *          $ref: '#/components/responses/UnprocessableEntity'
  */
 
 router.post('/', usersController.register);
@@ -238,31 +290,34 @@ router.post('/', usersController.register);
  * /users/auth:
  *   post:
  *     summary: Login to the application
- *     consumes:
- *       - application/json
  *     tags: [Users]
- *     produces:
- *       - application/json
- *     parameters:
- *       - in: body
- *         name: body
- *         description: user's credential
- *         schema:
- *           type: object
- *           required:
- *            - email
- *            - password
- *           properties:
- *              email:
- *                 type: string
- *              password:
- *                 type: string
- *                 example: u1234
+ *     requestBody:
+ *        description: user's credential
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              required:
+ *                - email
+ *                - password
+ *              properties:
+ *                email:
+ *                  type: string
+ *                password:
+ *                  type: string
  *     responses:
  *       200:
  *         description: OK
- *         schema:
- *          $ref: '#/definitions/AuthState'
+ *         content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/AuthState'
+ *         headers:
+ *          Set-Cookie:
+ *            schema:
+ *              type: string
+ *              example: JSESSIONID=abcde12345; Path=/; HttpOnly
  *       422:
  *         description: Validation error
  *       500:
@@ -278,11 +333,11 @@ router.post('/auth', usersController.auth);
  *    post:
  *       summary: Log out the current user
  *       security:
- *         - myCookie: []
+ *         - cookieAuth: []
  *       tags: [Users]
  *       responses:
  *        200:
- *          $ref: '#/responses/OK'
+ *          $ref: '#/components/responses/OK'
  */
 router.post('/logout', auth.required, usersController.logout);
 

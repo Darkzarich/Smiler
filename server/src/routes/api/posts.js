@@ -4,49 +4,86 @@ const auth = require('../auth');
 
 /**
  * @swagger
- *  tags:
+ * tags:
  *    - name: Posts
  *      description: Actions with posts
- * definitions:
- *   Post:
- *      type: object
- *      properties:
- *        id:
- *          type: string
- *        commentCount:
- *          description: number of comments in a post
- *          type: number
- *        title:
- *          type: string
- *        body:
- *          type: string
- *        author:
- *          $ref: '#/definitions/Author'
- *        slug:
- *          type: string
- *          example: My-post-title-d2k5g8
- *        uploads:
- *          type: array
- *          description: array paths of attachments
- *          items:
- *            type: string
- *        createdAt:
- *          type: string
- *          example: 2019-08-21T22:05:44.788Z
- *        updatedAt:
- *          type: string
- *          example: 2019-09-22T14:02:14.532Z
- *        rating:
- *          type: number
- *        rated:
- *          $ref: '#/definitions/UserRate'
- *   UserRate:
- *      type: object
- *      properties:
- *        isRated:
- *          type: boolean
- *        negative:
- *          type: boolean
+ * components:
+ *  schemas:
+ *    Post:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         commentCount:
+ *           description: number of comments in a post
+ *           type: number
+ *         title:
+ *           type: string
+ *         sections:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/PostSection'
+ *         author:
+ *           $ref: '#/components/schemas/Author'
+ *         slug:
+ *           type: string
+ *           example: My-post-title-d2k5g8
+ *         createdAt:
+ *           type: string
+ *           example: 2019-08-21T22:05:44.788Z
+ *         updatedAt:
+ *           type: string
+ *           example: 2019-09-22T14:02:14.532Z
+ *         rating:
+ *           type: number
+ *         rated:
+ *           $ref: '#/components/schemas/UserRate'
+ *    UserRate:
+ *       type: object
+ *       properties:
+ *         isRated:
+ *           type: boolean
+ *         negative:
+ *           type: boolean
+ *    PostSection:
+ *      oneOf:
+ *        - $ref: '#/components/schemas/PostSectionText'
+ *        - $ref: '#/components/schemas/PostSectionImage'
+ *        - $ref: '#/components/schemas/PostSectionVideo'
+ *    PostSectionText:
+ *       type: object
+ *       properties:
+ *         type:
+ *           type: string
+ *           enum: [text]
+ *         content:
+ *           type: string
+ *           maxLength: 4500
+ *         hash:
+ *           type: string
+ *    PostSectionImage:
+ *       type: object
+ *       properties:
+ *         type:
+ *           type: string
+ *           enum: [pic]
+ *         url:
+ *           type: string
+ *         hash:
+ *           type: string
+ *         isFile:
+ *           type: boolean
+ *           default: false
+ *    PostSectionVideo:
+ *       type: object
+ *       properties:
+ *         type:
+ *           type: string
+ *           enum: [vid]
+ *         url:
+ *           type: string
+ *         hash:
+ *           type: string
  */
 
 
@@ -60,58 +97,69 @@ const auth = require('../auth');
  *      parameters:
  *        - in: query
  *          name: limit
- *          type: string
- *          default: 100
- *          maximum: 100
- *          minimum: 1
+ *          required: true
+ *          schema:
+ *            type: number
+ *            default: 100
+ *            maximum: 100
+ *            minimum: 1
  *          description: posts per page
  *        - in: query
  *          name: offset
- *          type: string
- *          default: 0
+ *          required: true
+ *          schema:
+ *            type: number
+ *            default: 0
  *          description: offset from element
  *        - in: query
  *          name: author
- *          type: string
+ *          schema:
+ *            type: string
  *          description: By author
  *      responses:
  *        200:
  *          description: OK
- *          schema:
- *            type: object
- *            properties:
- *              posts:
- *                type: array
- *                items:
- *                  $ref: '#/definitions/Post'
- *              pages:
- *                type: number
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  posts:
+ *                    type: array
+ *                    items:
+ *                      $ref: '#/components/schemas/Post'
+ *                  pages:
+ *                    type: number
  *    post:
  *      tags: [Posts]
- *      description: Create a post with title `title` and body `body`. Attachments are taken from the template
+ *      description: Create a post with `title` and `sections`. Creating a post clears the template.
  *      summary: create a post
  *      security:
- *        - myCookie: []
- *      parameters:
- *        - in: body
- *          name: body
- *          schema:
- *            type: object
- *            required: [title, body]
- *            properties:
- *              title:
- *                type: string
- *              body:
- *                type: string
+ *        - cookieAuth: []
+ *      requestBody:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              required: [title, sections]
+ *              properties:
+ *                title:
+ *                  type: string
+ *                sections:
+ *                  type: array
+ *                  items:
+ *                    $ref: '#/components/schemas/PostSection'
  *      responses:
  *        200:
  *          description: OK
- *          schema:
- *            $ref: '#/definitions/Post'
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/Post'
  *        422:
- *          $ref: '#/responses/UnprocessableEntity'
+ *          $ref: '#/components/responses/UnprocessableEntity'
  *        401:
- *          $ref: '#/responses/Unauthorized'
+ *          $ref: '#/components/responses/Unauthorized'
  */
 router.get('/', postsController.getAll);
 router.post('/', auth.required, postsController.create);
@@ -123,61 +171,61 @@ router.post('/', auth.required, postsController.create);
  *    put:
  *      tags: [Posts]
  *      security:
- *        - myCookie: []
+ *        - cookieAuth: []
  *      description: Edit a post. You can edit a post only within certain time after it is created
  *      summary: edit a post
  *      parameters:
  *        - in: path
  *          name: slug
  *          required: true
- *          type: string
- *        - in: body
- *          name: body
  *          schema:
- *            type: object
- *            properties:
- *              title:
- *                type: string
- *              body:
- *                type: string
- *              toDelete:
- *                type: array
- *                items:
- *                  description: paths to delete
+ *            type: string
+ *      requestBody:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                title:
  *                  type: string
+ *                sections:
+ *                  type: array
+ *                  items:
+ *                    $ref: '#/components/schemas/PostSection'
  *      responses:
  *        200:
- *          $ref: '#/responses/OK'
+ *          $ref: '#/components/responses/OK'
  *        403:
- *          $ref: '#/responses/Forbidden'
+ *          $ref: '#/components/responses/Forbidden'
  *        401:
- *          $ref: '#/responses/Unauthorized'
+ *          $ref: '#/components/responses/Unauthorized'
  *        404:
- *          $ref: '#/responses/NotFound'
+ *          $ref: '#/components/responses/NotFound'
  *        405:
- *          $ref: '#/responses/MethodNotAllowed'
+ *          $ref: '#/components/responses/MethodNotAllowed'
  *    delete:
  *      tags: [Posts]
  *      summary: delete a post by its slug
  *      description: delete a post by its `slug`
  *      security:
- *        - myCookie: []
+ *        - cookieAuth: []
  *      parameters:
  *        - in: path
  *          name: slug
- *          type: string
  *          required: true
+ *          schema:
+ *            type: string
  *      responses:
  *        200:
- *          $ref: '#/responses/OK'
+ *          $ref: '#/components/responses/OK'
  *        403:
- *          $ref: '#/responses/Forbidden'
+ *          $ref: '#/components/responses/Forbidden'
  *        404:
- *          $ref: '#/responses/NotFound'
+ *          $ref: '#/components/responses/NotFound'
  *        401:
- *          $ref: '#/responses/Unauthorized'
+ *          $ref: '#/components/responses/Unauthorized'
  *        405:
- *          $ref: '#/responses/MethodNotAllowed'
+ *          $ref: '#/components/responses/MethodNotAllowed'
  *    get:
  *      tags: [Posts]
  *      summary: get a post by its slug
@@ -185,15 +233,18 @@ router.post('/', auth.required, postsController.create);
  *      parameters:
  *        - in: path
  *          name: slug
- *          type: string
+ *          schema:
+ *            type: string
  *          required: true
  *      responses:
  *        200:
  *          description: OK
- *          schema:
- *            $ref: '#/definitions/Post'
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/Post'
  *        404:
- *          $ref: '#/responses/NotFound'
+ *          $ref: '#/components/responses/NotFound'
  */
 router.put('/:slug', auth.required, postsController.update);
 router.delete('/:slug', auth.required, postsController.delete);
@@ -207,27 +258,29 @@ router.get('/:slug', postsController.getBySlug);
  *    summary: upload picture
  *    description: "Upload the picture to template. Allowed extentions: `jpg|jpeg|png|gif`"
  *    security:
- *      - myCookie: []
- *    consumes:
- *      - multipart/form-data
- *    parameters:
- *      - in: formData
- *        name: attachments
- *        type: file
- *        description: the file to upload
+ *      - cookieAuth: []
+ *    requestBody:
+ *      content:
+ *        multipart/form-data:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              attachments:
+ *                type: string
+ *                format: binary
  *    responses:
  *      200:
- *        $ref: '#/responses/OK'
+ *        $ref: '#/components/responses/OK'
  *      422:
- *        $ref: '#/responses/UnprocessableEntity'
+ *        $ref: '#/components/responses/UnprocessableEntity'
  *      409:
- *        $ref: '#/responses/Conflict'
+ *        $ref: '#/components/responses/Conflict'
  *      401:
- *        $ref: '#/responses/Unauthorized'
+ *        $ref: '#/components/responses/Unauthorized'
  *      413:
- *        $ref: '#/responses/RequestEntityTooLarge'
+ *        $ref: '#/components/responses/RequestEntityTooLarge'
  *      500:
- *        $ref: '#/responses/InternalServerError'
+ *        $ref: '#/components/responses/InternalServerError'
  */
 router.post('/upload', auth.required, postsController.upload);
 
@@ -240,49 +293,52 @@ router.post('/upload', auth.required, postsController.upload);
  * You can't rate post again before deleting previous rate"
  *      tags: [Posts]
  *      security:
- *        - myCookie: []
+ *        - cookieAuth: []
  *      parameters:
  *        - in: path
  *          name: slug
  *          required: true
- *          type: string
- *        - in: body
- *          name: body
  *          schema:
- *            type: object
- *            properties:
- *              negative:
- *                type: boolean
- *                default: false
+ *            type: string
+ *      requestBody:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                negative:
+ *                  type: boolean
+ *                  default: false
  *      responses:
  *        200:
- *          $ref: '#/responses/OK'
+ *          $ref: '#/components/responses/OK'
  *        405:
- *          $ref: '#/responses/MethodNotAllowed'
+ *          $ref: '#/components/responses/MethodNotAllowed'
  *        401:
- *          $ref: '#/responses/Unauthorized'
+ *          $ref: '#/components/responses/Unauthorized'
  *        404:
- *          $ref: '#/responses/NotFound'
+ *          $ref: '#/components/responses/NotFound'
  *    delete:
  *      summary: Unrate post
  *      description: Delete already existing rate for user for post
  *      tags: [Posts]
  *      security:
- *        - myCookie: []
+ *        - cookieAuth: []
  *      parameters:
  *        - in: path
  *          name: slug
  *          required: true
- *          type: string
+ *          schema:
+ *            type: string
  *      responses:
  *        200:
- *          $ref: '#/responses/OK'
+ *          $ref: '#/components/responses/OK'
  *        405:
- *          $ref: '#/responses/MethodNotAllowed'
+ *          $ref: '#/components/responses/MethodNotAllowed'
  *        401:
- *          $ref: '#/responses/Unauthorized'
+ *          $ref: '#/components/responses/Unauthorized'
  *        404:
- *          $ref: '#/responses/NotFound'
+ *          $ref: '#/components/responses/NotFound'
  */
 router.delete('/:slug/rate', auth.required, postsController.unrate);
 router.put('/:slug/rate', auth.required, postsController.rate);

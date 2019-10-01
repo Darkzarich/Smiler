@@ -246,4 +246,7 @@ module.exports = {
       success(res);
     }
   },
+  deleteUserPostTemplatePicture: async () => {
+
+  },
 };

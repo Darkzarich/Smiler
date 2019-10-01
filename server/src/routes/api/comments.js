@@ -8,31 +8,32 @@ const auth = require('../auth');
  *    - name: Comments
  *      description: Actions with comments
  *
- * definitions:
- *    Comment:
- *      type: object
- *      properties:
- *        id:
- *          type: string
- *        post:
- *          type: string
- *        body:
- *          type: string
- *        parent:
- *          type: string
- *        author:
- *          $ref: '#/definitions/Author'
- *        createdAt:
- *          type: string
- *          example: 2019-08-16T01:04:02.504Z
- *        children:
- *          type: array
- *          items:
- *            $ref: '#/definitions/Comment'
- *        rating:
- *          type: number
- *        rated:
- *          $ref: '#/definitions/UserRate'
+ * components:
+ *   schemas:
+ *      Comment:
+ *        type: object
+ *        properties:
+ *          id:
+ *            type: string
+ *          post:
+ *            type: string
+ *          body:
+ *            type: string
+ *          parent:
+ *            type: string
+ *          author:
+ *            $ref: '#/components/schemas/Author'
+ *          createdAt:
+ *            type: string
+ *            example: 2019-08-16T01:04:02.504Z
+ *          children:
+ *            type: array
+ *            items:
+ *              $ref: '#/components/schemas/Comment'
+ *          rating:
+ *            type: number
+ *          rated:
+ *            $ref: '#/components/schemas/UserRate'
  *
  */
 
@@ -45,66 +46,72 @@ const auth = require('../auth');
  *    parameters:
  *      - in: query
  *        name: offset
- *        default: 0
- *        type: integer
+ *        schema:
+ *          default: 0
+ *          type: number
  *        description: The number of items to skip before starting to collect the result set.
  *      - in: query
  *        name: limit
- *        default: 10
- *        maximum: 30
- *        minimum: 1
- *        type: integer
+ *        schema:
+ *          default: 10
+ *          maximum: 30
+ *          minimum: 1
+ *          type: number
  *        description: The numbers of items to return.
  *      - in: query
  *        name: author
- *        type: string
+ *        schema:
+ *          type: string
  *        description: user which comments you want to see
  *      - in: query
  *        name: post
  *        required: true
- *        type: string
+ *        schema:
+ *          type: string
  *        description: post id
  *    responses:
  *      200:
  *        description: OK
- *        schema:
- *          $ref: '#/definitions/Comment'
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/Comment'
  *      404:
- *        $ref: '#/responses/NotFound'
+ *        $ref: '#/components/responses/NotFound'
  *      422:
- *        $ref: '#/responses/UnprocessableEntity'
+ *        $ref: '#/components/responses/UnprocessableEntity'
  *  post:
  *    summary: Create a comment
  *    tags: [Comments]
  *    description: Create a comment to a post
  *    security:
- *      - myCookie: []
- *    parameters:
- *      - in: body
- *        name: body
- *        schema:
- *          type: object
- *          required:
- *            - post
- *          properties:
- *            body:
- *              type: string
- *              example: My body is dry
- *            post:
- *              type: string
- *              example: 5d546c95c0f3a272b2062205
- *            parent:
- *              type: string
- *              example: 5d55daa034c1991762147c2b
+ *      - cookieAuth: []
+ *    requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            required:
+ *              - post
+ *            properties:
+ *              body:
+ *                type: string
+ *                example: My body is dry
+ *              post:
+ *                type: string
+ *                example: 5d546c95c0f3a272b2062205
+ *              parent:
+ *                type: string
+ *                example: 5d55daa034c1991762147c2b
  *    responses:
  *      200:
- *        $ref: '#/responses/OK'
+ *        $ref: '#/components/responses/OK'
  *      404:
- *        $ref: '#/responses/NotFound'
+ *        $ref: '#/components/responses/NotFound'
  *      422:
- *        $ref: '#/responses/UnprocessableEntity'
+ *        $ref: '#/components/responses/UnprocessableEntity'
  *      401:
- *        $ref: '#/responses/Unauthorized'
+ *        $ref: '#/components/responses/Unauthorized'
  *
  */
 router.get('/', commentsController.getComment);
@@ -121,30 +128,32 @@ router.post('/', auth.required, commentsController.createComment);
  *    parameters:
  *      - in: path
  *        name: id
- *        type: string
- *        required: true
- *      - in: body
- *        name: body
  *        schema:
- *          type: object
- *          properties:
- *            body:
- *              type: string
+ *          type: string
+ *        required: true
+ *    requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              body:
+ *                type: string
  *    security:
- *      - myCookie: []
+ *      - cookieAuth: []
  *    responses:
  *      200:
- *        $ref: '#/responses/OK'
+ *        $ref: '#/components/responses/OK'
  *      422:
- *        $ref: '#/responses/UnprocessableEntity'
+ *        $ref: '#/components/responses/UnprocessableEntity'
  *      401:
- *        $ref: '#/responses/Unauthorized'
+ *        $ref: '#/components/responses/Unauthorized'
  *      403:
- *        $ref: '#/responses/Forbidden'
+ *        $ref: '#/components/responses/Forbidden'
  *      404:
- *        $ref: '#/responses/NotFound'
+ *        $ref: '#/components/responses/NotFound'
  *      405:
- *        $ref: '#/responses/MethodNotAllowed'
+ *        $ref: '#/components/responses/MethodNotAllowed'
  *  delete:
  *    tags: [Comments]
  *    summary: Delete comment
@@ -152,21 +161,22 @@ router.post('/', auth.required, commentsController.createComment);
  *    parameters:
  *      - in: path
  *        name: id
- *        type: string
+ *        schema:
+ *          type: string
  *        required: true
  *    security:
- *      - myCookie: []
+ *      - cookieAuth: []
  *    responses:
  *      200:
- *        $ref: '#/responses/OK'
+ *        $ref: '#/components/responses/OK'
  *      403:
- *        $ref: '#/responses/Forbidden'
+ *        $ref: '#/components/responses/Forbidden'
  *      401:
- *        $ref: '#/responses/Unauthorized'
+ *        $ref: '#/components/responses/Unauthorized'
  *      404:
- *        $ref: '#/responses/NotFound'
+ *        $ref: '#/components/responses/NotFound'
  *      405:
- *        $ref: '#/responses/MethodNotAllowed'
+ *        $ref: '#/components/responses/MethodNotAllowed'
 */
 
 router.put('/:id', auth.required, commentsController.editComment);
@@ -181,49 +191,52 @@ router.delete('/:id', auth.required, commentsController.deleteComment);
  * You can't rate comment again before deleting previous rate"
  *      tags: [Comments]
  *      security:
- *        - myCookie: []
+ *        - cookieAuth: []
  *      parameters:
  *        - in: path
  *          name: id
  *          required: true
- *          type: string
- *        - in: body
- *          name: body
  *          schema:
- *            type: object
- *            properties:
- *              negative:
- *                type: boolean
- *                default: false
+ *            type: string
+ *      requestBody:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                negative:
+ *                  type: boolean
+ *                  default: false
  *      responses:
  *        200:
- *          $ref: '#/responses/OK'
+ *          $ref: '#/components/responses/OK'
  *        405:
- *          $ref: '#/responses/MethodNotAllowed'
+ *          $ref: '#/components/responses/MethodNotAllowed'
  *        401:
- *          $ref: '#/responses/Unauthorized'
+ *          $ref: '#/components/responses/Unauthorized'
  *        404:
- *          $ref: '#/responses/NotFound'
+ *          $ref: '#/components/responses/NotFound'
  *    delete:
  *      summary: Unrate comment
  *      description: Delete already existing rate for user for comment
  *      tags: [Comments]
  *      security:
- *        - myCookie: []
+ *        - cookieAuth: []
  *      parameters:
  *        - in: path
  *          name: id
  *          required: true
- *          type: string
+ *          schema:
+ *            type: string
  *      responses:
  *        200:
- *          $ref: '#/responses/OK'
+ *          $ref: '#/components/responses/OK'
  *        405:
- *          $ref: '#/responses/MethodNotAllowed'
+ *          $ref: '#/components/responses/MethodNotAllowed'
  *        401:
- *          $ref: '#/responses/Unauthorized'
+ *          $ref: '#/components/responses/Unauthorized'
  *        404:
- *          $ref: '#/responses/NotFound'
+ *          $ref: '#/components/responses/NotFound'
  */
 router.delete('/:id/rate', auth.required, commentsController.unrate);
 router.put('/:id/rate', auth.required, commentsController.rate);

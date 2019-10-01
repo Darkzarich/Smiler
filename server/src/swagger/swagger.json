@@ -1,28 +1,20 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.0",
   "info": {
     "title": "Express Blog",
     "version": "1.0.0",
     "description": "An open API to my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.com or pikabu.ru (mostly copies many pikabu features) with many different and awesome features, open swagger API documentation. Main reason of making this site is fun and learning new things while making it"
   },
-  "basePath": "/api",
-  "schemes": [
-    "http",
-    "https"
-  ],
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
-  "securityDefinitions": {
-    "myCookie": {
-      "type": "apiKey",
-      "name": "Cookie",
-      "in": "header"
+  "servers": [
+    {
+      "url": "https://dz-express-blog-api.herokuapp.com/api",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Local server"
     }
-  },
+  ],
   "paths": {
     "/comments": {
       "get": {
@@ -34,45 +26,57 @@
           {
             "in": "query",
             "name": "offset",
-            "default": 0,
-            "type": "integer",
+            "schema": {
+              "default": 0,
+              "type": "number"
+            },
             "description": "The number of items to skip before starting to collect the result set."
           },
           {
             "in": "query",
             "name": "limit",
-            "default": 10,
-            "maximum": 30,
-            "minimum": 1,
-            "type": "integer",
+            "schema": {
+              "default": 10,
+              "maximum": 30,
+              "minimum": 1,
+              "type": "number"
+            },
             "description": "The numbers of items to return."
           },
           {
             "in": "query",
             "name": "author",
-            "type": "string",
+            "schema": {
+              "type": "string"
+            },
             "description": "user which comments you want to see"
           },
           {
             "in": "query",
             "name": "post",
             "required": true,
-            "type": "string",
+            "schema": {
+              "type": "string"
+            },
             "description": "post id"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/Comment"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
             }
           },
           "404": {
-            "$ref": "#/responses/NotFound"
+            "$ref": "#/components/responses/NotFound"
           },
           "422": {
-            "$ref": "#/responses/UnprocessableEntity"
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         }
       },
@@ -84,47 +88,47 @@
         "description": "Create a comment to a post",
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "type": "object",
-              "required": [
-                "post"
-              ],
-              "properties": {
-                "body": {
-                  "type": "string",
-                  "example": "My body is dry"
-                },
-                "post": {
-                  "type": "string",
-                  "example": "5d546c95c0f3a272b2062205"
-                },
-                "parent": {
-                  "type": "string",
-                  "example": "5d55daa034c1991762147c2b"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "post"
+                ],
+                "properties": {
+                  "body": {
+                    "type": "string",
+                    "example": "My body is dry"
+                  },
+                  "post": {
+                    "type": "string",
+                    "example": "5d546c95c0f3a272b2062205"
+                  },
+                  "parent": {
+                    "type": "string",
+                    "example": "5d55daa034c1991762147c2b"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "$ref": "#/components/responses/OK"
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
-            "$ref": "#/responses/NotFound"
+            "$ref": "#/components/responses/NotFound"
           },
           "422": {
-            "$ref": "#/responses/UnprocessableEntity"
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         }
       }
@@ -140,45 +144,49 @@
           {
             "in": "path",
             "name": "id",
-            "type": "string",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
             "schema": {
-              "type": "object",
-              "properties": {
-                "body": {
-                  "type": "string"
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "body": {
+                    "type": "string"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "$ref": "#/components/responses/OK"
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/responses/Forbidden"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "$ref": "#/responses/NotFound"
+            "$ref": "#/components/responses/NotFound"
           },
           "405": {
-            "$ref": "#/responses/MethodNotAllowed"
+            "$ref": "#/components/responses/MethodNotAllowed"
           },
           "422": {
-            "$ref": "#/responses/UnprocessableEntity"
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         }
       },
@@ -192,30 +200,32 @@
           {
             "in": "path",
             "name": "id",
-            "type": "string",
+            "schema": {
+              "type": "string"
+            },
             "required": true
           }
         ],
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "$ref": "#/components/responses/OK"
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/responses/Forbidden"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "$ref": "#/responses/NotFound"
+            "$ref": "#/components/responses/NotFound"
           },
           "405": {
-            "$ref": "#/responses/MethodNotAllowed"
+            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       }
@@ -229,7 +239,7 @@
         ],
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
         "parameters": [
@@ -237,34 +247,38 @@
             "in": "path",
             "name": "id",
             "required": true,
-            "type": "string"
-          },
-          {
-            "in": "body",
-            "name": "body",
             "schema": {
-              "type": "object",
-              "properties": {
-                "negative": {
-                  "type": "boolean",
-                  "default": false
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "negative": {
+                    "type": "boolean",
+                    "default": false
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "$ref": "#/components/responses/OK"
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
-            "$ref": "#/responses/NotFound"
+            "$ref": "#/components/responses/NotFound"
           },
           "405": {
-            "$ref": "#/responses/MethodNotAllowed"
+            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       },
@@ -276,7 +290,7 @@
         ],
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
         "parameters": [
@@ -284,21 +298,23 @@
             "in": "path",
             "name": "id",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "$ref": "#/components/responses/OK"
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
-            "$ref": "#/responses/NotFound"
+            "$ref": "#/components/responses/NotFound"
           },
           "405": {
-            "$ref": "#/responses/MethodNotAllowed"
+            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       }
@@ -314,40 +330,52 @@
           {
             "in": "query",
             "name": "limit",
-            "type": "string",
-            "default": 100,
-            "maximum": 100,
-            "minimum": 1,
+            "required": true,
+            "schema": {
+              "type": "number",
+              "default": 100,
+              "maximum": 100,
+              "minimum": 1
+            },
             "description": "posts per page"
           },
           {
             "in": "query",
             "name": "offset",
-            "type": "string",
-            "default": 0,
+            "required": true,
+            "schema": {
+              "type": "number",
+              "default": 0
+            },
             "description": "offset from element"
           },
           {
             "in": "query",
             "name": "author",
-            "type": "string",
+            "schema": {
+              "type": "string"
+            },
             "description": "By author"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "posts": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/Post"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "posts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Post"
+                      }
+                    },
+                    "pages": {
+                      "type": "number"
+                    }
                   }
-                },
-                "pages": {
-                  "type": "number"
                 }
               }
             }
@@ -358,46 +386,53 @@
         "tags": [
           "Posts"
         ],
-        "description": "Create a post with title `title` and body `body`. Attachments are taken from the template",
+        "description": "Create a post with `title` and `sections`. Creating a post clears the template.",
         "summary": "create a post",
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "type": "object",
-              "required": [
-                "title",
-                "body"
-              ],
-              "properties": {
-                "title": {
-                  "type": "string"
-                },
-                "body": {
-                  "type": "string"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "sections"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "sections": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PostSection"
+                    }
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/Post"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
             }
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "422": {
-            "$ref": "#/responses/UnprocessableEntity"
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         }
       }
@@ -409,7 +444,7 @@
         ],
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
         "description": "Edit a post. You can edit a post only within certain time after it is created",
@@ -419,46 +454,46 @@
             "in": "path",
             "name": "slug",
             "required": true,
-            "type": "string"
-          },
-          {
-            "in": "body",
-            "name": "body",
             "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "type": "string"
-                },
-                "body": {
-                  "type": "string"
-                },
-                "toDelete": {
-                  "type": "array",
-                  "items": {
-                    "description": "paths to delete",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
                     "type": "string"
+                  },
+                  "sections": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PostSection"
+                    }
                   }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "$ref": "#/components/responses/OK"
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/responses/Forbidden"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "$ref": "#/responses/NotFound"
+            "$ref": "#/components/responses/NotFound"
           },
           "405": {
-            "$ref": "#/responses/MethodNotAllowed"
+            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       },
@@ -470,32 +505,34 @@
         "description": "delete a post by its `slug`",
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
         "parameters": [
           {
             "in": "path",
             "name": "slug",
-            "type": "string",
-            "required": true
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "$ref": "#/components/responses/OK"
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/responses/Forbidden"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "$ref": "#/responses/NotFound"
+            "$ref": "#/components/responses/NotFound"
           },
           "405": {
-            "$ref": "#/responses/MethodNotAllowed"
+            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       },
@@ -509,19 +546,25 @@
           {
             "in": "path",
             "name": "slug",
-            "type": "string",
+            "schema": {
+              "type": "string"
+            },
             "required": true
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/Post"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
             }
           },
           "404": {
-            "$ref": "#/responses/NotFound"
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -535,38 +578,42 @@
         "description": "Upload the picture to template. Allowed extentions: `jpg|jpeg|png|gif`",
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
-        "consumes": [
-          "multipart/form-data"
-        ],
-        "parameters": [
-          {
-            "in": "formData",
-            "name": "attachments",
-            "type": "file",
-            "description": "the file to upload"
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "attachments": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "$ref": "#/components/responses/OK"
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "409": {
-            "$ref": "#/responses/Conflict"
+            "$ref": "#/components/responses/Conflict"
           },
           "413": {
-            "$ref": "#/responses/RequestEntityTooLarge"
+            "$ref": "#/components/responses/RequestEntityTooLarge"
           },
           "422": {
-            "$ref": "#/responses/UnprocessableEntity"
+            "$ref": "#/components/responses/UnprocessableEntity"
           },
           "500": {
-            "$ref": "#/responses/InternalServerError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -580,7 +627,7 @@
         ],
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
         "parameters": [
@@ -588,34 +635,38 @@
             "in": "path",
             "name": "slug",
             "required": true,
-            "type": "string"
-          },
-          {
-            "in": "body",
-            "name": "body",
             "schema": {
-              "type": "object",
-              "properties": {
-                "negative": {
-                  "type": "boolean",
-                  "default": false
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "negative": {
+                    "type": "boolean",
+                    "default": false
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "$ref": "#/components/responses/OK"
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
-            "$ref": "#/responses/NotFound"
+            "$ref": "#/components/responses/NotFound"
           },
           "405": {
-            "$ref": "#/responses/MethodNotAllowed"
+            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       },
@@ -627,7 +678,7 @@
         ],
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
         "parameters": [
@@ -635,21 +686,23 @@
             "in": "path",
             "name": "slug",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "$ref": "#/components/responses/OK"
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
-            "$ref": "#/responses/NotFound"
+            "$ref": "#/components/responses/NotFound"
           },
           "405": {
-            "$ref": "#/responses/MethodNotAllowed"
+            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       }
@@ -664,8 +717,12 @@
         "responses": {
           "200": {
             "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/AuthState"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthState"
+                }
+              }
             }
           }
         }
@@ -682,19 +739,25 @@
           {
             "in": "path",
             "name": "login",
-            "type": "string",
+            "schema": {
+              "type": "string"
+            },
             "required": true
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/UserProfile"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
             }
           },
           "404": {
-            "$ref": "#/responses/NotFound"
+            "$ref": "#/components/responses/NotFound"
           }
         }
       },
@@ -706,50 +769,54 @@
         "description": "Update user info with payload",
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
         "parameters": [
           {
             "in": "path",
             "name": "login",
-            "type": "string",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
             "schema": {
-              "type": "object",
-              "properties": {
-                "bio": {
-                  "type": "string",
-                  "maxLength": 300
-                },
-                "avatar": {
-                  "type": "string",
-                  "maxLength": 150,
-                  "description": "URL"
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bio": {
+                    "type": "string",
+                    "maxLength": 300
+                  },
+                  "avatar": {
+                    "type": "string",
+                    "maxLength": 150,
+                    "description": "URL"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "$ref": "#/components/responses/OK"
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/responses/Forbidden"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "$ref": "#/responses/NotFound"
+            "$ref": "#/components/responses/NotFound"
           },
           "422": {
-            "$ref": "#/responses/UnprocessableEntity"
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         }
       }
@@ -762,15 +829,17 @@
         ],
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
-        "description": "Returns user's saved template for post",
+        "description": "Returns user's saved template for post with `title` and `sections`",
         "parameters": [
           {
             "in": "path",
             "name": "login",
-            "type": "string",
+            "schema": {
+              "type": "string"
+            },
             "required": true,
             "description": "User name"
           }
@@ -778,30 +847,31 @@
         "responses": {
           "200": {
             "description": "ok",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "type": "string"
-                },
-                "body": {
-                  "type": "string"
-                },
-                "attachments": {
-                  "description": "Array of pic paths",
-                  "type": "array",
-                  "items": {
-                    "type": "string"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "sections": {
+                      "description": "Post sections",
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PostSection"
+                      }
+                    }
                   }
                 }
               }
             }
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/responses/Forbidden"
+            "$ref": "#/components/responses/Forbidden"
           }
         }
       },
@@ -810,52 +880,106 @@
         "tags": [
           "Users"
         ],
-        "description": "Update user post template, delete attachments (pics with following paths)",
+        "description": "Update user post template `sections` and `title`",
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
         "parameters": [
           {
             "in": "path",
             "name": "login",
-            "type": "string",
+            "schema": {
+              "type": "string"
+            },
             "required": true,
             "description": "User name"
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "type": "string"
-                },
-                "body": {
-                  "type": "string"
-                },
-                "delete": {
-                  "type": "array",
-                  "items": {
-                    "description": "path to pic",
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
                     "type": "string"
+                  },
+                  "sections": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PostSection"
+                    }
                   }
                 }
               }
             }
           }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/users/{login}/template/{hash}": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delete section file picture",
+        "description": "Deletes file picture section and the image from the server. Works only for sections with `isFile` set as true",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "login",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "User name"
+          },
+          {
+            "in": "path",
+            "name": "hash",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Section hash"
+          }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "$ref": "#/components/responses/OK"
           },
           "401": {
-            "$ref": "#/responses/Unauthorized"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/responses/Forbidden"
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         }
       }
@@ -867,44 +991,59 @@
           "Users"
         ],
         "description": "Register a new user and return its cookie token (connect.sid)",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "type": "object",
-              "required": [
-                "login",
-                "password",
-                "confirm"
-              ],
-              "description": "user's credential",
-              "properties": {
-                "login": {
-                  "type": "string",
-                  "minLength": 3,
-                  "maxLength": 10
-                },
-                "email": {
-                  "type": "string"
-                },
-                "password": {
-                  "type": "string",
-                  "minLength": 6
-                },
-                "confirm": {
-                  "type": "string"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "login",
+                  "password",
+                  "confirm",
+                  "email"
+                ],
+                "properties": {
+                  "login": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 10
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 6
+                  },
+                  "confirm": {
+                    "type": "string"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthState"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string",
+                  "example": "JSESSIONID=abcde12345; Path=/; HttpOnly"
+                }
+              }
+            }
           },
           "422": {
-            "$ref": "#/responses/UnprocessableEntity"
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         }
       }
@@ -912,41 +1051,50 @@
     "/users/auth": {
       "post": {
         "summary": "Login to the application",
-        "consumes": [
-          "application/json"
-        ],
         "tags": [
           "Users"
         ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "description": "user's credential",
-            "schema": {
-              "type": "object",
-              "required": [
-                "email",
-                "password"
-              ],
-              "properties": {
-                "email": {
-                  "type": "string"
-                },
-                "password": {
-                  "type": "string",
-                  "example": "u1234"
+        "requestBody": {
+          "description": "user's credential",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthState"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string",
+                  "example": "JSESSIONID=abcde12345; Path=/; HttpOnly"
+                }
+              }
+            }
           },
           "401": {
             "description": "Authorization information is missing or invalid."
@@ -965,7 +1113,7 @@
         "summary": "Log out the current user",
         "security": [
           {
-            "myCookie": []
+            "cookieAuth": []
           }
         ],
         "tags": [
@@ -973,247 +1121,356 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/OK"
+            "$ref": "#/components/responses/OK"
           }
         }
       }
     }
   },
-  "definitions": {
-    "Comment": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "post": {
-          "type": "string"
-        },
-        "body": {
-          "type": "string"
-        },
-        "parent": {
-          "type": "string"
-        },
-        "author": {
-          "$ref": "#/definitions/Author"
-        },
-        "createdAt": {
-          "type": "string",
-          "example": "2019-08-16T01:04:02.504Z"
-        },
-        "children": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Comment"
+  "components": {
+    "schemas": {
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "post": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "parent": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/components/schemas/Author"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2019-08-16T01:04:02.504Z"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            }
+          },
+          "rating": {
+            "type": "number"
+          },
+          "rated": {
+            "$ref": "#/components/schemas/UserRate"
           }
-        },
-        "rating": {
-          "type": "number"
-        },
-        "rated": {
-          "$ref": "#/definitions/UserRate"
         }
-      }
-    },
-    "Post": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "commentCount": {
-          "description": "number of comments in a post",
-          "type": "number"
-        },
-        "title": {
-          "type": "string"
-        },
-        "body": {
-          "type": "string"
-        },
-        "author": {
-          "$ref": "#/definitions/Author"
-        },
-        "slug": {
-          "type": "string",
-          "example": "My-post-title-d2k5g8"
-        },
-        "uploads": {
-          "type": "array",
-          "description": "array paths of attachments",
-          "items": {
+      },
+      "Post": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "commentCount": {
+            "description": "number of comments in a post",
+            "type": "number"
+          },
+          "title": {
+            "type": "string"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostSection"
+            }
+          },
+          "author": {
+            "$ref": "#/components/schemas/Author"
+          },
+          "slug": {
+            "type": "string",
+            "example": "My-post-title-d2k5g8"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2019-08-21T22:05:44.788Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "example": "2019-09-22T14:02:14.532Z"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "rated": {
+            "$ref": "#/components/schemas/UserRate"
+          }
+        }
+      },
+      "UserRate": {
+        "type": "object",
+        "properties": {
+          "isRated": {
+            "type": "boolean"
+          },
+          "negative": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PostSection": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/PostSectionText"
+          },
+          {
+            "$ref": "#/components/schemas/PostSectionImage"
+          },
+          {
+            "$ref": "#/components/schemas/PostSectionVideo"
+          }
+        ]
+      },
+      "PostSectionText": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "text"
+            ]
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 4500
+          },
+          "hash": {
             "type": "string"
           }
+        }
+      },
+      "PostSectionImage": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "pic"
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "hash": {
+            "type": "string"
+          },
+          "isFile": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "PostSectionVideo": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "vid"
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "hash": {
+            "type": "string"
+          }
+        }
+      },
+      "Author": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string",
+            "example": "user123"
+          },
+          "avatar": {
+            "type": "string"
+          }
+        }
+      },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        }
+      },
+      "AuthState": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "isAuth": {
+            "type": "boolean"
+          },
+          "rating": {
+            "type": "number"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string"
+              }
+            }
+          }
         },
-        "createdAt": {
-          "type": "string",
-          "example": "2019-08-21T22:05:44.788Z"
-        },
-        "updatedAt": {
-          "type": "string",
-          "example": "2019-09-22T14:02:14.532Z"
-        },
-        "rating": {
-          "type": "number"
-        },
-        "rated": {
-          "$ref": "#/definitions/UserRate"
+        "required": [
+          "message"
+        ]
+      },
+      "OK": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          }
         }
       }
     },
-    "UserRate": {
-      "type": "object",
-      "properties": {
-        "isRated": {
-          "type": "boolean"
-        },
-        "negative": {
-          "type": "boolean"
-        }
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "JSESSIONID"
       }
     },
-    "Author": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "login": {
-          "type": "string",
-          "example": "user123"
-        },
-        "avatar": {
-          "type": "string"
-        }
-      }
-    },
-    "UserProfile": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "login": {
-          "type": "string"
-        },
-        "rating": {
-          "type": "number"
-        },
-        "bio": {
-          "type": "string"
-        },
-        "avatar": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string"
-        }
-      }
-    },
-    "AuthState": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "login": {
-          "type": "string"
-        },
-        "avatar": {
-          "type": "string"
-        },
-        "isAuth": {
-          "type": "boolean"
-        },
-        "rating": {
-          "type": "number"
-        }
-      }
-    },
-    "Error": {
-      "type": "object",
-      "properties": {
-        "error": {
-          "type": "object",
-          "properties": {
-            "message": {
-              "type": "string"
+    "responses": {
+      "NotFound": {
+        "description": "The specified resource was not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
             }
           }
         }
       },
-      "required": [
-        "message"
-      ]
-    },
-    "OK": {
-      "type": "object",
-      "properties": {
-        "ok": {
-          "type": "boolean",
-          "example": true
+      "Unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not enough rights",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "UnprocessableEntity": {
+        "description": "Validation error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "RequestEntityTooLarge": {
+        "description": "Request entity too large",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "OK": {
+        "description": "Everything went alright",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/OK"
+            }
+          }
+        }
+      },
+      "MethodNotAllowed": {
+        "description": "Method is not available due to certain restrictions",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
         }
       }
     }
   },
-  "responses": {
-    "NotFound": {
-      "description": "The specified resource was not found",
-      "schema": {
-        "$ref": "#/definitions/Error"
-      }
-    },
-    "Unauthorized": {
-      "description": "Unauthorized",
-      "schema": {
-        "$ref": "#/definitions/Error"
-      }
-    },
-    "Forbidden": {
-      "description": "Not enough rights",
-      "schema": {
-        "$ref": "#/definitions/Error"
-      }
-    },
-    "UnprocessableEntity": {
-      "description": "Validation error",
-      "schema": {
-        "$ref": "#/definitions/Error"
-      }
-    },
-    "Conflict": {
-      "description": "Conflict",
-      "schema": {
-        "$ref": "#/definitions/Error"
-      }
-    },
-    "RequestEntityTooLarge": {
-      "description": "Request entity too large",
-      "schema": {
-        "$ref": "#/definitions/Error"
-      }
-    },
-    "InternalServerError": {
-      "description": "Internal server error",
-      "schema": {
-        "$ref": "#/definitions/Error"
-      }
-    },
-    "OK": {
-      "description": "Everything went alright",
-      "schema": {
-        "$ref": "#/definitions/OK"
-      }
-    },
-    "MethodNotAllowed": {
-      "description": "Method is not available due to certain restrictions",
-      "schema": {
-        "$ref": "#/definitions/OK"
-      }
-    }
-  },
-  "parameters": {},
   "tags": [
     {
       "name": "Comments",

@@ -24,6 +24,7 @@ This is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.c
 - General:
 	- **Clustering**. If something goes wrong on the server side and something throws an exception the app won't
 	die
+	- **CORS Protection**. The API has set allowed domains through env variables.
 - Posts:
 	- **Creating posts**. Users can create posts and it will get a slug based on its title
 	- **Uploading pictures**. All posts can have attachments, isn't that nice!

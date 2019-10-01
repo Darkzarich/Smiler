@@ -16,7 +16,7 @@ const { PORT } = config;
 const whitelist = [
   config.FRONT_ORIGIN_LOCAL,
   config.FRONT_ORIGIN_REMOTE,
-  `http://localhost:${PORT}/`,
+  `http://localhost:${PORT}`,
 ];
 
 app.use(cors({

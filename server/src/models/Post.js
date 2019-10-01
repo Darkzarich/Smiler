@@ -20,9 +20,9 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
-  uploads: [
+  sections: [
     {
-      type: String,
+      type: Schema.Types.Mixed,
     },
   ],
   commentCount: {

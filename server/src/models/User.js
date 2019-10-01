@@ -37,8 +37,7 @@ const schema = new Schema({
     type: Schema.Types.Mixed,
     default: {
       title: '',
-      body: '',
-      attachments: [],
+      sections: [],
     },
   },
   rating: {

@@ -28,7 +28,7 @@ const uploader = multer({
           withoutEnlargement: true,
         })
         .jpeg({
-          quality: 40,
+          quality: 60,
           progressive: true,
         });
 
