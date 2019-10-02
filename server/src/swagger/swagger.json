@@ -437,7 +437,7 @@
         }
       }
     },
-    "/posts/{slug}": {
+    "/posts/{id}": {
       "put": {
         "tags": [
           "Posts"
@@ -452,7 +452,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "slug",
+            "name": "id",
             "required": true,
             "schema": {
               "type": "string"
@@ -501,8 +501,8 @@
         "tags": [
           "Posts"
         ],
-        "summary": "delete a post by its slug",
-        "description": "delete a post by its `slug`",
+        "summary": "delete a post by its Id",
+        "description": "delete a post by its `Id`",
         "security": [
           {
             "cookieAuth": []
@@ -511,7 +511,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "slug",
+            "name": "id",
             "required": true,
             "schema": {
               "type": "string"
@@ -540,12 +540,12 @@
         "tags": [
           "Posts"
         ],
-        "summary": "get a post by its slug",
-        "description": "Get a post by its `slug`",
+        "summary": "get a post by its Id",
+        "description": "Get a post by its `Id`",
         "parameters": [
           {
             "in": "path",
-            "name": "slug",
+            "name": "id",
             "schema": {
               "type": "string"
             },
@@ -587,7 +587,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "attachments": {
+                  "picture": {
                     "type": "string",
                     "format": "binary"
                   }
@@ -618,7 +618,7 @@
         }
       }
     },
-    "/posts/{slug}/rate": {
+    "/posts/{id}/rate": {
       "put": {
         "summary": "Change rate on post",
         "description": "Changes rate for post. `negative` decides direction. You can't rate post again before deleting previous rate",
@@ -633,7 +633,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "slug",
+            "name": "id",
             "required": true,
             "schema": {
               "type": "string"
@@ -684,7 +684,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "slug",
+            "name": "id",
             "required": true,
             "schema": {
               "type": "string"

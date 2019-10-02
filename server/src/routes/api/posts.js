@@ -167,7 +167,7 @@ router.post('/', auth.required, postsController.create);
 
 /**
  * @swagger
- * /posts/{slug}:
+ * /posts/{id}:
  *    put:
  *      tags: [Posts]
  *      security:
@@ -176,7 +176,7 @@ router.post('/', auth.required, postsController.create);
  *      summary: edit a post
  *      parameters:
  *        - in: path
- *          name: slug
+ *          name: id
  *          required: true
  *          schema:
  *            type: string
@@ -205,13 +205,13 @@ router.post('/', auth.required, postsController.create);
  *          $ref: '#/components/responses/MethodNotAllowed'
  *    delete:
  *      tags: [Posts]
- *      summary: delete a post by its slug
- *      description: delete a post by its `slug`
+ *      summary: delete a post by its Id
+ *      description: delete a post by its `Id`
  *      security:
  *        - cookieAuth: []
  *      parameters:
  *        - in: path
- *          name: slug
+ *          name: id
  *          required: true
  *          schema:
  *            type: string
@@ -228,11 +228,11 @@ router.post('/', auth.required, postsController.create);
  *          $ref: '#/components/responses/MethodNotAllowed'
  *    get:
  *      tags: [Posts]
- *      summary: get a post by its slug
- *      description: Get a post by its `slug`
+ *      summary: get a post by its Id
+ *      description: Get a post by its `Id`
  *      parameters:
  *        - in: path
- *          name: slug
+ *          name: id
  *          schema:
  *            type: string
  *          required: true
@@ -246,9 +246,9 @@ router.post('/', auth.required, postsController.create);
  *        404:
  *          $ref: '#/components/responses/NotFound'
  */
-router.put('/:slug', auth.required, postsController.update);
-router.delete('/:slug', auth.required, postsController.delete);
-router.get('/:slug', postsController.getBySlug);
+router.put('/:id', auth.required, postsController.update);
+router.delete('/:id', auth.required, postsController.delete);
+router.get('/:id', postsController.getById);
 
 /**
  * @swagger
@@ -265,7 +265,7 @@ router.get('/:slug', postsController.getBySlug);
  *          schema:
  *            type: object
  *            properties:
- *              attachments:
+ *              picture:
  *                type: string
  *                format: binary
  *    responses:
@@ -286,7 +286,7 @@ router.post('/upload', auth.required, postsController.upload);
 
 /**
  * @swagger
- *  /posts/{slug}/rate:
+ *  /posts/{id}/rate:
  *    put:
  *      summary: Change rate on post
  *      description: "Changes rate for post. `negative` decides direction.
@@ -296,7 +296,7 @@ router.post('/upload', auth.required, postsController.upload);
  *        - cookieAuth: []
  *      parameters:
  *        - in: path
- *          name: slug
+ *          name: id
  *          required: true
  *          schema:
  *            type: string
@@ -326,7 +326,7 @@ router.post('/upload', auth.required, postsController.upload);
  *        - cookieAuth: []
  *      parameters:
  *        - in: path
- *          name: slug
+ *          name: id
  *          required: true
  *          schema:
  *            type: string
@@ -340,7 +340,7 @@ router.post('/upload', auth.required, postsController.upload);
  *        404:
  *          $ref: '#/components/responses/NotFound'
  */
-router.delete('/:slug/rate', auth.required, postsController.unrate);
-router.put('/:slug/rate', auth.required, postsController.rate);
+router.delete('/:id/rate', auth.required, postsController.unrate);
+router.put('/:id/rate', auth.required, postsController.rate);
 
 module.exports = router;

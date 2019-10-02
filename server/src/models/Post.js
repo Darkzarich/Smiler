@@ -9,10 +9,6 @@ const schema = new Schema({
     type: String,
     required: true,
   },
-  body: {
-    type: String,
-    required: true,
-  },
   slug: {
     type: String,
   },
@@ -58,7 +54,7 @@ schema.methods.toResponse = function (user) {
 
   return {
     title: this.title,
-    body: this.body,
+    sections: this.sections,
     slug: this.slug,
     author: this.author,
     uploads: this.uploads,
