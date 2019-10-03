@@ -270,7 +270,10 @@ router.get('/:id', postsController.getById);
  *                format: binary
  *    responses:
  *      200:
- *        $ref: '#/components/responses/OK'
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/PostSectionImage'
  *      422:
  *        $ref: '#/components/responses/UnprocessableEntity'
  *      409:

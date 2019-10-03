@@ -55,24 +55,19 @@ function startUpload(req, res, next) {
     } else {
       const user = await User.findById(req.session.userId).select('template');
 
-      user.template.attachments.push(req.file.path);
-      console.log(req.file.path);
+      const newSection = {
+        type: 'pic',
+        url: req.file.path,
+        hash: (Math.random() * Math.random()).toString(36),
+        isFile: true,
+      };
 
-      user.template.sections.push(
-        {
-          type: 'pic',
-          url: file.path,
-          hash: (Math.random() * Math.random()).toString(36),
-          isFile: true,
-        },
-      );
+      user.template.sections.push(newSection);
 
       user.markModified('template');
       await user.save();
 
-      success(res, {
-        url: req.file.path,
-      });
+      success(res, newSection);
     }
   });
 }
@@ -160,7 +155,7 @@ module.exports = {
     const { sections } = req.body;
 
     if (!title) { generateError('Title is required', 422, next); return; }
-    if (!sections) { generateError('At least one section is required', 422, next); return; }
+    if (!sections || sections.length < 1) { generateError('At least one section is required', 422, next); return; }
     if (sections.length > consts.POST_SECTIONS_MAX) { generateError('Exceeded max amount of sections', 422, next); return; }
     if (title.length > consts.POST_TITLE_MAX_LENGTH) { generateError('Exceeded max length of title', 422, next); return; }
 

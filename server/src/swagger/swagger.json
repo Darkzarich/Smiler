@@ -598,7 +598,13 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/OK"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostSectionImage"
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"

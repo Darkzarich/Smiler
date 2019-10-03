@@ -199,54 +199,77 @@ module.exports = {
     success(res, template.template);
   },
   updateUserPostTemplate: async (req, res, next) => {
-    let error = false;
-    const deleteParam = req.body.delete || [];
-
-    if (deleteParam.length > consts.POST_ATTACHMENTS_LIMIT) {
-      generateError('Too big delete array', 422, next); return;
-    }
-
-    const toDeleteArray = [].concat(req.body.delete);
+    const { sections } = req.body;
+    const { title } = req.body;
 
     if (req.session.userLogin !== req.params.login) {
       generateError('Can save template only for yourself', 403, next); return;
     }
 
-    const template = await User.findById(req.session.userId).select('template');
+    const userTemplate = await User.findById(req.session.userId).select('template');
 
-    template.template.title = req.body.title || req.body.title === '' ? req.body.title : template.template.title;
-    template.template.body = req.body.body || req.body.body === '' ? req.body.body : template.template.body;
+    userTemplate.template.title = title || userTemplate.template.title;
+    userTemplate.template.sections = sections || userTemplate.template.sections;
 
-    toDeleteArray.forEach((el) => {
-      if (el && template.template.attachments.length !== 0) {
-        const index = template.template.attachments.indexOf(el);
-
-        if (index !== -1) {
-          const deleted = template.template.attachments.splice(index, 1);
-          fs.exists(deleted[0], (exists) => {
-            if (exists) {
-              fs.unlink(deleted[0], (err) => {
-                if (err) {
-                  error = true;
-                  template.template.attachments.push(deleted[0]);
-                  template.markModified('template');
-                  template.save();
-                  generateError(`Could't delete an attachment: ${deleted[0]}`, 500, next);
-                }
-              });
-            }
-          });
-        }
-      }
-    });
-
-    if (!error) {
-      template.markModified('template');
-      await template.save();
+    try {
+      userTemplate.markModified('template');
+      await userTemplate.save();
       success(res);
+    } catch (e) {
+      next(e);
     }
   },
-  deleteUserPostTemplatePicture: async () => {
+  deleteUserPostTemplatePicture: async (req, res, next) => {
+    const { login } = req.params;
+    const { hash } = req.params;
 
+    if (req.session.userLogin !== login) {
+      generateError('Can delete image only for yourself', 403, next); return;
+    }
+    if (!hash) { generateError('Hash is required for this operation', 422, next); return; }
+
+    const userTemplate = await User.findById(req.session.userId).select('template');
+
+    const foundSection = userTemplate.template.sections
+      .find(sec => sec.hash === hash);
+
+    userTemplate.template.sections.indexOf(foundSection);
+
+    if (foundSection) {
+      if (foundSection.type === consts.POST_SECTION_TYPES.PICTURE && foundSection.isFile === true) {
+        const { url } = foundSection;
+
+        // async function removeSection() {
+        //   await User.findByIdAndUpdate(req.session.userId, {
+        //     $pull: {
+        //       'template.sections': foundSection,
+        //     },
+        //   });
+        // }
+
+        const delCb = (err) => {
+          if (err) generateError(err, 500, next);
+          else success(res);
+        };
+
+        fs.exists(url, (exists) => {
+          if (exists) {
+            fs.unlink(url, (err) => {
+              if (err) {
+                generateError(err, 500, next);
+              } else {
+                userTemplate.deleteSection(foundSection, delCb);
+              }
+            });
+          } else {
+            userTemplate.deleteSection(foundSection, delCb);
+          }
+        });
+      } else {
+        generateError('This operation cannot be done for not file picture sections or not pictures');
+      }
+    } else {
+      generateError('Section with given hash is not found', 404, next);
+    }
   },
 };

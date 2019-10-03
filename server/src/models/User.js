@@ -73,4 +73,12 @@ schema.methods.isRated = function (id) {
   };
 };
 
+schema.methods.deleteSection = async function (sec, cb) {
+  await this.updateOne({
+    $pull: {
+      'template.sections': sec,
+    },
+  }, cb);
+};
+
 module.exports = mongoose.model('User', schema);
