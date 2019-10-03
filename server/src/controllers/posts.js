@@ -46,7 +46,7 @@ const uploader = multer({
       cb(null, true);
     }
   },
-}).array('attachments', consts.POST_ATTACHMENTS_LIMIT);
+}).single('picture');
 
 function startUpload(req, res, next) {
   uploader(req, res, async (err) => {
@@ -55,15 +55,23 @@ function startUpload(req, res, next) {
     } else {
       const user = await User.findById(req.session.userId).select('template');
 
-      req.files.forEach((file) => {
-        user.template.attachments.push(file.path);
-      });
+      user.template.attachments.push(req.file.path);
+      console.log(req.file.path);
+
+      user.template.sections.push(
+        {
+          type: 'pic',
+          url: file.path,
+          hash: (Math.random() * Math.random()).toString(36),
+          isFile: true,
+        },
+      );
 
       user.markModified('template');
       await user.save();
 
       success(res, {
-        files: user.template.attachments,
+        url: req.file.path,
       });
     }
   });
@@ -116,18 +124,18 @@ module.exports = {
       next(e);
     }
   },
-  getBySlug: async (req, res, next) => {
-    const slug = req.params.slug.trim();
+  getById: async (req, res, next) => {
+    const { id } = req.params;
     const { userId } = req.session;
 
-    // TODO: predownload using params, redo slug to id because vue route can send id and use slug as link
+    // TODO: predownload using params
 
-    if (!slug) { generateError('Slug is required', 422, next); return; }
+    if (!id) { generateError('id is required', 422, next); return; }
 
     try {
       Promise.all([
         Post.findOne({
-          slug,
+          id,
         }).populate('author', 'login avatar'),
         User.findById(userId).select('rates').populate('rates'),
       ]).then((result) => {
@@ -145,14 +153,38 @@ module.exports = {
     }
   },
   create: async (req, res, next) => {
-    // TODO: rework this
+    // TODO: rework this | move validation and validate allowed tags, cut attributes
 
     const { userId } = req.session;
     const { title } = req.body;
-    const { body } = req.body;
+    const { sections } = req.body;
 
     if (!title) { generateError('Title is required', 422, next); return; }
-    if (!body) { generateError('Body is required', 422, next); return; }
+    if (!sections) { generateError('At least one section is required', 422, next); return; }
+    if (sections.length > consts.POST_SECTIONS_MAX) { generateError('Exceeded max amount of sections', 422, next); return; }
+    if (title.length > consts.POST_TITLE_MAX_LENGTH) { generateError('Exceeded max length of title', 422, next); return; }
+
+
+    const textSections = sections.filter(sec => sec.type === consts.POST_SECTION_TYPES.TEXT);
+    let typeError = false;
+    const textSectionsSumLength = textSections.reduce((acc, el) => {
+      // while we go through array we could save some time validating one more thing along the way
+      if (!Object.values(consts.POST_SECTION_TYPES).includes(el.type)) {
+        typeError = true;
+      }
+
+      return acc + el.content.length;
+    }, 0);
+
+    if (textSectionsSumLength > consts.POST_SECTIONS_MAX_LENGTH) {
+      generateError(`Text sections sum length exceeded max allowed length of ${consts.POST_SECTIONS_MAX_LENGTH} symbols`, 422, next);
+      return;
+    }
+
+    if (typeError) {
+      generateError(`One of sections has unsupported type. Supported types: ${consts.POST_SECTION_TYPES}`, 422, next);
+      return;
+    }
 
     const slug = `${slugLib(title)}-${new Date().getTime().toString(36)}`;
 
@@ -161,15 +193,13 @@ module.exports = {
     try {
       const post = await Post.create({
         title,
-        body,
+        sections,
         slug,
-        uploads: user.template.attachments,
         author: userId,
       });
 
       user.template.title = '';
-      user.template.body = '';
-      user.template.attachments = [];
+      user.template.sections = [];
 
       user.markModified('template');
       await user.save();
@@ -180,14 +210,15 @@ module.exports = {
     }
   },
   update: async (req, res, next) => {
+    // TODO: validate sections on update by type and othher stuff the same as when creating post
+
     const { userId } = req.session;
-    const { slug } = req.params;
+    const { id } = req.params;
     const { title } = req.body;
-    const { body } = req.body;
-    const { toDelete } = req.body;
+    const { sections } = req.body;
 
     const foundPost = await Post.findOne({
-      slug,
+      id,
     });
 
     if (foundPost) {
@@ -196,11 +227,25 @@ module.exports = {
       const curDate = new Date().getTime();
       const postDate = new Date(foundPost.createdAt.toString()).getTime();
 
-
       if (curDate - postDate > consts.POST_TIME_TO_UPDATE) {
         generateError(`You can edit post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`, 405, next);
       } else {
-        foundPost.body = body || foundPost.body;
+        const toDelete = [];
+
+        if (sections) {
+          foundPost.sections = sections;
+
+          // seaching for pics that got removed from post
+          foundPost.sections.forEach((rowSec) => {
+            if (rowSec.type === consts.POST_SECTION_TYPES.PICTURE && rowSec.isFile) {
+              const item = sections.find(el => (el.url === rowSec.url));
+              if (!item) {
+                toDelete.push(rowSec.url);
+              }
+            }
+          });
+        }
+
         foundPost.title = title || foundPost.title;
 
         if (toDelete && toDelete instanceof Array && toDelete.length > 0) {
@@ -216,14 +261,6 @@ module.exports = {
             });
           });
 
-          await foundPost.updateOne({
-            $pull: {
-              uploads: {
-                $in: toDelete,
-              },
-            },
-          });
-
           await foundPost.save();
           success(res);
         }
@@ -234,10 +271,10 @@ module.exports = {
   },
   delete: async (req, res, next) => {
     const { userId } = req.session;
-    const { slug } = req.params;
+    const { id } = req.params;
 
     const foundPost = await Post.findOne({
-      slug,
+      id,
     });
 
     if (foundPost) {
@@ -249,14 +286,16 @@ module.exports = {
       if (curDate - postDate > consts.POST_TIME_TO_UPDATE) {
         generateError(`You can delete post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`, 405, next);
       } else {
-        const { uploads } = foundPost;
+        const { sections } = foundPost;
 
         await foundPost.remove();
 
-        uploads.forEach((el) => {
-          fs.exists(el, (exists) => {
+        const filePicSections = sections.filter(sec => sec.type === consts.POST_SECTION_TYPES.PICTURE && sec.isFile);
+
+        filePicSections.forEach((url) => {
+          fs.exists(url, (exists) => {
             if (exists) {
-              fs.unlink(el, (err) => {
+              fs.unlink(url, (err) => {
                 if (err) {
                   generateError(err, 500, next);
                 }
@@ -275,8 +314,8 @@ module.exports = {
     try {
       const user = await User.findById(req.session.userId).select('template');
 
-      if (user.template.attachments.length === consts.POST_ATTACHMENTS_LIMIT) {
-        generateError(`Exceed limit of post attachments: ${consts.POST_ATTACHMENTS_LIMIT}`, 409, next);
+      if (user.template.sections.length === consts.POST_SECTIONS_MAX) {
+        generateError(`Exceed limit of post sections: ${consts.POST_SECTIONS_MAX}`, 409, next);
         return;
       }
 
@@ -299,11 +338,11 @@ module.exports = {
   },
   rate: async (req, res, next) => {
     const { userId } = req.session;
-    const { slug } = req.params;
+    const { id } = req.params;
     const { negative } = req.body;
 
     const foundPost = await Post.findOne({
-      slug,
+      id,
     });
 
     if (foundPost) {
@@ -346,10 +385,10 @@ module.exports = {
   },
   unrate: async (req, res, next) => {
     const { userId } = req.session;
-    const { slug } = req.params;
+    const { id } = req.params;
 
     const foundPost = await Post.findOne({
-      slug,
+      id,
     });
 
     if (foundPost) {
