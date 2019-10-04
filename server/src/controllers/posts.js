@@ -265,9 +265,7 @@ module.exports = {
     const { userId } = req.session;
     const { id } = req.params;
 
-    const foundPost = await Post.findOne({
-      id,
-    });
+    const foundPost = await Post.findById(id);
 
     if (foundPost) {
       if (foundPost.author.toString() !== userId) { generateError('The post is not yours', 403, next); return; }
