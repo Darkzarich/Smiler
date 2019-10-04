@@ -336,9 +336,7 @@ module.exports = {
     const { id } = req.params;
     const { negative } = req.body;
 
-    const foundPost = await Post.findOne({
-      id,
-    });
+    const foundPost = await Post.findById(id);
 
     if (foundPost) {
       if (foundPost.author.toString() === userId) {
@@ -382,9 +380,7 @@ module.exports = {
     const { userId } = req.session;
     const { id } = req.params;
 
-    const foundPost = await Post.findOne({
-      id,
-    });
+    const foundPost = await Post.findById(id);
 
     if (foundPost) {
       const user = await User.findById(userId).populate('rates');
