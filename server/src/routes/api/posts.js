@@ -228,11 +228,11 @@ router.post('/', auth.required, postsController.create);
  *          $ref: '#/components/responses/MethodNotAllowed'
  *    get:
  *      tags: [Posts]
- *      summary: get a post by its Id
- *      description: Get a post by its `Id`
+ *      summary: get a post by its slug
+ *      description: Get a post by its `slug`
  *      parameters:
  *        - in: path
- *          name: id
+ *          name: slug
  *          schema:
  *            type: string
  *          required: true
@@ -248,7 +248,7 @@ router.post('/', auth.required, postsController.create);
  */
 router.put('/:id', auth.required, postsController.update);
 router.delete('/:id', auth.required, postsController.delete);
-router.get('/:id', postsController.getById);
+router.get('/:slug', postsController.getBySlug);
 
 /**
  * @swagger

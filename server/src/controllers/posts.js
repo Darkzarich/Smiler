@@ -119,18 +119,18 @@ module.exports = {
       next(e);
     }
   },
-  getById: async (req, res, next) => {
-    const { id } = req.params;
+  getBySlug: async (req, res, next) => {
+    const { slug } = req.params;
     const { userId } = req.session;
 
     // TODO: predownload using params
 
-    if (!id) { generateError('id is required', 422, next); return; }
+    if (slug) { generateError('slug is required', 422, next); return; }
 
     try {
       Promise.all([
         Post.findOne({
-          id,
+          slug,
         }).populate('author', 'login avatar'),
         User.findById(userId).select('rates').populate('rates'),
       ]).then((result) => {

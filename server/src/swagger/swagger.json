@@ -540,12 +540,12 @@
         "tags": [
           "Posts"
         ],
-        "summary": "get a post by its Id",
-        "description": "Get a post by its `Id`",
+        "summary": "get a post by its slug",
+        "description": "Get a post by its `slug`",
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "slug",
             "schema": {
               "type": "string"
             },
