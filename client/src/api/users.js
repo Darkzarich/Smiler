@@ -22,6 +22,12 @@ export default {
       data,
     });
   },
+  removeFilePicSection(login, hash) {
+    return Query({
+      url: `${CONTROLLER_URL}/${login}/template/${hash}`,
+      method: 'delete',
+    });
+  },
   getUserTemplate(login) {
     return Query({
       url: `${CONTROLLER_URL}/${login}/template`,

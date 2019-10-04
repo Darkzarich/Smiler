@@ -3,7 +3,7 @@
     <div class="post-side">
       <div
         class="post-side__upvote"
-        @click="upvote(postData.slug)"
+        @click="upvote(postData.id)"
         :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''">
         <plus-icon/>
       </div>
@@ -12,7 +12,7 @@
       </div>
       <div
         class="post-side__downvote"
-        @click="downvote(postData.slug)"
+        @click="downvote(postData.id)"
         :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''">
         <minus-icon/>
       </div>
@@ -31,16 +31,24 @@
           {{ postData.title }}
         </div>
       </router-link>
-      <div class="post-main__body" v-html="postData.body">
-        <!-- {{ postData.body }} -->
-      </div>
-      <div class="post-main__attachments">
+      <div class="post-main__body">
         <div
-          class="post-main__attachments-item"
-          v-for="upload in postData.uploads"
-          :key="upload"
-        >
-          <img @error="$resolveImageError" :src="$resolveImage(upload)">
+        class="post-main__body-section"
+        v-for="section in postData.sections"
+        :key="section.hash">
+          <template v-if="section.type === POST_SECTION_TYPES.TEXT">
+            <div v-html="section.content"/>
+          </template>
+          <template v-else-if="section.type === POST_SECTION_TYPES.PICTURE">
+            <div class="post-main__attachments-item">
+              <img @error="$resolveImageError" :src="$resolveImage(section.url)">
+            </div>
+          </template>
+          <template v-else-if="section.type === POST_SECTION_TYPES.VIDEO">
+            <div class="post-main__attachments-item">
+              <video controls :src="section.url"></video>
+            </div>
+          </template>
         </div>
       </div>
       <div class="post-main__footer">
@@ -98,15 +106,16 @@ export default {
     return {
       postData: this.post,
       loadingRate: false,
+      POST_SECTION_TYPES: consts.POST_SECTION_TYPES,
     };
   },
   methods: {
-    async upvote(slug) {
+    async upvote(id) {
       if (!this.loadingRate) {
         this.loadingRate = true;
 
         if (!this.postData.rated.isRated) {
-          const res = await api.posts.updateRateBySlug(slug, {
+          const res = await api.posts.updateRateById(id, {
             negative: false,
           });
 
@@ -116,7 +125,7 @@ export default {
             this.postData.rating += consts.POST_RATE_VALUE;
           }
         } else if (this.postData.rated.negative) {
-          const res = await api.posts.removeRateBySlug(slug);
+          const res = await api.posts.removeRateById(id);
 
           if (!res.data.error) {
             this.postData.rated.isRated = false;
@@ -127,12 +136,12 @@ export default {
 
       this.loadingRate = false;
     },
-    async downvote(slug) {
+    async downvote(id) {
       if (!this.loadingRate) {
         this.loadingRate = true;
 
         if (!this.postData.rated.isRated) {
-          const res = await api.posts.updateRateBySlug(slug, {
+          const res = await api.posts.updateRateById(id, {
             negative: true,
           });
 
@@ -142,7 +151,7 @@ export default {
             this.postData.rating -= consts.POST_RATE_VALUE;
           }
         } else if (!this.postData.rated.negative) {
-          const res = await api.posts.removeRateBySlug(slug);
+          const res = await api.posts.removeRateById(id);
 
           if (!res.data.error) {
             this.postData.rated.isRated = false;
@@ -191,6 +200,14 @@ export default {
 
     &__body {
       line-height: 1.5rem;
+      cite {
+        border: 1px solid $light-gray;
+        padding: 0.5rem;
+        padding-left: 1rem;
+        display: block;
+        background: $bg;
+        margin-top: 0.5rem;
+      }
     }
 
     &__attachments {
@@ -201,7 +218,7 @@ export default {
         border: 1px solid $light-gray;
         margin-bottom: 1rem;
         margin-top: 1rem;
-        img {
+        img, video {
           width: 100%;
           height: 100%;
         }

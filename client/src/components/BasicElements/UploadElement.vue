@@ -1,7 +1,7 @@
 <template>
   <div class="upload">
     <label class="upload__input">
-      Image
+      <span>Upload image</span>
       <input
         type="file"
         @input="$emit('input', $event.target.files[0])"
@@ -32,11 +32,19 @@ export default {
     border: 2px solid $light-gray;
     padding: 1rem;
     border-radius: 3px;
+    background: $bg;
+
+    span {
+      color: $main-text;
+      display: block;
+      text-align: center;
+    }
 
     input[type="file" i] {
       outline:0;
       opacity:0;
       pointer-events:none;
+      position: absolute;
       user-select: none;
     }
   }

@@ -21,6 +21,15 @@
             <template v-if="section.type === POST_SECTION_TYPES.PICTURE">
               <post-editor-picture
                 v-model="section.url"
+                @set-section="setSection"
+              />
+              <div class="post-editor__delete" @click="deleteSection(section)">
+                <close-icon/>
+              </div>
+            </template>
+            <template v-if="section.type === POST_SECTION_TYPES.VIDEO">
+              <post-editor-picture
+                v-model="section.url"
               />
               <div class="post-editor__delete" @click="deleteSection(section)">
                 <close-icon/>
@@ -98,6 +107,7 @@ export default {
     const res = await api.users.getUserTemplate(this.getUserLogin);
     if (!res.data.error) {
       this.title = res.data.title;
+      this.sections = res.data.sections || [];
     }
   },
   methods: {
@@ -110,8 +120,21 @@ export default {
       // });
       this.sending = false;
     },
-    deleteSection(section) {
-      this.sections.splice(this.sections.indexOf(section), 1);
+    async deleteSection(section) {
+      if (section.type === this.POST_SECTION_TYPES.PICTURE && section.isFile) {
+        const res = await api.users.removeFilePicSection(this.getUserLogin, section.hash);
+        if (!res.data.error) {
+          this.sections.splice(this.sections.indexOf(section), 1);
+        }
+      } else {
+        this.sections.splice(this.sections.indexOf(section), 1);
+      }
+    },
+    setSection(data) {
+      console.log(data);
+      console.log(this.sections[0]);
+      const section = this.sections.find(el => el.url === data.url);
+      this.sections[this.sections.indexOf(section)] = data;
     },
     createSection(type) {
       this.sections.push({

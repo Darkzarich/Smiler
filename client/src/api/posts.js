@@ -30,29 +30,29 @@ export default {
       method: 'get',
     });
   },
-  updatePostBySlug(slug, data) {
+  updatePostById(id, data) {
     return Query({
-      url: `${CONTROLLER_URL}/${slug}`,
+      url: `${CONTROLLER_URL}/${id}`,
       method: 'put',
       data,
     });
   },
-  deletePostBySlug(slug) {
+  deletePostById(id) {
     return Query({
-      url: `${CONTROLLER_URL}/${slug}`,
+      url: `${CONTROLLER_URL}/${id}`,
       method: 'delete',
     });
   },
-  updateRateBySlug(slug, data) {
+  updateRateById(id, data) {
     return Query({
-      url: `${CONTROLLER_URL}/${slug}/rate`,
+      url: `${CONTROLLER_URL}/${id}/rate`,
       method: 'put',
       data,
     });
   },
-  removeRateBySlug(slug) {
+  removeRateById(id) {
     return Query({
-      url: `${CONTROLLER_URL}/${slug}/rate`,
+      url: `${CONTROLLER_URL}/${id}/rate`,
       method: 'delete',
     });
   },

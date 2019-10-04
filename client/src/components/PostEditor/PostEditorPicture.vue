@@ -1,30 +1,35 @@
 <template>
 <div class="post-image-upload">
-  <upload-element
-    v-model="file"
-  />
-  <div class="post-image-upload__or">
-      OR
-  </div>
-  <div class="post-image-upload__input-url">
-    <input-element
-      v-model.lazy="file"
-      place-holder="Paste URL"
+  <div class="post-image-upload__container" v-if="!value">
+    <upload-element
+      v-model="file"
     />
-    <button-element
-      :callback="upload"
-      :loading="uploading"
-      :disabled="!file"
+    <div class="post-image-upload__or">
+        OR
+    </div>
+    <div class="post-image-upload__input-url">
+      <input-element
+        v-model.lazy="file"
+        place-holder="Paste URL"
+      />
+      <button-element
+        :callback="upload"
+        :loading="uploading"
+        :disabled="!file"
+      >
+        Upload
+      </button-element>
+    </div>
+    <img
+      hidden
+      v-if="file"
+      :src="file"
+      @error="error()"
     >
-      Upload
-    </button-element>
   </div>
-  <img
-    hidden
-    v-if="file"
-    :src="file"
-    @error="error()"
-  >
+  <div v-else class="post-image-upload__image">
+    <img @error="$resolveImageError" :src="$resolveImage(value)"/>
+  </div>
 </div>
 </template>
 
@@ -58,22 +63,18 @@ export default {
       if (this.file instanceof File) {
         const formData = new FormData();
 
-        formData.append('attachments', this.file);
+        formData.append('picture', this.file);
 
         const res = await api.posts.uploadAttachment(formData);
 
         if (res.data.error) {
           this.file = '';
         } else {
-          this.$emit('input', res.data.files[0]);
+          this.$emit('input', res.data.url);
+          this.$emit('set-section', res.data);
         }
       } else if (typeof this.file === 'string') {
-        const res = await api.posts.uploadAttachmentLink();
-        if (res.data.error) {
-          this.file = '';
-        } else {
-          this.$emit('input', res.data.files[0]);
-        }
+        this.$emit('input', this.file);
       } else {
         this.file = '';
         this.$store.dispatch('newSystemNotification', {
@@ -113,6 +114,16 @@ export default {
       text-align: center;
       font-weight: bold;
       color: $firm;
+    }
+    &__image {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      border: 1px solid $light-gray;
+      img {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 </style>
