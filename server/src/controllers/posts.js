@@ -282,10 +282,10 @@ module.exports = {
 
         const filePicSections = sections.filter(sec => sec.type === consts.POST_SECTION_TYPES.PICTURE && sec.isFile);
 
-        filePicSections.forEach((url) => {
-          fs.exists(url, (exists) => {
+        filePicSections.forEach((sec) => {
+          fs.exists(sec.url, (exists) => {
             if (exists) {
-              fs.unlink(url, (err) => {
+              fs.unlink(sec.url, (err) => {
                 if (err) {
                   generateError(err, 500, next);
                 }
