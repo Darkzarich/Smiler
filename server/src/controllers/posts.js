@@ -125,7 +125,7 @@ module.exports = {
 
     // TODO: predownload using params
 
-    if (slug) { generateError('slug is required', 422, next); return; }
+    if (!slug) { generateError('slug is required', 422, next); return; }
 
     try {
       Promise.all([
