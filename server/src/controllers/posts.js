@@ -239,8 +239,8 @@ module.exports = {
           });
         }
 
-        foundPost.title = title || foundPost.title;
 
+        foundPost.title = title || foundPost.title;
         if (toDelete && toDelete instanceof Array && toDelete.length > 0) {
           toDelete.forEach((el) => {
             fs.exists(el, (exist) => {
@@ -253,10 +253,9 @@ module.exports = {
               }
             });
           });
-
-          await foundPost.save();
-          success(res);
         }
+        await foundPost.save();
+        success(res);
       }
     } else {
       generateError('Post doesn\'t exist', 404, next);
