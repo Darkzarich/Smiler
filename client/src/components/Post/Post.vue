@@ -29,6 +29,17 @@
       >
         <div class="post-main__title">
           {{ postData.title }}
+          <template v-if="canEdit">
+            <router-link title="Edit post" :to="postData.slug + '/edit'">
+              <edit-icon/>
+            </router-link>
+            <span @click="deletePost(postData.id)">
+              <router-link title="Delete post" :to="'/'">
+                <delete-icon/>
+              </router-link>
+            </span>
+          </template>
+
         </div>
       </router-link>
       <div class="post-main__body">
@@ -92,6 +103,8 @@ import api from '@/api/index';
 import commentsIcon from '@/library/svg/comments';
 import plusIcon from '@/library/svg/plus';
 import minusIcon from '@/library/svg/minus';
+import editIcon from '@/library/svg/edit';
+import deleteIcon from '@/library/svg/delete';
 
 import consts from '@/const/const';
 
@@ -100,8 +113,10 @@ export default {
     commentsIcon,
     plusIcon,
     minusIcon,
+    editIcon,
+    deleteIcon,
   },
-  props: ['post'],
+  props: ['post', 'canEdit'],
   data() {
     return {
       postData: this.post,
@@ -162,6 +177,12 @@ export default {
 
       this.loadingRate = false;
     },
+    async deletePost(id) {
+      const res = await api.posts.deletePostById(id);
+      if (!res.data.error) {
+        document.location.reload();
+      }
+    },
   },
 };
 </script>
@@ -191,6 +212,14 @@ export default {
         margin-bottom: 1rem;
         font-weight: 400;
         font-size: 20px;
+        a {
+          display: inline;
+          svg {
+            position: relative;
+            top: 3px;
+            fill: $light-gray;
+          }
+        }
       }
     }
 

@@ -4,6 +4,7 @@ import App from './App.vue';
 import router from './router';
 import store from '@/store/index';
 import config from '@/config/config';
+import consts from '@/const/const';
 
 import defaultAvatar from '@/assets/neutral_avatar.png';
 import postNoImage from '@/assets/post_no_image.png';
@@ -34,6 +35,45 @@ Vue.mixin({
         return path;
       }
       return config.STATIC_ROUTE + path;
+    },
+    $videoGenerateEmbedLink(url) {
+      try {
+        const youtubeRegExp = consts.POST_SECTION_VIDEO_REGEXP.YOUTUBE;
+        let mathedURL = url.match(youtubeRegExp);
+
+        if (mathedURL) {
+          if (mathedURL.length > 0 && (mathedURL[6] || mathedURL[8])) {
+            return `${consts.POST_SECTION_VIDEO_EMBED.YOUTUBE}${mathedURL[6] || mathedURL[8]}`;
+          }
+        }
+
+        mathedURL = consts.POST_SECTION_VIDEO_REGEXP.OTHERS.test(url);
+
+        if (mathedURL) {
+          return url;
+        }
+
+        return 'error';
+      } catch (e) {
+        return 'error';
+      }
+    },
+    $postCanEdit(post) {
+      const curUser = store.getters.getUser.login;
+
+      if (curUser) {
+        if (post.author.login !== curUser) {
+          return false;
+        }
+
+        const dateNow = new Date().getTime();
+        if (dateNow - new Date(post.createdAt).getTime() > consts.POST_TIME_TO_UPDATE) {
+          return false;
+        }
+        return true;
+      }
+
+      return false;
     },
   },
   filters: {

@@ -65,6 +65,17 @@ const router = new Router({
         authGuard(to, from, next);
       },
     },
+    {
+      path: '/:slug/edit',
+      name: 'PostEdit',
+      component: PostCreate,
+      beforeEnter(to, from, next) {
+        authGuard(to, from, next);
+      },
+      meta: {
+        mode: 'edit',
+      },
+    },
     // {
     //   path: '/about',
     //   name: 'about',

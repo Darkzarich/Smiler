@@ -3,6 +3,7 @@
     <input-element
       class="post-editor__title"
       :place-holder="'Title'"
+      :error="validation.title"
       v-model="title"
     />
     <transition-group name="post-editor__section">
@@ -15,7 +16,7 @@
                 v-model="section.content"
               />
               <div class="post-editor__delete" @click="deleteSection(section)">
-                <close-icon/>
+                <close-icon title="Delete"/>
               </div>
             </template>
             <template v-if="section.type === POST_SECTION_TYPES.PICTURE">
@@ -24,15 +25,15 @@
                 @set-section="setSection"
               />
               <div class="post-editor__delete" @click="deleteSection(section)">
-                <close-icon/>
+                <close-icon title="Delete"/>
               </div>
             </template>
             <template v-if="section.type === POST_SECTION_TYPES.VIDEO">
-              <post-editor-picture
+              <post-editor-video
                 v-model="section.url"
               />
               <div class="post-editor__delete" @click="deleteSection(section)">
-                <close-icon/>
+                <close-icon title="Delete"/>
               </div>
             </template>
       </div>
@@ -52,12 +53,29 @@
       Can't add any more sections. Max amount of sections is {{ POST_MAX_SECTIONS }}.
     </div>
     <div class="post-editor__submit">
-      <button-element
-        :loading="sending"
-        :callback="createPost"
-      >
-        Create Post
-      </button-element>
+      <template v-if="!edit">
+        <button-element
+          :loading="sending"
+          :callback="createPost"
+          :disabled="isSubmitDisabled"
+        >
+          Create Post
+        </button-element>
+        <button-element
+          :loading="saving"
+          :callback="saveDraft"
+        >
+          Save Draft
+        </button-element>
+      </template>
+      <template v-else>
+        <button-element
+          :loading="saving"
+          :callback="saveEdited"
+        >
+          Save Edited
+        </button-element>
+      </template>
     </div>
   </div>
 </template>
@@ -69,6 +87,7 @@ import api from '@/api';
 import ButtonElement from '../BasicElements/ButtonElement.vue';
 import TextEditorElement from '../BasicElements/TextEditorElement.vue';
 import PostEditorPicture from './PostEditorPicture';
+import PostEditorVideo from './PostEditorVideo';
 import InputElement from '../BasicElements/InputElement.vue';
 
 import closeIcon from '@/library/svg/exit';
@@ -84,6 +103,7 @@ export default {
     InputElement,
     TextEditorElement,
     PostEditorPicture,
+    PostEditorVideo,
     closeIcon,
     videoIcon,
     pictureIcon,
@@ -93,32 +113,92 @@ export default {
     return {
       title: '',
       sending: false,
+      saving: false,
       sections: [],
       POST_SECTION_TYPES: consts.POST_SECTION_TYPES,
       POST_MAX_SECTIONS: consts.POST_MAX_SECTIONS,
     };
   },
+  props: ['edit', 'post'],
   computed: {
     ...mapState({
       getUserLogin: state => state.user.login,
     }),
+    isSubmitDisabled() {
+      return !!(this.validation.title || this.validation.sections);
+    },
+    validation() {
+      const validation = {
+        title: '',
+        sections: '',
+      };
+
+      // title
+
+      if (this.title.length === 0) {
+        validation.title = 'Title can\'t be empty';
+      } else if (this.title.length > consts.POST_TITLE_MAX_LENGTH) {
+        validation.title = `Title can't be longer than ${consts.POST_TITLE_MAX_LENGTH} symbols`;
+      }
+
+      return validation;
+    },
   },
   async created() {
-    const res = await api.users.getUserTemplate(this.getUserLogin);
-    if (!res.data.error) {
-      this.title = res.data.title;
-      this.sections = res.data.sections || [];
+    if (this.edit) {
+      this.sections = this.post.sections;
+      this.title = this.post.title;
+    } else {
+      const res = await api.users.getUserTemplate(this.getUserLogin);
+      if (!res.data.error) {
+        this.title = res.data.title;
+        this.sections = res.data.sections || [];
+      }
     }
   },
   methods: {
     async createPost() {
-      console.log(this.sections);
       this.sending = true;
-      // await api.posts.createPost({
-      //   body: this.body,
-      //   title: this.title,
-      // });
+      const res = await api.posts.createPost({
+        sections: this.sections,
+        title: this.title,
+      });
+
+      if (!res.data.error) {
+        this.$router.push({
+          name: 'Single',
+          params: {
+            slug: res.data.slug,
+          },
+        });
+      }
+
       this.sending = false;
+    },
+    async saveEdited() {
+      const res = await api.posts.updatePostById(this.post.id, {
+        title: this.title,
+        sections: this.sections,
+      });
+
+      if (!res.data.error) {
+        this.$router.push({
+          name: 'Single',
+          params: {
+            slug: this.post.slug,
+          },
+        });
+      }
+    },
+    async saveDraft() {
+      this.saving = true;
+
+      await api.users.updateUserTemplate(this.getUserLogin, {
+        title: this.title,
+        sections: this.sections,
+      });
+
+      this.saving = false;
     },
     async deleteSection(section) {
       if (section.type === this.POST_SECTION_TYPES.PICTURE && section.isFile) {
@@ -131,8 +211,6 @@ export default {
       }
     },
     setSection(data) {
-      console.log(data);
-      console.log(this.sections[0]);
       const section = this.sections.find(el => el.url === data.url);
       this.sections[this.sections.indexOf(section)] = data;
     },
@@ -151,8 +229,12 @@ export default {
 
 .post-editor {
   &__submit {
-    width: 50%;
-    margin-left: 25%;
+    display: flex;
+    justify-content: space-around;
+    .button {
+      white-space: nowrap;
+      width: 25%;
+    }
   }
   &__title input {
     font-size: 20px;
@@ -196,14 +278,14 @@ export default {
   }
 
   &__delete {
-    opacity: 0.5;
-    transition: opacity 0.3s ease-in-out;
-    &:hover {
-      opacity: 1;
-    }
+    width: 0;
     svg {
       cursor: pointer;
+      transition: fill 0.3s ease-in-out;
       fill: $error;
+      &:hover {
+        fill: darken($error, 20%);
+      }
     }
   }
 }

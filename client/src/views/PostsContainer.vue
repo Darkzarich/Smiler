@@ -5,7 +5,10 @@
         v-for="post in posts"
         :key="post.id"
       >
-        <post :post="post"/>
+        <post
+          :post="post"
+          :can-edit="$postCanEdit(post)"
+        />
       </div>
     </div>
     <div v-else class="loading">
@@ -15,6 +18,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import Post from '@/components/Post/Post.vue';
 import api from '@/api';
 

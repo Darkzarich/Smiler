@@ -1,5 +1,5 @@
 <template>
-<div class="post-image-upload">
+<div class="post-image-upload" :class="value ? 'post-image-upload_uploaded' : ''">
   <div class="post-image-upload__container" v-if="!value">
     <upload-element
       v-model="file"
@@ -87,8 +87,6 @@ export default {
     },
     error() {
       if (!(this.file instanceof File)) {
-        console.log('error');
-
         this.$store.dispatch('newSystemNotification', {
           error: {
             message: 'Invalid image link',
@@ -108,6 +106,9 @@ export default {
 
   .post-image-upload {
     padding: 1rem;
+    &_uploaded {
+      padding: 0;
+    }
     border: 1px solid $light-gray;
     width: 100%;
     &__or {
@@ -119,7 +120,6 @@ export default {
       display: flex;
       flex-direction: row;
       flex-wrap: nowrap;
-      border: 1px solid $light-gray;
       img {
         width: 100%;
         height: 100%;
