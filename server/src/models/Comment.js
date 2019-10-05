@@ -6,6 +6,10 @@ const Post = require('./Post');
 const { Schema } = mongoose;
 
 const schema = new Schema({
+  deleted: {
+    type: Boolean,
+    default: false,
+  },
   body: {
     type: String,
     required: true,
@@ -66,6 +70,16 @@ schema.pre('remove', async function (next) {
 });
 
 schema.methods.toResponse = function (user) {
+  if (this.deleted) {
+    return {
+      author: this.author,
+      children: this.children,
+      id: this._id,
+      deleted: true,
+      parent: this.parent,
+      createdAt: this.createdAt,
+    };
+  }
   const rated = user ? user.isRated(this.id) : {};
 
   return {

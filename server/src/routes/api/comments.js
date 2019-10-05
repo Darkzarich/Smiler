@@ -29,12 +29,33 @@ const auth = require('../auth');
  *          children:
  *            type: array
  *            items:
- *              $ref: '#/components/schemas/Comment'
+ *              oneOf:
+ *                - $ref: '#/components/schemas/Comment'
+ *                - $ref: '#/components/schemas/CommentDeleted'
  *          rating:
  *            type: number
  *          rated:
  *            $ref: '#/components/schemas/UserRate'
- *
+ *      CommentDeleted:
+ *        type: object
+ *        properties:
+ *          id:
+ *            type: string
+ *          post:
+ *            type: string
+ *          deleted:
+ *            type: boolean
+ *          parent:
+ *            type: string
+ *          createdAt:
+ *            type: string
+ *            example: 2019-08-16T01:04:02.504Z
+ *          children:
+ *            type: array
+ *            items:
+ *              oneOf:
+ *                - $ref: '#/components/schemas/Comment'
+ *                - $ref: '#/components/schemas/CommentDeleted'
  */
 
 /**
