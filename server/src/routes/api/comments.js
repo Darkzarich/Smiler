@@ -126,7 +126,11 @@ const auth = require('../auth');
  *                example: 5d55daa034c1991762147c2b
  *    responses:
  *      200:
- *        $ref: '#/components/responses/OK'
+ *        description: OK
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/Comment'
  *      404:
  *        $ref: '#/components/responses/NotFound'
  *      422:

@@ -109,7 +109,7 @@ module.exports = {
         children.push(comment.id);
         parentCommentary.children = children;
         await parentCommentary.save();
-        success(res);
+        success(res, comment);
       }
     } catch (e) {
       next(e);
