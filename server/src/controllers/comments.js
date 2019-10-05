@@ -40,7 +40,6 @@ module.exports = {
 
         function formRecursive(array) {
           const newArray = [];
-// TODO: fix this for the case when no child
           function deep(nestedArray) {
             if (nestedArray.children.length > 0) {
               nestedArray = nestedArray.children.map((el) => {
@@ -56,7 +55,9 @@ module.exports = {
 
           array.forEach((el) => {
             const el2 = el.toResponse(user);
-            el2.children = deep(el2);
+            if (el2.children.length > 0) {
+              el2.children = deep(el2);
+            }
             newArray.push(el2);
           });
 
