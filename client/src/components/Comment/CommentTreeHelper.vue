@@ -1,5 +1,5 @@
 <template>
-  <comments :data="data" :indent-level="2"/>
+  <comments :data="data" :post="post" :indent-level="2"/>
 </template>
 
 <script>
@@ -8,6 +8,6 @@ export default {
   components: {
     Comments: () => import('./Comments'),
   },
-  props: ['data', 'indentLevel'],
+  props: ['data', 'indentLevel', 'post'],
 };
 </script>

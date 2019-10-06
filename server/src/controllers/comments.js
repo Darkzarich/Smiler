@@ -37,7 +37,6 @@ module.exports = {
       ]).then((result) => {
         const comments = result[0];
         const user = result[1];
-
         function formRecursive(array) {
           const newArray = [];
           function deep(nestedArray) {
@@ -50,7 +49,7 @@ module.exports = {
 
               return nestedArray;
             }
-            return nestedArray.toResponse(user);
+            return [];
           }
 
           array.forEach((el) => {

@@ -96,7 +96,9 @@ const auth = require('../auth');
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Comment'
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/Comment'
  *      404:
  *        $ref: '#/components/responses/NotFound'
  *      422:

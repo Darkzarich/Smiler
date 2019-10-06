@@ -5,7 +5,7 @@
 >
   <button
       class="button__element"
-      @click="callback"
+      @click="callback(argument)"
       :disabled="disabled"
     >
     <span class="button__element-content">
@@ -30,6 +30,9 @@ export default {
   props: {
     callback: {
       type: Function,
+    },
+    argument: {
+      type: String,
     },
     disabled: {
       type: [Boolean, String],

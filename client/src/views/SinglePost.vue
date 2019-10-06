@@ -13,6 +13,7 @@
         :data="comments"
         :indent-level="1"
         :user="login"
+        :post="post.id"
       />
       <div class="comments__no-comments" v-else-if="!commentsLoading">
         No comments yet... Be the first!
@@ -28,7 +29,7 @@
 import { mapState } from 'vuex';
 import Post from '@/components/Post/Post.vue';
 import Comments from '@/components/Comment/Comments.vue';
-import loadingIcon from '@/library/svg/animation/circularLoader'
+import loadingIcon from '@/library/svg/animation/circularLoader';
 
 import api from '@/api';
 

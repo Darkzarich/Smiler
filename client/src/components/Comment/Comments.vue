@@ -2,52 +2,92 @@
   <div class="comments__item">
     <div
       v-for="comment in data"
+      :key="comment.id"
       class="comments__item-main"
       :style="`margin-left: ${indentLevel}rem`"
-      :key="comment.id"
     >
       <div class="comments__item-main-block">
         <div class="comments__item-main-block-meta">
-          <div class="comments__item-main-block-meta-rating">
-            {{ comment.rating }}
-          </div>
-          <div
-            class="comments__item-main-block-meta-upvote"
-            @click="upvote(comment.id)"
-            :class="comment.rated.isRated && !comment.rated.negative ? 'comments__item-main-block-meta-upvote_active' : ''"
-          >
-            <plus-icon/>
-          </div>
-          <div
-            @click="downvote(comment.id)"
-            class="comments__item-main-block-meta-downvote"
-            :class="comment.rated.isRated && comment.rated.negative ? 'comments__item-main-block-meta-downvote_active' : ''"
-          >
-            <minus-icon/>
-          </div>
-          <router-link :to="{
-            name: 'UserPage',
-            params: {
-              login: comment.author.login
-            }
-          }">
-            <div class="comments__item-main-block-meta-author">
-              {{ comment.author.login }}
+          <template v-if="!comment.deleted">
+            <div class="comments__item-main-block-meta-rating">
+              {{ comment.rating }}
             </div>
-            <div class="comments__item-main-block-meta-avatar">
-              <img :src="$resolveAvatar(comment.author.avatar)"/>
+            <div
+              class="comments__item-main-block-meta-upvote"
+              @click="upvote(comment.id)"
+              :class="comment.rated.isRated && !comment.rated.negative ? 'comments__item-main-block-meta-upvote_active' : ''"
+            >
+              <plus-icon/>
             </div>
-          </router-link>
+            <div
+              @click="downvote(comment.id)"
+              class="comments__item-main-block-meta-downvote"
+              :class="comment.rated.isRated && comment.rated.negative ? 'comments__item-main-block-meta-downvote_active' : ''"
+            >
+              <minus-icon/>
+            </div>
+            <router-link :to="{
+              name: 'UserPage',
+              params: {
+                login: comment.author.login
+              }
+            }">
+              <div class="comments__item-main-block-meta-author">
+                {{ comment.author.login }}
+              </div>
+              <div class="comments__item-main-block-meta-avatar">
+                <img :src="$resolveAvatar(comment.author.avatar)"/>
+              </div>
+            </router-link>
+          </template>
           <div class="comments__item-main-block-meta-date">
             {{ comment.createdAt | $fromNow }}
           </div>
         </div>
         <div class="comments__item-main-block-body">
-          {{ comment.body }}
+          <template v-if="!comment.deleted">
+
+            <div v-html="comment.body"/>
+
+            <div class="comments__item-main-answer">
+              <div v-if="replyFieldShowFor == comment.id" class="comments__item-main-answer-editor">
+                <text-editor-element v-model="replyBody"/>
+                <div class="comments__item-main-answer-buttons">
+                  <button-element
+                    :loading="replySending"
+                    :callback="reply"
+                    :argument="comment.id"
+                  >
+                    Send {{ comment.post }}
+                  </button-element>
+                  <button-element
+                    :callback="toggleReply"
+                  >
+                    Close
+                  </button-element>
+                </div>
+              </div>
+              <template v-else>
+                <div
+                  class="comments__item-main-answer-toggler"
+                  @click="toggleReply(comment.id)"
+                >
+                  Reply
+                </div>
+              </template>
+            </div>
+          </template>
+          <template v-else>
+            <i>This comment is deleted</i>
+          </template>
         </div>
       </div>
       <div v-if="comment.children.length > 0">
-        <comment-tree-helper :data="comment.children" :indent-level="indentLevel"/>
+        <comment-tree-helper
+          :data="comment.children"
+          :indent-level="indentLevel"
+          :post="post"
+        />
       </div>
     </div>
   </div>
@@ -57,6 +97,8 @@
 import api from '@/api/index';
 
 import CommentTreeHelper from './CommentTreeHelper';
+import TextEditorElement from '@/components/BasicElements/TextEditorElement';
+import ButtonElement from '@/components/BasicElements/ButtonElement';
 import plusIcon from '@/library/svg/plus';
 import minusIcon from '@/library/svg/minus';
 
@@ -65,17 +107,48 @@ import consts from '@/const/const';
 export default {
   components: {
     CommentTreeHelper,
+    TextEditorElement,
+    ButtonElement,
     plusIcon,
     minusIcon,
   },
-  props: ['data', 'indentLevel'],
+  props: ['data', 'indentLevel', 'post'],
   data() {
     return {
       commentData: this.data,
       loadingRate: false,
+      replyFieldShowFor: '',
+      replyBody: '',
+      replySending: false,
     };
   },
   methods: {
+    toggleReply(comID) {
+      if (this.replyFieldShowFor) {
+        this.replyFieldShowFor = '';
+      } else {
+        this.replyFieldShowFor = comID;
+      }
+    },
+    async reply(parent) {
+      this.replySending = true;
+      console.log(this.data);
+      console.log(parent);
+      const parentCom = this.data.find(el => el.id === parent);
+
+      const res = await api.comments.createComment({
+        post: this.post,
+        parent,
+        body: this.replyBody,
+      });
+
+      if (!res.data.error) {
+        this.data[this.data.indexOf(parentCom)].children.push(res.data);
+        this.replyBody = '';
+        this.replySending = false;
+        this.replyFieldShowFor = false;
+      }
+    },
     async upvote(id) {
       if (!this.loadingRate) {
         const commentItemData = this.commentData.find(el => el.id === id);
@@ -138,6 +211,7 @@ export default {
 
 <style lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/mixins.scss';
 
 .comments {
 
@@ -203,6 +277,33 @@ export default {
 
         &-body {
           line-height: 1.5rem;
+        }
+      }
+      &-answer {
+        &-editor {
+          width: 85%;
+          .text-editor {
+            height: 6rem;
+          }
+        }
+        &-toggler {
+          color: $firm;
+          margin-top: 0.5rem;
+          display: inline-block;
+          cursor: pointer;
+          font-size: 0.9rem;
+          font-weight: bold;
+          transition: color 0.2s ease;
+          &:hover {
+            color: darken($firm, 20%);
+          }
+        }
+        &-buttons {
+          margin-bottom: -1rem;
+          @include flex-row();
+          .button {
+            width: 100%;
+          }
         }
       }
     }
