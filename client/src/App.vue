@@ -67,10 +67,11 @@ body {
   margin-top: $header-height-interval;
   max-width: 1110px;
   min-height: 100vh;
+  margin-left: auto;
+  margin-right: auto;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  padding-left: 80px;
   padding-right: 10px;
   &__main {
     width: 70%;

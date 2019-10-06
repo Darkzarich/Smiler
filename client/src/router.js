@@ -43,6 +43,26 @@ const router = new Router({
       component: PostsContainer,
     },
     {
+      path: '/posts/blowing',
+      component: PostsContainer,
+      name: 'Blowing',
+    },
+    {
+      path: '/posts/top-this-week',
+      component: PostsContainer,
+      name: 'TopThisWeek',
+    },
+    {
+      path: '/posts/new',
+      component: PostsContainer,
+      name: 'New',
+    },
+    {
+      path: '/posts/feed',
+      component: PostsContainer,
+      name: 'Feed',
+    },
+    {
       path: '/error/404',
       name: '404',
       component: NotFound,
