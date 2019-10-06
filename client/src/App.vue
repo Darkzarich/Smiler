@@ -14,11 +14,13 @@
         <user/>
       </div>
     </div>
+    <footer-element/>
   </div>
 </template>
 
 <script>
 import HeaderElement from '@/components/HeaderElement';
+import FooterElement from '@/components/FooterElement';
 import SystemNotification from '@/components/SystemNotification/SystemNotification';
 import User from '@/components/User/User';
 
@@ -27,6 +29,7 @@ import api from '@/api';
 export default {
   components: {
     HeaderElement,
+    FooterElement,
     SystemNotification,
     User,
   },
@@ -63,6 +66,7 @@ body {
 .content-box {
   margin-top: $header-height-interval;
   max-width: 1110px;
+  min-height: 100vh;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;

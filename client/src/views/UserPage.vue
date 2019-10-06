@@ -10,8 +10,8 @@
         <post :post="post"/>
       </div>
     </div>
-    <div v-else class="loading">
-      Loading...
+    <div v-else class="post-loading">
+      <loader/>
     </div>
   </div>
 </template>
@@ -20,6 +20,8 @@
 import Post from '@/components/Post/Post.vue';
 import UserProfile from '@/components/UserProfile/UserProfile.vue';
 import api from '@/api';
+
+import loader from '@/library/svg/animation/circularLoader'
 
 import consts from '@/const/const';
 
@@ -34,6 +36,7 @@ export default {
   components: {
     Post,
     UserProfile,
+    loader
   },
   async beforeRouteEnter(to, from, next) {
     const user = await api.users.getUserProfile(to.params.login);
@@ -82,5 +85,12 @@ export default {
 </script>
 
 <style lang="scss">
+@import '@/styles/mixins';
+@import '@/styles/colors';
 
+  .post-loading {
+    @include widget();
+    @include flex-row();
+    justify-content: center;
+  }
 </style>

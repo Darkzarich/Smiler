@@ -1,5 +1,7 @@
 <template>
   <div>
+<!-- TODO: fix navigation, animation for comments, change rating with
+sockets -->
     <div v-if="!loading" class="post-container">
      <div
         v-for="post in posts"
@@ -11,8 +13,8 @@
         />
       </div>
     </div>
-    <div v-else class="loading">
-      Loading...
+    <div v-else class="post-loading">
+      <loader/>
     </div>
   </div>
 </template>
@@ -21,6 +23,8 @@
 import { mapState } from 'vuex';
 import Post from '@/components/Post/Post.vue';
 import api from '@/api';
+
+import loader from '@/library/svg/animation/circularLoader'
 
 import consts from '@/const/const';
 
@@ -33,6 +37,7 @@ export default {
   },
   components: {
     Post,
+    loader,
   },
   async created() {
     this.loading = true;
@@ -49,5 +54,12 @@ export default {
 </script>
 
 <style lang="scss">
+@import '@/styles/mixins';
+@import '@/styles/colors';
 
+  .post-loading {
+    @include widget();
+    @include flex-row();
+    justify-content: center;
+  }
 </style>
