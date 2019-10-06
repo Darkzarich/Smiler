@@ -6,13 +6,35 @@
 
     <div class="comments" id="comments">
       <div class="comments__title">
-        Comments ( <span class="comments__title-number"> {{post.commentCount }} </span> )
+        Commentaries ( <span class="comments__title-number"> {{post.commentCount }} </span> )
+      </div>
+      <div class="comments__form" :class="!user.authState ? 'comments__form_disabled' : ''" v-if="!commentsLoading">
+        <template v-if="user.authState">
+          <div class="comments__form-title">
+            Leave the commentary
+          </div>
+          <text-editor-element
+            v-model="sendCommentBody"
+          >
+                    <div class="comments__form-submit">
+            <button-element
+              :loading="sendCommentLoading"
+              :callback="sendComment"
+            >
+              Send
+            </button-element>
+          </div>
+          </text-editor-element>
+        </template>
+        <template v-else>
+          Please, <b>login</b> \ <b>register</b> to be able to leave any comments
+        </template>
       </div>
       <comments
         v-if="!commentsLoading && comments.length > 0"
         :data="comments"
         :indent-level="1"
-        :user="login"
+        :user="user.login"
         :post="post.id"
       />
       <div class="comments__no-comments" v-else-if="!commentsLoading">
@@ -29,6 +51,10 @@
 import { mapState } from 'vuex';
 import Post from '@/components/Post/Post.vue';
 import Comments from '@/components/Comment/Comments.vue';
+
+import TextEditorElement from '@/components/BasicElements/TextEditorElement';
+import ButtonElement from '@/components/BasicElements/ButtonElement';
+
 import loadingIcon from '@/library/svg/animation/circularLoader';
 
 import api from '@/api';
@@ -42,16 +68,20 @@ export default {
       showPost: false,
       comments: [],
       commentsLoading: false,
+      sendCommentBody: '',
+      sendCommentLoading: false,
     };
   },
   components: {
     Post,
+    TextEditorElement,
+    ButtonElement,
     Comments,
     loadingIcon,
   },
   computed: {
     ...mapState({
-      login: state => state.user.login,
+      user: state => state.user,
     }),
   },
   async beforeRouteEnter(to, from, next) {
@@ -81,6 +111,30 @@ export default {
       this.comments = res.data;
       this.commentsLoading = false;
     },
+    async sendComment() {
+      this.sendCommentLoading = true;
+      const res = await api.comments.createComment({
+        post: this.post.id,
+        body: this.sendCommentBody,
+      });
+      if (!res.data.error) {
+        const newComment = {
+          ...res.data,
+          rated: {
+            isRated: false,
+            negative: false,
+          },
+          author: {
+            avatar: this.user.avatar,
+            login: this.user.login,
+          },
+        };
+        this.post.commentCount = this.post.commentCount + 1;
+        this.comments.unshift(newComment);
+        this.sendCommentBody = '';
+      }
+      this.sendCommentLoading = false;
+    },
   },
 };
 </script>
@@ -92,6 +146,23 @@ export default {
   border: 1px solid $light-gray;
   padding: 1rem;
   margin-bottom: 2rem;
+  &__form {
+    width: 85%;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    &_disabled {
+      border: 1px solid $light-gray;
+      background: $widget-bg;
+      color: $main-text;
+    }
+    .text-editor {
+      height: 6rem;
+    }
+    &-title {
+      color: $main-text;
+      font-size: 1.2rem;
+    }
+  }
   &__title {
     color: $main-text;
     &-number {

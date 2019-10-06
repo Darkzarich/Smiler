@@ -51,21 +51,22 @@
 
             <div class="comments__item-main-answer">
               <div v-if="replyFieldShowFor == comment.id" class="comments__item-main-answer-editor">
-                <text-editor-element v-model="replyBody"/>
-                <div class="comments__item-main-answer-buttons">
-                  <button-element
-                    :loading="replySending"
-                    :callback="reply"
-                    :argument="comment.id"
-                  >
-                    Send {{ comment.post }}
-                  </button-element>
-                  <button-element
-                    :callback="toggleReply"
-                  >
-                    Close
-                  </button-element>
-                </div>
+                <text-editor-element v-model="replyBody">
+                  <div class="comments__item-main-answer-buttons">
+                    <button-element
+                      :loading="replySending"
+                      :callback="reply"
+                      :argument="comment.id"
+                    >
+                      Send
+                    </button-element>
+                    <button-element
+                      :callback="toggleReply"
+                    >
+                      Close
+                    </button-element>
+                  </div>
+                </text-editor-element>
               </div>
               <template v-else>
                 <div
@@ -94,6 +95,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import api from '@/api/index';
 
 import CommentTreeHelper from './CommentTreeHelper';
@@ -103,6 +105,7 @@ import plusIcon from '@/library/svg/plus';
 import minusIcon from '@/library/svg/minus';
 
 import consts from '@/const/const';
+
 
 export default {
   components: {
@@ -122,6 +125,11 @@ export default {
       replySending: false,
     };
   },
+  computed: {
+    ...mapState({
+      user: state => state.user,
+    }),
+  },
   methods: {
     toggleReply(comID) {
       if (this.replyFieldShowFor) {
@@ -132,8 +140,6 @@ export default {
     },
     async reply(parent) {
       this.replySending = true;
-      console.log(this.data);
-      console.log(parent);
       const parentCom = this.data.find(el => el.id === parent);
 
       const res = await api.comments.createComment({
@@ -143,11 +149,23 @@ export default {
       });
 
       if (!res.data.error) {
-        this.data[this.data.indexOf(parentCom)].children.push(res.data);
+        const newComment = {
+          ...res.data,
+          rated: {
+            isRated: false,
+            negative: false,
+          },
+          author: {
+            avatar: this.user.avatar,
+            login: this.user.login,
+          },
+        };
+
+        this.data[this.data.indexOf(parentCom)].children.unshift(newComment);
         this.replyBody = '';
-        this.replySending = false;
         this.replyFieldShowFor = false;
       }
+      this.replySending = false;
     },
     async upvote(id) {
       if (!this.loadingRate) {
@@ -186,7 +204,7 @@ export default {
         if (!commentItemData.rated.isRated) {
           const res = await api.comments.updateRate(id, {
             negative: true,
-          });
+          }); push;
 
           if (!res.data.error) {
             commentItemData.rated.isRated = true;
