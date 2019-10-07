@@ -1,8 +1,6 @@
 <template>
   <div>
-<!-- TODO: fix navigation, animation for comments, change rating with
-sockets -->
-    <div v-if="!loading" class="post-container">
+    <div v-if="!loading || posts.length > 0" class="post-container" v-scroll="handleScroll">
      <div
         v-for="post in posts"
         :key="post.id"
@@ -12,9 +10,21 @@ sockets -->
           :can-edit="$postCanEdit(post)"
         />
       </div>
+      <div
+        v-if="posts.length == 0"
+        class="post-container__no-post"
+      >
+        We're sorry. No posts for this time yet.
+      </div>
     </div>
-    <div v-else class="post-loading">
+    <div v-if="loading" class="post-loading">
       <loader/>
+    </div>
+    <div
+      v-else-if="noMorePost"
+      class="post-container__no-more"
+    >
+      Congratulations! You've read everything available. Thanks! Please, come later time to see more!
     </div>
   </div>
 </template>
@@ -24,7 +34,7 @@ import { mapState } from 'vuex';
 import Post from '@/components/Post/Post.vue';
 import api from '@/api';
 
-import loader from '@/library/svg/animation/circularLoader'
+import loader from '@/library/svg/animation/circularLoader';
 
 import consts from '@/const/const';
 
@@ -33,22 +43,53 @@ export default {
     return {
       posts: [],
       loading: false,
+      curPage: 0,
+      noMorePost: false,
     };
   },
   components: {
     Post,
     loader,
   },
-  async created() {
-    this.loading = true;
+  created() {
+    this.getPosts(this.curPage);
+  },
+  methods: {
+    // add decides if concat of arrays is used
+    async getPosts(add) {
+      this.loading = true;
 
-    const res = await api.posts.getPosts({
-      limit: consts.POSTS_INITIAL_COUNT,
-    });
+      const res = await api.posts.getPosts({
+        limit: consts.POSTS_INITIAL_COUNT,
+        offset: 0 + (this.curPage * consts.POSTS_INITIAL_COUNT),
+      });
 
-    this.posts = res.data.posts;
+      if (!res.data.error) {
+        if (add) {
+          if (res.data.posts.length === 0) {
+            this.noMorePost = true;
+          } else {
+            this.posts = this.posts.concat(res.data.posts);
+          }
+        } else {
+          this.posts = res.data.posts;
+          if (res.data.pages === 1) {
+            this.noMorePost = true;
+          }
+        }
+      }
 
-    this.loading = false;
+      this.loading = false;
+    },
+    handleScroll(evt, el) {
+      if (!this.loading && !this.noMorePost) {
+        const curContainerBounds = el.getBoundingClientRect();
+        if (curContainerBounds.height - Math.abs(curContainerBounds.y) < window.innerHeight) {
+          this.curPage = this.curPage + 1;
+          this.getPosts(true);
+        }
+      }
+    },
   },
 };
 </script>
@@ -61,5 +102,20 @@ export default {
     @include widget();
     @include flex-row();
     justify-content: center;
+    margin-left: 10%;
+  }
+  .post-container {
+    &__no-post, &__no-more {
+      @include widget;
+      color: $main-text;
+      display: flex;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    &__no-more {
+      margin-left: 10%;
+      text-align: center;
+      justify-content: none;
+    }
   }
 </style>

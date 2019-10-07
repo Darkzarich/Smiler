@@ -17,6 +17,15 @@ new Vue({
   render: h => h(App),
 }).$mount('#app');
 
+Vue.directive('scroll', {
+  inserted(el, binding) {
+    const f = (evt) => {
+      binding.value(evt, el);
+    };
+    window.addEventListener('scroll', f);
+  },
+});
+
 // Mixin for global functions
 
 Vue.mixin({

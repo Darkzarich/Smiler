@@ -2,16 +2,31 @@
   <div>
     <user-profile :data="userInfo"/>
 
-    <div v-if="!loading" class="post-container">
+    <div
+      v-scroll="handleScroll"
+      v-if="!loading || posts.length > 0"
+      class="post-container">
      <div
         v-for="post in posts"
         :key="post.id"
       >
         <post :post="post"/>
       </div>
+      <div
+        v-if="posts.length == 0"
+        class="post-container__no-post"
+      >
+        Author has no posts yet.
+      </div>
     </div>
-    <div v-else class="post-loading">
+    <div v-if="loading" class="post-loading">
       <loader/>
+    </div>
+    <div
+      v-else-if="noMorePost"
+      class="post-container__no-more"
+    >
+      Congratulations! You've read every post this author had!
     </div>
   </div>
 </template>
@@ -21,7 +36,7 @@ import Post from '@/components/Post/Post.vue';
 import UserProfile from '@/components/UserProfile/UserProfile.vue';
 import api from '@/api';
 
-import loader from '@/library/svg/animation/circularLoader'
+import loader from '@/library/svg/animation/circularLoader';
 
 import consts from '@/const/const';
 
@@ -31,12 +46,14 @@ export default {
       posts: [],
       userInfo: {},
       loading: false,
+      curPage: 0,
+      noMorePost: false,
     };
   },
   components: {
     Post,
     UserProfile,
-    loader
+    loader,
   },
   async beforeRouteEnter(to, from, next) {
     const user = await api.users.getUserProfile(to.params.login);
@@ -68,17 +85,40 @@ export default {
     setUserInfo(user) {
       this.userInfo = user;
     },
-    async uploadPosts() {
+    async uploadPosts(add) {
       this.loading = true;
 
       const res = await api.posts.getPosts({
         author: this.userInfo.login || this.$route.params.login,
         limit: consts.POSTS_INITIAL_COUNT,
+        offset: 0 + (this.curPage * consts.POSTS_INITIAL_COUNT),
       });
 
-      this.posts = res.data.posts;
+      if (!res.data.error) {
+        if (add) {
+          if (res.data.posts.length === 0) {
+            this.noMorePost = true;
+          } else {
+            this.posts = this.posts.concat(res.data.posts);
+          }
+        } else {
+          this.posts = res.data.posts;
+          if (res.data.pages === 1) {
+            this.noMorePost = true;
+          }
+        }
+      }
 
       this.loading = false;
+    },
+    handleScroll(evt, el) {
+      if (!this.loading && !this.noMorePost && this.posts.length > 0) {
+        const curContainerBounds = el.getBoundingClientRect();
+        if (curContainerBounds.height - Math.abs(curContainerBounds.y) < window.innerHeight) {
+          this.curPage = this.curPage + 1;
+          this.uploadPosts(true);
+        }
+      }
     },
   },
 };
@@ -92,5 +132,20 @@ export default {
     @include widget();
     @include flex-row();
     justify-content: center;
+  }
+
+  .post-container {
+    &__no-post, &__no-more {
+      @include widget;
+      color: $main-text;
+      display: flex;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    &__no-more, &__no-post {
+      margin-left: 10%;
+      text-align: center;
+      justify-content: none;
+    }
   }
 </style>

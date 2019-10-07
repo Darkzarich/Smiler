@@ -73,6 +73,7 @@ function startUpload(req, res, next) {
 }
 
 module.exports = {
+  // TODO: fix counting pages for pages, with author filter counts for all pages
   getAll: async (req, res, next) => {
     const limit = +req.query.limit || 100;
     const offset = +req.query.offset || 0;
