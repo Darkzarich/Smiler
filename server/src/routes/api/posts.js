@@ -105,6 +105,18 @@ const auth = require('../auth');
  *            minimum: 1
  *          description: posts per page
  *        - in: query
+ *          name: sort
+ *          schema:
+ *            type: string
+ *          description: Sorts posts by field `sort`, default descending. `-<sortField>` - ascending sort.
+ *          examples:
+ *            descending:
+ *              summary: Example of descending sort by field `createdAt`
+ *              value: -createdAt
+ *            ascending:
+ *              summary: Example of ascending sort by field `rating`
+ *              value: rating
+ *        - in: query
  *          name: offset
  *          required: true
  *          schema:
@@ -116,6 +128,33 @@ const auth = require('../auth');
  *          schema:
  *            type: string
  *          description: By author
+ *        - in: query
+ *          name: title
+ *          description: Seach post by title
+ *          schema:
+ *            type: string
+ *        - in: query
+ *          name: dateFrom
+ *          description: Show posts posted after `dateFrom`
+ *          schema:
+ *            type: string
+ *          example: 2019-08-21T22:05:44.788Z
+ *        - in: query
+ *          name: dateTo
+ *          description: Show posts posted before `dateTo`
+ *          schema:
+ *            type: string
+ *          example: 2019-09-21T22:05:44.788Z
+ *        - in: query
+ *          name: ratingFrom
+ *          description: Show posts posted with rating above `ratingFrom`
+ *          schema:
+ *            type: string
+ *        - in: query
+ *          name: ratingTo
+ *          description: Show posts posted with rating below `ratingTo`
+ *          schema:
+ *            type: string
  *      responses:
  *        200:
  *          description: OK
