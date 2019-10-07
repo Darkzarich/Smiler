@@ -4,6 +4,7 @@
       v-for="comment in data"
       :key="comment.id"
       class="comments__item-main"
+      :class="first ? 'comments__item-main_first' : ''"
       :style="`margin-left: ${indentLevel}rem`"
     >
       <div class="comments__item-main-block">
@@ -72,6 +73,7 @@
                 <div
                   class="comments__item-main-answer-toggler"
                   @click="toggleReply(comment.id)"
+                  v-if="level < COMMENTS_NESTED_LIMIT"
                 >
                   Reply
                 </div>
@@ -82,12 +84,18 @@
             <i>This comment is deleted</i>
           </template>
         </div>
+        <div @click="toggleShowChild(comment.id)"
+          v-if="!hideChild.includes(comment.id) && comment.children.length > 0"
+          class="comments__child-toggler">[-]</div>
+        <div @click="toggleShowChild(comment.id)" v-else-if="comment.children.length > 0"
+        class="comments__child-toggler comments__child-toggler_active">[+]</div>
       </div>
-      <div v-if="comment.children.length > 0">
+      <div v-if="comment.children.length > 0 && !hideChild.includes(comment.id)">
         <comment-tree-helper
           :data="comment.children"
           :indent-level="indentLevel"
           :post="post"
+          :level="level"
         />
       </div>
     </div>
@@ -115,7 +123,7 @@ export default {
     plusIcon,
     minusIcon,
   },
-  props: ['data', 'indentLevel', 'post'],
+  props: ['data', 'indentLevel', 'post', 'first', 'level'],
   data() {
     return {
       commentData: this.data,
@@ -123,6 +131,8 @@ export default {
       replyFieldShowFor: '',
       replyBody: '',
       replySending: false,
+      hideChild: [],
+      COMMENTS_NESTED_LIMIT: consts.COMMENTS_NESTED_LIMIT,
     };
   },
   computed: {
@@ -131,6 +141,13 @@ export default {
     }),
   },
   methods: {
+    toggleShowChild(id) {
+      if (this.hideChild.includes(id)) {
+        this.hideChild.splice(this.hideChild.indexOf(id), 1);
+      } else {
+        this.hideChild.push(id);
+      }
+    },
     toggleReply(comID) {
       if (this.replyFieldShowFor) {
         this.replyFieldShowFor = '';
@@ -232,10 +249,28 @@ export default {
 @import '@/styles/mixins.scss';
 
 .comments {
-
+  &__child-toggler {
+    display: inline-block;
+    position: absolute;
+    margin-top: 1rem;
+    color: $light-gray;
+    cursor: pointer;
+    &:hover, &_active {
+      color: $firm;
+    }
+    &_active {
+      font-weight: bold;
+    }
+    font-family: monospace;
+    margin-left: -0.7rem;
+  }
   &__item {
     &-main {
       border-left: solid 1px $light-gray;
+      &_first {
+        border-left: none !important;
+        margin-left: 0 !important;
+      }
       &-block {
         background: $widget-bg;
         margin: 1rem;

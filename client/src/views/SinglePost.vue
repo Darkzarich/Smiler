@@ -34,8 +34,9 @@
         v-if="!commentsLoading && comments.length > 0"
         :data="comments"
         :indent-level="1"
-        :user="user.login"
         :post="post.id"
+        :level="0"
+        :first="true"
       />
       <div class="comments__no-comments" v-else-if="!commentsLoading">
         No comments yet... Be the first!

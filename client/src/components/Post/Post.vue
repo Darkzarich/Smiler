@@ -71,8 +71,10 @@
             <router-link
             target="_blank"
             :to="{
-              path: postData.slug,
-              hash: 'comments'
+              name: 'Single',
+              params: {
+                slug: postData.slug
+              },
             }">
               <comments-icon/> {{ postData.commentCount }}
             </router-link>
