@@ -129,6 +129,7 @@ export default {
             avatar: this.user.avatar,
             login: this.user.login,
           },
+          created: true,
         };
         this.post.commentCount = this.post.commentCount + 1;
         this.comments.unshift(newComment);

@@ -7,7 +7,10 @@
       :class="first ? 'comments__item-main_first' : ''"
       :style="`margin-left: ${indentLevel}rem`"
     >
-      <div class="comments__item-main-block">
+      <div
+        class="comments__item-main-block"
+        :class=" comment.created ? 'comments__item-main-block_created' : ''"
+      >
         <div class="comments__item-main-block-meta">
           <template v-if="!comment.deleted">
             <div class="comments__item-main-block-meta-rating">
@@ -176,6 +179,7 @@ export default {
             avatar: this.user.avatar,
             login: this.user.login,
           },
+          created: true,
         };
 
         this.data[this.data.indexOf(parentCom)].children.unshift(newComment);
@@ -276,6 +280,20 @@ export default {
         margin: 1rem;
         padding: 1rem;
         color: $main-text;
+
+        &_created {
+
+          animation: flash 1s ease-out;
+
+          @keyframes flash {
+            0% {
+              background: $comments-animation;
+            }
+            100% {
+              background: $widget-bg;
+            }
+          }
+        }
 
         &-meta {
           display: flex;

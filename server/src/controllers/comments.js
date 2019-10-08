@@ -29,7 +29,7 @@ module.exports = {
     try {
       Promise.all([
         Comment.find(query)
-          .sort('-createdAt')
+          .sort('-rating')
           .skip(offset)
           .limit(limit)
           .exists('parent', false),
