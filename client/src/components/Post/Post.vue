@@ -269,14 +269,19 @@ export default {
       border-top: 1px solid $light-gray;
 
       &-comments {
-        position: absolute;
-        margin-left: 25%;
         svg {
           fill: $main-text;
           width: 1rem;
           height: 1rem;
+          margin-right: 0.2rem;
         }
       }
+
+     > a {
+       flex-basis: 33%;
+       display: flex;
+       justify-content: flex-end;
+     }
 
       &-author {
         display: flex;
@@ -296,6 +301,7 @@ export default {
         }
       }
       &-date {
+            flex-basis: 33%;
         display: inline-block;
       }
     }

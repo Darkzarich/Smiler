@@ -6,6 +6,7 @@
     <div class="user-login__email-input">
       <input-element
         :name="'email'"
+        :enter-callback="login"
         :place-holder="'Email'"
         :error="validation.email"
         v-model="email"/>
@@ -14,6 +15,7 @@
       <input-element
         :type="'password'"
         :name="'password'"
+        :enter-callback="login"
         :error="validation.password"
         :place-holder="'Password'"
         v-model="password"/>

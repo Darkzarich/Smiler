@@ -8,6 +8,7 @@ import NotFound from './views/NotFound.vue';
 import SinglePost from './views/SinglePost.vue';
 import UserPage from './views/UserPage.vue';
 import PostCreate from './views/PostCreate.vue';
+import Search from './views/Search.vue';
 
 Vue.use(Router);
 
@@ -146,6 +147,11 @@ const router = new Router({
       meta: {
         mode: 'edit',
       },
+    },
+    {
+      path: '/posts/search',
+      name: 'Search',
+      component: Search,
     },
     // {
     //   path: '/about',

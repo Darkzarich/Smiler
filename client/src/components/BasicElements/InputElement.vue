@@ -9,14 +9,19 @@
     v-if="!multiline"
     :name="name"
     @input="setValueAndChanged($event.target.value)"
+    @keyup.enter="enterCallback"
     :value="value"
     :placeholder="placeHolder"
     class="input__element"
     :class="(error || errorOnlyStyle) && wasChanged ? 'input__element_error' : ''"
   >
+  </input>
+  <div @click="iconClickCallback" class="input__icon">
+    <component v-if="icon" :is="icon"/>
+  </div>
   <textarea
     :id="label"
-    v-else
+    v-if="multiline"
     :type="type"
     :name="name"
     @input="setValueAndChanged($event.target.value)"
@@ -35,11 +40,16 @@
 </template>
 
 <script>
+import searchIcon from '@/library/svg/search';
+
 export default {
   data() {
     return {
       wasChanged: false,
     };
+  },
+  components: {
+    searchIcon,
   },
   props: {
     value: {
@@ -73,6 +83,17 @@ export default {
     errorOnlyStyle: {
       type: Boolean,
     },
+    enterCallback: {
+      type: Function,
+      default: () => {},
+    },
+    icon: {
+      type: String,
+    },
+    iconClickCallback: {
+      type: Function,
+      default: () => {},
+    },
   },
   methods: {
     setValueAndChanged(val) {
@@ -95,6 +116,17 @@ export default {
   &__error {
     color: $error;
     font-size: 0.7rem;
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    position: relative;
+    left: -2rem;
+    svg {
+      fill: $light-gray;
+      cursor: pointer;
+    }
   }
 
   &__element {

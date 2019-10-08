@@ -8,6 +8,7 @@
       <input-element
         :name="'email'"
         :place-holder="'Email'"
+        :enter-callback="register"
         :error="validation.email"
         v-model="email"/>
     </div>
@@ -15,12 +16,14 @@
       <input-element
         :name="'login'"
         :place-holder="'Login'"
+        :enter-callback="register"
         :error="validation.login"
         v-model="login"/>
     </div>
     <div class="user-registration__password-input">
       <input-element
         :type="'password'"
+        :enter-callback="register"
         :name="'password'"
         :error="validation.password"
         :place-holder="'Password'"
@@ -29,6 +32,7 @@
     <div class="user-registration__confirm-input">
       <input-element
         :type="'password'"
+        :enter-callback="register"
         :name="'confirm'"
         :error="validation.confirm"
         :place-holder="'Confirm password'"

@@ -30,6 +30,7 @@ export default {
   props: {
     callback: {
       type: Function,
+      default: () => {},
     },
     argument: {
       type: String,

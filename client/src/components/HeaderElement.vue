@@ -24,6 +24,17 @@
         <div> MY FEED </div>
       </router-link>
     </nav>
+    <div v-if="$route.name !== 'Search'"
+         class="header-container__search">
+      <input-element
+        :place-holder="'Search'"
+        icon="searchIcon"
+        :style="'flex-direction: row'"
+        v-model.trim="title"
+        :enter-callback="search"
+        :icon-click-callback="search"
+      />
+    </div>
     <div
       class="header-container__avatar"
       v-if="user.authState"
@@ -43,13 +54,35 @@
 
 <script>
 import { mapState } from 'vuex';
+import inputElement from '@/components/BasicElements/InputElement';
+
 
 export default {
-
+  components: {
+    inputElement,
+  },
+  data() {
+    return {
+      // for search
+      title: '',
+    };
+  },
   computed: {
     ...mapState({
       user: state => state.user,
     }),
+  },
+  methods: {
+    search() {
+      if (this.title.length > 0) {
+        this.$router.push({
+          name: 'Search',
+          query: {
+            title: this.title,
+          },
+        });
+      }
+    },
   },
 };
 </script>
@@ -97,6 +130,11 @@ export default {
         color: $firm;
         border-bottom: 2px solid $firm !important;
       }
+    }
+    &__search {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
     }
     &__avatar {
       display: flex;

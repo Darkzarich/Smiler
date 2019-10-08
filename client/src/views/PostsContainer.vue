@@ -48,12 +48,17 @@ export default {
       filters: this.$route.meta.filters,
     };
   },
+  props: ['searchFilter'],
   components: {
     Post,
     loader,
   },
   created() {
-    this.getPosts(this.curPage);
+    if (this.searchFilter) {
+      this.filters = this.searchFilter;
+    } else {
+      this.getPosts(this.curPage);
+    }
   },
   watch: {
     '$route.meta': function (newVal) {
@@ -65,6 +70,11 @@ export default {
       this.curPage = 0;
       this.noMorePost = false;
       this.getPosts();
+    },
+    searchFilter(newVal) {
+      if (this.searchFilter) {
+        this.filters = newVal;
+      }
     },
   },
   methods: {
