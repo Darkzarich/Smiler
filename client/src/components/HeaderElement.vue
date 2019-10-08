@@ -8,6 +8,9 @@
       <router-link :to="{ name: 'Home' }">
         <div> TODAY </div>
       </router-link>
+      <router-link :to="{ name: 'All' }">
+        <div> ALL </div>
+      </router-link>
       <router-link :to="{ name: 'Blowing' }">
         <div title="posted recently, 50+ rating"> BLOWING </div>
       </router-link>
@@ -92,7 +95,7 @@ export default {
       }
       .router-link-exact-active {
         color: $firm;
-        border-bottom: 2px solid $firm;
+        border-bottom: 2px solid $firm !important;
       }
     }
     &__avatar {

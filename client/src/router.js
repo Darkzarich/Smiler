@@ -27,6 +27,19 @@ const authGuard = async (to, from, next) => {
   }
 };
 
+const getFilterDate = (h, m, s, d) => {
+  const date = new Date();
+  date.setHours(h || 0);
+  date.setMinutes(m || 0);
+  date.setSeconds(s || 0);
+
+  if (d) {
+    date.setDate(d);
+  }
+
+  return date.toISOString();
+};
+
 const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
@@ -41,21 +54,59 @@ const router = new Router({
       path: '/',
       name: 'Home',
       component: PostsContainer,
+      meta: {
+        filters: {
+          sort: '-rating',
+          dateFrom: getFilterDate(),
+          dateTo: getFilterDate(23, 59, 59),
+        },
+      },
+    },
+    {
+      path: '/posts/all',
+      name: 'All',
+      component: PostsContainer,
+      meta: {
+        filters: {
+          sort: '-rating',
+        },
+      },
     },
     {
       path: '/posts/blowing',
       component: PostsContainer,
       name: 'Blowing',
+      meta: {
+        filters: {
+          sort: '-rating',
+          ratingFrom: 50,
+          dateFrom: getFilterDate(new Date().getHours - 2),
+          dateTo: new Date().toISOString(),
+        },
+      },
     },
     {
       path: '/posts/top-this-week',
       component: PostsContainer,
       name: 'TopThisWeek',
+      meta: {
+        filters: {
+          sort: '-createdAt',
+          dateFrom: getFilterDate(0, 0, 0, new Date().getDate() - new Date().getDay()),
+          dateTo: new Date().toISOString(),
+        },
+      },
     },
     {
       path: '/posts/new',
       component: PostsContainer,
       name: 'New',
+      meta: {
+        filters: {
+          sort: '-createdAt',
+          dateFrom: getFilterDate(new Date().getHours() - 2, new Date().getMinutes()),
+        },
+      },
     },
     {
       path: '/posts/feed',

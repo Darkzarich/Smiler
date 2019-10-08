@@ -45,6 +45,7 @@ export default {
       loading: false,
       curPage: 0,
       noMorePost: false,
+      filters: this.$route.meta.filters,
     };
   },
   components: {
@@ -54,6 +55,18 @@ export default {
   created() {
     this.getPosts(this.curPage);
   },
+  watch: {
+    '$route.meta': function (newVal) {
+      this.filters = newVal.filters;
+    },
+    filters() {
+      this.posts = [];
+      this.loading = false;
+      this.curPage = 0;
+      this.noMorePost = false;
+      this.getPosts();
+    },
+  },
   methods: {
     // add decides if concat of arrays is used
     async getPosts(add) {
@@ -62,6 +75,7 @@ export default {
       const res = await api.posts.getPosts({
         limit: consts.POSTS_INITIAL_COUNT,
         offset: 0 + (this.curPage * consts.POSTS_INITIAL_COUNT),
+        ...this.filters,
       });
 
       if (!res.data.error) {
@@ -82,7 +96,7 @@ export default {
       this.loading = false;
     },
     handleScroll(evt, el) {
-      if (!this.loading && !this.noMorePost) {
+      if (!this.loading && !this.noMorePost && this.posts.length > 0) {
         const curContainerBounds = el.getBoundingClientRect();
         if (curContainerBounds.height - Math.abs(curContainerBounds.y) < window.innerHeight) {
           this.curPage = this.curPage + 1;
