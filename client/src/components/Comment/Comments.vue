@@ -76,7 +76,14 @@
                 <div
                   class="comments__item-main-answer-toggler"
                   @click="toggleReply(comment.id)"
-                  v-if="level < COMMENTS_NESTED_LIMIT"
+                  v-if="level < COMMENTS_NESTED_LIMIT && user.authState"
+                >
+                  Reply
+                </div>
+                <div
+                  v-else-if="level < COMMENTS_NESTED_LIMIT"
+                  class="comments__item-main-answer-toggler comments__item-main-answer-toggler_disabled"
+                  title="Please, Log in to be able to answer"
                 >
                   Reply
                 </div>
@@ -367,6 +374,10 @@ export default {
           transition: color 0.2s ease;
           &:hover {
             color: darken($firm, 20%);
+          }
+          &_disabled {
+            color: $light-gray !important;
+            cursor: default;
           }
         }
         &-buttons {
