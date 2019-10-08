@@ -113,6 +113,9 @@ const router = new Router({
       path: '/posts/feed',
       component: PostsContainer,
       name: 'Feed',
+      beforeEnter(to, from, next) {
+        authGuard(to, from, next);
+      },
     },
     {
       path: '/error/404',

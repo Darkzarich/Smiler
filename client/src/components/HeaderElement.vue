@@ -20,9 +20,17 @@
       <router-link :to="{ name: 'New' }">
         <div title="posts posted 2 hours ago sorted by newer"> NEW </div>
       </router-link>
-      <router-link :to="{ name: 'Feed' }">
-        <div> MY FEED </div>
-      </router-link>
+
+      <template v-if="user.authState">
+        <router-link :to="{ name: 'Feed' }">
+          <div> MY FEED </div>
+        </router-link>
+      </template>
+      <template v-else>
+        <a title="Log in to access this page" class="header-container__nav-link_disabled">
+          <div> MY FEED </div>
+        </a>
+      </template>
     </nav>
     <div v-if="$route.name !== 'Search'"
          class="header-container__search">
@@ -125,6 +133,12 @@ export default {
         &:hover {
           border-bottom: 2px solid $main-text;
         }
+      }
+      .header-container__nav-link_disabled {
+        color: $light-gray !important;
+        border-bottom: 2px solid transparent !important;
+        cursor: default;
+        user-select: none;
       }
       .router-link-exact-active {
         color: $firm;
