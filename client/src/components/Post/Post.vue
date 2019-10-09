@@ -42,6 +42,13 @@
 
         </div>
       </router-link>
+
+      <div v-if="postData.tags.length > 0" class="post-main__tags">
+        <div v-for="tag in postData.tags" :key="tag" class="post-main__tags-item">
+          {{ tag }}
+        </div>
+      </div>
+
       <div class="post-main__body">
         <div
         class="post-main__body-section"
@@ -191,6 +198,7 @@ export default {
 
 <style lang="scss">
 @import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
 @import '@/styles/colors.scss';
 
 .post-container__item {
@@ -222,6 +230,24 @@ export default {
             fill: $light-gray;
           }
         }
+      }
+    }
+
+    &__tags {
+      @include flex-row;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+      &-item {
+        color: $firm;
+        font-weight: bold;
+        background: transparent;
+        font-size: 0.8rem;
+        font-family: monospace;
+        cursor: pointer;
+        padding: 0.1rem;
+        margin-right: 0.5rem;
+        border-radius: 5px;
+        border: 1px solid $firm;
       }
     }
 
