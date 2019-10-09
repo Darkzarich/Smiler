@@ -84,6 +84,7 @@ module.exports = {
     const ratingFrom = +req.query.ratingFrom || '';
     const ratingTo = +req.query.ratingTo || '';
     const sort = req.query.sort || '-createdAt';
+    const tags = req.query.tags || [];
     const { userId } = req.session;
 
     if (limit > 100) { generateError('Limit can\'t be more than 100', 422, next); return; }
@@ -137,6 +138,12 @@ module.exports = {
         if (ratingTo) {
           query.rating.$lte = ratingTo;
         }
+      }
+
+      if (tags.length > 0) {
+        query.tags = {
+          $in: tags,
+        };
       }
 
       Promise.all([
@@ -196,6 +203,7 @@ module.exports = {
 
     const { userId } = req.session;
     const { title } = req.body;
+    const { tags } = req.body;
     const { sections } = req.body;
 
     if (!title) { generateError('Title is required', 422, next); return; }
@@ -203,6 +211,10 @@ module.exports = {
     if (sections.length > consts.POST_SECTIONS_MAX) { generateError('Exceeded max amount of sections', 422, next); return; }
     if (title.length > consts.POST_TITLE_MAX_LENGTH) { generateError('Exceeded max length of title', 422, next); return; }
 
+    if (tags) {
+      if (tags.length > consts.POST_MAX_TAGS) { generateError('Too many tags', 422, next); return; }
+      if (tags.find(el => el.length > consts.POST_MAX_TAG_LEN)) { generateError('Exceeded max length of a tag', 422, next); return; }
+    }
 
     const textSections = sections.filter(sec => sec.type === consts.POST_SECTION_TYPES.TEXT);
     let typeError = false;
@@ -233,12 +245,14 @@ module.exports = {
       const post = await Post.create({
         title,
         sections,
+        tags,
         slug,
         author: userId,
       });
 
       user.template.title = '';
       user.template.sections = [];
+      user.template.tags = [];
 
       user.markModified('template');
       await user.save();
@@ -254,6 +268,7 @@ module.exports = {
     const { userId } = req.session;
     const { id } = req.params;
     const { title } = req.body;
+    const { tags } = req.body;
     const { sections } = req.body;
 
     const foundPost = await Post.findById(id);
@@ -268,6 +283,11 @@ module.exports = {
         generateError(`You can edit post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`, 405, next);
       } else {
         const toDelete = [];
+
+        if (tags) {
+          if (tags.length > consts.POST_MAX_TAGS) { generateError('Too many tags', 422, next); return; }
+          if (tags.find(el => el.length > consts.POST_MAX_TAG_LEN)) { generateError('Exceeded max length of a tag', 422, next); return; }
+        }
 
         if (sections) {
           foundPost.sections = sections;
@@ -285,6 +305,8 @@ module.exports = {
 
 
         foundPost.title = title || foundPost.title;
+        foundPost.tags = tags || foundPost.tags;
+
         if (toDelete && toDelete instanceof Array && toDelete.length > 0) {
           toDelete.forEach((el) => {
             fs.exists(el, (exist) => {

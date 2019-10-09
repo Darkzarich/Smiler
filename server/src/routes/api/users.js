@@ -154,6 +154,10 @@ router.put('/:login', auth.required, usersController.updateUser);
  *                properties:
  *                  title:
  *                    type: string
+ *                  tags:
+ *                    type: array
+ *                    items:
+ *                      type: string
  *                  sections:
  *                    description: Post sections
  *                    type: array
@@ -166,7 +170,7 @@ router.put('/:login', auth.required, usersController.updateUser);
  *    put:
  *      summary: Update user template
  *      tags: [Users]
- *      description: Update user post template `sections` and `title`
+ *      description: Update user post template `sections`, `title` and `tags`
  *      security:
  *        - cookieAuth: []
  *      parameters:
@@ -184,6 +188,10 @@ router.put('/:login', auth.required, usersController.updateUser);
  *              properties:
  *                title:
  *                  type: string
+ *                tags:
+ *                  type: array
+ *                  items:
+ *                    type: string
  *                sections:
  *                  type: array
  *                  items:

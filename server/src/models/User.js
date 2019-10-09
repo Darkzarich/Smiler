@@ -37,6 +37,7 @@ const schema = new Schema({
     type: Schema.Types.Mixed,
     default: {
       title: '',
+      tags: [],
       sections: [],
     },
   },

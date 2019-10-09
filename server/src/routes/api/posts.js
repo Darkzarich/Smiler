@@ -36,6 +36,10 @@ const auth = require('../auth');
  *           example: 2019-09-22T14:02:14.532Z
  *         rating:
  *           type: number
+ *         tags:
+ *           type: array
+ *           items:
+ *            type: string
  *         rated:
  *           $ref: '#/components/schemas/UserRate'
  *    UserRate:
@@ -124,6 +128,13 @@ const auth = require('../auth');
  *            default: 0
  *          description: offset from element
  *        - in: query
+ *          name: tags
+ *          schema:
+ *            type: array
+ *            items:
+ *              type: string
+ *          explode: form
+ *        - in: query
  *          name: author
  *          schema:
  *            type: string
@@ -188,6 +199,10 @@ const auth = require('../auth');
  *                  type: array
  *                  items:
  *                    $ref: '#/components/schemas/PostSection'
+ *                tags:
+ *                  type: array
+ *                  items:
+ *                    type: string
  *      responses:
  *        200:
  *          description: OK
@@ -227,6 +242,10 @@ router.post('/', auth.required, postsController.create);
  *              properties:
  *                title:
  *                  type: string
+ *                tags:
+ *                  type: array
+ *                  items:
+ *                    type: string
  *                sections:
  *                  type: array
  *                  items:

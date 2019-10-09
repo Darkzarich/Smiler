@@ -16,6 +16,11 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
+  tags: [
+    {
+      type: Schema.Types.String,
+    },
+  ],
   sections: [
     {
       type: Schema.Types.Mixed,
@@ -62,6 +67,7 @@ schema.methods.toResponse = function (user) {
     commentCount: this.commentCount,
     rating: this.rating,
     createdAt: this.createdAt,
+    tags: this.tags,
     rated: {
       isRated: rated.result || false,
       negative: rated.negative || false,

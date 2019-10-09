@@ -8,6 +8,8 @@ module.exports = {
     PICTURE: 'pic',
     VIDEO: 'vid',
   },
+  POST_MAX_TAGS: 8,
+  POST_MAX_TAG_LEN: 20,
   POST_SECTIONS_MAX: 8,
   POST_SECTIONS_MAX_LENGTH: 10000,
   POST_TITLE_MAX_LENGTH: 40,
