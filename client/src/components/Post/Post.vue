@@ -236,13 +236,15 @@ export default {
     &__tags {
       @include flex-row;
       flex-wrap: wrap;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
       &-item {
+        margin-top: 0.5rem;
         color: $firm;
         font-weight: bold;
         background: transparent;
         font-size: 0.8rem;
         font-family: monospace;
+        user-select: none;
         cursor: pointer;
         padding: 0.1rem;
         margin-right: 0.5rem;

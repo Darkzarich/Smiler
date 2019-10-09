@@ -82,23 +82,25 @@ export default {
     async getPosts(add) {
       this.loading = true;
 
-      const res = await api.posts.getPosts({
-        limit: consts.POSTS_INITIAL_COUNT,
-        offset: 0 + (this.curPage * consts.POSTS_INITIAL_COUNT),
-        ...this.filters,
-      });
+      if (this.$route.name !== 'Search' || this.filters) {
+        const res = await api.posts.getPosts({
+          limit: consts.POSTS_INITIAL_COUNT,
+          offset: 0 + (this.curPage * consts.POSTS_INITIAL_COUNT),
+          ...this.filters,
+        });
 
-      if (!res.data.error) {
-        if (add) {
-          if (res.data.posts.length === 0) {
-            this.noMorePost = true;
+        if (!res.data.error) {
+          if (add) {
+            if (res.data.posts.length === 0) {
+              this.noMorePost = true;
+            } else {
+              this.posts = this.posts.concat(res.data.posts);
+            }
           } else {
-            this.posts = this.posts.concat(res.data.posts);
-          }
-        } else {
-          this.posts = res.data.posts;
-          if (res.data.pages === 1) {
-            this.noMorePost = true;
+            this.posts = res.data.posts;
+            if (res.data.pages === 1) {
+              this.noMorePost = true;
+            }
           }
         }
       }

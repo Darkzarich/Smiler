@@ -6,6 +6,9 @@
       :error="validation.title"
       v-model="title"
     />
+    <post-editor-tags
+      :tags="tags"
+    />
     <transition-group name="post-editor__section">
       <div
         class="post-editor__section"
@@ -88,6 +91,7 @@ import ButtonElement from '../BasicElements/ButtonElement.vue';
 import TextEditorElement from '../BasicElements/TextEditorElement.vue';
 import PostEditorPicture from './PostEditorPicture';
 import PostEditorVideo from './PostEditorVideo';
+import PostEditorTags from './PostEditorTags';
 import InputElement from '../BasicElements/InputElement.vue';
 
 import closeIcon from '@/library/svg/exit';
@@ -104,6 +108,7 @@ export default {
     TextEditorElement,
     PostEditorPicture,
     PostEditorVideo,
+    PostEditorTags,
     closeIcon,
     videoIcon,
     pictureIcon,
@@ -115,6 +120,7 @@ export default {
       sending: false,
       saving: false,
       sections: [],
+      tags: [],
       POST_SECTION_TYPES: consts.POST_SECTION_TYPES,
       POST_MAX_SECTIONS: consts.POST_MAX_SECTIONS,
     };
@@ -148,11 +154,13 @@ export default {
     if (this.edit) {
       this.sections = this.post.sections;
       this.title = this.post.title;
+      this.tags = this.post.tags;
     } else {
       const res = await api.users.getUserTemplate(this.getUserLogin);
       if (!res.data.error) {
         this.title = res.data.title;
         this.sections = res.data.sections || [];
+        this.tags = res.data.tags || [];
       }
     }
   },
@@ -162,6 +170,7 @@ export default {
       const res = await api.posts.createPost({
         sections: this.sections,
         title: this.title,
+        tags: this.tags,
       });
 
       if (!res.data.error) {
@@ -179,6 +188,7 @@ export default {
       const res = await api.posts.updatePostById(this.post.id, {
         title: this.title,
         sections: this.sections,
+        tags: this.tags,
       });
 
       if (!res.data.error) {
@@ -196,6 +206,7 @@ export default {
       await api.users.updateUserTemplate(this.getUserLogin, {
         title: this.title,
         sections: this.sections,
+        tags: this.tags,
       });
 
       this.saving = false;

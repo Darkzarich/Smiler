@@ -28,6 +28,7 @@ export default {
         ratingTo: null,
         dateFrom: '',
         dateTo: '',
+        tags: [],
       },
     };
   },

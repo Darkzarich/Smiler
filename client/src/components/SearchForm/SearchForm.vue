@@ -27,6 +27,11 @@
       />
     </div>
   </div>
+  <div class="search-form__tags">
+    <post-editor-tags
+      :tags="filters.tags"
+    />
+  </div>
   <div class="search-form__submit">
     <button-element
       :callback="search"
@@ -47,6 +52,7 @@ import inputElement from '@/components/BasicElements/InputElement';
 import datePickElement from '@/components/BasicElements/DatePickElement';
 import buttonElement from '@/components/BasicElements/ButtonElement';
 import sliderElement from '@/components/BasicElements/SliderElement';
+import postEditorTags from '@/components/PostEditor/PostEditorTags';
 
 export default {
   components: {
@@ -54,12 +60,14 @@ export default {
     buttonElement,
     datePickElement,
     sliderElement,
+    postEditorTags,
   },
   props: ['value'],
   data() {
     return {
       filters: {
         title: this.value.title,
+        tags: this.value.tags,
       },
     };
   },
