@@ -84,7 +84,11 @@ export default {
     },
     clear() {
       Object.keys(this.filters).forEach((el) => {
-        this.filters[el] = undefined;
+        if (typeof this.filters[el] === 'object') {
+          this.filters[el] = [];
+        } else {
+          this.filters[el] = undefined;
+        }
       });
       this.$router.push({
         query: this.filters,

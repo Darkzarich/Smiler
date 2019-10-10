@@ -44,7 +44,11 @@
       </router-link>
 
       <div v-if="postData.tags.length > 0" class="post-main__tags">
-        <div v-for="tag in postData.tags" :key="tag" class="post-main__tags-item">
+        <div
+          v-for="tag in postData.tags"
+          @click="searchTag(tag)"
+          :key="tag"
+          class="post-main__tags-item">
           {{ tag }}
         </div>
       </div>
@@ -191,6 +195,14 @@ export default {
       if (!res.data.error) {
         document.location.reload();
       }
+    },
+    searchTag(tag) {
+      this.$router.push({
+        name: 'Search',
+        query: {
+          tags: [tag],
+        },
+      });
     },
   },
 };
