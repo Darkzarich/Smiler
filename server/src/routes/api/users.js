@@ -63,6 +63,12 @@ const auth = require('../auth');
   *        type: boolean
   *      rating:
   *        type: number
+  *      followersAmount:
+  *        type: number
+  *      tagsFollowed:
+  *        type: array
+  *        items:
+  *         type: string
 */
 
 /**

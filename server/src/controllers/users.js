@@ -312,6 +312,8 @@ module.exports = {
         rating: user.rating || 0,
         avatar: user.avatar || '',
         email: user.email || '',
+        tagsFollowed: user.tagsFollowed || [],
+        followersAmount: user.followersAmount,
       };
     } else {
       authState.isAuth = false;
