@@ -3,50 +3,66 @@ const usersController = require('../../controllers/users');
 const auth = require('../auth');
 
 /**
-*  @swagger
-*  tags:
-*   - name: Users
-*     description: Actions with Users collection
-* components:
-*  schemas:
-*   Author:
-*    type: object
-*    properties:
-*      id:
-*        type: string
-*      login:
-*        type: string
-*        example: user123
-*      avatar:
-*        type: string
-*   UserProfile:
-*    type: object
-*    properties:
-*      id:
-*        type: string
-*      login:
-*        type: string
-*      rating:
-*        type: number
-*      bio:
-*        type: string
-*      avatar:
-*        type: string
-*      createdAt:
-*        type: string
-*   AuthState:
-*    type: object
-*    properties:
-*      email:
-*        type: string
-*      login:
-*        type: string
-*      avatar:
-*        type: string
-*      isAuth:
-*        type: boolean
-*      rating:
-*        type: number
+  *  @swagger
+  *  tags:
+  *   - name: Users
+  *     description: Actions with Users collection
+  * components:
+  *  schemas:
+  *   Author:
+  *    type: object
+  *    properties:
+  *      id:
+  *        type: string
+  *      login:
+  *        type: string
+  *        example: user123
+  *      avatar:
+  *        type: string
+  *   UserProfile:
+  *    type: object
+  *    properties:
+  *      id:
+  *        type: string
+  *      login:
+  *        type: string
+  *      rating:
+  *        type: number
+  *      bio:
+  *        type: string
+  *      avatar:
+  *        type: string
+  *      createdAt:
+  *        type: string
+  *      followersCount:
+  *        type: number
+  *      isFollowed:
+  *        type: boolean
+  *        default: false
+  *   UserFollowing:
+  *     type: object
+  *     properties:
+  *       tags:
+  *         type: array
+  *         items:
+  *           type: string
+  *       authors:
+  *         type: array
+  *         items:
+  *           $ref: '#/components/schemas/Author'
+  *   AuthState:
+  *    type: object
+  *    properties:
+  *      email:
+  *        type: string
+  *      login:
+  *        type: string
+  *      avatar:
+  *        type: string
+  *      isAuth:
+  *        type: boolean
+  *      rating:
+  *        type: number
 */
 
 /**
@@ -210,6 +226,89 @@ router.put('/:login', auth.required, usersController.updateUser);
 router.get('/:login/template', auth.required, usersController.getUserPostTemplate);
 
 router.put('/:login/template', auth.required, usersController.updateUserPostTemplate);
+
+/**
+ * @swagger
+ * /users/{login}/following:
+ *  get:
+ *    tags: [Users]
+ *    summary: Get user following
+ *    description: Gets who user is following
+ *    security:
+ *      - cookieAuth: []
+ *    parameters:
+ *      - in: path
+ *        name: login
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: User name
+ *    responses:
+ *      200:
+ *        description: OK
+ *        content:
+ *          application/json:
+ *            schema:
+ *             $ref: '#/components/schemas/UserFollowing'
+ *      401:
+ *        $ref: '#/components/responses/Unauthorized'
+ *      403:
+ *        $ref: '#/components/responses/Forbidden'
+ *      404:
+ *        $ref: '#/components/responses/NotFound'
+ */
+
+router.get('/:login/following', auth.required, usersController.getFollowing);
+
+/**
+ * @swagger
+ * /users/{id}/follow:
+ *  put:
+ *    tags: [Users]
+ *    summary: Follow a user
+ *    description: Follow a user
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *    security:
+ *      - cookieAuth: []
+ *    responses:
+ *      200:
+ *        $ref: '#/components/responses/OK'
+ *      401:
+ *        $ref: '#/components/responses/Unauthorized'
+ *      422:
+ *        $ref: '#/components/responses/UnprocessableEntity'
+ *      404:
+ *        $ref: '#/components/responses/NotFound'
+ *  delete:
+ *    tags: [Users]
+ *    summary: Unfollow a user
+ *    description: Unfollow a user
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *    security:
+ *      - cookieAuth: []
+ *    responses:
+ *      200:
+ *        $ref: '#/components/responses/OK'
+ *      401:
+ *        $ref: '#/components/responses/Unauthorized'
+ *      422:
+ *        $ref: '#/components/responses/UnprocessableEntity'
+ *      404:
+ *        $ref: '#/components/responses/NotFound'
+ */
+
+router.put('/:id/follow', auth.required, usersController.follow);
+router.delete('/:id/follow', auth.required, usersController.unfollow);
 
 /**
  * @swagger

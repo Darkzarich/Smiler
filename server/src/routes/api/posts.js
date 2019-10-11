@@ -218,6 +218,49 @@ const auth = require('../auth');
 router.get('/', postsController.getAll);
 router.post('/', auth.required, postsController.create);
 
+/**
+ * @swagger
+ *  /posts/feed:
+ *    get:
+ *      tags: [Posts]
+ *      description: Get feed
+ *      summary: Get feed
+ *      parameters:
+ *        - in: query
+ *          name: limit
+ *          required: true
+ *          schema:
+ *            type: number
+ *            default: 20
+ *            maximum: 100
+ *            minimum: 1
+ *          description: posts per page
+ *        - in: query
+ *          name: offset
+ *          required: true
+ *          schema:
+ *            type: number
+ *            default: 0
+ *          description: offset from element
+ *      responses:
+ *        200:
+ *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  posts:
+ *                    type: array
+ *                    items:
+ *                      $ref: '#/components/schemas/Post'
+ *                  pages:
+ *                    type: number
+ *        401:
+ *          $ref: '#/components/responses/Unauthorized'
+ */
+
+router.get('/feed', auth.required, postsController.getFeed);
 
 /**
  * @swagger

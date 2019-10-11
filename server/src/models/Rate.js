@@ -12,6 +12,7 @@ const schema = new Schema({
     required: true,
     refPath: 'targetModel',
   },
+  // TODO: add component showing rated comments and posts on the frontend
   targetModel: {
     type: String,
     required: true,

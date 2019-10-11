@@ -51,6 +51,23 @@ const schema = new Schema({
       ref: 'Rate',
     },
   ],
+  followersAmount: {
+    type: Number,
+    default: 0,
+  },
+  tagsFollowed: [
+    {
+      type: Schema.Types.String,
+      unique: true,
+    },
+  ],
+  usersFollowed: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      unique: true,
+    },
+  ],
 }, {
   timestamps: true,
 });
@@ -72,6 +89,12 @@ schema.methods.isRated = function (id) {
   return {
     result: false,
   };
+};
+
+schema.methods.isFollowed = function (id) {
+  const followedUser = this.usersFollowed.find(el => el.toString() === id.toString());
+
+  return !!followedUser;
 };
 
 schema.methods.deleteSection = async function (sec, cb) {

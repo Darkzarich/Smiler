@@ -38,18 +38,45 @@ const validateUserAuth = (user, next) => {
 module.exports = {
   getUser: async (req, res, next) => {
     const { login } = req.params;
-    const user = await User.findOne({
-      login,
-    }).select('login rating bio avatar createdAt');
-    if (user) {
-      success(res, user);
+    const { userId } = req.session;
+    const { userLogin } = req.session;
+
+    let promises;
+
+    if (userId && login !== userLogin) {
+      promises = Promise.all([
+        User.findOne({
+          login,
+        }).select('login rating bio avatar createdAt followersAmount'),
+        User.findById(userId),
+      ]);
     } else {
-      generateError('User is not found', 404, next);
+      promises = Promise.all([
+        User.findOne({
+          login,
+        }).select('login rating bio avatar createdAt followersAmount'),
+      ]);
     }
+
+    promises.then((users) => {
+      const requestedUser = users[0];
+      const requestingUser = users[1];
+
+      if (requestedUser) {
+        const response = {
+          ...requestedUser.toJSON(),
+          isFollowed: requestingUser ? requestingUser.isFollowed(requestedUser._id) : false,
+        };
+
+        success(res, response);
+      } else {
+        generateError('User is not found', 404, next);
+      }
+    });
   },
   updateUser: async (req, res, next) => {
     const { login } = req.params;
-    const { userId } = req.session;
+    const { userLogin } = req.session;
     const { bio } = req.body;
     const { avatar } = req.body;
 
@@ -57,6 +84,8 @@ module.exports = {
       generateError(`bio can't be longer than ${consts.USER_MAX_BIO_LENGTH}`, 422, next); return;
     } if (avatar && avatar.length > consts.USER_MAX_AVATAR_LENGTH) {
       generateError(`Avatar link can't be longer than ${consts.USER_MAX_AVATAR_LENGTH}`, 422, next); return;
+    } if (login !== userLogin) {
+      generateError('Can edit information only for yourself', 403, next); return;
     }
 
     const user = await User.findOne({
@@ -64,19 +93,120 @@ module.exports = {
     });
 
     if (user) {
-      if (user.id.toString() !== userId) {
-        generateError('Can edit only information for yourself', 403, next);
-      } else {
-        user.bio = bio || user.bio;
-        user.avatar = avatar || user.avatar;
+      user.bio = bio || user.bio;
+      user.avatar = avatar || user.avatar;
 
-        await user.save();
+      await user.save();
 
-        success(res);
-      }
+      success(res);
     } else {
       generateError('User is not found', 404, next);
     }
+  },
+  getFollowing: async (req, res, next) => {
+    const { userLogin } = req.session;
+    const { login } = req.params;
+
+    if (login !== userLogin) {
+      generateError('Can see following only for yourself', 403, next);
+    } else {
+      const user = await User.findOne({
+        login,
+      }).populate('usersFollowed', 'login avatar id');
+
+      if (user) {
+        const following = {
+          authors: user.usersFollowed,
+          tags: user.tagsFollowed,
+        };
+
+        success(res, following);
+      } else {
+        generateError('User is not found', 404, next);
+      }
+    }
+  },
+  follow: async (req, res, next) => {
+    const { id } = req.params;
+    const { userId } = req.session;
+
+    if (id === userId) {
+      generateError('You cannot follow yourself', 422, next);
+      return;
+    }
+
+    Promise.all([
+      User.findById(userId),
+      User.findById(id),
+    ]).then((users) => {
+      const userFollowing = users[0];
+      const userFollowed = users[1];
+
+      if (userFollowed) {
+        if (userFollowing.usersFollowed.includes(id)) {
+          generateError('You cannot follow the same author twice', 422, next);
+          return;
+        }
+
+        Promise.all([
+          userFollowing.updateOne({
+            $push: {
+              usersFollowed: id,
+            },
+          }),
+          userFollowed.updateOne({
+            $inc: {
+              followersAmount: 1,
+            },
+          }),
+        ]).then(() => {
+          success(res);
+        });
+      } else {
+        generateError('User is not found', 404, next);
+      }
+    });
+  },
+  unfollow: async (req, res, next) => {
+    const { id } = req.params;
+    const { userId } = req.session;
+
+    if (id === userId) {
+      generateError('You cannot unfollow yourself', 422, next);
+      return;
+    }
+
+    Promise.all([
+      User.findById(userId),
+      User.findById(id),
+    ]).then((users) => {
+      const userUnfollowing = users[0];
+      const userUnfollowed = users[1];
+
+      if (userUnfollowed) {
+        if (!userUnfollowing.usersFollowed.includes(id)) {
+          generateError('You\'re not following this author', 404, next);
+          return;
+        }
+
+        Promise.all([
+          userUnfollowing.updateOne({
+            $pull: {
+              usersFollowed: id,
+            },
+          }),
+          userUnfollowed.updateOne({
+            $inc: {
+              followersAmount: -1,
+            },
+          }),
+        ]).then(() => {
+          success(res);
+        });
+      } else {
+        generateError('User is not found', 404, next);
+      }
+    });
   },
   register: async (req, res, next) => {
     // TODO: Rework validation, rework unique email
