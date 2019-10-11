@@ -61,4 +61,22 @@ export default {
       method: 'post',
     });
   },
+  followUser(id) {
+    return Query({
+      url: `${CONTROLLER_URL}/${id}/follow`,
+      method: 'put',
+    });
+  },
+  unfollowUser(id) {
+    return Query({
+      url: `${CONTROLLER_URL}/${id}/follow`,
+      method: 'delete',
+    });
+  },
+  getUsersFollowing(login) {
+    return Query({
+      url: `${CONTROLLER_URL}/${login}/following`,
+      method: 'get',
+    });
+  },
 };

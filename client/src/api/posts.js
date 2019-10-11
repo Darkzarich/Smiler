@@ -10,6 +10,13 @@ export default {
       params,
     });
   },
+  getFeed(params) {
+    return Query({
+      url: `${CONTROLLER_URL}/feed`,
+      method: 'get',
+      params,
+    });
+  },
   createPost(data) {
     return Query({
       url: CONTROLLER_URL,

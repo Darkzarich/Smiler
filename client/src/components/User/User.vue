@@ -33,6 +33,10 @@
               <div>Rating</div>
               <div>{{ getUser.rating }}</div>
             </div>
+            <div class="user__logged-info-rating">
+              <div>Followers</div>
+              <div>{{ getUser.followersAmount }}</div>
+            </div>
         </div>
         <div class="user__logged-nav">
           <ul class="user__logged-nav-list">
@@ -41,6 +45,13 @@
             }">
               <li class="user__logged-nav-item">
                   <add-icon/> New Post
+              </li>
+            </router-link>
+            <router-link :to="{
+                name: 'UserSettings'
+            }">
+              <li class="user__logged-nav-item">
+                  <settings-icon/> Settings
               </li>
             </router-link>
             <li class="user__logged-nav-item" @click="logout">
@@ -61,12 +72,14 @@ import UserLogin from '@/components/User/UserLogin';
 import UserRegistration from '@/components/User/UserRegistration';
 
 import exitIcon from '@/library/svg/exit';
+import settingsIcon from '@/library/svg/settings';
 import addIcon from '@/library/svg/add';
 
 export default {
   components: {
     UserLogin,
     UserRegistration,
+    settingsIcon,
     exitIcon,
     addIcon,
   },
@@ -117,6 +130,7 @@ export default {
       &-avatar {
         justify-content: center;
         display: flex;
+        user-select: none;
         flex-direction: column;
         flex-wrap: nowrap;
         padding: 1rem;
@@ -148,6 +162,7 @@ export default {
     border-bottom: 1px solid $light-gray;
     div {
       text-align: center;
+      margin-right: 0.5rem;
     }
   }
   &__logged-nav {

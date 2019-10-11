@@ -8,6 +8,7 @@ import NotFound from './views/NotFound.vue';
 import SinglePost from './views/SinglePost.vue';
 import UserPage from './views/UserPage.vue';
 import PostCreate from './views/PostCreate.vue';
+import UserSettings from './views/UserSettings.vue';
 import Search from './views/Search.vue';
 
 Vue.use(Router);
@@ -126,6 +127,14 @@ const router = new Router({
       path: '/user/@:login',
       name: 'UserPage',
       component: UserPage,
+    },
+    {
+      path: '/user/settings',
+      name: 'UserSettings',
+      component: UserSettings,
+      beforeEnter(to, from, next) {
+        authGuard(to, from, next);
+      },
     },
     {
       path: '/:slug',

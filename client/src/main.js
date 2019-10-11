@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import vClickOutside from 'v-click-outside';
 import moment from 'moment';
 import App from './App.vue';
 import router from './router';
@@ -10,6 +11,8 @@ import defaultAvatar from '@/assets/neutral_avatar.png';
 import postNoImage from '@/assets/post_no_image.png';
 
 Vue.config.productionTip = false;
+
+Vue.use(vClickOutside);
 
 new Vue({
   router,

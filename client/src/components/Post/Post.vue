@@ -46,7 +46,7 @@
       <div v-if="postData.tags.length > 0" class="post-main__tags">
         <div
           v-for="tag in postData.tags"
-          @click="searchTag(tag)"
+          @click="openContextMenu($event, tag)"
           :key="tag"
           class="post-main__tags-item">
           {{ tag }}
@@ -107,12 +107,24 @@
         <!-- {{ post.createdAt !== post.updatedAt ? 'updated: ' + post.updatedAt : ''}} -->
       </div>
     </div>
+    <context-menu-wrapper
+      :show="contextMenuData.show"
+      :posX="contextMenuData.x"
+      :posY="contextMenuData.y"
+      :list="contextMenuData.list"
+      :target="contextMenuData.target"
+      :filter="contextMenuData.filter"
+      v-click-outside="closeContextMenu"
+    >
+    </context-menu-wrapper>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import api from '@/api/index';
 
+import contextMenuWrapper from '@/components/BasicElements/ContextMenuWrapper';
 import commentsIcon from '@/library/svg/comments';
 import plusIcon from '@/library/svg/plus';
 import minusIcon from '@/library/svg/minus';
@@ -127,6 +139,7 @@ export default {
     plusIcon,
     minusIcon,
     editIcon,
+    contextMenuWrapper,
     deleteIcon,
   },
   props: ['post', 'canEdit'],
@@ -135,7 +148,49 @@ export default {
       postData: this.post,
       loadingRate: false,
       POST_SECTION_TYPES: consts.POST_SECTION_TYPES,
+      contextMenuData: {
+        show: false,
+        x: 0,
+        y: 0,
+        target: null,
+        list: [
+          {
+            title: 'Search tag',
+            callback: this.searchTag,
+          },
+          {
+            title: 'Follow tag',
+            callback: this.followTag,
+          },
+          {
+            title: 'Unfollow tag',
+            callback: this.unfollowTag,
+          },
+        ],
+        // filter callback for context menu, decides what elements to show under conditions
+        filter: (item) => {
+          if (item.title === 'Follow tag' || item.title === 'Unfollow tag') {
+            if (!this.authState) {
+              return false;
+            }
+            const foundTag = this.$store.getters.isTagFollowed[this.contextMenuData.target];
+
+            if (foundTag && item.title === 'Unfollow tag') {
+              return true;
+            } if (item.title === 'Follow tag' && !foundTag) {
+              return true;
+            }
+            return false;
+          }
+          return true;
+        },
+      },
     };
+  },
+  computed: {
+    ...mapState({
+      authState: state => state.user.authState,
+    }),
   },
   methods: {
     async upvote(id) {
@@ -194,6 +249,38 @@ export default {
       const res = await api.posts.deletePostById(id);
       if (!res.data.error) {
         document.location.reload();
+      }
+    },
+    openContextMenu(ev, tag) {
+      if (!this.contextMenuData.show) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        // console.log(ev);
+        // console.log(ev.target.getBoundingClientRect());
+        this.contextMenuData.show = true;
+        this.contextMenuData.target = tag;
+        this.contextMenuData.x = ev.layerX;
+        this.contextMenuData.y = ev.layerY;
+      }
+    },
+    closeContextMenu() {
+      if (this.contextMenuData.show) {
+        this.contextMenuData.show = false;
+      }
+    },
+    // context menu options
+    async followTag(tag) {
+      this.closeContextMenu();
+      const res = await api.tags.follow(tag);
+      if (!res.data.error) {
+        this.$store.commit('followTag', tag);
+      }
+    },
+    async unfollowTag(tag) {
+      this.closeContextMenu();
+      const res = await api.tags.unfollow(tag);
+      if (!res.data.error) {
+        this.$store.commit('unfollowTag', tag);
       }
     },
     searchTag(tag) {

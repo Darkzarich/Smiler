@@ -83,11 +83,20 @@ export default {
       this.loading = true;
 
       if (this.$route.name !== 'Search' || this.filters) {
-        const res = await api.posts.getPosts({
-          limit: consts.POSTS_INITIAL_COUNT,
-          offset: 0 + (this.curPage * consts.POSTS_INITIAL_COUNT),
-          ...this.filters,
-        });
+        let res;
+
+        if (this.$route.name === 'Feed') {
+          res = await api.posts.getFeed({
+            limit: consts.POSTS_INITIAL_COUNT,
+            offset: 0 + (this.curPage * consts.POSTS_INITIAL_COUNT),
+          });
+        } else {
+          res = await api.posts.getPosts({
+            limit: consts.POSTS_INITIAL_COUNT,
+            offset: 0 + (this.curPage * consts.POSTS_INITIAL_COUNT),
+            ...this.filters,
+          });
+        }
 
         if (!res.data.error) {
           if (add) {

@@ -284,6 +284,8 @@ module.exports = {
           rating: foundUser.rating || 0,
           avatar: foundUser.avatar || '',
           email: foundUser.email || '',
+          tagsFollowed: foundUser.tagsFollowed || [],
+          followersAmount: foundUser.followersAmount,
         };
 
         success(res, userAuth);
