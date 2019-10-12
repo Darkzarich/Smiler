@@ -51,6 +51,9 @@ export default {
     unfollowTag(state, tag) {
       state.tagsFollowed.splice(state.tagsFollowed.indexOf(tag), 1);
     },
+    setAvatar(state, url) {
+      state.avatar = url;
+    },
   },
   actions: {
     async userCheckAuthState(context) {

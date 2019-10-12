@@ -39,7 +39,49 @@
             <i>Nothing in following...</i>
           </div>
       </div>
+      <div class="user-settings__block">
+        <div class="user-settings__data-title">
+          Edit Bio
+        </div>
+        <input-element
+          class="user-settings__bio-edit"
+          :multiline="true"
+          v-model="bioEditInput"
+        />
+        <div class="user-settings__bio-buttons">
+          <button-element
+            :loading="bioEditRequesting"
+            :callback="editBio"
+            :disabled="bioEditInput.length > USER_MAX_BIO_LENGTH"
+          >
+            Submit
+          </button-element>
+        </div>
+      </div>
+      <div class="user-settings__block">
+        <div class="user-settings__data-title">
+          Edit Avatar
+        </div>
+        <div class="user-settings__current-avatar">
+          <img :src="$resolveAvatar(avatar)">
+        </div>
+        <input-element
+          class="user-settings__avatar-edit"
+          v-model="avatarEditInput"
+          place-holder="URL to avatar..."
+        />
+        <div class="user-settings__bio-buttons">
+          <button-element
+            :loading="avatarEditRequesting"
+            :callback="editAvatar"
+            :disabled="bioEditInput.length > USER_MAX_AVATAR_LENGTH"
+          >
+            Submit
+          </button-element>
+        </div>
+      </div>
     </div>
+            <!-- TODO: rated list -->
     <div v-else class="user-settings__loading">
       <loader/>
     </div>
@@ -47,13 +89,19 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import api from '@/api';
 import loader from '@/library/svg/animation/circularLoader';
-import { mapState } from 'vuex';
+import consts from '@/const/const';
+
+import inputElement from '@/components/BasicElements/InputElement.vue';
+import buttonElement from '@/components/BasicElements/ButtonElement.vue';
 
 export default {
   components: {
-    loader
+    loader,
+    inputElement,
+    buttonElement,
   },
   data() {
     return {
@@ -62,11 +110,18 @@ export default {
       loading: true,
       requestingForTags: false,
       requestingForUsers: false,
+      bioEditInput: '',
+      bioEditRequesting: false,
+      avatarEditInput: '',
+      avatarEditRequesting: false,
+      USER_MAX_BIO_LENGTH: consts.USER_MAX_BIO_LENGTH,
+      USER_MAX_AVATAR_LENGTH: consts.USER_MAX_AVATAR_LENGTH,
     };
   },
   computed: {
     ...mapState({
       login: state => state.user.login,
+      avatar: state => state.user.avatar,
     }),
   },
   created() {
@@ -82,6 +137,26 @@ export default {
         this.tagsFollowed = res.data.tags;
       }
       this.loading = false;
+    },
+    async editBio() {
+      this.bioEditRequesting = true;
+      await api.users.updateUserProfile(this.login, {
+        bio: this.bioEditInput,
+      });
+      this.bioEditRequesting = false;
+    },
+    async editAvatar() {
+      this.avatarEditRequesting = true;
+      const res = await api.users.updateUserProfile(this.login, {
+        avatar: this.avatarEditInput,
+      });
+
+      if (!res.data.error) {
+        this.$store.commit('setAvatar', this.avatarEditInput);
+        this.avatarEditInput = '';
+      }
+
+      this.avatarEditRequesting = false;
     },
     async unfollowTag(tag) {
       if (!this.requestingForUsers) {
@@ -109,7 +184,7 @@ export default {
       }
     },
   },
-}
+};
 </script>
 
 <style lang="scss">
@@ -128,10 +203,42 @@ export default {
       cursor: pointer;
   }
 
+  &__bio-buttons {
+    @include flex-row();
+    .button {
+      width: 20%;
+    }
+  }
+
+  &__bio-edit {
+    textarea {
+      resize: none;
+      width: 50%;
+      height: 5rem;
+    }
+  }
+
+  &__avatar-edit {
+    width: 60%;
+  }
+
+  &__current-avatar {
+    width: 8rem;
+    border: 1px solid $light-gray;
+    margin-bottom: 0.5rem;
+    margin-left: 1rem;
+    img {
+      border-radius: 50%;
+      width: 8rem;
+    }
+  }
+
   &__data-title {
       font-size: 1.5rem;
       color: $main-text;
       text-align: center;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
   }
 
   &__data-group {

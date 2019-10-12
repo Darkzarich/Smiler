@@ -87,6 +87,23 @@ Vue.mixin({
 
       return false;
     },
+    $commentCanEdit(comment) {
+      const curUser = store.getters.getUser.login;
+
+      if (curUser) {
+        if (comment.author.login !== curUser) {
+          return false;
+        }
+
+        const dateNow = new Date().getTime();
+        if (dateNow - new Date(comment.createdAt).getTime() > consts.COMMENT_TIME_TO_UPDATE) {
+          return false;
+        }
+        return true;
+      }
+
+      return false;
+    },
   },
   filters: {
     $fromNow(date) {

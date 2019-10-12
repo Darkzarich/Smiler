@@ -39,9 +39,6 @@
 
         <div class="user-profile__bio" v-if="data.bio">
           Bio: <i>{{ data.bio }}</i>
-          <!-- TODO: editing bio, updating avatar (in settings but in his own profile
-          user can tap on his avatar to shortlink to settings), rated list, button to update comments
-          maybe, editing \ deleting comments -->
         </div>
       </div>
     </div>

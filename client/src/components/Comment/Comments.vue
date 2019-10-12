@@ -4,12 +4,16 @@
       v-for="comment in data"
       :key="comment.id"
       class="comments__item-main"
-      :class="first ? 'comments__item-main_first' : ''"
+      :class="{
+          'comments__item-main_first': first,
+          'comments__item-main_refresh-new': comment.isRefreshNew}"
+          @mouseover="comment.isRefreshNew ? comment.isRefreshNew = false : ''"
       :style="`margin-left: ${indentLevel}rem`"
     >
       <div
         class="comments__item-main-block"
-        :class=" comment.created ? 'comments__item-main-block_created' : ''"
+        :class="{'comments__item-main-block_created' : comment.created,
+                 'comments__item-main-block_refresh-new' : comment.isRefreshNew}"
       >
         <div class="comments__item-main-block-meta">
           <template v-if="!comment.deleted">
@@ -43,6 +47,14 @@
                 <img :src="$resolveAvatar(comment.author.avatar)"/>
               </div>
             </router-link>
+            <template v-if="$commentCanEdit(comment)">
+              <div @click="toggleEdit(comment.id)" class="comments__item-main-block-meta-edit">
+                <edit-icon/>
+              </div>
+              <div @click="deleteCom(comment.id)" class="comments__item-main-block-meta-delete">
+                <delete-icon/>
+              </div>
+            </template>
           </template>
           <div class="comments__item-main-block-meta-date">
             {{ comment.createdAt | $fromNow }}
@@ -51,7 +63,30 @@
         <div class="comments__item-main-block-body">
           <template v-if="!comment.deleted">
 
-            <div v-html="comment.body"/>
+            <template v-if="commentEdit !== comment.id">
+              <div v-html="comment.body"/>
+            </template>
+
+            <template v-else>
+              <div class="comments__item-main-answer-editor">
+                <text-editor-element v-model="commentEditInput">
+                  <div class="comments__item-main-answer-buttons">
+                    <button-element
+                      :loading="editSending"
+                      :callback="edit"
+                      :argument="comment.id"
+                    >
+                      Send
+                    </button-element>
+                    <button-element
+                      :callback="toggleEdit"
+                    >
+                      Close
+                    </button-element>
+                  </div>
+                </text-editor-element>
+              </div>
+            </template>
 
             <div class="comments__item-main-answer">
               <div v-if="replyFieldShowFor == comment.id" class="comments__item-main-answer-editor">
@@ -121,6 +156,8 @@ import TextEditorElement from '@/components/BasicElements/TextEditorElement';
 import ButtonElement from '@/components/BasicElements/ButtonElement';
 import plusIcon from '@/library/svg/plus';
 import minusIcon from '@/library/svg/minus';
+import editIcon from '@/library/svg/edit';
+import deleteIcon from '@/library/svg/delete';
 
 import consts from '@/const/const';
 
@@ -132,16 +169,21 @@ export default {
     ButtonElement,
     plusIcon,
     minusIcon,
+    editIcon,
+    deleteIcon,
   },
   props: ['data', 'indentLevel', 'post', 'first', 'level'],
   data() {
     return {
       commentData: this.data,
+      commentEdit: '',
+      commentEditInput: '',
       loadingRate: false,
       replyFieldShowFor: '',
       replyBody: '',
       replySending: false,
-      hideChild: [],
+      editSending: false,
+      hideChild: this.level === consts.COMMENT_AUTO_HIDE_LEVEL ? this.data.map(el => el.id) : [],
       COMMENTS_NESTED_LIMIT: consts.COMMENTS_NESTED_LIMIT,
     };
   },
@@ -163,6 +205,43 @@ export default {
         this.replyFieldShowFor = '';
       } else {
         this.replyFieldShowFor = comID;
+      }
+    },
+    toggleEdit(id) {
+      if (id) {
+        this.commentEdit = id;
+        const foundCom = this.data.find(el => el.id === this.commentEdit);
+        this.commentEditInput = foundCom.body;
+      } else {
+        this.commentEdit = '';
+      }
+    },
+    async edit() {
+      this.editSending = true;
+
+      const res = await api.comments.updateComment(this.commentEdit, {
+        body: this.commentEditInput,
+      });
+
+      if (!res.data.error) {
+        const foundCom = this.data.find(el => el.id === this.commentEdit);
+        foundCom.body = this.commentEditInput;
+        this.toggleEdit();
+      }
+
+      this.editSending = false;
+    },
+    async deleteCom(id) {
+      const res = await api.comments.deleteComment(id);
+
+      if (!res.data.error) {
+        const foundCom = this.data.find(el => el.id === id);
+
+        if (foundCom.children.length > 0) {
+          foundCom.deleted = true;
+        } else {
+          this.data.splice(this.data.indexOf(foundCom), 1);
+        }
       }
     },
     async reply(parent) {
@@ -232,7 +311,7 @@ export default {
         if (!commentItemData.rated.isRated) {
           const res = await api.comments.updateRate(id, {
             negative: true,
-          }); push;
+          });
 
           if (!res.data.error) {
             commentItemData.rated.isRated = true;
@@ -278,15 +357,24 @@ export default {
   &__item {
     &-main {
       border-left: solid 1px $light-gray;
+
       &_first {
         border-left: none !important;
         margin-left: 0 !important;
       }
+      &_refresh-new {
+        border-left: solid 3px $firm !important;
+      }
+
       &-block {
         background: $widget-bg;
         margin: 1rem;
         padding: 1rem;
         color: $main-text;
+
+        &_refresh-new {
+          background: #86c2321c;
+        }
 
         &_created {
 
@@ -326,7 +414,7 @@ export default {
             color: $light-gray;
           }
 
-          &-upvote, &-rating, &-downvote {
+          &-upvote, &-rating, &-downvote, &-edit, &-delete {
             color: $light-gray;
             svg {
               fill: $light-gray;
@@ -338,16 +426,24 @@ export default {
             }
           }
 
+          &-edit, &-delete {
+            margin-left: 0.5rem;
+            svg {
+              transform: scale(1);
+              width: 1.3rem;
+            }
+          }
+
           &-downvote {
             margin-left: -0.5rem;
           }
 
-          &-upvote:hover svg, &-upvote_active svg {
+          &-upvote:hover svg, &-upvote_active svg, &-edit:hover svg {
             cursor: pointer;
             fill: $dark-firm;
           }
 
-          &-downvote:hover svg, &-downvote_active svg {
+          &-downvote:hover svg, &-downvote_active svg, &-delete:hover svg {
             cursor: pointer;
             fill: $dark-red;
           }

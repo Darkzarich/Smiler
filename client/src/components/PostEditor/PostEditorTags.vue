@@ -15,10 +15,13 @@
     <div v-if="tags.length < POST_MAX_TAGS" class="post-editor__tags-input">
       <input-element
         place-holder="Input up to 8 tags"
-        v-model="tagString"
+        v-model="tagInput"
         :enter-callback="addTag"
         :error="validation"
       />
+      <span v-if="tagInput.length > 0" @click="addTag">
+        +
+      </span>
     </div>
   </div>
 </template>
@@ -33,7 +36,7 @@ export default {
   },
   data() {
     return {
-      tagString: '',
+      tagInput: '',
       POST_MAX_TAGS: consts.POST_MAX_TAGS,
     };
   },
@@ -42,7 +45,7 @@ export default {
     validation() {
       let validation = '';
 
-      if (this.tagString.length > consts.POST_MAX_TAG_LEN) {
+      if (this.tagInput.length > consts.POST_MAX_TAG_LEN) {
         validation = `Tag can't be longer than ${consts.POST_MAX_TAG_LEN}`;
       }
 
@@ -51,10 +54,12 @@ export default {
   },
   methods: {
     addTag() {
-      const checkDouble = this.tags.find(el => el === this.tagString);
-      if (!checkDouble && !this.validation) {
-        this.tags.push(this.tagString);
-        this.tagString = '';
+      if (this.tagInput.length > 0) {
+        const checkDouble = this.tags.find(el => el === this.tagInput);
+        if (!checkDouble && !this.validation) {
+          this.tags.push(this.tagInput);
+          this.tagInput = '';
+        }
       }
     },
     removeTag(tag) {
@@ -92,6 +97,17 @@ export default {
       border: 1px solid $firm;
       &-remove {
         color: $error;
+      }
+    }
+    &-input {
+      display: flex;
+      align-items: center;
+      span {
+        color: $firm;
+        font-weight: bold;
+        font-size: 1.5rem;
+        cursor: pointer;
+        user-select: none;
       }
     }
   }
