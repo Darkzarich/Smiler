@@ -38,7 +38,10 @@
         </div>
 
         <div class="user-profile__bio" v-if="data.bio">
-          Bio: {{ data.bio }}
+          Bio: <i>{{ data.bio }}</i>
+          <!-- TODO: editing bio, updating avatar (in settings but in his own profile
+          user can tap on his avatar to shortlink to settings), rated list, button to update comments
+          maybe, editing \ deleting comments -->
         </div>
       </div>
     </div>
@@ -141,6 +144,19 @@ export default {
     border-radius: 2px;
     background: $widget-bg;
     color: $main-text;
+    &:after {
+      content: '';
+      display: inline-block;
+      width: 50%;
+      height: 100%;
+      position: relative;
+      background-repeat: no-repeat;
+      background-image: url('../../assets/neutral_avatar.png');
+      opacity: 0.1;
+      background-position: center;
+      filter: grayscale(1);
+      background-size: cover;
+    }
   }
 
   &__login,
