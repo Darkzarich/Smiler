@@ -183,6 +183,7 @@ export default {
       replyBody: '',
       replySending: false,
       editSending: false,
+      deleteSending: false,
       hideChild: this.level === consts.COMMENT_AUTO_HIDE_LEVEL ? this.data.map(el => el.id) : [],
       COMMENTS_NESTED_LIMIT: consts.COMMENTS_NESTED_LIMIT,
     };
@@ -231,17 +232,23 @@ export default {
 
       this.editSending = false;
     },
+    // TODO: events for changing post comment count on delete
     async deleteCom(id) {
-      const res = await api.comments.deleteComment(id);
+      if (!this.deleteSending) {
+        this.deleteSending = true;
 
-      if (!res.data.error) {
-        const foundCom = this.data.find(el => el.id === id);
+        const res = await api.comments.deleteComment(id);
 
-        if (foundCom.children.length > 0) {
-          foundCom.deleted = true;
-        } else {
-          this.data.splice(this.data.indexOf(foundCom), 1);
+        if (!res.data.error) {
+          const foundCom = this.data.find(el => el.id === id);
+
+          if (foundCom.children.length > 0) {
+            foundCom.deleted = true;
+          } else {
+            this.data.splice(this.data.indexOf(foundCom), 1);
+          }
         }
+        this.deleteSending = false;
       }
     },
     async reply(parent) {

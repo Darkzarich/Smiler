@@ -53,6 +53,23 @@
         <loading-icon/>
       </div>
     </div>
+    <div
+      v-if="comments.length > 0 && curPage !== maxPages"
+      class="comments__load-more"
+      @click="loadMoreComments()"
+    >
+      <template v-if="moreCommentsLoading">
+        <loader/>
+      </template>
+      <template v-else>
+        Click to load more comments
+      </template>
+    </div>
+    <div
+      v-if="comments.length > 0 && curPage === maxPages"
+      class="comments__load-more-cant">
+      You've read all the comments. It's time to post some your own!
+    </div>
   </div>
 </template>
 
@@ -66,6 +83,7 @@ import ButtonElement from '@/components/BasicElements/ButtonElement';
 
 import loadingIcon from '@/library/svg/animation/circularLoader';
 import refreshIcon from '@/library/svg/refresh';
+import loader from '@/library/svg/animation/circularLoader';
 
 import api from '@/api';
 
@@ -82,6 +100,9 @@ export default {
       sendCommentLoading: false,
       commentsRefreshing: false,
       newCommentsCount: 0,
+      curPage: 1,
+      maxPages: 1,
+      moreCommentsLoading: false,
     };
   },
   components: {
@@ -91,6 +112,7 @@ export default {
     Comments,
     loadingIcon,
     refreshIcon,
+    loader,
   },
   computed: {
     ...mapState({
@@ -121,8 +143,24 @@ export default {
         post: post.id,
       });
 
-      this.comments = res.data;
+      this.comments = res.data.comments;
+      this.maxPages = res.data.pages;
       this.commentsLoading = false;
+    },
+    async loadMoreComments() {
+      this.moreCommentsLoading = true;
+      const res = await api.comments.getComments({
+        limit: consts.COMMENTS_INITIAL_COUNT,
+        post: this.post.id,
+        offset: 0 + this.curPage * consts.COMMENTS_INITIAL_COUNT,
+      });
+
+      if (!res.data.error) {
+        this.comments = this.comments.concat(res.data.comments);
+        this.curPage += 1;
+      }
+
+      this.moreCommentsLoading = false;
     },
     async refreshComments() {
       this.commentsRefreshing = true;
@@ -133,27 +171,11 @@ export default {
       });
 
       if (!res.data.error) {
-        res.data[0].children[1].children.push({
-          author: {
-            avatar: 'https://nyaa.shikimori.one/system/users/x160/91575.png?1469271045',
-            id: '123',
-            login: 'DZ',
-          },
-          body: 'ITS WORKING',
-          children: [],
-          createdAt: '2019-10-08T13:50:40.089Z',
-          id: '5d9c94301c11d80030f48b282',
-          rated: { isRated: false, negative: false },
-          isRated: false,
-          negative: false,
-          rating: 0,
-        });
-        this.recursiveCommentsCheck(null, res.data);
+        this.recursiveCommentsCheck(null, res.data.comments);
         this.commentsRefreshing = false;
       }
     },
     recursiveCommentsCheck(oldCommentsArr, newCommentsArr) {
-      debugger;
       const oldComments = oldCommentsArr || this.comments;
       // determine if newCommentsArr length is longer, if so, then in cycle there will be a
       // situation when index return undefined and then that means it's a new comment
@@ -218,6 +240,7 @@ export default {
 
 <style lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/mixins.scss';
 
 .comments {
   border: 1px solid $light-gray;
@@ -291,6 +314,18 @@ export default {
     text-align: center;
     margin-top: 0.5rem;
   }
+
+  &__load-more, &__load-more-cant {
+    color: $main-text;
+    font-size: 1.2rem;
+    text-align: center;
+    margin-top: 0.5rem;
+    @include widget;
+  }
+  &__load-more {
+    cursor: pointer;
+  }
+
   &__loading {
     display: flex;
     justify-content: center;

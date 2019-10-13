@@ -400,6 +400,11 @@ module.exports = {
       } else {
         const { sections } = foundPost;
 
+        /**
+         * TODO: need to somehow check if post has comments or no and then don't allow to delete or
+         * delete related comments
+        */
+
         await foundPost.remove();
 
         const filePicSections = sections.filter(sec => sec.type === consts.POST_SECTION_TYPES.PICTURE && sec.isFile);
