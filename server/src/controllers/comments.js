@@ -70,7 +70,7 @@ module.exports = {
         const transComments = formRecursive(comments);
 
         success(res, {
-          ...transComments,
+          comments: transComments,
           pages,
         });
       });
