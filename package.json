@@ -1,8 +1,7 @@
 {
   "name": "express-blog-unit",
   "version": "1.0.0",
-  "description": "Bridge connecting frontend and backend for express-blog project",
-  "main": "index.js",
+  "description": "Bridge connecting frontend and backend for Smiler.",
   "scripts": {
     "run:dev": "concurrently --kill-others \"cd server && npm start\" \"cd client && npm run serve\"",
     "front:build": "cd client && npm run build",
