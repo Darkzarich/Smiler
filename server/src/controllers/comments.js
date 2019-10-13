@@ -26,6 +26,7 @@ module.exports = {
       query.author = foundAuthor.id;
     }
     query.post = post;
+
     try {
       Promise.all([
         Comment.find(query)
@@ -34,9 +35,12 @@ module.exports = {
           .limit(limit)
           .exists('parent', false),
         User.findById(userId).select('rates').populate('rates'),
+        Comment.countDocuments(query).exists('parent', false),
       ]).then((result) => {
         const comments = result[0];
         const user = result[1];
+        const pages = Math.ceil(result[2] / limit);
+
         function formRecursive(array) {
           const newArray = [];
           function deep(nestedArray) {
@@ -65,7 +69,10 @@ module.exports = {
 
         const transComments = formRecursive(comments);
 
-        success(res, transComments);
+        success(res, {
+          ...transComments,
+          pages,
+        });
       });
     } catch (e) {
       next(e);
