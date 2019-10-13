@@ -1,35 +1,48 @@
 <template>
 <header class="header">
   <div class="header-container">
+    <div
+      @click="mobileMenuShow = !mobileMenuShow"
+      class="header-container__mobile_menu"
+      :class="mobileMenuShow ? 'header-container__mobile_active' : ''">
+      <mobile-menu-icon/>
+    </div>
+    <transition name="header-container__mobile_menu">
+      <header-mobile-menu v-if="mobileMenuShow" @close="mobileMenuShow = false" />\
+    </transition>
     <router-link :to="{ name: 'Home' }">
-      <img src="@/assets/logo.png" alt="Home">
+      <img src="@/assets/logo.png" class="header-container__logo" alt="Home">
+      <img src="@/assets/neutral_avatar.png" class="header-container__logo_mobile" alt="Home">
     </router-link>
     <nav>
-      <router-link :to="{ name: 'Home' }">
-        <div> TODAY </div>
-      </router-link>
-      <router-link :to="{ name: 'All' }">
-        <div> ALL </div>
-      </router-link>
-      <router-link :to="{ name: 'Blowing' }">
-        <div title="posted recently, 50+ rating"> BLOWING </div>
-      </router-link>
-      <router-link :to="{ name: 'TopThisWeek' }">
-        <div title="current week posts sorted by newer"> TOP THIS WEEK </div>
-      </router-link>
-      <router-link :to="{ name: 'New' }">
-        <div title="posts posted 2 hours ago sorted by newer"> NEW </div>
-      </router-link>
-
-      <template v-if="user.authState">
-        <router-link :to="{ name: 'Feed' }">
-          <div> MY FEED </div>
+      <template v-if="!$isMobile()">
+        <router-link :to="{ name: 'Home' }">
+          <div> TODAY </div>
         </router-link>
-      </template>
-      <template v-else>
-        <a title="Log in to access this page" class="header-container__nav-link_disabled">
-          <div> MY FEED </div>
-        </a>
+        <router-link :to="{ name: 'All' }">
+          <div> ALL </div>
+        </router-link>
+        <router-link :to="{ name: 'Blowing' }">
+          <div title="posted recently, 50+ rating"> BLOWING </div>
+        </router-link>
+        <router-link :to="{ name: 'TopThisWeek' }">
+          <div title="current week posts sorted by newer"> TOP THIS WEEK </div>
+        </router-link>
+        <router-link :to="{ name: 'New' }">
+          <div title="posts posted 2 hours ago sorted by newer"> NEW </div>
+        </router-link>
+
+        <template v-if="user.authState">
+          <router-link :to="{ name: 'Feed' }">
+            <div> MY FEED </div>
+          </router-link>
+        </template>
+        <template v-else>
+          <a title="Log in to access this page" class="header-container__nav-link_disabled">
+            <div> MY FEED </div>
+          </a>
+        </template>
+
       </template>
     </nav>
     <div v-if="$route.name !== 'Search'"
@@ -63,14 +76,18 @@
 <script>
 import { mapState } from 'vuex';
 import inputElement from '@/components/BasicElements/InputElement';
-
+import mobileMenuIcon from '@/library/svg/mobilemenu';
+import headerMobileMenu from './HeaderMobileMenu';
 
 export default {
   components: {
+    headerMobileMenu,
     inputElement,
+    mobileMenuIcon,
   },
   data() {
     return {
+      mobileMenuShow: false,
       // for search
       title: '',
     };
@@ -101,7 +118,7 @@ export default {
 @import '@/styles/colors.scss';
 
   .header {
-    background-color: $widget-bg;
+    background-color: $header;
     height: $header-height;
     width: 100%;
     position: fixed;
@@ -109,6 +126,9 @@ export default {
     z-index: 2;
     padding: 0.5rem;
     height: 40px;
+    @include for-size(phone-only) {
+      height: 30px;
+    }
     display: flex;
     justify-content: center;
   }
@@ -117,12 +137,19 @@ export default {
     display: flex;
     padding-left: 80px;
     padding-right: 10px;
+    @include for-size(phone-only) {
+      padding-left: 0px;
+      padding-right: 0px;
+    }
     width: 100%;
     max-width: 1110px;
     nav {
       @include flex-row();
       align-items: center;
       margin-left: 4rem;
+      @include for-size(phone-only) {
+        margin-left: 0;
+      }
       a {
         color: $main-text;
         padding-top: 5px;
@@ -154,6 +181,9 @@ export default {
       display: flex;
       margin-left: auto;
       margin-right: 3rem;
+      @include for-size(phone-only) {
+        margin-right: 1rem;
+      }
       align-self: center;
       img {
         border-radius: 50%;
@@ -166,8 +196,46 @@ export default {
       color: $main-text;
       text-decoration: none;
       width: 10%;
-      img {
+      .header-container__logo {
         height: 100%;
+        @include for-size(phone-only) {
+          display: none;
+        }
+        &_mobile {
+          display: none;
+          height: 100%;
+          @include for-size(phone-only) {
+            display: inline-block;
+          }
+        }
+      }
+    }
+    &__mobile_menu {
+      display: none;
+      margin-right: 1rem;
+      cursor: pointer;
+      @include for-size(phone-only) {
+        display: block;
+        svg {
+          height: 100%;
+          fill: $light-gray;
+        }
+      }
+      &-enter-active, &-leave-active {
+        transition: all 0.2s;
+      }
+
+      &-enter, &-leave-to {
+        opacity: 0;
+        transform: translateY(15px);
+        @include for-size(phone-only) {
+          transform: translateY(-15px);
+        }
+      }
+    }
+    &__mobile_active {
+      svg {
+        fill: $main-text;
       }
     }
   }

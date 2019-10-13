@@ -368,6 +368,9 @@ export default {
       &_first {
         border-left: none !important;
         margin-left: 0 !important;
+        @include for-size(phone-only) {
+          margin-left: -1rem !important;
+        }
       }
       &_refresh-new {
         border-left: solid 3px $firm !important;
@@ -377,6 +380,10 @@ export default {
         background: $widget-bg;
         margin: 1rem;
         padding: 1rem;
+        @include for-size(phone-only) {
+          // margin-left: 0;
+          margin-right: 0;
+        }
         color: $main-text;
 
         &_refresh-new {
@@ -463,6 +470,9 @@ export default {
       &-answer {
         &-editor {
           width: 85%;
+          @include for-size(phone-only) {
+            width: 100%;
+          }
           .text-editor {
             height: 6rem;
           }

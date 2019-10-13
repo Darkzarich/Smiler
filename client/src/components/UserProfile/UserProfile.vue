@@ -131,6 +131,9 @@ export default {
 
   &__offset {
     width: 10%;
+    @include for-size(phone-only) {
+      display: none;
+    }
   }
 
   &__block {
@@ -153,6 +156,13 @@ export default {
       background-position: center;
       filter: grayscale(1);
       background-size: cover;
+    }
+    @include for-size(phone-only) {
+      width: 100%;
+      border: none;
+      &:after {
+        display: none;
+      }
     }
   }
 

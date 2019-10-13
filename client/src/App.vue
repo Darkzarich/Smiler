@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import HeaderElement from '@/components/HeaderElement';
+import HeaderElement from '@/components/Header/HeaderElement';
 import FooterElement from '@/components/FooterElement';
 import SystemNotification from '@/components/SystemNotification/SystemNotification';
 import User from '@/components/User/User';
@@ -49,6 +49,7 @@ export default {
 <style lang="scss">
 @import '@/styles/variables.scss';
 @import '@/styles/colors.scss';
+@import '@/styles/mixins.scss';
 
 html {
   font-family: "Roboto","Open Sans",Helvetica,Arial,sans-serif,
@@ -61,6 +62,7 @@ body {
 
 #app {
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .content-box {
@@ -73,12 +75,22 @@ body {
   flex-direction: row;
   flex-wrap: nowrap;
   padding-right: 10px;
+  @include for-size(phone-only) {
+    padding-right: 0;
+  }
   &__main {
     width: 70%;
     margin-right: $widget-margin;
+    @include for-size(phone-only) {
+      width: 100%;
+      margin-right: 0;
+    }
   }
   &__sidebar {
     width: 30%;
+    @include for-size(phone-only) {
+      display: none;
+    }
   }
 }
 

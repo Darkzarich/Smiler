@@ -12,7 +12,7 @@
 
 export default {
 
-}
+};
 </script>
 
 <style lang="scss">
@@ -23,7 +23,7 @@ footer {
   width: 100%;
   height: 4rem;
   margin-top: 1rem;
-  background: $widget-bg;
+  background: $header;
   align-items: center;
   @include flex-row();
   .footer-github {

@@ -33,6 +33,12 @@ Vue.directive('scroll', {
 
 Vue.mixin({
   methods: {
+    $isMobile() {
+      if (window.matchMedia('(max-device-width: 960px)').matches) {
+        return true;
+      }
+      return false;
+    },
     $resolveAvatar(path) {
       if (path) {
         return path;

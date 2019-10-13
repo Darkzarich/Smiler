@@ -290,6 +290,9 @@ export default {
 
   &__delete {
     width: 0;
+    @include for-size(phone-only) {
+      width: 10px;
+    }
     svg {
       cursor: pointer;
       transition: fill 0.3s ease-in-out;

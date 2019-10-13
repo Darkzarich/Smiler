@@ -3,10 +3,10 @@
 
     <template v-if="!getUserAuthState">
       <template v-if="mode == USER_LOGIN_MODE">
-        <user-login @mode-change="setMode(USER_REG_MODE)"/>
+        <user-login @close="closeMenu" @mode-change="setMode(USER_REG_MODE)"/>
       </template>
       <template v-else-if="mode == USER_REG_MODE">
-        <user-registration @mode-change="setMode(USER_LOGIN_MODE)"/>
+        <user-registration @close="closeMenu" @mode-change="setMode(USER_LOGIN_MODE)"/>
       </template>
     </template>
 
@@ -14,7 +14,7 @@
       <div class="user__logged-block">
         <div class="user__logged-meta">
           <div class="user__logged-meta-avatar">
-            <router-link :to="{
+            <router-link @click.native="navNative ? closeMenu() : ''" :to="{
               name: 'UserPage',
                 params: {
                   login: getUser.login
@@ -40,14 +40,14 @@
         </div>
         <div class="user__logged-nav">
           <ul class="user__logged-nav-list">
-            <router-link :to="{
+            <router-link @click.native="navNative ? closeMenu() : ''" :to="{
                 name: 'PostCreate'
             }">
               <li class="user__logged-nav-item">
                   <add-icon/> New Post
               </li>
             </router-link>
-            <router-link :to="{
+            <router-link @click.native="navNative ? closeMenu() : ''" :to="{
                 name: 'UserSettings'
             }">
               <li class="user__logged-nav-item">
@@ -83,6 +83,7 @@ export default {
     exitIcon,
     addIcon,
   },
+  props: ['navNative'],
   data() {
     return {
       USER_LOGIN_MODE: consts.USER_LOGIN_MODE,
@@ -109,6 +110,10 @@ export default {
         document.location.reload();
       }
     },
+    // emit close event to HeaderMobileMenu, which will close the menu
+    closeMenu() {
+      this.$emit('close');
+    },
   },
 };
 </script>
@@ -134,6 +139,9 @@ export default {
         flex-direction: column;
         flex-wrap: nowrap;
         padding: 1rem;
+        @include for-size(phone-only) {
+          padding: 0.5rem;
+        }
         align-items: center;
         width: 50%;
         img {
@@ -146,6 +154,9 @@ export default {
         font-size: 1rem;
         text-align: center;
         margin: 1rem;
+        @include for-size(phone-only) {
+          margin: 0.5rem;
+        }
       }
 
       a {

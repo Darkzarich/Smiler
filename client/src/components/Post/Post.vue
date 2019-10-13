@@ -25,9 +25,10 @@
             slug: postData.slug
           }
         }"
-        target="_blank"
+        :target="$isMobile() ? '' : '_blank'"
       >
         <div class="post-main__title">
+
           {{ postData.title }}
           <template v-if="canEdit">
             <router-link title="Edit post" :to="postData.slug + '/edit'">
@@ -73,6 +74,28 @@
           </template>
         </div>
       </div>
+
+<!-- for mobile -->
+
+          <div class="post-main__rate-mobile">
+            <div
+              class="post-side__upvote"
+              @click="upvote(postData.id)"
+              :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''">
+              <plus-icon/>
+            </div>
+            <div class="post-side__rating">
+              {{ postData.rating }}
+            </div>
+            <div
+              class="post-side__downvote"
+              @click="downvote(postData.id)"
+              :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''">
+              <minus-icon/>
+            </div>
+          </div>
+
+<!-- for mobile -->
       <div class="post-main__footer">
         <div class="post-main__meta">
           <span class="post-main__meta-date">
@@ -80,7 +103,7 @@
           </span>
           <span class="post-main__meta-comments">
             <router-link
-            target="_blank"
+            :target="$isMobile() ? '' : '_blank'"
             :to="{
               name: 'Single',
               params: {
@@ -91,7 +114,7 @@
             </router-link>
           </span>
             <router-link
-            target="_blank"
+            :target="$isMobile() ? '' : '_blank'"
             :to="{
               name: 'UserPage',
               params: {
@@ -312,7 +335,23 @@ export default {
     padding: 1rem;
     color: $main-text;
     border: 1px solid $light-gray;
+    @include for-size(phone-only) {
+      border: none;
+      border-bottom: 1px solid $light-gray;
+      width: 100%;
+    }
     border-radius: 2px;
+
+    &__rate-mobile {
+      display: none;
+    }
+    @include for-size(phone-only) {
+      &__rate-mobile {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
 
     a {
       color: $light-gray;
@@ -354,6 +393,9 @@ export default {
 
     &__footer {
       margin-top: 1rem;
+      @include for-size(phone-only) {
+        margin-top: -1rem;
+      }
     }
 
     &__body {
@@ -380,6 +422,11 @@ export default {
           width: 100%;
           height: 100%;
         }
+        @include for-size(phone-only) {
+          margin-left: -1rem;
+          border: none;
+          width: 110%;
+        }
       }
     }
 
@@ -394,6 +441,9 @@ export default {
       background: $bg;
       margin-top: 1rem;
       border-top: 1px solid $light-gray;
+      @include for-size(phone-only) {
+        border-top: none;
+      }
 
       &-comments {
         svg {
@@ -439,12 +489,18 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+    @include for-size(phone-only) {
+      display: none;
+    }
 
     &__upvote, &__rating, &__downvote {
       color: $light-gray;
       svg {
         fill: $light-gray;
         width: 5rem;
+        @include for-size(phone-only) {
+          width: 3rem;
+        }
       }
     }
 

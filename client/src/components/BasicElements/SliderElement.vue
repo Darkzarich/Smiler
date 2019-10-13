@@ -30,7 +30,7 @@ export default {
     },
     min: {
       type: Number,
-      default: -100,
+      default: -2000,
     },
     max: {
       type: Number,

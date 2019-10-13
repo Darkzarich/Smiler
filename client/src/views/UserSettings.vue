@@ -193,6 +193,10 @@ export default {
 
 .user-settings {
   @include widget;
+  @include for-size(phone-only) {
+    border-left: none;
+    border-right: none;
+  }
   &__loading {
     display: flex;
     justify-content: center;
@@ -211,15 +215,25 @@ export default {
   }
 
   &__bio-edit {
+    @include for-size(phone-only) {
+      margin-left: 0;
+    }
     textarea {
       resize: none;
       width: 50%;
       height: 5rem;
+      @include for-size(phone-only) {
+        width: 100%;
+      }
     }
   }
 
   &__avatar-edit {
     width: 60%;
+    @include for-size(phone-only) {
+      width: 80%;
+      margin-left: 0;
+    }
   }
 
   &__current-avatar {
@@ -227,6 +241,9 @@ export default {
     border: 1px solid $light-gray;
     margin-bottom: 0.5rem;
     margin-left: 1rem;
+    @include for-size(phone-only) {
+      margin-left: 0;
+    }
     img {
       border-radius: 50%;
       width: 8rem;
@@ -237,7 +254,7 @@ export default {
       font-size: 1.5rem;
       color: $main-text;
       text-align: center;
-      margin-top: 0.5rem;
+      margin-top: 1.5rem;
       margin-bottom: 1rem;
   }
 
@@ -246,6 +263,9 @@ export default {
       flex-wrap: wrap;
       margin-top: 0.5rem;
       padding-left: 1rem;
+      @include for-size(phone-only) {
+        padding-left: 0;
+      }
       i {
         color: $main-text;
       }

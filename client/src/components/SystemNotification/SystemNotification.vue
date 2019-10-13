@@ -52,6 +52,9 @@ export default {
       background: $error;
       height: 2rem;
       opacity: 0.5;
+      @include for-size(phone-only) {
+        opacity: 1;
+      }
       transition: opacity 0.2s 0s ease-in-out;
       &:hover {
         opacity: 1;
@@ -67,6 +70,9 @@ export default {
       &-enter, &-leave-to {
         opacity: 0;
         transform: translateY(15px);
+        @include for-size(phone-only) {
+          transform: translateY(-15px);
+        }
       }
     }
     &__close {

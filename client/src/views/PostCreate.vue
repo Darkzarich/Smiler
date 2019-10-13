@@ -91,6 +91,9 @@ export default {
 .post-create {
   @include widget();
   @include flex-col();
+  @include for-size(phone-only) {
+    border: none;
+  }
   &__header {
     align-self: center;
     font-size: 1.5rem;

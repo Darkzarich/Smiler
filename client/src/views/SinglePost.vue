@@ -244,6 +244,9 @@ export default {
 
 .comments {
   border: 1px solid $light-gray;
+  @include for-size(phone-only) {
+    border: none;
+  }
   padding: 1rem;
   margin-bottom: 2rem;
   &__update {
@@ -287,6 +290,10 @@ export default {
   &__form {
     width: 85%;
     padding: 1rem;
+    @include for-size(phone-only) {
+      width: 100%;
+      padding: 0;
+    }
     margin-top: 0.5rem;
     &_disabled {
       border: 1px solid $light-gray;
