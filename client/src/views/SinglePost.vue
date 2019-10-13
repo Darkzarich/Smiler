@@ -134,6 +134,8 @@ export default {
     async setPost(post) {
       this.post = post;
       this.showPost = true;
+      window.document.title = this.post.title;
+      
       // comments
 
       this.commentsLoading = true;

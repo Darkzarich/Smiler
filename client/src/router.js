@@ -62,6 +62,7 @@ const router = new Router({
           dateFrom: getFilterDate(),
           dateTo: getFilterDate(23, 59, 59),
         },
+        title: 'Home',
       },
     },
     {
@@ -72,6 +73,7 @@ const router = new Router({
         filters: {
           sort: '-rating',
         },
+        title: 'All Posts',
       },
     },
     {
@@ -85,6 +87,7 @@ const router = new Router({
           dateFrom: getFilterDate(new Date().getHours - 2),
           dateTo: new Date().toISOString(),
         },
+        title: 'Blowing',
       },
     },
     {
@@ -97,6 +100,7 @@ const router = new Router({
           dateFrom: getFilterDate(0, 0, 0, new Date().getDate() - new Date().getDay()),
           dateTo: new Date().toISOString(),
         },
+        title: 'Top This Week',
       },
     },
     {
@@ -108,6 +112,7 @@ const router = new Router({
           sort: '-createdAt',
           dateFrom: getFilterDate(new Date().getHours() - 2, new Date().getMinutes()),
         },
+        title: 'Recent',
       },
     },
     {
@@ -117,16 +122,25 @@ const router = new Router({
       beforeEnter(to, from, next) {
         authGuard(to, from, next);
       },
+      meta: {
+        title: 'Feed',
+      },
     },
     {
       path: '/error/404',
       name: '404',
       component: NotFound,
+      meta: {
+        title: '404',
+      },
     },
     {
       path: '/user/@:login',
       name: 'UserPage',
       component: UserPage,
+      meta: {
+        titleParam: 'login',
+      },
     },
     {
       path: '/user/settings',
@@ -134,6 +148,9 @@ const router = new Router({
       component: UserSettings,
       beforeEnter(to, from, next) {
         authGuard(to, from, next);
+      },
+      meta: {
+        title: 'Settings',
       },
     },
     {
@@ -148,6 +165,9 @@ const router = new Router({
       beforeEnter(to, from, next) {
         authGuard(to, from, next);
       },
+      meta: {
+        title: 'Create New Post',
+      },
     },
     {
       path: '/:slug/edit',
@@ -158,21 +178,17 @@ const router = new Router({
       },
       meta: {
         mode: 'edit',
+        title: 'Edit Post',
       },
     },
     {
       path: '/posts/search',
       name: 'Search',
       component: Search,
+      meta: {
+        title: 'Search',
+      },
     },
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (about.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
-    // },
   ],
 });
 
@@ -180,6 +196,17 @@ router.beforeEach((to, from, next) => {
   const mathed = router.options.routes.find(el => el.name === to.name);
 
   if (mathed) {
+    // set title
+
+    const titleTo = to.meta.title;
+    const titleParams = to.meta.titleParam;
+
+    if (titleTo) {
+      window.document.title = titleTo;
+    } else if (titleParams) {
+      window.document.title = to.params[titleParams];
+    }
+
     next();
   } else {
     next({
