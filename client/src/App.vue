@@ -25,7 +25,7 @@ import SystemNotification from '@/components/SystemNotification/SystemNotificati
 import User from '@/components/User/User';
 
 import api from '@/api';
-
+// TODO: global mini loader fixed to top
 export default {
   components: {
     HeaderElement,

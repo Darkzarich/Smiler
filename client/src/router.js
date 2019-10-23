@@ -209,6 +209,7 @@ router.beforeEach((to, from, next) => {
 
     next();
   } else {
+    // TODO: use path * to redirect to 404 instead of cycle through names
     next({
       name: '404',
     });
