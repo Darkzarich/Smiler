@@ -288,21 +288,27 @@ export default {
         this.loadingRate = true;
 
         if (!commentItemData.rated.isRated) {
+          commentItemData.rated.isRated = true;
+          commentItemData.rated.negative = false;
+          commentItemData.rating += consts.COMMENT_RATE_VALUE;
+
           const res = await api.comments.updateRate(id, {
             negative: false,
           });
 
-          if (!res.data.error) {
-            commentItemData.rated.isRated = true;
-            commentItemData.rated.negative = false;
-            commentItemData.rating += consts.COMMENT_RATE_VALUE;
+          if (res.data.error) {
+            commentItemData.rated.isRated = false;
+            commentItemData.rating -= consts.COMMENT_RATE_VALUE;
           }
         } else if (commentItemData.rated.negative) {
+          commentItemData.rated.isRated = false;
+          commentItemData.rating += consts.COMMENT_RATE_VALUE;
+
           const res = await api.comments.removeRate(id);
 
-          if (!res.data.error) {
-            commentItemData.rated.isRated = false;
-            commentItemData.rating += consts.COMMENT_RATE_VALUE;
+          if (res.data.error) {
+            commentItemData.rated.isRated = true;
+            commentItemData.rating -= consts.COMMENT_RATE_VALUE;
           }
         }
       }
@@ -316,21 +322,27 @@ export default {
         this.loadingRate = true;
 
         if (!commentItemData.rated.isRated) {
+          commentItemData.rated.isRated = true;
+          commentItemData.rated.negative = true;
+          commentItemData.rating -= consts.COMMENT_RATE_VALUE;
+
           const res = await api.comments.updateRate(id, {
             negative: true,
           });
 
-          if (!res.data.error) {
-            commentItemData.rated.isRated = true;
-            commentItemData.rated.negative = true;
-            commentItemData.rating -= consts.COMMENT_RATE_VALUE;
+          if (res.data.error) {
+            commentItemData.rated.isRated = false;
+            commentItemData.rating += consts.COMMENT_RATE_VALUE;
           }
         } else if (!commentItemData.rated.negative) {
+          commentItemData.rated.isRated = false;
+          commentItemData.rating -= consts.COMMENT_RATE_VALUE;
+
           const res = await api.comments.removeRate(id);
 
-          if (!res.data.error) {
-            commentItemData.rated.isRated = false;
-            commentItemData.rating -= consts.COMMENT_RATE_VALUE;
+          if (res.data.error) {
+            commentItemData.rated.isRated = true;
+            commentItemData.rating += consts.COMMENT_RATE_VALUE;
           }
         }
       }

@@ -221,21 +221,26 @@ export default {
         this.loadingRate = true;
 
         if (!this.postData.rated.isRated) {
+          this.postData.rated.isRated = true;
+          this.postData.rated.negative = false;
+          this.postData.rating += consts.POST_RATE_VALUE;
+
           const res = await api.posts.updateRateById(id, {
             negative: false,
           });
 
-          if (!res.data.error) {
-            this.postData.rated.isRated = true;
-            this.postData.rated.negative = false;
-            this.postData.rating += consts.POST_RATE_VALUE;
+          if (res.data.error) {
+            this.postData.rated.isRated = false;
+            this.postData.rating -= consts.POST_RATE_VALUE;
           }
         } else if (this.postData.rated.negative) {
+          this.postData.rated.isRated = false;
+          this.postData.rating += consts.POST_RATE_VALUE;
           const res = await api.posts.removeRateById(id);
 
-          if (!res.data.error) {
-            this.postData.rated.isRated = false;
-            this.postData.rating += consts.POST_RATE_VALUE;
+          if (res.data.error) {
+            this.postData.rated.isRated = true;
+            this.postData.rating -= consts.POST_RATE_VALUE;
           }
         }
       }
@@ -247,21 +252,27 @@ export default {
         this.loadingRate = true;
 
         if (!this.postData.rated.isRated) {
+          this.postData.rated.isRated = true;
+          this.postData.rated.negative = true;
+          this.postData.rating -= consts.POST_RATE_VALUE;
+
           const res = await api.posts.updateRateById(id, {
             negative: true,
           });
 
-          if (!res.data.error) {
-            this.postData.rated.isRated = true;
-            this.postData.rated.negative = true;
-            this.postData.rating -= consts.POST_RATE_VALUE;
+          if (res.data.error) {
+            this.postData.rated.isRated = false;
+            this.postData.rating += consts.POST_RATE_VALUE;
           }
         } else if (!this.postData.rated.negative) {
+          this.postData.rated.isRated = false;
+          this.postData.rating -= consts.POST_RATE_VALUE;
+
           const res = await api.posts.removeRateById(id);
 
-          if (!res.data.error) {
-            this.postData.rated.isRated = false;
-            this.postData.rating -= consts.POST_RATE_VALUE;
+          if (res.data.error) {
+            this.postData.rated.isRated = true;
+            this.postData.rating += consts.POST_RATE_VALUE;
           }
         }
       }
