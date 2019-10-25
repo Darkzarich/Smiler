@@ -189,31 +189,27 @@ const router = new Router({
         title: 'Search',
       },
     },
+    {
+      path: '*',
+      redirect: {
+        name: '404',
+      },
+    },
   ],
 });
 
 router.beforeEach((to, from, next) => {
-  const mathed = router.options.routes.find(el => el.name === to.name);
+  // set title
+  const titleTo = to.meta.title;
+  const titleParams = to.meta.titleParam;
 
-  if (mathed) {
-    // set title
-
-    const titleTo = to.meta.title;
-    const titleParams = to.meta.titleParam;
-
-    if (titleTo) {
-      window.document.title = titleTo;
-    } else if (titleParams) {
-      window.document.title = to.params[titleParams];
-    }
-
-    next();
-  } else {
-    // TODO: use path * to redirect to 404 instead of cycle through names
-    next({
-      name: '404',
-    });
+  if (titleTo) {
+    window.document.title = titleTo;
+  } else if (titleParams) {
+    window.document.title = to.params[titleParams];
   }
+
+  next();
 });
 
 export default router;
