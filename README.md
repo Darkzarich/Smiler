@@ -8,7 +8,7 @@
 
 Hello! :smile: 
 
-This is my own pet MEVN (MongoDB, Express, Vue.js, Node.js) site-project similar to reddit.com or pikabu.ru (mostly copies many pikabu features) with many different and awesome features, open Swagger API documentation (as the result of using Design First approach). Main reason of making this site is fun and learning new things while making it.
+This is my own pet MEVN (MongoDB, Express, Vue.js, Node.js) site-project similar to reddit.com or pikabu.ru (mostly copies many pikabu features) with many different and awesome features, open Swagger API documentation (as the result of using Design First approach). Main reason of making this site is fun and learning new things while making it. The app is hosted on a hosting with cold start so it may take some time before it loads.
 
 ### How to run it:
 
