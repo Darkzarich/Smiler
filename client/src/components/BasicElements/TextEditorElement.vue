@@ -136,6 +136,7 @@ export default {
     color: $main-text;
     outline: none;
     font-weight: bold;
+    cursor: pointer;
     &:hover {
       background: $widget-bg;
     }
@@ -152,6 +153,7 @@ export default {
   margin-right: 1.5rem;
   height: 15rem;
   overflow-y: scroll;
+  cursor: text;
   &__input {
     width: 95%;
     outline: $firm;

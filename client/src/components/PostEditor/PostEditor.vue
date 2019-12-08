@@ -9,38 +9,46 @@
     <post-editor-tags
       :tags="tags"
     />
-    <transition-group name="post-editor__section">
-      <div
-        class="post-editor__section"
-        :key="section.hash"
-        v-for="section in sections">
-            <template v-if="section.type === POST_SECTION_TYPES.TEXT">
-              <text-editor-element
-                v-model="section.content"
-              />
-              <div class="post-editor__delete" @click="deleteSection(section)">
-                <close-icon title="Delete"/>
-              </div>
-            </template>
-            <template v-if="section.type === POST_SECTION_TYPES.PICTURE">
-              <post-editor-picture
-                v-model="section.url"
-                @set-section="setSection"
-              />
-              <div class="post-editor__delete" @click="deleteSection(section)">
-                <close-icon title="Delete"/>
-              </div>
-            </template>
-            <template v-if="section.type === POST_SECTION_TYPES.VIDEO">
-              <post-editor-video
-                v-model="section.url"
-              />
-              <div class="post-editor__delete" @click="deleteSection(section)">
-                <close-icon title="Delete"/>
-              </div>
-            </template>
-      </div>
-    </transition-group>
+
+    <draggable
+      :list="sections"
+      :animation="200"
+      ghost-class="post-editor__section_moving"
+      chosen-class="post-editor__section_chosen"
+    >
+      <transition-group name="post-editor__section">
+        <div
+          class="post-editor__section"
+          :key="section.hash"
+          v-for="section in sections">
+              <template v-if="section.type === POST_SECTION_TYPES.TEXT">
+                <text-editor-element
+                  v-model="section.content"
+                />
+                <div class="post-editor__delete" @click="deleteSection(section)">
+                  <close-icon title="Delete"/>
+                </div>
+              </template>
+              <template v-if="section.type === POST_SECTION_TYPES.PICTURE">
+                <post-editor-picture
+                  v-model="section.url"
+                  @set-section="setSection"
+                />
+                <div class="post-editor__delete" @click="deleteSection(section)">
+                  <close-icon title="Delete"/>
+                </div>
+              </template>
+              <template v-if="section.type === POST_SECTION_TYPES.VIDEO">
+                <post-editor-video
+                  v-model="section.url"
+                />
+                <div class="post-editor__delete" @click="deleteSection(section)">
+                  <close-icon title="Delete"/>
+                </div>
+              </template>
+        </div>
+      </transition-group>
+   </draggable>
     <div class="post-editor__control" v-if="sections.length < POST_MAX_SECTIONS">
       <div class="post-editor__control-item" @click="createSection(POST_SECTION_TYPES.TEXT)">
         <text-icon/>
@@ -85,6 +93,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import Draggable from 'vuedraggable';
 import api from '@/api';
 
 import ButtonElement from '../BasicElements/ButtonElement.vue';
@@ -113,6 +122,7 @@ export default {
     videoIcon,
     pictureIcon,
     textIcon,
+    Draggable,
   },
   data() {
     return {
@@ -254,6 +264,18 @@ export default {
     @include flex-row();
     align-items: center;
     margin-top: 1rem;
+    cursor: move;
+
+    &_moving {
+      opacity: 0.4;
+    }
+
+    &_chosen {
+      .text-editor-container, .post-image-upload, .post-video-upload {
+        border: 1px solid $firm;
+      }
+    }
+
     .text-editor-container {
       width: 95%;
     }
