@@ -10,12 +10,15 @@ Hello! :smile:
 
 This is my own pet MEVN (MongoDB, Express, Vue.js, Node.js) site-project similar to reddit.com or pikabu.ru (mostly copies many pikabu features) with many different and awesome features, open Swagger API documentation (as the result of using Design First approach). Main reason of making this site is fun and learning new things while making it. The app is hosted on a hosting with cold start so it may take some time before it loads.
 
+Here is [my public Trello board](https://trello.com/b/a9VbK9M3/smiler) so you will know anything about what I'm working on right now related to this repository
+and also any my future ideas and fixes I'm plannig to release one day :sunglasses:
+
 ### How to run it:
 
 0. Get your MongoDB ready. Create user with admin rights
 1. `npm install`
 2. Take `.env.example` file inside `server` folder and rename it to `.env`
-3. Fill your `.env` file following the comments
+3. Fill in your `.env` file following the comments
 4. `npm run run:dev`
 
 *Be sure to check main package.json for scripts*
@@ -73,6 +76,7 @@ This is my own pet MEVN (MongoDB, Express, Vue.js, Node.js) site-project similar
 	- **Few pages for post containers**. There are generally **6 pages** for this: *Today* page will show posts posted today sorted by rating (server time), *All* shows all posts posted ever, *Blowing* shows posts with 
 	50+ rating posted recently (so to say, hot posts), *Top this week* page speaks for itself, *New* shows posts posted up to 2 hours ago sorted by date
 	- **Post editor**. Serves for creating and editing posts. Main its features: Creating and deleting post sections, **rich text editor** (I made this one entirely myself so it probably is pretty buggy but it's working in general) for text section, adding tags, dynamic check if the picture by link is available.
+	Also sections are totally supporting Drag and Drop.
 	- **Preloader**.
 	- **Loading more posts on scroll**. When the bottom is reached
 	- **Search post with filters**
@@ -91,24 +95,3 @@ This is my own pet MEVN (MongoDB, Express, Vue.js, Node.js) site-project similar
 	- **Updating comments**
 	- **Loading new comments**. Small flying button which allows to request comments again but all new comments
 	will be highlighted, also there is a counter which says how many comments were added.
-
-### Backend Plans:
-- General:
-	- Limit for requests per sec
-	- **Sockets**
-	- **Transactions**. MongoDB queries must be refactored to transactions **to solve some existing potential race condition issues**
-- Users:
-	- **Settings (?)**
-	- **Changing password**
-	- **Password recovery**
-	- **Mail (?)**. Mail box, working with emails
-	- **Mentions**. Usual @ mentions
-	- **Roles**(regular, moderator, admin)
-- Tags:
-	- **Ignore tags**
-
-### Frontend Plans:
-- General:
-	- Implement everything what needs frontend from Backend plans
--	Users:
-	- **Rated posts page**
