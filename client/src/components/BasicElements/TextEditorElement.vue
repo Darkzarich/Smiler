@@ -14,7 +14,8 @@
         class="text-editor__input"
         contenteditable
         v-html="value"
-        @focusout="updateHtml($event.target.innerHTML)"
+        @selectstart="selecting = true"
+        @mouseup="endSelect($event.target.innerHTML)"
       >
       </div>
     </div>
@@ -33,6 +34,7 @@ export default {
   data() {
     return {
       curSelection: '',
+      selecting: true,
     };
   },
   computed: {
@@ -41,23 +43,23 @@ export default {
       return document.getSelection().anchorOffset;
     },
   },
+  created() {
+    document.execCommand('defaultParagraphSeparator', false, 'br');
+  },
   methods: {
-    updateHtml(text) {
-      // const updText = text;
+    endSelect(text) {
+      if (this.selecting) {
+        this.curSelection = document.getSelection();
+        console.log('updHtml / ', this.curSelection);
+        this.selecting = false;
 
-      this.curSelection = document.getSelection();
-
-      console.log('updHtml / ', this.curSelection);
-
-      // updText = updText.replace(/&lt;/g, '<');
-      // updText = updText.replace(/&gt;/g, '>');
-      let replacedDivText = text.replace(/<\/div>/g, 'br');
-      replacedDivText = text.replace(/<div>/g, '');
-      // this.$emit('input', updText);
-      this.$emit('input', replacedDivText);
+        let replacedDivText = text.replace(/<\/div>/g, 'br');
+        replacedDivText = text.replace(/<div>/g, '');
+        this.$emit('input', replacedDivText);
+      }
     },
     styleSelected(tag) {
-      console.log(this.curSelection.toString());
+      console.log(this.curSelection);
 
       console.log('beforeChange ', this.value);
 
@@ -106,9 +108,6 @@ export default {
         this.$emit('input', updText);
       }
     },
-  },
-  created() {
-    document.execCommand('defaultParagraphSeparator', false, 'br');
   },
 };
 </script>
