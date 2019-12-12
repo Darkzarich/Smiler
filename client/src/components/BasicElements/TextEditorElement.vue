@@ -14,6 +14,7 @@
         class="text-editor__input"
         contenteditable
         v-html="value"
+        :id="id"
         :ref="'text-editor#' + id"
         @selectstart="selecting = true"
         @mouseup="endSelect()"
@@ -39,6 +40,9 @@ export default {
   data() {
     return {
       curSelection: '',
+      selectedDOMElement: null,
+      anchorOffset: 0,
+      focusOffset: 0,
       editedText: '',
       selecting: true,
     };
@@ -51,14 +55,28 @@ export default {
   },
   created() {
     document.execCommand('defaultParagraphSeparator', false, 'br');
+    window.editedText = () => { console.log(this.editedText); };
   },
   methods: {
     endSelect() {
       const text = this.$refs[`text-editor#${this.id}`].innerHTML;
+      const selection = document.getSelection();
 
       if (this.selecting) {
-        this.curSelection = document.getSelection();
+        if (selection.toString().replace(/\n/g, '<br>')) {
+          this.curSelection = selection.toString().replace(/\n/g, '<br>');
+          this.selectedDOMElement = selection.anchorNode;
+          // selection start index
+          this.anchorOffset = selection.anchorOffset;
+          // selection end index
+          this.focusOffset = selection.focusOffset;
+        }
+
         console.log('curSelection / ', this.curSelection);
+
+        window.test = selection;
+
+        console.log('curSelection obj / ', selection);
 
         this.selecting = false;
 
@@ -76,8 +94,8 @@ export default {
         console.log('replace2: ', replacedDivText.replace(/<\/div>/g, ''));
         replacedDivText = replacedDivText.replace(/<\/div>/g, '');
 
-        console.log('replace3: ', replacedDivText.replace(/<div>/g, '<br>'));
-        replacedDivText = replacedDivText.replace(/<div>/g, '<br>');
+        console.log('replace3: ', replacedDivText.replace(/<div>/g, '<br>').replace(/(<br>){2,}/g, '<br>'));
+        replacedDivText = replacedDivText.replace(/<div>/g, '<br>').replace(/(<br>){2,}/g, '<br>');
 
         this.editedText = replacedDivText;
       }
@@ -89,53 +107,25 @@ export default {
       this.$emit('input', this.editedText);
     },
     styleSelected(tag) {
-      console.log(this.curSelection);
-
+      console.log('styleSelected curSelection: ', this.curSelection.trim());
+      console.log('DOM Ele: ', this.selectedDOMElement);
       console.log('beforeChange ', this.value);
 
-      const selectLeft = this.curSelection.anchorOffset > this.curSelection.focusOffset ? this.curSelection.focusOffset + 1 : this.curSelection.anchorOffset + 1;
-      const selectRight = this.curSelection.anchorOffset < this.curSelection.focusOffset ? this.curSelection.focusOffset + 1 : this.curSelection.anchorOffset + 1;
-      const tagLength = `<${tag}>`.length;
+      if (this.curSelection.trim().length > 0) {
+        // replace curSelection text with that text inside tags
+        this.selectedDOMElement.textContent = `${this.selectedDOMElement.wholeText.slice(0, this.anchorOffset)}<${tag}>${this.curSelection.toString().trim()}</${tag}>
+          ${this.selectedDOMElement.wholeText.slice(this.focusOffset, this.selectedDOMElement.wholeText.length)}`;
 
-      if (this.curSelection.toString().trim().length > 0) {
-        const IsInsideTag = new RegExp(`<${tag}>.*${this.curSelection.toString().trim()}.*<\/${tag}>`, 'g');
-        let updText;
+        let DOMHTML = document.getElementById(this.id).innerHTML;
 
-        updText = this.curSelection.baseNode.nodeValue.slice(selectLeft - 1, selectRight);
-        // debugger;
-        console.log(`selectLeft/Right: ${selectLeft} | ${selectRight}`);
-        console.log(this.curSelection.baseNode.nodeValue);
-        console.log('With tag | ', updText);
+        // replace all &lt; and &gt; with < and > because it gets transformed to those automatically
+        DOMHTML = DOMHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+        document.getElementById(this.id).innerHTML = DOMHTML;
 
-        if (this.curSelection.baseNode.parentNode.localName !== tag) {
-          if (!IsInsideTag.test(updText)) {
-            updText = this.curSelection.baseNode.nodeValue.slice(selectLeft - 1, selectRight);
-            console.log(this.curSelection);
-            updText = updText.replace(this.curSelection.toString().trim(), `<${tag}>${this.curSelection.toString().trim()}</${tag}>`);
-          } else {
-            updText = updText.replace(this.curSelection.toString().trim(), `</${tag}>${this.curSelection.toString().trim()}<${tag}>`);
-          }
-        } else {
-          updText = updText.replace(this.curSelection.toString().trim(), `</${tag}>${this.curSelection.toString().trim()}<${tag}>`);
-        }
+        // TODO: clear the style when a tab button is clicked and selection was already styled
+        // <b> some text </b> ----> <b></b> sometext <b></b> and then clean empty tags
 
-        updText = this.curSelection.baseNode.nodeValue.slice(0, selectLeft - 1) + updText
-        + this.curSelection.baseNode.nodeValue.slice(selectRight, this.curSelection.baseNode.nodeValue.length);
-
-        updText = this.value.replace(this.curSelection.baseNode.nodeValue, updText);
-
-        console.log(updText);
-
-        // clear tags
-
-        ['b', 'u', 'i', 's', 'cite'].forEach((el) => {
-          const clearEmptyTags = new RegExp(`<${el}> *<\/${el}>`, 'g');
-          updText = updText.replace(clearEmptyTags, '');
-        });
-
-        console.log('after clear ', updText);
-
-        this.$emit('input', updText);
+        this.$emit('input', document.getElementById(this.id).innerHTML);
       }
     },
   },
