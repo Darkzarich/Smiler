@@ -14,8 +14,10 @@
         class="text-editor__input"
         contenteditable
         v-html="value"
+        :ref="'text-editor#' + id"
         @selectstart="selecting = true"
-        @mouseup="endSelect($event.target.innerHTML)"
+        @mouseup="endSelect()"
+        @focusout="setText()"
       >
       </div>
     </div>
@@ -27,6 +29,9 @@
 <script>
 export default {
   props: {
+    id: {
+      type: String,
+    },
     value: {
       type: String,
     },
@@ -34,6 +39,7 @@ export default {
   data() {
     return {
       curSelection: '',
+      editedText: '',
       selecting: true,
     };
   },
@@ -47,16 +53,40 @@ export default {
     document.execCommand('defaultParagraphSeparator', false, 'br');
   },
   methods: {
-    endSelect(text) {
+    endSelect() {
+      const text = this.$refs[`text-editor#${this.id}`].innerHTML;
+
       if (this.selecting) {
         this.curSelection = document.getSelection();
-        console.log('updHtml / ', this.curSelection);
+        console.log('curSelection / ', this.curSelection);
+
         this.selecting = false;
 
-        let replacedDivText = text.replace(/<\/div>/g, 'br');
-        replacedDivText = text.replace(/<div>/g, '');
-        this.$emit('input', replacedDivText);
+        console.log('text: ', text);
+
+        // text.replace(/<\/div>/g, '<br>')
+
+        let replacedDivText = text;
+
+        if (text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)) {
+          replacedDivText = text.replace(text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)[2], '');
+          console.log('replace1: ', text.replace(text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)[2], ''));
+        }
+
+        console.log('replace2: ', replacedDivText.replace(/<\/div>/g, ''));
+        replacedDivText = replacedDivText.replace(/<\/div>/g, '');
+
+        console.log('replace3: ', replacedDivText.replace(/<div>/g, '<br>'));
+        replacedDivText = replacedDivText.replace(/<div>/g, '<br>');
+
+        this.editedText = replacedDivText;
       }
+    },
+    setText() {
+      this.selecting = true;
+      this.endSelect();
+      console.log('set text!');
+      this.$emit('input', this.editedText);
     },
     styleSelected(tag) {
       console.log(this.curSelection);

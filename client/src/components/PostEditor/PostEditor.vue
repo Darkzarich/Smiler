@@ -24,6 +24,7 @@
               <template v-if="section.type === POST_SECTION_TYPES.TEXT">
                 <text-editor-element
                   v-model="section.content"
+                  :id="section.hash"
                 />
                 <div class="post-editor__delete" @click="deleteSection(section)">
                   <close-icon title="Delete"/>
