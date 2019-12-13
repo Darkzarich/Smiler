@@ -46,19 +46,27 @@ export default {
       focusOffset: 0,
       editedText: '',
       selecting: true,
+      tags: ['b', 'i', 's', 'u', 'cite'],
     };
   },
   computed: {
     curSelectionComp() {
-      console.log(document.getSelection());
       return document.getSelection().anchorOffset;
     },
   },
   created() {
     document.execCommand('defaultParagraphSeparator', false, 'br');
-    window.editedText = () => { console.log(this.editedText); };
   },
   methods: {
+    removeStyles() {
+      let text = this.value;
+
+      this.tags.forEach((tag) => {
+        text = text.replace(new RegExp(`((<\/${tag}>)|(<${tag}>))*`, 'g'), '');
+      });
+
+      this.$emit('input', text);
+    },
     endSelect() {
       const text = this.$refs[`text-editor#${this.id}`].innerHTML;
       const selection = document.getSelection();
@@ -78,8 +86,6 @@ export default {
         }
 
         console.log('curSelection / ', this.curSelection);
-
-        window.test = selection;
 
         console.log('curSelection obj / ', selection);
 
