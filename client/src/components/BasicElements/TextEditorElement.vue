@@ -6,6 +6,7 @@
       <button title="strike" @click="styleSelected('s')">S</button>
       <button title="underline" @click="styleSelected('u')">U</button>
       <button title="quote" @click="styleSelected('cite')">Q</button>
+      <button title="remove styles" @click="removeStyles()">REMOVE STYLES</button>
     </div>
     <div
       class="text-editor"
@@ -67,9 +68,13 @@ export default {
           this.curSelection = selection.toString().replace(/\n/g, '<br>');
           this.selectedDOMElement = selection.anchorNode;
           // selection start index
-          this.anchorOffset = selection.anchorOffset;
+          this.anchorOffset = selection.anchorOffset < selection.focusOffset
+            ? selection.anchorOffset
+            : selection.focusOffset;
           // selection end index
-          this.focusOffset = selection.focusOffset;
+          this.focusOffset = selection.anchorOffset < selection.focusOffset
+            ? selection.focusOffset
+            : selection.anchorOffset;
         }
 
         console.log('curSelection / ', this.curSelection);
@@ -113,8 +118,9 @@ export default {
 
       if (this.curSelection.trim().length > 0) {
         // replace curSelection text with that text inside tags
-        this.selectedDOMElement.textContent = `${this.selectedDOMElement.wholeText.slice(0, this.anchorOffset)}<${tag}>${this.curSelection.toString().trim()}</${tag}>
-          ${this.selectedDOMElement.wholeText.slice(this.focusOffset, this.selectedDOMElement.wholeText.length)}`;
+        this.selectedDOMElement.textContent = `${this.selectedDOMElement.wholeText.slice(0, this.anchorOffset)}`
+        + `<${tag}>${this.curSelection.toString().trim()}</${tag}>`
+        + `${this.selectedDOMElement.wholeText.slice(this.focusOffset, this.selectedDOMElement.wholeText.length)}`;
 
         let DOMHTML = document.getElementById(this.id).innerHTML;
 
