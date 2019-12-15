@@ -30,6 +30,7 @@ and also any my future ideas and fixes I'm plannig to release one day :sunglasse
 	- **Clustering**. If something goes wrong on the server side and something throws an exception the app won't
 	die
 	- **CORS Protection**. The API has set allowed domains through env variables.
+	- **Logging**. Every single request is logged with [Winston](https://github.com/winstonjs/winston) and [morgan](https://github.com/expressjs/morgan). Also logs are saved to the file as well.
 - Posts:
 	- **Creating posts**. Users can create posts and it will get a slug based on its title. The content of the post is formed with `sections`. Sections can be one of following types: text , picture, picture from link or link to video. Sent sections will save their order in the Database. Users are able to add up to 8 sections
 	- **Uploading pictures**. Through post sections. Images are getting resized and optimized. There are two
