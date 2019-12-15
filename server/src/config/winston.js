@@ -10,23 +10,29 @@ const options = {
     maxsize: 5242880, // 5MB
     maxFiles: 5,
     colorize: false,
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.printf(({
+        level, message, timestamp,
+      }) => `${timestamp} [${level}]: ${message}`),
+    ),
   },
   console: {
     level: 'debug',
     handleExceptions: true,
     json: false,
     colorize: true,
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.timestamp(),
+      winston.format.printf(({
+        level, message, timestamp,
+      }) => `${timestamp} [${level}]: ${message}`),
+    ),
   },
 };
 
 const logger = winston.createLogger({
-  format: winston.format.combine(
-    winston.format.colorize(),
-    winston.format.timestamp(),
-    winston.format.printf(({
-      level, message, label, timestamp,
-    }) => `${timestamp} [${level}]: ${message}`),
-  ),
   transports: [
     new winston.transports.File(options.file),
     new winston.transports.Console(options.console),
