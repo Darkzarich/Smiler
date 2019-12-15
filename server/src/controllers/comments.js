@@ -2,11 +2,11 @@
 const Comment = require('../models/Comment');
 const User = require('../models/User');
 const Rate = require('../models/Rate');
-const { generateError, success } = require('./utils/utils');
+const { generateError, success, asyncErrorHandler } = require('./utils/utils');
 const consts = require('../const/const');
 
 module.exports = {
-  getComment: async (req, res, next) => {
+  getComment: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
     const { post } = req.query;
     const limit = +req.query.limit || 10;
@@ -69,16 +69,18 @@ module.exports = {
 
         const transComments = formRecursive(comments);
 
-        success(res, {
+        success(req, res, {
           comments: transComments,
           pages,
         });
+      }).catch((e) => {
+        next(e);
       });
     } catch (e) {
       next(e);
     }
-  },
-  createComment: async (req, res, next) => {
+  }),
+  createComment: asyncErrorHandler(async (req, res, next) => {
     const { body } = req.body;
     const { parent } = req.body;
     const { post } = req.body;
@@ -95,7 +97,7 @@ module.exports = {
           author: userId,
         });
 
-        success(res, comment);
+        success(req, res, comment);
       } else {
         const parentCommentary = await Comment.findOne({
           _id: parent,
@@ -115,13 +117,13 @@ module.exports = {
         children.push(comment.id);
         parentCommentary.children = children;
         await parentCommentary.save();
-        success(res, comment);
+        success(req, res, comment);
       }
     } catch (e) {
       next(e);
     }
-  },
-  editComment: async (req, res, next) => {
+  }),
+  editComment: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
     const { id } = req.params;
     const { body } = req.body;
@@ -143,14 +145,14 @@ module.exports = {
           comFound.body = body;
           await comFound.save();
 
-          success(res);
+          success(req, res);
         }
       }
     } else {
       generateError('Comment is not found', 404, next);
     }
-  },
-  deleteComment: async (req, res, next) => {
+  }),
+  deleteComment: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
     const { id } = req.params;
 
@@ -168,17 +170,17 @@ module.exports = {
         } else if (comFound.children.length > 0) {
           comFound.deleted = true;
           await comFound.save();
-          success(res);
+          success(req, res);
         } else {
           await comFound.remove();
-          success(res);
+          success(req, res);
         }
       }
     } else {
       generateError('Comment is not found', 404, next);
     }
-  },
-  rate: async (req, res, next) => {
+  }),
+  rate: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
     const { id } = req.params;
     const { negative } = req.body;
@@ -215,7 +217,9 @@ module.exports = {
           user.save();
           commentAuthor.save();
 
-          success(res);
+          success(req, res);
+        }).catch((e) => {
+          next(e);
         });
       } else {
         generateError('Can\'t rate comment you already rated', 405, next);
@@ -223,8 +227,8 @@ module.exports = {
     } else {
       generateError('Comment doesn\'t exist', 404, next);
     }
-  },
-  unrate: async (req, res, next) => {
+  }),
+  unrate: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
     const { id } = req.params;
 
@@ -252,7 +256,9 @@ module.exports = {
           user.save();
           commentAuthor.save();
 
-          success(res);
+          success(req, res);
+        }).catch((e) => {
+          next(e);
         });
       } else {
         generateError('You didn\'t rate this comment', 405, next);
@@ -260,5 +266,5 @@ module.exports = {
     } else {
       generateError('Comment doesn\'t exist', 404, next);
     }
-  },
+  }),
 };

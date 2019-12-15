@@ -1,10 +1,11 @@
 /* eslint-disable no-underscore-dangle */
 const crypto = require('crypto');
 const fs = require('fs');
+const logger = require('../config/winston');
 
 const User = require('../models/User');
 
-const { generateError, success } = require('./utils/utils');
+const { generateError, success, asyncErrorHandler } = require('./utils/utils');
 const consts = require('../const/const');
 
 const validateUserRegistration = (user, next) => {
@@ -36,7 +37,7 @@ const validateUserAuth = (user, next) => {
 };
 
 module.exports = {
-  getUser: async (req, res, next) => {
+  getUser: asyncErrorHandler(async (req, res, next) => {
     const { login } = req.params;
     const { userId } = req.session;
     const { userLogin } = req.session;
@@ -68,13 +69,15 @@ module.exports = {
           isFollowed: requestingUser ? requestingUser.isFollowed(requestedUser._id) : false,
         };
 
-        success(res, response);
+        success(req, res, response);
       } else {
         generateError('User is not found', 404, next);
       }
+    }).catch((e) => {
+      next(e);
     });
-  },
-  updateUser: async (req, res, next) => {
+  }),
+  updateUser: asyncErrorHandler(async (req, res, next) => {
     const { login } = req.params;
     const { userLogin } = req.session;
     const { bio } = req.body;
@@ -98,12 +101,12 @@ module.exports = {
 
       await user.save();
 
-      success(res);
+      success(req, res);
     } else {
       generateError('User is not found', 404, next);
     }
-  },
-  getFollowing: async (req, res, next) => {
+  }),
+  getFollowing: asyncErrorHandler(async (req, res, next) => {
     const { userLogin } = req.session;
     const { login } = req.params;
 
@@ -120,13 +123,13 @@ module.exports = {
           tags: user.tagsFollowed,
         };
 
-        success(res, following);
+        success(req, res, following);
       } else {
         generateError('User is not found', 404, next);
       }
     }
-  },
-  follow: async (req, res, next) => {
+  }),
+  follow: asyncErrorHandler(async (req, res, next) => {
     const { id } = req.params;
     const { userId } = req.session;
 
@@ -160,14 +163,18 @@ module.exports = {
             },
           }),
         ]).then(() => {
-          success(res);
+          success(req, res);
+        }).catch((e) => {
+          next(e);
         });
       } else {
         generateError('User is not found', 404, next);
       }
+    }).catch((e) => {
+      next(e);
     });
-  },
-  unfollow: async (req, res, next) => {
+  }),
+  unfollow: asyncErrorHandler(async (req, res, next) => {
     const { id } = req.params;
     const { userId } = req.session;
 
@@ -201,14 +208,18 @@ module.exports = {
             },
           }),
         ]).then(() => {
-          success(res);
+          success(req, res);
+        }).catch((e) => {
+          next(e);
         });
       } else {
         generateError('User is not found', 404, next);
       }
+    }).catch((e) => {
+      next(e);
     });
-  },
-  register: async (req, res, next) => {
+  }),
+  register: asyncErrorHandler(async (req, res, next) => {
     // TODO: Rework validation, rework unique email
     const user = {
       email: req.body.email,
@@ -245,12 +256,12 @@ module.exports = {
         email: newUser.email,
       };
 
-      success(res, userAuth);
+      success(req, res, userAuth);
     } catch (e) {
       next(e);
     }
-  },
-  auth: async (req, res, next) => {
+  }),
+  auth: asyncErrorHandler(async (req, res, next) => {
     const user = {
       email: req.body.email,
       password: req.body.password,
@@ -288,7 +299,7 @@ module.exports = {
           followersAmount: foundUser.followersAmount,
         };
 
-        success(res, userAuth);
+        success(req, res, userAuth);
       } else {
         generateError('Invalid email or password', 401, next);
         return;
@@ -296,12 +307,12 @@ module.exports = {
     } catch (e) {
       next(e);
     }
-  },
-  logout: async (req, res) => {
+  }),
+  logout: asyncErrorHandler(async (req, res) => {
     req.session.destroy();
-    success(res);
-  },
-  getAuth: async (req, res) => {
+    success(req, res);
+  }),
+  getAuth: asyncErrorHandler(async (req, res) => {
     const { userId } = req.session;
     let authState = {};
 
@@ -321,18 +332,18 @@ module.exports = {
       authState.isAuth = false;
     }
 
-    success(res, authState);
-  },
-  getUserPostTemplate: async (req, res, next) => {
+    success(req, res, authState);
+  }),
+  getUserPostTemplate: asyncErrorHandler(async (req, res, next) => {
     if (req.session.userLogin !== req.params.login) {
       generateError('Can see only your own template', 403, next); return;
     }
 
     const template = await User.findById(req.session.userId).select('template');
 
-    success(res, template.template);
-  },
-  updateUserPostTemplate: async (req, res, next) => {
+    success(req, res, template.template);
+  }),
+  updateUserPostTemplate: asyncErrorHandler(async (req, res, next) => {
     // TODO: validate title, sections just like in posts
 
     const { sections } = req.body;
@@ -357,12 +368,12 @@ module.exports = {
     try {
       userTemplate.markModified('template');
       await userTemplate.save();
-      success(res);
+      success(req, res);
     } catch (e) {
       next(e);
     }
-  },
-  deleteUserPostTemplatePicture: async (req, res, next) => {
+  }),
+  deleteUserPostTemplatePicture: asyncErrorHandler(async (req, res, next) => {
     const { login } = req.params;
     const { hash } = req.params;
 
@@ -392,7 +403,7 @@ module.exports = {
 
         const delCb = (err) => {
           if (err) generateError(err, 500, next);
-          else success(res);
+          else success(req, res);
         };
 
         fs.exists(url, (exists) => {
@@ -414,5 +425,5 @@ module.exports = {
     } else {
       generateError('Section with given hash is not found', 404, next);
     }
-  },
+  }),
 };

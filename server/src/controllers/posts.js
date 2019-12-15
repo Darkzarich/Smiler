@@ -9,7 +9,7 @@ const Post = require('../models/Post');
 const User = require('../models/User');
 const Rate = require('../models/Rate');
 
-const { generateError, success } = require('./utils/utils');
+const { generateError, success, asyncErrorHandler } = require('./utils/utils');
 const diskStorage = require('./utils/DiskStorage');
 const consts = require('../const/const');
 
@@ -67,14 +67,14 @@ function startUpload(req, res, next) {
       user.markModified('template');
       await user.save();
 
-      success(res, newSection);
+      success(req, res, newSection);
     }
   });
 }
 
 module.exports = {
   // TODO: fix counting pages for pages, with author filter counts for all pages
-  getAll: async (req, res, next) => {
+  getAll: asyncErrorHandler(async (req, res, next) => {
     const limit = +req.query.limit || 100;
     const offset = +req.query.offset || 0;
     const author = req.query.author || '';
@@ -161,16 +161,18 @@ module.exports = {
 
         const transPosts = posts.map(el => el.toResponse(user));
 
-        success(res, {
+        success(req, res, {
           pages,
           posts: transPosts,
         });
+      }).catch((e) => {
+        next(e);
       });
     } catch (e) {
       next(e);
     }
-  },
-  getFeed: async (req, res, next) => {
+  }),
+  getFeed: asyncErrorHandler(async (req, res, next) => {
     const limit = +req.query.limit || 100;
     const offset = +req.query.offset || 0;
     const { userId } = req.session;
@@ -217,16 +219,18 @@ module.exports = {
 
         const transPosts = posts.map(el => el.toResponse(user));
 
-        success(res, {
+        success(req, res, {
           pages,
           posts: transPosts,
         });
+      }).catch((e) => {
+        next(e);
       });
     } catch (e) {
       next(e);
     }
-  },
-  getBySlug: async (req, res, next) => {
+  }),
+  getBySlug: asyncErrorHandler(async (req, res, next) => {
     const { slug } = req.params;
     const { userId } = req.session;
 
@@ -247,14 +251,16 @@ module.exports = {
         if (!post) {
           generateError('Post doesn\'t exist', 404, next);
         } else {
-          success(res, post.toResponse(user));
+          success(req, res, post.toResponse(user));
         }
+      }).catch((e) => {
+        next(e);
       });
     } catch (e) {
       next(e);
     }
-  },
-  create: async (req, res, next) => {
+  }),
+  create: asyncErrorHandler(async (req, res, next) => {
     // TODO: rework this | move validation and validate allowed tags, cut attributes
 
     const { userId } = req.session;
@@ -313,12 +319,12 @@ module.exports = {
       user.markModified('template');
       await user.save();
 
-      success(res, post);
+      success(req, res, post);
     } catch (e) {
       next(e);
     }
-  },
-  update: async (req, res, next) => {
+  }),
+  update: asyncErrorHandler(async (req, res, next) => {
     // TODO: validate sections on update by type and othher stuff the same as when creating post
 
     const { userId } = req.session;
@@ -377,13 +383,13 @@ module.exports = {
           });
         }
         await foundPost.save();
-        success(res);
+        success(req, res);
       }
     } else {
       generateError('Post doesn\'t exist', 404, next);
     }
-  },
-  delete: async (req, res, next) => {
+  }),
+  delete: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
     const { id } = req.params;
 
@@ -421,13 +427,13 @@ module.exports = {
           });
         });
 
-        success(res);
+        success(req, res);
       }
     } else {
       generateError('Post doesn\'t exist', 404, next);
     }
-  },
-  upload: async (req, res, next) => {
+  }),
+  upload: asyncErrorHandler(async (req, res, next) => {
     try {
       const user = await User.findById(req.session.userId).select('template');
 
@@ -452,8 +458,8 @@ module.exports = {
     } catch (e) {
       next(e);
     }
-  },
-  rate: async (req, res, next) => {
+  }),
+  rate: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
     const { id } = req.params;
     const { negative } = req.body;
@@ -489,7 +495,9 @@ module.exports = {
           user.save();
           postAuthor.save();
 
-          success(res);
+          success(req, res);
+        }).catch((e) => {
+          next(e);
         });
       } else {
         generateError('Can\'t rate post you already rated', 405, next);
@@ -497,8 +505,8 @@ module.exports = {
     } else {
       generateError('Post doesn\'t exist', 404, next);
     }
-  },
-  unrate: async (req, res, next) => {
+  }),
+  unrate: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
     const { id } = req.params;
 
@@ -526,7 +534,9 @@ module.exports = {
           user.save();
           postAuthor.save();
 
-          success(res);
+          success(req, res);
+        }).catch((e) => {
+          next(e);
         });
       } else {
         generateError('You didn\'t rate this post', 405, next);
@@ -534,5 +544,5 @@ module.exports = {
     } else {
       generateError('Post doesn\'t exist', 404, next);
     }
-  },
+  }),
 };

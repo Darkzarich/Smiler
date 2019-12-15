@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logger = require('./src/config/winston');
 const config = require('./src/config/config');
 
 mongoose.connect(config.DB_URL, {
@@ -11,7 +12,7 @@ const db = mongoose.connection;
 
 db.on('error', global.console.error.bind(console, 'connection error:'))
   .once('open', () => {
-    global.console.log(`${process.pid} [pid]: Successfully connected to MongoDB database`);
+    logger.info(`${process.pid} [pid]: Successfully connected to MongoDB database`);
   });
 
 module.exports = db;

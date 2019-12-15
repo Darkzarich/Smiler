@@ -68,6 +68,8 @@ schema.pre('remove', async function (next) {
     ],
   ).then(() => {
     next();
+  }).catch((e) => {
+    next(e);
   });
 });
 
