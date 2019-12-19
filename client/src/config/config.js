@@ -1,6 +1,5 @@
-// const API_ROUTE = process.env.API_ROUTE || 'localhost:3000/api';
-const API_ROUTE = 'https://dz-express-blog-api.herokuapp.com/api';
-const STATIC_ROUTE = 'https://dz-express-blog-api.herokuapp.com';
+const { API_ROUTE } = process.env;
+const { STATIC_ROUTE } = process.env;
 
 module.exports = {
   API_ROUTE,

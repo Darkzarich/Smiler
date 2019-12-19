@@ -20,6 +20,7 @@ const whitelist = [
   config.FRONT_ORIGIN_LOCAL,
   config.FRONT_ORIGIN_REMOTE,
   `http://localhost:${PORT}`,
+  `http://localhost:8080`,
 ];
 
 app.use(cors({

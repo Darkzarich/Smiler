@@ -6,6 +6,7 @@
     "run:dev": "concurrently --kill-others \"cd server && npm start\" \"cd client && npm run serve\"",
     "front:build": "cd client && npm run build",
     "front:serve": "cd client && npm run serve",
+    "front:serve-local": "cd client && npm run serve-local",
     "back:serve": "cd server && npm start",
     "run:production": "cd server && node index.js"
   },

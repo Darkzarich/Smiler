@@ -24,6 +24,7 @@ export default (requestData) => {
         store.commit('clearUser');
       }
     } else {
+      // NetworkError type
       console.error(e);
     }
 
