@@ -9,23 +9,19 @@ module.exports = {
     const defineModule = {
       'process.env': {
         NODE_ENV: '"development"',
-        BASE_URL: '"/"'
+        BASE_URL: '"/"',
+        API_ROUTE: remoteAPI,
+        STATIC_ROUTE: remoteStore,
       }
     }
 
-    if (process.env.NODE_ENV === 'development') {
-
-      if (process.env.SERVER_LOCAL) {
-        defineModule["process.env"].API_ROUTE = localAPI;
-        defineModule["process.env"].STATIC_ROUTE = localStore;
-      } else {
-        defineModule["process.env"].API_ROUTE = remoteAPI;
-        defineModule["process.env"].STATIC_ROUTE = remoteStore;
-      }
-
-      config
-        .plugin('define')
-          .tap( args => [defineModule])
+    if (process.env.NODE_ENV === 'development' && process.env.SERVER_LOCAL) {
+      defineModule["process.env"].API_ROUTE = localAPI;
+      defineModule["process.env"].STATIC_ROUTE = localStore;
     }
+
+    config
+    .plugin('define')
+      .tap( args => [defineModule])
   }
 }
