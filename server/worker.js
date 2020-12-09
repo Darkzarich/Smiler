@@ -40,12 +40,16 @@ app.use(addRequestId);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+if (config.IS_PRODUCTION) {
+  app.set('trust proxy', 1);
+}
+
 app.use(
   session({
     secret: config.SESSION_SECRET,
     resave: true,
     cookie: {
-      secure: true,
+      secure: config.IS_PRODUCTION,
       httpOnly: true,
       sameSite: 'none',
       maxAge: 60 * 60 * 24 * 1000,
