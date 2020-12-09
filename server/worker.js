@@ -10,7 +10,6 @@ const logger = require('./src/config/winston');
 const db = require('./db');
 const config = require('./src/config/config');
 
-
 const router = require('./src/routes');
 
 const app = express();
@@ -20,7 +19,7 @@ const whitelist = [
   config.FRONT_ORIGIN_LOCAL,
   config.FRONT_ORIGIN_REMOTE,
   `http://localhost:${PORT}`,
-  `http://localhost:8080`,
+  'http://localhost:8080',
 ];
 
 app.use(cors({
@@ -45,6 +44,12 @@ app.use(
   session({
     secret: config.SESSION_SECRET,
     resave: true,
+    cookie: {
+      secure: true,
+      httpOnly: true,
+      sameSite: 'none',
+      maxAge: 60 * 60 * 24 * 1000,
+    },
     saveUninitialized: false,
     store: new MongoStore({
       mongooseConnection: db,
