@@ -6,7 +6,7 @@ axios.defaults.withCredentials = true;
 
 export default (requestData) => {
   const requestDataMod = requestData;
-  requestDataMod.url = config.API_ROUTE + requestDataMod.url;
+  requestDataMod.url = `${config.API_ROUTE}/api${requestDataMod.url}`;
 
   return axios(requestDataMod).catch((e) => {
     if (e.response) {

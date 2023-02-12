@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+  frontend: 
+    build: ./client
+    container_name: smiler-frontend
+    ports:
+      - ${FRONTEND_PORT}:80
+    depends_on:
+      - backend
+    networks:
+      - app
+  backend:
+    build: ./server
+    container_name: smiler-backend
+    env_file: ./server/.env
+    ports:
+      - ${BACKEND_HOST_PORT}:${BACKEND_PORT}
+    restart: always
+    volumes:
+      - /usr/src/smiler/logs:/usr/src/app/logs
+      - /usr/src/smiler/uploads:/usr/src/app/uploads
+    networks:
+      - app
+      - db
+    depends_on:
+      db: 
+        condition: service_healthy
+  db:
+    image: mongo:5.0.10
+    restart: always
+    container_name: smiler-db
+    env_file: ./server/.env
+    volumes:
+      - /usr/src/smiler/db:/data/db
+    networks:
+      - db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh db:27017 --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+networks:
+  app:
+  db:

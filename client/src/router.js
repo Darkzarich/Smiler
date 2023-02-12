@@ -43,7 +43,7 @@ const getFilterDate = (h, m, s, d) => {
 
 const router = new Router({
   mode: 'history',
-  base: process.env.BASE_URL,
+  base: '/',
   scrollBehavior(to) {
     if (to.hash) {
       return { selector: to.hash };

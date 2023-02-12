@@ -51,7 +51,7 @@ app.use(
     cookie: {
       secure: config.IS_PRODUCTION,
       httpOnly: true,
-      sameSite: 'none',
+      sameSite: 'strict',
       maxAge: 60 * 60 * 24 * 1000,
     },
     saveUninitialized: false,
@@ -64,7 +64,7 @@ app.use(
 // logging
 morgan.token('request-body', (req, res) => {
   const body = Object.assign({}, req.body);
-  // is not safe to leave unsecure user's passwords in logs
+  // is not safe to leave insecure user's passwords in logs
   if ('password' in body) {
     body.password = '***';
   }
@@ -96,13 +96,10 @@ app.use(morgan(loggerFormat, {
 app.use(router);
 
 // set files folder
-if (config.IS_PRODUCTION) {
-  logger.info('Worker is running in PRODUCTION mode...');
-  app.use('/app/uploads', express.static(path.join(__dirname, 'uploads')));
-} else {
-  logger.info('Worker is running in DEV mode...');
-  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-}
+
+logger.info(`Worker is running in ${config.IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode...`);
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.listen(PORT, () => {
   logger.info(`${process.pid} [pid]: Server is listening on the port ${PORT}`);
