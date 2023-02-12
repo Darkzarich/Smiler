@@ -9,7 +9,7 @@
         :enter-callback="login"
         :place-holder="'Email'"
         :error="validation.email"
-        v-model="email"/>
+        v-model="email" />
     </div>
     <div class="user-login__password-input">
       <input-element
@@ -18,7 +18,7 @@
         :enter-callback="login"
         :error="validation.password"
         :place-holder="'Password'"
-        v-model="password"/>
+        v-model="password" />
     </div>
     <div class="user-login__submit">
       <button-element
@@ -38,10 +38,9 @@
 <script>
 import api from '@/api';
 
+import consts from '@/const/const';
 import ButtonElement from '../BasicElements/ButtonElement.vue';
 import InputElement from '../BasicElements/InputElement.vue';
-
-import consts from '@/const/const';
 
 export default {
   components: {

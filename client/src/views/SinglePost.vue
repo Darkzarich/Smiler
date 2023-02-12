@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="post-container">
-      <post v-if="showPost" :post="post" :can-edit="$postCanEdit(post)"/>
+      <post v-if="showPost" :post="post" :can-edit="$postCanEdit(post)" />
     </div>
 
     <div class="comments" id="comments">
@@ -10,13 +10,17 @@
         title="Refresh comments"
         :class="commentsRefreshing ? 'comments__update_refreshing' : ''"
         class="comments__update">
-        <refresh-icon/>
+        <refresh-icon />
         <template v-if="newCommentsCount > 0"> <span>+{{ newCommentsCount }}</span> </template>
       </div>
       <div class="comments__title">
         Commentaries ( <span class="comments__title-number"> {{post.commentCount }} </span> )
       </div>
-      <div class="comments__form" :class="!user.authState ? 'comments__form_disabled' : ''" v-if="!commentsLoading">
+      <div
+        class="comments__form"
+        :class="!user.authState ? 'comments__form_disabled' : ''"
+        v-if="!commentsLoading"
+      >
         <template v-if="user.authState">
           <div class="comments__form-title">
             Leave the commentary
@@ -24,14 +28,14 @@
           <text-editor-element
             v-model="sendCommentBody"
           >
-                    <div class="comments__form-submit">
-            <button-element
-              :loading="sendCommentLoading"
-              :callback="sendComment"
-            >
-              Send
-            </button-element>
-          </div>
+            <div class="comments__form-submit">
+              <button-element
+                :loading="sendCommentLoading"
+                :callback="sendComment"
+              >
+                Send
+              </button-element>
+            </div>
           </text-editor-element>
         </template>
         <template v-else>
@@ -50,7 +54,7 @@
         No comments yet... Be the first!
       </div>
       <div class="comments__loading" v-else>
-        <loading-icon/>
+        <loading-icon />
       </div>
     </div>
     <div
@@ -59,7 +63,7 @@
       @click="loadMoreComments()"
     >
       <template v-if="moreCommentsLoading">
-        <loader/>
+        <loader />
       </template>
       <template v-else>
         Click to load more comments
@@ -81,7 +85,6 @@ import Comments from '@/components/Comment/Comments.vue';
 import TextEditorElement from '@/components/BasicElements/TextEditorElement';
 import ButtonElement from '@/components/BasicElements/ButtonElement';
 
-import loadingIcon from '@/library/svg/animation/circularLoader';
 import refreshIcon from '@/library/svg/refresh';
 import loader from '@/library/svg/animation/circularLoader';
 
@@ -110,13 +113,12 @@ export default {
     TextEditorElement,
     ButtonElement,
     Comments,
-    loadingIcon,
     refreshIcon,
     loader,
   },
   computed: {
     ...mapState({
-      user: state => state.user,
+      user: (state) => state.user,
     }),
   },
   async beforeRouteEnter(to, from, next) {
@@ -127,7 +129,7 @@ export default {
         name: '404',
       });
     } else {
-      next(vm => vm.setPost(post.data));
+      next((vm) => vm.setPost(post.data));
     }
   },
   methods: {
@@ -135,7 +137,7 @@ export default {
       this.post = post;
       this.showPost = true;
       window.document.title = this.post.title;
-      
+
       // comments
 
       this.commentsLoading = true;
@@ -159,7 +161,7 @@ export default {
 
       if (!res.data.error) {
         this.comments = this.comments.concat(res.data.comments);
-        this.curPage += 1;
+        this.curPage = this.curPage + 1;
       }
 
       this.moreCommentsLoading = false;
@@ -184,7 +186,7 @@ export default {
       const maxLen = (oldCommentsArr || this.comments).length > newCommentsArr.length
         ? (oldCommentsArr || this.comments).length : newCommentsArr.length;
 
-      for (let i = 0; i < maxLen; i += 1) {
+      for (let i = 0; i < maxLen; i = i + 1) {
         if (oldComments[i]) {
           if (oldComments[i].children.length > 0) {
             // recursion
@@ -192,11 +194,11 @@ export default {
           } else if (newCommentsArr[i].children.length > 0) {
             // if oldComments children length is zero but newCommentsArr is not then that means
             // oldComments got children so we just assign newCommentsArr children to oldComments'
-            this.newCommentsCount += 1;
-            this.post.commentCount += 1;
+            this.newCommentsCount = this.newCommentsCount + 1;
+            this.post.commentCount = this.post.commentCount + 1;
             oldComments[i].children = newCommentsArr[i].children;
             // make every single child get styles of a new comment
-            for (let j = 0; j < oldComments[i].children.length; j += 1) {
+            for (let j = 0; j < oldComments[i].children.length; j = j + 1) {
               oldComments[i].children[j].isRefreshNew = true;
             }
           }
@@ -206,8 +208,8 @@ export default {
             ...newCommentsArr[i],
             isRefreshNew: true,
           });
-          this.newCommentsCount += 1;
-          this.post.commentCount += 1;
+          this.newCommentsCount = this.newCommentsCount + 1;
+          this.post.commentCount = this.post.commentCount + 1;
         }
       }
     },

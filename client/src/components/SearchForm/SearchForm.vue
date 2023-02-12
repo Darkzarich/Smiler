@@ -1,50 +1,50 @@
 <template>
-<div>
-  <div class="search-form__string">
-    <input-element
-      v-model="filters.title"
-    />
-  </div>
-  <div class="search-form__extra">
-    <div class="search-form__extra-date">
-      <date-pick-element
-        v-model="filters.dateFrom"
-        :label="'Date from'"
-      />
-      <date-pick-element
-        v-model="filters.dateTo"
-        :label="'Date to'"
+  <div>
+    <div class="search-form__string">
+      <input-element
+        v-model="filters.title"
       />
     </div>
-    <div class="search-form__extra-slider">
-      <slider-element
-        v-model="filters.ratingFrom"
-        :label="'Rating from'"
-      />
-      <slider-element
-        v-model="filters.ratingTo"
-        :label="'Rating to'"
+    <div class="search-form__extra">
+      <div class="search-form__extra-date">
+        <date-pick-element
+          v-model="filters.dateFrom"
+          :label="'Date from'"
+        />
+        <date-pick-element
+          v-model="filters.dateTo"
+          :label="'Date to'"
+        />
+      </div>
+      <div class="search-form__extra-slider">
+        <slider-element
+          v-model="filters.ratingFrom"
+          :label="'Rating from'"
+        />
+        <slider-element
+          v-model="filters.ratingTo"
+          :label="'Rating to'"
+        />
+      </div>
+    </div>
+    <div class="search-form__tags">
+      <post-editor-tags
+        :tags="filters.tags"
       />
     </div>
+    <div class="search-form__submit">
+      <button-element
+        :callback="search"
+      >
+        Submit
+      </button-element>
+      <button-element
+        :callback="clear"
+      >
+        Clear filters
+      </button-element>
+    </div>
   </div>
-  <div class="search-form__tags">
-    <post-editor-tags
-      :tags="filters.tags"
-    />
-  </div>
-  <div class="search-form__submit">
-    <button-element
-      :callback="search"
-    >
-      Submit
-    </button-element>
-    <button-element
-      :callback="clear"
-    >
-      Clear filters
-    </button-element>
-  </div>
-</div>
 </template>
 
 <script>

@@ -1,76 +1,78 @@
 <template>
-<header class="header">
-  <div class="header-container">
-    <div
-      @click="mobileMenuShow = !mobileMenuShow"
-      class="header-container__mobile_menu"
-      :class="mobileMenuShow ? 'header-container__mobile_active' : ''">
-      <mobile-menu-icon/>
-    </div>
-    <transition name="header-container__mobile_menu">
-      <header-mobile-menu v-if="mobileMenuShow" @close="mobileMenuShow = false" />\
-    </transition>
-    <router-link :to="{ name: 'Home' }">
-      <img src="@/assets/logo.png" class="header-container__logo" alt="Home">
-      <img src="@/assets/neutral_avatar.png" class="header-container__logo_mobile" alt="Home">
-    </router-link>
-    <nav>
-      <template v-if="!$isMobile()">
-        <router-link :to="{ name: 'Home' }">
-          <div> TODAY </div>
-        </router-link>
-        <router-link :to="{ name: 'All' }">
-          <div> ALL </div>
-        </router-link>
-        <router-link :to="{ name: 'Blowing' }">
-          <div title="posted recently, 50+ rating"> BLOWING </div>
-        </router-link>
-        <router-link :to="{ name: 'TopThisWeek' }">
-          <div title="current week posts sorted by newer"> TOP THIS WEEK </div>
-        </router-link>
-        <router-link :to="{ name: 'New' }">
-          <div title="posts posted 2 hours ago sorted by newer"> NEW </div>
-        </router-link>
-
-        <template v-if="user.authState">
-          <router-link :to="{ name: 'Feed' }">
-            <div> MY FEED </div>
-          </router-link>
-        </template>
-        <template v-else>
-          <a title="Log in to access this page" class="header-container__nav-link_disabled">
-            <div> MY FEED </div>
-          </a>
-        </template>
-
-      </template>
-    </nav>
-    <div v-if="$route.name !== 'Search'"
-         class="header-container__search">
-      <input-element
-        :place-holder="'Search'"
-        icon="searchIcon"
-        :style="'flex-direction: row'"
-        v-model.trim="title"
-        :enter-callback="search"
-        :icon-click-callback="search"
-      />
-    </div>
-    <div
-      class="header-container__avatar"
-      v-if="user.authState"
-    >
-      <router-link :to="{
-        name: 'UserPage',
-          params: {
-            login: user.login
-          }
-      }">
-        <img :src="$resolveAvatar(user.avatar)" alt="avatar">
+  <header class="header">
+    <div class="header-container">
+      <div
+        @click="mobileMenuShow = !mobileMenuShow"
+        class="header-container__mobile_menu"
+        :class="mobileMenuShow ? 'header-container__mobile_active' : ''">
+        <mobile-menu-icon />
+      </div>
+      <transition name="header-container__mobile_menu">
+        <header-mobile-menu v-if="mobileMenuShow" @close="mobileMenuShow = false" />\
+      </transition>
+      <router-link :to="{ name: 'Home' }">
+        <img src="@/assets/logo.png" class="header-container__logo" alt="Home">
+        <img src="@/assets/neutral_avatar.png" class="header-container__logo_mobile" alt="Home">
       </router-link>
+      <nav>
+        <template v-if="!$isMobile()">
+          <router-link :to="{ name: 'Home' }">
+            <div> TODAY </div>
+          </router-link>
+          <router-link :to="{ name: 'All' }">
+            <div> ALL </div>
+          </router-link>
+          <router-link :to="{ name: 'Blowing' }">
+            <div title="posted recently, 50+ rating"> BLOWING </div>
+          </router-link>
+          <router-link :to="{ name: 'TopThisWeek' }">
+            <div title="current week posts sorted by newer"> TOP THIS WEEK </div>
+          </router-link>
+          <router-link :to="{ name: 'New' }">
+            <div title="posts posted 2 hours ago sorted by newer"> NEW </div>
+          </router-link>
+
+          <template v-if="user.authState">
+            <router-link :to="{ name: 'Feed' }">
+              <div> MY FEED </div>
+            </router-link>
+          </template>
+          <template v-else>
+            <a title="Log in to access this page" class="header-container__nav-link_disabled">
+              <div> MY FEED </div>
+            </a>
+          </template>
+
+        </template>
+      </nav>
+      <div
+        v-if="$route.name !== 'Search'"
+        class="header-container__search">
+        <input-element
+          :place-holder="'Search'"
+          icon="searchIcon"
+          :style="'flex-direction: row'"
+          v-model.trim="title"
+          :enter-callback="search"
+          :icon-click-callback="search"
+        />
+      </div>
+      <div
+        class="header-container__avatar"
+        v-if="user.authState"
+      >
+        <router-link
+          :to="{
+            name: 'UserPage',
+            params: {
+              login: user.login,
+            },
+          }">
+          <img :src="$resolveAvatar(user.avatar)" alt="avatar">
+        </router-link>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 </template>
 
 <script>
@@ -94,7 +96,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user,
+      user: (state) => state.user,
     }),
   },
   methods: {

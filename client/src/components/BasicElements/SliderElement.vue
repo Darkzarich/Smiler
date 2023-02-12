@@ -1,21 +1,21 @@
 <template>
-<div class="slider">
-  <label :for="label">
-    {{ label }}
-  </label>
-  <input
-    type="range"
-    :id="label"
-    :max="max"
-    :min="min"
-    step="1"
-    :value="value"
-    @input="$emit('input', $event.target.value)"
-  >
-  <span class="slider__val">
-    {{ value }}
-  </span>
-</div>
+  <div class="slider">
+    <label :for="label">
+      {{ label }}
+    </label>
+    <input
+      type="range"
+      :id="label"
+      :max="max"
+      :min="min"
+      step="1"
+      :value="value"
+      @input="$emit('input', $event.target.value)"
+    >
+    <span class="slider__val">
+      {{ value }}
+    </span>
+  </div>
 </template>
 
 <script>
@@ -27,6 +27,7 @@ export default {
     },
     label: {
       type: String,
+      default: 'Slider',
     },
     min: {
       type: Number,
@@ -80,6 +81,5 @@ export default {
     color: $light-gray;
   }
 }
-
 
 </style>

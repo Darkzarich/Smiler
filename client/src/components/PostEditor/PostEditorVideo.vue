@@ -1,38 +1,36 @@
 <template>
-<div class="post-video-upload">
-  <div class="post-video-upload__container" v-if="!value">
-    <div class="post-video-upload__input-url">
-      <input-element
-        v-model.lazy="url"
-        place-holder="Paste URL of the video [youtube]"
-      />
-      <button-element
-        :callback="upload"
-        :loading="uploading"
-        :disabled="!url"
-      >
-        Upload
-      </button-element>
+  <div class="post-video-upload">
+    <div class="post-video-upload__container" v-if="!value">
+      <div class="post-video-upload__input-url">
+        <input-element
+          v-model.lazy="url"
+          place-holder="Paste URL of the video [youtube]"
+        />
+        <button-element
+          :callback="upload"
+          :loading="uploading"
+          :disabled="!url"
+        >
+          Upload
+        </button-element>
+      </div>
+    </div>
+    <div v-else class="post-video-upload__video">
+      <iframe
+        title="video"
+        :src="value"
+        frameborder="0"
+        width="560"
+        height="315"
+        allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen />
     </div>
   </div>
-  <div v-else class="post-video-upload__video">
-    <iframe
-      :src="value"
-      frameborder="0"
-      width="560"
-      height="315"
-      allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-      allowfullscreen>
-    </iframe>
-  </div>
-</div>
 </template>
 
 <script>
 import inputElement from '../BasicElements/InputElement';
 import buttonElement from '../BasicElements/ButtonElement';
-
-import api from '@/api';
 
 export default {
   components: {
@@ -48,6 +46,7 @@ export default {
   props: {
     value: {
       type: String,
+      default: '',
     },
   },
   methods: {

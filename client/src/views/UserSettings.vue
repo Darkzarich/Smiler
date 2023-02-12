@@ -5,39 +5,42 @@
         <div class="user-settings__data-title">
           Following
         </div>
-          <div v-if="usersFollowed.length > 0" class="user-settings__data-group">
-            <div class="user-settings__data-group-title">
-              Authors:
-            </div>
-            <div
-              class="user-settings__data-group-author"
-              v-for="author in usersFollowed"
-              :key="author.id"
-            >
-              {{ author.login }}
-              <span @click="unfollow(author.id)" class="user-settings__data-group-unfollow">
+        <div v-if="usersFollowed.length > 0" class="user-settings__data-group">
+          <div class="user-settings__data-group-title">
+            Authors:
+          </div>
+          <div
+            class="user-settings__data-group-author"
+            :key="author.id"
+            v-for="author in usersFollowed"
+          >
+            {{ author.login }}
+            <span @click="unfollow(author.id)" class="user-settings__data-group-unfollow">
               x
-              </span>
-            </div>
+            </span>
           </div>
-          <div v-if="tagsFollowed.length > 0" class="user-settings__data-group">
-            <div class="user-settings__data-group-title">
-              Tags:
-            </div>
-            <div
-              class="user-settings__data-group-tag"
-              v-for="tag in tagsFollowed"
-              :key="tag"
-            >
-              {{ tag }}
-              <span @click="unfollowTag(tag)" class="user-settings__data-group-unfollow">
-                x
-              </span>
-            </div>
+        </div>
+        <div v-if="tagsFollowed.length > 0" class="user-settings__data-group">
+          <div class="user-settings__data-group-title">
+            Tags:
           </div>
-          <div class="user-settings__data-group" v-if="usersFollowed.length === 0 && tagsFollowed.length === 0">
-            <i>Nothing in following...</i>
+          <div
+            class="user-settings__data-group-tag"
+            v-for="tag in tagsFollowed"
+            :key="tag"
+          >
+            {{ tag }}
+            <span @click="unfollowTag(tag)" class="user-settings__data-group-unfollow">
+              x
+            </span>
           </div>
+        </div>
+        <div
+          class="user-settings__data-group"
+          v-if="usersFollowed.length === 0 && tagsFollowed.length === 0"
+        >
+          <i>Nothing in following...</i>
+        </div>
       </div>
       <div class="user-settings__block">
         <div class="user-settings__data-title">
@@ -63,7 +66,7 @@
           Edit Avatar
         </div>
         <div class="user-settings__current-avatar">
-          <img :src="$resolveAvatar(avatar)">
+          <img :src="$resolveAvatar(avatar)" :alt="avatar">
         </div>
         <input-element
           class="user-settings__avatar-edit"
@@ -81,9 +84,9 @@
         </div>
       </div>
     </div>
-            <!-- TODO: rated list -->
+    <!-- TODO: rated list -->
     <div v-else class="user-settings__loading">
-      <loader/>
+      <loader />
     </div>
   </div>
 </template>
@@ -91,7 +94,7 @@
 <script>
 import { mapState } from 'vuex';
 import api from '@/api';
-import loader from '@/library/svg/animation/circularLoader';
+import loader from '@/library/svg/animation/circularLoader.vue';
 import consts from '@/const/const';
 
 import inputElement from '@/components/BasicElements/InputElement.vue';
@@ -120,8 +123,8 @@ export default {
   },
   computed: {
     ...mapState({
-      login: state => state.user.login,
-      avatar: state => state.user.avatar,
+      login: (state) => state.user.login,
+      avatar: (state) => state.user.avatar,
     }),
   },
   created() {
@@ -175,7 +178,7 @@ export default {
         const res = await api.users.unfollowUser(id);
 
         if (!res.data.error) {
-          const foundUser = this.usersFollowed.find(el => el.id === id);
+          const foundUser = this.usersFollowed.find((el) => el.id === id);
           if (foundUser) {
             this.usersFollowed.splice(this.usersFollowed.indexOf(foundUser), 1);
           }

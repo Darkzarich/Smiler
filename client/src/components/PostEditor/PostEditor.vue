@@ -21,44 +21,44 @@
           class="post-editor__section"
           :key="section.hash"
           v-for="section in sections">
-              <template v-if="section.type === POST_SECTION_TYPES.TEXT">
-                <text-editor-element
-                  v-model="section.content"
-                  :id="section.hash"
-                />
-                <div class="post-editor__delete" @click="deleteSection(section)">
-                  <close-icon title="Delete"/>
-                </div>
-              </template>
-              <template v-if="section.type === POST_SECTION_TYPES.PICTURE">
-                <post-editor-picture
-                  v-model="section.url"
-                  @set-section="setSection"
-                />
-                <div class="post-editor__delete" @click="deleteSection(section)">
-                  <close-icon title="Delete"/>
-                </div>
-              </template>
-              <template v-if="section.type === POST_SECTION_TYPES.VIDEO">
-                <post-editor-video
-                  v-model="section.url"
-                />
-                <div class="post-editor__delete" @click="deleteSection(section)">
-                  <close-icon title="Delete"/>
-                </div>
-              </template>
+          <template v-if="section.type === POST_SECTION_TYPES.TEXT">
+            <text-editor-element
+              v-model="section.content"
+              :id="section.hash"
+            />
+            <div class="post-editor__delete" @click="deleteSection(section)">
+              <close-icon title="Delete" />
+            </div>
+          </template>
+          <template v-if="section.type === POST_SECTION_TYPES.PICTURE">
+            <post-editor-picture
+              v-model="section.url"
+              @set-section="setSection"
+            />
+            <div class="post-editor__delete" @click="deleteSection(section)">
+              <close-icon title="Delete" />
+            </div>
+          </template>
+          <template v-if="section.type === POST_SECTION_TYPES.VIDEO">
+            <post-editor-video
+              v-model="section.url"
+            />
+            <div class="post-editor__delete" @click="deleteSection(section)">
+              <close-icon title="Delete" />
+            </div>
+          </template>
         </div>
       </transition-group>
-   </draggable>
+    </draggable>
     <div class="post-editor__control" v-if="sections.length < POST_MAX_SECTIONS">
       <div class="post-editor__control-item" @click="createSection(POST_SECTION_TYPES.TEXT)">
-        <text-icon/>
+        <text-icon />
       </div>
       <div class="post-editor__control-item" @click="createSection(POST_SECTION_TYPES.PICTURE)">
-        <picture-icon/>
+        <picture-icon />
       </div>
       <div class="post-editor__control-item" @click="createSection(POST_SECTION_TYPES.VIDEO)">
-        <video-icon/>
+        <video-icon />
       </div>
     </div>
     <div class="post-editor__control-error" v-else>
@@ -97,19 +97,17 @@ import { mapState } from 'vuex';
 import Draggable from 'vuedraggable';
 import api from '@/api';
 
+import closeIcon from '@/library/svg/exit';
+import videoIcon from '@/library/svg/video';
+import pictureIcon from '@/library/svg/picture';
+import textIcon from '@/library/svg/text';
+import consts from '@/const/const';
 import ButtonElement from '../BasicElements/ButtonElement.vue';
 import TextEditorElement from '../BasicElements/TextEditorElement.vue';
 import PostEditorPicture from './PostEditorPicture';
 import PostEditorVideo from './PostEditorVideo';
 import PostEditorTags from './PostEditorTags';
 import InputElement from '../BasicElements/InputElement.vue';
-
-import closeIcon from '@/library/svg/exit';
-import videoIcon from '@/library/svg/video';
-import pictureIcon from '@/library/svg/picture';
-import textIcon from '@/library/svg/text';
-
-import consts from '@/const/const';
 
 export default {
   components: {
@@ -139,7 +137,7 @@ export default {
   props: ['edit', 'post'],
   computed: {
     ...mapState({
-      getUserLogin: state => state.user.login,
+      getUserLogin: (state) => state.user.login,
     }),
     isSubmitDisabled() {
       return !!(this.validation.title || this.validation.sections);
@@ -233,7 +231,7 @@ export default {
       }
     },
     setSection(data) {
-      const section = this.sections.find(el => el.url === data.url);
+      const section = this.sections.find((el) => el.url === data.url);
       this.sections[this.sections.indexOf(section)] = data;
     },
     createSection(type) {

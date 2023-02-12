@@ -1,42 +1,41 @@
 <template>
-<div class="input">
-  <label v-if="label" for="label">
-    {{ label }}
-  </label>
-  <input
-    :id="label"
-    :type="type"
-    v-if="!multiline"
-    :name="name"
-    @input="setValueAndChanged($event.target.value)"
-    @keyup.enter="enterCallback"
-    :value="value"
-    :placeholder="placeHolder"
-    class="input__element"
-    :class="(error || errorOnlyStyle) && wasChanged ? 'input__element_error' : ''"
-  >
-  </input>
-  <div @click="iconClickCallback" class="input__icon">
-    <component v-if="icon" :is="icon"/>
+  <div class="input">
+    <label v-if="label" for="label">
+      {{ label }}
+    </label>
+    <input
+      :id="label"
+      :type="type"
+      v-if="!multiline"
+      :name="name"
+      @input="setValueAndChanged($event.target.value)"
+      @keyup.enter="enterCallback"
+      :value="value"
+      :placeholder="placeHolder"
+      class="input__element"
+      :class="(error || errorOnlyStyle) && wasChanged ? 'input__element_error' : ''"
+    />
+    <div @click="iconClickCallback" class="input__icon">
+      <component v-if="icon" :is="icon" />
+    </div>
+    <textarea
+      :id="label"
+      v-if="multiline"
+      :type="type"
+      :name="name"
+      @input="setValueAndChanged($event.target.value)"
+      :value="value"
+      :placeholder="placeHolder"
+      class="input__element"
+      :class="(error || errorOnlyStyle) && wasChanged ? 'input__element_error' : ''"
+    />
+    <span
+      class="input__error"
+      v-if="wasChanged"
+    >
+      {{ error }}
+    </span>
   </div>
-  <textarea
-    :id="label"
-    v-if="multiline"
-    :type="type"
-    :name="name"
-    @input="setValueAndChanged($event.target.value)"
-    :value="value"
-    :placeholder="placeHolder"
-    class="input__element"
-    :class="(error || errorOnlyStyle) && wasChanged ? 'input__element_error' : ''"
-  />
-  <span
-    class="input__error"
-    v-if="wasChanged"
-  >
-    {{ error }}
-  </span>
-</div>
 </template>
 
 <script>
@@ -54,9 +53,11 @@ export default {
   props: {
     value: {
       type: String,
+      default: '',
     },
     label: {
       type: String,
+      default: '',
     },
     type: {
       type: String,
@@ -79,6 +80,7 @@ export default {
     },
     error: {
       type: String,
+      default: '',
     },
     errorOnlyStyle: {
       type: Boolean,
@@ -89,6 +91,7 @@ export default {
     },
     icon: {
       type: String,
+      default: '',
     },
     iconClickCallback: {
       type: Function,

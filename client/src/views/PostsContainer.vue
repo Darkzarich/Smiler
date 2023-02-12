@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="!loading || posts.length > 0" class="post-container" v-scroll="handleScroll">
-     <div
+      <div
         v-for="post in posts"
         :key="post.id"
       >
@@ -18,19 +18,19 @@
       </div>
     </div>
     <div v-if="loading" class="post-loading">
-      <loader/>
+      <loader />
     </div>
     <div
       v-else-if="noMorePost"
       class="post-container__no-more"
     >
-      Congratulations! You've read everything available. Thanks! Please, come later time to see more!
+      Congratulations! You've read everything available. Thanks!
+      Please, come later to see more!
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import Post from '@/components/Post/Post.vue';
 import api from '@/api';
 
@@ -78,7 +78,7 @@ export default {
     },
   },
   methods: {
-    // add decides if concat of arrays is used
+    // "add" param decides if concat of arrays is used
     async getPosts(add) {
       this.loading = true;
 
@@ -98,7 +98,7 @@ export default {
           });
         }
 
-        if (!res.data.error) {
+        if (res && !res.data.error) {
           if (add) {
             if (res.data.posts.length === 0) {
               this.noMorePost = true;

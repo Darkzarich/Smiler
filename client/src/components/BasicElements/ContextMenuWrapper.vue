@@ -9,7 +9,7 @@
         <li
           @click="item.callback(target)"
           class="context-menu__item"
-          v-for="item in list.filter( el => filter(el))"
+          v-for="item in list.filter(el => filter(el))"
           :key="item.title"
         >
           {{ item.title }}
@@ -28,15 +28,19 @@ export default {
     },
     posX: {
       type: Number,
+      default: 0,
     },
     posY: {
       type: Number,
+      default: 0,
     },
     list: {
       type: Array,
+      default: () => [],
     },
     target: {
       type: String,
+      default: '',
     },
     filter: {
       type: Function,
@@ -47,7 +51,7 @@ export default {
     getPositionStyle() {
       return {
         // offset for every single element + abs offset
-        top: `${Number(this.posY) - (30 * this.list.filter(el => this.filter(el)).length) - 30}px`,
+        top: `${Number(this.posY) - (30 * this.list.filter((el) => this.filter(el)).length) - 30}px`,
         left: `${this.posX}px`,
       };
     },

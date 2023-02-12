@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import store from '@/store/index';
-import api from '@/api/index';
 
 import PostsContainer from './views/PostsContainer.vue';
 import NotFound from './views/NotFound.vue';
@@ -22,7 +21,7 @@ const authGuard = async (to, from, next) => {
     console.log(store.getters.getUserAuthState);
     store.dispatch('newSystemNotification', {
       error: {
-        message: 'Only authenticated users can acces this page.',
+        message: 'Only authenticated users can access this page.',
       },
     });
     next(from);

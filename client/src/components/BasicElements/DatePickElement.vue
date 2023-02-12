@@ -1,15 +1,15 @@
 <template>
-<div class="date-picker">
-  <label :for="label">
-    {{ label }}
-  </label>
-  <input
-    type="date"
-    :id="label"
-    :value="value"
-    @input="$emit('input', $event.target.value)"
-  >
-</div>
+  <div class="date-picker">
+    <label :for="label">
+      {{ label }}
+    </label>
+    <input
+      type="date"
+      :id="label"
+      :value="value"
+      @input="$emit('input', $event.target.value)"
+    >
+  </div>
 </template>
 
 <script>
@@ -17,9 +17,11 @@ export default {
   props: {
     value: {
       type: String,
+      default: '',
     },
     label: {
       type: String,
+      default: '',
     },
   },
 };
@@ -47,6 +49,5 @@ export default {
     color: $light-gray;
   }
 }
-
 
 </style>

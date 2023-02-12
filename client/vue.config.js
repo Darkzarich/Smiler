@@ -21,6 +21,6 @@ module.exports = {
 
     config
       .plugin('define')
-      .tap(args => [defineModule]);
+      .tap(() => [defineModule]);
   },
 };

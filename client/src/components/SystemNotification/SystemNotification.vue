@@ -9,7 +9,7 @@
         Error occured. {{ notif.error }}
 
         <div class="notifications__close" @click=closeNotification(notif.timer)>
-          <exit-icon/>
+          <exit-icon />
         </div>
       </div>
     </transition-group>
@@ -26,7 +26,7 @@ export default {
   },
   computed: {
     ...mapState({
-      notifications: state => state.notifications.notifications,
+      notifications: (state) => state.notifications.notifications,
     }),
   },
   methods: {

@@ -3,10 +3,10 @@
 
     <template v-if="!getUserAuthState">
       <template v-if="mode == USER_LOGIN_MODE">
-        <user-login @close="closeMenu" @mode-change="setMode(USER_REG_MODE)"/>
+        <user-login @close="closeMenu" @mode-change="setMode(USER_REG_MODE)" />
       </template>
       <template v-else-if="mode == USER_REG_MODE">
-        <user-registration @close="closeMenu" @mode-change="setMode(USER_LOGIN_MODE)"/>
+        <user-registration @close="closeMenu" @mode-change="setMode(USER_LOGIN_MODE)" />
       </template>
     </template>
 
@@ -14,13 +14,15 @@
       <div class="user__logged-block">
         <div class="user__logged-meta">
           <div class="user__logged-meta-avatar">
-            <router-link @click.native="navNative ? closeMenu() : ''" :to="{
-              name: 'UserPage',
+            <router-link
+              @click.native="navNative ? closeMenu() : ''"
+              :to="{
+                name: 'UserPage',
                 params: {
-                  login: getUser.login
-                }
-            }">
-              <img :src="$resolveAvatar(getUser.avatar)">
+                  login: getUser.login,
+                },
+              }">
+              <img :src="$resolveAvatar(getUser.avatar)" :alt="getUser.avatar">
               <div class="user__logged-meta-login">
                 {{ getUser.login }}
               </div>
@@ -29,33 +31,37 @@
 
         </div>
         <div class="user__logged-info">
-            <div class="user__logged-info-rating">
-              <div>Rating</div>
-              <div>{{ getUser.rating }}</div>
-            </div>
-            <div class="user__logged-info-rating">
-              <div>Followers</div>
-              <div>{{ getUser.followersAmount }}</div>
-            </div>
+          <div class="user__logged-info-rating">
+            <div>Rating</div>
+            <div>{{ getUser.rating }}</div>
+          </div>
+          <div class="user__logged-info-rating">
+            <div>Followers</div>
+            <div>{{ getUser.followersAmount }}</div>
+          </div>
         </div>
         <div class="user__logged-nav">
           <ul class="user__logged-nav-list">
-            <router-link @click.native="navNative ? closeMenu() : ''" :to="{
-                name: 'PostCreate'
-            }">
+            <router-link
+              @click.native="navNative ? closeMenu() : ''"
+              :to="{
+                name: 'PostCreate',
+              }">
               <li class="user__logged-nav-item">
-                  <add-icon/> New Post
+                <add-icon /> New Post
               </li>
             </router-link>
-            <router-link @click.native="navNative ? closeMenu() : ''" :to="{
-                name: 'UserSettings'
-            }">
+            <router-link
+              @click.native="navNative ? closeMenu() : ''"
+              :to="{
+                name: 'UserSettings',
+              }">
               <li class="user__logged-nav-item">
-                  <settings-icon/> Settings
+                <settings-icon /> Settings
               </li>
             </router-link>
             <li class="user__logged-nav-item" @click="logout">
-              <exit-icon/> Logout
+              <exit-icon /> Logout
             </li>
           </ul>
         </div>

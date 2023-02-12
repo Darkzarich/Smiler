@@ -1,7 +1,7 @@
 <template>
   <footer>
     <div class="footer-github">
-      <a href="https://github.com/Darkzarich/express-blog" target="_blank">
+      <a href="https://github.com/Darkzarich/express-blog" rel="noopener noreferrer" target="_blank">
         <img src="@/assets/GitHub-Mark-Light-64px.png" alt="GitHub">
       </a>
     </div>

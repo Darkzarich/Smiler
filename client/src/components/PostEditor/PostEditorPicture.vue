@@ -1,44 +1,44 @@
 <template>
-<div class="post-image-upload" :class="value ? 'post-image-upload_uploaded' : ''">
-  <div class="post-image-upload__container" v-if="!value">
-    <upload-element
-      v-model="file"
-    />
-    <div class="post-image-upload__or">
-        OR
-    </div>
-    <div class="post-image-upload__input-url">
-      <input-element
-        v-model.lazy="file"
-        place-holder="Paste URL"
+  <div class="post-image-upload" :class="value ? 'post-image-upload_uploaded' : ''">
+    <div class="post-image-upload__container" v-if="!value">
+      <upload-element
+        v-model="file"
       />
-      <button-element
-        :callback="upload"
-        :loading="uploading"
-        :disabled="!file"
+      <div class="post-image-upload__or">
+        OR
+      </div>
+      <div class="post-image-upload__input-url">
+        <input-element
+          v-model.lazy="file"
+          place-holder="Paste URL"
+        />
+        <button-element
+          :callback="upload"
+          :loading="uploading"
+          :disabled="!file"
+        >
+          Upload
+        </button-element>
+      </div>
+      <img
+        hidden
+        v-if="file"
+        :src="file"
+        @error="error()"
+        alt="error"
       >
-        Upload
-      </button-element>
     </div>
-    <img
-      hidden
-      v-if="file"
-      :src="file"
-      @error="error()"
-    >
+    <div v-else class="post-image-upload__image">
+      <img @error="$resolveImageError" :src="$resolveImage(value)" :alt="value" />
+    </div>
   </div>
-  <div v-else class="post-image-upload__image">
-    <img @error="$resolveImageError" :src="$resolveImage(value)"/>
-  </div>
-</div>
 </template>
 
 <script>
+import api from '@/api';
 import inputElement from '../BasicElements/InputElement';
 import buttonElement from '../BasicElements/ButtonElement';
 import uploadElement from '../BasicElements/UploadElement';
-
-import api from '@/api';
 
 export default {
   components: {
@@ -55,6 +55,7 @@ export default {
   props: {
     value: {
       type: String,
+      default: '',
     },
   },
   methods: {

@@ -5,15 +5,18 @@
       :key="comment.id"
       class="comments__item-main"
       :class="{
-          'comments__item-main_first': first,
-          'comments__item-main_refresh-new': comment.isRefreshNew}"
-          @mouseover="comment.isRefreshNew ? comment.isRefreshNew = false : ''"
+        'comments__item-main_first': first,
+        'comments__item-main_refresh-new': comment.isRefreshNew,
+      }"
+      @mouseover="comment.isRefreshNew ? comment.isRefreshNew = false : ''"
       :style="`margin-left: ${indentLevel}rem`"
     >
       <div
         class="comments__item-main-block"
-        :class="{'comments__item-main-block_created' : comment.created,
-                 'comments__item-main-block_refresh-new' : comment.isRefreshNew}"
+        :class="{
+          'comments__item-main-block_created': comment.created,
+          'comments__item-main-block_refresh-new': comment.isRefreshNew,
+        }"
       >
         <div class="comments__item-main-block-meta">
           <template v-if="!comment.deleted">
@@ -25,34 +28,35 @@
               @click="upvote(comment.id)"
               :class="comment.rated.isRated && !comment.rated.negative ? 'comments__item-main-block-meta-upvote_active' : ''"
             >
-              <plus-icon/>
+              <plus-icon />
             </div>
             <div
               @click="downvote(comment.id)"
               class="comments__item-main-block-meta-downvote"
               :class="comment.rated.isRated && comment.rated.negative ? 'comments__item-main-block-meta-downvote_active' : ''"
             >
-              <minus-icon/>
+              <minus-icon />
             </div>
-            <router-link :to="{
-              name: 'UserPage',
-              params: {
-                login: comment.author.login
-              }
-            }">
+            <router-link
+              :to="{
+                name: 'UserPage',
+                params: {
+                  login: comment.author.login,
+                },
+              }">
               <div class="comments__item-main-block-meta-author">
                 {{ comment.author.login }}
               </div>
               <div class="comments__item-main-block-meta-avatar">
-                <img :src="$resolveAvatar(comment.author.avatar)"/>
+                <img :src="$resolveAvatar(comment.author.avatar)" :alt="comment.author.avatar" />
               </div>
             </router-link>
             <template v-if="$commentCanEdit(comment)">
               <div @click="toggleEdit(comment.id)" class="comments__item-main-block-meta-edit">
-                <edit-icon/>
+                <edit-icon />
               </div>
               <div @click="deleteCom(comment.id)" class="comments__item-main-block-meta-delete">
-                <delete-icon/>
+                <delete-icon />
               </div>
             </template>
           </template>
@@ -64,7 +68,7 @@
           <template v-if="!comment.deleted">
 
             <template v-if="commentEdit !== comment.id">
-              <div v-html="comment.body"/>
+              <div v-html="comment.body" />
             </template>
 
             <template v-else>
@@ -129,11 +133,14 @@
             <i>This comment is deleted</i>
           </template>
         </div>
-        <div @click="toggleShowChild(comment.id)"
+        <div
+          @click="toggleShowChild(comment.id)"
           v-if="!hideChild.includes(comment.id) && comment.children.length > 0"
           class="comments__child-toggler">[-]</div>
-        <div @click="toggleShowChild(comment.id)" v-else-if="comment.children.length > 0"
-        class="comments__child-toggler comments__child-toggler_active">[+]</div>
+        <div
+          @click="toggleShowChild(comment.id)"
+          v-else-if="comment.children.length > 0"
+          class="comments__child-toggler comments__child-toggler_active">[+]</div>
       </div>
       <div v-if="comment.children.length > 0 && !hideChild.includes(comment.id)">
         <comment-tree-helper
@@ -151,7 +158,6 @@
 import { mapState } from 'vuex';
 import api from '@/api/index';
 
-import CommentTreeHelper from './CommentTreeHelper';
 import TextEditorElement from '@/components/BasicElements/TextEditorElement';
 import ButtonElement from '@/components/BasicElements/ButtonElement';
 import plusIcon from '@/library/svg/plus';
@@ -160,7 +166,7 @@ import editIcon from '@/library/svg/edit';
 import deleteIcon from '@/library/svg/delete';
 
 import consts from '@/const/const';
-
+import CommentTreeHelper from './CommentTreeHelper';
 
 export default {
   components: {
@@ -184,13 +190,13 @@ export default {
       replySending: false,
       editSending: false,
       deleteSending: false,
-      hideChild: this.level === consts.COMMENT_AUTO_HIDE_LEVEL ? this.data.map(el => el.id) : [],
+      hideChild: this.level === consts.COMMENT_AUTO_HIDE_LEVEL ? this.data.map((el) => el.id) : [],
       COMMENTS_NESTED_LIMIT: consts.COMMENTS_NESTED_LIMIT,
     };
   },
   computed: {
     ...mapState({
-      user: state => state.user,
+      user: (state) => state.user,
     }),
   },
   methods: {
@@ -211,7 +217,7 @@ export default {
     toggleEdit(id) {
       if (id) {
         this.commentEdit = id;
-        const foundCom = this.data.find(el => el.id === this.commentEdit);
+        const foundCom = this.data.find((el) => el.id === this.commentEdit);
         this.commentEditInput = foundCom.body;
       } else {
         this.commentEdit = '';
@@ -225,7 +231,7 @@ export default {
       });
 
       if (!res.data.error) {
-        const foundCom = this.data.find(el => el.id === this.commentEdit);
+        const foundCom = this.data.find((el) => el.id === this.commentEdit);
         foundCom.body = this.commentEditInput;
         this.toggleEdit();
       }
@@ -240,7 +246,7 @@ export default {
         const res = await api.comments.deleteComment(id);
 
         if (!res.data.error) {
-          const foundCom = this.data.find(el => el.id === id);
+          const foundCom = this.data.find((el) => el.id === id);
 
           if (foundCom.children.length > 0) {
             foundCom.deleted = true;
@@ -253,7 +259,7 @@ export default {
     },
     async reply(parent) {
       this.replySending = true;
-      const parentCom = this.data.find(el => el.id === parent);
+      const parentCom = this.data.find((el) => el.id === parent);
 
       const res = await api.comments.createComment({
         post: this.post,
@@ -283,14 +289,14 @@ export default {
     },
     async upvote(id) {
       if (!this.loadingRate) {
-        const commentItemData = this.commentData.find(el => el.id === id);
+        const commentItemData = this.commentData.find((el) => el.id === id);
 
         this.loadingRate = true;
 
         if (!commentItemData.rated.isRated) {
           commentItemData.rated.isRated = true;
           commentItemData.rated.negative = false;
-          commentItemData.rating += consts.COMMENT_RATE_VALUE;
+          commentItemData.rating = commentItemData.rating + consts.COMMENT_RATE_VALUE;
 
           const res = await api.comments.updateRate(id, {
             negative: false,
@@ -298,17 +304,17 @@ export default {
 
           if (res.data.error) {
             commentItemData.rated.isRated = false;
-            commentItemData.rating -= consts.COMMENT_RATE_VALUE;
+            commentItemData.rating = commentItemData.rating - consts.COMMENT_RATE_VALUE;
           }
         } else if (commentItemData.rated.negative) {
           commentItemData.rated.isRated = false;
-          commentItemData.rating += consts.COMMENT_RATE_VALUE;
+          commentItemData.rating = commentItemData.rating + consts.COMMENT_RATE_VALUE;
 
           const res = await api.comments.removeRate(id);
 
           if (res.data.error) {
             commentItemData.rated.isRated = true;
-            commentItemData.rating -= consts.COMMENT_RATE_VALUE;
+            commentItemData.rating = commentItemData.rating - consts.COMMENT_RATE_VALUE;
           }
         }
       }
@@ -317,14 +323,14 @@ export default {
     },
     async downvote(id) {
       if (!this.loadingRate) {
-        const commentItemData = this.commentData.find(el => el.id === id);
+        const commentItemData = this.commentData.find((el) => el.id === id);
 
         this.loadingRate = true;
 
         if (!commentItemData.rated.isRated) {
           commentItemData.rated.isRated = true;
           commentItemData.rated.negative = true;
-          commentItemData.rating -= consts.COMMENT_RATE_VALUE;
+          commentItemData.rating = commentItemData.rating - consts.COMMENT_RATE_VALUE;
 
           const res = await api.comments.updateRate(id, {
             negative: true,
@@ -332,17 +338,17 @@ export default {
 
           if (res.data.error) {
             commentItemData.rated.isRated = false;
-            commentItemData.rating += consts.COMMENT_RATE_VALUE;
+            commentItemData.rating = commentItemData.rating + consts.COMMENT_RATE_VALUE;
           }
         } else if (!commentItemData.rated.negative) {
           commentItemData.rated.isRated = false;
-          commentItemData.rating -= consts.COMMENT_RATE_VALUE;
+          commentItemData.rating = commentItemData.rating - consts.COMMENT_RATE_VALUE;
 
           const res = await api.comments.removeRate(id);
 
           if (res.data.error) {
             commentItemData.rated.isRated = true;
-            commentItemData.rating += consts.COMMENT_RATE_VALUE;
+            commentItemData.rating = commentItemData.rating + consts.COMMENT_RATE_VALUE;
           }
         }
       }

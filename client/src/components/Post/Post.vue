@@ -5,7 +5,7 @@
         class="post-side__upvote"
         @click="upvote(postData.id)"
         :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''">
-        <plus-icon/>
+        <plus-icon />
       </div>
       <div class="post-side__rating">
         {{ postData.rating }}
@@ -14,7 +14,7 @@
         class="post-side__downvote"
         @click="downvote(postData.id)"
         :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''">
-        <minus-icon/>
+        <minus-icon />
       </div>
     </div>
     <div class="post-main">
@@ -22,8 +22,8 @@
         :to="{
           name: 'Single',
           params: {
-            slug: postData.slug
-          }
+            slug: postData.slug,
+          },
         }"
         :target="$isMobile() ? '' : '_blank'"
       >
@@ -32,11 +32,11 @@
           {{ postData.title }}
           <template v-if="canEdit">
             <router-link title="Edit post" :to="postData.slug + '/edit'">
-              <edit-icon/>
+              <edit-icon />
             </router-link>
             <span @click="deletePost(postData.id)">
               <router-link title="Delete post" :to="'/'">
-                <delete-icon/>
+                <delete-icon />
               </router-link>
             </span>
           </template>
@@ -56,46 +56,46 @@
 
       <div class="post-main__body">
         <div
-        class="post-main__body-section"
-        v-for="section in postData.sections"
-        :key="section.hash">
+          class="post-main__body-section"
+          v-for="section in postData.sections"
+          :key="section.hash">
           <template v-if="section.type === POST_SECTION_TYPES.TEXT">
-            <div v-html="section.content"/>
+            <div v-html="section.content" />
           </template>
           <template v-else-if="section.type === POST_SECTION_TYPES.PICTURE">
             <div class="post-main__attachments-item">
-              <img @error="$resolveImageError" :src="$resolveImage(section.url)">
+              <img @error="$resolveImageError" :src="$resolveImage(section.url)" :alt="section.url">
             </div>
           </template>
           <template v-else-if="section.type === POST_SECTION_TYPES.VIDEO">
             <div class="post-main__attachments-item">
-              <video controls :src="section.url"></video>
+              <video controls :src="section.url" />
             </div>
           </template>
         </div>
       </div>
 
-<!-- for mobile -->
+      <!-- for mobile -->
 
-          <div class="post-main__rate-mobile">
-            <div
-              class="post-side__upvote"
-              @click="upvote(postData.id)"
-              :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''">
-              <plus-icon/>
-            </div>
-            <div class="post-side__rating">
-              {{ postData.rating }}
-            </div>
-            <div
-              class="post-side__downvote"
-              @click="downvote(postData.id)"
-              :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''">
-              <minus-icon/>
-            </div>
-          </div>
+      <div class="post-main__rate-mobile">
+        <div
+          class="post-side__upvote"
+          @click="upvote(postData.id)"
+          :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''">
+          <plus-icon />
+        </div>
+        <div class="post-side__rating">
+          {{ postData.rating }}
+        </div>
+        <div
+          class="post-side__downvote"
+          @click="downvote(postData.id)"
+          :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''">
+          <minus-icon />
+        </div>
+      </div>
 
-<!-- for mobile -->
+      <!-- for mobile -->
       <div class="post-main__footer">
         <div class="post-main__meta">
           <span class="post-main__meta-date">
@@ -103,29 +103,32 @@
           </span>
           <span class="post-main__meta-comments">
             <router-link
-            :target="$isMobile() ? '' : '_blank'"
-            :to="{
-              name: 'Single',
-              params: {
-                slug: postData.slug
-              },
-            }">
-              <comments-icon/> {{ postData.commentCount }}
+              :target="$isMobile() ? '' : '_blank'"
+              :to="{
+                name: 'Single',
+                params: {
+                  slug: postData.slug,
+                },
+              }">
+              <comments-icon /> {{ postData.commentCount }}
             </router-link>
           </span>
-            <router-link
+          <router-link
             :target="$isMobile() ? '' : '_blank'"
             :to="{
               name: 'UserPage',
               params: {
-                login: postData.author.login
+                login: postData.author.login,
               },
             }">
-              <span class="post-main__meta-author">
-                <span> {{ postData.author.login }} </span>
-                <img :src="$resolveAvatar(postData.author.avatar)">
-              </span>
-            </router-link>
+            <span class="post-main__meta-author">
+              <span> {{ postData.author.login }} </span>
+              <img
+                :src="$resolveAvatar(postData.author.avatar)"
+                :alt="postData.author.avatar"
+              >
+            </span>
+          </router-link>
         </div>
         <!-- {{ post.createdAt !== post.updatedAt ? 'updated: ' + post.updatedAt : ''}} -->
       </div>
@@ -138,8 +141,7 @@
       :target="contextMenuData.target"
       :filter="contextMenuData.filter"
       v-click-outside="closeContextMenu"
-    >
-    </context-menu-wrapper>
+    />
   </div>
 </template>
 
@@ -212,7 +214,7 @@ export default {
   },
   computed: {
     ...mapState({
-      authState: state => state.user.authState,
+      authState: (state) => state.user.authState,
     }),
   },
   methods: {
@@ -223,7 +225,7 @@ export default {
         if (!this.postData.rated.isRated) {
           this.postData.rated.isRated = true;
           this.postData.rated.negative = false;
-          this.postData.rating += consts.POST_RATE_VALUE;
+          this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
 
           const res = await api.posts.updateRateById(id, {
             negative: false,
@@ -231,16 +233,16 @@ export default {
 
           if (res.data.error) {
             this.postData.rated.isRated = false;
-            this.postData.rating -= consts.POST_RATE_VALUE;
+            this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
           }
         } else if (this.postData.rated.negative) {
           this.postData.rated.isRated = false;
-          this.postData.rating += consts.POST_RATE_VALUE;
+          this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
           const res = await api.posts.removeRateById(id);
 
           if (res.data.error) {
             this.postData.rated.isRated = true;
-            this.postData.rating -= consts.POST_RATE_VALUE;
+            this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
           }
         }
       }
@@ -254,7 +256,7 @@ export default {
         if (!this.postData.rated.isRated) {
           this.postData.rated.isRated = true;
           this.postData.rated.negative = true;
-          this.postData.rating -= consts.POST_RATE_VALUE;
+          this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
 
           const res = await api.posts.updateRateById(id, {
             negative: true,
@@ -262,17 +264,17 @@ export default {
 
           if (res.data.error) {
             this.postData.rated.isRated = false;
-            this.postData.rating += consts.POST_RATE_VALUE;
+            this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
           }
         } else if (!this.postData.rated.negative) {
           this.postData.rated.isRated = false;
-          this.postData.rating -= consts.POST_RATE_VALUE;
+          this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
 
           const res = await api.posts.removeRateById(id);
 
           if (res.data.error) {
             this.postData.rated.isRated = true;
-            this.postData.rating += consts.POST_RATE_VALUE;
+            this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
           }
         }
       }

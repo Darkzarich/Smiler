@@ -1,9 +1,9 @@
 <template>
   <div class="user-profile">
-    <div class="user-profile__offset"/>
+    <div class="user-profile__offset" />
     <div class="user-profile__block">
       <div class="user-profile__avatar">
-        <img :src="$resolveAvatar(data.avatar)"/>
+        <img :src="$resolveAvatar(data.avatar)" :alt="data.avatar" />
       </div>
       <div class="user-profile__main-info">
         <div class="user-profile__login">
@@ -19,8 +19,8 @@
           </template>
           <template v-else-if="data.login !== user.login">
             <button-element
-            :loading="requesting"
-            :callback="unfollow"
+              :loading="requesting"
+              :callback="unfollow"
             >
               Unfollow
             </button-element>
@@ -59,7 +59,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user,
+      user: (state) => state.user,
     }),
     isFollowed() {
       return this.data.isFollowed;

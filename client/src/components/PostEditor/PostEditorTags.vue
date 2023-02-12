@@ -10,7 +10,7 @@
         <span @click="removeTag(tag)" class="post-editor__tags-item-remove">
           x
         </span>
-    </div>
+      </div>
     </div>
     <div v-if="tags.length < POST_MAX_TAGS" class="post-editor__tags-input">
       <input-element
@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import InputElement from '../BasicElements/InputElement.vue';
 import consts from '@/const/const';
+import InputElement from '../BasicElements/InputElement.vue';
 
 export default {
   components: {
@@ -55,7 +55,7 @@ export default {
   methods: {
     addTag() {
       if (this.tagInput.length > 0) {
-        const checkDouble = this.tags.find(el => el === this.tagInput);
+        const checkDouble = this.tags.find((el) => el === this.tagInput);
         if (!checkDouble && !this.validation) {
           this.tags.push(this.tagInput);
           this.tagInput = '';

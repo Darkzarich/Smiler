@@ -1,5 +1,5 @@
 <template>
-  <comments :data="data" :post="post" :level='level + 1' :indent-level="2"/>
+  <comments :data="data" :post="post" :level='level + 1' :indent-level="2" />
 </template>
 
 <script>

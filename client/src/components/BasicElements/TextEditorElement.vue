@@ -1,12 +1,12 @@
 <template>
   <div class="text-editor-container">
     <div class="text-editor-control">
-      <button title="bold" @click="styleSelected('b')">B</button>
-      <button title="italic" @click="styleSelected('i')">I</button>
-      <button title="strike" @click="styleSelected('s')">S</button>
-      <button title="underline" @click="styleSelected('u')">U</button>
-      <button title="quote" @click="styleSelected('cite')">Q</button>
-      <button title="remove styles" @click="removeStyles()">REMOVE STYLES</button>
+      <button type="button" title="bold" @click="styleSelected('b')">B</button>
+      <button type="button" title="italic" @click="styleSelected('i')">I</button>
+      <button type="button" title="strike" @click="styleSelected('s')">S</button>
+      <button type="button" title="underline" @click="styleSelected('u')">U</button>
+      <button type="button" title="quote" @click="styleSelected('cite')">Q</button>
+      <button type="button" title="remove styles" @click="removeStyles()">REMOVE STYLES</button>
     </div>
     <div
       class="text-editor"
@@ -20,11 +20,9 @@
         @selectstart="selecting = true"
         @mouseup="endSelect()"
         @focusout="setText()"
-      >
-      </div>
+      />
     </div>
-    <slot>
-    </slot>
+    <slot />
   </div>
 </template>
 
@@ -33,9 +31,11 @@ export default {
   props: {
     id: {
       type: String,
+      default: 'text-editor',
     },
     value: {
       type: String,
+      default: '',
     },
   },
   data() {
@@ -62,7 +62,7 @@ export default {
       let text = this.value;
 
       this.tags.forEach((tag) => {
-        text = text.replace(new RegExp(`((<\/${tag}>)|(<${tag}>))*`, 'g'), '');
+        text = text.replace(new RegExp(`((</${tag}>)|(<${tag}>))*`, 'g'), '');
       });
 
       this.$emit('input', text);

@@ -10,7 +10,7 @@ export default {
       state.notifications.push(notif);
     },
     removeSystemNotification(state, timerId) {
-      const notif = state.notifications.find(el => el.timer === timerId);
+      const notif = state.notifications.find((el) => el.timer === timerId);
       clearTimeout(notif.timer);
       state.notifications.splice(state.notifications.indexOf(notif), 1);
     },

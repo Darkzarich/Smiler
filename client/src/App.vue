@@ -1,20 +1,20 @@
 <template>
   <div id="app" v-if="show">
-    <system-notification/>
-    <header-element/>
-      <!-- <div id="nav">
+    <system-notification />
+    <header-element />
+    <!-- <div id="nav">
         <router-link to="/">Home</router-link> |
         <router-link to="/about">About</router-link>
       </div> -->
     <div class="content-box">
       <content class="content-box__main">
-        <router-view/>
+        <router-view />
       </content>
       <div class="content-box__sidebar">
-        <user/>
+        <user />
       </div>
     </div>
-    <footer-element/>
+    <footer-element />
   </div>
 </template>
 
@@ -24,7 +24,6 @@ import FooterElement from '@/components/FooterElement';
 import SystemNotification from '@/components/SystemNotification/SystemNotification';
 import User from '@/components/User/User';
 
-import api from '@/api';
 // TODO: global mini loader fixed to top
 export default {
   components: {
@@ -93,22 +92,4 @@ body {
     }
   }
 }
-
-// #app {
-//   font-family: 'Avenir', Helvetica, Arial, sans-serif;
-//   -webkit-font-smoothing: antialiased;
-//   -moz-osx-font-smoothing: grayscale;
-//   text-align: center;
-//   color: #2c3e50;
-// }
-// #nav {
-//   padding: 30px;
-//   a {
-//     font-weight: bold;
-//     color: #2c3e50;
-//     &.router-link-exact-active {
-//       color: #42b983;
-//     }
-//   }
-// }
 </style>

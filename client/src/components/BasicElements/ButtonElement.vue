@@ -1,23 +1,22 @@
 <template>
-<div
-  class="button"
-  :class="loading ? 'button_loading' : ''"
->
-  <button
+  <div
+    class="button"
+    :class="loading ? 'button_loading' : ''"
+  >
+    <button
+      type="button"
       class="button__element"
       @click="callback(argument)"
       :disabled="disabled"
     >
-    <span class="button__element-content">
-      <slot>
-
-      </slot>
-    </span>
-    <div v-if="loading" class="button__element-loader">
-      <circular-loader/>
-    </div>
-  </button>
-</div>
+      <span class="button__element-content">
+        <slot />
+      </span>
+      <div v-if="loading" class="button__element-loader">
+        <circular-loader />
+      </div>
+    </button>
+  </div>
 </template>
 
 <script>
@@ -34,6 +33,7 @@ export default {
     },
     argument: {
       type: String,
+      default: '',
     },
     disabled: {
       type: [Boolean, String],

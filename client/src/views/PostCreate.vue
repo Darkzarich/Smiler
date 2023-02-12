@@ -3,7 +3,7 @@
     <div class="post-create__header">
       {{ edit ? 'Edit' : 'Create'}} Post
     </div>
-    <post-editor :key="key" :edit="edit" :post="post"/>
+    <post-editor :key="key" :edit="edit" :post="post" />
   </div>
 </template>
 
@@ -12,7 +12,6 @@ import { mapState } from 'vuex';
 import api from '@/api/index';
 
 import PostEditor from '@/components/PostEditor/PostEditor';
-
 
 export default {
   components: {
@@ -28,7 +27,7 @@ export default {
   },
   computed: {
     ...mapState({
-      login: state => state.user.login,
+      login: (state) => state.user.login,
     }),
   },
   async beforeRouteEnter(to, from, next) {
@@ -40,10 +39,10 @@ export default {
           name: '404',
         });
       } else {
-        next(vm => vm.setPost(res.data));
+        next((vm) => vm.setPost(res.data));
       }
     } else {
-      next(vm => vm.showEditor());
+      next((vm) => vm.showEditor());
     }
   },
   methods: {

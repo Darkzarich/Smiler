@@ -1,16 +1,16 @@
 <template>
   <div>
-    <user-profile :data="userInfo"/>
+    <user-profile :data="userInfo" />
 
     <div
       v-scroll="handleScroll"
       v-if="!loading || posts.length > 0"
       class="post-container">
-     <div
+      <div
         v-for="post in posts"
         :key="post.id"
       >
-        <post :post="post"/>
+        <post :post="post" />
       </div>
       <div
         v-if="posts.length == 0"
@@ -20,7 +20,7 @@
       </div>
     </div>
     <div v-if="loading" class="post-loading">
-      <loader/>
+      <loader />
     </div>
     <div
       v-else-if="noMorePost"
@@ -36,7 +36,7 @@ import Post from '@/components/Post/Post.vue';
 import UserProfile from '@/components/UserProfile/UserProfile.vue';
 import api from '@/api';
 
-import loader from '@/library/svg/animation/circularLoader';
+import loader from '@/library/svg/animation/circularLoader.vue';
 
 import consts from '@/const/const';
 
@@ -63,7 +63,7 @@ export default {
         name: '404',
       });
     } else {
-      next(vm => vm.setUserInfo(user.data));
+      next((vm) => vm.setUserInfo(user.data));
     }
   },
   async beforeRouteUpdate(to, from, next) {

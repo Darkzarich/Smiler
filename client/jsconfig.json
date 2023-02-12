@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "es5",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "exclude": ["node_modules"]
+}

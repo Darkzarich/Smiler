@@ -59,7 +59,7 @@ export default {
     async userCheckAuthState(context) {
       const user = await api.users.checkAuthState();
 
-      if (user.data.isAuth) {
+      if (user && user.data.isAuth) {
         context.commit('setUser', user.data);
       }
     },

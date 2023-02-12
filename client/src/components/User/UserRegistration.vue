@@ -10,7 +10,7 @@
         :place-holder="'Email'"
         :enter-callback="register"
         :error="validation.email"
-        v-model="email"/>
+        v-model="email" />
     </div>
     <div class="user-registration__username-input">
       <input-element
@@ -18,7 +18,7 @@
         :place-holder="'Login'"
         :enter-callback="register"
         :error="validation.login"
-        v-model="login"/>
+        v-model="login" />
     </div>
     <div class="user-registration__password-input">
       <input-element
@@ -27,7 +27,7 @@
         :name="'password'"
         :error="validation.password"
         :place-holder="'Password'"
-        v-model="password"/>
+        v-model="password" />
     </div>
     <div class="user-registration__confirm-input">
       <input-element
@@ -36,7 +36,7 @@
         :name="'confirm'"
         :error="validation.confirm"
         :place-holder="'Confirm password'"
-        v-model="confirm"/>
+        v-model="confirm" />
     </div>
     <div class="user-registration__submit">
       <button-element
@@ -57,10 +57,9 @@
 <script>
 import api from '@/api';
 
+import consts from '@/const/const';
 import ButtonElement from '../BasicElements/ButtonElement.vue';
 import InputElement from '../BasicElements/InputElement.vue';
-
-import consts from '@/const/const';
 
 export default {
   components: {
@@ -111,7 +110,8 @@ export default {
 
         if (this.login.length === 0) {
           validation.login = 'Login can\'t be empty';
-        } else if (this.login.length < consts.LOGIN_MIN_LENGTH || this.login.length > consts.LOGIN_MAX_LENGTH) {
+        } else if (this.login.length < consts.LOGIN_MIN_LENGTH
+        || this.login.length > consts.LOGIN_MAX_LENGTH) {
           validation.login = `Login length must be ${consts.LOGIN_MIN_LENGTH}-${consts.LOGIN_MAX_LENGTH}`;
         }
 

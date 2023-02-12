@@ -1,14 +1,14 @@
 import Vue from 'vue';
 import vClickOutside from 'v-click-outside';
 import moment from 'moment';
-import App from './App.vue';
-import router from './router';
 import store from '@/store/index';
 import config from '@/config/config';
 import consts from '@/const/const';
 
 import defaultAvatar from '@/assets/neutral_avatar.png';
 import postNoImage from '@/assets/post_no_image.png';
+import router from './router';
+import App from './App.vue';
 
 Vue.config.productionTip = false;
 
@@ -17,7 +17,7 @@ Vue.use(vClickOutside);
 new Vue({
   router,
   store,
-  render: h => h(App),
+  render: (h) => h(App),
 }).$mount('#app');
 
 Vue.directive('scroll', {
@@ -49,7 +49,7 @@ Vue.mixin({
       e.target.src = postNoImage;
     },
     $resolveImage(path) {
-      if (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/.test(path)) {
+      if (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(path)) {
         return path;
       }
       return config.STATIC_ROUTE + path;

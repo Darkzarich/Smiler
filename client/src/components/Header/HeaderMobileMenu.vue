@@ -1,7 +1,7 @@
 <template>
   <div class="mobile-menu">
     <div @click="closeMenu()" class="mobile-menu__close-icon">
-      <exit-icon/>
+      <exit-icon />
     </div>
     <div class="mobile-menu__user">
       <!-- vue requires .native to catch click event for vue-router links -->
@@ -18,7 +18,8 @@
         </router-link>
       </template>
       <template v-else>
-        <a title="Log in to access this page"
+        <a
+          title="Log in to access this page"
           class="mobile-menu__nav-link mobile-menu__nav-link_disabled">
           <div>MY FEED</div>
         </a>
@@ -56,7 +57,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user,
+      user: (state) => state.user,
     }),
   },
   methods: {

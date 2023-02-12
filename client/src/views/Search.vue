@@ -1,14 +1,14 @@
 <template>
-<div>
-  <div class="search-form">
-    <search-form
-      v-model="filter"
+  <div>
+    <div class="search-form">
+      <search-form
+        v-model="filter"
+      />
+    </div>
+    <posts-container
+      :search-filter="filter"
     />
   </div>
-  <posts-container
-    :search-filter="filter"
-  />
-</div>
 </template>
 
 <script>

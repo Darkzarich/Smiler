@@ -14,5 +14,5 @@ export default {
       url: `${CONTROLLER_URL}/${tag}/follow`,
       method: 'delete',
     });
-  }
-}
+  },
+};

@@ -1,5 +1,6 @@
 {
   "name": "express-blog-unit",
+  "author": "Darkzarich",
   "version": "1.0.0",
   "description": "Bridge connecting frontend and backend for Smiler.",
   "scripts": {
@@ -8,16 +9,15 @@
     "front:serve": "cd client && npm run serve",
     "front:serve-local": "cd client && npm run serve-local",
     "back:serve": "cd server && npm start",
-    "run:production": "cd server && node index.js"
+    "run:production": "cd server && node index.js",
+    "postinstall": "(cd client && npm i); (cd server && npm i);"
   },
-  "author": "Darkzarich",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Darkzarich/express-blog/issues"
   },
   "homepage": "https://github.com/Darkzarich/express-blog#readme",
   "devDependencies": {
-    "concurrently": "^4.1.2"
-  },
-  "dependencies": {}
+    "concurrently": "^7.6.0"
+  }
 }
