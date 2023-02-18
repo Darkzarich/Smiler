@@ -48,8 +48,8 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
-@import '@/styles/mixins';
+@import "@/styles/colors";
+@import "@/styles/mixins";
 
 .button {
   margin: 1rem;
