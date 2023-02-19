@@ -1,5 +1,5 @@
-const { API_ROUTE } = process.env;
+const { VUE_APP_API_URL } = process.env;
 
 module.exports = {
-  API_ROUTE,
+  VUE_APP_API_URL,
 };

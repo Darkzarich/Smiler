@@ -2,6 +2,10 @@
 
 FROM node:16.16.0-alpine3.16 AS builder 
 
+ARG API_URL
+
+ENV API_URL "$API_URL"
+
 WORKDIR /usr/src/app
 
 COPY . .
@@ -11,7 +15,7 @@ RUN npm run build
 
 # Step 2
 
-FROM nginx:latest 
+FROM nginx:1.22.1 
 
 EXPOSE 80  
 

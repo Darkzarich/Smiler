@@ -1,11 +1,28 @@
 version: '3.9'
 
+x-common-variables: &common-variables
+  # MongoDB
+  DB_PORT: ${DB_PORT:-27017}
+  MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+  MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+  MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+  # Backend+Frontend
+  BACKEND_HOST_PORT: ${BACKEND_HOST_PORT}
+
 services:
   frontend: 
-    build: ./client
+    build:
+      context: ./client
+      args:
+        - API_URL=${API_URL}
     container_name: smiler-frontend
     ports:
       - ${FRONTEND_PORT}:80
+    env_file: ./.env
+    environment:
+      API_URL: ${API_URL}
+      FRONTEND_PORT: ${FRONTEND_PORT}
+      <<: *common-variables
     depends_on:
       - backend
     networks:
@@ -13,13 +30,20 @@ services:
   backend:
     build: ./server
     container_name: smiler-backend
-    env_file: ./server/.env
+    env_file: ./.env
     ports:
       - ${BACKEND_HOST_PORT}:${BACKEND_PORT}
+    environment:
+      NODE_ENV: production
+      BACKEND_PORT: ${BACKEND_PORT}
+      SESSION_SECRET: ${SESSION_SECRET}
+      FRONT_ORIGIN_REMOTE: ${FRONT_ORIGIN_REMOTE}
+      DB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@db:${DB_PORT}/${MONGO_INITDB_DATABASE}?authSource=admin
+      <<: *common-variables
     restart: always
     volumes:
-      - /usr/src/smiler/logs:/usr/src/app/logs
-      - /usr/src/smiler/uploads:/usr/src/app/uploads
+      - /data/smiler/logs:/usr/src/app/logs
+      - /data/smiler/uploads:/usr/src/app/uploads
     networks:
       - app
       - db
@@ -30,13 +54,15 @@ services:
     image: mongo:5.0.10
     restart: always
     container_name: smiler-db
-    env_file: ./server/.env
     volumes:
       - /usr/src/smiler/db:/data/db
     networks:
       - db
+    env_file: ./.env
+    environment:
+      <<: *common-variables
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh db:27017 --quiet
+      test: echo 'db.runCommand("ping").ok' | mongosh db:${DB_PORT} --quiet
       interval: 10s
       timeout: 10s
       retries: 5

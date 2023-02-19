@@ -13,13 +13,14 @@ const config = require('./src/config/config');
 const router = require('./src/routes');
 
 const app = express();
+
 const { PORT } = config;
 
 const whitelist = [
   config.FRONT_ORIGIN_LOCAL,
   config.FRONT_ORIGIN_REMOTE,
+  config.IS_PRODUCTION ? undefined : 'http://localhost:8080',
   `http://localhost:${PORT}`,
-  'http://localhost:8080',
 ];
 
 app.use(cors({

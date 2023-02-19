@@ -13,13 +13,29 @@ This is my own pet MEVN (MongoDB, Express, Vue.js, Node.js) site-project similar
 Here is [my public Trello board](https://trello.com/b/a9VbK9M3/smiler) so you will know anything about what I'm working on right now related to this repository
 and also any my future ideas and fixes I'm plannig to release one day :sunglasses:
 
+### Requirements:
+- Node.js
+- Docker (optionally)
+
 ### How to run it:
 
-0. Get your MongoDB ready. Create user with admin rights
+0. Get your remote MongoDB ready. Do one of the options:
+	- Get a remote mongo db instance. Take connection link and put it into `.env` file
+	- Run a local MongoDB instance with Docker
+		```
+		docker run -d -v /usr/src/smiler/db:/data/db -p 27017:27017 mongo:5.0.10
+		```
+	-
+
 1. `npm install`
-2. Take `.env.example` file inside `server` folder and rename it to `.env`
+2. Inside root folder rename `.env.example` to `.env`
 3. Fill in your `.env` file following the comments
 4. `npm run run:dev`
+
+Alternatively you can run it with Docker Compose:
+```
+docker-compose up -d
+```
 
 *Be sure to check main package.json for scripts*
 
