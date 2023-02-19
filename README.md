@@ -25,7 +25,6 @@ and also any my future ideas and fixes I'm plannig to release one day :sunglasse
 		```
 		docker run -d -v /usr/src/smiler/db:/data/db -p 27017:27017 mongo:5.0.10
 		```
-	-
 
 1. `npm install`
 2. Inside root folder rename `.env.example` to `.env`
