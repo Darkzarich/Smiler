@@ -33,7 +33,8 @@ and also any my future ideas and fixes I'm plannig to release one day :sunglasse
 
 Alternatively you can run it with Docker Compose:
 ```bash
-docker compose up -d # optionally add --build to build images instead of getting it from docker hub
+# optionally add --build to build images instead of getting it from docker hub
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
 ```
 
 ### Backend Features:

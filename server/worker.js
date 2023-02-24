@@ -14,14 +14,17 @@ const router = require('./src/routes');
 
 const app = express();
 
-const { PORT } = config;
+const {
+  PORT, FRONT_ORIGIN_LOCAL, FRONT_ORIGIN_REMOTE, SESSION_SECRET, IS_PRODUCTION,
+} = config;
 
 const whitelist = [
-  config.FRONT_ORIGIN_LOCAL,
-  config.FRONT_ORIGIN_REMOTE,
-  config.IS_PRODUCTION ? undefined : 'http://localhost:8080',
+  FRONT_ORIGIN_LOCAL,
+  FRONT_ORIGIN_REMOTE,
   `http://localhost:${PORT}`,
 ];
+
+console.log('CORS whitelist: ', whitelist.join(','));
 
 app.use(cors({
   credentials: true,
@@ -41,16 +44,16 @@ app.use(addRequestId);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-if (config.IS_PRODUCTION) {
+if (IS_PRODUCTION) {
   app.set('trust proxy', 1);
 }
 
 app.use(
   session({
-    secret: config.SESSION_SECRET,
+    secret: SESSION_SECRET,
     resave: true,
     cookie: {
-      secure: config.IS_PRODUCTION,
+      secure: IS_PRODUCTION,
       httpOnly: true,
       sameSite: 'strict',
       maxAge: 60 * 60 * 24 * 1000,
@@ -98,7 +101,7 @@ app.use(router);
 
 // set files folder
 
-logger.info(`Worker is running in ${config.IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode...`);
+logger.info(`Worker is running in ${IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode...`);
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

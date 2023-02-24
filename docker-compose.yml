@@ -1,43 +1,37 @@
 version: '3.9'
 
 x-common-variables: &common-variables
+  FRONTEND_PORT: ${FRONTEND_PORT}
   # MongoDB
   DB_PORT: ${DB_PORT:-27017}
   MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
   MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
   MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-  # Backend+Frontend
-  BACKEND_HOST_PORT: ${BACKEND_HOST_PORT}
 
 services:
-  frontend: 
+  smiler-frontend: 
     # If both image and build specified then it will try to get the image from Docker Hub 
     # and if it doesn't exist there it will build a new one using Dockerfile from provided folder
     image: darkzarich/smiler-frontend
     build: ./client
     container_name: smiler-frontend
-    ports:
-      - ${FRONTEND_PORT}:80
     environment:
       API_URL: ${API_URL}
-      FRONTEND_PORT: ${FRONTEND_PORT}
       <<: *common-variables
     depends_on:
-      - backend
+      - smiler-backend
     networks:
       - app
-  backend:
+  smiler-backend:
     image: darkzarich/smiler-backend
     build: ./server
     container_name: smiler-backend
-    ports:
-      - ${BACKEND_HOST_PORT}:${BACKEND_PORT}
     environment:
       NODE_ENV: production
       BACKEND_PORT: ${BACKEND_PORT}
       SESSION_SECRET: ${SESSION_SECRET}
       FRONT_ORIGIN_REMOTE: ${FRONT_ORIGIN_REMOTE}
-      DB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@db:${DB_PORT}/${MONGO_INITDB_DATABASE}?authSource=admin
+      DB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@smiler-db:${DB_PORT}/${MONGO_INITDB_DATABASE}?authSource=admin
       <<: *common-variables
     restart: always
     volumes:
@@ -47,9 +41,9 @@ services:
       - app
       - db
     depends_on:
-      db: 
+      smiler-db: 
         condition: service_healthy
-  db:
+  smiler-db:
     image: mongo:5.0.10
     restart: always
     container_name: smiler-db
@@ -60,7 +54,7 @@ services:
     environment:
       <<: *common-variables
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh db:${DB_PORT} --quiet
+      test: echo 'db.runCommand("ping").ok' | mongosh smiler-db:${DB_PORT} --quiet
       interval: 10s
       timeout: 10s
       retries: 5
