@@ -2,43 +2,39 @@
    <img src="https://i.imgur.com/D3AjmGt.png"/>
 </div>
 
-# Express-blog
+# Smiler
 
 ### [Demo](https://dz-express-blog.herokuapp.com) | [Swagger documentation](https://dz-express-blog-api.herokuapp.com/api-docs/)
 
 Hello! :smile: 
 
-This is my own pet MEVN (MongoDB, Express, Vue.js, Node.js) site-project similar to reddit.com, 9gag, etc with many different and awesome features, open Swagger API documentation (as the result of using Design First approach). Main reason of making this site is fun and learning new things while making it. The app is hosted on a hosting with cold start so it may take some time before it loads.
+This is my own pet MEVN (MongoDB, Express, Vue.js, Node.js) site-project similar to reddit.com, 9gag, etc with many different and awesome features, open Swagger API documentation (as the result of using Design First approach). Main reason of making this site is fun and learning new things while making it.
 
 Here is [my public Trello board](https://trello.com/b/a9VbK9M3/smiler) so you will know anything about what I'm working on right now related to this repository
 and also any my future ideas and fixes I'm plannig to release one day :sunglasses:
 
 ### Requirements:
 - Node.js
-- Docker (optionally)
+- Docker and Docker Compose (optionally)
 
 ### How to run it:
 
 0. Get your remote MongoDB ready. Do one of the options:
-	- Get a remote mongo db instance. Take connection link and put it into `.env` file
+	- Get a remote mongo db instance, for example [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). Take connection link and put it into `.env` file
 	- Run a local MongoDB instance with Docker
-		```
+		```bash
 		docker run -d -v /usr/src/smiler/db:/data/db -p 27017:27017 mongo:5.0.10
 		```
 
 1. `npm install`
 2. Inside root folder rename `.env.example` to `.env`
-3. Fill in your `.env` file following the comments
-4. `npm run run:dev`
+3. Fill in your `.env` file following the comments inside the file
+4. `npm run run:dev` or `npm run run:production`
 
 Alternatively you can run it with Docker Compose:
+```bash
+docker compose up -d # optionally add --build to build images instead of getting it from docker hub
 ```
-docker-compose up -d
-```
-
-*Be sure to check main package.json for scripts*
-
-**tip**: For MongoDB you could use [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 
 ### Backend Features:
 - General:

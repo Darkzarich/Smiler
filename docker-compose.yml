@@ -11,8 +11,10 @@ x-common-variables: &common-variables
 
 services:
   frontend: 
-    build:
-      context: ./client
+    # If both image and build specified then it will try to get the image from Docker Hub 
+    # and if it doesn't exist there it will build a new one using Dockerfile from provided folder
+    image: darkzarich/smiler-frontend
+    build: ./client
     container_name: smiler-frontend
     ports:
       - ${FRONTEND_PORT}:80
@@ -26,6 +28,7 @@ services:
     networks:
       - app
   backend:
+    image: darkzarich/smiler-backend
     build: ./server
     container_name: smiler-backend
     env_file: ./.env
