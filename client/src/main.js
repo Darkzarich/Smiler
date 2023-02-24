@@ -77,38 +77,36 @@ Vue.mixin({
       }
     },
     $postCanEdit(post) {
-      const curUser = store.getters.getUser.login;
+      const currentLogin = store.getters.getUser.login;
 
-      if (curUser) {
-        if (post.author.login !== curUser) {
-          return false;
-        }
-
-        const dateNow = new Date().getTime();
-        if (dateNow - new Date(post.createdAt).getTime() > consts.POST_TIME_TO_UPDATE) {
-          return false;
-        }
-        return true;
+      if (!currentLogin || !post.author || post.author.login !== currentLogin) {
+        return false;
       }
 
-      return false;
+      const dateNow = new Date().getTime();
+      const dateCreated = new Date(post.createdAt).getTime();
+
+      if (dateNow - dateCreated > consts.POST_TIME_TO_UPDATE) {
+        return false;
+      }
+
+      return true;
     },
     $commentCanEdit(comment) {
-      const curUser = store.getters.getUser.login;
+      const currentLogin = store.getters.getUser.login;
 
-      if (curUser) {
-        if (comment.author.login !== curUser) {
-          return false;
-        }
-
-        const dateNow = new Date().getTime();
-        if (dateNow - new Date(comment.createdAt).getTime() > consts.COMMENT_TIME_TO_UPDATE) {
-          return false;
-        }
-        return true;
+      if (!currentLogin || !comment.author || comment.author.login !== currentLogin) {
+        return false;
       }
 
-      return false;
+      const dateNow = new Date().getTime();
+      const dateCreated = new Date(comment.createdAt).getTime();
+
+      if (dateNow - dateCreated > consts.COMMENT_TIME_TO_UPDATE) {
+        return false;
+      }
+
+      return true;
     },
   },
   filters: {

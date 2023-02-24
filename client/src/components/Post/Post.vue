@@ -113,22 +113,35 @@
               <comments-icon /> {{ postData.commentCount }}
             </router-link>
           </span>
-          <router-link
-            :target="$isMobile() ? '' : '_blank'"
-            :to="{
-              name: 'UserPage',
-              params: {
-                login: postData.author.login,
-              },
-            }">
+
+          <template v-if="postData.author">
+            <router-link
+              :target="$isMobile() ? '' : '_blank'"
+              :to="{
+                name: 'UserPage',
+                params: {
+                  login: postData.author.login,
+                },
+              }">
+              <span class="post-main__meta-author">
+                <span> {{ postData.author.login }} </span>
+                <img
+                  :src="$resolveAvatar(postData.author.avatar)"
+                  :alt="postData.author.avatar"
+                >
+              </span>
+            </router-link>
+          </template>
+          <template v-else>
             <span class="post-main__meta-author">
-              <span> {{ postData.author.login }} </span>
+              <span> Anonymous </span>
               <img
-                :src="$resolveAvatar(postData.author.avatar)"
-                :alt="postData.author.avatar"
+                :src="$resolveAvatar('')"
+                :alt="'avatar'"
               >
             </span>
-          </router-link>
+          </template>
+
         </div>
         <!-- {{ post.createdAt !== post.updatedAt ? 'updated: ' + post.updatedAt : ''}} -->
       </div>
