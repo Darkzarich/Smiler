@@ -13,8 +13,6 @@ services:
   frontend: 
     build:
       context: ./client
-      args:
-        - API_URL=${API_URL}
     container_name: smiler-frontend
     ports:
       - ${FRONTEND_PORT}:80
