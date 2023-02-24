@@ -4,7 +4,7 @@
 
 # Smiler
 
-### [Demo](https://dz-express-blog.herokuapp.com) | [Swagger documentation](https://dz-express-blog-api.herokuapp.com/api-docs/)
+### [Demo](https://smiler.darkzarich.fun/posts/all) | [Swagger documentation](https://smiler-api.darkzarich.fun//api-docs/)
 
 Hello! :smile: 
 
