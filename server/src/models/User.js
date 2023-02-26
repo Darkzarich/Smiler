@@ -58,14 +58,12 @@ const schema = new Schema({
   tagsFollowed: [
     {
       type: Schema.Types.String,
-      unique: true,
     },
   ],
   usersFollowed: [
     {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      unique: true,
     },
   ],
 }, {

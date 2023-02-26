@@ -11,6 +11,7 @@ const schema = new Schema({
   },
   slug: {
     type: String,
+    index: true,
   },
   author: {
     type: Schema.Types.ObjectId,

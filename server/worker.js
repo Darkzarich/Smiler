@@ -77,7 +77,7 @@ morgan.token('request-body', (req, res) => {
 });
 morgan.token('request-id', (req, res) => req.id);
 morgan.token('user', (req, res) => {
-  if (req.session.userId) return req.session.userId;
+  if (req.session && req.session.userId) return req.session.userId;
   return 'no user';
 });
 
