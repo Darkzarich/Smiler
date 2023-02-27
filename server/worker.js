@@ -73,6 +73,10 @@ morgan.token('request-body', (req, res) => {
     body.password = '***';
   }
 
+  if ('confirm' in body) {
+    body.confirm = '***';
+  }
+
   return JSON.stringify(body);
 });
 morgan.token('request-id', (req, res) => req.id);

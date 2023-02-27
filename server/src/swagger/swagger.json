@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://dz-express-blog-api.herokuapp.com/api",
+      "url": "https://smiler-api.darkzarich.fun/api",
       "description": "Production server"
     },
     {
