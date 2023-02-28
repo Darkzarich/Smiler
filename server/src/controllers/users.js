@@ -309,8 +309,13 @@ module.exports = {
     }
   }),
   logout: asyncErrorHandler(async (req, res) => {
+    const { userId } = req.session;
+
     req.session.destroy();
-    success(req, res);
+
+    success(req, res, null, {
+      userId,
+    });
   }),
   getAuth: asyncErrorHandler(async (req, res) => {
     const { userId } = req.session;

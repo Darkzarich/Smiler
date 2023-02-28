@@ -19,12 +19,16 @@ module.exports = {
       });
     }
   },
-  success: (req, res, payload = undefined) => {
+  success: (req, res, payload = undefined, additionalData = { userId: 'no-auth' }) => {
+    const userId = req.session
+      ? req.session.userId
+      : additionalData.userId;
+
     if (payload) {
-      logger.info(`[req_id: ${req.id}][uid: ${req.session.userId || 'no auth'}] [200] "${req.originalUrl}" responded with ${JSON.stringify(payload)}`);
+      logger.info(`[req_id: ${req.id}][uid: ${userId}] [200] "${req.originalUrl}" responded with ${JSON.stringify(payload)}`);
       res.status(200).json(payload);
     } else {
-      logger.info(`[req_id: ${req.id}][uid: ${req.session.userId || 'no auth'}] [200] "${req.originalUrl}" responded with ${JSON.stringify({ ok: true })}`);
+      logger.info(`[req_id: ${req.id}][uid: ${userId}] [200] "${req.originalUrl}" responded with ${JSON.stringify({ ok: true })}`);
       res.status(200).json({
         ok: true,
       });
