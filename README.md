@@ -37,6 +37,9 @@ Alternatively you can run it with Docker Compose:
 docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
 ```
 
+### Common Features
+- It's containerized and docker-compose setup is very flexible! BUT it also can work without Docker
+
 ### Backend Features:
 - General:
 	- **Clustering**. If something goes wrong on the server side and something throws an exception the app won't
