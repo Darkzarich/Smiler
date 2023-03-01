@@ -9,21 +9,22 @@
       </div>
       <div class="post-image-upload__input-url">
         <input-element
-          v-model.lazy="file"
+          v-model.lazy="imageUrl"
+          :disabled="Boolean(file)"
           place-holder="Paste URL"
         />
         <button-element
           :callback="upload"
           :loading="uploading"
-          :disabled="!file"
+          :disabled="!imageUrl"
         >
           Upload
         </button-element>
       </div>
       <img
         hidden
-        v-if="file"
-        :src="file"
+        v-if="!file && imageUrl"
+        :src="imageUrl"
         @error="error()"
         alt="error"
       >
@@ -48,7 +49,8 @@ export default {
   },
   data() {
     return {
-      file: '',
+      file: null,
+      imageUrl: '',
       uploading: false,
     };
   },
@@ -58,9 +60,17 @@ export default {
       default: '',
     },
   },
+  watch: {
+    file(newFile) {
+      if (newFile instanceof File) {
+        this.imageUrl = newFile.name;
+      }
+    },
+  },
   methods: {
     async upload() {
       this.uploading = true;
+
       if (this.file instanceof File) {
         const formData = new FormData();
 
@@ -69,7 +79,7 @@ export default {
         const res = await api.posts.uploadAttachment(formData);
 
         if (res.data.error) {
-          this.file = '';
+          this.reset();
         } else {
           this.$emit('input', res.data.url);
           this.$emit('set-section', res.data);
@@ -77,13 +87,14 @@ export default {
       } else if (typeof this.file === 'string') {
         this.$emit('input', this.file);
       } else {
-        this.file = '';
+        this.reset();
         this.$store.dispatch('newSystemNotification', {
           error: {
             message: 'Something went wrong while uploading file. Please, put the file in again.',
           },
         });
       }
+
       this.uploading = false;
     },
     error() {
@@ -94,8 +105,12 @@ export default {
           },
         });
 
-        this.file = '';
+        this.reset();
       }
+    },
+    reset() {
+      this.file = null;
+      this.imageUrl = '';
     },
   },
 };

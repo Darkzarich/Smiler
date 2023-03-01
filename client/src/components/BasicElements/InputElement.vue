@@ -5,6 +5,7 @@
     </label>
     <input
       :id="label"
+      :disabled="disabled"
       :type="type"
       v-if="!multiline"
       :name="name"
@@ -20,6 +21,7 @@
     </div>
     <textarea
       :id="label"
+      :disabled="disabled"
       v-if="multiline"
       :type="type"
       :name="name"
@@ -54,6 +56,10 @@ export default {
     value: {
       type: String,
       default: '',
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
     label: {
       type: String,

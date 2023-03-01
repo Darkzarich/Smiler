@@ -4,8 +4,8 @@
       <span>Upload image</span>
       <input
         type="file"
-        @input="$emit('input', $event.target.files[0])"
-        @change="$emit('input', $event.target.files[0])"
+        @input="handleInput($event.target.files[0])"
+        @change="handleInput($event.target.files[0])"
       >
     </label>
   </div>
@@ -15,6 +15,12 @@
 
 export default {
   props: ['value'],
+  methods: {
+    handleInput(val) {
+      console.log(val);
+      this.$emit('input', val);
+    },
+  },
 };
 </script>
 

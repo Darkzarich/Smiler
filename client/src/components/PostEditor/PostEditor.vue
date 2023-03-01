@@ -75,6 +75,7 @@
         </button-element>
         <button-element
           :loading="saving"
+          :disabled="!sections.length"
           :callback="saveDraft"
         >
           Save Draft
@@ -83,6 +84,7 @@
       <template v-else>
         <button-element
           :loading="saving"
+          :disabled="!sections.length"
           :callback="saveEdited"
         >
           Save Edited
