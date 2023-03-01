@@ -16,7 +16,7 @@ const consts = require('../const/const');
 const uploader = multer({
   storage: diskStorage({
     destination: async (req, file, cb) => {
-      cb(null, path.join(__dirname, '../..', '/uploads', req.session.userLogin));
+      cb(null, path.join(process.cwd(), '/uploads', req.session.userLogin));
     },
     filename: (req, file, cb) => {
       cb(null, `${Date.now()}${path.extname(file.originalname)}`);
@@ -36,12 +36,12 @@ const uploader = multer({
     },
   }),
   limits: {
-    fieldSize: 1 * 1024 * 1024,
-    fileSize: 1 * 1024 * 1024,
+    fieldSize: 3 * 1024 * 1024,
+    fileSize: 3 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-      cb(new Error('Invalid file extention'), false);
+      cb(new Error('Invalid file extension'), false);
     } else {
       cb(null, true);
     }
@@ -54,10 +54,12 @@ function startUpload(req, res, next) {
       generateError(err.message, 413, next);
     } else {
       const user = await User.findById(req.session.userId).select('template');
+      // /uploads/username/file.jpg
+      const fileRelativePath = req.file.path.replace(process.cwd(), '');
 
       const newSection = {
         type: 'pic',
-        url: req.file.path,
+        url: fileRelativePath,
         hash: (Math.random() * Math.random()).toString(36),
         isFile: true,
       };
@@ -65,6 +67,7 @@ function startUpload(req, res, next) {
       user.template.sections.push(newSection);
 
       user.markModified('template');
+
       await user.save();
 
       success(req, res, newSection);
@@ -371,9 +374,11 @@ module.exports = {
 
         if (toDelete && toDelete instanceof Array && toDelete.length > 0) {
           toDelete.forEach((el) => {
-            fs.exists(el, (exist) => {
+            const absolutePath = path.join(process.cwd(), el);
+
+            fs.exists(absolutePath, (exist) => {
               if (exist) {
-                fs.unlink(el, (err) => {
+                fs.unlink(absolutePath, (err) => {
                   if (err) {
                     generateError(err, 500, next);
                   }
@@ -413,12 +418,16 @@ module.exports = {
 
         await foundPost.remove();
 
-        const filePicSections = sections.filter(sec => sec.type === consts.POST_SECTION_TYPES.PICTURE && sec.isFile);
+        const filePicSections = sections.filter(
+          sec => sec.type === consts.POST_SECTION_TYPES.PICTURE && sec.isFile,
+        );
 
         filePicSections.forEach((sec) => {
-          fs.exists(sec.url, (exists) => {
+          const absolutePath = path.join(process.cwd(), sec.url);
+
+          fs.exists(absolutePath, (exists) => {
             if (exists) {
-              fs.unlink(sec.url, (err) => {
+              fs.unlink(absolutePath, (err) => {
                 if (err) {
                   generateError(err, 500, next);
                 }

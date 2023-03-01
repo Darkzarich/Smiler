@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 const crypto = require('crypto');
 const fs = require('fs');
+const path = require('path');
 const logger = require('../config/winston');
 
 const User = require('../models/User');
@@ -411,9 +412,11 @@ module.exports = {
           else success(req, res);
         };
 
-        fs.exists(url, (exists) => {
+        const absolutePath = path.join(process.cwd(), url);
+
+        fs.exists(absolutePath, (exists) => {
           if (exists) {
-            fs.unlink(url, (err) => {
+            fs.unlink(absolutePath, (err) => {
               if (err) {
                 generateError(err, 500, next);
               } else {

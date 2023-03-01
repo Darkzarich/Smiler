@@ -29,7 +29,7 @@ console.log('CORS whitelist: ', whitelist.join(','));
 app.use(cors({
   credentials: true,
   origin(origin, callback) {
-    if (origin === undefined || whitelist.indexOf(origin) !== -1) {
+    if (origin === undefined || whitelist.indexOf(origin) !== -1 || !IS_PRODUCTION) {
       callback(null, true);
     } else {
       logger.warn(`"${origin}" is not allowed by CORS`);

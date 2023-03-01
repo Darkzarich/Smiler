@@ -36,7 +36,7 @@ services:
     restart: always
     volumes:
       - /data/smiler/logs:/usr/src/app/logs
-      - /data/smiler/uploads:/usr/src/app/uploads
+      - /data/uploads/smiler:/usr/src/app/uploads
     networks:
       - app
       - db
