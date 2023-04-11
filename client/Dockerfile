@@ -23,4 +23,4 @@ COPY --from=builder /usr/src/app/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Replace Frontend API URL before running NGNIX
 
-CMD . ./change-api-url.sh && rm change-api-url.sh && nginx -g "daemon off;"
+CMD . ./change-api-url.sh && nginx -g "daemon off;"

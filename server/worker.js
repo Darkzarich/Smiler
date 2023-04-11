@@ -107,6 +107,7 @@ app.use(router);
 
 logger.info(`Worker is running in ${IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode...`);
 
+// TODO: make it conditional, make static only for dev
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.listen(PORT, () => {
