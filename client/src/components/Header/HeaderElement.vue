@@ -77,9 +77,9 @@
 
 <script>
 import { mapState } from 'vuex';
-import inputElement from '@/components/BasicElements/InputElement';
-import mobileMenuIcon from '@/library/svg/mobilemenu';
-import headerMobileMenu from './HeaderMobileMenu';
+import inputElement from '@/components/BasicElements/InputElement.vue';
+import mobileMenuIcon from '@/library/svg/mobilemenu.vue';
+import headerMobileMenu from './HeaderMobileMenu.vue';
 
 export default {
   components: {

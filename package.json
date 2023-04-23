@@ -4,10 +4,9 @@
   "version": "1.0.0",
   "description": "Bridge connecting frontend and backend for Smiler.",
   "scripts": {
-    "run:dev": "concurrently --kill-others \"cd server && npm start\" \"cd client && npm run serve\"",
+    "run:dev": "concurrently --kill-others \"cd server && npm start\" \"cd client && npm run dev\"",
     "front:build": "cd client && npm run build",
-    "front:serve": "cd client && npm run serve",
-    "front:serve-local": "cd client && npm run serve-local",
+    "front:dev": "cd client && npm run dev",
     "back:serve": "cd server && npm start",
     "run:production": "cd server && node index.js",
     "postinstall": "(cd client && npm i); (cd server && npm i);"

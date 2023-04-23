@@ -1,5 +1,5 @@
 const { VUE_APP_API_URL } = process.env;
 
-module.exports = {
+export default {
   VUE_APP_API_URL,
 };

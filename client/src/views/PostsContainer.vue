@@ -34,7 +34,7 @@
 import Post from '@/components/Post/Post.vue';
 import api from '@/api';
 
-import loader from '@/library/svg/animation/circularLoader';
+import loader from '@/library/svg/animation/circularLoader.vue';
 
 import consts from '@/const/const';
 

@@ -13,11 +13,11 @@ export default (requestData) => {
       if (e.response.data.error) {
         console.error(e.response.data.error.message);
 
-        const notif = {
+        const notification = {
           error: e.response.data.error,
         };
 
-        store.dispatch('newSystemNotification', notif);
+        store.dispatch('newSystemNotification', notification);
       }
 
       if (e.response.status === 401) {

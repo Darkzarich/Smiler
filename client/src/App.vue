@@ -19,10 +19,10 @@
 </template>
 
 <script>
-import HeaderElement from '@/components/Header/HeaderElement';
-import FooterElement from '@/components/FooterElement';
-import SystemNotification from '@/components/SystemNotification/SystemNotification';
-import User from '@/components/User/User';
+import HeaderElement from '@/components/Header/HeaderElement.vue';
+import FooterElement from '@/components/FooterElement.vue';
+import SystemNotification from '@/components/SystemNotification/SystemNotification.vue';
+import User from '@/components/User/User.vue';
 
 // TODO: global mini loader fixed to top
 export default {

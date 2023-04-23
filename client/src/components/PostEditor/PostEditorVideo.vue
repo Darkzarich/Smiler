@@ -29,8 +29,8 @@
 </template>
 
 <script>
-import inputElement from '../BasicElements/InputElement';
-import buttonElement from '../BasicElements/ButtonElement';
+import inputElement from '../BasicElements/InputElement.vue';
+import buttonElement from '../BasicElements/ButtonElement.vue';
 
 export default {
   components: {

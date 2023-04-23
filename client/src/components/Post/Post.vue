@@ -162,12 +162,12 @@
 import { mapState } from 'vuex';
 import api from '@/api/index';
 
-import contextMenuWrapper from '@/components/BasicElements/ContextMenuWrapper';
-import commentsIcon from '@/library/svg/comments';
-import plusIcon from '@/library/svg/plus';
-import minusIcon from '@/library/svg/minus';
-import editIcon from '@/library/svg/edit';
-import deleteIcon from '@/library/svg/delete';
+import contextMenuWrapper from '@/components/BasicElements/ContextMenuWrapper.vue';
+import commentsIcon from '@/library/svg/comments.vue';
+import plusIcon from '@/library/svg/plus.vue';
+import minusIcon from '@/library/svg/minus.vue';
+import editIcon from '@/library/svg/edit.vue';
+import deleteIcon from '@/library/svg/delete.vue';
 
 import consts from '@/const/const';
 

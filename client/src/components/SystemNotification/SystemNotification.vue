@@ -18,7 +18,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import exitIcon from '@/library/svg/exit';
+import exitIcon from '@/library/svg/exit.vue';
 
 export default {
   components: {

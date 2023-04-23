@@ -158,15 +158,15 @@
 import { mapState } from 'vuex';
 import api from '@/api/index';
 
-import TextEditorElement from '@/components/BasicElements/TextEditorElement';
-import ButtonElement from '@/components/BasicElements/ButtonElement';
-import plusIcon from '@/library/svg/plus';
-import minusIcon from '@/library/svg/minus';
-import editIcon from '@/library/svg/edit';
-import deleteIcon from '@/library/svg/delete';
+import TextEditorElement from '@/components/BasicElements/TextEditorElement.vue';
+import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
+import plusIcon from '@/library/svg/plus.vue';
+import minusIcon from '@/library/svg/minus.vue';
+import editIcon from '@/library/svg/edit.vue';
+import deleteIcon from '@/library/svg/delete.vue';
 
 import consts from '@/const/const';
-import CommentTreeHelper from './CommentTreeHelper';
+import CommentTreeHelper from './CommentTreeHelper.vue';
 
 export default {
   components: {

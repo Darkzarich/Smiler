@@ -22,10 +22,9 @@ module.exports = {
     'vuejs-accessibility/mouse-events-have-key-events': 'warn',
   },
   parser: 'vue-eslint-parser',
-  parserOptions: {
-    babelOptions: {
-      configFile: './babel.config.js',
-    },
+  env: {
+    node: true,
+    es2022: true,
   },
   settings: {
     'import/resolver': {

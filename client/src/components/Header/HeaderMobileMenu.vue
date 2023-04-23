@@ -47,8 +47,8 @@
 <script>
 import { mapState } from 'vuex';
 
-import user from '@/components/User/User';
-import exitIcon from '@/library/svg/exit';
+import user from '@/components/User/User.vue';
+import exitIcon from '@/library/svg/exit.vue';
 
 export default {
   components: {

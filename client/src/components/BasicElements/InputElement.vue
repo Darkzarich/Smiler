@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import searchIcon from '@/library/svg/search';
+import searchIcon from '@/library/svg/search.vue';
 
 export default {
   data() {

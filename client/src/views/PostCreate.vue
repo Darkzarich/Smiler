@@ -11,7 +11,7 @@
 import { mapState } from 'vuex';
 import api from '@/api/index';
 
-import PostEditor from '@/components/PostEditor/PostEditor';
+import PostEditor from '@/components/PostEditor/PostEditor.vue';
 
 export default {
   components: {

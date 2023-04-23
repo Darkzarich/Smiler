@@ -37,9 +37,9 @@
 
 <script>
 import api from '@/api';
-import inputElement from '../BasicElements/InputElement';
-import buttonElement from '../BasicElements/ButtonElement';
-import uploadElement from '../BasicElements/UploadElement';
+import inputElement from '../BasicElements/InputElement.vue';
+import buttonElement from '../BasicElements/ButtonElement.vue';
+import uploadElement from '../BasicElements/UploadElement.vue';
 
 export default {
   components: {

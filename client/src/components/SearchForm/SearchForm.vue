@@ -48,11 +48,11 @@
 </template>
 
 <script>
-import inputElement from '@/components/BasicElements/InputElement';
-import datePickElement from '@/components/BasicElements/DatePickElement';
-import buttonElement from '@/components/BasicElements/ButtonElement';
-import sliderElement from '@/components/BasicElements/SliderElement';
-import postEditorTags from '@/components/PostEditor/PostEditorTags';
+import inputElement from '@/components/BasicElements/InputElement.vue';
+import datePickElement from '@/components/BasicElements/DatePickElement.vue';
+import buttonElement from '@/components/BasicElements/ButtonElement.vue';
+import sliderElement from '@/components/BasicElements/SliderElement.vue';
+import postEditorTags from '@/components/PostEditor/PostEditorTags.vue';
 
 export default {
   components: {

@@ -54,7 +54,7 @@
         No comments yet... Be the first!
       </div>
       <div class="comments__loading" v-else>
-        <loading-icon />
+        <loader />
       </div>
     </div>
     <div
@@ -82,11 +82,11 @@ import { mapState } from 'vuex';
 import Post from '@/components/Post/Post.vue';
 import Comments from '@/components/Comment/Comments.vue';
 
-import TextEditorElement from '@/components/BasicElements/TextEditorElement';
-import ButtonElement from '@/components/BasicElements/ButtonElement';
+import TextEditorElement from '@/components/BasicElements/TextEditorElement.vue';
+import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
 
-import refreshIcon from '@/library/svg/refresh';
-import loader from '@/library/svg/animation/circularLoader';
+import refreshIcon from '@/library/svg/refresh.vue';
+import loader from '@/library/svg/animation/circularLoader.vue';
 
 import api from '@/api';
 

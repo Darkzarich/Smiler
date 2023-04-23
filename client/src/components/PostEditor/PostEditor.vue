@@ -99,16 +99,16 @@ import { mapState } from 'vuex';
 import Draggable from 'vuedraggable';
 import api from '@/api';
 
-import closeIcon from '@/library/svg/exit';
-import videoIcon from '@/library/svg/video';
-import pictureIcon from '@/library/svg/picture';
-import textIcon from '@/library/svg/text';
+import closeIcon from '@/library/svg/exit.vue';
+import videoIcon from '@/library/svg/video.vue';
+import pictureIcon from '@/library/svg/picture.vue';
+import textIcon from '@/library/svg/text.vue';
 import consts from '@/const/const';
 import ButtonElement from '../BasicElements/ButtonElement.vue';
 import TextEditorElement from '../BasicElements/TextEditorElement.vue';
-import PostEditorPicture from './PostEditorPicture';
-import PostEditorVideo from './PostEditorVideo';
-import PostEditorTags from './PostEditorTags';
+import PostEditorPicture from './PostEditorPicture.vue';
+import PostEditorVideo from './PostEditorVideo.vue';
+import PostEditorTags from './PostEditorTags.vue';
 import InputElement from '../BasicElements/InputElement.vue';
 
 export default {

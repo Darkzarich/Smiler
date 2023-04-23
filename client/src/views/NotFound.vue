@@ -19,8 +19,7 @@
 </template>
 
 <script>
-
-import buttonElement from '@/components/BasicElements/ButtonElement';
+import buttonElement from '@/components/BasicElements/ButtonElement.vue';
 
 export default {
   components: {

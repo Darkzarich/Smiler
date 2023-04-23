@@ -6,7 +6,7 @@
 
 export default {
   components: {
-    Comments: () => import('./Comments'),
+    Comments: () => import('./Comments.vue'),
   },
   props: ['data', 'indentLevel', 'post', 'level'],
 };

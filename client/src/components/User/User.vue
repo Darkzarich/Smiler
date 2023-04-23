@@ -74,12 +74,12 @@
 import consts from '@/const/const';
 import api from '@/api';
 
-import UserLogin from '@/components/User/UserLogin';
-import UserRegistration from '@/components/User/UserRegistration';
+import UserLogin from '@/components/User/UserLogin.vue';
+import UserRegistration from '@/components/User/UserRegistration.vue';
 
-import exitIcon from '@/library/svg/exit';
-import settingsIcon from '@/library/svg/settings';
-import addIcon from '@/library/svg/add';
+import exitIcon from '@/library/svg/exit.vue';
+import settingsIcon from '@/library/svg/settings.vue';
+import addIcon from '@/library/svg/add.vue';
 
 export default {
   components: {
