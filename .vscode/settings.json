@@ -2,6 +2,7 @@
   "eslint.validate": ["vue", "javascript", "javascriptreact"],
   "editor.formatOnSave": false,
   "vetur.validation.template": true,
+  "vetur.validation.interpolation": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
