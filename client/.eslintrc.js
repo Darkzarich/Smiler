@@ -2,10 +2,11 @@ module.exports = {
   root: true,
   env: {
     node: true,
+    es2022: true,
   },
   extends: [
     'plugin:vue/essential',
-    '@vue/airbnb',
+    '@vue/eslint-config-airbnb',
   ],
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
@@ -22,10 +23,6 @@ module.exports = {
     'vuejs-accessibility/mouse-events-have-key-events': 'warn',
   },
   parser: 'vue-eslint-parser',
-  env: {
-    node: true,
-    es2022: true,
-  },
   settings: {
     'import/resolver': {
       node: {

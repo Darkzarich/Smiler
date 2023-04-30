@@ -74,16 +74,20 @@ body {
   flex-direction: row;
   flex-wrap: nowrap;
   padding-right: 10px;
+
   @include for-size(phone-only) {
     padding-right: 0;
   }
+
   &__main {
     width: 70%;
     margin-right: $widget-margin;
+
     @include for-size(phone-only) {
       width: 100%;
       margin-right: 0;
     }
+
   }
 }
 </style>
