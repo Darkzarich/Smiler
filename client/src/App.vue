@@ -89,5 +89,13 @@ body {
     }
 
   }
+
+  &__sidebar {
+    width: 30%;
+
+    @include for-size(phone-only) {
+      display: none;
+    }
+  }
 }
 </style>
