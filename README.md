@@ -4,7 +4,7 @@
 
 # Smiler
 
-### [Demo](https://smiler.darkzarich.fun/posts/all) | [Swagger documentation](https://smiler-api.darkzarich.fun//api-docs/)
+### [Demo](https://smiler.darkzarich.com/posts/all) | [Swagger documentation](https://smiler-api.darkzarich.com//api-docs/)
 
 Hello! :smile: 
 

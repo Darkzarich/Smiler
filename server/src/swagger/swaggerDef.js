@@ -8,7 +8,7 @@ module.exports = {
   },
   servers: [
     {
-      url: 'https://smiler-api.darkzarich.fun/api',
+      url: 'https://smiler-api.darkzarich.com/api',
       description: 'Production server',
     },
     {
