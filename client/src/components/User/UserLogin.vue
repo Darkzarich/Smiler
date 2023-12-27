@@ -3,21 +3,23 @@
     <div class="user-login__header">
       Login
     </div>
-    <div class="user-login__email-input">
+    <div class="user-login__form-input">
       <input-element
-        :name="'email'"
+        label="Email"
+        name="email"
+        place-holder="Enter email"
         :enter-callback="login"
-        :place-holder="'Email'"
         :error="validation.email"
         v-model="email" />
     </div>
-    <div class="user-login__password-input">
+    <div class="user-login__form-input">
       <input-element
-        :type="'password'"
-        :name="'password'"
+        label="Password"
+        type="password"
+        name="password"
         :enter-callback="login"
         :error="validation.password"
-        :place-holder="'Password'"
+        place-holder="Enter password"
         v-model="password" />
     </div>
     <div class="user-login__submit">
@@ -129,6 +131,11 @@ export default {
   align-items: center;
   padding: 1rem;
 
+  &__form-input {
+    margin-bottom: 12px;
+    width: 100%;
+  }
+
   &__header {
     color: $main-text;
     font-weight: bold;
@@ -146,7 +153,7 @@ export default {
     }
   }
 
-  &__submit, &__email-input, &__password-input {
+  &__submit {
     width: 100%;
   }
 }

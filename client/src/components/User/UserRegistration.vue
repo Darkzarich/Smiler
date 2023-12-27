@@ -4,40 +4,49 @@
     <div class="user-registration__header">
       Registration
     </div>
-    <div class="user-registration__email-input">
+
+    <div class="user-registration__form-input">
       <input-element
-        :name="'email'"
-        :place-holder="'Email'"
+        label="Email"
+        name="email"
+        place-holder="Enter email"
         :enter-callback="register"
         :error="validation.email"
         v-model="email" />
     </div>
-    <div class="user-registration__username-input">
+
+    <div class="user-registration__form-input">
       <input-element
-        :name="'login'"
-        :place-holder="'Login'"
+        label="Login"
+        name="login"
+        place-holder="Enter login"
         :enter-callback="register"
         :error="validation.login"
         v-model="login" />
     </div>
-    <div class="user-registration__password-input">
+
+    <div class="user-registration__form-input">
       <input-element
+        label="Password"
         :type="'password'"
         :enter-callback="register"
-        :name="'password'"
+        name="password"
         :error="validation.password"
-        :place-holder="'Password'"
+        place-holder="Enter password"
         v-model="password" />
     </div>
-    <div class="user-registration__confirm-input">
+
+    <div class="user-registration__form-input">
       <input-element
-        :type="'password'"
+        label="Confirm password"
+        type="password"
         :enter-callback="register"
-        :name="'confirm'"
+        name="confirm"
         :error="validation.confirm"
-        :place-holder="'Confirm password'"
+        place-holder="Enter password again"
         v-model="confirm" />
     </div>
+
     <div class="user-registration__submit">
       <button-element
         :callback="register"
@@ -47,6 +56,7 @@
         FINISH
       </button-element>
     </div>
+
     <div @click="$emit('mode-change')" class="user-registration__mode-toggler">
       OR LOGIN
     </div>
@@ -178,6 +188,11 @@ export default {
   align-items: center;
   padding: 1rem;
 
+  &__form-input {
+    margin-bottom: 12px;
+    width: 100%;
+  }
+
   &__header {
     color: $main-text;
     font-weight: bold;
@@ -195,7 +210,7 @@ export default {
     }
   }
 
-  &__submit, &__email-input, &__password-input, &__username-input, &__confirm-input {
+  &__submit {
     width: 100%;
   }
 }

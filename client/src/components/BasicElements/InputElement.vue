@@ -1,8 +1,9 @@
 <template>
-  <div class="input">
-    <label v-if="label" for="label">
+  <div class="input" :class="(error || errorOnlyStyle) && wasChanged ? 'input--error' : ''">
+    <label class="input__label" v-if="label" for="label">
       {{ label }}
     </label>
+
     <input
       :id="label"
       :disabled="disabled"
@@ -14,11 +15,12 @@
       :value="value"
       :placeholder="placeHolder"
       class="input__element"
-      :class="(error || errorOnlyStyle) && wasChanged ? 'input__element_error' : ''"
     />
+
     <div @click="iconClickCallback" class="input__icon">
       <component v-if="icon" :is="icon" />
     </div>
+
     <textarea
       :id="label"
       :disabled="disabled"
@@ -29,8 +31,8 @@
       :value="value"
       :placeholder="placeHolder"
       class="input__element"
-      :class="(error || errorOnlyStyle) && wasChanged ? 'input__element_error' : ''"
     />
+
     <span
       class="input__error"
       v-if="wasChanged"
@@ -122,6 +124,27 @@ export default {
   margin-left: 1rem;
   margin-right: 1rem;
 
+  &--error {
+
+    .input__label {
+      color: $error;
+    }
+
+    .input__element {
+      border: 1px solid $error;
+    }
+
+    .input__element:focus {
+      outline-color: $error;
+    }
+  }
+
+  &__label {
+    color: $main-text;
+    font-size: 13px;
+    margin-bottom: -4px;
+  }
+
   &__error {
     color: $error;
     font-size: 0.7rem;
@@ -132,6 +155,7 @@ export default {
     align-items: center;
     position: relative;
     left: -2rem;
+
     svg {
       fill: $light-gray;
       cursor: pointer;
@@ -147,11 +171,9 @@ export default {
     color: $main-text;
     border: 1px solid $light-gray;
     border-radius: 2px;
+
     &:focus {
       outline-color: $firm;
-    }
-    &_error {
-      border: 1px solid $error;
     }
   }
 }

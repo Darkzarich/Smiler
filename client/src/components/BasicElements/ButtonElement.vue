@@ -52,6 +52,7 @@ export default {
 @import "@/styles/mixins";
 
 .button {
+  // TODO: basic components must not have this style
   margin: 1rem;
   justify-content: center;
   @include flex-row();
