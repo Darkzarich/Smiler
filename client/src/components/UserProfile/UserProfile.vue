@@ -192,7 +192,8 @@ export default {
       margin: 0;
       margin-left: 1rem;
       &__element {
-        padding: 1px 6px;
+        padding: 4px 6px;
+        width: 75px;
       }
     }
   }
