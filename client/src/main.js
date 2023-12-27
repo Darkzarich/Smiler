@@ -6,7 +6,7 @@ import config from '@/config/config';
 import consts from '@/const/const';
 
 import defaultAvatar from '@/assets/neutral_avatar.png';
-import postNoImage from '@/assets/post_no_image.png';
+import postNoImage from '@/assets/post_no_image.svg';
 import router from './router';
 import App from './App.vue';
 
