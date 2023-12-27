@@ -10,7 +10,7 @@ Hello! :smile:
 
 This is my own pet MEVN (MongoDB, Express, Vue.js, Node.js) site-project similar to reddit.com, 9gag, etc with many different and awesome features, open Swagger API documentation (as the result of using Design First approach). Main reason of making this site is fun and learning new things while making it.
 
-Here is my [public roadmap](https://indecisive-shame-203.notion.site/73381a25f9154f56acf3eb43dcb6e36e?v=1d21a8001b464367963c77605c9ab92a&pvs=4) so you will know anything about what I'm currently working on related to this project and also any my future ideas and fixes I'm plannig to release one day :sunglasses:
+Here is my [public roadmap](https://indecisive-shame-203.notion.site/73381a25f9154f56acf3eb43dcb6e36e?v=1d21a8001b464367963c77605c9ab92a&pvs=4) so you will know anything about what I'm currently working on related to this project and also any my future ideas and fixes I'm planning to release one day :sunglasses:
 
 ### Requirements:
 - Node.js
@@ -97,7 +97,7 @@ docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
 	- **Search post with filters**
 	- **Following tags**. When a tag is clicked the context menu appears and user can either search by tag or follow\unfollow a tag.
 - Users:
-	- **Auth state**. Hiding what is not availabe due to not being logged in, taking session data, handling auth state checks when it's needed. Any error with status 401 will destroy auth state.
+	- **Auth state**. Hiding what is not available due to not being logged in, taking session data, handling auth state checks when it's needed. Any error with status 401 will destroy auth state.
 	- **User page**. User's posts, user's rating, amount of followers, bio, avatar, etc..
 	- **Follow\unfollow users**
 	- **Settings**. Lets unfollow users and tags seeing the whole image, change bio, change avatar
