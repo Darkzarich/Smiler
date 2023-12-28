@@ -4,7 +4,7 @@
   "vetur.validation.template": true,
   "vetur.validation.interpolation": false,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "eslint.workingDirectories": [
