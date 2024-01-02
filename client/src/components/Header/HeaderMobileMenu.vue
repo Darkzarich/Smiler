@@ -25,19 +25,19 @@
         </a>
       </template>
 
-      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'Home' }">
+      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'Home' }" data-testid="today-link">
         <div>TODAY</div>
       </router-link>
-      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'All' }">
+      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'All' }" data-testid="all-link">
         <div>ALL</div>
       </router-link>
-      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'Blowing' }">
+      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'Blowing' }" data-testid="blowing-link">
         <div title="posted recently, 50+ rating">BLOWING</div>
       </router-link>
-      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'TopThisWeek' }">
+      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'TopThisWeek' }" data-testid="top-this-week-link">
         <div title="current week posts sorted by newer">TOP THIS WEEK</div>
       </router-link>
-      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'New' }">
+      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'New' }" data-testid="new-link">
         <div title="posts posted 2 hours ago sorted by newer">NEW</div>
       </router-link>
     </div>

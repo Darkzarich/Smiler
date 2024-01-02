@@ -2,6 +2,7 @@
   <header class="header">
     <div class="header-container">
       <div
+        data-testid="mobile-menu"
         @click="mobileMenuShow = !mobileMenuShow"
         class="header-container__mobile_menu"
         :class="mobileMenuShow ? 'header-container__mobile_active' : ''">
@@ -16,19 +17,19 @@
       </router-link>
       <nav>
         <template v-if="!$isMobile()">
-          <router-link :to="{ name: 'Home' }">
+          <router-link :to="{ name: 'Home' }" data-testid="today-link">
             <div> TODAY </div>
           </router-link>
-          <router-link :to="{ name: 'All' }">
+          <router-link :to="{ name: 'All' }" data-testid="all-link">
             <div> ALL </div>
           </router-link>
-          <router-link :to="{ name: 'Blowing' }">
+          <router-link :to="{ name: 'Blowing' }" data-testid="blowing-link">
             <div title="posted recently, 50+ rating"> BLOWING </div>
           </router-link>
-          <router-link :to="{ name: 'TopThisWeek' }">
+          <router-link :to="{ name: 'TopThisWeek' }" data-testid="top-this-week-link">
             <div title="current week posts sorted by newer"> TOP THIS WEEK </div>
           </router-link>
-          <router-link :to="{ name: 'New' }">
+          <router-link :to="{ name: 'New' }" data-testid="new-link">
             <div title="posts posted 2 hours ago sorted by newer"> NEW </div>
           </router-link>
 

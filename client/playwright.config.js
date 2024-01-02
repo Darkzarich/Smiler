@@ -24,7 +24,7 @@ module.exports = defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run serve',
+    command: 'npm run build && npm run serve',
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
   },

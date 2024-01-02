@@ -3,7 +3,7 @@ import defaultsDeep from 'lodash/defaultsDeep';
 import cloneDeep from 'lodash/cloneDeep';
 
 const user = {
-  avatar: '/assets/neutral_avatar-f439ba56.png',
+  avatar: '',
   bio: 'test BIO',
   rating: 0,
   followersAmount: 0,

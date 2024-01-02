@@ -8,9 +8,9 @@ const post = {
   title: 'Test post',
   sections: [
     {
-      type: 'pic',
-      hash: 'test123',
-      url: '/assets/neutral_avatar-f439ba56.png',
+      type: 'text',
+      hash: '2',
+      context: 'test post content',
     },
   ],
   slug: 'test-post-123',

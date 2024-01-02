@@ -2,6 +2,7 @@
   <div class="post-container__item">
     <div class="post-side">
       <div
+        :data-testid="`post-${ postData.id }-upvote`"
         class="post-side__upvote"
         @click="upvote(postData.id)"
         :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''">
@@ -11,6 +12,7 @@
         {{ postData.rating }}
       </div>
       <div
+        :data-testid="`post-${ postData.id }-downvote`"
         class="post-side__downvote"
         @click="downvote(postData.id)"
         :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''">
@@ -27,8 +29,7 @@
         }"
         :target="$isMobile() ? '' : '_blank'"
       >
-        <div class="post-main__title">
-
+        <div class="post-main__title" :data-testid="`post-${ postData.id }-title`">
           {{ postData.title }}
           <template v-if="canEdit">
             <router-link title="Edit post" :to="postData.slug + '/edit'">
@@ -60,16 +61,16 @@
           v-for="section in postData.sections"
           :key="section.hash">
           <template v-if="section.type === POST_SECTION_TYPES.TEXT">
-            <div v-html="section.content" />
+            <div v-html="section.content" :data-testid="`post-${ postData.id }-text-${section.hash}`" />
           </template>
           <template v-else-if="section.type === POST_SECTION_TYPES.PICTURE">
             <div class="post-main__attachments-item">
-              <img @error="$resolveImageError" :src="$resolveImage(section.url)" :alt="section.url">
+              <img @error="$resolveImageError" :src="$resolveImage(section.url)" :alt="section.url" :data-testid="`post-${ postData.id }-pic-${section.hash}`">
             </div>
           </template>
           <template v-else-if="section.type === POST_SECTION_TYPES.VIDEO">
             <div class="post-main__attachments-item">
-              <video controls :src="section.url" />
+              <video controls :src="section.url" :data-testid="`post-${ postData.id }-vid-${section.hash}`" />
             </div>
           </template>
         </div>
@@ -81,6 +82,7 @@
         <div
           class="post-side__upvote"
           @click="upvote(postData.id)"
+          :data-testid="`m-post-${ postData.id }-upvote`"
           :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''">
           <plus-icon />
         </div>
@@ -90,6 +92,7 @@
         <div
           class="post-side__downvote"
           @click="downvote(postData.id)"
+          :data-testid="`m-post-${ postData.id }-downvote`"
           :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''">
           <minus-icon />
         </div>
