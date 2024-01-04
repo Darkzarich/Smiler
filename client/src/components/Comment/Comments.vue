@@ -25,6 +25,7 @@
             </div>
             <div
               class="comments__item-main-block-meta-upvote"
+              :data-testid="`comment-${comment.id}-upvote`"
               @click="upvote(comment.id)"
               :class="comment.rated.isRated && !comment.rated.negative ? 'comments__item-main-block-meta-upvote_active' : ''"
             >
@@ -32,6 +33,7 @@
             </div>
             <div
               @click="downvote(comment.id)"
+              :data-testid="`comment-${comment.id}-downvote`"
               class="comments__item-main-block-meta-downvote"
               :class="comment.rated.isRated && comment.rated.negative ? 'comments__item-main-block-meta-downvote_active' : ''"
             >
@@ -64,7 +66,7 @@
             {{ comment.createdAt | $fromNow }}
           </div>
         </div>
-        <div class="comments__item-main-block-body">
+        <div class="comments__item-main-block-body" :data-testid="`comment-${comment.id}-body`">
           <template v-if="!comment.deleted">
 
             <template v-if="commentEdit !== comment.id">
@@ -134,10 +136,12 @@
           </template>
         </div>
         <div
+          :data-testid="`comment-${comment.id}-expander`"
           @click="toggleShowChild(comment.id)"
           v-if="!hideChild.includes(comment.id) && comment.children.length > 0"
           class="comments__child-toggler">[-]</div>
         <div
+          :data-testid="`comment-${comment.id}-expander`"
           @click="toggleShowChild(comment.id)"
           v-else-if="comment.children.length > 0"
           class="comments__child-toggler comments__child-toggler_active">[+]</div>

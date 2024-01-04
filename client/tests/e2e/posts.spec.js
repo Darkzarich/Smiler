@@ -31,7 +31,7 @@ test.beforeEach(async ({ context }) => {
   });
 });
 
-test('Loads posts with the expected filters', async ({ page }) => {
+test('Fetches posts with expected filters', async ({ page }) => {
   await page.goto('/');
 
   const postRequest = await page.waitForRequest('*/**/posts*');
@@ -139,7 +139,7 @@ test.describe('Sections', () => {
   async function mockPostSection(context, section) {
     const post = {
       id: '1',
-      sections: [
+      sections: Array.isArray(section) ? section : [
         section,
       ],
     };
@@ -158,7 +158,7 @@ test.describe('Sections', () => {
     return post;
   }
 
-  test('Show text section', async ({ context, page }) => {
+  test('Shows text section', async ({ context, page }) => {
     const section = {
       hash: '1',
       type: 'text',
@@ -172,7 +172,7 @@ test.describe('Sections', () => {
     await expect(page.getByTestId(`post-${post.id}-text-${section.hash}`)).toContainText(section.content);
   });
 
-  test('Show pic section', async ({ context, page }) => {
+  test('Shows pic section', async ({ context, page }) => {
     const section = {
       hash: '2',
       type: 'pic',
@@ -187,7 +187,7 @@ test.describe('Sections', () => {
     await expect(page.getByTestId(`post-${post.id}-pic-${section.hash}`)).toHaveAttribute('alt', section.url);
   });
 
-  test('Show video section', async ({ context, page }) => {
+  test('Shows video section', async ({ context, page }) => {
     const section = {
       hash: '3',
       type: 'vid',
@@ -200,5 +200,35 @@ test.describe('Sections', () => {
 
     await expect(page.getByTestId(`post-${post.id}-vid-${section.hash}`)).toBeVisible();
     await expect(page.getByTestId(`post-${post.id}-vid-${section.hash}`)).toHaveAttribute('src', section.url);
+  });
+
+  test('Shows multiple sections', async ({ context, page }) => {
+    const sections = [
+      {
+        hash: '1',
+        type: 'pic',
+        url: 'test',
+      },
+      {
+        hash: '2',
+        type: 'text',
+        content: 'test text',
+      },
+      {
+        hash: '3',
+        type: 'vid',
+        url: 'test',
+      },
+    ];
+
+    const post = await mockPostSection(context, sections);
+
+    await page.goto('/');
+
+    await expect(page.getByTestId(`post-${post.id}-pic-${sections[0].hash}`)).toBeVisible();
+    await expect(page.getByTestId(`post-${post.id}-pic-${sections[0].hash}`)).toHaveAttribute('alt', sections[0].url);
+    await expect(page.getByTestId(`post-${post.id}-text-${sections[1].hash}`)).toContainText(sections[1].content);
+    await expect(page.getByTestId(`post-${post.id}-vid-${sections[2].hash}`)).toBeVisible();
+    await expect(page.getByTestId(`post-${post.id}-vid-${sections[2].hash}`)).toHaveAttribute('src', sections[2].url);
   });
 });

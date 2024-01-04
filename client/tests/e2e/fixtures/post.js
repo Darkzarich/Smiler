@@ -10,7 +10,7 @@ const post = {
     {
       type: 'text',
       hash: '2',
-      context: 'test post content',
+      content: 'test post content',
     },
   ],
   slug: 'test-post-123',
