@@ -71,7 +71,7 @@
         <input-element
           class="user-settings__avatar-edit"
           v-model="avatarEditInput"
-          place-holder="URL to avatar..."
+          placeholder="URL to avatar..."
         />
         <div class="user-settings__bio-buttons">
           <button-element

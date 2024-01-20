@@ -9,7 +9,7 @@
       <input-element
         label="Email"
         name="email"
-        place-holder="Enter email"
+        placeholder="Enter email"
         :enter-callback="register"
         :error="validation.email"
         v-model="email" />
@@ -19,7 +19,7 @@
       <input-element
         label="Login"
         name="login"
-        place-holder="Enter login"
+        placeholder="Enter login"
         :enter-callback="register"
         :error="validation.login"
         v-model="login" />
@@ -32,7 +32,7 @@
         :enter-callback="register"
         name="password"
         :error="validation.password"
-        place-holder="Enter password"
+        placeholder="Enter password"
         v-model="password" />
     </div>
 
@@ -43,7 +43,7 @@
         :enter-callback="register"
         name="confirm"
         :error="validation.confirm"
-        place-holder="Enter password again"
+        placeholder="Enter password again"
         v-model="confirm" />
     </div>
 

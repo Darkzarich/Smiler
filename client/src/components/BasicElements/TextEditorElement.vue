@@ -13,6 +13,9 @@
     >
       <div
         class="text-editor__input"
+        data-testid="text-editor"
+        role="textbox"
+        tabIndex="0"
         contenteditable
         v-html="value"
         :id="id"

@@ -5,6 +5,7 @@
     </label>
 
     <input
+      :data-testid="dataTestid"
       :id="label"
       :disabled="disabled"
       :type="type"
@@ -22,6 +23,7 @@
     </div>
 
     <textarea
+      :data-testid="dataTestid"
       :id="label"
       :disabled="disabled"
       v-if="multiline"
@@ -29,7 +31,7 @@
       :name="name"
       @input="setValueAndChanged($event.target.value)"
       :value="value"
-      :placeholder="placeHolder"
+      :placeholder="placeholder"
       class="input__element"
     />
 
@@ -55,6 +57,10 @@ export default {
     searchIcon,
   },
   props: {
+    dataTestid: {
+      type: String,
+      default: 'input',
+    },
     value: {
       type: String,
       default: '',
@@ -82,7 +88,7 @@ export default {
       type: String,
       default: '',
     },
-    placeHolder: {
+    placeholder: {
       type: String,
       default: 'Enter any text',
     },
