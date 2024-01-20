@@ -14,7 +14,7 @@
       @input="setValueAndChanged($event.target.value)"
       @keyup.enter="enterCallback"
       :value="value"
-      :placeholder="placeHolder"
+      :placeholder="placeholder"
       class="input__element"
     />
 
