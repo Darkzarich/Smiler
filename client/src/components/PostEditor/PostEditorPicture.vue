@@ -70,9 +70,23 @@ export default {
     },
   },
   methods: {
-    async upload() {
+    async handleUpload() {
       this.uploading = true;
 
+      try {
+        await this.upload();
+      } catch (e) {
+        this.$store.dispatch('newSystemNotification', {
+          error: {
+            message: 'Something went wrong while uploading the file. Please, try to upload the file again.',
+          },
+        });
+      } finally {
+        this.reset();
+        this.uploading = false;
+      }
+    },
+    async upload() {
       if (this.file instanceof File) {
         const formData = new FormData();
 
@@ -80,24 +94,13 @@ export default {
 
         const res = await api.posts.uploadAttachment(formData);
 
-        if (res.data.error) {
-          this.reset();
-        } else {
-          this.$emit('input', res.data.url);
-          this.$emit('set-section', res.data);
-        }
-      } else if (typeof this.file === 'string') {
-        this.$emit('input', this.file);
-      } else {
-        this.reset();
-        this.$store.dispatch('newSystemNotification', {
-          error: {
-            message: 'Something went wrong while uploading file. Please, put the file in again.',
-          },
-        });
+        this.$emit('input', res.data.url);
+        this.$emit('set-section', res.data);
+
+        return;
       }
 
-      this.uploading = false;
+      this.$emit('input', this.imageUrl);
     },
     error() {
       if (!(this.file instanceof File)) {
