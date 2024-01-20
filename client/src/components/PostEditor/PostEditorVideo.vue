@@ -4,7 +4,8 @@
       <div class="post-video-upload__input-url">
         <input-element
           v-model.lazy="url"
-          place-holder="Paste URL of the video [youtube]"
+          placeholder="Paste URL of the video [youtube]"
+          data-testid="video-url-input"
         />
         <button-element
           :callback="upload"

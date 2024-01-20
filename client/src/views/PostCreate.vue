@@ -1,6 +1,6 @@
 <template>
   <div v-if="show" class="post-create">
-    <div class="post-create__header">
+    <div class="post-create__header" data-testid="post-create-header">
       {{ edit ? 'Edit' : 'Create'}} Post
     </div>
     <post-editor :key="key" :edit="edit" :post="post" />

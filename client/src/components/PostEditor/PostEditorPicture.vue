@@ -11,9 +11,11 @@
         <input-element
           v-model.lazy="imageUrl"
           :disabled="Boolean(file)"
-          place-holder="Paste URL"
+          placeholder="Paste URL"
+          data-testid="image-url-input"
         />
         <button-element
+          data-testid="image-upload-button"
           :callback="upload"
           :loading="uploading"
           :disabled="!imageUrl"

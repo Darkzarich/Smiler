@@ -4,6 +4,7 @@
     :class="loading ? 'button_loading' : ''"
   >
     <button
+      :data-testid="dataTestid"
       type="button"
       class="button__element"
       @click="callback(argument)"
@@ -27,6 +28,10 @@ export default {
     circularLoader,
   },
   props: {
+    dataTestid: {
+      type: String,
+      default: 'button',
+    },
     callback: {
       type: Function,
       default: () => {},

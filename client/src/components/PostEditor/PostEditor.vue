@@ -2,7 +2,8 @@
   <div class="post-editor">
     <input-element
       class="post-editor__title"
-      :place-holder="'Title'"
+      data-testid="post-title-input"
+      :placeholder="'Title'"
       :error="validation.title"
       v-model="title"
     />
@@ -32,6 +33,7 @@
           </template>
           <template v-if="section.type === POST_SECTION_TYPES.PICTURE">
             <post-editor-picture
+              data-testid="pic-section"
               v-model="section.url"
               @set-section="setSection"
             />
@@ -41,6 +43,7 @@
           </template>
           <template v-if="section.type === POST_SECTION_TYPES.VIDEO">
             <post-editor-video
+              data-testid="video-section"
               v-model="section.url"
             />
             <div class="post-editor__delete" @click="deleteSection(section)">
@@ -51,13 +54,13 @@
       </transition-group>
     </draggable>
     <div class="post-editor__control" v-if="sections.length < POST_MAX_SECTIONS">
-      <div class="post-editor__control-item" @click="createSection(POST_SECTION_TYPES.TEXT)">
+      <div class="post-editor__control-item" @click="createSection(POST_SECTION_TYPES.TEXT)" data-testid="add-text-button" role="button" tabindex="0">
         <text-icon />
       </div>
-      <div class="post-editor__control-item" @click="createSection(POST_SECTION_TYPES.PICTURE)">
+      <div class="post-editor__control-item" @click="createSection(POST_SECTION_TYPES.PICTURE)" data-testid="add-pic-button" role="button" tabindex="0">
         <picture-icon />
       </div>
-      <div class="post-editor__control-item" @click="createSection(POST_SECTION_TYPES.VIDEO)">
+      <div class="post-editor__control-item" @click="createSection(POST_SECTION_TYPES.VIDEO)" data-testid="add-video-button" role="button" tabindex="0">
         <video-icon />
       </div>
     </div>
@@ -67,6 +70,7 @@
     <div class="post-editor__submit">
       <template v-if="!edit">
         <button-element
+          data-testid="create-post-button"
           :loading="sending"
           :callback="createPost"
           :disabled="isSubmitDisabled"
@@ -74,6 +78,7 @@
           Create Post
         </button-element>
         <button-element
+          data-testid="save-draft-button"
           :loading="saving"
           :disabled="!sections.length"
           :callback="saveDraft"

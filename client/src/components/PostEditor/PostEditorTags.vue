@@ -1,6 +1,6 @@
 <template>
   <div class="post-editor__tags">
-    <div class="post-editor__tags-container">
+    <div class="post-editor__tags-container" data-testid="post-tags-list">
       <div
         v-for="tag in tags"
         :key="tag"
@@ -14,7 +14,8 @@
     </div>
     <div v-if="tags.length < POST_MAX_TAGS" class="post-editor__tags-input">
       <input-element
-        place-holder="Input up to 8 tags"
+        data-testid="post-tag-input"
+        placeholder="Input up to 8 tags"
         v-model="tagInput"
         :enter-callback="addTag"
         :error="validation"

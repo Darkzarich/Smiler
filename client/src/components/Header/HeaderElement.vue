@@ -50,7 +50,7 @@
         v-if="$route.name !== 'Search'"
         class="header-container__search">
         <input-element
-          :place-holder="'Search'"
+          :placeholder="'Search'"
           icon="searchIcon"
           :style="'flex-direction: row'"
           v-model.trim="title"

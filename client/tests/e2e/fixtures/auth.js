@@ -3,6 +3,12 @@ import cloneDeep from 'lodash/cloneDeep';
 
 const auth = {
   isAuth: false,
+  tagsFollowed: ['test-tag', 'test-tag2'],
+  login: 'TestUser',
+  rating: 0,
+  avatar: '',
+  email: 'test@gmail.com',
+  followersAmount: 0,
 };
 
 /**
@@ -15,7 +21,7 @@ const auth = {
 export default function generateAuth(isAuth = false) {
   const newAuth = cloneDeep(auth);
 
-  auth.isAuth = isAuth;
+  newAuth.isAuth = isAuth;
 
   return newAuth;
 }
