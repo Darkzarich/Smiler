@@ -20,17 +20,23 @@ test.beforeEach(async ({ context }) => {
 });
 
 test('Creates a post with title, tags and content', async ({ page }) => {
+  const tags = ['test tag', 'test tag 2'];
+  const title = 'Test post';
+  const picUrl = 'https://placehold.co/600x400';
+  const vidCode = 'dQw4w9WgXcQ';
+
   await page.goto('/post/create');
 
   await expect(page.getByTestId('post-create-header')).toBeVisible();
 
-  await page.getByTestId('post-title-input').fill('Test post');
+  await page.getByTestId('post-title-input').fill(title);
 
-  await page.getByTestId('post-tag-input').fill('test tag');
-  await page.keyboard.press('Enter');
-
-  await page.getByTestId('post-tag-input').fill('test tag 2');
-  await page.keyboard.press('Enter');
+  for (const tag of tags) {
+    // eslint-disable-next-line no-await-in-loop
+    await page.getByTestId('post-tag-input').fill(tag);
+    // eslint-disable-next-line no-await-in-loop
+    await page.keyboard.press('Enter');
+  }
 
   await page.getByTestId('add-text-button').click();
   await page.getByTestId('text-editor').fill('test text');
@@ -40,7 +46,8 @@ test('Creates a post with title, tags and content', async ({ page }) => {
   await page.getByTestId('image-upload-button').click();
 
   await page.getByTestId('add-video-button').click();
-  await page.getByTestId('video-url-input').fill('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+  await page.getByTestId('video-url-input').fill(`https://www.youtube.com/watch?v=${vidCode}`);
+  await page.getByTestId('video-upload-button').click();
 
   // eslint-disable-next-line no-unused-vars
   const [_, createPostRequest] = await Promise.all([
@@ -49,6 +56,8 @@ test('Creates a post with title, tags and content', async ({ page }) => {
   ]);
 
   expect(createPostRequest.postDataJSON()).toMatchObject({
+    title,
+    tags,
     sections: [
       {
         type: 'text',
@@ -56,15 +65,13 @@ test('Creates a post with title, tags and content', async ({ page }) => {
       },
       {
         type: 'pic',
-        url: 'https://placehold.co/600x400',
+        url: picUrl,
       },
       {
         type: 'vid',
-        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        url: `https://www.youtube.com/embed/${vidCode}`,
       },
     ],
-    title: 'Test post',
-    tags: ['test tag', 'test tag 2'],
   });
 });
 

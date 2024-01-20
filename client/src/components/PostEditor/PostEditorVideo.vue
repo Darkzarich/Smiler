@@ -8,6 +8,7 @@
           data-testid="video-url-input"
         />
         <button-element
+          data-testid="video-upload-button"
           :callback="upload"
           :loading="uploading"
           :disabled="!url"
