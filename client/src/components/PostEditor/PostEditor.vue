@@ -17,18 +17,21 @@
       ghost-class="post-editor__section_moving"
       chosen-class="post-editor__section_chosen"
     >
-      <transition-group name="post-editor__section">
+      <transition-group name="post-editor__section" data-testid="post-sections">
         <div
           class="post-editor__section"
+          data-testid="post-section"
           :key="section.hash"
           v-for="section in sections">
+          <!-- TODO: Refactor this part -->
           <template v-if="section.type === POST_SECTION_TYPES.TEXT">
             <text-editor-element
+              data-testid="text-section"
               v-model="section.content"
               :id="section.hash"
             />
             <div class="post-editor__delete" @click="deleteSection(section)">
-              <close-icon title="Delete" />
+              <close-icon title="Delete" :data-testid="`delete-section-${section.hash}`" />
             </div>
           </template>
           <template v-if="section.type === POST_SECTION_TYPES.PICTURE">
@@ -38,7 +41,7 @@
               @set-section="setSection"
             />
             <div class="post-editor__delete" @click="deleteSection(section)">
-              <close-icon title="Delete" />
+              <close-icon title="Delete" :data-testid="`delete-section-${section.hash}`" />
             </div>
           </template>
           <template v-if="section.type === POST_SECTION_TYPES.VIDEO">
@@ -47,7 +50,7 @@
               v-model="section.url"
             />
             <div class="post-editor__delete" @click="deleteSection(section)">
-              <close-icon title="Delete" />
+              <close-icon title="Delete" :data-testid="`delete-section-${section.hash}`" />
             </div>
           </template>
         </div>

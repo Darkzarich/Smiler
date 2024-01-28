@@ -17,7 +17,7 @@
         </button-element>
       </div>
     </div>
-    <div v-else class="post-video-upload__video">
+    <div v-else class="post-video-upload__video" :test-dataid="`video-${value}`">
       <iframe
         title="video"
         :src="value"

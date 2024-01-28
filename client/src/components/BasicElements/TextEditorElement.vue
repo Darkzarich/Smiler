@@ -1,6 +1,6 @@
 <template>
   <div class="text-editor-container">
-    <div class="text-editor-control">
+    <div class="text-editor-control" :data-testid="dataTestid">
       <button type="button" title="bold" @click="styleSelected('b')">B</button>
       <button type="button" title="italic" @click="styleSelected('i')">I</button>
       <button type="button" title="strike" @click="styleSelected('s')">S</button>
@@ -32,6 +32,10 @@
 <script>
 export default {
   props: {
+    dataTestid: {
+      type: String,
+      default: 'text-editor-container',
+    },
     id: {
       type: String,
       default: 'text-editor',

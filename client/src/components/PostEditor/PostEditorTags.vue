@@ -7,7 +7,7 @@
         class="post-editor__tags-item"
       >
         {{ tag }}
-        <span @click="removeTag(tag)" class="post-editor__tags-item-remove">
+        <span @click="removeTag(tag)" :data-testid="`remove-tag-button-${tag}`" class="post-editor__tags-item-remove">
           x
         </span>
       </div>
