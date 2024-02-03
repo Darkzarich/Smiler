@@ -35,10 +35,11 @@ test.beforeEach(async ({ context }) => {
 });
 
 test('Fetches the post by post slug', async ({ page }) => {
-  await Promise.all([
-    page.goto(`/${post.slug}`),
-    page.waitForRequest(`*/**/posts/${post.slug}`),
-  ]);
+  const postBySlugRequest = page.waitForRequest(`*/**/posts/${post.slug}`);
+
+  await page.goto(`/${post.slug}`);
+
+  await postBySlugRequest;
 
   await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(post.title);
 });
@@ -113,7 +114,7 @@ test.describe('Sections', () => {
     await expect(page.getByTestId(`post-${mockedPost.id}-vid-${section.hash}`)).toHaveAttribute('src', section.url);
   });
 
-  test('Shows multiple sections', async ({ context, page }) => {
+  test('Shows multiple sections at the same time', async ({ context, page }) => {
     const sections = [
       {
         hash: '1',
@@ -162,53 +163,107 @@ test.describe('Comments', () => {
     await expect(page.getByTestId(`comment-${comment.children[0].children[0].id}-body`)).not.toBeVisible();
   });
 
-  test('Rates a comment (upvote/downvote/removing vote)', async ({ page, context }) => {
+  test.describe('Votes', () => {
+    test.beforeEach(async ({ context }) => {
+      await context.route(`*/**/comments/${comment.id}/rate`, async (route) => {
+        await route.fulfill({
+          status: 200,
+        });
+      });
+    });
+
     // TODO: Introduce page object to make it better
     const dataTestIds = {
       upvote: `comment-${comment.id}-upvote`,
       downvote: `comment-${comment.id}-downvote`,
     };
 
-    await context.route(`*/**/comments/${comment.id}/rate`, async (route) => {
-      await route.fulfill({
-        status: 200,
+    test('Upvotes a comment', async ({ page }) => {
+      await page.goto(`/${post.slug}`);
+
+      await page.getByTestId(`comment-${comment.id}-body`).isVisible();
+
+      const upvoteRequest = page.waitForRequest((res) => res.url().includes(`/comments/${comment.id}/rate`) && res.method() === 'PUT');
+
+      await page.getByTestId(dataTestIds.upvote).click();
+
+      const upvoteResponse = await upvoteRequest;
+
+      expect(upvoteResponse.postDataJSON()).toEqual({
+        negative: false,
       });
     });
 
-    await page.goto(`/${post.slug}`);
+    test('Downvotes a comment', async ({ page }) => {
+      await page.goto(`/${post.slug}`);
 
-    await page.getByTestId(`comment-${comment.id}-body`).isVisible();
+      await page.getByTestId(`comment-${comment.id}-body`).isVisible();
 
-    // eslint-disable-next-line no-unused-vars
-    const [upvoteLocator, upvoteRequest] = await Promise.all([
-      page.getByTestId(dataTestIds.upvote).click(),
-      page.waitForRequest((res) => res.url().includes(`/comments/${comment.id}/rate`) && res.method() === 'PUT'),
-    ]);
+      const downvoteRequest = page.waitForRequest((res) => res.url().includes(`/comments/${comment.id}/rate`) && res.method() === 'PUT');
 
-    expect(upvoteRequest.postDataJSON()).toEqual({
-      negative: false,
+      await page.getByTestId(dataTestIds.downvote).click();
+
+      const downvoteResponse = await downvoteRequest;
+
+      expect(downvoteResponse.postDataJSON()).toEqual({
+        negative: true,
+      });
     });
 
-    // eslint-disable-next-line no-unused-vars
-    const [removeVoteLocator1, removeVoteRequest1] = await Promise.all([
-      page.getByTestId(dataTestIds.downvote).click(),
-      page.waitForRequest((res) => res.url().includes(`/comments/${comment.id}/rate`) && res.method() === 'DELETE'),
-    ]);
+    test('Removes a vote from a comment if it was upvoted before', async ({ page, context }) => {
+      await context.route('*/**/comments*', async (route) => {
+        await route.fulfill({
+          json: {
+            pages: 0,
+            comments: [
+              generateComment({
+                rated: {
+                  isRated: true,
+                  negative: false,
+                },
+              }),
+            ],
+          },
+        });
+      });
 
-    // eslint-disable-next-line no-unused-vars
-    const [downvoteLocator, downvoteRequest] = await Promise.all([
-      page.getByTestId(dataTestIds.downvote).click(),
-      page.waitForRequest((res) => res.url().includes(`/comments/${comment.id}/rate`) && res.method() === 'PUT'),
-    ]);
+      await page.goto(`/${post.slug}`);
 
-    expect(downvoteRequest.postDataJSON()).toEqual({
-      negative: true,
+      await page.getByTestId(`comment-${comment.id}-body`).isVisible();
+
+      const removeUpvoteRequest = page.waitForRequest((res) => res.url().includes(`/comments/${comment.id}/rate`) && res.method() === 'DELETE');
+
+      await page.getByTestId(dataTestIds.downvote).click();
+
+      await removeUpvoteRequest;
     });
 
-    // eslint-disable-next-line no-unused-vars
-    const [removeVoteLocator2, removeVoteRequest2] = await Promise.all([
-      page.getByTestId(dataTestIds.upvote).click(),
-      page.waitForRequest((res) => res.url().includes(`/comments/${comment.id}/rate`) && res.method() === 'DELETE'),
-    ]);
+    test('Removes a vote from a comment if it was downvoted before', async ({ page, context }) => {
+      await context.route('*/**/comments*', async (route) => {
+        await route.fulfill({
+          json: {
+            pages: 0,
+            comments: [
+              generateComment({
+                rated: {
+                  isRated: true,
+                  negative: true,
+                },
+              }),
+            ],
+          },
+        });
+      });
+
+      await page.goto(`/${post.slug}`);
+
+      await page.getByTestId(`comment-${comment.id}-body`).isVisible();
+
+      const removeDownVoteRequest = page.waitForRequest((res) => res.url().includes(`/comments/${comment.id}/rate`) && res.method() === 'DELETE');
+
+      await page.getByTestId(dataTestIds.upvote).click();
+
+      await removeDownVoteRequest;
+    });
   });
 });

@@ -44,95 +44,186 @@ test('Fetches posts with expected filters', async ({ page }) => {
   }
 });
 
-test('Shows post categories in the header and clicking them loads posts with the expected filters', async ({ page, isMobile }) => {
-  async function clickCategory(category) {
+test.describe('Post groups', async () => {
+  async function clickPostGroup({ page, group, isMobile }) {
     if (isMobile) {
       page.getByTestId('mobile-menu').click();
     }
-    await page.getByTestId(category).click();
+    await page.getByTestId(group).click();
   }
 
-  await page.goto('/');
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+  });
 
-  await Promise.all([
-    clickCategory('all-link'),
-    page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-rating')),
-  ]);
-  await expect(page).toHaveURL(/.*posts\/all/);
+  test('Fetches all posts', async ({ page, isMobile }) => {
+    const allPostsRequest = page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-rating'));
 
-  await Promise.all([
-    clickCategory('blowing-link'),
-    page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-rating&ratingFrom=50')),
-  ]);
-  await expect(page).toHaveURL(/.*posts\/blowing/);
+    await clickPostGroup({
+      group: 'all-link',
+      isMobile,
+      page,
+    });
 
-  await Promise.all([
-    clickCategory('top-this-week-link'),
-    page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-createdAt')),
-  ]);
-  await expect(page).toHaveURL(/.*posts\/top-this-week/);
+    await allPostsRequest;
+    await expect(page).toHaveURL(/.*posts\/all/);
+  });
 
-  await Promise.all([
-    clickCategory('new-link'),
-    page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-createdAt')),
-  ]);
-  await expect(page).toHaveURL(/.*posts\/new/);
+  test('Fetches "blowing" posts', async ({ page, isMobile }) => {
+    const blowingPostsRequest = page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-rating&ratingFrom=50'));
 
-  await Promise.all([
-    clickCategory('today-link'),
-    page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-rating')),
-  ]);
-  await expect(page).toHaveURL(/.*/);
+    await clickPostGroup({
+      group: 'blowing-link',
+      isMobile,
+      page,
+    });
+
+    await blowingPostsRequest;
+    await expect(page).toHaveURL(/.*posts\/blowing/);
+  });
+
+  test('Fetches "top this week" posts', async ({ page, isMobile }) => {
+    const topThisWeekRequest = page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-createdAt'));
+
+    await clickPostGroup({
+      group: 'top-this-week-link',
+      isMobile,
+      page,
+    });
+
+    await topThisWeekRequest;
+    await expect(page).toHaveURL(/.*posts\/top-this-week/);
+  });
+
+  test('Fetches "new" posts', async ({ page, isMobile }) => {
+    const newPostsRequest = page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-createdAt'));
+
+    await clickPostGroup({
+      group: 'new-link',
+      isMobile,
+      page,
+    });
+
+    await newPostsRequest;
+    await expect(page).toHaveURL(/.*posts\/new/);
+  });
+
+  test('Fetches "today" posts', async ({ page, isMobile }) => {
+    const todayPostsRequest = page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-rating&dateFrom='));
+
+    await clickPostGroup({
+      group: 'today-link',
+      isMobile,
+      page,
+    });
+
+    await todayPostsRequest;
+    await expect(page).toHaveURL(/.*/);
+  });
 });
 
-test('Rates a post in the list (upvote/downvote/removing vote)', async ({ page, context, isMobile }) => {
-  // TODO: Introduce page object to make it better
-  const dataTestIds = {
-    upvote: `${isMobile ? 'm-' : ''}post-${post1.id}-upvote`,
-    downvote: `${isMobile ? 'm-' : ''}post-${post1.id}-downvote`,
-  };
+test.describe('Post votes', async () => {
+  let dataTestIds;
 
-  await context.route(`*/**/posts/${post1.id}/rate`, async (route) => {
-    await route.fulfill({
-      status: 200,
+  test.beforeAll(async ({ isMobile }) => {
+    // TODO: Introduce page object to make it better
+    dataTestIds = {
+      upvote: `${isMobile ? 'm-' : ''}post-${post1.id}-upvote`,
+      downvote: `${isMobile ? 'm-' : ''}post-${post1.id}-downvote`,
+    };
+  });
+
+  test.beforeEach(async ({ context }) => {
+    await context.route(`*/**/posts/${post1.id}/rate`, async (route) => {
+      await route.fulfill({
+        status: 200,
+      });
     });
   });
 
-  await page.goto('/');
+  test('Upvotes a post', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId(`post-${post1.id}-title`).isVisible();
 
-  await page.getByTestId(`post-${post1.id}-title`).isVisible();
+    const upvoteRequest = page.waitForRequest((res) => res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'PUT');
 
-  // eslint-disable-next-line no-unused-vars
-  const [upvoteLocator, upvoteRequest] = await Promise.all([
-    page.getByTestId(dataTestIds.upvote).click(),
-    page.waitForRequest((res) => res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'PUT'),
-  ]);
+    await page.getByTestId(dataTestIds.upvote).click();
+    const upvoteResponse = await upvoteRequest;
 
-  expect(upvoteRequest.postDataJSON()).toEqual({
-    negative: false,
+    expect(upvoteResponse.postDataJSON()).toEqual({
+      negative: false,
+    });
   });
 
-  // eslint-disable-next-line no-unused-vars
-  const [removeVoteLocator1, removeVoteRequest1] = await Promise.all([
-    page.getByTestId(dataTestIds.downvote).click(),
-    page.waitForRequest((res) => res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'DELETE'),
-  ]);
+  test('Downvotes a post', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId(`post-${post1.id}-title`).isVisible();
 
-  // eslint-disable-next-line no-unused-vars
-  const [downvoteLocator, downvoteRequest] = await Promise.all([
-    page.getByTestId(dataTestIds.downvote).click(),
-    page.waitForRequest((res) => res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'PUT'),
-  ]);
+    const downvoteRequest = page.waitForRequest((res) => res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'PUT');
 
-  expect(downvoteRequest.postDataJSON()).toEqual({
-    negative: true,
+    await page.getByTestId(dataTestIds.downvote).click();
+    const downvoteResponse = await downvoteRequest;
+
+    expect(downvoteResponse.postDataJSON()).toEqual({
+      negative: true,
+    });
   });
 
-  // eslint-disable-next-line no-unused-vars
-  const [removeVoteLocator2, removeVoteRequest2] = await Promise.all([
-    page.getByTestId(dataTestIds.upvote).click(),
-    page.waitForRequest((res) => res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'DELETE'),
-  ]);
+  test('Removes a vote from a post if it was upvoted before', async ({ page, context }) => {
+    await context.route('*/**/posts*', async (route) => {
+      await route.fulfill({
+        json: {
+          pages: 0,
+          posts: [
+            {
+              ...post1,
+              rated: {
+                isRated: true,
+                negative: false,
+              },
+            },
+          ],
+        },
+      });
+    });
+
+    await page.goto('/');
+    await page.getByTestId(`post-${post1.id}-title`).isVisible();
+
+    const removeUpvoteRequest = page.waitForRequest((res) => res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'DELETE');
+
+    await page.getByTestId(dataTestIds.downvote).click();
+
+    await removeUpvoteRequest;
+  });
+
+  test('Removes a vote from a post if it was downvoted before', async ({ page, context }) => {
+    await context.route('*/**/posts*', async (route) => {
+      await route.fulfill({
+        json: {
+          pages: 0,
+          posts: [
+            {
+              ...post1,
+              rated: {
+                isRated: true,
+                negative: true,
+              },
+            },
+          ],
+        },
+      });
+    });
+
+    await page.goto('/');
+    await page.getByTestId(`post-${post1.id}-title`).isVisible();
+
+    const removeDownVoteRequest = page.waitForRequest((res) => res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'DELETE');
+
+    await page.getByTestId(dataTestIds.upvote).click();
+
+    await removeDownVoteRequest;
+  });
 });
 
 test.describe('Sections', () => {
