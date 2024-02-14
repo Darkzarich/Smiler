@@ -1,3 +1,5 @@
+version: '3'
+
 x-common-variables: &common-variables
   FRONTEND_PORT: ${FRONTEND_PORT}
   # MongoDB
