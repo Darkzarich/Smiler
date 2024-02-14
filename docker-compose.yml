@@ -44,7 +44,6 @@ services:
     depends_on:
       smiler-db: 
         condition: service_healthy
-        restart: true
   smiler-db:
     image: mongo:5.0.10
     restart: always
