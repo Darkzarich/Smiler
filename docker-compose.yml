@@ -12,6 +12,7 @@ services:
   smiler-frontend: 
     # If both image and build specified then it will try to get the image from Docker Hub 
     # and if it doesn't exist there it will build a new one using Dockerfile from provided folder
+    restart: always
     image: darkzarich/smiler-frontend:latest
     build: ./client
     container_name: smiler-frontend
@@ -43,6 +44,7 @@ services:
     depends_on:
       smiler-db: 
         condition: service_healthy
+        restart: true
   smiler-db:
     image: mongo:5.0.10
     restart: always
