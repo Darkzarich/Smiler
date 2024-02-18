@@ -7,6 +7,7 @@
 
     <div class="user-registration__form-input">
       <input-element
+        data-testid="user-signup-email"
         label="Email"
         name="email"
         placeholder="Enter email"
@@ -17,6 +18,7 @@
 
     <div class="user-registration__form-input">
       <input-element
+        data-testid="user-signup-login"
         label="Login"
         name="login"
         placeholder="Enter login"
@@ -27,6 +29,7 @@
 
     <div class="user-registration__form-input">
       <input-element
+        data-testid="user-signup-password"
         label="Password"
         :type="'password'"
         :enter-callback="register"
@@ -38,6 +41,7 @@
 
     <div class="user-registration__form-input">
       <input-element
+        data-testid="user-signup-confirm"
         label="Confirm password"
         type="password"
         :enter-callback="register"
@@ -49,6 +53,7 @@
 
     <div class="user-registration__submit">
       <button-element
+        data-testid="user-signup-submit"
         :callback="register"
         :loading="loading"
         :disabled="isSubmitDisabled"
@@ -57,7 +62,7 @@
       </button-element>
     </div>
 
-    <div @click="$emit('mode-change')" class="user-registration__mode-toggler">
+    <div @click="$emit('mode-change')" data-testid="user-form-mode-toggler" class="user-registration__mode-toggler">
       OR LOGIN
     </div>
 

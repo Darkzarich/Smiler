@@ -1,10 +1,11 @@
 <template>
   <div class="user-login">
-    <div class="user-login__header">
+    <div class="user-login__header" data-testid="user-signin-form">
       Login
     </div>
     <div class="user-login__form-input">
       <input-element
+        data-testid="user-signin-email"
         label="Email"
         name="email"
         placeholder="Enter email"
@@ -14,6 +15,7 @@
     </div>
     <div class="user-login__form-input">
       <input-element
+        data-testid="user-signin-password"
         label="Password"
         type="password"
         name="password"
@@ -24,6 +26,7 @@
     </div>
     <div class="user-login__submit">
       <button-element
+        data-testid="user-signin-submit"
         :callback="login"
         :loading="loading"
         :disabled="isSubmitDisabled"
@@ -31,7 +34,7 @@
         SIGN IN
       </button-element>
     </div>
-    <div @click="$emit('mode-change')" class="user-login__mode-toggler">
+    <div @click="$emit('mode-change')" data-testid="user-form-mode-toggler" class="user-login__mode-toggler">
       OR REGISTRATION
     </div>
   </div>
