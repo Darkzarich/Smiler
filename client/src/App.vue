@@ -10,7 +10,7 @@
       <content class="content-box__main">
         <router-view />
       </content>
-      <div class="content-box__sidebar">
+      <div class="content-box__sidebar" v-if="!$isMobile()">
         <user />
       </div>
     </div>

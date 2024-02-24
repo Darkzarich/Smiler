@@ -18,23 +18,31 @@ test.beforeEach(async ({ context }) => {
   });
 });
 
-test('Checks auth status on load and shows an expected state', async ({ page }) => {
+test('Checks auth status on load and shows an expected state', async ({ page, isMobile }) => {
   const getAuthRequest = page.waitForRequest('*/**/users/get-auth');
 
   await page.goto('/');
 
   await getAuthRequest;
 
+  if (isMobile) {
+    await page.getByTestId('mobile-menu').click();
+  }
+
   await expect(page.getByTestId('user-signin-form')).toBeVisible();
 });
 
-test('Fills Sign In form and sends an expected request body', async ({ page }) => {
+test('Fills Sign In form and sends an expected request body', async ({ page, isMobile }) => {
   await page.goto('/');
 
   const formData = {
     email: 'test@gmail.com',
     password: '123456',
   };
+
+  if (isMobile) {
+    await page.getByTestId('mobile-menu').click();
+  }
 
   await page.getByTestId('user-signin-email').fill(formData.email);
   await page.getByTestId('user-signin-password').fill(formData.password);
@@ -48,7 +56,7 @@ test('Fills Sign In form and sends an expected request body', async ({ page }) =
   expect(signInResponse.postDataJSON()).toEqual(formData);
 });
 
-test('Fills Sign Up form and sends an expected request body', async ({ page }) => {
+test('Fills Sign Up form and sends an expected request body', async ({ page, isMobile }) => {
   await page.goto('/');
 
   const formData = {
@@ -56,6 +64,10 @@ test('Fills Sign Up form and sends an expected request body', async ({ page }) =
     login: 'test',
     password: '123456',
   };
+
+  if (isMobile) {
+    page.getByTestId('mobile-menu').click();
+  }
 
   await page.getByTestId('user-form-mode-toggler').click();
 

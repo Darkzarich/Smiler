@@ -14,12 +14,6 @@ Vue.config.productionTip = false;
 
 Vue.use(vClickOutside);
 
-new Vue({
-  router,
-  store,
-  render: (h) => h(App),
-}).$mount('#app');
-
 Vue.directive('scroll', {
   inserted(el, binding) {
     const f = (evt) => {
@@ -116,3 +110,9 @@ Vue.mixin({
     },
   },
 });
+
+new Vue({
+  router,
+  store,
+  render: (h) => h(App),
+}).$mount('#app');
