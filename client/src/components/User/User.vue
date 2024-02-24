@@ -23,7 +23,7 @@
                 },
               }">
               <img :src="$resolveAvatar(getUser.avatar)" :alt="getUser.avatar">
-              <div class="user__logged-meta-login">
+              <div class="user__logged-meta-login" data-testid="user-login">
                 {{ getUser.login }}
               </div>
             </router-link>
@@ -33,16 +33,17 @@
         <div class="user__logged-info">
           <div class="user__logged-info-rating">
             <div>Rating</div>
-            <div>{{ getUser.rating }}</div>
+            <div data-testid="user-rating">{{ getUser.rating }}</div>
           </div>
           <div class="user__logged-info-rating">
             <div>Followers</div>
-            <div>{{ getUser.followersAmount }}</div>
+            <div data-testid="user-followers-amount">{{ getUser.followersAmount }}</div>
           </div>
         </div>
         <div class="user__logged-nav">
           <ul class="user__logged-nav-list">
             <router-link
+              data-testid="create-post-btn"
               @click.native="navNative ? closeMenu() : ''"
               :to="{
                 name: 'PostCreate',
@@ -60,7 +61,7 @@
                 <settings-icon /> Settings
               </li>
             </router-link>
-            <li class="user__logged-nav-item" @click="logout">
+            <li class="user__logged-nav-item" @click="logout" data-testid="logout-btn">
               <exit-icon /> Logout
             </li>
           </ul>
@@ -113,7 +114,7 @@ export default {
       const res = await api.users.logoutUser();
 
       if (res.data.ok) {
-        document.location.reload();
+        this.$store.commit('clearUser');
       }
     },
     // emit close event to HeaderMobileMenu, which will close the menu

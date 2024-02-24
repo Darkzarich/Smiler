@@ -36,6 +36,7 @@
     />
 
     <span
+      :data-testid="`${dataTestid}-error`"
       class="input__error"
       v-if="wasChanged"
     >

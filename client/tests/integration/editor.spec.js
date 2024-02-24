@@ -38,6 +38,25 @@ test.beforeEach(async ({ context }) => {
   });
 });
 
+test('Goes to create post page from user menu', async ({ page, context, isMobile }) => {
+  await context.route('*/**/users/get-auth', async (route) => {
+    await route.fulfill({
+      json: generateAuth(true),
+    });
+  });
+
+  await page.goto('/');
+
+  if (isMobile) {
+    await page.getByTestId('mobile-menu').click();
+  }
+
+  await page.getByTestId('create-post-btn').click();
+
+  await expect(page).toHaveURL('/post/create');
+  await expect(page.getByTestId('post-create-header')).toBeVisible();
+});
+
 test('Creates a post with title, tags and content', async ({ page, context }) => {
   await mockPostsRoute(context);
 
