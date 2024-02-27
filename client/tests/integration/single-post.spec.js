@@ -45,11 +45,13 @@ test('Fetches the post by post slug', async ({ page }) => {
 });
 
 test('Fetches post comments by post id', async ({ page }) => {
+  const commentsRequest = page.waitForRequest('*/**/comments*');
+
   await page.goto(`/${post.slug}`);
 
-  const commentsRequest = await page.waitForRequest('*/**/comments*');
+  const commentsResponse = await commentsRequest;
 
-  expect(commentsRequest.url()).toContain(`limit=10&post=${post.id}`);
+  expect(commentsResponse.url()).toContain(`limit=10&post=${post.id}`);
 });
 
 test.describe('Sections', () => {
