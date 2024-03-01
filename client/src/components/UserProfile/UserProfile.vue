@@ -8,21 +8,21 @@
       <div class="user-profile__main-info">
         <div class="user-profile__login">
           {{ data.login }}
-          <template v-if="(!isFollowed && data.login !== user.login) || !user.authState">
+
+          <template v-if="user.authState && !isSameUser">
             <button-element
-              :disabled="!user.authState"
-              :loading="requesting"
-              :callback="follow"
-            >
-              Follow
-            </button-element>
-          </template>
-          <template v-else-if="data.login !== user.login">
-            <button-element
+              v-if="isFollowed"
               :loading="requesting"
               :callback="unfollow"
             >
               Unfollow
+            </button-element>
+            <button-element
+              v-else
+              :loading="requesting"
+              :callback="follow"
+            >
+              Follow
             </button-element>
           </template>
         </div>
@@ -63,6 +63,9 @@ export default {
     }),
     isFollowed() {
       return this.data.isFollowed;
+    },
+    isSameUser() {
+      return this.data.login === this.user.login;
     },
   },
   props: ['data'],

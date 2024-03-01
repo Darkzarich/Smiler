@@ -1,4 +1,5 @@
 <template>
+  <!-- TODO: refactor: make <button> root element then I won't need :callback prop -->
   <div
     class="button"
     :class="loading ? 'button_loading' : ''"
