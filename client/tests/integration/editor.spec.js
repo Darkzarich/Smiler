@@ -110,6 +110,37 @@ test('Creates a post with title, tags and content', async ({ page, context }) =>
   });
 });
 
+test('Uploads a picture in the picture section', async ({ page, context }) => {
+  await context.route('*/**/posts/upload', async (route) => {
+    await route.fulfill({
+      json: {
+        type: 'pic',
+        url: 'https://placehold.co/600x400',
+        hash: (Math.random() * Math.random()).toString(36),
+        isFile: true,
+      },
+    });
+  });
+
+  await page.goto('/post/create');
+
+  await page.getByTestId('add-pic-button').click();
+
+  await page.getByLabel('Upload image').setInputFiles({
+    name: 'test.jpeg',
+    buffer: Buffer.from('test', 'utf-8'),
+    mimeType: 'image/jpeg',
+  });
+
+  const uploadRequest = page.waitForRequest((res) => res.url().includes('/posts/upload') && res.method() === 'POST');
+
+  await page.getByTestId('image-upload-button').click();
+
+  const uploadResponse = await uploadRequest;
+
+  expect(uploadResponse.headers()['content-type']).toContain('multipart/form-data; boundary=');
+});
+
 test('Deletes sections in a post', async ({ page }) => {
   await page.goto('/post/create');
 
