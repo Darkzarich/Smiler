@@ -5,7 +5,9 @@ import { test, expect } from '@playwright/test';
 import generateAuth from './fixtures/auth';
 import generatePost from './fixtures/post';
 
-const authUser = generateAuth(true);
+const authUser = generateAuth({
+  isAuth: true,
+});
 const title = 'Test post';
 const picUrl = 'https://placehold.co/600x400';
 const vidCode = 'dQw4w9WgXcQ';
@@ -41,7 +43,9 @@ test.beforeEach(async ({ context }) => {
 test('Goes to create post page from user menu', async ({ page, context, isMobile }) => {
   await context.route('*/**/users/get-auth', async (route) => {
     await route.fulfill({
-      json: generateAuth(true),
+      json: generateAuth({
+        isAuth: true,
+      }),
     });
   });
 

@@ -290,6 +290,7 @@ module.exports = {
         req.session.userId = foundUser._id;
         req.session.userLogin = foundUser.login;
 
+        // TODO: Maybe move to getters of the model
         const userAuth = {
           login: foundUser.login,
           isAuth: true,

@@ -6,11 +6,12 @@
         <img :src="$resolveAvatar(data.avatar)" :alt="data.avatar" />
       </div>
       <div class="user-profile__main-info">
-        <div class="user-profile__login">
+        <div class="user-profile__login" data-testid="user-profile-login">
           {{ data.login }}
 
           <template v-if="user.authState && !isSameUser">
             <button-element
+              data-testid="user-profile-unfollow-btn"
               v-if="isFollowed"
               :loading="requesting"
               :callback="unfollow"
@@ -18,6 +19,7 @@
               Unfollow
             </button-element>
             <button-element
+              data-testid="user-profile-follow-btn"
               v-else
               :loading="requesting"
               :callback="follow"
@@ -29,15 +31,15 @@
         <div class="user-profile__date"> With us already {{ data.createdAt | toDate }} </div>
 
         <div class="user-profile__main-info-row">
-          <div :class="ratingClass(data.rating)" class="user-profile__rating">
+          <div :class="ratingClass(data.rating)" class="user-profile__rating" data-testid="user-profile-rating">
             Rating: <span>{{ data.rating | ratingTransform }} </span>
           </div>
-          <div class="user-profile__followers">
+          <div class="user-profile__followers" data-testid="user-profile-followers">
             Followers: <span>{{ data.followersAmount }} </span>
           </div>
         </div>
 
-        <div class="user-profile__bio" v-if="data.bio">
+        <div class="user-profile__bio" v-if="data.bio" data-testid="user-profile-bio">
           Bio: <i>{{ data.bio }}</i>
         </div>
       </div>

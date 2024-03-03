@@ -34,7 +34,9 @@ test.describe('Auth state', () => {
   });
 
   test('Shows auth-ed user menu', async ({ page, isMobile, context }) => {
-    const auth = generateAuth(true);
+    const auth = generateAuth({
+      isAuth: true,
+    });
 
     await context.route('*/**/users/get-auth', async (route) => {
       route.fulfill({
@@ -57,7 +59,9 @@ test.describe('Auth state', () => {
   test('Shows not auth-ed state in the user menu on logout', async ({ page, isMobile, context }) => {
     await context.route('*/**/users/get-auth', async (route) => {
       route.fulfill({
-        json: generateAuth(true),
+        json: generateAuth({
+          isAuth: true,
+        }),
       });
     });
 
