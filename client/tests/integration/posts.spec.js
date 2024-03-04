@@ -52,7 +52,26 @@ test.describe('Post groups', async () => {
     await page.getByTestId(group).click();
   }
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, context }) => {
+    // playwright.config.js has Europe/Amsterdam (GMT+1) timezone set
+    const mockedDate = new Date('2024-03-06T00:00:00.000Z');
+
+    await context.addInitScript(`{
+      Date = class extends Date {
+        constructor(...args) {
+          if (args.length === 0) {
+            super(${mockedDate.getTime()})
+          } else {
+            super(...args)
+          }
+        }
+      }
+      
+      const __DateNowOffset = ${mockedDate.getTime()} - Date.now()
+      const __DateNow = Date.now
+      Date.now = () => __DateNow() + __DateNowOffset
+    }`);
+
     await page.goto('/');
   });
 
@@ -67,10 +86,13 @@ test.describe('Post groups', async () => {
 
     await allPostsRequest;
     await expect(page).toHaveURL(/.*posts\/all/);
+    await expect(page).toHaveTitle('All Posts');
   });
 
   test('Fetches "blowing" posts', async ({ page, isMobile }) => {
-    const blowingPostsRequest = page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-rating&ratingFrom=50'));
+    // Two hours ago from the mocked date and rating is already at least 50
+    const dateFrom = 'dateFrom=2024-03-05T22:00:00.000Z';
+    const blowingPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?limit=20&offset=0&sort=-rating&ratingFrom=50&${dateFrom}`));
 
     await clickPostGroup({
       group: 'blowing-link',
@@ -80,10 +102,13 @@ test.describe('Post groups', async () => {
 
     await blowingPostsRequest;
     await expect(page).toHaveURL(/.*posts\/blowing/);
+    await expect(page).toHaveTitle('Blowing');
   });
 
   test('Fetches "top this week" posts', async ({ page, isMobile }) => {
-    const topThisWeekRequest = page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-createdAt'));
+    // Posts with createdAt starting from the start of this week
+    const dateFromTo = 'dateFrom=2024-03-02T23:00:00.000Z&dateTo=2024-03-05T23:00:00.999Z';
+    const topThisWeekRequest = page.waitForRequest((res) => res.url().includes(`/posts?limit=20&offset=0&sort=-createdAt&${dateFromTo}`));
 
     await clickPostGroup({
       group: 'top-this-week-link',
@@ -93,10 +118,13 @@ test.describe('Post groups', async () => {
 
     await topThisWeekRequest;
     await expect(page).toHaveURL(/.*posts\/top-this-week/);
+    await expect(page).toHaveTitle('Top This Week');
   });
 
   test('Fetches "new" posts', async ({ page, isMobile }) => {
-    const newPostsRequest = page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-createdAt'));
+    // Two hours ago from the mocked date
+    const dateFrom = 'dateFrom=2024-03-05T22:00:00.000Z';
+    const newPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?limit=20&offset=0&sort=-createdAt&${dateFrom}`));
 
     await clickPostGroup({
       group: 'new-link',
@@ -106,10 +134,12 @@ test.describe('Post groups', async () => {
 
     await newPostsRequest;
     await expect(page).toHaveURL(/.*posts\/new/);
+    await expect(page).toHaveTitle('Recent');
   });
 
   test('Fetches "today" posts', async ({ page, isMobile }) => {
-    const todayPostsRequest = page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-rating&dateFrom='));
+    const dateFromTo = 'dateFrom=2024-03-05T23:00:00.000Z&dateTo=2024-03-06T22:59:59.999Z';
+    const todayPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?limit=20&offset=0&sort=-rating&${dateFromTo}`));
 
     await clickPostGroup({
       group: 'today-link',
@@ -119,6 +149,7 @@ test.describe('Post groups', async () => {
 
     await todayPostsRequest;
     await expect(page).toHaveURL(/.*/);
+    await expect(page).toHaveTitle('Home');
   });
 });
 
