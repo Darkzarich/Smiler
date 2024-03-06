@@ -1,34 +1,20 @@
 <template>
   <div v-if="show" class="post-create">
     <div class="post-create__header" data-testid="post-create-header">
-      {{ edit ? 'Edit' : 'Create'}} Post
+      {{ edit ? 'Edit' : 'Create' }} Post
     </div>
-    <post-editor :key="key" :edit="edit" :post="post" />
+    <PostEditor :key="key" :edit="edit" :post="post" />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import api from '@/api/index';
-
 import PostEditor from '@/components/PostEditor/PostEditor.vue';
 
 export default {
   components: {
     PostEditor,
-  },
-  data() {
-    return {
-      edit: false,
-      post: {},
-      show: false,
-      key: '',
-    };
-  },
-  computed: {
-    ...mapState({
-      login: (state) => state.user.login,
-    }),
   },
   async beforeRouteEnter(to, from, next) {
     if (to.meta.mode === 'edit') {
@@ -44,6 +30,19 @@ export default {
     } else {
       next((vm) => vm.showEditor());
     }
+  },
+  data() {
+    return {
+      edit: false,
+      post: {},
+      show: false,
+      key: '',
+    };
+  },
+  computed: {
+    ...mapState({
+      login: (state) => state.user.login,
+    }),
   },
   methods: {
     showEditor() {

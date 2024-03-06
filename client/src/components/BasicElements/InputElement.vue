@@ -1,44 +1,44 @@
 <template>
   <div class="input" :class="(error || errorOnlyStyle) && wasChanged ? 'input--error' : ''">
-    <label class="input__label" v-if="label" for="label">
+    <label v-if="label" class="input__label" for="label">
       {{ label }}
     </label>
 
     <input
-      :data-testid="dataTestid"
+      v-if="!multiline"
       :id="label"
+      :data-testid="dataTestid"
       :disabled="disabled"
       :type="type"
-      v-if="!multiline"
       :name="name"
-      @input="setValueAndChanged($event.target.value)"
-      @keyup.enter="enterCallback"
       :value="value"
       :placeholder="placeholder"
       class="input__element"
+      @input="setValueAndChanged($event.target.value)"
+      @keyup.enter="enterCallback"
     />
 
-    <div @click="iconClickCallback" class="input__icon">
-      <component v-if="icon" :is="icon" />
+    <div class="input__icon" @click="iconClickCallback">
+      <Component :is="icon" v-if="icon" />
     </div>
 
     <textarea
-      :data-testid="dataTestid"
-      :id="label"
-      :disabled="disabled"
       v-if="multiline"
+      :id="label"
+      :data-testid="dataTestid"
+      :disabled="disabled"
       :type="type"
       :name="name"
-      @input="setValueAndChanged($event.target.value)"
       :value="value"
       :placeholder="placeholder"
       class="input__element"
+      @input="setValueAndChanged($event.target.value)"
     />
 
     <span
+      v-if="wasChanged"
       :data-testid="`${dataTestid}-error`"
       class="input__error"
-      v-if="wasChanged"
     >
       {{ error }}
     </span>
@@ -46,16 +46,11 @@
 </template>
 
 <script>
-import searchIcon from '@/library/svg/search.vue';
+import SearchIcon from '@/library/svg/SearchIcon.vue';
 
 export default {
-  data() {
-    return {
-      wasChanged: false,
-    };
-  },
   components: {
-    searchIcon,
+    SearchIcon,
   },
   props: {
     dataTestid: {
@@ -112,6 +107,11 @@ export default {
       type: Function,
       default: () => {},
     },
+  },
+  data() {
+    return {
+      wasChanged: false,
+    };
   },
   methods: {
     setValueAndChanged(val) {

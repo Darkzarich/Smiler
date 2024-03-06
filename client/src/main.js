@@ -1,14 +1,13 @@
-import Vue from 'vue';
-import vClickOutside from 'v-click-outside';
 import moment from 'moment';
-import store from '@/store/index';
-import config from '@/config/config';
-import consts from '@/const/const';
-
+import vClickOutside from 'v-click-outside';
+import Vue from 'vue';
+import App from './App.vue';
+import router from './router';
 import defaultAvatar from '@/assets/neutral_avatar.png';
 import postNoImage from '@/assets/post_no_image.svg';
-import router from './router';
-import App from './App.vue';
+import config from '@/config/config';
+import consts from '@/const/const';
+import store from '@/store/index';
 
 Vue.config.productionTip = false;
 
@@ -26,6 +25,11 @@ Vue.directive('scroll', {
 // Mixin for global functions
 
 Vue.mixin({
+  filters: {
+    $fromNow(date) {
+      return moment(date).fromNow();
+    },
+  },
   methods: {
     $isMobile() {
       if (window.matchMedia('(max-device-width: 599px)').matches) {
@@ -102,11 +106,6 @@ Vue.mixin({
       }
 
       return true;
-    },
-  },
-  filters: {
-    $fromNow(date) {
-      return moment(date).fromNow();
     },
   },
 });

@@ -1,12 +1,11 @@
 <template>
   <div class="user">
-
     <template v-if="!getUserAuthState">
       <template v-if="mode == USER_LOGIN_MODE">
-        <user-login @close="closeMenu" @mode-change="setMode(USER_REG_MODE)" />
+        <UserLogin @close="closeMenu" @mode-change="setMode(USER_REG_MODE)" />
       </template>
       <template v-else-if="mode == USER_REG_MODE">
-        <user-registration @close="closeMenu" @mode-change="setMode(USER_LOGIN_MODE)" />
+        <UserRegistration @close="closeMenu" @mode-change="setMode(USER_LOGIN_MODE)" />
       </template>
     </template>
 
@@ -14,55 +13,61 @@
       <div class="user__logged-block">
         <div class="user__logged-meta">
           <div class="user__logged-meta-avatar">
-            <router-link
-              @click.native="navNative ? closeMenu() : ''"
+            <RouterLink
               :to="{
                 name: 'UserPage',
                 params: {
                   login: getUser.login,
                 },
-              }">
+              }"
+              @click.native="navNative ? closeMenu() : ''"
+            >
               <img :src="$resolveAvatar(getUser.avatar)" :alt="getUser.avatar">
               <div class="user__logged-meta-login" data-testid="user-login">
                 {{ getUser.login }}
               </div>
-            </router-link>
+            </RouterLink>
           </div>
-
         </div>
         <div class="user__logged-info">
           <div class="user__logged-info-rating">
             <div>Rating</div>
-            <div data-testid="user-rating">{{ getUser.rating }}</div>
+            <div data-testid="user-rating">
+              {{ getUser.rating }}
+            </div>
           </div>
           <div class="user__logged-info-rating">
             <div>Followers</div>
-            <div data-testid="user-followers-amount">{{ getUser.followersAmount }}</div>
+            <div data-testid="user-followers-amount">
+              {{ getUser.followersAmount }}
+            </div>
           </div>
         </div>
         <div class="user__logged-nav">
           <ul class="user__logged-nav-list">
-            <router-link
+            <RouterLink
               data-testid="create-post-btn"
-              @click.native="navNative ? closeMenu() : ''"
               :to="{
                 name: 'PostCreate',
-              }">
-              <li class="user__logged-nav-item">
-                <add-icon /> New Post
-              </li>
-            </router-link>
-            <router-link
+              }"
               @click.native="navNative ? closeMenu() : ''"
+            >
+              <li class="user__logged-nav-item">
+                <AddIcon /> New Post
+              </li>
+            </RouterLink>
+            <RouterLink
               :to="{
                 name: 'UserSettings',
-              }">
+              }"
+              @click.native="navNative ? closeMenu() : ''"
+            >
               <li class="user__logged-nav-item">
-                <settings-icon /> Settings
+                <SettingsIcon /> Settings
               </li>
-            </router-link>
-            <li class="user__logged-nav-item" @click="logout" data-testid="logout-btn">
-              <exit-icon /> Logout
+            </RouterLink>
+            <li class="user__logged-nav-item" data-testid="logout-btn" @click="logout">
+              <ExitIcon /> Logout
             </li>
           </ul>
         </div>
@@ -72,23 +77,21 @@
 </template>
 
 <script>
-import consts from '@/const/const';
 import api from '@/api';
-
 import UserLogin from '@/components/User/UserLogin.vue';
 import UserRegistration from '@/components/User/UserRegistration.vue';
-
-import exitIcon from '@/library/svg/exit.vue';
-import settingsIcon from '@/library/svg/settings.vue';
-import addIcon from '@/library/svg/add.vue';
+import consts from '@/const/const';
+import AddIcon from '@/library/svg/AddIcon.vue';
+import ExitIcon from '@/library/svg/ExitIcon.vue';
+import SettingsIcon from '@/library/svg/SettingsIcon.vue';
 
 export default {
   components: {
     UserLogin,
     UserRegistration,
-    settingsIcon,
-    exitIcon,
-    addIcon,
+    AddIcon,
+    ExitIcon,
+    SettingsIcon,
   },
   props: ['navNative'],
   data() {

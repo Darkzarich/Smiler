@@ -4,9 +4,10 @@
       <div
         :data-testid="`post-${ postData.id }-upvote`"
         class="post-side__upvote"
+        :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''"
         @click="upvote(postData.id)"
-        :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''">
-        <plus-icon />
+      >
+        <PlusIcon />
       </div>
       <div class="post-side__rating">
         {{ postData.rating }}
@@ -14,13 +15,14 @@
       <div
         :data-testid="`post-${ postData.id }-downvote`"
         class="post-side__downvote"
+        :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''"
         @click="downvote(postData.id)"
-        :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''">
-        <minus-icon />
+      >
+        <MinusIcon />
       </div>
     </div>
     <div class="post-main">
-      <router-link
+      <RouterLink
         :to="{
           name: 'Single',
           params: {
@@ -32,40 +34,46 @@
         <div class="post-main__title" :data-testid="`post-${ postData.id }-title`">
           {{ postData.title }}
           <template v-if="canEdit">
-            <router-link title="Edit post" :to="postData.slug + '/edit'">
-              <edit-icon />
-            </router-link>
+            <RouterLink title="Edit post" :to="postData.slug + '/edit'">
+              <EditIcon />
+            </RouterLink>
             <span @click="deletePost(postData.id)">
-              <router-link title="Delete post" :to="'/'">
-                <delete-icon />
-              </router-link>
+              <RouterLink title="Delete post" :to="'/'">
+                <DeleteIcon />
+              </RouterLink>
             </span>
           </template>
-
         </div>
-      </router-link>
+      </RouterLink>
 
       <div v-if="postData.tags.length > 0" class="post-main__tags">
         <div
           v-for="tag in postData.tags"
-          @click="openContextMenu($event, tag)"
           :key="tag"
-          class="post-main__tags-item">
+          class="post-main__tags-item"
+          @click="openContextMenu($event, tag)"
+        >
           {{ tag }}
         </div>
       </div>
 
       <div class="post-main__body">
         <div
-          class="post-main__body-section"
           v-for="section in postData.sections"
-          :key="section.hash">
+          :key="section.hash"
+          class="post-main__body-section"
+        >
           <template v-if="section.type === POST_SECTION_TYPES.TEXT">
-            <div v-html="section.content" :data-testid="`post-${ postData.id }-text-${section.hash}`" />
+            <div :data-testid="`post-${ postData.id }-text-${section.hash}`" v-html="section.content" />
           </template>
           <template v-else-if="section.type === POST_SECTION_TYPES.PICTURE">
             <div class="post-main__attachments-item">
-              <img @error="$resolveImageError" :src="$resolveImage(section.url)" :alt="section.url" :data-testid="`post-${ postData.id }-pic-${section.hash}`">
+              <img
+                :src="$resolveImage(section.url)"
+                :alt="section.url"
+                :data-testid="`post-${ postData.id }-pic-${section.hash}`"
+                @error="$resolveImageError"
+              >
             </div>
           </template>
           <template v-else-if="section.type === POST_SECTION_TYPES.VIDEO">
@@ -81,20 +89,22 @@
       <div class="post-main__rate-mobile">
         <div
           class="post-side__upvote"
-          @click="upvote(postData.id)"
           :data-testid="`m-post-${ postData.id }-upvote`"
-          :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''">
-          <plus-icon />
+          :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''"
+          @click="upvote(postData.id)"
+        >
+          <PlusIcon />
         </div>
         <div class="post-side__rating">
           {{ postData.rating }}
         </div>
         <div
           class="post-side__downvote"
-          @click="downvote(postData.id)"
           :data-testid="`m-post-${ postData.id }-downvote`"
-          :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''">
-          <minus-icon />
+          :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''"
+          @click="downvote(postData.id)"
+        >
+          <MinusIcon />
         </div>
       </div>
 
@@ -105,27 +115,29 @@
             {{ postData.createdAt | $fromNow }}
           </span>
           <span class="post-main__meta-comments">
-            <router-link
+            <RouterLink
               :target="$isMobile() ? '' : '_blank'"
               :to="{
                 name: 'Single',
                 params: {
                   slug: postData.slug,
                 },
-              }">
-              <comments-icon /> {{ postData.commentCount }}
-            </router-link>
+              }"
+            >
+              <CommentsIcon /> {{ postData.commentCount }}
+            </RouterLink>
           </span>
 
           <template v-if="postData.author">
-            <router-link
+            <RouterLink
               :target="$isMobile() ? '' : '_blank'"
               :to="{
                 name: 'UserPage',
                 params: {
                   login: postData.author.login,
                 },
-              }">
+              }"
+            >
               <span class="post-main__meta-author">
                 <span> {{ postData.author.login }} </span>
                 <img
@@ -133,7 +145,7 @@
                   :alt="postData.author.avatar"
                 >
               </span>
-            </router-link>
+            </RouterLink>
           </template>
           <template v-else>
             <span class="post-main__meta-author">
@@ -144,19 +156,18 @@
               >
             </span>
           </template>
-
         </div>
         <!-- {{ post.createdAt !== post.updatedAt ? 'updated: ' + post.updatedAt : ''}} -->
       </div>
     </div>
-    <context-menu-wrapper
+    <ContextMenuWrapper
+      v-click-outside="closeContextMenu"
       :show="contextMenuData.show"
-      :posX="contextMenuData.x"
-      :posY="contextMenuData.y"
+      :pos-x="contextMenuData.x"
+      :pos-y="contextMenuData.y"
       :list="contextMenuData.list"
       :target="contextMenuData.target"
       :filter="contextMenuData.filter"
-      v-click-outside="closeContextMenu"
     />
   </div>
 </template>
@@ -164,24 +175,22 @@
 <script>
 import { mapState } from 'vuex';
 import api from '@/api/index';
-
-import contextMenuWrapper from '@/components/BasicElements/ContextMenuWrapper.vue';
-import commentsIcon from '@/library/svg/comments.vue';
-import plusIcon from '@/library/svg/plus.vue';
-import minusIcon from '@/library/svg/minus.vue';
-import editIcon from '@/library/svg/edit.vue';
-import deleteIcon from '@/library/svg/delete.vue';
-
+import ContextMenuWrapper from '@/components/BasicElements/ContextMenuWrapper.vue';
 import consts from '@/const/const';
+import CommentsIcon from '@/library/svg/CommentsIcon.vue';
+import DeleteIcon from '@/library/svg/DeleteIcon.vue';
+import EditIcon from '@/library/svg/EditIcon.vue';
+import MinusIcon from '@/library/svg/MinusIcon.vue';
+import PlusIcon from '@/library/svg/PlusIcon.vue';
 
 export default {
   components: {
-    commentsIcon,
-    plusIcon,
-    minusIcon,
-    editIcon,
-    contextMenuWrapper,
-    deleteIcon,
+    CommentsIcon,
+    DeleteIcon,
+    EditIcon,
+    MinusIcon,
+    ContextMenuWrapper,
+    PlusIcon,
   },
   props: ['post', 'canEdit'],
   data() {

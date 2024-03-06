@@ -1,59 +1,89 @@
 <template>
   <div class="mobile-menu">
-    <div @click="closeMenu()" class="mobile-menu__close-icon">
-      <exit-icon />
+    <div class="mobile-menu__close-icon" @click="closeMenu()">
+      <ExitIcon />
     </div>
     <div class="mobile-menu__user">
       <!-- vue requires .native to catch click event for vue-router links -->
-      <user
+      <User
         :nav-native="true"
         @close="closeMenu()"
       />
     </div>
     <div class="mobile-menu__nav-container">
-
       <template v-if="user.authState">
-        <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'Feed' }">
+        <RouterLink class="mobile-menu__nav-link" :to="{ name: 'Feed' }" @click.native="closeMenu()">
           <div>MY FEED</div>
-        </router-link>
+        </RouterLink>
       </template>
       <template v-else>
         <a
           title="Log in to access this page"
-          class="mobile-menu__nav-link mobile-menu__nav-link_disabled">
+          class="mobile-menu__nav-link mobile-menu__nav-link_disabled"
+        >
           <div>MY FEED</div>
         </a>
       </template>
 
-      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'Home' }" data-testid="today-link">
+      <RouterLink
+        class="mobile-menu__nav-link"
+        :to="{ name: 'Home' }"
+        data-testid="today-link"
+        @click.native="closeMenu()"
+      >
         <div>TODAY</div>
-      </router-link>
-      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'All' }" data-testid="all-link">
+      </RouterLink>
+      <RouterLink
+        class="mobile-menu__nav-link"
+        :to="{ name: 'All' }"
+        data-testid="all-link"
+        @click.native="closeMenu()"
+      >
         <div>ALL</div>
-      </router-link>
-      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'Blowing' }" data-testid="blowing-link">
-        <div title="posted recently, 50+ rating">BLOWING</div>
-      </router-link>
-      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'TopThisWeek' }" data-testid="top-this-week-link">
-        <div title="current week posts sorted by newer">TOP THIS WEEK</div>
-      </router-link>
-      <router-link class="mobile-menu__nav-link" @click.native="closeMenu()" :to="{ name: 'New' }" data-testid="new-link">
-        <div title="posts posted 2 hours ago sorted by newer">NEW</div>
-      </router-link>
+      </RouterLink>
+      <RouterLink
+        class="mobile-menu__nav-link"
+        :to="{ name: 'Blowing' }"
+        data-testid="blowing-link"
+        @click.native="closeMenu()"
+      >
+        <div title="posted recently, 50+ rating">
+          BLOWING
+        </div>
+      </RouterLink>
+      <RouterLink
+        class="mobile-menu__nav-link"
+        :to="{ name: 'TopThisWeek' }"
+        data-testid="top-this-week-link"
+        @click.native="closeMenu()"
+      >
+        <div title="current week posts sorted by newer">
+          TOP THIS WEEK
+        </div>
+      </RouterLink>
+      <RouterLink
+        class="mobile-menu__nav-link"
+        :to="{ name: 'New' }"
+        data-testid="new-link"
+        @click.native="closeMenu()"
+      >
+        <div title="posts posted 2 hours ago sorted by newer">
+          NEW
+        </div>
+      </RouterLink>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-
-import user from '@/components/User/User.vue';
-import exitIcon from '@/library/svg/exit.vue';
+import User from '@/components/User/User.vue';
+import ExitIcon from '@/library/svg/ExitIcon.vue';
 
 export default {
   components: {
-    user,
-    exitIcon,
+    User,
+    ExitIcon,
   },
   computed: {
     ...mapState({

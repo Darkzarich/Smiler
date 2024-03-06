@@ -1,28 +1,40 @@
 <template>
   <div class="text-editor-container">
     <div class="text-editor-control" :data-testid="dataTestid">
-      <button type="button" title="bold" @click="styleSelected('b')">B</button>
-      <button type="button" title="italic" @click="styleSelected('i')">I</button>
-      <button type="button" title="strike" @click="styleSelected('s')">S</button>
-      <button type="button" title="underline" @click="styleSelected('u')">U</button>
-      <button type="button" title="quote" @click="styleSelected('cite')">Q</button>
-      <button type="button" title="remove styles" @click="removeStyles()">REMOVE STYLES</button>
+      <button type="button" title="bold" @click="styleSelected('b')">
+        B
+      </button>
+      <button type="button" title="italic" @click="styleSelected('i')">
+        I
+      </button>
+      <button type="button" title="strike" @click="styleSelected('s')">
+        S
+      </button>
+      <button type="button" title="underline" @click="styleSelected('u')">
+        U
+      </button>
+      <button type="button" title="quote" @click="styleSelected('cite')">
+        Q
+      </button>
+      <button type="button" title="remove styles" @click="removeStyles()">
+        REMOVE STYLES
+      </button>
     </div>
     <div
       class="text-editor"
     >
       <div
+        :id="id"
+        :ref="'text-editor#' + id"
         class="text-editor__input"
         data-testid="text-editor"
         role="textbox"
         tabIndex="0"
         contenteditable
-        v-html="value"
-        :id="id"
-        :ref="'text-editor#' + id"
         @selectstart="selecting = true"
         @mouseup="endSelect()"
         @focusout="setText()"
+        v-html="value"
       />
     </div>
     <slot />

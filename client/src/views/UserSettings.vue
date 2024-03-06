@@ -10,12 +10,12 @@
             Authors:
           </div>
           <div
-            class="user-settings__data-group-author"
-            :key="author.id"
             v-for="author in usersFollowed"
+            :key="author.id"
+            class="user-settings__data-group-author"
           >
             {{ author.login }}
-            <span @click="unfollow(author.id)" class="user-settings__data-group-unfollow">
+            <span class="user-settings__data-group-unfollow" @click="unfollow(author.id)">
               x
             </span>
           </div>
@@ -25,19 +25,19 @@
             Tags:
           </div>
           <div
-            class="user-settings__data-group-tag"
             v-for="tag in tagsFollowed"
             :key="tag"
+            class="user-settings__data-group-tag"
           >
             {{ tag }}
-            <span @click="unfollowTag(tag)" class="user-settings__data-group-unfollow">
+            <span class="user-settings__data-group-unfollow" @click="unfollowTag(tag)">
               x
             </span>
           </div>
         </div>
         <div
-          class="user-settings__data-group"
           v-if="usersFollowed.length === 0 && tagsFollowed.length === 0"
+          class="user-settings__data-group"
         >
           <i>Nothing in following...</i>
         </div>
@@ -46,19 +46,19 @@
         <div class="user-settings__data-title">
           Edit Bio
         </div>
-        <input-element
+        <InputElement
+          v-model="bioEditInput"
           class="user-settings__bio-edit"
           :multiline="true"
-          v-model="bioEditInput"
         />
         <div class="user-settings__bio-buttons">
-          <button-element
+          <ButtonElement
             :loading="bioEditRequesting"
             :callback="editBio"
             :disabled="bioEditInput.length > USER_MAX_BIO_LENGTH"
           >
             Submit
-          </button-element>
+          </ButtonElement>
         </div>
       </div>
       <div class="user-settings__block">
@@ -68,25 +68,25 @@
         <div class="user-settings__current-avatar">
           <img :src="$resolveAvatar(avatar)" :alt="avatar">
         </div>
-        <input-element
-          class="user-settings__avatar-edit"
+        <InputElement
           v-model="avatarEditInput"
+          class="user-settings__avatar-edit"
           placeholder="URL to avatar..."
         />
         <div class="user-settings__bio-buttons">
-          <button-element
+          <ButtonElement
             :loading="avatarEditRequesting"
             :callback="editAvatar"
             :disabled="bioEditInput.length > USER_MAX_AVATAR_LENGTH"
           >
             Submit
-          </button-element>
+          </ButtonElement>
         </div>
       </div>
     </div>
     <!-- TODO: rated list -->
     <div v-else class="user-settings__loading">
-      <loader />
+      <CircularLoader />
     </div>
   </div>
 </template>
@@ -94,17 +94,16 @@
 <script>
 import { mapState } from 'vuex';
 import api from '@/api';
-import loader from '@/library/svg/animation/circularLoader.vue';
+import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
+import InputElement from '@/components/BasicElements/InputElement.vue';
 import consts from '@/const/const';
-
-import inputElement from '@/components/BasicElements/InputElement.vue';
-import buttonElement from '@/components/BasicElements/ButtonElement.vue';
+import CircularLoader from '@/library/svg/animation/CircularLoader.vue';
 
 export default {
   components: {
-    loader,
-    inputElement,
-    buttonElement,
+    CircularLoader,
+    InputElement,
+    ButtonElement,
   },
   data() {
     return {

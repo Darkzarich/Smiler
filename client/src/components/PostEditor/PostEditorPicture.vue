@@ -1,53 +1,59 @@
 <template>
   <div class="post-image-upload" :class="value ? 'post-image-upload_uploaded' : ''">
-    <div class="post-image-upload__container" v-if="!value">
-      <upload-element
+    <div v-if="!value" class="post-image-upload__container">
+      <UploadElement
         v-model="file"
       />
       <div class="post-image-upload__or">
         OR
       </div>
       <div class="post-image-upload__input-url">
-        <input-element
+        <InputElement
           v-model.lazy="imageUrl"
           :disabled="Boolean(file)"
           placeholder="Paste URL"
           data-testid="image-url-input"
         />
-        <button-element
+        <ButtonElement
           data-testid="image-upload-button"
           :callback="upload"
           :loading="uploading"
           :disabled="!imageUrl"
         >
           Upload
-        </button-element>
+        </ButtonElement>
       </div>
       <img
-        hidden
         v-if="!file && imageUrl"
+        hidden
         :src="imageUrl"
-        @error="error()"
         alt="error"
+        @error="error()"
       >
     </div>
     <div v-else class="post-image-upload__image">
-      <img @error="$resolveImageError" :src="$resolveImage(value)" :alt="value" />
+      <img :src="$resolveImage(value)" :alt="value" @error="$resolveImageError" />
     </div>
   </div>
 </template>
 
 <script>
+import ButtonElement from '../BasicElements/ButtonElement.vue';
+import InputElement from '../BasicElements/InputElement.vue';
+import UploadElement from '../BasicElements/UploadElement.vue';
 import api from '@/api';
-import inputElement from '../BasicElements/InputElement.vue';
-import buttonElement from '../BasicElements/ButtonElement.vue';
-import uploadElement from '../BasicElements/UploadElement.vue';
 
 export default {
   components: {
-    uploadElement,
-    buttonElement,
-    inputElement,
+    UploadElement,
+    ButtonElement,
+    InputElement,
+  },
+  props: {
+    value: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -55,12 +61,6 @@ export default {
       imageUrl: '',
       uploading: false,
     };
-  },
-  props: {
-    value: {
-      type: String,
-      default: '',
-    },
   },
   watch: {
     file(newFile) {

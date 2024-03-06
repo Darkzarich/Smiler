@@ -1,66 +1,66 @@
 <template>
   <div>
     <div class="search-form__string">
-      <input-element
+      <InputElement
         v-model="filters.title"
       />
     </div>
     <div class="search-form__extra">
       <div class="search-form__extra-date">
-        <date-pick-element
+        <DatePickerElement
           v-model="filters.dateFrom"
           :label="'Date from'"
         />
-        <date-pick-element
+        <DatePickerElement
           v-model="filters.dateTo"
           :label="'Date to'"
         />
       </div>
       <div class="search-form__extra-slider">
-        <slider-element
+        <SliderElement
           v-model="filters.ratingFrom"
           :label="'Rating from'"
         />
-        <slider-element
+        <SliderElement
           v-model="filters.ratingTo"
           :label="'Rating to'"
         />
       </div>
     </div>
     <div class="search-form__tags">
-      <post-editor-tags
+      <PostEditorTags
         :tags="filters.tags"
       />
     </div>
     <div class="search-form__submit">
-      <button-element
+      <ButtonElement
         :callback="search"
       >
         Submit
-      </button-element>
-      <button-element
+      </ButtonElement>
+      <ButtonElement
         :callback="clear"
       >
         Clear filters
-      </button-element>
+      </ButtonElement>
     </div>
   </div>
 </template>
 
 <script>
-import inputElement from '@/components/BasicElements/InputElement.vue';
-import datePickElement from '@/components/BasicElements/DatePickElement.vue';
-import buttonElement from '@/components/BasicElements/ButtonElement.vue';
-import sliderElement from '@/components/BasicElements/SliderElement.vue';
-import postEditorTags from '@/components/PostEditor/PostEditorTags.vue';
+import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
+import DatePickerElement from '@/components/BasicElements/DatePickerElement.vue';
+import InputElement from '@/components/BasicElements/InputElement.vue';
+import SliderElement from '@/components/BasicElements/SliderElement.vue';
+import PostEditorTags from '@/components/PostEditor/PostEditorTags.vue';
 
 export default {
   components: {
-    inputElement,
-    buttonElement,
-    datePickElement,
-    sliderElement,
-    postEditorTags,
+    InputElement,
+    ButtonElement,
+    DatePickerElement,
+    SliderElement,
+    PostEditorTags,
   },
   props: ['value'],
   data() {

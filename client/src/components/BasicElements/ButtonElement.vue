@@ -8,25 +8,25 @@
       :data-testid="dataTestid"
       type="button"
       class="button__element"
-      @click="callback(argument)"
       :disabled="disabled"
+      @click="callback(argument)"
     >
       <span class="button__element-content">
         <slot />
       </span>
       <div v-if="loading" class="button__element-loader">
-        <circular-loader />
+        <CircularLoader />
       </div>
     </button>
   </div>
 </template>
 
 <script>
-import circularLoader from '../../library/svg/animation/circularLoader.vue';
+import CircularLoader from '@/library/svg/animation/CircularLoader.vue';
 
 export default {
   components: {
-    circularLoader,
+    CircularLoader,
   },
   props: {
     dataTestid: {

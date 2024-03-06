@@ -4,8 +4,8 @@
       {{ label }}
     </label>
     <input
-      type="range"
       :id="label"
+      type="range"
       :max="max"
       :min="min"
       step="1"

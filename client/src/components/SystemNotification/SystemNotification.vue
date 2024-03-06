@@ -1,28 +1,28 @@
 <template>
   <div class="notifications">
-    <transition-group name="notifications__item">
+    <TransitionGroup name="notifications__item">
       <div
-        class="notifications__item"
         v-for="notif in notifications"
         :key="notif.timer"
+        class="notifications__item"
       >
         Error occured. {{ notif.error }}
 
-        <div class="notifications__close" @click=closeNotification(notif.timer)>
-          <exit-icon />
+        <div class="notifications__close" @click="closeNotification(notif.timer)">
+          <ExitIcon />
         </div>
       </div>
-    </transition-group>
+    </TransitionGroup>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import exitIcon from '@/library/svg/exit.vue';
+import ExitIcon from '@/library/svg/ExitIcon.vue';
 
 export default {
   components: {
-    exitIcon,
+    ExitIcon,
   },
   computed: {
     ...mapState({

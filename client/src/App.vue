@@ -1,26 +1,27 @@
 <template>
-  <div id="app" v-if="show">
-    <system-notification />
-    <header-element />
+  <div v-if="show" id="app">
+    <SystemNotification />
+    <HeaderElement />
     <!-- <div id="nav">
         <router-link to="/">Home</router-link> |
         <router-link to="/about">About</router-link>
       </div> -->
     <div class="content-box">
       <content class="content-box__main">
-        <router-view />
+        <RouterView />
       </content>
-      <div class="content-box__sidebar" v-if="!$isMobile()">
-        <user />
+      <div v-if="!$isMobile()" class="content-box__sidebar">
+        <User />
       </div>
     </div>
-    <footer-element />
+
+    <FooterElement />
   </div>
 </template>
 
 <script>
-import HeaderElement from '@/components/Header/HeaderElement.vue';
 import FooterElement from '@/components/FooterElement.vue';
+import HeaderElement from '@/components/Header/HeaderElement.vue';
 import SystemNotification from '@/components/SystemNotification/SystemNotification.vue';
 import User from '@/components/User/User.vue';
 

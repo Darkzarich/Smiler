@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div v-if="!loading || posts.length > 0" class="post-container" v-scroll="handleScroll">
+    <div v-if="!loading || posts.length > 0" v-scroll="handleScroll" class="post-container">
       <div
         v-for="post in posts"
         :key="post.id"
       >
-        <post
+        <Post
           :post="post"
           :can-edit="$postCanEdit(post)"
         />
@@ -18,7 +18,7 @@
       </div>
     </div>
     <div v-if="loading" class="post-loading">
-      <loader />
+      <CircularLoader />
     </div>
     <div
       v-else-if="noMorePost"
@@ -31,14 +31,17 @@
 </template>
 
 <script>
-import Post from '@/components/Post/Post.vue';
 import api from '@/api';
-
-import loader from '@/library/svg/animation/circularLoader.vue';
-
+import Post from '@/components/Post/Post.vue';
 import consts from '@/const/const';
+import CircularLoader from '@/library/svg/animation/CircularLoader.vue';
 
 export default {
+  components: {
+    Post,
+    CircularLoader,
+  },
+  props: ['searchFilter'],
   data() {
     return {
       posts: [],
@@ -47,18 +50,6 @@ export default {
       noMorePost: false,
       filters: this.$route.meta.filters,
     };
-  },
-  props: ['searchFilter'],
-  components: {
-    Post,
-    loader,
-  },
-  created() {
-    if (this.searchFilter) {
-      this.filters = this.searchFilter;
-    } else {
-      this.getPosts(this.curPage);
-    }
   },
   watch: {
     '$route.meta': function (newVal) {
@@ -76,6 +67,13 @@ export default {
         this.filters = newVal;
       }
     },
+  },
+  created() {
+    if (this.searchFilter) {
+      this.filters = this.searchFilter;
+    } else {
+      this.getPosts(this.curPage);
+    }
   },
   methods: {
     // "add" param decides if concat of arrays is used

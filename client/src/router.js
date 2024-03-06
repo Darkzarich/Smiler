@@ -1,14 +1,13 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import store from '@/store/index';
-
-import PostsContainer from './views/PostsContainer.vue';
 import NotFound from './views/NotFound.vue';
+import PostCreate from './views/PostCreate.vue';
+import PostsContainer from './views/PostsContainer.vue';
+import Search from './views/Search.vue';
 import SinglePost from './views/SinglePost.vue';
 import UserPage from './views/UserPage.vue';
-import PostCreate from './views/PostCreate.vue';
 import UserSettings from './views/UserSettings.vue';
-import Search from './views/Search.vue';
+import store from '@/store/index';
 
 Vue.use(Router);
 

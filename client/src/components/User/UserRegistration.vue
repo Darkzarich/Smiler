@@ -1,34 +1,36 @@
 <template>
   <div class="user-registration">
-
     <div class="user-registration__header">
       Registration
     </div>
 
     <div class="user-registration__form-input">
-      <input-element
+      <InputElement
+        v-model="email"
         data-testid="user-signup-email"
         label="Email"
         name="email"
         placeholder="Enter email"
         :enter-callback="register"
         :error="validation.email"
-        v-model="email" />
+      />
     </div>
 
     <div class="user-registration__form-input">
-      <input-element
+      <InputElement
+        v-model="login"
         data-testid="user-signup-login"
         label="Login"
         name="login"
         placeholder="Enter login"
         :enter-callback="register"
         :error="validation.login"
-        v-model="login" />
+      />
     </div>
 
     <div class="user-registration__form-input">
-      <input-element
+      <InputElement
+        v-model="password"
         data-testid="user-signup-password"
         label="Password"
         :type="'password'"
@@ -36,11 +38,12 @@
         name="password"
         :error="validation.password"
         placeholder="Enter password"
-        v-model="password" />
+      />
     </div>
 
     <div class="user-registration__form-input">
-      <input-element
+      <InputElement
+        v-model="confirm"
         data-testid="user-signup-confirm"
         label="Confirm password"
         type="password"
@@ -48,33 +51,31 @@
         name="confirm"
         :error="validation.confirm"
         placeholder="Enter password again"
-        v-model="confirm" />
+      />
     </div>
 
     <div class="user-registration__submit">
-      <button-element
+      <ButtonElement
         data-testid="user-signup-submit"
         :callback="register"
         :loading="loading"
         :disabled="isSubmitDisabled"
       >
         FINISH
-      </button-element>
+      </ButtonElement>
     </div>
 
-    <div @click="$emit('mode-change')" data-testid="user-form-mode-toggler" class="user-registration__mode-toggler">
+    <div data-testid="user-form-mode-toggler" class="user-registration__mode-toggler" @click="$emit('mode-change')">
       OR LOGIN
     </div>
-
   </div>
 </template>
 
 <script>
-import api from '@/api';
-
-import consts from '@/const/const';
 import ButtonElement from '../BasicElements/ButtonElement.vue';
 import InputElement from '../BasicElements/InputElement.vue';
+import api from '@/api';
+import consts from '@/const/const';
 
 export default {
   components: {

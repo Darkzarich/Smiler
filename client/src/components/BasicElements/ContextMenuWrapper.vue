@@ -1,5 +1,5 @@
 <template>
-  <transition name="context-menu">
+  <Transition name="context-menu">
     <div
       v-if="show"
       class="context-menu"
@@ -7,16 +7,16 @@
     >
       <ul class="context-menu__list">
         <li
-          @click="item.callback(target)"
-          class="context-menu__item"
           v-for="item in list.filter(el => filter(el))"
           :key="item.title"
+          class="context-menu__item"
+          @click="item.callback(target)"
         >
           {{ item.title }}
         </li>
       </ul>
     </div>
-  </transition>
+  </Transition>
 </template>
 
 <script>

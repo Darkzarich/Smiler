@@ -1,24 +1,24 @@
 <template>
   <div>
     <div class="search-form">
-      <search-form
+      <SearchForm
         v-model="filter"
       />
     </div>
-    <posts-container
+    <PostsContainer
       :search-filter="filter"
     />
   </div>
 </template>
 
 <script>
-import searchForm from '@/components/SearchForm/SearchForm.vue';
-import postsContainer from '@/views/PostsContainer.vue';
+import SearchForm from '@/components/SearchForm/SearchForm.vue';
+import PostsContainer from '@/views/PostsContainer.vue';
 
 export default {
   components: {
-    searchForm,
-    postsContainer,
+    SearchForm,
+    PostsContainer,
   },
   data() {
     return {

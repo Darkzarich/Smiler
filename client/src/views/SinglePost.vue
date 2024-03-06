@@ -1,48 +1,51 @@
 <template>
   <div>
     <div class="post-container">
-      <post v-if="showPost" :post="post" :can-edit="$postCanEdit(post)" />
+      <Post v-if="showPost" :post="post" :can-edit="$postCanEdit(post)" />
     </div>
 
-    <div class="comments" id="comments">
+    <div id="comments" class="comments">
       <div
-        @click="refreshComments()"
         title="Refresh comments"
         :class="commentsRefreshing ? 'comments__update_refreshing' : ''"
-        class="comments__update">
-        <refresh-icon />
-        <template v-if="newCommentsCount > 0"> <span>+{{ newCommentsCount }}</span> </template>
+        class="comments__update"
+        @click="refreshComments()"
+      >
+        <RefreshIcon />
+        <template v-if="newCommentsCount > 0">
+          <span>+{{ newCommentsCount }}</span>
+        </template>
       </div>
       <div class="comments__title">
-        Commentaries ( <span class="comments__title-number"> {{post.commentCount }} </span> )
+        Commentaries ( <span class="comments__title-number"> {{ post.commentCount }} </span> )
       </div>
       <div
+        v-if="!commentsLoading"
         class="comments__form"
         :class="!user.authState ? 'comments__form_disabled' : ''"
-        v-if="!commentsLoading"
       >
         <template v-if="user.authState">
           <div class="comments__form-title">
             Leave the commentary
           </div>
-          <text-editor-element
+          <TextEditorElement
             v-model="sendCommentBody"
           >
             <div class="comments__form-submit">
-              <button-element
+              <ButtonElement
                 :loading="sendCommentLoading"
                 :callback="sendComment"
               >
                 Send
-              </button-element>
+              </ButtonElement>
             </div>
-          </text-editor-element>
+          </TextEditorElement>
         </template>
         <template v-else>
           Please, <b>login</b> \ <b>register</b> to be able to leave any comments
         </template>
       </div>
-      <comments
+      <Comments
         v-if="!commentsLoading && comments.length > 0"
         :data="comments"
         :indent-level="1"
@@ -50,11 +53,11 @@
         :level="0"
         :first="true"
       />
-      <div class="comments__no-comments" v-else-if="!commentsLoading">
+      <div v-else-if="!commentsLoading" class="comments__no-comments">
         No comments yet... Be the first!
       </div>
-      <div class="comments__loading" v-else>
-        <loader />
+      <div v-else class="comments__loading">
+        <Loader />
       </div>
     </div>
     <div
@@ -63,7 +66,7 @@
       @click="loadMoreComments()"
     >
       <template v-if="moreCommentsLoading">
-        <loader />
+        <CircularLoader />
       </template>
       <template v-else>
         Click to load more comments
@@ -71,7 +74,8 @@
     </div>
     <div
       v-if="comments.length > 0 && curPage === maxPages"
-      class="comments__load-more-cant">
+      class="comments__load-more-cant"
+    >
       You've read all the comments. It's time to post some your own!
     </div>
   </div>
@@ -79,20 +83,35 @@
 
 <script>
 import { mapState } from 'vuex';
-import Post from '@/components/Post/Post.vue';
-import Comments from '@/components/Comment/Comments.vue';
-
-import TextEditorElement from '@/components/BasicElements/TextEditorElement.vue';
-import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
-
-import refreshIcon from '@/library/svg/refresh.vue';
-import loader from '@/library/svg/animation/circularLoader.vue';
-
 import api from '@/api';
-
+import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
+import TextEditorElement from '@/components/BasicElements/TextEditorElement.vue';
+import Comments from '@/components/Comment/Comments.vue';
+import Post from '@/components/Post/Post.vue';
 import consts from '@/const/const';
+import RefreshIcon from '@/library/svg/RefreshIcon.vue';
+import CircularLoader from '@/library/svg/animation/CircularLoader.vue';
 
 export default {
+  components: {
+    Post,
+    TextEditorElement,
+    ButtonElement,
+    Comments,
+    RefreshIcon,
+    CircularLoader,
+  },
+  async beforeRouteEnter(to, from, next) {
+    const post = await api.posts.getPostBySlug(to.params.slug);
+
+    if (post.data.error) {
+      next({
+        name: '404',
+      });
+    } else {
+      next((vm) => vm.setPost(post.data));
+    }
+  },
   data() {
     return {
       post: {},
@@ -108,29 +127,10 @@ export default {
       moreCommentsLoading: false,
     };
   },
-  components: {
-    Post,
-    TextEditorElement,
-    ButtonElement,
-    Comments,
-    refreshIcon,
-    loader,
-  },
   computed: {
     ...mapState({
       user: (state) => state.user,
     }),
-  },
-  async beforeRouteEnter(to, from, next) {
-    const post = await api.posts.getPostBySlug(to.params.slug);
-
-    if (post.data.error) {
-      next({
-        name: '404',
-      });
-    } else {
-      next((vm) => vm.setPost(post.data));
-    }
   },
   methods: {
     async setPost(post) {

@@ -4,17 +4,19 @@
       Login
     </div>
     <div class="user-login__form-input">
-      <input-element
+      <InputElement
+        v-model="email"
         data-testid="user-signin-email"
         label="Email"
         name="email"
         placeholder="Enter email"
         :enter-callback="login"
         :error="validation.email"
-        v-model="email" />
+      />
     </div>
     <div class="user-login__form-input">
-      <input-element
+      <InputElement
+        v-model="password"
         data-testid="user-signin-password"
         label="Password"
         type="password"
@@ -22,30 +24,29 @@
         :enter-callback="login"
         :error="validation.password"
         placeholder="Enter password"
-        v-model="password" />
+      />
     </div>
     <div class="user-login__submit">
-      <button-element
+      <ButtonElement
         data-testid="user-signin-submit"
         :callback="login"
         :loading="loading"
         :disabled="isSubmitDisabled"
       >
         SIGN IN
-      </button-element>
+      </ButtonElement>
     </div>
-    <div @click="$emit('mode-change')" data-testid="user-form-mode-toggler" class="user-login__mode-toggler">
+    <div data-testid="user-form-mode-toggler" class="user-login__mode-toggler" @click="$emit('mode-change')">
       OR REGISTRATION
     </div>
   </div>
 </template>
 
 <script>
-import api from '@/api';
-
-import consts from '@/const/const';
 import ButtonElement from '../BasicElements/ButtonElement.vue';
 import InputElement from '../BasicElements/InputElement.vue';
+import api from '@/api';
+import consts from '@/const/const';
 
 export default {
   components: {

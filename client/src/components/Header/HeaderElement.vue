@@ -3,74 +3,82 @@
     <div class="header-container">
       <div
         data-testid="mobile-menu"
-        @click="mobileMenuShow = !mobileMenuShow"
         class="header-container__mobile_menu"
-        :class="mobileMenuShow ? 'header-container__mobile_active' : ''">
-        <mobile-menu-icon />
+        :class="mobileMenuShow ? 'header-container__mobile_active' : ''"
+        @click="mobileMenuShow = !mobileMenuShow"
+      >
+        <MobileMenuIcon />
       </div>
-      <transition name="header-container__mobile_menu">
-        <header-mobile-menu v-if="mobileMenuShow" @close="mobileMenuShow = false" />\
-      </transition>
-      <router-link :to="{ name: 'Home' }">
+      <Transition name="header-container__mobile_menu">
+        <HeaderMobileMenu v-if="mobileMenuShow" @close="mobileMenuShow = false" />\
+      </Transition>
+      <RouterLink :to="{ name: 'Home' }">
         <img src="@/assets/logo.png" class="header-container__logo" alt="Home">
         <img src="@/assets/neutral_avatar.png" class="header-container__logo_mobile" alt="Home">
-      </router-link>
+      </RouterLink>
       <nav>
         <template v-if="!$isMobile()">
-          <router-link :to="{ name: 'Home' }" data-testid="today-link">
+          <RouterLink :to="{ name: 'Home' }" data-testid="today-link">
             <div> TODAY </div>
-          </router-link>
-          <router-link :to="{ name: 'All' }" data-testid="all-link">
+          </RouterLink>
+          <RouterLink :to="{ name: 'All' }" data-testid="all-link">
             <div> ALL </div>
-          </router-link>
-          <router-link :to="{ name: 'Blowing' }" data-testid="blowing-link">
-            <div title="posted recently, 50+ rating"> BLOWING </div>
-          </router-link>
-          <router-link :to="{ name: 'TopThisWeek' }" data-testid="top-this-week-link">
-            <div title="current week posts sorted by newer"> TOP THIS WEEK </div>
-          </router-link>
-          <router-link :to="{ name: 'New' }" data-testid="new-link">
-            <div title="posts posted 2 hours ago sorted by newer"> NEW </div>
-          </router-link>
+          </RouterLink>
+          <RouterLink :to="{ name: 'Blowing' }" data-testid="blowing-link">
+            <div title="posted recently, 50+ rating">
+              BLOWING
+            </div>
+          </RouterLink>
+          <RouterLink :to="{ name: 'TopThisWeek' }" data-testid="top-this-week-link">
+            <div title="current week posts sorted by newer">
+              TOP THIS WEEK
+            </div>
+          </RouterLink>
+          <RouterLink :to="{ name: 'New' }" data-testid="new-link">
+            <div title="posts posted 2 hours ago sorted by newer">
+              NEW
+            </div>
+          </RouterLink>
 
           <template v-if="user.authState">
-            <router-link :to="{ name: 'Feed' }">
+            <RouterLink :to="{ name: 'Feed' }">
               <div> MY FEED </div>
-            </router-link>
+            </RouterLink>
           </template>
           <template v-else>
             <a title="Log in to access this page" class="header-container__nav-link_disabled">
               <div> MY FEED </div>
             </a>
           </template>
-
         </template>
       </nav>
       <div
         v-if="$route.name !== 'Search'"
-        class="header-container__search">
-        <input-element
-          :placeholder="'Search'"
-          icon="searchIcon"
-          :style="'flex-direction: row'"
+        class="header-container__search"
+      >
+        <InputElement
           v-model.trim="title"
+          :placeholder="'Search'"
+          icon="SearchIcon"
+          :style="'flex-direction: row'"
           :enter-callback="search"
           :icon-click-callback="search"
         />
       </div>
       <div
-        class="header-container__avatar"
         v-if="user.authState"
+        class="header-container__avatar"
       >
-        <router-link
+        <RouterLink
           :to="{
             name: 'UserPage',
             params: {
               login: user.login,
             },
-          }">
+          }"
+        >
           <img :src="$resolveAvatar(user.avatar)" alt="avatar">
-        </router-link>
+        </RouterLink>
       </div>
     </div>
   </header>
@@ -78,15 +86,15 @@
 
 <script>
 import { mapState } from 'vuex';
-import inputElement from '@/components/BasicElements/InputElement.vue';
-import mobileMenuIcon from '@/library/svg/mobilemenu.vue';
-import headerMobileMenu from './HeaderMobileMenu.vue';
+import HeaderMobileMenu from './HeaderMobileMenu.vue';
+import InputElement from '@/components/BasicElements/InputElement.vue';
+import MobileMenuIcon from '@/library/svg/MobileMenuIcon.vue';
 
 export default {
   components: {
-    headerMobileMenu,
-    inputElement,
-    mobileMenuIcon,
+    HeaderMobileMenu,
+    InputElement,
+    MobileMenuIcon,
   },
   data() {
     return {

@@ -1,16 +1,17 @@
 <template>
   <div>
-    <user-profile :data="userInfo" />
+    <UserProfile :data="userInfo" />
 
     <div
-      v-scroll="handleScroll"
       v-if="!loading || posts.length > 0"
-      class="post-container">
+      v-scroll="handleScroll"
+      class="post-container"
+    >
       <div
         v-for="post in posts"
         :key="post.id"
       >
-        <post :post="post" />
+        <Post :post="post" />
       </div>
       <div
         v-if="posts.length == 0"
@@ -20,7 +21,7 @@
       </div>
     </div>
     <div v-if="loading" class="post-loading">
-      <loader />
+      <CircularLoader />
     </div>
     <div
       v-else-if="noMorePost"
@@ -32,28 +33,17 @@
 </template>
 
 <script>
+import api from '@/api';
 import Post from '@/components/Post/Post.vue';
 import UserProfile from '@/components/UserProfile/UserProfile.vue';
-import api from '@/api';
-
-import loader from '@/library/svg/animation/circularLoader.vue';
-
 import consts from '@/const/const';
+import CircularLoader from '@/library/svg/animation/CircularLoader.vue';
 
 export default {
-  data() {
-    return {
-      posts: [],
-      userInfo: {},
-      loading: false,
-      curPage: 0,
-      noMorePost: false,
-    };
-  },
   components: {
     Post,
     UserProfile,
-    loader,
+    CircularLoader,
   },
   async beforeRouteEnter(to, from, next) {
     const user = await api.users.getUserProfile(to.params.login);
@@ -77,6 +67,15 @@ export default {
       this.setUserInfo(user.data);
       this.uploadPosts();
     }
+  },
+  data() {
+    return {
+      posts: [],
+      userInfo: {},
+      loading: false,
+      curPage: 0,
+      noMorePost: false,
+    };
   },
   async created() {
     this.uploadPosts();

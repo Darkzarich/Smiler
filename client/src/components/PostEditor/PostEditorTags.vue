@@ -7,16 +7,16 @@
         class="post-editor__tags-item"
       >
         {{ tag }}
-        <span @click="removeTag(tag)" :data-testid="`remove-tag-button-${tag}`" class="post-editor__tags-item-remove">
+        <span :data-testid="`remove-tag-button-${tag}`" class="post-editor__tags-item-remove" @click="removeTag(tag)">
           x
         </span>
       </div>
     </div>
     <div v-if="tags.length < POST_MAX_TAGS" class="post-editor__tags-input">
-      <input-element
+      <InputElement
+        v-model="tagInput"
         data-testid="post-tag-input"
         placeholder="Input up to 8 tags"
-        v-model="tagInput"
         :enter-callback="addTag"
         :error="validation"
       />
@@ -28,20 +28,20 @@
 </template>
 
 <script>
-import consts from '@/const/const';
 import InputElement from '../BasicElements/InputElement.vue';
+import consts from '@/const/const';
 
 export default {
   components: {
     InputElement,
   },
+  props: ['tags'],
   data() {
     return {
       tagInput: '',
       POST_MAX_TAGS: consts.POST_MAX_TAGS,
     };
   },
-  props: ['tags'],
   computed: {
     validation() {
       let validation = '';

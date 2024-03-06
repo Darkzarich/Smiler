@@ -10,25 +10,27 @@
           {{ data.login }}
 
           <template v-if="user.authState && !isSameUser">
-            <button-element
-              data-testid="user-profile-unfollow-btn"
+            <ButtonElement
               v-if="isFollowed"
+              data-testid="user-profile-unfollow-btn"
               :loading="requesting"
               :callback="unfollow"
             >
               Unfollow
-            </button-element>
-            <button-element
-              data-testid="user-profile-follow-btn"
+            </ButtonElement>
+            <ButtonElement
               v-else
+              data-testid="user-profile-follow-btn"
               :loading="requesting"
               :callback="follow"
             >
               Follow
-            </button-element>
+            </ButtonElement>
           </template>
         </div>
-        <div class="user-profile__date"> With us already {{ data.createdAt | toDate }} </div>
+        <div class="user-profile__date">
+          With us already {{ data.createdAt | toDate }}
+        </div>
 
         <div class="user-profile__main-info-row">
           <div :class="ratingClass(data.rating)" class="user-profile__rating" data-testid="user-profile-rating">
@@ -39,7 +41,7 @@
           </div>
         </div>
 
-        <div class="user-profile__bio" v-if="data.bio" data-testid="user-profile-bio">
+        <div v-if="data.bio" class="user-profile__bio" data-testid="user-profile-bio">
           Bio: <i>{{ data.bio }}</i>
         </div>
       </div>
@@ -50,14 +52,29 @@
 <script>
 import moment from 'moment';
 import { mapState } from 'vuex';
-
-import api from '@/api/index';
-
 import ButtonElement from '../BasicElements/ButtonElement.vue';
+import api from '@/api/index';
 
 export default {
   components: {
     ButtonElement,
+  },
+  filters: {
+    toDate(date) {
+      return moment().to(date, true);
+    },
+    ratingTransform(rating) {
+      if (rating > 0) {
+        return `+${rating}`;
+      }
+      return rating;
+    },
+  },
+  props: ['data'],
+  data() {
+    return {
+      requesting: false,
+    };
   },
   computed: {
     ...mapState({
@@ -69,12 +86,6 @@ export default {
     isSameUser() {
       return this.data.login === this.user.login;
     },
-  },
-  props: ['data'],
-  data() {
-    return {
-      requesting: false,
-    };
   },
   methods: {
     ratingClass(rating) {
@@ -108,17 +119,6 @@ export default {
         }
         this.requesting = false;
       }
-    },
-  },
-  filters: {
-    toDate(date) {
-      return moment().to(date, true);
-    },
-    ratingTransform(rating) {
-      if (rating > 0) {
-        return `+${rating}`;
-      }
-      return rating;
     },
   },
 };

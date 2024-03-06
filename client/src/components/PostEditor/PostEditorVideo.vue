@@ -1,20 +1,20 @@
 <template>
   <div class="post-video-upload">
-    <div class="post-video-upload__container" v-if="!value">
+    <div v-if="!value" class="post-video-upload__container">
       <div class="post-video-upload__input-url">
-        <input-element
+        <InputElement
           v-model.lazy="url"
           placeholder="Paste URL of the video [youtube]"
           data-testid="video-url-input"
         />
-        <button-element
+        <ButtonElement
           data-testid="video-upload-button"
           :callback="upload"
           :loading="uploading"
           :disabled="!url"
         >
           Upload
-        </button-element>
+        </ButtonElement>
       </div>
     </div>
     <div v-else class="post-video-upload__video" :test-dataid="`video-${value}`">
@@ -25,31 +25,32 @@
         width="560"
         height="315"
         allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen />
+        allowfullscreen
+      />
     </div>
   </div>
 </template>
 
 <script>
-import inputElement from '../BasicElements/InputElement.vue';
-import buttonElement from '../BasicElements/ButtonElement.vue';
+import ButtonElement from '../BasicElements/ButtonElement.vue';
+import InputElement from '../BasicElements/InputElement.vue';
 
 export default {
   components: {
-    buttonElement,
-    inputElement,
-  },
-  data() {
-    return {
-      url: '',
-      uploading: false,
-    };
+    ButtonElement,
+    InputElement,
   },
   props: {
     value: {
       type: String,
       default: '',
     },
+  },
+  data() {
+    return {
+      url: '',
+      uploading: false,
+    };
   },
   methods: {
     async upload() {

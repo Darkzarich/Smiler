@@ -8,8 +8,8 @@
         'comments__item-main_first': first,
         'comments__item-main_refresh-new': comment.isRefreshNew,
       }"
-      @mouseover="comment.isRefreshNew ? comment.isRefreshNew = false : ''"
       :style="`margin-left: ${indentLevel}rem`"
+      @mouseover="comment.isRefreshNew ? comment.isRefreshNew = false : ''"
     >
       <div
         class="comments__item-main-block"
@@ -26,39 +26,40 @@
             <div
               class="comments__item-main-block-meta-upvote"
               :data-testid="`comment-${comment.id}-upvote`"
-              @click="upvote(comment.id)"
               :class="comment.rated.isRated && !comment.rated.negative ? 'comments__item-main-block-meta-upvote_active' : ''"
+              @click="upvote(comment.id)"
             >
-              <plus-icon />
+              <PlusIcon />
             </div>
             <div
-              @click="downvote(comment.id)"
               :data-testid="`comment-${comment.id}-downvote`"
               class="comments__item-main-block-meta-downvote"
               :class="comment.rated.isRated && comment.rated.negative ? 'comments__item-main-block-meta-downvote_active' : ''"
+              @click="downvote(comment.id)"
             >
-              <minus-icon />
+              <MinusIcon />
             </div>
-            <router-link
+            <RouterLink
               :to="{
                 name: 'UserPage',
                 params: {
                   login: comment.author.login,
                 },
-              }">
+              }"
+            >
               <div class="comments__item-main-block-meta-author">
                 {{ comment.author.login }}
               </div>
               <div class="comments__item-main-block-meta-avatar">
                 <img :src="$resolveAvatar(comment.author.avatar)" :alt="comment.author.avatar" />
               </div>
-            </router-link>
+            </RouterLink>
             <template v-if="$commentCanEdit(comment)">
-              <div @click="toggleEdit(comment.id)" class="comments__item-main-block-meta-edit">
-                <edit-icon />
+              <div class="comments__item-main-block-meta-edit" @click="toggleEdit(comment.id)">
+                <EditIcon />
               </div>
-              <div @click="deleteCom(comment.id)" class="comments__item-main-block-meta-delete">
-                <delete-icon />
+              <div class="comments__item-main-block-meta-delete" @click="deleteCom(comment.id)">
+                <DeleteIcon />
               </div>
             </template>
           </template>
@@ -68,56 +69,55 @@
         </div>
         <div class="comments__item-main-block-body" :data-testid="`comment-${comment.id}-body`">
           <template v-if="!comment.deleted">
-
             <template v-if="commentEdit !== comment.id">
               <div v-html="comment.body" />
             </template>
 
             <template v-else>
               <div class="comments__item-main-answer-editor">
-                <text-editor-element v-model="commentEditInput">
+                <TextEditorElement v-model="commentEditInput">
                   <div class="comments__item-main-answer-buttons">
-                    <button-element
+                    <ButtonElement
                       :loading="editSending"
                       :callback="edit"
                       :argument="comment.id"
                     >
                       Send
-                    </button-element>
-                    <button-element
+                    </ButtonElement>
+                    <ButtonElement
                       :callback="toggleEdit"
                     >
                       Close
-                    </button-element>
+                    </ButtonElement>
                   </div>
-                </text-editor-element>
+                </TextEditorElement>
               </div>
             </template>
 
             <div class="comments__item-main-answer">
               <div v-if="replyFieldShowFor == comment.id" class="comments__item-main-answer-editor">
-                <text-editor-element v-model="replyBody">
+                <TextEditorElement v-model="replyBody">
                   <div class="comments__item-main-answer-buttons">
-                    <button-element
+                    <ButtonElement
                       :loading="replySending"
                       :callback="reply"
                       :argument="comment.id"
                     >
                       Send
-                    </button-element>
-                    <button-element
+                    </ButtonElement>
+                    <ButtonElement
                       :callback="toggleReply"
                     >
                       Close
-                    </button-element>
+                    </ButtonElement>
                   </div>
-                </text-editor-element>
+                </TextEditorElement>
               </div>
               <template v-else>
                 <div
+                  v-if="level < COMMENTS_NESTED_LIMIT && user.authState"
                   class="comments__item-main-answer-toggler"
                   @click="toggleReply(comment.id)"
-                  v-if="level < COMMENTS_NESTED_LIMIT && user.authState"
                 >
                   Reply
                 </div>
@@ -136,18 +136,24 @@
           </template>
         </div>
         <div
-          :data-testid="`comment-${comment.id}-expander`"
-          @click="toggleShowChild(comment.id)"
           v-if="!hideChild.includes(comment.id) && comment.children.length > 0"
-          class="comments__child-toggler">[-]</div>
-        <div
           :data-testid="`comment-${comment.id}-expander`"
+          class="comments__child-toggler"
           @click="toggleShowChild(comment.id)"
+        >
+          [-]
+        </div>
+        <div
           v-else-if="comment.children.length > 0"
-          class="comments__child-toggler comments__child-toggler_active">[+]</div>
+          :data-testid="`comment-${comment.id}-expander`"
+          class="comments__child-toggler comments__child-toggler_active"
+          @click="toggleShowChild(comment.id)"
+        >
+          [+]
+        </div>
       </div>
       <div v-if="comment.children.length > 0 && !hideChild.includes(comment.id)">
-        <comment-tree-helper
+        <CommentTreeHelper
           :data="comment.children"
           :indent-level="indentLevel"
           :post="post"
@@ -160,27 +166,25 @@
 
 <script>
 import { mapState } from 'vuex';
-import api from '@/api/index';
-
-import TextEditorElement from '@/components/BasicElements/TextEditorElement.vue';
-import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
-import plusIcon from '@/library/svg/plus.vue';
-import minusIcon from '@/library/svg/minus.vue';
-import editIcon from '@/library/svg/edit.vue';
-import deleteIcon from '@/library/svg/delete.vue';
-
-import consts from '@/const/const';
 import CommentTreeHelper from './CommentTreeHelper.vue';
+import api from '@/api/index';
+import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
+import TextEditorElement from '@/components/BasicElements/TextEditorElement.vue';
+import consts from '@/const/const';
+import DeleteIcon from '@/library/svg/DeleteIcon.vue';
+import EditIcon from '@/library/svg/EditIcon.vue';
+import MinusIcon from '@/library/svg/MinusIcon.vue';
+import PlusIcon from '@/library/svg/PlusIcon.vue';
 
 export default {
   components: {
     CommentTreeHelper,
     TextEditorElement,
     ButtonElement,
-    plusIcon,
-    minusIcon,
-    editIcon,
-    deleteIcon,
+    EditIcon,
+    MinusIcon,
+    PlusIcon,
+    DeleteIcon,
   },
   props: ['data', 'indentLevel', 'post', 'first', 'level'],
   data() {

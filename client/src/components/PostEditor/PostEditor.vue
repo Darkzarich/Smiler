@@ -1,123 +1,141 @@
 <template>
   <div class="post-editor">
-    <input-element
+    <InputElement
+      v-model="title"
       class="post-editor__title"
       data-testid="post-title-input"
       :placeholder="'Title'"
       :error="validation.title"
-      v-model="title"
     />
-    <post-editor-tags
+    <PostEditorTags
       :tags="tags"
     />
 
-    <draggable
+    <Draggable
       :list="sections"
       :animation="200"
       ghost-class="post-editor__section_moving"
       chosen-class="post-editor__section_chosen"
     >
-      <transition-group name="post-editor__section" data-testid="post-sections">
+      <TransitionGroup name="post-editor__section" data-testid="post-sections">
         <div
+          v-for="section in sections"
+          :key="section.hash"
           class="post-editor__section"
           data-testid="post-section"
-          :key="section.hash"
-          v-for="section in sections">
+        >
           <!-- TODO: Refactor this part -->
           <template v-if="section.type === POST_SECTION_TYPES.TEXT">
-            <text-editor-element
-              data-testid="text-section"
-              v-model="section.content"
+            <TextEditorElement
               :id="section.hash"
+              v-model="section.content"
+              data-testid="text-section"
             />
             <div class="post-editor__delete" @click="deleteSection(section)">
-              <close-icon title="Delete" :data-testid="`delete-section-${section.hash}`" />
+              <CloseIcon title="Delete" :data-testid="`delete-section-${section.hash}`" />
             </div>
           </template>
           <template v-if="section.type === POST_SECTION_TYPES.PICTURE">
-            <post-editor-picture
-              data-testid="pic-section"
+            <PostEditorPicture
               v-model="section.url"
+              data-testid="pic-section"
               @set-section="setSection"
             />
             <div class="post-editor__delete" @click="deleteSection(section)">
-              <close-icon title="Delete" :data-testid="`delete-section-${section.hash}`" />
+              <CloseIcon title="Delete" :data-testid="`delete-section-${section.hash}`" />
             </div>
           </template>
           <template v-if="section.type === POST_SECTION_TYPES.VIDEO">
-            <post-editor-video
-              data-testid="video-section"
+            <PostEditorVideo
               v-model="section.url"
+              data-testid="video-section"
             />
             <div class="post-editor__delete" @click="deleteSection(section)">
-              <close-icon title="Delete" :data-testid="`delete-section-${section.hash}`" />
+              <CloseIcon title="Delete" :data-testid="`delete-section-${section.hash}`" />
             </div>
           </template>
         </div>
-      </transition-group>
-    </draggable>
-    <div class="post-editor__control" v-if="sections.length < POST_MAX_SECTIONS">
-      <div class="post-editor__control-item" @click="createSection(POST_SECTION_TYPES.TEXT)" data-testid="add-text-button" role="button" tabindex="0">
-        <text-icon />
+      </TransitionGroup>
+    </Draggable>
+    <div v-if="sections.length < POST_MAX_SECTIONS" class="post-editor__control">
+      <div
+        class="post-editor__control-item"
+        data-testid="add-text-button"
+        role="button"
+        tabindex="0"
+        @click="createSection(POST_SECTION_TYPES.TEXT)"
+      >
+        <TextIcon />
       </div>
-      <div class="post-editor__control-item" @click="createSection(POST_SECTION_TYPES.PICTURE)" data-testid="add-pic-button" role="button" tabindex="0">
-        <picture-icon />
+      <div
+        class="post-editor__control-item"
+        data-testid="add-pic-button"
+        role="button"
+        tabindex="0"
+        @click="createSection(POST_SECTION_TYPES.PICTURE)"
+      >
+        <PictureIcon />
       </div>
-      <div class="post-editor__control-item" @click="createSection(POST_SECTION_TYPES.VIDEO)" data-testid="add-video-button" role="button" tabindex="0">
-        <video-icon />
+      <div
+        class="post-editor__control-item"
+        data-testid="add-video-button"
+        role="button"
+        tabindex="0"
+        @click="createSection(POST_SECTION_TYPES.VIDEO)"
+      >
+        <VideoIcon />
       </div>
     </div>
-    <div class="post-editor__control-error" v-else>
+    <div v-else class="post-editor__control-error">
       Can't add any more sections. Max amount of sections is {{ POST_MAX_SECTIONS }}.
     </div>
     <div class="post-editor__submit">
       <template v-if="!edit">
-        <button-element
+        <ButtonElement
           data-testid="create-post-button"
           :loading="sending"
           :callback="createPost"
           :disabled="isSubmitDisabled"
         >
           Create Post
-        </button-element>
-        <button-element
+        </ButtonElement>
+        <ButtonElement
           data-testid="save-draft-button"
           :loading="saving"
           :disabled="!sections.length"
           :callback="saveDraft"
         >
           Save Draft
-        </button-element>
+        </ButtonElement>
       </template>
       <template v-else>
-        <button-element
+        <ButtonElement
           :loading="saving"
           :disabled="!sections.length"
           :callback="saveEdited"
         >
           Save Edited
-        </button-element>
+        </ButtonElement>
       </template>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import Draggable from 'vuedraggable';
-import api from '@/api';
-
-import closeIcon from '@/library/svg/exit.vue';
-import videoIcon from '@/library/svg/video.vue';
-import pictureIcon from '@/library/svg/picture.vue';
-import textIcon from '@/library/svg/text.vue';
-import consts from '@/const/const';
+import { mapState } from 'vuex';
 import ButtonElement from '../BasicElements/ButtonElement.vue';
+import InputElement from '../BasicElements/InputElement.vue';
 import TextEditorElement from '../BasicElements/TextEditorElement.vue';
 import PostEditorPicture from './PostEditorPicture.vue';
-import PostEditorVideo from './PostEditorVideo.vue';
 import PostEditorTags from './PostEditorTags.vue';
-import InputElement from '../BasicElements/InputElement.vue';
+import PostEditorVideo from './PostEditorVideo.vue';
+import api from '@/api';
+import consts from '@/const/const';
+import CloseIcon from '@/library/svg/ExitIcon.vue';
+import PictureIcon from '@/library/svg/PictureIcon.vue';
+import TextIcon from '@/library/svg/TextIcon.vue';
+import VideoIcon from '@/library/svg/VideoIcon.vue';
 
 export default {
   components: {
@@ -127,12 +145,13 @@ export default {
     PostEditorPicture,
     PostEditorVideo,
     PostEditorTags,
-    closeIcon,
-    videoIcon,
-    pictureIcon,
-    textIcon,
+    CloseIcon,
+    PictureIcon,
+    TextIcon,
+    VideoIcon,
     Draggable,
   },
+  props: ['edit', 'post'],
   data() {
     return {
       title: '',
@@ -144,7 +163,6 @@ export default {
       POST_MAX_SECTIONS: consts.POST_MAX_SECTIONS,
     };
   },
-  props: ['edit', 'post'],
   computed: {
     ...mapState({
       getUserLogin: (state) => state.user.login,

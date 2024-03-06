@@ -4,8 +4,8 @@
       {{ label }}
     </label>
     <input
-      type="date"
       :id="label"
+      type="date"
       :value="value"
       @input="$emit('input', $event.target.value)"
     >
