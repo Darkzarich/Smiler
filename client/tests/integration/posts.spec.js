@@ -2,8 +2,8 @@
 // @ts-check
 
 import { test, expect } from '@playwright/test';
-import generatePost from './fixtures/post';
 import generateAuth from './fixtures/auth';
+import generatePost from './fixtures/post';
 
 const post1 = generatePost({
   id: '1',
@@ -76,7 +76,13 @@ test.describe('Post groups', async () => {
   });
 
   test('Fetches all posts', async ({ page, isMobile }) => {
-    const allPostsRequest = page.waitForRequest((res) => res.url().includes('/posts?limit=20&offset=0&sort=-rating'));
+    const searchParams = new URLSearchParams({
+      limit: '20',
+      offset: '0',
+      sort: '-rating',
+    });
+
+    const allPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?${searchParams.toString()}`));
 
     await clickPostGroup({
       group: 'all-link',
@@ -90,9 +96,16 @@ test.describe('Post groups', async () => {
   });
 
   test('Fetches "blowing" posts', async ({ page, isMobile }) => {
-    // Two hours ago from the mocked date and rating is already at least 50
-    const dateFrom = 'dateFrom=2024-03-05T22:00:00.000Z';
-    const blowingPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?limit=20&offset=0&sort=-rating&ratingFrom=50&${dateFrom}`));
+    const searchParams = new URLSearchParams({
+      limit: '20',
+      offset: '0',
+      sort: '-rating',
+      ratingFrom: '50',
+      // Two hours ago from the mocked date and rating is already at least 50
+      dateFrom: '2024-03-05T22:00:00.000Z',
+    });
+
+    const blowingPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?${decodeURIComponent(searchParams.toString())}`));
 
     await clickPostGroup({
       group: 'blowing-link',
@@ -106,9 +119,16 @@ test.describe('Post groups', async () => {
   });
 
   test('Fetches "top this week" posts', async ({ page, isMobile }) => {
-    // Posts with createdAt starting from the start of this week
-    const dateFromTo = 'dateFrom=2024-03-02T23:00:00.000Z&dateTo=2024-03-05T23:00:00.999Z';
-    const topThisWeekRequest = page.waitForRequest((res) => res.url().includes(`/posts?limit=20&offset=0&sort=-createdAt&${dateFromTo}`));
+    const searchParams = new URLSearchParams({
+      limit: '20',
+      offset: '0',
+      sort: '-createdAt',
+      // Posts with createdAt starting from the date of the start of this week
+      dateFrom: '2024-03-02T23:00:00.000Z',
+      dateTo: '2024-03-05T23:00:00.999Z',
+    });
+
+    const topThisWeekRequest = page.waitForRequest((res) => res.url().includes(`/posts?${decodeURIComponent(searchParams.toString())}`));
 
     await clickPostGroup({
       group: 'top-this-week-link',
@@ -122,9 +142,15 @@ test.describe('Post groups', async () => {
   });
 
   test('Fetches "new" posts', async ({ page, isMobile }) => {
-    // Two hours ago from the mocked date
-    const dateFrom = 'dateFrom=2024-03-05T22:00:00.000Z';
-    const newPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?limit=20&offset=0&sort=-createdAt&${dateFrom}`));
+    const searchParams = new URLSearchParams({
+      limit: '20',
+      offset: '0',
+      sort: '-createdAt',
+      // Within two hours from the mocked date
+      dateFrom: '2024-03-05T22:00:00.000Z',
+    });
+
+    const newPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?${decodeURIComponent(searchParams.toString())}`));
 
     await clickPostGroup({
       group: 'new-link',
@@ -138,8 +164,16 @@ test.describe('Post groups', async () => {
   });
 
   test('Fetches "today" posts', async ({ page, isMobile }) => {
-    const dateFromTo = 'dateFrom=2024-03-05T23:00:00.000Z&dateTo=2024-03-06T22:59:59.999Z';
-    const todayPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?limit=20&offset=0&sort=-rating&${dateFromTo}`));
+    const searchParams = new URLSearchParams({
+      limit: '20',
+      offset: '0',
+      sort: '-rating',
+      // Within two hours from the mocked date
+      dateFrom: '2024-03-05T23:00:00.000Z',
+      dateTo: '2024-03-06T22:59:59.999Z',
+    });
+
+    const todayPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?${decodeURIComponent(searchParams.toString())}`));
 
     await clickPostGroup({
       group: 'today-link',
