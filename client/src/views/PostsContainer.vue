@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-testid="posts-container">
     <div v-if="!loading || posts.length > 0" v-scroll="handleScroll" class="post-container">
       <div
         v-for="post in posts"

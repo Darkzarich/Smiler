@@ -3,42 +3,52 @@
     <div class="search-form__string">
       <InputElement
         v-model="filters.title"
+        placeholder="Title"
+        data-testid="search-form-input"
+        :enter-callback="search"
       />
     </div>
     <div class="search-form__extra">
       <div class="search-form__extra-date">
         <DatePickerElement
           v-model="filters.dateFrom"
+          data-testid="search-form-date-from"
           :label="'Date from'"
         />
         <DatePickerElement
           v-model="filters.dateTo"
+          data-testid="search-form-date-to"
           :label="'Date to'"
         />
       </div>
       <div class="search-form__extra-slider">
         <SliderElement
           v-model="filters.ratingFrom"
+          data-testid="search-form-rating-from"
           :label="'Rating from'"
         />
         <SliderElement
           v-model="filters.ratingTo"
+          data-testid="search-form-rating-to"
           :label="'Rating to'"
         />
       </div>
     </div>
     <div class="search-form__tags">
       <PostEditorTags
-        :tags="filters.tags"
+        v-model="filters.tags"
+        data-testid="search-form-tags"
       />
     </div>
     <div class="search-form__submit">
       <ButtonElement
+        data-testid="search-form-submit"
         :callback="search"
       >
         Submit
       </ButtonElement>
       <ButtonElement
+        data-testid="search-form-clear"
         :callback="clear"
       >
         Clear filters

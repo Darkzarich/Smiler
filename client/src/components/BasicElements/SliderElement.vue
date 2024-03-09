@@ -5,6 +5,7 @@
     </label>
     <input
       :id="label"
+      :data-testid="dataTestid"
       type="range"
       :max="max"
       :min="min"
@@ -21,6 +22,10 @@
 <script>
 export default {
   props: {
+    dataTestid: {
+      type: String,
+      default: 'slider',
+    },
     value: {
       type: String,
       default: '0',

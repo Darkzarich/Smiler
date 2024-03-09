@@ -2,6 +2,7 @@
   <Transition name="context-menu">
     <div
       v-if="show"
+      data-testid="context-menu"
       class="context-menu"
       :style="getPositionStyle"
     >

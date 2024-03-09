@@ -6,6 +6,7 @@
       />
     </div>
     <PostsContainer
+      v-if="isAnyFilterActive"
       :search-filter="filter"
     />
   </div>
@@ -32,10 +33,21 @@ export default {
       },
     };
   },
+  computed: {
+    isAnyFilterActive() {
+      return Object.keys(this.filter).some((filterKey) => {
+        if (filterKey === 'tags') {
+          return this.filter.tags.length > 0;
+        }
+
+        return Boolean(this.filter[filterKey]);
+      });
+    },
+  },
   created() {
-    Object.keys(this.filter).forEach((el) => {
-      if (this.$route.query[el]) {
-        this.filter[el] = this.$route.query[el];
+    Object.keys(this.$route.query).forEach((filterKey) => {
+      if (this.$route.query[filterKey]) {
+        this.filter[filterKey] = this.$route.query[filterKey];
       }
     });
   },

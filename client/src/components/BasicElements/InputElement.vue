@@ -6,7 +6,7 @@
 
     <input
       v-if="!multiline"
-      :id="label"
+      :id="id"
       :data-testid="dataTestid"
       :disabled="disabled"
       :type="type"
@@ -24,7 +24,7 @@
 
     <textarea
       v-if="multiline"
-      :id="label"
+      :id="id"
       :data-testid="dataTestid"
       :disabled="disabled"
       :type="type"
@@ -53,6 +53,10 @@ export default {
     SearchIcon,
   },
   props: {
+    id: {
+      type: String,
+      default: () => crypto.randomUUID(),
+    },
     dataTestid: {
       type: String,
       default: 'input',

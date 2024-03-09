@@ -1,8 +1,8 @@
 // @ts-check
 
 // TODO: Replace with lodash-es when moving to TypeScript
-import defaultsDeep from 'lodash/defaultsDeep';
 import cloneDeep from 'lodash/cloneDeep';
+import defaultsDeep from 'lodash/defaultsDeep';
 
 const post = {
   title: 'Test post',

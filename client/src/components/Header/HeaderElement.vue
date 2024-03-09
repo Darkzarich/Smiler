@@ -59,6 +59,7 @@
         <InputElement
           v-model.trim="title"
           :placeholder="'Search'"
+          data-testid="header-search-input"
           icon="SearchIcon"
           :style="'flex-direction: row'"
           :enter-callback="search"

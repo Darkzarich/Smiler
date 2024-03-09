@@ -5,6 +5,7 @@
     </label>
     <input
       :id="label"
+      :data-testid="dataTestid"
       type="date"
       :value="value"
       @input="$emit('input', $event.target.value)"
@@ -15,6 +16,10 @@
 <script>
 export default {
   props: {
+    dataTestid: {
+      type: String,
+      default: 'datepicker',
+    },
     value: {
       type: String,
       default: '',

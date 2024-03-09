@@ -13,7 +13,7 @@
         {{ postData.rating }}
       </div>
       <div
-        :data-testid="`post-${ postData.id }-downvote`"
+        :data-testid="`post-${postData.id}-downvote`"
         class="post-side__downvote"
         :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''"
         @click="downvote(postData.id)"
@@ -31,7 +31,7 @@
         }"
         :target="$isMobile() ? '' : '_blank'"
       >
-        <div class="post-main__title" :data-testid="`post-${ postData.id }-title`">
+        <div class="post-main__title" :data-testid="`post-${postData.id}-title`">
           {{ postData.title }}
           <template v-if="canEdit">
             <RouterLink title="Edit post" :to="postData.slug + '/edit'">
@@ -50,6 +50,7 @@
         <div
           v-for="tag in postData.tags"
           :key="tag"
+          :data-testid="`post-${postData.id}-tag-${tag}`"
           class="post-main__tags-item"
           @click="openContextMenu($event, tag)"
         >
@@ -64,21 +65,21 @@
           class="post-main__body-section"
         >
           <template v-if="section.type === POST_SECTION_TYPES.TEXT">
-            <div :data-testid="`post-${ postData.id }-text-${section.hash}`" v-html="section.content" />
+            <div :data-testid="`post-${postData.id}-text-${section.hash}`" v-html="section.content" />
           </template>
           <template v-else-if="section.type === POST_SECTION_TYPES.PICTURE">
             <div class="post-main__attachments-item">
               <img
                 :src="$resolveImage(section.url)"
                 :alt="section.url"
-                :data-testid="`post-${ postData.id }-pic-${section.hash}`"
+                :data-testid="`post-${postData.id}-pic-${section.hash}`"
                 @error="$resolveImageError"
               >
             </div>
           </template>
           <template v-else-if="section.type === POST_SECTION_TYPES.VIDEO">
             <div class="post-main__attachments-item">
-              <video controls :src="section.url" :data-testid="`post-${ postData.id }-vid-${section.hash}`" />
+              <video controls :src="section.url" :data-testid="`post-${postData.id}-vid-${section.hash}`" />
             </div>
           </template>
         </div>
@@ -89,7 +90,7 @@
       <div class="post-main__rate-mobile">
         <div
           class="post-side__upvote"
-          :data-testid="`m-post-${ postData.id }-upvote`"
+          :data-testid="`m-post-${postData.id}-upvote`"
           :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''"
           @click="upvote(postData.id)"
         >
