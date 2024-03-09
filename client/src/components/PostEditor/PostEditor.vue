@@ -8,7 +8,7 @@
       :error="validation.title"
     />
     <PostEditorTags
-      :tags="tags"
+      v-model="tags"
     />
 
     <Draggable

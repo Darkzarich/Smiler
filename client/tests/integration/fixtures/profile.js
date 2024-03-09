@@ -1,6 +1,6 @@
 // @ts-check
-import defaultsDeep from 'lodash/defaultsDeep';
 import cloneDeep from 'lodash/cloneDeep';
+import defaultsDeep from 'lodash/defaultsDeep';
 
 const profile = {
   id: '1',

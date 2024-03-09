@@ -2,9 +2,9 @@
 // @ts-check
 
 import { test, expect } from '@playwright/test';
-import generatePost from './fixtures/post';
 import generateAuth from './fixtures/auth';
 import generateComment from './fixtures/comment';
+import generatePost from './fixtures/post';
 
 const post = generatePost();
 const comment = generateComment();

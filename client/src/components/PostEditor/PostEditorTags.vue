@@ -28,6 +28,7 @@
 </template>
 
 <script>
+// TODO: This can be a BasicElements
 import InputElement from '../BasicElements/InputElement.vue';
 import consts from '@/const/const';
 
@@ -35,7 +36,15 @@ export default {
   components: {
     InputElement,
   },
-  props: ['tags'],
+  model: {
+    prop: 'tags',
+  },
+  props: {
+    tags: {
+      type: Array,
+      default: () => [],
+    },
+  },
   data() {
     return {
       tagInput: '',
@@ -57,14 +66,15 @@ export default {
     addTag() {
       if (this.tagInput.length > 0) {
         const checkDouble = this.tags.find((el) => el === this.tagInput);
+
         if (!checkDouble && !this.validation) {
-          this.tags.push(this.tagInput);
+          this.$emit('input', this.tags.concat(this.tagInput));
           this.tagInput = '';
         }
       }
     },
     removeTag(tag) {
-      this.tags.splice(this.tags.indexOf(tag), 1);
+      this.$emit('input', this.tags.filter((el) => el !== tag));
     },
   },
 };
