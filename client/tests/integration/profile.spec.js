@@ -51,6 +51,8 @@ test('Goes to 404 if user does not exist', async ({ context, page }) => {
   await page.goto('/user/@non-existing-user');
 
   await page.waitForURL('**/error/404');
+  await expect(page).toHaveTitle('404 Not Found | Smiler');
+  await expect(page.getByTestId('system-notification')).toContainText('User not found');
 });
 
 test('Fetches and shows user profile', async ({ page }) => {

@@ -44,6 +44,25 @@ test('Fetches the post by post slug', async ({ page }) => {
   await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(post.title);
 });
 
+test('Redirect to 404 if the post is not found', async ({ page, context }) => {
+  await context.route(`*/**/posts/${post.slug}`, async (route) => {
+    await route.fulfill({
+      status: 404,
+      json: {
+        error: {
+          message: 'Post does not exist',
+        },
+      },
+    });
+  });
+
+  await page.goto(`/${post.slug}`);
+
+  await expect(page).toHaveURL('/error/404');
+  await expect(page).toHaveTitle('404 Not Found | Smiler');
+  await expect(page.getByTestId('system-notification')).toContainText('Post does not exist');
+});
+
 test('Fetches post comments by post id', async ({ page }) => {
   const commentsRequest = page.waitForRequest('*/**/comments*');
 

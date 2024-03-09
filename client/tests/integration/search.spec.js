@@ -37,7 +37,7 @@ test('Searches posts using the search bar', async ({ page }) => {
 
   await postsRequest;
 
-  await expect(page).toHaveTitle('Search');
+  await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL(/\/posts\/search\?.*title=test/);
   await expect(page.getByTestId('search-form-input')).toHaveValue('test');
 });
@@ -54,7 +54,7 @@ test('Doesn\'t send posts request when just opened search page', async ({ page }
 
   await page.goto('/posts/search');
 
-  await expect(page).toHaveTitle('Search');
+  await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL('posts/search');
   await expect(page.getByTestId('posts-container')).not.toBeVisible();
   expect(isPostsRequestSent).toBe(false);
@@ -71,7 +71,7 @@ test('Searches posts by title using search page', async ({ page }) => {
 
   await postsRequest;
 
-  await expect(page).toHaveTitle('Search');
+  await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL(/\/posts\/search\?.*title=test/);
 });
 
@@ -93,7 +93,7 @@ test('Searches posts by dateTo and dateFrom', async ({ page }) => {
 
   await postsRequest;
 
-  await expect(page).toHaveTitle('Search');
+  await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL(new RegExp(`/posts/search?.*dateFrom=${dates.from}&dateTo=${dates.to}`));
 });
 
@@ -115,7 +115,7 @@ test('Searches posts by ratingFrom and ratingTo', async ({ page }) => {
 
   await postsRequest;
 
-  await expect(page).toHaveTitle('Search');
+  await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL(new RegExp(`/posts/search?.*ratingFrom=${ratings.from}&ratingTo=${ratings.to}`));
 });
 
@@ -138,7 +138,7 @@ test('Searches posts by tags', async ({ page }) => {
 
   await postsRequest;
 
-  await expect(page).toHaveTitle('Search');
+  await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL(new RegExp(`/posts/search?.*${urlTags}`));
 });
 
@@ -171,7 +171,7 @@ test('Sets all filters from URL', async ({ page }) => {
 
   await postsRequest;
 
-  await expect(page).toHaveTitle('Search');
+  await expect(page).toHaveTitle('Search | Smiler');
 });
 
 test('Searches posts by clicking on a tag name and then "Search tag" option in the context menu', async ({ page, context }) => {
@@ -199,7 +199,7 @@ test('Searches posts by clicking on a tag name and then "Search tag" option in t
 
   await postsRequest;
 
-  await expect(page).toHaveTitle('Search');
+  await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL(new RegExp(`/posts/search?.*tags=${tags[0]}`));
 });
 

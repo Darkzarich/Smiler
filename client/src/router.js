@@ -145,14 +145,6 @@ const router = new Router({
       },
     },
     {
-      path: '/error/404',
-      name: '404',
-      component: NotFound,
-      meta: {
-        title: '404',
-      },
-    },
-    {
       path: '/user/@:login',
       name: 'UserPage',
       component: UserPage,
@@ -208,6 +200,14 @@ const router = new Router({
       },
     },
     {
+      path: '/error/404',
+      name: '404',
+      component: NotFound,
+      meta: {
+        title: '404 Not Found',
+      },
+    },
+    {
       path: '*',
       redirect: {
         name: '404',
@@ -218,13 +218,14 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   // set title
+  const ending = ' | Smiler';
   const titleTo = to.meta.title;
   const titleParams = to.meta.titleParam;
 
   if (titleTo) {
-    window.document.title = titleTo;
+    window.document.title = titleTo + ending;
   } else if (titleParams) {
-    window.document.title = to.params[titleParams];
+    window.document.title = to.params[titleParams] + ending;
   }
 
   next();

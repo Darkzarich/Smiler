@@ -32,16 +32,34 @@ test.beforeEach(async ({ context }) => {
 });
 
 test('Fetches posts with expected filters', async ({ page }) => {
+  const postsRequest = page.waitForRequest('*/**/posts*');
+
   await page.goto('/');
 
-  const postRequest = await page.waitForRequest('*/**/posts*');
+  const postsResponse = await postsRequest;
 
   // TODO: check for date range as well
-  expect(postRequest.url()).toContain('limit=20&offset=0&sort=-rating');
+  expect(postsResponse.url()).toContain('limit=20&offset=0&sort=-rating');
 
   for (const post of posts) {
     await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(post.title);
   }
+});
+
+test('Empty posts lists', async ({ page, context }) => {
+  await context.route('*/**/posts*', async (route) => {
+    await route.fulfill({
+      json: {
+        pages: 0,
+        posts: [],
+      },
+    });
+  });
+
+  await page.goto('/');
+
+  await expect(page.getByTestId('posts-container')).toBeVisible();
+  await expect(page.getByText('We\'re sorry. No posts for this time yet.')).toBeVisible();
 });
 
 test.describe('Post groups', async () => {
@@ -92,7 +110,7 @@ test.describe('Post groups', async () => {
 
     await allPostsRequest;
     await expect(page).toHaveURL(/.*posts\/all/);
-    await expect(page).toHaveTitle('All Posts');
+    await expect(page).toHaveTitle('All Posts | Smiler');
   });
 
   test('Fetches "blowing" posts', async ({ page, isMobile }) => {
@@ -115,7 +133,7 @@ test.describe('Post groups', async () => {
 
     await blowingPostsRequest;
     await expect(page).toHaveURL(/.*posts\/blowing/);
-    await expect(page).toHaveTitle('Blowing');
+    await expect(page).toHaveTitle('Blowing | Smiler');
   });
 
   test('Fetches "top this week" posts', async ({ page, isMobile }) => {
@@ -138,7 +156,7 @@ test.describe('Post groups', async () => {
 
     await topThisWeekRequest;
     await expect(page).toHaveURL(/.*posts\/top-this-week/);
-    await expect(page).toHaveTitle('Top This Week');
+    await expect(page).toHaveTitle('Top This Week | Smiler');
   });
 
   test('Fetches "new" posts', async ({ page, isMobile }) => {
@@ -160,7 +178,7 @@ test.describe('Post groups', async () => {
 
     await newPostsRequest;
     await expect(page).toHaveURL(/.*posts\/new/);
-    await expect(page).toHaveTitle('Recent');
+    await expect(page).toHaveTitle('Recent | Smiler');
   });
 
   test('Fetches "today" posts', async ({ page, isMobile }) => {
@@ -183,7 +201,7 @@ test.describe('Post groups', async () => {
 
     await todayPostsRequest;
     await expect(page).toHaveURL(/.*/);
-    await expect(page).toHaveTitle('Home');
+    await expect(page).toHaveTitle('Home | Smiler');
   });
 });
 
