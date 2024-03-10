@@ -4,7 +4,7 @@
       <Post v-if="showPost" :post="post" :can-edit="$postCanEdit(post)" />
     </div>
 
-    <div id="comments" class="comments">
+    <div id="comments" ref="comments" class="comments">
       <div
         title="Refresh comments"
         :class="commentsRefreshing ? 'comments__update_refreshing' : ''"
@@ -57,7 +57,7 @@
         No comments yet... Be the first!
       </div>
       <div v-else class="comments__loading">
-        <Loader />
+        <CircularLoader />
       </div>
     </div>
     <div

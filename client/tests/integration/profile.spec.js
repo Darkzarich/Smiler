@@ -71,11 +71,13 @@ test('Fetches and shows user profile', async ({ page }) => {
 });
 
 test('Fetches user posts with expected filters', async ({ page }) => {
+  const postRequest = page.waitForRequest('*/**/posts*');
+
   await page.goto(`/user/@${testUser.login}`);
 
-  const postRequest = await page.waitForRequest('*/**/posts*');
+  const postResponse = await postRequest;
 
-  expect(postRequest.url()).toContain(`author=${testUser.login}&limit=20&offset=0`);
+  expect(postResponse.url()).toContain(`author=${testUser.login}&limit=20&offset=0`);
 
   await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(post.title);
 });

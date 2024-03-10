@@ -120,6 +120,7 @@
               :target="$isMobile() ? '' : '_blank'"
               :to="{
                 name: 'Single',
+                hash: '#comments',
                 params: {
                   slug: postData.slug,
                 },
@@ -131,7 +132,6 @@
 
           <template v-if="postData.author">
             <RouterLink
-              :target="$isMobile() ? '' : '_blank'"
               :to="{
                 name: 'UserPage',
                 params: {
