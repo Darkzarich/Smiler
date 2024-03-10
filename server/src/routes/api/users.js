@@ -173,7 +173,7 @@ router.get('/get-auth', usersController.getAuth);
         }
       }
     },
-  }
+  },
   "/users/me": {
     "put": {
       "tags": [

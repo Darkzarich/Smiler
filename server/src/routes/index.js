@@ -18,7 +18,7 @@ module.exports = router;
         
         "type": "apiKey",
         "in": "cookie",
-        "name": "JSESSIONID"
+        "name": "connect.sid"
       }
     },
     "schemas": {
