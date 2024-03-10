@@ -85,15 +85,18 @@ module.exports = {
 
     if (bio && bio.length > consts.USER_MAX_BIO_LENGTH) {
       generateError(`bio can't be longer than ${consts.USER_MAX_BIO_LENGTH}`, 422, next); return;
-    } if (avatar && avatar.length > consts.USER_MAX_AVATAR_LENGTH) {
+    } 
+    
+    if (avatar && avatar.length > consts.USER_MAX_AVATAR_LENGTH) {
       generateError(`Avatar link can't be longer than ${consts.USER_MAX_AVATAR_LENGTH}`, 422, next); return;
     }
 
+    // TODO: Call mongodb update instead of changing the fields and calling save
     const user = await User.findById(userId);
 
     if (user) {
-      user.bio = bio || user.bio;
-      user.avatar = avatar || user.avatar;
+      user.bio = bio || '';
+      user.avatar = avatar || '';
 
       await user.save();
 
