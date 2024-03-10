@@ -17,7 +17,7 @@
               class="user-settings__data-group-author"
             >
               {{ author.login }}
-              <span class="user-settings__data-group-unfollow" @click="unfollow(author.id)">
+              <span class="user-settings__data-group-unfollow" :data-testid="`user-settings-author-${author.id}-unfollow`" @click="unfollowUser(author.id)">
                 x
               </span>
             </div>
@@ -30,11 +30,11 @@
             <div
               v-for="tag in tagsFollowed"
               :key="tag"
-              :data-testid="`user-settings-author-${tag}`"
+              :data-testid="`user-settings-tags-${tag}`"
               class="user-settings__data-group-tag"
             >
               {{ tag }}
-              <span class="user-settings__data-group-unfollow" @click="unfollowTag(tag)">
+              <span class="user-settings__data-group-unfollow" :data-testid="`user-settings-tag-${tag}-unfollow`" @click="unfollowTag(tag)">
                 x
               </span>
             </div>
@@ -55,14 +55,17 @@
         </div>
         <InputElement
           v-model="bioEditInput"
+          data-testid="user-settings-bio-input"
           class="user-settings__bio-edit"
           :multiline="true"
+          :error="isBioTooLong ? 'Bio is too long' : ''"
         />
         <div class="user-settings__bio-buttons">
           <ButtonElement
+            data-testid="user-settings-bio-submit"
             :loading="bioEditRequesting"
             :callback="editBio"
-            :disabled="bioEditInput.length > USER_MAX_BIO_LENGTH"
+            :disabled="isBioTooLong"
           >
             Submit
           </ButtonElement>
@@ -78,10 +81,12 @@
         <InputElement
           v-model="avatarEditInput"
           class="user-settings__avatar-edit"
+          data-testid="user-settings-avatar-input"
           placeholder="URL to avatar..."
         />
         <div class="user-settings__bio-buttons">
           <ButtonElement
+            data-testid="user-settings-avatar-submit"
             :loading="avatarEditRequesting"
             :callback="editAvatar"
             :disabled="bioEditInput.length > USER_MAX_AVATAR_LENGTH"
@@ -118,6 +123,7 @@ export default {
       loading: true,
       requestingForTags: false,
       requestingForUsers: false,
+      // TODO: Show the current bio
       bioEditInput: '',
       bioEditRequesting: false,
       avatarEditInput: '',
@@ -129,7 +135,11 @@ export default {
   computed: {
     ...mapState({
       avatar: (state) => state.user.avatar,
+      bio: (state) => state.user.bio,
     }),
+    isBioTooLong() {
+      return this.bioEditInput.length > this.USER_MAX_BIO_LENGTH;
+    },
   },
   created() {
     this.getData();
@@ -179,7 +189,7 @@ export default {
         this.requestingForUsers = false;
       }
     },
-    async unfollow(id) {
+    async unfollowUser(id) {
       if (!this.requestingForTags) {
         this.requestingForTags = true;
         const res = await api.users.unfollowUser(id);
