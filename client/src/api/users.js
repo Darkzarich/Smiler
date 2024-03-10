@@ -15,9 +15,9 @@ export default {
       method: 'get',
     });
   },
-  updateUserProfile(login, data) {
+  updateUserProfile(data) {
     return Query({
-      url: `${CONTROLLER_URL}/${login}`,
+      url: `${CONTROLLER_URL}/me`,
       method: 'put',
       data,
     });
@@ -73,9 +73,9 @@ export default {
       method: 'delete',
     });
   },
-  getUsersFollowing(login) {
+  getUsersFollowing() {
     return Query({
-      url: `${CONTROLLER_URL}/${login}/following`,
+      url: `${CONTROLLER_URL}/me/following`,
       method: 'get',
     });
   },

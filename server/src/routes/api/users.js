@@ -173,6 +173,8 @@ router.get('/get-auth', usersController.getAuth);
         }
       }
     },
+  }
+  "/users/me": {
     "put": {
       "tags": [
         "Users"
@@ -236,7 +238,7 @@ router.get('/get-auth', usersController.getAuth);
 }
 */
 router.get('/:login', usersController.getUser);
-router.put('/:login', auth.required, usersController.updateUser);
+router.put('/me', auth.required, usersController.updateUser);
 
 /**
 @swagger
@@ -375,27 +377,16 @@ router.put('/:login/template', auth.required, usersController.updateUserPostTemp
 /**
 @swagger
 {
-  "/users/{login}/following": {
+  "/users/me/following": {
     "get": {
       "tags": [
         "Users"
       ],
-      "summary": "Get user following",
-      "description": "Gets who user is following",
+      "summary": "Get the current user's following",
+      "description": "Gets who the current user is following",
       "security": [
         {
           "cookieAuth": []
-        }
-      ],
-      "parameters": [
-        {
-          "in": "path",
-          "name": "login",
-          "schema": {
-            "type": "string"
-          },
-          "required": true,
-          "description": "User name"
         }
       ],
       "responses": {
@@ -424,7 +415,7 @@ router.put('/:login/template', auth.required, usersController.updateUserPostTemp
 }
  */
 
-router.get('/:login/following', auth.required, usersController.getFollowing);
+router.get('/me/following', auth.required, usersController.getFollowing);
 
 /**
 @swagger

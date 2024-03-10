@@ -79,8 +79,7 @@ module.exports = {
     });
   }),
   updateUser: asyncErrorHandler(async (req, res, next) => {
-    const { login } = req.params;
-    const { userLogin } = req.session;
+    const { userId } = req.session;
     const { bio } = req.body;
     const { avatar } = req.body;
 
@@ -88,13 +87,9 @@ module.exports = {
       generateError(`bio can't be longer than ${consts.USER_MAX_BIO_LENGTH}`, 422, next); return;
     } if (avatar && avatar.length > consts.USER_MAX_AVATAR_LENGTH) {
       generateError(`Avatar link can't be longer than ${consts.USER_MAX_AVATAR_LENGTH}`, 422, next); return;
-    } if (login !== userLogin) {
-      generateError('Can edit information only for yourself', 403, next); return;
     }
 
-    const user = await User.findOne({
-      login,
-    });
+    const user = await User.findById(userId);
 
     if (user) {
       user.bio = bio || user.bio;
@@ -108,26 +103,19 @@ module.exports = {
     }
   }),
   getFollowing: asyncErrorHandler(async (req, res, next) => {
-    const { userLogin } = req.session;
-    const { login } = req.params;
+    const { userId } = req.session;
 
-    if (login !== userLogin) {
-      generateError('Can see following only for yourself', 403, next);
+    const user = await User.findById(userId).populate('usersFollowed', 'login avatar id');
+
+    if (user) {
+      const following = {
+        authors: user.usersFollowed,
+        tags: user.tagsFollowed,
+      };
+
+      success(req, res, following);
     } else {
-      const user = await User.findOne({
-        login,
-      }).populate('usersFollowed', 'login avatar id');
-
-      if (user) {
-        const following = {
-          authors: user.usersFollowed,
-          tags: user.tagsFollowed,
-        };
-
-        success(req, res, following);
-      } else {
-        generateError('User is not found', 404, next);
-      }
+      generateError('User is not found', 404, next);
     }
   }),
   follow: asyncErrorHandler(async (req, res, next) => {

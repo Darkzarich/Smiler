@@ -5,43 +5,50 @@
         <div class="user-settings__data-title">
           Following
         </div>
-        <div v-if="usersFollowed.length > 0" class="user-settings__data-group">
-          <div class="user-settings__data-group-title">
-            Authors:
+        <template v-if="usersFollowed.length || tagsFollowed.length">
+          <div class="user-settings__data-group">
+            <div class="user-settings__data-group-title">
+              Authors:
+            </div>
+            <div
+              v-for="author in usersFollowed"
+              :key="author.id"
+              :data-testid="`user-settings-author-${author.id}`"
+              class="user-settings__data-group-author"
+            >
+              {{ author.login }}
+              <span class="user-settings__data-group-unfollow" @click="unfollow(author.id)">
+                x
+              </span>
+            </div>
           </div>
-          <div
-            v-for="author in usersFollowed"
-            :key="author.id"
-            class="user-settings__data-group-author"
-          >
-            {{ author.login }}
-            <span class="user-settings__data-group-unfollow" @click="unfollow(author.id)">
-              x
-            </span>
+
+          <div class="user-settings__data-group" data-testid="user-settings-tags">
+            <div class="user-settings__data-group-title">
+              Tags:
+            </div>
+            <div
+              v-for="tag in tagsFollowed"
+              :key="tag"
+              :data-testid="`user-settings-author-${tag}`"
+              class="user-settings__data-group-tag"
+            >
+              {{ tag }}
+              <span class="user-settings__data-group-unfollow" @click="unfollowTag(tag)">
+                x
+              </span>
+            </div>
           </div>
-        </div>
-        <div v-if="tagsFollowed.length > 0" class="user-settings__data-group">
-          <div class="user-settings__data-group-title">
-            Tags:
-          </div>
-          <div
-            v-for="tag in tagsFollowed"
-            :key="tag"
-            class="user-settings__data-group-tag"
-          >
-            {{ tag }}
-            <span class="user-settings__data-group-unfollow" @click="unfollowTag(tag)">
-              x
-            </span>
-          </div>
-        </div>
+        </template>
         <div
-          v-if="usersFollowed.length === 0 && tagsFollowed.length === 0"
+          v-else
           class="user-settings__data-group"
+          data-testid="user-settings-no-following"
         >
-          <i>Nothing in following...</i>
+          <i>You don't follow any authors or tags...</i>
         </div>
       </div>
+
       <div class="user-settings__block">
         <div class="user-settings__data-title">
           Edit Bio
@@ -84,7 +91,6 @@
         </div>
       </div>
     </div>
-    <!-- TODO: rated list -->
     <div v-else class="user-settings__loading">
       <CircularLoader />
     </div>
@@ -122,7 +128,6 @@ export default {
   },
   computed: {
     ...mapState({
-      login: (state) => state.user.login,
       avatar: (state) => state.user.avatar,
     }),
   },
@@ -132,7 +137,7 @@ export default {
   methods: {
     async getData() {
       this.loading = true;
-      const res = await api.users.getUsersFollowing(this.login);
+      const res = await api.users.getUsersFollowing();
 
       if (!res.data.error) {
         this.usersFollowed = res.data.authors;
@@ -142,14 +147,17 @@ export default {
     },
     async editBio() {
       this.bioEditRequesting = true;
-      await api.users.updateUserProfile(this.login, {
+
+      await api.users.updateUserProfile({
         bio: this.bioEditInput,
       });
+
       this.bioEditRequesting = false;
     },
     async editAvatar() {
       this.avatarEditRequesting = true;
-      const res = await api.users.updateUserProfile(this.login, {
+
+      const res = await api.users.updateUserProfile({
         avatar: this.avatarEditInput,
       });
 
