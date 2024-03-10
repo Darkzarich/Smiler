@@ -1,21 +1,21 @@
 {
-  "name": "smiler-monorepo",
+  "name": "Smiler",
   "author": "Darkzarich",
   "version": "1.0.0",
-  "description": "Bridge connecting frontend and backend for Smiler.",
+  "description": "Smiler project monorepository.",
   "scripts": {
-    "run:dev": "concurrently --kill-others \"cd server && npm start\" \"cd client && npm run dev\"",
+    "dev": "concurrently --kill-others \"cd server && npm run dev\" \"cd client && npm run dev\"",
     "front:build": "cd client && npm run build",
     "front:dev": "cd client && npm run dev",
+    "back:dev": "cd server && npm run dev",
     "back:serve": "cd server && npm start",
-    "run:production": "cd server && node index.js",
     "postinstall": "(cd client && npm i); (cd server && npm i);"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Darkzarich/express-blog/issues"
+    "url": "https://github.com/Darkzarich/Smiler/issues"
   },
-  "homepage": "https://github.com/Darkzarich/express-blog#readme",
+  "homepage": "https://github.com/Darkzarich/Smiler#readme",
   "devDependencies": {
     "concurrently": "^7.6.0"
   }

@@ -1,5 +1,6 @@
 {
   "name": "smiler-frontend",
+  "description": "Frontend module of Smiler project",
   "version": "1.0.0",
   "private": true,
   "scripts": {

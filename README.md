@@ -28,7 +28,7 @@ Here is my [public roadmap](https://indecisive-shame-203.notion.site/73381a25f91
 1. `npm install`
 2. Inside root folder rename `.env.example` to `.env`
 3. Fill in your `.env` file following the comments inside the file
-4. `npm run run:dev` or `npm run run:production`
+4. `npm run dev`
 
 Alternatively you can run it with Docker Compose:
 ```bash
