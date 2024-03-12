@@ -9,13 +9,10 @@ const schema = new Schema({
   login: {
     type: String,
     required: [true, 'can\'t be blank.'],
-    unique: true,
-    index: true,
   },
   email: {
     type: String,
     required: [true, 'can\'t be blank.'],
-    unique: true,
   },
   hash: {
     type: String,
@@ -69,6 +66,10 @@ const schema = new Schema({
 }, {
   timestamps: true,
 });
+
+schema.index({ login: 1 }, { unique: true, background: true });
+
+schema.index({ email: 1 }, { unique: true, background: true });
 
 schema.set('toJSON', {
   virtuals: true,

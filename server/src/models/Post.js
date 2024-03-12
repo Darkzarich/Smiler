@@ -39,6 +39,14 @@ const schema = new Schema({
   timestamps: true,
 });
 
+schema.index({ slug: 1 }, { unique: true });
+
+schema.index({ rating: -1, createdAt: -1 });
+
+schema.index({ rating: -1 });
+
+schema.index({ createdAt: -1 });
+
 schema.static('commentCountInc', function (postId) {
   return this.findByIdAndUpdate(postId, {
     $inc: { commentCount: 1 },

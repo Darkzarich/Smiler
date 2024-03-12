@@ -48,6 +48,8 @@ const schema = new Schema({
   },
 });
 
+schema.index({ post: 1 });
+
 schema.pre('save', async function (next) {
   if (this.isNew) {
     await Post.commentCountInc(this.post);
