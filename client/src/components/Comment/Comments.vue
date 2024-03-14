@@ -368,8 +368,9 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors.scss';
-@import '@/styles/mixins.scss';
+@use "sass:color";
+@import '@/styles/colors';
+@import '@/styles/mixins';
 
 .comments {
   &__child-toggler {
@@ -378,15 +379,19 @@ export default {
     margin-top: 1rem;
     color: $light-gray;
     cursor: pointer;
+
     &:hover, &_active {
       color: $firm;
     }
+
     &_active {
       font-weight: bold;
     }
+
     font-family: monospace;
     margin-left: -0.7rem;
   }
+
   &__item {
     &-main {
       border-left: solid 1px $light-gray;
@@ -394,10 +399,12 @@ export default {
       &_first {
         border-left: none !important;
         margin-left: 0 !important;
+
         @include for-size(phone-only) {
           margin-left: -1rem !important;
         }
       }
+
       &_refresh-new {
         border-left: solid 3px $firm !important;
       }
@@ -406,10 +413,12 @@ export default {
         background: $widget-bg;
         margin: 1rem;
         padding: 1rem;
+
         @include for-size(phone-only) {
           // margin-left: 0;
           margin-right: 0;
         }
+
         color: $main-text;
 
         &_refresh-new {
@@ -417,13 +426,13 @@ export default {
         }
 
         &_created {
-
           animation: flash 1s ease-out;
 
           @keyframes flash {
             0% {
               background: $comments-animation;
             }
+
             100% {
               background: $widget-bg;
             }
@@ -456,6 +465,7 @@ export default {
 
           &-upvote, &-rating, &-downvote, &-edit, &-delete {
             color: $light-gray;
+
             svg {
               fill: $light-gray;
               width: 2rem;
@@ -468,6 +478,7 @@ export default {
 
           &-edit, &-delete {
             margin-left: 0.5rem;
+
             svg {
               transform: scale(1);
               width: 1.3rem;
@@ -493,16 +504,20 @@ export default {
           line-height: 1.5rem;
         }
       }
+
       &-answer {
         &-editor {
           width: 85%;
+
           @include for-size(phone-only) {
             width: 100%;
           }
+
           .text-editor {
             height: 6rem;
           }
         }
+
         &-toggler {
           color: $firm;
           margin-top: 0.5rem;
@@ -511,17 +526,22 @@ export default {
           font-size: 0.9rem;
           font-weight: bold;
           transition: color 0.2s ease;
+
           &:hover {
-            color: darken($firm, 20%);
+            color: color.adjust($firm, $lightness: -20%);
           }
+
           &_disabled {
             color: $light-gray !important;
             cursor: default;
           }
         }
+
         &-buttons {
           margin-bottom: -1rem;
-          @include flex-row();
+
+          @include flex-row;
+
           .button {
             width: 100%;
           }

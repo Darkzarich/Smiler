@@ -129,16 +129,19 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors.scss';
-@import '@/styles/mixins.scss';
+@import '@/styles/colors';
+@import '@/styles/mixins';
 
 .user {
-  @include widget();
+  @include widget;
+
   padding: 0;
 
   &__logged-meta {
     border-bottom: 1px solid $light-gray;
+
     @include flex-row;
+
     background: $bg;
     justify-content: center;
 
@@ -146,24 +149,28 @@ export default {
         justify-content: center;
         display: flex;
         user-select: none;
-        flex-direction: column;
-        flex-wrap: nowrap;
+        flex-flow: column nowrap;
         padding: 1rem;
+
         @include for-size(phone-only) {
           padding: 0.5rem;
         }
+
         align-items: center;
         width: 50%;
+
         img {
           border-radius: 50%;
           width: 8rem;
         }
       }
+
       &-login {
         color: $main-text;
         font-size: 1rem;
         text-align: center;
         margin: 1rem;
+
         @include for-size(phone-only) {
           margin: 0.5rem;
         }
@@ -173,31 +180,34 @@ export default {
         text-decoration: none;
       }
   }
+
   &__logged-info {
     display: flex;
     justify-content: center;
-    flex-direction: row;
-    flex-wrap: nowrap;
+    flex-flow: row nowrap;
     color: $main-text;
     padding: 1rem;
     border-bottom: 1px solid $light-gray;
+
     div {
       text-align: center;
       margin-right: 0.5rem;
     }
   }
+
   &__logged-nav {
     &-list {
       margin-left: 0;
       padding-inline-start: 0;
-      margin-block-start: 0em;
-      margin-block-end: 0em;
+      margin-block: 0 0;
       list-style: none;
       text-align: center;
+
       a {
         text-decoration: none;
       }
     }
+
     &-item {
       cursor: pointer;
       color: $main-text;

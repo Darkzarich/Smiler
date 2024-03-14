@@ -273,22 +273,27 @@ export default {
 </script>
 
 <style lang="scss">
+@use "sass:color";
 @import '@/styles/mixins';
 
 .post-editor {
   &__submit {
     display: flex;
     justify-content: space-around;
+
     .button {
       white-space: nowrap;
       width: 25%;
     }
   }
+
   &__title input {
     font-size: 20px;
   }
+
   &__section {
-    @include flex-row();
+    @include flex-row;
+
     align-items: center;
     margin-top: 1rem;
     cursor: move;
@@ -322,15 +327,19 @@ export default {
     justify-content: center;
     margin: 1rem;
     padding: 1rem;
+
     &-item {
       border: 1px solid $light-gray;
       padding: 1rem;
       background: $bg;
       cursor: pointer;
+
       &:hover {
         background: $widget-bg;
       }
+
       margin-left: 1rem;
+
       svg {
         fill: $light-gray;
       }
@@ -339,15 +348,18 @@ export default {
 
   &__delete {
     width: 0;
+
     @include for-size(phone-only) {
       width: 10px;
     }
+
     svg {
       cursor: pointer;
       transition: fill 0.3s ease-in-out;
       fill: $error;
+
       &:hover {
-        fill: darken($error, 20%);
+        fill: color.adjust($error, $lightness: -20%);
       }
     }
   }

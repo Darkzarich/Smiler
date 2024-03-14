@@ -131,7 +131,8 @@ export default {
 @import '@/styles/colors';
 
 .user-login {
-  @include flex-col();
+  @include flex-col;
+
   align-items: center;
   padding: 1rem;
 
@@ -152,6 +153,7 @@ export default {
     margin-top: 0.5rem;
     cursor: pointer;
     border-bottom: 1px solid transparent;
+
     &:hover {
       border-bottom: 1px solid $firm;
     }

@@ -127,24 +127,23 @@ export default {
 @import '@/styles/mixins';
 @import '@/styles/colors';
 
-  .post-loading {
-    @include widget();
-    @include flex-row();
-    justify-content: center;
-  }
+.post-loading {
+  @include widget;
+  @include flex-row;
 
-  .post-container {
-    &__no-post, &__no-more {
-      @include widget;
-      color: $main-text;
-      display: flex;
-      justify-content: center;
-      font-size: 1.3rem;
-    }
-    &__no-more, &__no-post {
-      margin-left: 10%;
-      text-align: center;
-      justify-content: none;
-    }
+  justify-content: center;
+}
+
+.post-container {
+  &__no-post, &__no-more {
+    @include widget;
+
+    color: $main-text;
+    display: flex;
+    font-size: 1.3rem;
+    margin-left: 10%;
+    text-align: center;
+    justify-content: none;
   }
+}
 </style>

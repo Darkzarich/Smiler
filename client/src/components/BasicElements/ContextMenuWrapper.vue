@@ -68,27 +68,33 @@ export default {
   padding: 0;
   background: $bg;
   border: 1px solid $light-gray;
+
   &-enter-active, &-leave-active {
     transition: all .1s;
   }
+
   &-enter, &-leave-to {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   &__list {
     list-style: none;
     margin: 0;
     padding: 0;
   }
+
   &__item {
     padding: 0.5rem;
     font-size: 0.9rem;
     color: #bfbfbf;
     cursor: pointer;
     border-bottom: 1px solid #6b6e70;
+
     &:hover {
       background: #272b2d
     }
+
     &:last-child {
       border-bottom: none;
     }

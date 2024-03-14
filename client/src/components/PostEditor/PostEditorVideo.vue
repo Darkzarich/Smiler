@@ -89,16 +89,18 @@ export default {
     padding: 1rem;
     border: 1px solid $light-gray;
     width: 100%;
+
     &__or {
       text-align: center;
       font-weight: bold;
       color: $firm;
     }
+
     &__video {
       display: flex;
-      flex-direction: row;
-      flex-wrap: nowrap;
+      flex-flow: row nowrap;
       border: 1px solid $light-gray;
+
       video, iframe {
         width: 100%;
       }

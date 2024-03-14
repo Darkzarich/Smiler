@@ -9,7 +9,8 @@
     "serve": "vite preview",
     "test:e2e": "npx playwright test",
     "test:e2e:ui": "npx playwright test --ui",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src"
+    "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
+    "lint:css": "npx stylelint '**/*.{css,scss,vue}'"
   },
   "dependencies": {
     "axios": "^1.3.2",
@@ -31,7 +32,13 @@
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-vue": "^9.2.0",
+    "postcss-html": "^1.6.0",
     "sass": "^1.62.0",
-    "vite": "^4.3.0"
+    "stylelint": "^16.2.1",
+    "stylelint-config-recommended-vue": "^1.5.0",
+    "stylelint-config-standard": "^36.0.0",
+    "stylelint-config-standard-scss": "^13.0.0",
+    "stylelint-scss": "^6.2.1",
+    "vite": "^4.5.2"
   }
 }

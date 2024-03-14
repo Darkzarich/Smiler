@@ -39,6 +39,7 @@ export default {
 .date-picker {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
+
   input[type="date"] {
     padding: 0.5rem;
     color: $main-text;
@@ -48,6 +49,7 @@ export default {
       &::-webkit-inner-spin-button { display: none; }
       &::-webkit-calendar-picker-indicator { background: transparent; }
   }
+
   label {
     min-width: 80px;
     display: inline-block;

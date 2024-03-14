@@ -99,12 +99,13 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/mixins.scss";
-@import "@/styles/colors.scss";
+@import "@/styles/mixins";
+@import "@/styles/colors";
 
 .mobile-menu {
   position: fixed;
   background: $widget-bg;
+
   // border: 1px solid $light-gray;
   top: 0;
   left: 0;
@@ -112,11 +113,36 @@ export default {
   width: 100%;
   overflow-y: scroll;
   z-index: 1000;
+
+  &__nav-link {
+    width: 100%;
+    padding: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    border-bottom: 1px solid $light-gray;
+
+    &_disabled {
+      border-top: 1px solid $light-gray;
+
+      div {
+        color: $light-gray !important;
+        border-bottom: 2px solid transparent !important;
+        cursor: default;
+        user-select: none;
+      }
+    }
+  }
+
+  div {
+    color: $main-text;
+  }
+
   .router-link-exact-active {
     div {
       color: $firm !important;
     }
   }
+
   &__close-icon {
     position: absolute;
     right: 0.5rem;
@@ -126,34 +152,19 @@ export default {
       fill: $error;
     }
   }
+
   &__user {
     margin-bottom: 0.5rem;
+
     .user {
       border: none;
     }
   }
+
   &__nav-container {
     overflow-x: hidden;
-    @include flex-col();
-  }
-  &__nav-link {
-    width: 100%;
-    padding: 1rem;
-    font-weight: bold;
-    text-decoration: none;
-    border-bottom: 1px solid $light-gray;
-    div {
-      color: $main-text;
-    }
-    &_disabled {
-      border-top: 1px solid $light-gray;
-      div {
-        color: $light-gray !important;
-        border-bottom: 2px solid transparent !important;
-        cursor: default;
-        user-select: none;
-      }
-    }
+
+    @include flex-col;
   }
 }
 </style>

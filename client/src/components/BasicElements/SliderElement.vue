@@ -53,25 +53,29 @@ export default {
 .slider {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
+
   &__val {
     position: absolute;
     color: $main-text;
   }
-  input[type=range] {
+
+  input[type="range"] {
     color: $main-text;
     background: $bg;
     outline: $firm;
     border: 1px solid $light-gray;
-    -webkit-appearance: none;
+    appearance: none;
+
     &::-webkit-slider-thumb {
       height: 1rem;
       width: 1rem;
       border-radius: 12px;
       background: $firm;
       cursor: pointer;
-      -webkit-appearance: none;
+      appearance: none;
       margin-top: -0.3rem;
     }
+
     &::-webkit-slider-runnable-track {
       background: $light-gray;
       height: 0.5rem;
@@ -80,6 +84,7 @@ export default {
       border-radius: 5px;
     }
   }
+
   label {
     min-width: 85px;
     display: inline-block;

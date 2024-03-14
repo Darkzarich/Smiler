@@ -132,28 +132,45 @@ export default {
 
 .input {
   @include flex-col;
+
   margin-left: 1rem;
   margin-right: 1rem;
-
-  &--error {
-
-    .input__label {
-      color: $error;
-    }
-
-    .input__element {
-      border: 1px solid $error;
-    }
-
-    .input__element:focus {
-      outline-color: $error;
-    }
-  }
 
   &__label {
     color: $main-text;
     font-size: 13px;
     margin-bottom: -4px;
+  }
+
+  &__element {
+    background: $bg;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    width: 95%;
+    margin-bottom: 0.5rem;
+    color: $main-text;
+    border: 1px solid $light-gray;
+    border-radius: 2px;
+
+    &:focus {
+      outline-color: $firm;
+    }
+  }
+
+  &--error {
+    .input {
+      &__label {
+        color: $error;
+      }
+
+      &__element {
+        border: 1px solid $error;
+
+        &:focus {
+          outline-color: $error;
+        }
+      }
+    }
   }
 
   &__error {
@@ -172,21 +189,5 @@ export default {
       cursor: pointer;
     }
   }
-
-  &__element {
-    background: $bg;
-    padding: 0.5rem;
-    margin-top: 0.5rem;
-    width: 95%;
-    margin-bottom: 0.5rem;
-    color: $main-text;
-    border: 1px solid $light-gray;
-    border-radius: 2px;
-
-    &:focus {
-      outline-color: $firm;
-    }
-  }
 }
-
 </style>

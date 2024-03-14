@@ -61,7 +61,8 @@ export default {
   // TODO: basic components must not have this style
   margin: 1rem;
   justify-content: center;
-  @include flex-row();
+
+  @include flex-row;
 
   &__element {
     width: 95%;
@@ -75,17 +76,21 @@ export default {
     cursor: pointer;
     display: flex;
     justify-content: center;
+
     &:hover {
       background: $widget-bg;
     }
+
     &[disabled] {
       pointer-events: none;
       border: 2px solid $light-gray;
       color: $light-gray;
     }
   }
+
   &__element-loader {
     position: absolute;
+
     svg {
       width: 1rem;
       height: 1rem;
@@ -94,12 +99,16 @@ export default {
 
   &_loading {
     pointer-events: none;
-    .button__element {
-      border: 2px solid rgba($firm, 0.5);
-    }
-    .button__element-content {
-      opacity: 0.5;
-      user-select: none;
+
+    .button {
+      &__element {
+        border: 2px solid rgba($firm, 0.5);
+      }
+
+      &__element-content {
+        opacity: 0.5;
+        user-select: none;
+      }
     }
   }
 }

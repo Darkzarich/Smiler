@@ -47,19 +47,25 @@ export default {
     color: #fff;
     z-index: 999;
     top: 0;
+
     &__item {
       border-bottom: 1px solid $bg;
       background: $error;
       height: 2rem;
       opacity: 0.5;
+
       @include for-size(phone-only) {
         opacity: 1;
       }
+
       transition: opacity 0.2s 0s ease-in-out;
+
       &:hover {
         opacity: 1;
       }
-      @include flex-row();
+
+      @include flex-row;
+
       align-items: center;
       justify-content: center;
 
@@ -70,15 +76,18 @@ export default {
       &-enter, &-leave-to {
         opacity: 0;
         transform: translateY(15px);
+
         @include for-size(phone-only) {
           transform: translateY(-15px);
         }
       }
     }
+
     &__close {
       position: absolute;
       right: 1rem;
       cursor: pointer;
+
       svg {
         fill: $bg;
       }

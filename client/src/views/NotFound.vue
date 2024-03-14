@@ -36,9 +36,11 @@ export default {
 @import '@/styles/mixins';
 
   .not-found {
-    @include widget();
-    @include flex-col();
+    @include widget;
+    @include flex-col;
+
     align-items: center;
+
     &__404 {
       color: $main-text;
       font-weight: bold;

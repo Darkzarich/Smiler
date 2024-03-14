@@ -81,46 +81,54 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins.scss';
-@import '@/styles/colors.scss';
+@import '@/styles/mixins';
+@import '@/styles/colors';
 
-  .post-editor__tags {
+.post-editor {
+  &__tags {
     @include flex-row;
+
     flex-wrap: wrap;
     margin-bottom: 0.5rem;
-    &-container {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    &-item {
-      margin-top: 0.5rem;
+  }
+
+  &__tags-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  &__tags-item {
+    margin-top: 0.5rem;
+    color: $firm;
+    font-weight: bold;
+    background: transparent;
+    font-size: 0.8rem;
+    font-family: monospace;
+    user-select: none;
+    cursor: pointer;
+    padding: 0.1rem;
+    margin-right: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid $firm;
+  }
+
+  &__tags-item-remove {
+    color: $error;
+  }
+
+  &__input {
+    display: flex;
+    align-items: center;
+
+    span {
       color: $firm;
       font-weight: bold;
-      background: transparent;
-      font-size: 0.8rem;
-      font-family: monospace;
-      user-select: none;
+      font-size: 1.5rem;
       cursor: pointer;
-      padding: 0.1rem;
-      margin-right: 0.5rem;
-      border-radius: 5px;
-      border: 1px solid $firm;
-      &-remove {
-        color: $error;
-      }
-    }
-    &-input {
-      display: flex;
-      align-items: center;
-      span {
-        color: $firm;
-        font-weight: bold;
-        font-size: 1.5rem;
-        cursor: pointer;
-        user-select: none;
-      }
+      user-select: none;
     }
   }
+}
 
 </style>

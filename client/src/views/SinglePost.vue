@@ -243,16 +243,19 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors.scss';
-@import '@/styles/mixins.scss';
+@import '@/styles/colors';
+@import '@/styles/mixins';
 
 .comments {
   border: 1px solid $light-gray;
+
   @include for-size(phone-only) {
     border: none;
   }
+
   padding: 1rem;
   margin-bottom: 2rem;
+
   &__update {
     cursor: pointer;
     background: $widget-bg;
@@ -263,23 +266,29 @@ export default {
     border-radius: 5px;
     opacity: 0.5;
     transition: opacity 0.1s ease-out;
+
     &:hover {
       opacity: 1;
     }
+
     width: 1rem;
     height: 1rem;
     border: 1px solid $light-gray;
+
     svg {
       fill: $light-gray;
       width: 1rem;
       height: 1rem;
     }
+
     span {
       color: $firm;
       position: absolute;
     }
+
     &_refreshing svg {
       animation: spin 0.5s linear infinite;
+
       @keyframes spin {
         0% {
           transform: rotate(0deg);
@@ -291,34 +300,43 @@ export default {
       }
     }
   }
+
   &__form {
     width: 85%;
     padding: 1rem;
+
     @include for-size(phone-only) {
       width: 100%;
       padding: 0;
     }
+
     margin-top: 0.5rem;
+
     &_disabled {
       border: 1px solid $light-gray;
       background: $widget-bg;
       color: $main-text;
     }
+
     .text-editor {
       height: 6rem;
     }
+
     &-title {
       color: $main-text;
       font-size: 1.2rem;
     }
   }
+
   &__title {
     color: $main-text;
     margin-top: -2rem;
+
     &-number {
       font-weight: bold;
     }
   }
+
   &__no-comments {
     color: $main-text;
     font-size: 1.2rem;
@@ -331,8 +349,10 @@ export default {
     font-size: 1.2rem;
     text-align: center;
     margin-top: 0.5rem;
+
     @include widget;
   }
+
   &__load-more {
     cursor: pointer;
   }

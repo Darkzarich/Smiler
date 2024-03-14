@@ -125,22 +125,23 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/variables.scss';
-@import '@/styles/mixins.scss';
-@import '@/styles/colors.scss';
+@import '@/styles/variables';
+@import '@/styles/mixins';
+@import '@/styles/colors';
 
   .header {
     background-color: $header;
-    height: $header-height;
     width: 100%;
     position: fixed;
     top: 0;
     z-index: 2;
     padding: 0.5rem;
     height: 40px;
+
     @include for-size(phone-only) {
       height: 30px;
     }
+
     display: flex;
     justify-content: center;
   }
@@ -149,19 +150,50 @@ export default {
     display: flex;
     padding-left: 80px;
     padding-right: 10px;
+
     @include for-size(phone-only) {
-      padding-left: 0px;
-      padding-right: 0px;
+      padding-left: 0;
+      padding-right: 0;
     }
+
     width: 100%;
     max-width: 1110px;
+
+    > a {
+      color: $main-text;
+      text-decoration: none;
+      width: 10%;
+
+      .header-container {
+        &__logo {
+          height: 100%;
+
+          @include for-size(phone-only) {
+            display: none;
+          }
+
+          &_mobile {
+            display: none;
+            height: 100%;
+
+            @include for-size(phone-only) {
+              display: inline-block;
+            }
+          }
+        }
+      }
+    }
+
     nav {
-      @include flex-row();
+      @include flex-row;
+
       align-items: center;
       margin-left: 4rem;
+
       @include for-size(phone-only) {
         margin-left: 0;
       }
+
       a {
         color: $main-text;
         padding-top: 5px;
@@ -169,34 +201,44 @@ export default {
         text-decoration: none;
         font-weight: bold;
         margin-left: 1rem;
+
         &:hover {
           border-bottom: 2px solid $main-text;
         }
       }
-      .header-container__nav-link_disabled {
-        color: $light-gray !important;
-        border-bottom: 2px solid transparent !important;
-        cursor: default;
-        user-select: none;
+
+      .header-container {
+        &__nav-link_disabled {
+          color: $light-gray !important;
+          border-bottom: 2px solid transparent !important;
+          cursor: default;
+          user-select: none;
+        }
       }
+
       .router-link-exact-active {
         color: $firm;
         border-bottom: 2px solid $firm !important;
       }
     }
+
     &__search {
       margin-left: auto;
       display: flex;
       align-items: center;
     }
+
     &__avatar {
       display: flex;
       margin-left: auto;
       margin-right: 3rem;
+
       @include for-size(phone-only) {
         margin-right: 1rem;
       }
+
       align-self: center;
+
       img {
         border-radius: 50%;
         width: 2.5rem;
@@ -204,35 +246,21 @@ export default {
         cursor: pointer;
       }
     }
-    > a {
-      color: $main-text;
-      text-decoration: none;
-      width: 10%;
-      .header-container__logo {
-        height: 100%;
-        @include for-size(phone-only) {
-          display: none;
-        }
-        &_mobile {
-          display: none;
-          height: 100%;
-          @include for-size(phone-only) {
-            display: inline-block;
-          }
-        }
-      }
-    }
+
     &__mobile_menu {
       display: none;
       margin-right: 1rem;
       cursor: pointer;
+
       @include for-size(phone-only) {
         display: block;
+
         svg {
           height: 100%;
           fill: $light-gray;
         }
       }
+
       &-enter-active, &-leave-active {
         transition: all 0.2s;
       }
@@ -240,11 +268,13 @@ export default {
       &-enter, &-leave-to {
         opacity: 0;
         transform: translateY(15px);
+
         @include for-size(phone-only) {
           transform: translateY(-15px);
         }
       }
     }
+
     &__mobile_active {
       svg {
         fill: $main-text;

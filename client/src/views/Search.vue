@@ -61,11 +61,14 @@ export default {
 
   .search-form {
     @include widget;
+
     margin-left: 10%;
+
     @include for-size(phone-only) {
       margin-left: 0;
       border: none;
     }
+
     margin-bottom: $widget-margin;
   }
 </style>

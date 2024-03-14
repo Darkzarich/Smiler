@@ -175,8 +175,11 @@ export default {
 
 .text-editor-control {
   padding: 1rem;
-  @include flex-row();
+
+  @include flex-row;
+
   padding-top: 0;
+
   button {
     font-family: monospace;
     background: $bg;
@@ -187,6 +190,7 @@ export default {
     outline: none;
     font-weight: bold;
     cursor: pointer;
+
     &:hover {
       background: $widget-bg;
     }
@@ -194,9 +198,9 @@ export default {
 }
 
 .text-editor {
-  @include input();
-  @include flex-row();
-  @include scroll();
+  @include input;
+  @include flex-row;
+  @include scroll;
 
   color: $main-text;
   margin-left: 1rem;
@@ -204,14 +208,17 @@ export default {
   height: 15rem;
   overflow-y: scroll;
   cursor: text;
+
   &__input {
     width: 95%;
     outline: $firm;
+
     br {
       margin-bottom: 1rem;
       display: block;
       content: '';
     }
+
     cite {
         display: block;
         padding: 1rem;

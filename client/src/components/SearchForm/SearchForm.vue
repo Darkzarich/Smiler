@@ -114,15 +114,20 @@ export default {
 
 .search-form {
   &__extra {
-    @include flex-row();
+    @include flex-row;
+
     justify-content: space-around;
+
     &-slider {
-      @include flex-col();
+      @include flex-col;
+
       justify-content: center;
     }
   }
+
   &__submit {
     @include flex-row;
+
     .button {
       width: 50%;
     }

@@ -25,7 +25,9 @@ footer {
   margin-top: 1rem;
   background: $header;
   align-items: center;
-  @include flex-row();
+
+  @include flex-row;
+
   .footer-github {
     display: inline-block;
     width: 3rem;
@@ -33,6 +35,7 @@ footer {
     margin-left: auto;
     margin-right: 1rem;
     cursor: pointer;
+
     img {
       width: 100%;
       height: 100%;

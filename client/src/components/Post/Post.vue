@@ -1,5 +1,5 @@
 <template>
-  <div class="post-container__item">
+  <div class="post-container-item">
     <div class="post-side">
       <div
         :data-testid="`post-${ postData.id }-upvote`"
@@ -358,15 +358,74 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/variables.scss';
-@import '@/styles/mixins.scss';
-@import '@/styles/colors.scss';
+@import '@/styles/variables';
+@import '@/styles/mixins';
+@import '@/styles/colors';
 
-.post-container__item {
+.post-container-item {
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
+  flex-flow: row nowrap;
   margin-bottom: $widget-margin;
+
+  &__meta {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    margin: -1rem;
+    padding: 0.5rem;
+    align-items: center;
+    background: $bg;
+    margin-top: 1rem;
+    border-top: 1px solid $light-gray;
+
+    @include for-size(phone-only) {
+      border-top: none;
+    }
+
+    &-comments svg {
+      fill: $main-text;
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.2rem;
+    }
+
+    &-author {
+      display: flex;
+      align-items: center;
+      color: $main-text;
+
+      span {
+        border-bottom: 1px solid transparent;
+
+        &:hover {
+          border-bottom: 1px solid $main-text;
+        }
+      }
+
+      img {
+        width: 2rem;
+        height: 2rem;
+        margin-left: 0.5rem;
+        border-radius: 50%;
+      }
+    }
+
+    &-date {
+          flex-basis: 33%;
+      display: inline-block;
+    }
+  }
+
+  &__upvote_active svg, &__upvote:hover svg {
+    cursor: pointer;
+    fill: $dark-firm;
+  }
+
+  > a {
+    flex-basis: 33%;
+    display: flex;
+    justify-content: flex-end;
+  }
 
   .post-main {
     background: $widget-bg;
@@ -374,16 +433,19 @@ export default {
     padding: 1rem;
     color: $main-text;
     border: 1px solid $light-gray;
+
     @include for-size(phone-only) {
       border: none;
       border-bottom: 1px solid $light-gray;
       width: 100%;
     }
+
     border-radius: 2px;
 
     &__rate-mobile {
       display: none;
     }
+
     @include for-size(phone-only) {
       &__rate-mobile {
         display: flex;
@@ -395,16 +457,21 @@ export default {
     a {
       color: $light-gray;
       text-decoration: none;
-      .post-main__title {
-        margin-bottom: 1rem;
-        font-weight: 400;
-        font-size: 20px;
-        a {
-          display: inline;
-          svg {
-            position: relative;
-            top: 3px;
-            fill: $light-gray;
+
+      .post-main {
+          &__title {
+          margin-bottom: 1rem;
+          font-weight: 400;
+          font-size: 20px;
+
+          a {
+            display: inline;
+
+            svg {
+              position: relative;
+              top: 3px;
+              fill: $light-gray;
+            }
           }
         }
       }
@@ -412,8 +479,10 @@ export default {
 
     &__tags {
       @include flex-row;
+
       flex-wrap: wrap;
       margin-bottom: 1rem;
+
       &-item {
         margin-top: 0.5rem;
         color: $firm;
@@ -432,6 +501,7 @@ export default {
 
     &__footer {
       margin-top: 1rem;
+
       @include for-size(phone-only) {
         margin-top: -1rem;
       }
@@ -439,6 +509,7 @@ export default {
 
     &__body {
       line-height: 1.5rem;
+
       cite {
         border: 1px solid $light-gray;
         padding: 0.5rem;
@@ -452,73 +523,21 @@ export default {
     &__attachments {
       &-item {
         display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
+        flex-flow: row nowrap;
         border: 1px solid $light-gray;
         margin-bottom: 1rem;
         margin-top: 1rem;
+
         img, video {
           width: 100%;
           height: 100%;
         }
+
         @include for-size(phone-only) {
           margin-left: -1rem;
           border: none;
           width: 110%;
         }
-      }
-    }
-
-    &__meta {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: nowrap;
-      justify-content: space-between;
-      margin: -1rem;
-      padding: 0.5rem;
-      align-items: center;
-      background: $bg;
-      margin-top: 1rem;
-      border-top: 1px solid $light-gray;
-      @include for-size(phone-only) {
-        border-top: none;
-      }
-
-      &-comments {
-        svg {
-          fill: $main-text;
-          width: 1rem;
-          height: 1rem;
-          margin-right: 0.2rem;
-        }
-      }
-
-     > a {
-       flex-basis: 33%;
-       display: flex;
-       justify-content: flex-end;
-     }
-
-      &-author {
-        display: flex;
-        align-items: center;
-        color: $main-text;
-        span {
-          border-bottom: 1px solid transparent;
-          &:hover {
-            border-bottom: 1px solid $main-text;
-          }
-        }
-        img {
-          width: 2rem;
-          height: 2rem;
-          margin-left: 0.5rem;
-          border-radius: 50%;
-        }
-      }
-      &-date {
-            flex-basis: 33%;
-        display: inline-block;
       }
     }
   }
@@ -528,15 +547,18 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+
     @include for-size(phone-only) {
       display: none;
     }
 
     &__upvote, &__rating, &__downvote {
       color: $light-gray;
+
       svg {
         fill: $light-gray;
         width: 5rem;
+
         @include for-size(phone-only) {
           width: 3rem;
         }
@@ -547,11 +569,6 @@ export default {
       font-size: 20px;
       margin-bottom: -1rem;
       margin-top: -1rem;
-    }
-
-    &__upvote:hover svg, &__upvote_active svg {
-      cursor: pointer;
-      fill: $dark-firm;
     }
 
     &__downvote:hover svg, &__downvote_active svg {

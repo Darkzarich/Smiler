@@ -127,20 +127,24 @@ export default {
 
   .post-image-upload {
     padding: 1rem;
+
     &_uploaded {
       padding: 0;
     }
+
     border: 1px solid $light-gray;
     width: 100%;
+
     &__or {
       text-align: center;
       font-weight: bold;
       color: $firm;
     }
+
     &__image {
       display: flex;
-      flex-direction: row;
-      flex-wrap: nowrap;
+      flex-flow: row nowrap;
+
       img {
         width: 100%;
         height: 100%;

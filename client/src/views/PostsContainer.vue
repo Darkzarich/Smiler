@@ -132,28 +132,33 @@ export default {
 @import '@/styles/colors';
 
   .post-loading {
-    @include widget();
-    @include flex-row();
+    @include widget;
+    @include flex-row;
+
     justify-content: center;
     margin-left: 10%;
+
     @include for-size(phone-only) {
       margin-left: 0%;
       border: none !important;
     }
   }
-  .post-container {
 
+  .post-container {
     &__no-post, &__no-more {
       @include widget;
+
       color: $main-text;
       display: flex;
       justify-content: center;
       font-size: 1.3rem;
+
       @include for-size(phone-only) {
         margin-left: 0% !important;
         border: none !important;
       }
     }
+
     &__no-more {
       margin-left: 10%;
       text-align: center;

@@ -125,31 +125,35 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/variables.scss';
-@import '@/styles/colors.scss';
-@import '@/styles/mixins.scss';
+@import '@/styles/variables';
+@import '@/styles/colors';
+@import '@/styles/mixins';
 
 .user-profile {
-  @include flex-row();
+  @include flex-row;
+
   justify-content: flex-end;
   margin-bottom: $widget-margin;
 
   &__offset {
     width: 10%;
+
     @include for-size(phone-only) {
       display: none;
     }
   }
 
   &__block {
-    @include flex-row();
+    @include flex-row;
+
     width: 90%;
     border: 1px solid $light-gray;
     padding: 1rem;
     border-radius: 2px;
     background: $widget-bg;
     color: $main-text;
-    &:after {
+
+    &::after {
       content: '';
       display: inline-block;
       width: 50%;
@@ -162,10 +166,12 @@ export default {
       filter: grayscale(1);
       background-size: cover;
     }
+
     @include for-size(phone-only) {
       width: 100%;
       border: none;
-      &:after {
+
+      &::after {
         display: none;
       }
     }
@@ -179,23 +185,26 @@ export default {
   }
 
   &__main-info-row {
-    @include flex-row();
+    @include flex-row;
   }
 
   &__followers {
     margin-left: 1rem;
   }
 
-  .user-profile__date {
+  &__date {
     color: $light-gray;
   }
 
   &__login {
     font-size: 1.5rem;
-    @include flex-row();
+
+    @include flex-row;
+
     .button {
       margin: 0;
       margin-left: 1rem;
+
       &__element {
         padding: 4px 6px;
         width: 75px;
@@ -207,6 +216,7 @@ export default {
     &_negative span {
       color: $dark-red;
     }
+
     &_positive span {
       color: $dark-firm;
     }
@@ -214,6 +224,7 @@ export default {
 
   &__avatar {
     margin-right: 1rem;
+
     img {
       border-radius: 50%;
       width: 7rem;

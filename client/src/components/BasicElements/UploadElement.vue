@@ -29,8 +29,10 @@ export default {
 @import '@/styles/mixins';
 
 .upload {
-  @include flex-col();
+  @include flex-col;
+
   padding: 1rem;
+
   &__input {
     border: 2px solid $light-gray;
     padding: 1rem;

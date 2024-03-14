@@ -47,12 +47,12 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/variables.scss';
-@import '@/styles/colors.scss';
-@import '@/styles/mixins.scss';
+@import '@/styles/variables';
+@import '@/styles/colors';
+@import '@/styles/mixins';
 
 html {
-  font-family: "Roboto","Open Sans",Helvetica,Arial,sans-serif,
+  font-family: Roboto,"Open Sans",Helvetica,Arial,sans-serif,
 }
 
 body {
@@ -72,8 +72,7 @@ body {
   margin-left: auto;
   margin-right: auto;
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
+  flex-flow: row nowrap;
   padding-right: 10px;
 
   @include for-size(phone-only) {

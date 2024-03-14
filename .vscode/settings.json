@@ -14,5 +14,6 @@
   ],
   "[vue]": {
     "editor.defaultFormatter": "octref.vetur"
-  }
+  },
+  "stylelint.validate": ["css", "less", "postcss", "vue", "scss"],
 }

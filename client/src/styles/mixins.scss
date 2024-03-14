@@ -1,4 +1,4 @@
-@import './colors.scss';
+@import './colors';
 
 @mixin for-size($range) {
   $phone-upper-boundary: 600px;
@@ -21,14 +21,12 @@
 
 @mixin flex-row {
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
+  flex-flow: row nowrap;
 }
 
 @mixin flex-col {
   display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
+  flex-flow: column nowrap;
 }
 
 @mixin widget {
@@ -43,7 +41,7 @@
   background: $bg;
   border-radius: 2px;
   padding: 1rem;
-  margin: 0em;
+  margin: 0;
 }
 
 @mixin scroll {
@@ -51,11 +49,13 @@
     width: 10px;
     background-color: #F5F5F5;
   }
+
   &::-webkit-scrollbar-thumb {
     background-color: $light-gray;
   }
+
   &::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    box-shadow: inset 0 0 6px rgb(0 0 0 / 30%);
     background-color: $widget-bg;
   }
 }
