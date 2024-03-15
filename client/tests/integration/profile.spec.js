@@ -76,8 +76,8 @@ test('Fetches and shows user profile', async ({ page }) => {
   await expect(page.getByTestId('user-profile-bio')).toContainText(
     testUser.bio,
   );
-  await expect(page.getByTestId('user-profile-unfollow-btn')).not.toBeVisible();
-  await expect(page.getByTestId('user-profile-follow-btn')).not.toBeVisible();
+  await expect(page.getByTestId('user-profile-unfollow-btn')).toBeHidden();
+  await expect(page.getByTestId('user-profile-follow-btn')).toBeHidden();
 });
 
 test('Fetches user posts with expected filters', async ({ page }) => {
@@ -177,9 +177,7 @@ test.describe('Follows and unfollow', () => {
 
     await page.goto(`/user/@${testUser.login}`);
 
-    await expect(
-      page.getByTestId('user-profile-unfollow-btn'),
-    ).not.toBeVisible();
-    await expect(page.getByTestId('user-profile-follow-btn')).not.toBeVisible();
+    await expect(page.getByTestId('user-profile-unfollow-btn')).toBeHidden();
+    await expect(page.getByTestId('user-profile-follow-btn')).toBeHidden();
   });
 });

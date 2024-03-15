@@ -12,6 +12,15 @@ module.exports = {
     '@vue/eslint-config-airbnb',
     'plugin:prettier/recommended',
   ],
+  overrides: [
+    {
+      files: ['tests/**/*.js'],
+      extends: ['plugin:playwright/recommended'],
+      rules: {
+        'no-console': 'off',
+      },
+    },
+  ],
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',

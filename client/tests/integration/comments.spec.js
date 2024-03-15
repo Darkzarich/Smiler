@@ -55,10 +55,10 @@ test('Hides children comments if root comment is collapsed', async ({
 
   await expect(
     page.getByTestId(`comment-${comment.children[0].id}-body`),
-  ).not.toBeVisible();
+  ).toBeHidden();
   await expect(
     page.getByTestId(`comment-${comment.children[0].children[0].id}-body`),
-  ).not.toBeVisible();
+  ).toBeHidden();
 });
 
 test.describe('Votes', () => {
@@ -94,6 +94,9 @@ test.describe('Votes', () => {
     expect(upvoteResponse.postDataJSON()).toEqual({
       negative: false,
     });
+    await expect(page.getByTestId(dataTestIds.upvote)).toHaveClass(
+      /comments__item-main-block-meta-upvote_active/,
+    );
   });
 
   test('Downvotes a comment', async ({ page }) => {
@@ -114,6 +117,9 @@ test.describe('Votes', () => {
     expect(downvoteResponse.postDataJSON()).toEqual({
       negative: true,
     });
+    await expect(page.getByTestId(dataTestIds.downvote)).toHaveClass(
+      /comments__item-main-block-meta-downvote_active/,
+    );
   });
 
   test('Removes a vote from a comment if it was upvoted before', async ({
@@ -138,7 +144,9 @@ test.describe('Votes', () => {
 
     await page.goto(`/${post.slug}`);
 
-    await page.getByTestId(`comment-${comment.id}-body`).isVisible();
+    await expect(page.getByTestId(dataTestIds.upvote)).toHaveClass(
+      /comments__item-main-block-meta-upvote_active/,
+    );
 
     const removeUpvoteRequest = page.waitForRequest(
       (res) =>
@@ -149,6 +157,10 @@ test.describe('Votes', () => {
     await page.getByTestId(dataTestIds.downvote).click();
 
     await removeUpvoteRequest;
+
+    await expect(page.getByTestId(dataTestIds.upvote)).not.toHaveClass(
+      /comments__item-main-block-meta-upvote_active/,
+    );
   });
 
   test('Removes a vote from a comment if it was downvoted before', async ({
@@ -173,7 +185,9 @@ test.describe('Votes', () => {
 
     await page.goto(`/${post.slug}`);
 
-    await page.getByTestId(`comment-${comment.id}-body`).isVisible();
+    await expect(page.getByTestId(dataTestIds.downvote)).toHaveClass(
+      /comments__item-main-block-meta-downvote_active/,
+    );
 
     const removeDownVoteRequest = page.waitForRequest(
       (res) =>
@@ -184,5 +198,9 @@ test.describe('Votes', () => {
     await page.getByTestId(dataTestIds.upvote).click();
 
     await removeDownVoteRequest;
+
+    await expect(page.getByTestId(dataTestIds.downvote)).not.toHaveClass(
+      /comments__item-main-block-meta-downvote_active/,
+    );
   });
 });

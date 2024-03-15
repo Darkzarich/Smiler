@@ -98,10 +98,10 @@ test.describe('Auth state', () => {
 
     await logoutRequest;
 
-    await expect(page.getByTestId('user-login')).not.toBeVisible();
-    await expect(page.getByTestId('user-rating')).not.toBeVisible();
-    await expect(page.getByTestId('user-followers-amount')).not.toBeVisible();
-    await expect(page.getByTestId('create-post-btn')).not.toBeVisible();
+    await expect(page.getByTestId('user-login')).toBeHidden();
+    await expect(page.getByTestId('user-rating')).toBeHidden();
+    await expect(page.getByTestId('user-followers-amount')).toBeHidden();
+    await expect(page.getByTestId('create-post-btn')).toBeHidden();
     await expect(page.getByTestId('user-signin-form')).toBeVisible();
   });
 });
@@ -189,10 +189,8 @@ test.describe('Sign In validation', () => {
   });
 
   test('Shows no validation errors by default', async ({ page }) => {
-    await expect(page.getByTestId('user-signin-email-error')).not.toBeVisible();
-    await expect(
-      page.getByTestId('user-signin-password-error'),
-    ).not.toBeVisible();
+    await expect(page.getByTestId('user-signin-email-error')).toBeHidden();
+    await expect(page.getByTestId('user-signin-password-error')).toBeHidden();
   });
 
   test('Errors on not a valid email', async ({ page }) => {
@@ -243,14 +241,10 @@ test.describe('Sign Up validation', () => {
   });
 
   test('Shows no validation errors by default', async ({ page }) => {
-    await expect(page.getByTestId('user-signup-email-error')).not.toBeVisible();
-    await expect(page.getByTestId('user-signup-login-error')).not.toBeVisible();
-    await expect(
-      page.getByTestId('user-signup-password-error'),
-    ).not.toBeVisible();
-    await expect(
-      page.getByTestId('user-signup-confirm-error'),
-    ).not.toBeVisible();
+    await expect(page.getByTestId('user-signup-email-error')).toBeHidden();
+    await expect(page.getByTestId('user-signup-login-error')).toBeHidden();
+    await expect(page.getByTestId('user-signup-password-error')).toBeHidden();
+    await expect(page.getByTestId('user-signup-confirm-error')).toBeHidden();
   });
 
   test('Errors on not a valid email', async ({ page }) => {

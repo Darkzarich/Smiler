@@ -60,7 +60,7 @@ test("Doesn't send posts request when just opened search page", async ({
 
   await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL('posts/search');
-  await expect(page.getByTestId('posts-container')).not.toBeVisible();
+  await expect(page.getByTestId('posts-container')).toBeHidden();
   expect(isPostsRequestSent).toBe(false);
 });
 

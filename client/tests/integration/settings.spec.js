@@ -66,18 +66,20 @@ test('Open settings page, shows expected authors and tags the user is following'
   await getFollowingRequest;
 
   for (const author of authors) {
-    expect(page.getByTestId(`user-settings-author-${author.id}`)).toContainText(
-      author.login,
-    );
+    // eslint-disable-next-line no-await-in-loop
+    await expect(
+      page.getByTestId(`user-settings-author-${author.id}`),
+    ).toContainText(author.login);
   }
 
   for (const tag of tags) {
-    expect(page.getByTestId(`user-settings-tags-${tag}`)).toContainText(tag);
+    // eslint-disable-next-line no-await-in-loop
+    await expect(page.getByTestId(`user-settings-tags-${tag}`)).toContainText(
+      tag,
+    );
   }
 
-  await expect(
-    page.getByTestId('user-settings-no-following'),
-  ).not.toBeVisible();
+  await expect(page.getByTestId('user-settings-no-following')).toBeHidden();
   await expect(page).toHaveTitle('Settings | Smiler');
 });
 
@@ -125,7 +127,7 @@ test('Unfollows an author, removes that author from the list of following', asyn
 
   await expect(
     page.getByTestId(`user-settings-author-${author1.id}`),
-  ).not.toBeVisible();
+  ).toBeHidden();
 });
 
 test('Unfollows a tag, removes that tag from the list of following', async ({
@@ -152,9 +154,7 @@ test('Unfollows a tag, removes that tag from the list of following', async ({
 
   await unfollowRequest;
 
-  await expect(
-    page.getByTestId(`user-settings-tag-${tags[0]}`),
-  ).not.toBeVisible();
+  await expect(page.getByTestId(`user-settings-tag-${tags[0]}`)).toBeHidden();
 });
 
 test("Edits current user's bio with expected request body", async ({

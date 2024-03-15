@@ -66,14 +66,14 @@ test('Empty posts lists', async ({ page, context }) => {
   ).toBeVisible();
 });
 
-test.describe('Post groups', async () => {
-  async function clickPostGroup({ page, group, isMobile }) {
-    if (isMobile) {
-      page.getByTestId('mobile-menu').click();
-    }
-    await page.getByTestId(group).click();
+async function clickPostGroup({ page, group, isMobile }) {
+  if (isMobile) {
+    page.getByTestId('mobile-menu').click();
   }
+  await page.getByTestId(group).click();
+}
 
+test.describe('Post groups', () => {
   test.beforeEach(async ({ page, context }) => {
     // playwright.config.js has Europe/Amsterdam (GMT+1) timezone set
     const mockedDate = new Date('2024-03-06T00:00:00.000Z');
@@ -227,7 +227,7 @@ test.describe('Post groups', async () => {
   });
 });
 
-test.describe('Post votes', async () => {
+test.describe('Post votes', () => {
   let dataTestIds;
 
   test.beforeAll(async ({ isMobile }) => {
@@ -261,6 +261,9 @@ test.describe('Post votes', async () => {
     expect(upvoteResponse.postDataJSON()).toEqual({
       negative: false,
     });
+    await expect(page.getByTestId(dataTestIds.upvote)).toHaveClass(
+      /post-side__upvote_active/,
+    );
   });
 
   test('Downvotes a post', async ({ page }) => {
@@ -278,6 +281,9 @@ test.describe('Post votes', async () => {
     expect(downvoteResponse.postDataJSON()).toEqual({
       negative: true,
     });
+    await expect(page.getByTestId(dataTestIds.downvote)).toHaveClass(
+      /post-side__downvote_active/,
+    );
   });
 
   test('Removes a vote from a post if it was upvoted before', async ({
@@ -302,7 +308,10 @@ test.describe('Post votes', async () => {
     });
 
     await page.goto('/');
-    await page.getByTestId(`post-${post1.id}-title`).isVisible();
+
+    await expect(page.getByTestId(dataTestIds.upvote)).toHaveClass(
+      /post-side__upvote_active/,
+    );
 
     const removeUpvoteRequest = page.waitForRequest(
       (res) =>
@@ -313,6 +322,10 @@ test.describe('Post votes', async () => {
     await page.getByTestId(dataTestIds.downvote).click();
 
     await removeUpvoteRequest;
+
+    await expect(page.getByTestId(dataTestIds.upvote)).not.toHaveClass(
+      /post-side__upvote_active/,
+    );
   });
 
   test('Removes a vote from a post if it was downvoted before', async ({
@@ -337,7 +350,10 @@ test.describe('Post votes', async () => {
     });
 
     await page.goto('/');
-    await page.getByTestId(`post-${post1.id}-title`).isVisible();
+
+    await expect(page.getByTestId(dataTestIds.downvote)).toHaveClass(
+      /post-side__downvote_active/,
+    );
 
     const removeDownVoteRequest = page.waitForRequest(
       (res) =>
@@ -348,6 +364,10 @@ test.describe('Post votes', async () => {
     await page.getByTestId(dataTestIds.upvote).click();
 
     await removeDownVoteRequest;
+
+    await expect(page.getByTestId(dataTestIds.downvote)).not.toHaveClass(
+      /post-side__downvote_active/,
+    );
   });
 });
 

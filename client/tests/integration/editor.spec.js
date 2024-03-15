@@ -183,9 +183,9 @@ test('Deletes sections in a post', async ({ page }) => {
     .first()
     .click();
 
-  await expect(page.getByTestId('text-section')).not.toBeVisible();
-  await expect(page.getByTestId('pic-section')).not.toBeVisible();
-  await expect(page.getByTestId('video-section')).not.toBeVisible();
+  await expect(page.getByTestId('text-section')).toBeHidden();
+  await expect(page.getByTestId('pic-section')).toBeHidden();
+  await expect(page.getByTestId('video-section')).toBeHidden();
 });
 
 test('D&D post sections to change order of sections', async ({
@@ -400,6 +400,6 @@ test.describe('Tags', () => {
 
     await addPostTagsFrom(page, tags);
 
-    await expect(page.getByTestId('post-tag-input')).not.toBeVisible();
+    await expect(page.getByTestId('post-tag-input')).toBeHidden();
   });
 });
