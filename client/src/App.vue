@@ -1,5 +1,8 @@
 <template>
-  <div v-if="show" id="app">
+  <div
+    v-if="show"
+    id="app"
+  >
     <SystemNotification />
     <HeaderElement />
     <!-- <div id="nav">
@@ -10,7 +13,10 @@
       <content class="content-box__main">
         <RouterView />
       </content>
-      <div v-if="!$isMobile()" class="content-box__sidebar">
+      <div
+        v-if="!$isMobile()"
+        class="content-box__sidebar"
+      >
         <User />
       </div>
     </div>
@@ -52,7 +58,7 @@ export default {
 @import '@/styles/mixins';
 
 html {
-  font-family: Roboto,"Open Sans",Helvetica,Arial,sans-serif,
+  font-family: Roboto, 'Open Sans', Helvetica, Arial, sans-serif;
 }
 
 body {
@@ -87,7 +93,6 @@ body {
       width: 100%;
       margin-right: 0;
     }
-
   }
 
   &__sidebar {

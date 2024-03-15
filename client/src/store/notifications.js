@@ -2,9 +2,7 @@ export default {
   state: {
     notifications: [],
   },
-  getters: {
-
-  },
+  getters: {},
   mutations: {
     pushSystemNotification(state, notif) {
       state.notifications.push(notif);

@@ -26,9 +26,7 @@ test.beforeEach(async ({ context }) => {
     await route.fulfill({
       json: {
         pages: 0,
-        comments: [
-          comment,
-        ],
+        comments: [comment],
       },
     });
   });
@@ -37,18 +35,30 @@ test.beforeEach(async ({ context }) => {
 test('Shows comment with its child comments', async ({ page }) => {
   await page.goto(`/${post.slug}`);
 
-  await expect(page.getByTestId(`comment-${comment.id}-body`)).toContainText(comment.body);
-  await expect(page.getByTestId(`comment-${comment.children[0].id}-body`)).toContainText(comment.children[0].body);
-  await expect(page.getByTestId(`comment-${comment.children[0].children[0].id}-body`)).toContainText(comment.children[0].children[0].body);
+  await expect(page.getByTestId(`comment-${comment.id}-body`)).toContainText(
+    comment.body,
+  );
+  await expect(
+    page.getByTestId(`comment-${comment.children[0].id}-body`),
+  ).toContainText(comment.children[0].body);
+  await expect(
+    page.getByTestId(`comment-${comment.children[0].children[0].id}-body`),
+  ).toContainText(comment.children[0].children[0].body);
 });
 
-test('Hides children comments if root comment is collapsed', async ({ page }) => {
+test('Hides children comments if root comment is collapsed', async ({
+  page,
+}) => {
   await page.goto(`/${post.slug}`);
 
   await page.getByTestId(`comment-${comment.id}-expander`).click();
 
-  await expect(page.getByTestId(`comment-${comment.children[0].id}-body`)).not.toBeVisible();
-  await expect(page.getByTestId(`comment-${comment.children[0].children[0].id}-body`)).not.toBeVisible();
+  await expect(
+    page.getByTestId(`comment-${comment.children[0].id}-body`),
+  ).not.toBeVisible();
+  await expect(
+    page.getByTestId(`comment-${comment.children[0].children[0].id}-body`),
+  ).not.toBeVisible();
 });
 
 test.describe('Votes', () => {
@@ -71,7 +81,11 @@ test.describe('Votes', () => {
 
     await page.getByTestId(`comment-${comment.id}-body`).isVisible();
 
-    const upvoteRequest = page.waitForRequest((res) => res.url().includes(`/comments/${comment.id}/rate`) && res.method() === 'PUT');
+    const upvoteRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/comments/${comment.id}/rate`) &&
+        res.method() === 'PUT',
+    );
 
     await page.getByTestId(dataTestIds.upvote).click();
 
@@ -87,7 +101,11 @@ test.describe('Votes', () => {
 
     await page.getByTestId(`comment-${comment.id}-body`).isVisible();
 
-    const downvoteRequest = page.waitForRequest((res) => res.url().includes(`/comments/${comment.id}/rate`) && res.method() === 'PUT');
+    const downvoteRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/comments/${comment.id}/rate`) &&
+        res.method() === 'PUT',
+    );
 
     await page.getByTestId(dataTestIds.downvote).click();
 
@@ -98,7 +116,10 @@ test.describe('Votes', () => {
     });
   });
 
-  test('Removes a vote from a comment if it was upvoted before', async ({ page, context }) => {
+  test('Removes a vote from a comment if it was upvoted before', async ({
+    page,
+    context,
+  }) => {
     await context.route('*/**/comments*', async (route) => {
       await route.fulfill({
         json: {
@@ -119,14 +140,21 @@ test.describe('Votes', () => {
 
     await page.getByTestId(`comment-${comment.id}-body`).isVisible();
 
-    const removeUpvoteRequest = page.waitForRequest((res) => res.url().includes(`/comments/${comment.id}/rate`) && res.method() === 'DELETE');
+    const removeUpvoteRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/comments/${comment.id}/rate`) &&
+        res.method() === 'DELETE',
+    );
 
     await page.getByTestId(dataTestIds.downvote).click();
 
     await removeUpvoteRequest;
   });
 
-  test('Removes a vote from a comment if it was downvoted before', async ({ page, context }) => {
+  test('Removes a vote from a comment if it was downvoted before', async ({
+    page,
+    context,
+  }) => {
     await context.route('*/**/comments*', async (route) => {
       await route.fulfill({
         json: {
@@ -147,7 +175,11 @@ test.describe('Votes', () => {
 
     await page.getByTestId(`comment-${comment.id}-body`).isVisible();
 
-    const removeDownVoteRequest = page.waitForRequest((res) => res.url().includes(`/comments/${comment.id}/rate`) && res.method() === 'DELETE');
+    const removeDownVoteRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/comments/${comment.id}/rate`) &&
+        res.method() === 'DELETE',
+    );
 
     await page.getByTestId(dataTestIds.upvote).click();
 

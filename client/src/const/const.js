@@ -11,7 +11,8 @@ const POST_SECTION_VIDEO_EMBED = {
   YOUTUBE: 'https://www.youtube.com/embed/',
 };
 const POST_SECTION_VIDEO_REGEXP = {
-  YOUTUBE: /((w{3}.)|(https?:\/\/))?((youtube.com\/.*v=(.*))|(youtu\.be\/(.*)))+/,
+  YOUTUBE:
+    /((w{3}.)|(https?:\/\/))?((youtube.com\/.*v=(.*))|(youtu\.be\/(.*)))+/,
   OTHERS: /((w{3}.)|(https?:\/\/))?.*\.(webm|avi|mp4|mkv|mov|wmv|flv)+/,
 };
 

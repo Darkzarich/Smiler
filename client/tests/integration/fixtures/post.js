@@ -32,8 +32,8 @@ const post = {
 /**
  * Generates a new post object with optional overrides.
  *
- * @param {object} overrides - An object containing properties to override in the new post object.
- * Default is an empty object.
+ * @param {object} overrides - An object containing properties to override in
+ * the new post object. Default is an empty object.
  * @return {object} The newly generated post object.
  */
 export default function generatePost(overrides = {}) {

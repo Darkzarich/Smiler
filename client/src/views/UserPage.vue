@@ -20,7 +20,10 @@
         Author has no posts yet.
       </div>
     </div>
-    <div v-if="loading" class="post-loading">
+    <div
+      v-if="loading"
+      class="post-loading"
+    >
       <CircularLoader />
     </div>
     <div
@@ -90,7 +93,7 @@ export default {
       const res = await api.posts.getPosts({
         author: this.userInfo.login || this.$route.params.login,
         limit: consts.POSTS_INITIAL_COUNT,
-        offset: 0 + (this.curPage * consts.POSTS_INITIAL_COUNT),
+        offset: 0 + this.curPage * consts.POSTS_INITIAL_COUNT,
       });
 
       if (!res.data.error) {
@@ -113,7 +116,10 @@ export default {
     handleScroll(evt, el) {
       if (!this.loading && !this.noMorePost && this.posts.length > 0) {
         const curContainerBounds = el.getBoundingClientRect();
-        if (curContainerBounds.height - Math.abs(curContainerBounds.y) < window.innerHeight) {
+        if (
+          curContainerBounds.height - Math.abs(curContainerBounds.y) <
+          window.innerHeight
+        ) {
           this.curPage = this.curPage + 1;
           this.uploadPosts(true);
         }
@@ -135,7 +141,8 @@ export default {
 }
 
 .post-container {
-  &__no-post, &__no-more {
+  &__no-post,
+  &__no-more {
     @include widget;
 
     color: $main-text;

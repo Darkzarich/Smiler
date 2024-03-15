@@ -25,9 +25,7 @@ test.beforeEach(async ({ context }) => {
     await route.fulfill({
       json: {
         pages: 0,
-        comments: [
-          generateComment(),
-        ],
+        comments: [generateComment()],
       },
     });
   });
@@ -40,7 +38,9 @@ test('Fetches the post by post slug', async ({ page }) => {
 
   await postBySlugRequest;
 
-  await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(post.title);
+  await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+    post.title,
+  );
 });
 
 test('Redirect to 404 if the post is not found', async ({ page, context }) => {
@@ -59,7 +59,9 @@ test('Redirect to 404 if the post is not found', async ({ page, context }) => {
 
   await expect(page).toHaveURL('/error/404');
   await expect(page).toHaveTitle('404 Not Found | Smiler');
-  await expect(page.getByTestId('system-notification')).toContainText('Post does not exist');
+  await expect(page.getByTestId('system-notification')).toContainText(
+    'Post does not exist',
+  );
 });
 
 test('Fetches post comments by post id', async ({ page }) => {
@@ -76,9 +78,7 @@ test.describe('Sections', () => {
   async function mockPostSection(context, section) {
     const postWithSections = {
       id: '1',
-      sections: Array.isArray(section) ? section : [
-        section,
-      ],
+      sections: Array.isArray(section) ? section : [section],
     };
 
     await context.route(`*/**/posts/${post.slug}`, async (route) => {
@@ -101,7 +101,9 @@ test.describe('Sections', () => {
 
     await page.goto(`/${mockedPost.slug}`);
 
-    await expect(page.getByTestId(`post-${mockedPost.id}-text-${section.hash}`)).toContainText(section.content);
+    await expect(
+      page.getByTestId(`post-${mockedPost.id}-text-${section.hash}`),
+    ).toContainText(section.content);
   });
 
   test('Shows pic section', async ({ context, page }) => {
@@ -115,8 +117,12 @@ test.describe('Sections', () => {
 
     await page.goto(`/${mockedPost.slug}`);
 
-    await expect(page.getByTestId(`post-${mockedPost.id}-pic-${section.hash}`)).toBeVisible();
-    await expect(page.getByTestId(`post-${mockedPost.id}-pic-${section.hash}`)).toHaveAttribute('alt', section.url);
+    await expect(
+      page.getByTestId(`post-${mockedPost.id}-pic-${section.hash}`),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId(`post-${mockedPost.id}-pic-${section.hash}`),
+    ).toHaveAttribute('alt', section.url);
   });
 
   test('Shows video section', async ({ context, page }) => {
@@ -130,11 +136,18 @@ test.describe('Sections', () => {
 
     await page.goto(`/${mockedPost.slug}`);
 
-    await expect(page.getByTestId(`post-${mockedPost.id}-vid-${section.hash}`)).toBeVisible();
-    await expect(page.getByTestId(`post-${mockedPost.id}-vid-${section.hash}`)).toHaveAttribute('src', section.url);
+    await expect(
+      page.getByTestId(`post-${mockedPost.id}-vid-${section.hash}`),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId(`post-${mockedPost.id}-vid-${section.hash}`),
+    ).toHaveAttribute('src', section.url);
   });
 
-  test('Shows multiple sections at the same time', async ({ context, page }) => {
+  test('Shows multiple sections at the same time', async ({
+    context,
+    page,
+  }) => {
     const sections = [
       {
         hash: '1',
@@ -157,10 +170,20 @@ test.describe('Sections', () => {
 
     await page.goto(`/${mockedPost.slug}`);
 
-    await expect(page.getByTestId(`post-${mockedPost.id}-pic-${sections[0].hash}`)).toBeVisible();
-    await expect(page.getByTestId(`post-${mockedPost.id}-pic-${sections[0].hash}`)).toHaveAttribute('alt', sections[0].url);
-    await expect(page.getByTestId(`post-${mockedPost.id}-text-${sections[1].hash}`)).toContainText(sections[1].content);
-    await expect(page.getByTestId(`post-${mockedPost.id}-vid-${sections[2].hash}`)).toBeVisible();
-    await expect(page.getByTestId(`post-${mockedPost.id}-vid-${sections[2].hash}`)).toHaveAttribute('src', sections[2].url);
+    await expect(
+      page.getByTestId(`post-${mockedPost.id}-pic-${sections[0].hash}`),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId(`post-${mockedPost.id}-pic-${sections[0].hash}`),
+    ).toHaveAttribute('alt', sections[0].url);
+    await expect(
+      page.getByTestId(`post-${mockedPost.id}-text-${sections[1].hash}`),
+    ).toContainText(sections[1].content);
+    await expect(
+      page.getByTestId(`post-${mockedPost.id}-vid-${sections[2].hash}`),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId(`post-${mockedPost.id}-vid-${sections[2].hash}`),
+    ).toHaveAttribute('src', sections[2].url);
   });
 });

@@ -35,7 +35,10 @@ test.beforeEach(async ({ context }) => {
   });
 });
 
-test('Only authenticated user can see Settings page', async ({ page, context }) => {
+test('Only authenticated user can see Settings page', async ({
+  page,
+  context,
+}) => {
   await context.route('*/**/users/get-auth', async (route) => {
     route.fulfill({
       json: generateAuth({
@@ -46,12 +49,16 @@ test('Only authenticated user can see Settings page', async ({ page, context }) 
 
   await page.goto('/user/settings');
 
-  await expect(page.getByTestId('system-notification')).toContainText('Only authenticated users can access this page.');
+  await expect(page.getByTestId('system-notification')).toContainText(
+    'Only authenticated users can access this page.',
+  );
   await expect(page).toHaveURL('/');
   await expect(page).toHaveTitle('Home | Smiler');
 });
 
-test('Open settings page, shows expected authors and tags the user is following', async ({ page }) => {
+test('Open settings page, shows expected authors and tags the user is following', async ({
+  page,
+}) => {
   const getFollowingRequest = page.waitForRequest('*/**/users/me/following');
 
   await page.goto('/user/settings');
@@ -59,18 +66,25 @@ test('Open settings page, shows expected authors and tags the user is following'
   await getFollowingRequest;
 
   for (const author of authors) {
-    expect(page.getByTestId(`user-settings-author-${author.id}`)).toContainText(author.login);
+    expect(page.getByTestId(`user-settings-author-${author.id}`)).toContainText(
+      author.login,
+    );
   }
 
   for (const tag of tags) {
     expect(page.getByTestId(`user-settings-tags-${tag}`)).toContainText(tag);
   }
 
-  await expect(page.getByTestId('user-settings-no-following')).not.toBeVisible();
+  await expect(
+    page.getByTestId('user-settings-no-following'),
+  ).not.toBeVisible();
   await expect(page).toHaveTitle('Settings | Smiler');
 });
 
-test('Shows empty list of authors and tags if the user is not following any', async ({ page, context }) => {
+test('Shows empty list of authors and tags if the user is not following any', async ({
+  page,
+  context,
+}) => {
   await context.route('*/**/users/me/following', async (route) => {
     route.fulfill({
       json: {
@@ -85,7 +99,10 @@ test('Shows empty list of authors and tags if the user is not following any', as
   await expect(page.getByTestId('user-settings-no-following')).toBeVisible();
 });
 
-test('Unfollows an author, removes that author from the list of following', async ({ page, context }) => {
+test('Unfollows an author, removes that author from the list of following', async ({
+  page,
+  context,
+}) => {
   await context.route(`**/users/${author1.id}/follow`, async (route) => {
     await route.fulfill({
       json: {
@@ -96,16 +113,25 @@ test('Unfollows an author, removes that author from the list of following', asyn
 
   await page.goto('/user/settings');
 
-  const unfollowRequest = page.waitForRequest((res) => res.url().includes(`/users/${author1.id}/follow`) && res.method() === 'DELETE');
+  const unfollowRequest = page.waitForRequest(
+    (res) =>
+      res.url().includes(`/users/${author1.id}/follow`) &&
+      res.method() === 'DELETE',
+  );
 
   await page.getByTestId(`user-settings-author-${author1.id}-unfollow`).click();
 
   await unfollowRequest;
 
-  await expect(page.getByTestId(`user-settings-author-${author1.id}`)).not.toBeVisible();
+  await expect(
+    page.getByTestId(`user-settings-author-${author1.id}`),
+  ).not.toBeVisible();
 });
 
-test('Unfollows a tag, removes that tag from the list of following', async ({ page, context }) => {
+test('Unfollows a tag, removes that tag from the list of following', async ({
+  page,
+  context,
+}) => {
   await context.route(`**/tags/${tags[0]}/follow`, async (route) => {
     await route.fulfill({
       json: {
@@ -116,19 +142,29 @@ test('Unfollows a tag, removes that tag from the list of following', async ({ pa
 
   await page.goto('/user/settings');
 
-  const unfollowRequest = page.waitForRequest((res) => res.url().includes(`/tags/${tags[0]}/follow`) && res.method() === 'DELETE');
+  const unfollowRequest = page.waitForRequest(
+    (res) =>
+      res.url().includes(`/tags/${tags[0]}/follow`) &&
+      res.method() === 'DELETE',
+  );
 
   await page.getByTestId(`user-settings-tag-${tags[0]}-unfollow`).click();
 
   await unfollowRequest;
 
-  await expect(page.getByTestId(`user-settings-tag-${tags[0]}`)).not.toBeVisible();
+  await expect(
+    page.getByTestId(`user-settings-tag-${tags[0]}`),
+  ).not.toBeVisible();
 });
 
-test('Edits current user\'s bio with expected request body', async ({ page }) => {
+test("Edits current user's bio with expected request body", async ({
+  page,
+}) => {
   await page.goto('/user/settings');
 
-  const editRequest = page.waitForRequest((res) => res.url().includes('/users/me') && res.method() === 'PUT');
+  const editRequest = page.waitForRequest(
+    (res) => res.url().includes('/users/me') && res.method() === 'PUT',
+  );
 
   await page.getByTestId('user-settings-bio-input').fill('New bio');
   await page.getByTestId('user-settings-bio-submit').click();
@@ -138,24 +174,36 @@ test('Edits current user\'s bio with expected request body', async ({ page }) =>
   expect(editResponse.postDataJSON()).toMatchObject({ bio: 'New bio' });
 });
 
-test('Edits current user\'s avatar with expected request body', async ({ page }) => {
+test("Edits current user's avatar with expected request body", async ({
+  page,
+}) => {
   await page.goto('/user/settings');
 
-  const editRequest = page.waitForRequest((res) => res.url().includes('/users/me') && res.method() === 'PUT');
+  const editRequest = page.waitForRequest(
+    (res) => res.url().includes('/users/me') && res.method() === 'PUT',
+  );
 
-  await page.getByTestId('user-settings-avatar-input').fill('https://placehold.co/128x128');
+  await page
+    .getByTestId('user-settings-avatar-input')
+    .fill('https://placehold.co/128x128');
   await page.getByTestId('user-settings-avatar-submit').click();
 
   const editResponse = await editRequest;
 
-  expect(editResponse.postDataJSON()).toMatchObject({ avatar: 'https://placehold.co/128x128' });
+  expect(editResponse.postDataJSON()).toMatchObject({
+    avatar: 'https://placehold.co/128x128',
+  });
 });
 
-test('If typed more than 300 symbols in bio shows validation error and blocks submit', async ({ page }) => {
+test('If typed more than 300 symbols in bio shows validation error and blocks submit', async ({
+  page,
+}) => {
   await page.goto('/user/settings');
 
   await page.getByTestId('user-settings-bio-input').fill('t'.repeat(301));
 
-  await expect(page.getByTestId('user-settings-bio-input-error')).toHaveText('Bio is too long');
+  await expect(page.getByTestId('user-settings-bio-input-error')).toHaveText(
+    'Bio is too long',
+  );
   await expect(page.getByTestId('user-settings-bio-submit')).toBeDisabled();
 });

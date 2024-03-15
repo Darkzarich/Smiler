@@ -1,6 +1,9 @@
 <template>
   <div class="user-login">
-    <div class="user-login__header" data-testid="user-signin-form">
+    <div
+      class="user-login__header"
+      data-testid="user-signin-form"
+    >
       Login
     </div>
     <div class="user-login__form-input">
@@ -36,7 +39,11 @@
         SIGN IN
       </ButtonElement>
     </div>
-    <div data-testid="user-form-mode-toggler" class="user-login__mode-toggler" @click="$emit('mode-change')">
+    <div
+      data-testid="user-form-mode-toggler"
+      class="user-login__mode-toggler"
+      @click="$emit('mode-change')"
+    >
       OR REGISTRATION
     </div>
   </div>
@@ -81,7 +88,7 @@ export default {
         this.requestError = '';
 
         if (this.email.length === 0) {
-          validation.email = 'Email can\'t be empty';
+          validation.email = "Email can't be empty";
         } else if (!/.+@.+\.[a-z]+/.test(this.email)) {
           validation.email = 'Email is not valid';
         }
@@ -89,7 +96,7 @@ export default {
         // password
 
         if (this.password.length === 0) {
-          validation.password = 'Password can\'t be empty';
+          validation.password = "Password can't be empty";
         } else if (this.password.length < consts.PASSWORD_MIN_LENGTH) {
           validation.password = `Password length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
         }

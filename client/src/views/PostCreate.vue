@@ -1,9 +1,19 @@
 <template>
-  <div v-if="show" class="post-create">
-    <div class="post-create__header" data-testid="post-create-header">
+  <div
+    v-if="show"
+    class="post-create"
+  >
+    <div
+      class="post-create__header"
+      data-testid="post-create-header"
+    >
       {{ edit ? 'Edit' : 'Create' }} Post
     </div>
-    <PostEditor :key="key" :edit="edit" :post="post" />
+    <PostEditor
+      :key="key"
+      :edit="edit"
+      :post="post"
+    />
   </div>
 </template>
 
@@ -54,6 +64,7 @@ export default {
     setPost(data) {
       this.show = false;
       this.key = 'edit';
+
       if (data.author.login !== this.login) {
         this.$store.dispatch('newSystemNotification', {
           error: {
@@ -100,5 +111,4 @@ export default {
     color: $main-text;
   }
 }
-
 </style>

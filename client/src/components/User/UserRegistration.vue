@@ -1,8 +1,6 @@
 <template>
   <div class="user-registration">
-    <div class="user-registration__header">
-      Registration
-    </div>
+    <div class="user-registration__header">Registration</div>
 
     <div class="user-registration__form-input">
       <InputElement
@@ -65,7 +63,11 @@
       </ButtonElement>
     </div>
 
-    <div data-testid="user-form-mode-toggler" class="user-registration__mode-toggler" @click="$emit('mode-change')">
+    <div
+      data-testid="user-form-mode-toggler"
+      class="user-registration__mode-toggler"
+      @click="$emit('mode-change')"
+    >
       OR LOGIN
     </div>
   </div>
@@ -95,8 +97,12 @@ export default {
   },
   computed: {
     isSubmitDisabled() {
-      return !!(this.validation.email || this.validation.password
-              || this.validation.confirm || this.validation.login);
+      return !!(
+        this.validation.email ||
+        this.validation.password ||
+        this.validation.confirm ||
+        this.validation.login
+      );
     },
     validation() {
       const validation = {
@@ -117,7 +123,7 @@ export default {
         this.requestError = '';
 
         if (this.email.length === 0) {
-          validation.email = 'Email can\'t be empty';
+          validation.email = "Email can't be empty";
         } else if (!/.+@.+\.[a-z]+/.test(this.email)) {
           validation.email = 'Email is not valid';
         }
@@ -125,16 +131,18 @@ export default {
         // login
 
         if (this.login.length === 0) {
-          validation.login = 'Login can\'t be empty';
-        } else if (this.login.length < consts.LOGIN_MIN_LENGTH
-        || this.login.length > consts.LOGIN_MAX_LENGTH) {
+          validation.login = "Login can't be empty";
+        } else if (
+          this.login.length < consts.LOGIN_MIN_LENGTH ||
+          this.login.length > consts.LOGIN_MAX_LENGTH
+        ) {
           validation.login = `Login length must be ${consts.LOGIN_MIN_LENGTH}-${consts.LOGIN_MAX_LENGTH}`;
         }
 
         // password
 
         if (this.password.length === 0) {
-          validation.password = 'Password can\'t be empty';
+          validation.password = "Password can't be empty";
         } else if (this.password.length < consts.PASSWORD_MIN_LENGTH) {
           validation.password = `Password length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
         }
@@ -142,7 +150,7 @@ export default {
         // confirm
 
         if (this.confirm.length === 0) {
-          validation.confirm = 'Password confirm can\'t be empty';
+          validation.confirm = "Password confirm can't be empty";
         } else if (this.confirm.length < consts.PASSWORD_MIN_LENGTH) {
           validation.confirm = `Password confirm length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
         } else if (this.confirm !== this.password) {

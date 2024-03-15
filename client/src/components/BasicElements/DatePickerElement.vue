@@ -9,7 +9,7 @@
       type="date"
       :value="value"
       @input="$emit('input', $event.target.value)"
-    >
+    />
   </div>
 </template>
 
@@ -40,14 +40,20 @@ export default {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 
-  input[type="date"] {
+  input[type='date'] {
     padding: 0.5rem;
     color: $main-text;
     background: $bg;
     outline: $firm;
     border: 1px solid $light-gray;
-      &::-webkit-inner-spin-button { display: none; }
-      &::-webkit-calendar-picker-indicator { background: transparent; }
+
+    &::-webkit-inner-spin-button {
+      display: none;
+    }
+
+    &::-webkit-calendar-picker-indicator {
+      background: transparent;
+    }
   }
 
   label {
@@ -56,5 +62,4 @@ export default {
     color: $light-gray;
   }
 }
-
 </style>

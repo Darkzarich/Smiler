@@ -1,15 +1,14 @@
 <template>
   <div class="user-settings">
-    <div v-if="!loading" class="user-settings__data">
+    <div
+      v-if="!loading"
+      class="user-settings__data"
+    >
       <div class="user-settings__block">
-        <div class="user-settings__data-title">
-          Following
-        </div>
+        <div class="user-settings__data-title">Following</div>
         <template v-if="usersFollowed.length || tagsFollowed.length">
           <div class="user-settings__data-group">
-            <div class="user-settings__data-group-title">
-              Authors:
-            </div>
+            <div class="user-settings__data-group-title">Authors:</div>
             <div
               v-for="author in usersFollowed"
               :key="author.id"
@@ -17,16 +16,21 @@
               class="user-settings__data-group-author"
             >
               {{ author.login }}
-              <span class="user-settings__data-group-unfollow" :data-testid="`user-settings-author-${author.id}-unfollow`" @click="unfollowUser(author.id)">
+              <span
+                class="user-settings__data-group-unfollow"
+                :data-testid="`user-settings-author-${author.id}-unfollow`"
+                @click="unfollowUser(author.id)"
+              >
                 x
               </span>
             </div>
           </div>
 
-          <div class="user-settings__data-group" data-testid="user-settings-tags">
-            <div class="user-settings__data-group-title">
-              Tags:
-            </div>
+          <div
+            class="user-settings__data-group"
+            data-testid="user-settings-tags"
+          >
+            <div class="user-settings__data-group-title">Tags:</div>
             <div
               v-for="tag in tagsFollowed"
               :key="tag"
@@ -34,7 +38,11 @@
               class="user-settings__data-group-tag"
             >
               {{ tag }}
-              <span class="user-settings__data-group-unfollow" :data-testid="`user-settings-tag-${tag}-unfollow`" @click="unfollowTag(tag)">
+              <span
+                class="user-settings__data-group-unfollow"
+                :data-testid="`user-settings-tag-${tag}-unfollow`"
+                @click="unfollowTag(tag)"
+              >
                 x
               </span>
             </div>
@@ -50,9 +58,7 @@
       </div>
 
       <div class="user-settings__block">
-        <div class="user-settings__data-title">
-          Edit Bio
-        </div>
+        <div class="user-settings__data-title">Edit Bio</div>
         <InputElement
           v-model="bioEditInput"
           data-testid="user-settings-bio-input"
@@ -72,11 +78,12 @@
         </div>
       </div>
       <div class="user-settings__block">
-        <div class="user-settings__data-title">
-          Edit Avatar
-        </div>
+        <div class="user-settings__data-title">Edit Avatar</div>
         <div class="user-settings__current-avatar">
-          <img :src="$resolveAvatar(avatar)" :alt="avatar">
+          <img
+            :src="$resolveAvatar(avatar)"
+            :alt="avatar"
+          />
         </div>
         <InputElement
           v-model="avatarEditInput"
@@ -96,7 +103,10 @@
         </div>
       </div>
     </div>
-    <div v-else class="user-settings__loading">
+    <div
+      v-else
+      class="user-settings__loading"
+    >
       <CircularLoader />
     </div>
   </div>
@@ -225,9 +235,9 @@ export default {
   }
 
   &__data-group-unfollow {
-      color: $error;
-      font-family: monospace;
-      cursor: pointer;
+    color: $error;
+    font-family: monospace;
+    cursor: pointer;
   }
 
   &__bio-buttons {
@@ -280,40 +290,39 @@ export default {
   }
 
   &__data-title {
-      font-size: 1.5rem;
-      color: $main-text;
-      text-align: center;
-      margin-top: 1.5rem;
-      margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: $main-text;
+    text-align: center;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   &__data-group {
-      display: flex;
-      flex-wrap: wrap;
-      margin-top: 0.5rem;
-      padding-left: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+    padding-left: 1rem;
 
-      @include for-size(phone-only) {
-        padding-left: 0;
-      }
+    @include for-size(phone-only) {
+      padding-left: 0;
+    }
 
-      i {
-        color: $main-text;
-      }
+    i {
+      color: $main-text;
+    }
   }
 
   &__data-group-title {
-      color: $light-gray;
-      font-weight: bold;
-      margin-top: 0.5rem;
+    color: $light-gray;
+    font-weight: bold;
+    margin-top: 0.5rem;
   }
 
   &__data-group-tag,
   &__data-group-author {
-      color: $main-text;
-      margin-left: 0.5rem;
-      margin-top: 0.5rem;
+    color: $main-text;
+    margin-left: 0.5rem;
+    margin-top: 0.5rem;
   }
 }
-
 </style>

@@ -1,6 +1,10 @@
 <template>
   <div data-testid="posts-container">
-    <div v-if="!loading || posts.length > 0" v-scroll="handleScroll" class="post-container">
+    <div
+      v-if="!loading || posts.length > 0"
+      v-scroll="handleScroll"
+      class="post-container"
+    >
       <div
         v-for="post in posts"
         :key="post.id"
@@ -17,15 +21,18 @@
         We're sorry. No posts for this time yet.
       </div>
     </div>
-    <div v-if="loading" class="post-loading">
+    <div
+      v-if="loading"
+      class="post-loading"
+    >
       <CircularLoader />
     </div>
     <div
       v-else-if="noMorePost"
       class="post-container__no-more"
     >
-      Congratulations! You've read everything available. Thanks!
-      Please, come later to see more!
+      Congratulations! You've read everything available. Thanks! Please, come
+      later to see more!
     </div>
   </div>
 </template>
@@ -86,12 +93,12 @@ export default {
         if (this.$route.name === 'Feed') {
           res = await api.posts.getFeed({
             limit: consts.POSTS_INITIAL_COUNT,
-            offset: 0 + (this.curPage * consts.POSTS_INITIAL_COUNT),
+            offset: 0 + this.curPage * consts.POSTS_INITIAL_COUNT,
           });
         } else {
           res = await api.posts.getPosts({
             limit: consts.POSTS_INITIAL_COUNT,
-            offset: 0 + (this.curPage * consts.POSTS_INITIAL_COUNT),
+            offset: 0 + this.curPage * consts.POSTS_INITIAL_COUNT,
             ...this.filters,
           });
         }
@@ -117,7 +124,10 @@ export default {
     handleScroll(evt, el) {
       if (!this.loading && !this.noMorePost && this.posts.length > 0) {
         const curContainerBounds = el.getBoundingClientRect();
-        if (curContainerBounds.height - Math.abs(curContainerBounds.y) < window.innerHeight) {
+        if (
+          curContainerBounds.height - Math.abs(curContainerBounds.y) <
+          window.innerHeight
+        ) {
           this.curPage = this.curPage + 1;
           this.getPosts(true);
         }
@@ -131,38 +141,39 @@ export default {
 @import '@/styles/mixins';
 @import '@/styles/colors';
 
-  .post-loading {
-    @include widget;
-    @include flex-row;
+.post-loading {
+  @include widget;
+  @include flex-row;
 
+  justify-content: center;
+  margin-left: 10%;
+
+  @include for-size(phone-only) {
+    margin-left: 0%;
+    border: none !important;
+  }
+}
+
+.post-container {
+  &__no-post,
+  &__no-more {
+    @include widget;
+
+    color: $main-text;
+    display: flex;
     justify-content: center;
-    margin-left: 10%;
+    font-size: 1.3rem;
 
     @include for-size(phone-only) {
-      margin-left: 0%;
+      margin-left: 0% !important;
       border: none !important;
     }
   }
 
-  .post-container {
-    &__no-post, &__no-more {
-      @include widget;
-
-      color: $main-text;
-      display: flex;
-      justify-content: center;
-      font-size: 1.3rem;
-
-      @include for-size(phone-only) {
-        margin-left: 0% !important;
-        border: none !important;
-      }
-    }
-
-    &__no-more {
-      margin-left: 10%;
-      text-align: center;
-      justify-content: none;
-    }
+  &__no-more {
+    margin-left: 10%;
+    text-align: center;
+    justify-content: none;
   }
+}
 </style>

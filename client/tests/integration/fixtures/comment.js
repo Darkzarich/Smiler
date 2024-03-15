@@ -56,7 +56,8 @@ const comment = {
 };
 
 /**
- * Generates a new comment object by merging overrides with the default comment object.
+ * Generates a new comment object by merging overrides with the default
+ * comment object.
  *
  * @param {object} overrides - An object containing properties to override
  * in the new comment object. Defaults to an empty object.

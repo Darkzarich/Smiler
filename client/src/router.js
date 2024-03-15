@@ -27,9 +27,7 @@ const authGuard = async (to, from, next) => {
   }
 };
 
-const getFilterDate = ({
-  h = 0, m = 0, s = 0, ms = 0, d = undefined,
-} = {}) => {
+const getFilterDate = ({ h = 0, m = 0, s = 0, ms = 0, d = undefined } = {}) => {
   // TODO: Change to date-fns
 
   const date = new Date();
@@ -66,7 +64,10 @@ const router = new Router({
           sort: '-rating',
           dateFrom: getFilterDate(),
           dateTo: getFilterDate({
-            h: 23, m: 59, s: 59, ms: 999,
+            h: 23,
+            m: 59,
+            s: 59,
+            ms: 999,
           }),
         },
         title: 'Home',
@@ -108,7 +109,11 @@ const router = new Router({
         filters: {
           sort: '-createdAt',
           dateFrom: getFilterDate({
-            h: 0, m: 0, s: 0, ms: 0, d: new Date().getDate() - new Date().getDay(),
+            h: 0,
+            m: 0,
+            s: 0,
+            ms: 0,
+            d: new Date().getDate() - new Date().getDay(),
           }),
           dateTo: getFilterDate({
             ms: 999,

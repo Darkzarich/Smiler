@@ -1,6 +1,9 @@
 <template>
   <div class="mobile-menu">
-    <div class="mobile-menu__close-icon" @click="closeMenu()">
+    <div
+      class="mobile-menu__close-icon"
+      @click="closeMenu()"
+    >
       <ExitIcon />
     </div>
     <div class="mobile-menu__user">
@@ -12,7 +15,11 @@
     </div>
     <div class="mobile-menu__nav-container">
       <template v-if="user.authState">
-        <RouterLink class="mobile-menu__nav-link" :to="{ name: 'Feed' }" @click.native="closeMenu()">
+        <RouterLink
+          class="mobile-menu__nav-link"
+          :to="{ name: 'Feed' }"
+          @click.native="closeMenu()"
+        >
           <div>MY FEED</div>
         </RouterLink>
       </template>
@@ -47,9 +54,7 @@
         data-testid="blowing-link"
         @click.native="closeMenu()"
       >
-        <div title="posted recently, 50+ rating">
-          BLOWING
-        </div>
+        <div title="posted recently, 50+ rating">BLOWING</div>
       </RouterLink>
       <RouterLink
         class="mobile-menu__nav-link"
@@ -57,9 +62,7 @@
         data-testid="top-this-week-link"
         @click.native="closeMenu()"
       >
-        <div title="current week posts sorted by newer">
-          TOP THIS WEEK
-        </div>
+        <div title="current week posts sorted by newer">TOP THIS WEEK</div>
       </RouterLink>
       <RouterLink
         class="mobile-menu__nav-link"
@@ -67,9 +70,7 @@
         data-testid="new-link"
         @click.native="closeMenu()"
       >
-        <div title="posts posted 2 hours ago sorted by newer">
-          NEW
-        </div>
+        <div title="posts posted 2 hours ago sorted by newer">NEW</div>
       </RouterLink>
     </div>
   </div>
@@ -99,8 +100,8 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/mixins";
-@import "@/styles/colors";
+@import '@/styles/mixins';
+@import '@/styles/colors';
 
 .mobile-menu {
   position: fixed;

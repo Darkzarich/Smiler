@@ -8,7 +8,7 @@
     >
       <ul class="context-menu__list">
         <li
-          v-for="item in list.filter(el => filter(el))"
+          v-for="item in list.filter((el) => filter(el))"
           :key="item.title"
           class="context-menu__item"
           @click="item.callback(target)"
@@ -52,7 +52,7 @@ export default {
     getPositionStyle() {
       return {
         // offset for every single element + abs offset
-        top: `${Number(this.posY) - (30 * this.list.filter((el) => this.filter(el)).length) - 30}px`,
+        top: `${Number(this.posY) - 30 * this.list.filter((el) => this.filter(el)).length - 30}px`,
         left: `${this.posX}px`,
       };
     },
@@ -69,11 +69,13 @@ export default {
   background: $bg;
   border: 1px solid $light-gray;
 
-  &-enter-active, &-leave-active {
-    transition: all .1s;
+  &-enter-active,
+  &-leave-active {
+    transition: all 0.1s;
   }
 
-  &-enter, &-leave-to {
+  &-enter,
+  &-leave-to {
     opacity: 0;
     transform: translateY(-20px);
   }
@@ -92,7 +94,7 @@ export default {
     border-bottom: 1px solid #6b6e70;
 
     &:hover {
-      background: #272b2d
+      background: #272b2d;
     }
 
     &:last-child {

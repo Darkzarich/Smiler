@@ -1,28 +1,53 @@
 <template>
   <div class="text-editor-container">
-    <div class="text-editor-control" :data-testid="dataTestid">
-      <button type="button" title="bold" @click="styleSelected('b')">
+    <div
+      class="text-editor-control"
+      :data-testid="dataTestid"
+    >
+      <button
+        type="button"
+        title="bold"
+        @click="styleSelected('b')"
+      >
         B
       </button>
-      <button type="button" title="italic" @click="styleSelected('i')">
+      <button
+        type="button"
+        title="italic"
+        @click="styleSelected('i')"
+      >
         I
       </button>
-      <button type="button" title="strike" @click="styleSelected('s')">
+      <button
+        type="button"
+        title="strike"
+        @click="styleSelected('s')"
+      >
         S
       </button>
-      <button type="button" title="underline" @click="styleSelected('u')">
+      <button
+        type="button"
+        title="underline"
+        @click="styleSelected('u')"
+      >
         U
       </button>
-      <button type="button" title="quote" @click="styleSelected('cite')">
+      <button
+        type="button"
+        title="quote"
+        @click="styleSelected('cite')"
+      >
         Q
       </button>
-      <button type="button" title="remove styles" @click="removeStyles()">
+      <button
+        type="button"
+        title="remove styles"
+        @click="removeStyles()"
+      >
         REMOVE STYLES
       </button>
     </div>
-    <div
-      class="text-editor"
-    >
+    <div class="text-editor">
       <div
         :id="id"
         :ref="'text-editor#' + id"
@@ -95,13 +120,15 @@ export default {
           this.curSelection = selection.toString().replace(/\n/g, '<br>');
           this.selectedDOMElement = selection.anchorNode;
           // selection start index
-          this.anchorOffset = selection.anchorOffset < selection.focusOffset
-            ? selection.anchorOffset
-            : selection.focusOffset;
+          this.anchorOffset =
+            selection.anchorOffset < selection.focusOffset
+              ? selection.anchorOffset
+              : selection.focusOffset;
           // selection end index
-          this.focusOffset = selection.anchorOffset < selection.focusOffset
-            ? selection.focusOffset
-            : selection.anchorOffset;
+          this.focusOffset =
+            selection.anchorOffset < selection.focusOffset
+              ? selection.focusOffset
+              : selection.anchorOffset;
         }
 
         console.log('curSelection / ', this.curSelection);
@@ -117,15 +144,31 @@ export default {
         let replacedDivText = text;
 
         if (text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)) {
-          replacedDivText = text.replace(text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)[2], '');
-          console.log('replace1: ', text.replace(text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)[2], ''));
+          replacedDivText = text.replace(
+            text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)[2],
+            '',
+          );
+          console.log(
+            'replace1: ',
+            text.replace(
+              text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)[2],
+              '',
+            ),
+          );
         }
 
         console.log('replace2: ', replacedDivText.replace(/<\/div>/g, ''));
         replacedDivText = replacedDivText.replace(/<\/div>/g, '');
 
-        console.log('replace3: ', replacedDivText.replace(/<div>/g, '<br>').replace(/(<br>){2,}/g, '<br>'));
-        replacedDivText = replacedDivText.replace(/<div>/g, '<br>').replace(/(<br>){2,}/g, '<br>');
+        console.log(
+          'replace3: ',
+          replacedDivText
+            .replace(/<div>/g, '<br>')
+            .replace(/(<br>){2,}/g, '<br>'),
+        );
+        replacedDivText = replacedDivText
+          .replace(/<div>/g, '<br>')
+          .replace(/(<br>){2,}/g, '<br>');
 
         this.editedText = replacedDivText;
       }
@@ -143,18 +186,22 @@ export default {
 
       if (this.curSelection.trim().length > 0) {
         // replace curSelection text with that text inside tags
-        this.selectedDOMElement.textContent = `${this.selectedDOMElement.wholeText.slice(0, this.anchorOffset)}`
-        + `<${tag}>${this.curSelection.toString().trim()}</${tag}>`
-        + `${this.selectedDOMElement.wholeText.slice(this.focusOffset, this.selectedDOMElement.wholeText.length)}`;
+        this.selectedDOMElement.textContent =
+          `${this.selectedDOMElement.wholeText.slice(0, this.anchorOffset)}` +
+          `<${tag}>${this.curSelection.toString().trim()}</${tag}>` +
+          `${this.selectedDOMElement.wholeText.slice(this.focusOffset, this.selectedDOMElement.wholeText.length)}`;
 
         let DOMHTML = document.getElementById(this.id).innerHTML;
 
-        // replace all &lt; and &gt; with < and > because it gets transformed to those automatically
+        /* replace all &lt; and &gt; with < and > because it gets transformed 
+        to those automatically */
         DOMHTML = DOMHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
         document.getElementById(this.id).innerHTML = DOMHTML;
 
-        // TODO: clear the style when a tab button is clicked and selection was already styled
-        // <b> some text </b> ----> <b></b> sometext <b></b> and then clean empty tags
+        /* TODO: clear the style when a tab button is clicked 
+        and selection was already styled <b> some text </b> ----> <b></b> 
+        sometext <b></b> and then clean empty tags 
+        */
 
         this.$emit('input', document.getElementById(this.id).innerHTML);
       }
@@ -220,14 +267,13 @@ export default {
     }
 
     cite {
-        display: block;
-        padding: 1rem;
-        border: solid 1px;
-        margin-top: 0.5rem;
-        margin-bottom: 0.5rem;
-        background-color: $bg;
+      display: block;
+      padding: 1rem;
+      border: solid 1px;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      background-color: $bg;
     }
   }
 }
-
 </style>

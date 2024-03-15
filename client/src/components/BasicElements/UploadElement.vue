@@ -6,13 +6,12 @@
         type="file"
         @input="handleInput($event.target.files[0])"
         @change="handleInput($event.target.files[0])"
-      >
+      />
     </label>
   </div>
 </template>
 
 <script>
-
 export default {
   props: ['value'],
   methods: {
@@ -45,10 +44,10 @@ export default {
       text-align: center;
     }
 
-    input[type="file" i] {
-      outline:0;
-      opacity:0;
-      pointer-events:none;
+    input[type='file' i] {
+      outline: 0;
+      opacity: 0;
+      pointer-events: none;
       position: absolute;
       user-select: none;
     }

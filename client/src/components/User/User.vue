@@ -2,10 +2,16 @@
   <div class="user">
     <template v-if="!getUserAuthState">
       <template v-if="mode == USER_LOGIN_MODE">
-        <UserLogin @close="closeMenu" @mode-change="setMode(USER_REG_MODE)" />
+        <UserLogin
+          @close="closeMenu"
+          @mode-change="setMode(USER_REG_MODE)"
+        />
       </template>
       <template v-else-if="mode == USER_REG_MODE">
-        <UserRegistration @close="closeMenu" @mode-change="setMode(USER_LOGIN_MODE)" />
+        <UserRegistration
+          @close="closeMenu"
+          @mode-change="setMode(USER_LOGIN_MODE)"
+        />
       </template>
     </template>
 
@@ -22,8 +28,14 @@
               }"
               @click.native="navNative ? closeMenu() : ''"
             >
-              <img :src="$resolveAvatar(getUser.avatar)" :alt="getUser.avatar">
-              <div class="user__logged-meta-login" data-testid="user-login">
+              <img
+                :src="$resolveAvatar(getUser.avatar)"
+                :alt="getUser.avatar"
+              />
+              <div
+                class="user__logged-meta-login"
+                data-testid="user-login"
+              >
                 {{ getUser.login }}
               </div>
             </RouterLink>
@@ -52,9 +64,7 @@
               }"
               @click.native="navNative ? closeMenu() : ''"
             >
-              <li class="user__logged-nav-item">
-                <AddIcon /> New Post
-              </li>
+              <li class="user__logged-nav-item"><AddIcon /> New Post</li>
             </RouterLink>
             <RouterLink
               :to="{
@@ -62,11 +72,13 @@
               }"
               @click.native="navNative ? closeMenu() : ''"
             >
-              <li class="user__logged-nav-item">
-                <SettingsIcon /> Settings
-              </li>
+              <li class="user__logged-nav-item"><SettingsIcon /> Settings</li>
             </RouterLink>
-            <li class="user__logged-nav-item" data-testid="logout-btn" @click="logout">
+            <li
+              class="user__logged-nav-item"
+              data-testid="logout-btn"
+              @click="logout"
+            >
               <ExitIcon /> Logout
             </li>
           </ul>
@@ -145,40 +157,40 @@ export default {
     background: $bg;
     justify-content: center;
 
-      &-avatar {
-        justify-content: center;
-        display: flex;
-        user-select: none;
-        flex-flow: column nowrap;
-        padding: 1rem;
+    &-avatar {
+      justify-content: center;
+      display: flex;
+      user-select: none;
+      flex-flow: column nowrap;
+      padding: 1rem;
 
-        @include for-size(phone-only) {
-          padding: 0.5rem;
-        }
-
-        align-items: center;
-        width: 50%;
-
-        img {
-          border-radius: 50%;
-          width: 8rem;
-        }
+      @include for-size(phone-only) {
+        padding: 0.5rem;
       }
 
-      &-login {
-        color: $main-text;
-        font-size: 1rem;
-        text-align: center;
-        margin: 1rem;
+      align-items: center;
+      width: 50%;
 
-        @include for-size(phone-only) {
-          margin: 0.5rem;
-        }
+      img {
+        border-radius: 50%;
+        width: 8rem;
       }
+    }
 
-      a {
-        text-decoration: none;
+    &-login {
+      color: $main-text;
+      font-size: 1rem;
+      text-align: center;
+      margin: 1rem;
+
+      @include for-size(phone-only) {
+        margin: 0.5rem;
       }
+    }
+
+    a {
+      text-decoration: none;
+    }
   }
 
   &__logged-info {

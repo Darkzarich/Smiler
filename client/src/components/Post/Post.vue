@@ -2,9 +2,13 @@
   <div class="post-container-item">
     <div class="post-side">
       <div
-        :data-testid="`post-${ postData.id }-upvote`"
+        :data-testid="`post-${postData.id}-upvote`"
         class="post-side__upvote"
-        :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''"
+        :class="
+          postData.rated.isRated && !postData.rated.negative
+            ? 'post-side__upvote_active'
+            : ''
+        "
         @click="upvote(postData.id)"
       >
         <PlusIcon />
@@ -15,7 +19,11 @@
       <div
         :data-testid="`post-${postData.id}-downvote`"
         class="post-side__downvote"
-        :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''"
+        :class="
+          postData.rated.isRated && postData.rated.negative
+            ? 'post-side__downvote_active'
+            : ''
+        "
         @click="downvote(postData.id)"
       >
         <MinusIcon />
@@ -31,14 +39,23 @@
         }"
         :target="$isMobile() ? '' : '_blank'"
       >
-        <div class="post-main__title" :data-testid="`post-${postData.id}-title`">
+        <div
+          class="post-main__title"
+          :data-testid="`post-${postData.id}-title`"
+        >
           {{ postData.title }}
           <template v-if="canEdit">
-            <RouterLink title="Edit post" :to="postData.slug + '/edit'">
+            <RouterLink
+              title="Edit post"
+              :to="postData.slug + '/edit'"
+            >
               <EditIcon />
             </RouterLink>
             <span @click="deletePost(postData.id)">
-              <RouterLink title="Delete post" :to="'/'">
+              <RouterLink
+                title="Delete post"
+                :to="'/'"
+              >
                 <DeleteIcon />
               </RouterLink>
             </span>
@@ -46,7 +63,10 @@
         </div>
       </RouterLink>
 
-      <div v-if="postData.tags.length > 0" class="post-main__tags">
+      <div
+        v-if="postData.tags.length > 0"
+        class="post-main__tags"
+      >
         <div
           v-for="tag in postData.tags"
           :key="tag"
@@ -65,7 +85,10 @@
           class="post-main__body-section"
         >
           <template v-if="section.type === POST_SECTION_TYPES.TEXT">
-            <div :data-testid="`post-${postData.id}-text-${section.hash}`" v-html="section.content" />
+            <div
+              :data-testid="`post-${postData.id}-text-${section.hash}`"
+              v-html="section.content"
+            />
           </template>
           <template v-else-if="section.type === POST_SECTION_TYPES.PICTURE">
             <div class="post-main__attachments-item">
@@ -74,12 +97,16 @@
                 :alt="section.url"
                 :data-testid="`post-${postData.id}-pic-${section.hash}`"
                 @error="$resolveImageError"
-              >
+              />
             </div>
           </template>
           <template v-else-if="section.type === POST_SECTION_TYPES.VIDEO">
             <div class="post-main__attachments-item">
-              <video controls :src="section.url" :data-testid="`post-${postData.id}-vid-${section.hash}`" />
+              <video
+                controls
+                :src="section.url"
+                :data-testid="`post-${postData.id}-vid-${section.hash}`"
+              />
             </div>
           </template>
         </div>
@@ -91,7 +118,11 @@
         <div
           class="post-side__upvote"
           :data-testid="`m-post-${postData.id}-upvote`"
-          :class="postData.rated.isRated && !postData.rated.negative ? 'post-side__upvote_active' : ''"
+          :class="
+            postData.rated.isRated && !postData.rated.negative
+              ? 'post-side__upvote_active'
+              : ''
+          "
           @click="upvote(postData.id)"
         >
           <PlusIcon />
@@ -101,8 +132,12 @@
         </div>
         <div
           class="post-side__downvote"
-          :data-testid="`m-post-${ postData.id }-downvote`"
-          :class="postData.rated.isRated && postData.rated.negative ? 'post-side__downvote_active' : ''"
+          :data-testid="`m-post-${postData.id}-downvote`"
+          :class="
+            postData.rated.isRated && postData.rated.negative
+              ? 'post-side__downvote_active'
+              : ''
+          "
           @click="downvote(postData.id)"
         >
           <MinusIcon />
@@ -144,7 +179,7 @@
                 <img
                   :src="$resolveAvatar(postData.author.avatar)"
                   :alt="postData.author.avatar"
-                >
+                />
               </span>
             </RouterLink>
           </template>
@@ -154,11 +189,12 @@
               <img
                 :src="$resolveAvatar('')"
                 :alt="'avatar'"
-              >
+              />
             </span>
           </template>
         </div>
-        <!-- {{ post.createdAt !== post.updatedAt ? 'updated: ' + post.updatedAt : ''}} -->
+        <!-- {{ post.createdAt !== post.updatedAt ? 
+          'updated: ' + post.updatedAt : ''}} -->
       </div>
     </div>
     <ContextMenuWrapper
@@ -218,17 +254,20 @@ export default {
             callback: this.unfollowTag,
           },
         ],
-        // filter callback for context menu, decides what elements to show under conditions
+        /* filter callback for context menu, 
+        it decides what elements to show under conditions */
         filter: (item) => {
           if (item.title === 'Follow tag' || item.title === 'Unfollow tag') {
             if (!this.authState) {
               return false;
             }
-            const foundTag = this.$store.getters.isTagFollowed[this.contextMenuData.target];
+            const foundTag =
+              this.$store.getters.isTagFollowed[this.contextMenuData.target];
 
             if (foundTag && item.title === 'Unfollow tag') {
               return true;
-            } if (item.title === 'Follow tag' && !foundTag) {
+            }
+            if (item.title === 'Follow tag' && !foundTag) {
               return true;
             }
             return false;
@@ -259,7 +298,8 @@ export default {
 
           if (res.data.error) {
             this.postData.rated.isRated = false;
-            this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
+            this.postData.rating =
+              this.postData.rating - consts.POST_RATE_VALUE;
           }
         } else if (this.postData.rated.negative) {
           this.postData.rated.isRated = false;
@@ -268,7 +308,8 @@ export default {
 
           if (res.data.error) {
             this.postData.rated.isRated = true;
-            this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
+            this.postData.rating =
+              this.postData.rating - consts.POST_RATE_VALUE;
           }
         }
       }
@@ -290,7 +331,8 @@ export default {
 
           if (res.data.error) {
             this.postData.rated.isRated = false;
-            this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
+            this.postData.rating =
+              this.postData.rating + consts.POST_RATE_VALUE;
           }
         } else if (!this.postData.rated.negative) {
           this.postData.rated.isRated = false;
@@ -300,7 +342,8 @@ export default {
 
           if (res.data.error) {
             this.postData.rated.isRated = true;
-            this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
+            this.postData.rating =
+              this.postData.rating + consts.POST_RATE_VALUE;
           }
         }
       }
@@ -411,12 +454,13 @@ export default {
     }
 
     &-date {
-          flex-basis: 33%;
+      flex-basis: 33%;
       display: inline-block;
     }
   }
 
-  &__upvote_active svg, &__upvote:hover svg {
+  &__upvote_active svg,
+  &__upvote:hover svg {
     cursor: pointer;
     fill: $dark-firm;
   }
@@ -459,7 +503,7 @@ export default {
       text-decoration: none;
 
       .post-main {
-          &__title {
+        &__title {
           margin-bottom: 1rem;
           font-weight: 400;
           font-size: 20px;
@@ -528,7 +572,8 @@ export default {
         margin-bottom: 1rem;
         margin-top: 1rem;
 
-        img, video {
+        img,
+        video {
           width: 100%;
           height: 100%;
         }
@@ -552,7 +597,9 @@ export default {
       display: none;
     }
 
-    &__upvote, &__rating, &__downvote {
+    &__upvote,
+    &__rating,
+    &__downvote {
       color: $light-gray;
 
       svg {
@@ -571,11 +618,11 @@ export default {
       margin-top: -1rem;
     }
 
-    &__downvote:hover svg, &__downvote_active svg {
+    &__downvote:hover svg,
+    &__downvote_active svg {
       cursor: pointer;
       fill: $dark-red;
     }
   }
 }
-
 </style>

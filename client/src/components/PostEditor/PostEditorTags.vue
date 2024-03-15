@@ -1,18 +1,28 @@
 <template>
   <div class="post-editor__tags">
-    <div class="post-editor__tags-container" data-testid="post-tags-list">
+    <div
+      class="post-editor__tags-container"
+      data-testid="post-tags-list"
+    >
       <div
         v-for="tag in tags"
         :key="tag"
         class="post-editor__tags-item"
       >
         {{ tag }}
-        <span :data-testid="`remove-tag-button-${tag}`" class="post-editor__tags-item-remove" @click="removeTag(tag)">
+        <span
+          :data-testid="`remove-tag-button-${tag}`"
+          class="post-editor__tags-item-remove"
+          @click="removeTag(tag)"
+        >
           x
         </span>
       </div>
     </div>
-    <div v-if="tags.length < POST_MAX_TAGS" class="post-editor__tags-input">
+    <div
+      v-if="tags.length < POST_MAX_TAGS"
+      class="post-editor__tags-input"
+    >
       <InputElement
         v-model="tagInput"
         data-testid="post-tag-input"
@@ -20,7 +30,10 @@
         :enter-callback="addTag"
         :error="validation"
       />
-      <span v-if="tagInput.length > 0" @click="addTag">
+      <span
+        v-if="tagInput.length > 0"
+        @click="addTag"
+      >
         +
       </span>
     </div>
@@ -74,7 +87,10 @@ export default {
       }
     },
     removeTag(tag) {
-      this.$emit('input', this.tags.filter((el) => el !== tag));
+      this.$emit(
+        'input',
+        this.tags.filter((el) => el !== tag),
+      );
     },
   },
 };
@@ -130,5 +146,4 @@ export default {
     }
   }
 }
-
 </style>

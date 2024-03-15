@@ -16,8 +16,8 @@ const profile = {
 /**
  * Generates a new profile object with optional overrides.
  *
- * @param {object} overrides - Object containing properties to override in the new profile object.
- * Default is an empty object.
+ * @param {object} overrides - Object containing properties to override in
+ * the new profile object. Default is an empty object.
  * @return {object} The newly generated profile object.
  */
 export default function generateProfile(overrides = {}) {

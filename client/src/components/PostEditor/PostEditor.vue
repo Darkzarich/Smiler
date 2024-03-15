@@ -7,9 +7,7 @@
       :placeholder="'Title'"
       :error="validation.title"
     />
-    <PostEditorTags
-      v-model="tags"
-    />
+    <PostEditorTags v-model="tags" />
 
     <Draggable
       :list="sections"
@@ -17,7 +15,10 @@
       ghost-class="post-editor__section_moving"
       chosen-class="post-editor__section_chosen"
     >
-      <TransitionGroup name="post-editor__section" data-testid="post-sections">
+      <TransitionGroup
+        name="post-editor__section"
+        data-testid="post-sections"
+      >
         <div
           v-for="section in sections"
           :key="section.hash"
@@ -31,8 +32,14 @@
               v-model="section.content"
               data-testid="text-section"
             />
-            <div class="post-editor__delete" @click="deleteSection(section)">
-              <CloseIcon title="Delete" :data-testid="`delete-section-${section.hash}`" />
+            <div
+              class="post-editor__delete"
+              @click="deleteSection(section)"
+            >
+              <CloseIcon
+                title="Delete"
+                :data-testid="`delete-section-${section.hash}`"
+              />
             </div>
           </template>
           <template v-if="section.type === POST_SECTION_TYPES.PICTURE">
@@ -41,8 +48,14 @@
               data-testid="pic-section"
               @set-section="setSection"
             />
-            <div class="post-editor__delete" @click="deleteSection(section)">
-              <CloseIcon title="Delete" :data-testid="`delete-section-${section.hash}`" />
+            <div
+              class="post-editor__delete"
+              @click="deleteSection(section)"
+            >
+              <CloseIcon
+                title="Delete"
+                :data-testid="`delete-section-${section.hash}`"
+              />
             </div>
           </template>
           <template v-if="section.type === POST_SECTION_TYPES.VIDEO">
@@ -50,14 +63,23 @@
               v-model="section.url"
               data-testid="video-section"
             />
-            <div class="post-editor__delete" @click="deleteSection(section)">
-              <CloseIcon title="Delete" :data-testid="`delete-section-${section.hash}`" />
+            <div
+              class="post-editor__delete"
+              @click="deleteSection(section)"
+            >
+              <CloseIcon
+                title="Delete"
+                :data-testid="`delete-section-${section.hash}`"
+              />
             </div>
           </template>
         </div>
       </TransitionGroup>
     </Draggable>
-    <div v-if="sections.length < POST_MAX_SECTIONS" class="post-editor__control">
+    <div
+      v-if="sections.length < POST_MAX_SECTIONS"
+      class="post-editor__control"
+    >
       <div
         class="post-editor__control-item"
         data-testid="add-text-button"
@@ -86,8 +108,12 @@
         <VideoIcon />
       </div>
     </div>
-    <div v-else class="post-editor__control-error">
-      Can't add any more sections. Max amount of sections is {{ POST_MAX_SECTIONS }}.
+    <div
+      v-else
+      class="post-editor__control-error"
+    >
+      Can't add any more sections. Max amount of sections is
+      {{ POST_MAX_SECTIONS }}.
     </div>
     <div class="post-editor__submit">
       <template v-if="!edit">
@@ -179,7 +205,7 @@ export default {
       // title
 
       if (this.title.length === 0) {
-        validation.title = 'Title can\'t be empty';
+        validation.title = "Title can't be empty";
       } else if (this.title.length > consts.POST_TITLE_MAX_LENGTH) {
         validation.title = `Title can't be longer than ${consts.POST_TITLE_MAX_LENGTH} symbols`;
       }
@@ -250,7 +276,10 @@ export default {
     },
     async deleteSection(section) {
       if (section.type === this.POST_SECTION_TYPES.PICTURE && section.isFile) {
-        const res = await api.users.removeFilePicSection(this.getUserLogin, section.hash);
+        const res = await api.users.removeFilePicSection(
+          this.getUserLogin,
+          section.hash,
+        );
         if (!res.data.error) {
           this.sections.splice(this.sections.indexOf(section), 1);
         }
@@ -273,7 +302,7 @@ export default {
 </script>
 
 <style lang="scss">
-@use "sass:color";
+@use 'sass:color';
 @import '@/styles/mixins';
 
 .post-editor {
@@ -303,7 +332,9 @@ export default {
     }
 
     &_chosen {
-      .text-editor-container, .post-image-upload, .post-video-upload {
+      .text-editor-container,
+      .post-image-upload,
+      .post-video-upload {
         border: 1px solid $firm;
       }
     }
@@ -312,11 +343,13 @@ export default {
       width: 95%;
     }
 
-    &-enter-active, &-leave-active {
-        transition: all 0.3s;
+    &-enter-active,
+    &-leave-active {
+      transition: all 0.3s;
     }
 
-    &-enter, &-leave-to {
+    &-enter,
+    &-leave-to {
       opacity: 0;
       transform: translateY(15px);
     }
@@ -364,5 +397,4 @@ export default {
     }
   }
 }
-
 </style>

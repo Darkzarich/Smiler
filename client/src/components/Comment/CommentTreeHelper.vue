@@ -8,7 +8,6 @@
 </template>
 
 <script>
-
 export default {
   components: {
     Comments: () => import('./Comments.vue'),

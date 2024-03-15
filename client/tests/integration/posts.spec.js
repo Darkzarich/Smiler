@@ -42,7 +42,9 @@ test('Fetches posts with expected filters', async ({ page }) => {
   expect(postsResponse.url()).toContain('limit=20&offset=0&sort=-rating');
 
   for (const post of posts) {
-    await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(post.title);
+    await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+      post.title,
+    );
   }
 });
 
@@ -59,7 +61,9 @@ test('Empty posts lists', async ({ page, context }) => {
   await page.goto('/');
 
   await expect(page.getByTestId('posts-container')).toBeVisible();
-  await expect(page.getByText('We\'re sorry. No posts for this time yet.')).toBeVisible();
+  await expect(
+    page.getByText("We're sorry. No posts for this time yet."),
+  ).toBeVisible();
 });
 
 test.describe('Post groups', async () => {
@@ -100,7 +104,9 @@ test.describe('Post groups', async () => {
       sort: '-rating',
     });
 
-    const allPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?${searchParams.toString()}`));
+    const allPostsRequest = page.waitForRequest((res) =>
+      res.url().includes(`/posts?${searchParams.toString()}`),
+    );
 
     await clickPostGroup({
       group: 'all-link',
@@ -123,7 +129,11 @@ test.describe('Post groups', async () => {
       dateFrom: '2024-03-05T22:00:00.000Z',
     });
 
-    const blowingPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?${decodeURIComponent(searchParams.toString())}`));
+    const blowingPostsRequest = page.waitForRequest((res) =>
+      res
+        .url()
+        .includes(`/posts?${decodeURIComponent(searchParams.toString())}`),
+    );
 
     await clickPostGroup({
       group: 'blowing-link',
@@ -146,7 +156,11 @@ test.describe('Post groups', async () => {
       dateTo: '2024-03-05T23:00:00.999Z',
     });
 
-    const topThisWeekRequest = page.waitForRequest((res) => res.url().includes(`/posts?${decodeURIComponent(searchParams.toString())}`));
+    const topThisWeekRequest = page.waitForRequest((res) =>
+      res
+        .url()
+        .includes(`/posts?${decodeURIComponent(searchParams.toString())}`),
+    );
 
     await clickPostGroup({
       group: 'top-this-week-link',
@@ -168,7 +182,11 @@ test.describe('Post groups', async () => {
       dateFrom: '2024-03-05T22:00:00.000Z',
     });
 
-    const newPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?${decodeURIComponent(searchParams.toString())}`));
+    const newPostsRequest = page.waitForRequest((res) =>
+      res
+        .url()
+        .includes(`/posts?${decodeURIComponent(searchParams.toString())}`),
+    );
 
     await clickPostGroup({
       group: 'new-link',
@@ -191,7 +209,11 @@ test.describe('Post groups', async () => {
       dateTo: '2024-03-06T22:59:59.999Z',
     });
 
-    const todayPostsRequest = page.waitForRequest((res) => res.url().includes(`/posts?${decodeURIComponent(searchParams.toString())}`));
+    const todayPostsRequest = page.waitForRequest((res) =>
+      res
+        .url()
+        .includes(`/posts?${decodeURIComponent(searchParams.toString())}`),
+    );
 
     await clickPostGroup({
       group: 'today-link',
@@ -228,7 +250,10 @@ test.describe('Post votes', async () => {
     await page.goto('/');
     await page.getByTestId(`post-${post1.id}-title`).isVisible();
 
-    const upvoteRequest = page.waitForRequest((res) => res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'PUT');
+    const upvoteRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'PUT',
+    );
 
     await page.getByTestId(dataTestIds.upvote).click();
     const upvoteResponse = await upvoteRequest;
@@ -242,7 +267,10 @@ test.describe('Post votes', async () => {
     await page.goto('/');
     await page.getByTestId(`post-${post1.id}-title`).isVisible();
 
-    const downvoteRequest = page.waitForRequest((res) => res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'PUT');
+    const downvoteRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'PUT',
+    );
 
     await page.getByTestId(dataTestIds.downvote).click();
     const downvoteResponse = await downvoteRequest;
@@ -252,7 +280,10 @@ test.describe('Post votes', async () => {
     });
   });
 
-  test('Removes a vote from a post if it was upvoted before', async ({ page, context }) => {
+  test('Removes a vote from a post if it was upvoted before', async ({
+    page,
+    context,
+  }) => {
     await context.route('*/**/posts*', async (route) => {
       await route.fulfill({
         json: {
@@ -273,14 +304,21 @@ test.describe('Post votes', async () => {
     await page.goto('/');
     await page.getByTestId(`post-${post1.id}-title`).isVisible();
 
-    const removeUpvoteRequest = page.waitForRequest((res) => res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'DELETE');
+    const removeUpvoteRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/posts/${post1.id}/rate`) &&
+        res.method() === 'DELETE',
+    );
 
     await page.getByTestId(dataTestIds.downvote).click();
 
     await removeUpvoteRequest;
   });
 
-  test('Removes a vote from a post if it was downvoted before', async ({ page, context }) => {
+  test('Removes a vote from a post if it was downvoted before', async ({
+    page,
+    context,
+  }) => {
     await context.route('*/**/posts*', async (route) => {
       await route.fulfill({
         json: {
@@ -301,7 +339,11 @@ test.describe('Post votes', async () => {
     await page.goto('/');
     await page.getByTestId(`post-${post1.id}-title`).isVisible();
 
-    const removeDownVoteRequest = page.waitForRequest((res) => res.url().includes(`/posts/${post1.id}/rate`) && res.method() === 'DELETE');
+    const removeDownVoteRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/posts/${post1.id}/rate`) &&
+        res.method() === 'DELETE',
+    );
 
     await page.getByTestId(dataTestIds.upvote).click();
 
@@ -313,18 +355,14 @@ test.describe('Sections', () => {
   async function mockPostSection(context, section) {
     const post = {
       id: '1',
-      sections: Array.isArray(section) ? section : [
-        section,
-      ],
+      sections: Array.isArray(section) ? section : [section],
     };
 
     await context.route('*/**/api/posts*', async (route) => {
       await route.fulfill({
         json: {
           pages: 0,
-          posts: [
-            generatePost(post),
-          ],
+          posts: [generatePost(post)],
         },
       });
     });
@@ -343,7 +381,9 @@ test.describe('Sections', () => {
 
     await page.goto('/');
 
-    await expect(page.getByTestId(`post-${post.id}-text-${section.hash}`)).toContainText(section.content);
+    await expect(
+      page.getByTestId(`post-${post.id}-text-${section.hash}`),
+    ).toContainText(section.content);
   });
 
   test('Shows pic section', async ({ context, page }) => {
@@ -357,8 +397,12 @@ test.describe('Sections', () => {
 
     await page.goto('/');
 
-    await expect(page.getByTestId(`post-${post.id}-pic-${section.hash}`)).toBeVisible();
-    await expect(page.getByTestId(`post-${post.id}-pic-${section.hash}`)).toHaveAttribute('alt', section.url);
+    await expect(
+      page.getByTestId(`post-${post.id}-pic-${section.hash}`),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId(`post-${post.id}-pic-${section.hash}`),
+    ).toHaveAttribute('alt', section.url);
   });
 
   test('Shows video section', async ({ context, page }) => {
@@ -372,8 +416,12 @@ test.describe('Sections', () => {
 
     await page.goto('/');
 
-    await expect(page.getByTestId(`post-${post.id}-vid-${section.hash}`)).toBeVisible();
-    await expect(page.getByTestId(`post-${post.id}-vid-${section.hash}`)).toHaveAttribute('src', section.url);
+    await expect(
+      page.getByTestId(`post-${post.id}-vid-${section.hash}`),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId(`post-${post.id}-vid-${section.hash}`),
+    ).toHaveAttribute('src', section.url);
   });
 
   test('Shows multiple sections', async ({ context, page }) => {
@@ -399,10 +447,20 @@ test.describe('Sections', () => {
 
     await page.goto('/');
 
-    await expect(page.getByTestId(`post-${post.id}-pic-${sections[0].hash}`)).toBeVisible();
-    await expect(page.getByTestId(`post-${post.id}-pic-${sections[0].hash}`)).toHaveAttribute('alt', sections[0].url);
-    await expect(page.getByTestId(`post-${post.id}-text-${sections[1].hash}`)).toContainText(sections[1].content);
-    await expect(page.getByTestId(`post-${post.id}-vid-${sections[2].hash}`)).toBeVisible();
-    await expect(page.getByTestId(`post-${post.id}-vid-${sections[2].hash}`)).toHaveAttribute('src', sections[2].url);
+    await expect(
+      page.getByTestId(`post-${post.id}-pic-${sections[0].hash}`),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId(`post-${post.id}-pic-${sections[0].hash}`),
+    ).toHaveAttribute('alt', sections[0].url);
+    await expect(
+      page.getByTestId(`post-${post.id}-text-${sections[1].hash}`),
+    ).toContainText(sections[1].content);
+    await expect(
+      page.getByTestId(`post-${post.id}-vid-${sections[2].hash}`),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId(`post-${post.id}-vid-${sections[2].hash}`),
+    ).toHaveAttribute('src', sections[2].url);
   });
 });

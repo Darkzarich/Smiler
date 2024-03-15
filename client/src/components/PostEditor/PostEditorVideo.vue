@@ -1,6 +1,9 @@
 <template>
   <div class="post-video-upload">
-    <div v-if="!value" class="post-video-upload__container">
+    <div
+      v-if="!value"
+      class="post-video-upload__container"
+    >
       <div class="post-video-upload__input-url">
         <InputElement
           v-model.lazy="url"
@@ -17,7 +20,11 @@
         </ButtonElement>
       </div>
     </div>
-    <div v-else class="post-video-upload__video" :test-dataid="`video-${value}`">
+    <div
+      v-else
+      class="post-video-upload__video"
+      :test-dataid="`video-${value}`"
+    >
       <iframe
         title="video"
         :src="value"
@@ -62,7 +69,8 @@ export default {
         this.url = '';
         this.$store.dispatch('newSystemNotification', {
           error: {
-            message: 'Something went wrong while uploading your video. Please, put the video in again.',
+            message:
+              'Something went wrong while uploading your video. Please, put the video in again.',
           },
         });
       }
@@ -85,25 +93,26 @@ export default {
 @import '@/styles/colors';
 @import '@/styles/mixins';
 
-  .post-video-upload {
-    padding: 1rem;
+.post-video-upload {
+  padding: 1rem;
+  border: 1px solid $light-gray;
+  width: 100%;
+
+  &__or {
+    text-align: center;
+    font-weight: bold;
+    color: $firm;
+  }
+
+  &__video {
+    display: flex;
+    flex-flow: row nowrap;
     border: 1px solid $light-gray;
-    width: 100%;
 
-    &__or {
-      text-align: center;
-      font-weight: bold;
-      color: $firm;
-    }
-
-    &__video {
-      display: flex;
-      flex-flow: row nowrap;
-      border: 1px solid $light-gray;
-
-      video, iframe {
-        width: 100%;
-      }
+    video,
+    iframe {
+      width: 100%;
     }
   }
+}
 </style>

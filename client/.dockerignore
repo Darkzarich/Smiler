@@ -5,3 +5,8 @@ npm-debug.log
 .env
 .git
 .gitignore
+stylelint.config.js
+playwright.config.js
+tests
+test-results
+playwright-report

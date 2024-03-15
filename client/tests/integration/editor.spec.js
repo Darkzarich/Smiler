@@ -33,14 +33,21 @@ test.beforeEach(async ({ context }) => {
     });
   });
 
-  await context.route(`*/**/api/users/${authUser.login}/template`, async (route) => {
-    await route.fulfill({
-      json: { title: '', sections: [], tags: [] },
-    });
-  });
+  await context.route(
+    `*/**/api/users/${authUser.login}/template`,
+    async (route) => {
+      await route.fulfill({
+        json: { title: '', sections: [], tags: [] },
+      });
+    },
+  );
 });
 
-test('Goes to create post page from user menu', async ({ page, context, isMobile }) => {
+test('Goes to create post page from user menu', async ({
+  page,
+  context,
+  isMobile,
+}) => {
   await context.route('*/**/users/get-auth', async (route) => {
     await route.fulfill({
       json: generateAuth({
@@ -61,7 +68,10 @@ test('Goes to create post page from user menu', async ({ page, context, isMobile
   await expect(page.getByTestId('post-create-header')).toBeVisible();
 });
 
-test('Creates a post with title, tags and content', async ({ page, context }) => {
+test('Creates a post with title, tags and content', async ({
+  page,
+  context,
+}) => {
   await mockPostsRoute(context);
 
   const tags = ['test tag', 'test tag 2'];
@@ -85,10 +95,14 @@ test('Creates a post with title, tags and content', async ({ page, context }) =>
   await page.getByTestId('image-upload-button').click();
 
   await page.getByTestId('add-video-button').click();
-  await page.getByTestId('video-url-input').fill(`https://www.youtube.com/watch?v=${vidCode}`);
+  await page
+    .getByTestId('video-url-input')
+    .fill(`https://www.youtube.com/watch?v=${vidCode}`);
   await page.getByTestId('video-upload-button').click();
 
-  const createPostRequest = page.waitForRequest((res) => res.url().includes('/posts') && res.method() === 'POST');
+  const createPostRequest = page.waitForRequest(
+    (res) => res.url().includes('/posts') && res.method() === 'POST',
+  );
 
   page.getByTestId('create-post-button').click();
 
@@ -136,13 +150,17 @@ test('Uploads a picture in the picture section', async ({ page, context }) => {
     mimeType: 'image/jpeg',
   });
 
-  const uploadRequest = page.waitForRequest((res) => res.url().includes('/posts/upload') && res.method() === 'POST');
+  const uploadRequest = page.waitForRequest(
+    (res) => res.url().includes('/posts/upload') && res.method() === 'POST',
+  );
 
   await page.getByTestId('image-upload-button').click();
 
   const uploadResponse = await uploadRequest;
 
-  expect(uploadResponse.headers()['content-type']).toContain('multipart/form-data; boundary=');
+  expect(uploadResponse.headers()['content-type']).toContain(
+    'multipart/form-data; boundary=',
+  );
 });
 
 test('Deletes sections in a post', async ({ page }) => {
@@ -152,16 +170,29 @@ test('Deletes sections in a post', async ({ page }) => {
   await page.getByTestId('add-pic-button').click();
   await page.getByTestId('add-video-button').click();
 
-  await page.getByTestId(/delete-section/).first().click();
-  await page.getByTestId(/delete-section/).last().click();
-  await page.getByTestId(/delete-section/).first().click();
+  await page
+    .getByTestId(/delete-section/)
+    .first()
+    .click();
+  await page
+    .getByTestId(/delete-section/)
+    .last()
+    .click();
+  await page
+    .getByTestId(/delete-section/)
+    .first()
+    .click();
 
   await expect(page.getByTestId('text-section')).not.toBeVisible();
   await expect(page.getByTestId('pic-section')).not.toBeVisible();
   await expect(page.getByTestId('video-section')).not.toBeVisible();
 });
 
-test('D&D post sections to change order of sections', async ({ page, context, isMobile }) => {
+test('D&D post sections to change order of sections', async ({
+  page,
+  context,
+  isMobile,
+}) => {
   // TODO: D&D test doesn't pass for mobile but the feature works
   if (isMobile) {
     return;
@@ -180,7 +211,9 @@ test('D&D post sections to change order of sections', async ({ page, context, is
 
   // Wait until animation if finished
   await page.waitForFunction(() => {
-    const element = document.querySelector('[data-testid="post-sections"] > div:last-child');
+    const element = document.querySelector(
+      '[data-testid="post-sections"] > div:last-child',
+    );
     const computedStyle = window.getComputedStyle(element);
     console.log(computedStyle.opacity);
     return computedStyle.opacity === '1' && computedStyle.transform === 'none';
@@ -190,13 +223,17 @@ test('D&D post sections to change order of sections', async ({ page, context, is
   // Text Section -> Pic Section order of sections
   expect(oldInnerHTML).toMatch(/text-section.*pic-section/);
 
-  await page.getByTestId('text-section').dragTo(page.getByTestId('pic-section'));
+  await page
+    .getByTestId('text-section')
+    .dragTo(page.getByTestId('pic-section'));
 
   const newInnerHTML = await page.getByTestId('post-sections').innerHTML();
   // Pic Section -> Text Section order of sections
   expect(newInnerHTML).toMatch(/pic-section.*text-section/);
 
-  const createPostRequest = page.waitForRequest((res) => res.url().includes('/posts') && res.method() === 'POST');
+  const createPostRequest = page.waitForRequest(
+    (res) => res.url().includes('/posts') && res.method() === 'POST',
+  );
 
   await page.getByTestId('create-post-button').click();
 
@@ -235,21 +272,31 @@ test('Fetch and show draft template', async ({ context, page }) => {
   ];
   const savedTags = ['test tag 1', 'test tag 2'];
 
-  await context.route(`*/**/api/users/${authUser.login}/template`, async (route) => {
-    await route.fulfill({
-      json: { title: savedTitle, sections: savedSections, tags: savedTags },
-    });
-  });
+  await context.route(
+    `*/**/api/users/${authUser.login}/template`,
+    async (route) => {
+      await route.fulfill({
+        json: { title: savedTitle, sections: savedSections, tags: savedTags },
+      });
+    },
+  );
 
   await page.goto('/post/create');
 
-  await expect(page.getByTestId('post-section').first()).toContainText(savedSections[0].content);
+  await expect(page.getByTestId('post-section').first()).toContainText(
+    savedSections[0].content,
+  );
 
-  await expect(page.locator('[data-testid="post-section"]:nth-child(2) img'))
-    .toHaveAttribute('src', savedSections[1].url);
+  await expect(
+    page.locator('[data-testid="post-section"]:nth-child(2) img'),
+  ).toHaveAttribute('src', savedSections[1].url);
 
-  await expect(page.getByTestId('post-section').last()
-    .filter({ has: page.getByTestId('video-section') })).toBeVisible();
+  await expect(
+    page
+      .getByTestId('post-section')
+      .last()
+      .filter({ has: page.getByTestId('video-section') }),
+  ).toBeVisible();
 });
 
 test('Saves draft template', async ({ page }) => {
@@ -270,11 +317,17 @@ test('Saves draft template', async ({ page }) => {
   await page.getByTestId('image-upload-button').click();
 
   await page.getByTestId('add-video-button').click();
-  await page.getByTestId('video-url-input').fill(`https://www.youtube.com/watch?v=${vidCode}`);
+  await page
+    .getByTestId('video-url-input')
+    .fill(`https://www.youtube.com/watch?v=${vidCode}`);
   await page.getByTestId('video-upload-button').click();
 
   // eslint-disable-next-line no-unused-vars
-  const saveDraftRequest = page.waitForRequest((res) => res.url().includes(`/users/${authUser.login}/template`) && res.method() === 'PUT');
+  const saveDraftRequest = page.waitForRequest(
+    (res) =>
+      res.url().includes(`/users/${authUser.login}/template`) &&
+      res.method() === 'PUT',
+  );
 
   await page.getByTestId('save-draft-button').click();
 
@@ -334,7 +387,16 @@ test.describe('Tags', () => {
   });
 
   test('Can add not more than 8 tags', async ({ page }) => {
-    const tags = ['test tag 1', 'test tag 2', 'test tag 3', 'test tag 4', 'test tag 5', 'test tag 6', 'test tag 7', 'test tag 8'];
+    const tags = [
+      'test tag 1',
+      'test tag 2',
+      'test tag 3',
+      'test tag 4',
+      'test tag 5',
+      'test tag 6',
+      'test tag 7',
+      'test tag 8',
+    ];
 
     await addPostTagsFrom(page, tags);
 

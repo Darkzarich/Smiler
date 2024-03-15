@@ -47,7 +47,11 @@ Vue.mixin({
       e.target.src = postNoImage;
     },
     $resolveImage(path) {
-      if (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(path)) {
+      if (
+        /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(
+          path,
+        )
+      ) {
         return path;
       }
 
@@ -94,7 +98,11 @@ Vue.mixin({
     $commentCanEdit(comment) {
       const currentLogin = store.getters.getUser.login;
 
-      if (!currentLogin || !comment.author || comment.author.login !== currentLogin) {
+      if (
+        !currentLogin ||
+        !comment.author ||
+        comment.author.login !== currentLogin
+      ) {
         return false;
       }
 

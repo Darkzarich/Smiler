@@ -52,7 +52,9 @@ test('Goes to 404 if user does not exist', async ({ context, page }) => {
 
   await page.waitForURL('**/error/404');
   await expect(page).toHaveTitle('404 Not Found | Smiler');
-  await expect(page.getByTestId('system-notification')).toContainText('User not found');
+  await expect(page.getByTestId('system-notification')).toContainText(
+    'User not found',
+  );
 });
 
 test('Fetches and shows user profile', async ({ page }) => {
@@ -62,10 +64,18 @@ test('Fetches and shows user profile', async ({ page }) => {
 
   await userRequest;
 
-  await expect(page.getByTestId('user-profile-login')).toContainText(testUser.login);
-  await expect(page.getByTestId('user-profile-rating')).toContainText(testUser.rating.toString());
-  await expect(page.getByTestId('user-profile-followers')).toContainText(testUser.followersAmount.toString());
-  await expect(page.getByTestId('user-profile-bio')).toContainText(testUser.bio);
+  await expect(page.getByTestId('user-profile-login')).toContainText(
+    testUser.login,
+  );
+  await expect(page.getByTestId('user-profile-rating')).toContainText(
+    testUser.rating.toString(),
+  );
+  await expect(page.getByTestId('user-profile-followers')).toContainText(
+    testUser.followersAmount.toString(),
+  );
+  await expect(page.getByTestId('user-profile-bio')).toContainText(
+    testUser.bio,
+  );
   await expect(page.getByTestId('user-profile-unfollow-btn')).not.toBeVisible();
   await expect(page.getByTestId('user-profile-follow-btn')).not.toBeVisible();
 });
@@ -77,9 +87,13 @@ test('Fetches user posts with expected filters', async ({ page }) => {
 
   const postResponse = await postRequest;
 
-  expect(postResponse.url()).toContain(`author=${testUser.login}&limit=20&offset=0`);
+  expect(postResponse.url()).toContain(
+    `author=${testUser.login}&limit=20&offset=0`,
+  );
 
-  await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(post.title);
+  await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+    post.title,
+  );
 });
 
 test.describe('Follows and unfollow', () => {
@@ -102,20 +116,31 @@ test.describe('Follows and unfollow', () => {
     });
   });
 
-  test('Follows a different user, followers count increases', async ({ page }) => {
+  test('Follows a different user, followers count increases', async ({
+    page,
+  }) => {
     await page.goto(`/user/@${testUser.login}`);
 
-    const followRequest = page.waitForRequest((res) => res.url().includes(`/users/${testUser.id}/follow`) && res.method() === 'PUT');
+    const followRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/users/${testUser.id}/follow`) &&
+        res.method() === 'PUT',
+    );
 
     await page.getByTestId('user-profile-follow-btn').click();
 
     await followRequest;
 
     await expect(page.getByTestId('user-profile-unfollow-btn')).toBeVisible();
-    await expect(page.getByTestId('user-profile-followers')).toContainText((testUser.followersAmount + 1).toString());
+    await expect(page.getByTestId('user-profile-followers')).toContainText(
+      (testUser.followersAmount + 1).toString(),
+    );
   });
 
-  test('Unfollows a followed user, followers count decreases', async ({ page, context }) => {
+  test('Unfollows a followed user, followers count decreases', async ({
+    page,
+    context,
+  }) => {
     await context.route(`**/users/${testUser.login}`, async (route) => {
       await route.fulfill({
         json: generateProfile({
@@ -127,7 +152,11 @@ test.describe('Follows and unfollow', () => {
 
     await page.goto(`/user/@${testUser.login}`);
 
-    const unfollowRequest = page.waitForRequest((res) => res.url().includes(`/users/${testUser.id}/follow`) && res.method() === 'DELETE');
+    const unfollowRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/users/${testUser.id}/follow`) &&
+        res.method() === 'DELETE',
+    );
 
     await page.getByTestId('user-profile-unfollow-btn').click();
 
@@ -148,7 +177,9 @@ test.describe('Follows and unfollow', () => {
 
     await page.goto(`/user/@${testUser.login}`);
 
-    await expect(page.getByTestId('user-profile-unfollow-btn')).not.toBeVisible();
+    await expect(
+      page.getByTestId('user-profile-unfollow-btn'),
+    ).not.toBeVisible();
     await expect(page.getByTestId('user-profile-follow-btn')).not.toBeVisible();
   });
 });

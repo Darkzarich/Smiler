@@ -1,9 +1,7 @@
 <template>
   <div>
     <div class="search-form">
-      <SearchForm
-        v-model="filter"
-      />
+      <SearchForm v-model="filter" />
     </div>
     <PostsContainer
       v-if="isAnyFilterActive"
@@ -59,16 +57,16 @@ export default {
 @import '@/styles/mixins';
 @import '@/styles/variables';
 
-  .search-form {
-    @include widget;
+.search-form {
+  @include widget;
 
-    margin-left: 10%;
+  margin-left: 10%;
 
-    @include for-size(phone-only) {
-      margin-left: 0;
-      border: none;
-    }
-
-    margin-bottom: $widget-margin;
+  @include for-size(phone-only) {
+    margin-left: 0;
+    border: none;
   }
+
+  margin-bottom: $widget-margin;
+}
 </style>

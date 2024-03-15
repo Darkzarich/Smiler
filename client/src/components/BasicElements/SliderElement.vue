@@ -12,7 +12,7 @@
       step="1"
       :value="value"
       @input="$emit('input', $event.target.value)"
-    >
+    />
     <span class="slider__val">
       {{ value }}
     </span>
@@ -59,7 +59,7 @@ export default {
     color: $main-text;
   }
 
-  input[type="range"] {
+  input[type='range'] {
     color: $main-text;
     background: $bg;
     outline: $firm;
@@ -91,5 +91,4 @@ export default {
     color: $light-gray;
   }
 }
-
 </style>

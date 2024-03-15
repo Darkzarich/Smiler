@@ -9,7 +9,7 @@
         'comments__item-main_refresh-new': comment.isRefreshNew,
       }"
       :style="`margin-left: ${indentLevel}rem`"
-      @mouseover="comment.isRefreshNew ? comment.isRefreshNew = false : ''"
+      @mouseover="comment.isRefreshNew ? (comment.isRefreshNew = false) : ''"
     >
       <div
         class="comments__item-main-block"
@@ -26,7 +26,11 @@
             <div
               class="comments__item-main-block-meta-upvote"
               :data-testid="`comment-${comment.id}-upvote`"
-              :class="comment.rated.isRated && !comment.rated.negative ? 'comments__item-main-block-meta-upvote_active' : ''"
+              :class="
+                comment.rated.isRated && !comment.rated.negative
+                  ? 'comments__item-main-block-meta-upvote_active'
+                  : ''
+              "
               @click="upvote(comment.id)"
             >
               <PlusIcon />
@@ -34,7 +38,11 @@
             <div
               :data-testid="`comment-${comment.id}-downvote`"
               class="comments__item-main-block-meta-downvote"
-              :class="comment.rated.isRated && comment.rated.negative ? 'comments__item-main-block-meta-downvote_active' : ''"
+              :class="
+                comment.rated.isRated && comment.rated.negative
+                  ? 'comments__item-main-block-meta-downvote_active'
+                  : ''
+              "
               @click="downvote(comment.id)"
             >
               <MinusIcon />
@@ -51,14 +59,23 @@
                 {{ comment.author.login }}
               </div>
               <div class="comments__item-main-block-meta-avatar">
-                <img :src="$resolveAvatar(comment.author.avatar)" :alt="comment.author.avatar" />
+                <img
+                  :src="$resolveAvatar(comment.author.avatar)"
+                  :alt="comment.author.avatar"
+                />
               </div>
             </RouterLink>
             <template v-if="$commentCanEdit(comment)">
-              <div class="comments__item-main-block-meta-edit" @click="toggleEdit(comment.id)">
+              <div
+                class="comments__item-main-block-meta-edit"
+                @click="toggleEdit(comment.id)"
+              >
                 <EditIcon />
               </div>
-              <div class="comments__item-main-block-meta-delete" @click="deleteCom(comment.id)">
+              <div
+                class="comments__item-main-block-meta-delete"
+                @click="deleteCom(comment.id)"
+              >
                 <DeleteIcon />
               </div>
             </template>
@@ -67,7 +84,10 @@
             {{ comment.createdAt | $fromNow }}
           </div>
         </div>
-        <div class="comments__item-main-block-body" :data-testid="`comment-${comment.id}-body`">
+        <div
+          class="comments__item-main-block-body"
+          :data-testid="`comment-${comment.id}-body`"
+        >
           <template v-if="!comment.deleted">
             <template v-if="commentEdit !== comment.id">
               <div v-html="comment.body" />
@@ -84,9 +104,7 @@
                     >
                       Send
                     </ButtonElement>
-                    <ButtonElement
-                      :callback="toggleEdit"
-                    >
+                    <ButtonElement :callback="toggleEdit">
                       Close
                     </ButtonElement>
                   </div>
@@ -95,7 +113,10 @@
             </template>
 
             <div class="comments__item-main-answer">
-              <div v-if="replyFieldShowFor == comment.id" class="comments__item-main-answer-editor">
+              <div
+                v-if="replyFieldShowFor == comment.id"
+                class="comments__item-main-answer-editor"
+              >
                 <TextEditorElement v-model="replyBody">
                   <div class="comments__item-main-answer-buttons">
                     <ButtonElement
@@ -105,9 +126,7 @@
                     >
                       Send
                     </ButtonElement>
-                    <ButtonElement
-                      :callback="toggleReply"
-                    >
+                    <ButtonElement :callback="toggleReply">
                       Close
                     </ButtonElement>
                   </div>
@@ -152,7 +171,9 @@
           [+]
         </div>
       </div>
-      <div v-if="comment.children.length > 0 && !hideChild.includes(comment.id)">
+      <div
+        v-if="comment.children.length > 0 && !hideChild.includes(comment.id)"
+      >
         <CommentTreeHelper
           :data="comment.children"
           :indent-level="indentLevel"
@@ -198,7 +219,10 @@ export default {
       replySending: false,
       editSending: false,
       deleteSending: false,
-      hideChild: this.level === consts.COMMENT_AUTO_HIDE_LEVEL ? this.data.map((el) => el.id) : [],
+      hideChild:
+        this.level === consts.COMMENT_AUTO_HIDE_LEVEL
+          ? this.data.map((el) => el.id)
+          : [],
       COMMENTS_NESTED_LIMIT: consts.COMMENTS_NESTED_LIMIT,
     };
   },
@@ -304,7 +328,8 @@ export default {
         if (!commentItemData.rated.isRated) {
           commentItemData.rated.isRated = true;
           commentItemData.rated.negative = false;
-          commentItemData.rating = commentItemData.rating + consts.COMMENT_RATE_VALUE;
+          commentItemData.rating =
+            commentItemData.rating + consts.COMMENT_RATE_VALUE;
 
           const res = await api.comments.updateRate(id, {
             negative: false,
@@ -312,17 +337,20 @@ export default {
 
           if (res.data.error) {
             commentItemData.rated.isRated = false;
-            commentItemData.rating = commentItemData.rating - consts.COMMENT_RATE_VALUE;
+            commentItemData.rating =
+              commentItemData.rating - consts.COMMENT_RATE_VALUE;
           }
         } else if (commentItemData.rated.negative) {
           commentItemData.rated.isRated = false;
-          commentItemData.rating = commentItemData.rating + consts.COMMENT_RATE_VALUE;
+          commentItemData.rating =
+            commentItemData.rating + consts.COMMENT_RATE_VALUE;
 
           const res = await api.comments.removeRate(id);
 
           if (res.data.error) {
             commentItemData.rated.isRated = true;
-            commentItemData.rating = commentItemData.rating - consts.COMMENT_RATE_VALUE;
+            commentItemData.rating =
+              commentItemData.rating - consts.COMMENT_RATE_VALUE;
           }
         }
       }
@@ -338,7 +366,8 @@ export default {
         if (!commentItemData.rated.isRated) {
           commentItemData.rated.isRated = true;
           commentItemData.rated.negative = true;
-          commentItemData.rating = commentItemData.rating - consts.COMMENT_RATE_VALUE;
+          commentItemData.rating =
+            commentItemData.rating - consts.COMMENT_RATE_VALUE;
 
           const res = await api.comments.updateRate(id, {
             negative: true,
@@ -346,17 +375,20 @@ export default {
 
           if (res.data.error) {
             commentItemData.rated.isRated = false;
-            commentItemData.rating = commentItemData.rating + consts.COMMENT_RATE_VALUE;
+            commentItemData.rating =
+              commentItemData.rating + consts.COMMENT_RATE_VALUE;
           }
         } else if (!commentItemData.rated.negative) {
           commentItemData.rated.isRated = false;
-          commentItemData.rating = commentItemData.rating - consts.COMMENT_RATE_VALUE;
+          commentItemData.rating =
+            commentItemData.rating - consts.COMMENT_RATE_VALUE;
 
           const res = await api.comments.removeRate(id);
 
           if (res.data.error) {
             commentItemData.rated.isRated = true;
-            commentItemData.rating = commentItemData.rating + consts.COMMENT_RATE_VALUE;
+            commentItemData.rating =
+              commentItemData.rating + consts.COMMENT_RATE_VALUE;
           }
         }
       }
@@ -368,7 +400,7 @@ export default {
 </script>
 
 <style lang="scss">
-@use "sass:color";
+@use 'sass:color';
 @import '@/styles/colors';
 @import '@/styles/mixins';
 
@@ -380,7 +412,8 @@ export default {
     color: $light-gray;
     cursor: pointer;
 
-    &:hover, &_active {
+    &:hover,
+    &_active {
       color: $firm;
     }
 
@@ -463,7 +496,11 @@ export default {
             color: $light-gray;
           }
 
-          &-upvote, &-rating, &-downvote, &-edit, &-delete {
+          &-upvote,
+          &-rating,
+          &-downvote,
+          &-edit,
+          &-delete {
             color: $light-gray;
 
             svg {
@@ -476,7 +513,8 @@ export default {
             }
           }
 
-          &-edit, &-delete {
+          &-edit,
+          &-delete {
             margin-left: 0.5rem;
 
             svg {
@@ -489,12 +527,16 @@ export default {
             margin-left: -0.5rem;
           }
 
-          &-upvote:hover svg, &-upvote_active svg, &-edit:hover svg {
+          &-upvote:hover svg,
+          &-upvote_active svg,
+          &-edit:hover svg {
             cursor: pointer;
             fill: $dark-firm;
           }
 
-          &-downvote:hover svg, &-downvote_active svg, &-delete:hover svg {
+          &-downvote:hover svg,
+          &-downvote_active svg,
+          &-delete:hover svg {
             cursor: pointer;
             fill: $dark-red;
           }

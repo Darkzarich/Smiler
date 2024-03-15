@@ -1,5 +1,6 @@
 <template>
-  <!-- TODO: refactor: make <button> root element then I won't need :callback prop -->
+  <!-- TODO: refactor: make <button> root element 
+    then I won't need :callback prop -->
   <div
     class="button"
     :class="loading ? 'button_loading' : ''"
@@ -14,7 +15,10 @@
       <span class="button__element-content">
         <slot />
       </span>
-      <div v-if="loading" class="button__element-loader">
+      <div
+        v-if="loading"
+        class="button__element-loader"
+      >
         <CircularLoader />
       </div>
     </button>
@@ -54,8 +58,8 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/colors";
-@import "@/styles/mixins";
+@import '@/styles/colors';
+@import '@/styles/mixins';
 
 .button {
   // TODO: basic components must not have this style

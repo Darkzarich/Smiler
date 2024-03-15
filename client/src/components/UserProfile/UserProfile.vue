@@ -3,10 +3,16 @@
     <div class="user-profile__offset" />
     <div class="user-profile__block">
       <div class="user-profile__avatar">
-        <img :src="$resolveAvatar(data.avatar)" :alt="data.avatar" />
+        <img
+          :src="$resolveAvatar(data.avatar)"
+          :alt="data.avatar"
+        />
       </div>
       <div class="user-profile__main-info">
-        <div class="user-profile__login" data-testid="user-profile-login">
+        <div
+          class="user-profile__login"
+          data-testid="user-profile-login"
+        >
           {{ data.login }}
 
           <template v-if="user.authState && !isSameUser">
@@ -33,15 +39,26 @@
         </div>
 
         <div class="user-profile__main-info-row">
-          <div :class="ratingClass(data.rating)" class="user-profile__rating" data-testid="user-profile-rating">
+          <div
+            :class="ratingClass(data.rating)"
+            class="user-profile__rating"
+            data-testid="user-profile-rating"
+          >
             Rating: <span>{{ data.rating | ratingTransform }} </span>
           </div>
-          <div class="user-profile__followers" data-testid="user-profile-followers">
+          <div
+            class="user-profile__followers"
+            data-testid="user-profile-followers"
+          >
             Followers: <span>{{ data.followersAmount }} </span>
           </div>
         </div>
 
-        <div v-if="data.bio" class="user-profile__bio" data-testid="user-profile-bio">
+        <div
+          v-if="data.bio"
+          class="user-profile__bio"
+          data-testid="user-profile-bio"
+        >
           Bio: <i>{{ data.bio }}</i>
         </div>
       </div>
@@ -91,7 +108,8 @@ export default {
     ratingClass(rating) {
       if (rating > 0) {
         return 'user-profile__rating_positive';
-      } if (rating < 0) {
+      }
+      if (rating < 0) {
         return 'user-profile__rating_negative';
       }
       return '';

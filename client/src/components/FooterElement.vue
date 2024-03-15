@@ -1,18 +1,22 @@
 <template>
   <footer>
     <div class="footer-github">
-      <a href="https://github.com/Darkzarich/express-blog" rel="noopener noreferrer" target="_blank">
-        <img src="@/assets/GitHub-Mark-Light-64px.png" alt="GitHub">
+      <a
+        href="https://github.com/Darkzarich/express-blog"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        <img
+          src="@/assets/GitHub-Mark-Light-64px.png"
+          alt="GitHub"
+        />
       </a>
     </div>
   </footer>
 </template>
 
 <script>
-
-export default {
-
-};
+export default {};
 </script>
 
 <style lang="scss">

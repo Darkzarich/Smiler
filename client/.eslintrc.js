@@ -2,33 +2,27 @@ module.exports = {
   root: true,
   env: {
     node: true,
-    es2022: true,
+    browser: true,
+    es6: true,
   },
+  plugins: ['prettier'],
   extends: [
     'eslint:recommended',
     'plugin:vue/recommended',
     '@vue/eslint-config-airbnb',
+    'plugin:prettier/recommended',
   ],
   rules: {
-    indent: ['warn', 2],
-    'brace-style': ['error'],
-    'comma-dangle': [
-      'error',
-      {
-        imports: 'always-multiline',
-        exports: 'always-multiline',
-        objects: 'always-multiline',
-        arrays: 'always-multiline',
-        functions: 'ignore',
-      },
-    ],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-new': 'error',
     'no-var': 'error',
     curly: 'warn',
     'operator-assignment': ['error', 'never'],
-    'import/order': ['error', { alphabetize: { order: 'asc' }, 'newlines-between': 'never' }],
+    'import/order': [
+      'error',
+      { alphabetize: { order: 'asc' }, 'newlines-between': 'never' },
+    ],
     'import/no-cycle': 'warn',
     'import/extensions': 'off',
     'vue/component-name-in-template-casing': [
@@ -72,7 +66,6 @@ module.exports = {
     'vue/multi-word-component-names': 'off',
     'vue/no-mutating-props': 'warn',
     'vue/no-side-effects-in-computed-properties': 'warn',
-    'vue/max-attributes-per-line': ['error', { singleline: 3, multiline: 1 }],
     'vuejs-accessibility/click-events-have-key-events': 'warn',
     'vuejs-accessibility/media-has-caption': 'warn',
     'vuejs-accessibility/mouse-events-have-key-events': 'warn',
@@ -81,11 +74,13 @@ module.exports = {
       'error',
       {
         selector: 'LabeledStatement',
-        message: 'Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.',
+        message:
+          'Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.',
       },
       {
         selector: 'WithStatement',
-        message: '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.',
+        message:
+          '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.',
       },
     ],
   },
@@ -96,9 +91,7 @@ module.exports = {
         extensions: ['.js', '.vue'],
       },
       alias: {
-        map: [
-          ['@', './src'],
-        ],
+        map: [['@', './src']],
         extensions: ['.js', '.vue'],
       },
     },
