@@ -64,6 +64,7 @@ test('Fetches and shows user profile', async ({ page }) => {
 
   await userRequest;
 
+  await expect(page).toHaveTitle(`${testUser.login} | Smiler`);
   await expect(page.getByTestId('user-profile-login')).toContainText(
     testUser.login,
   );

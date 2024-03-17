@@ -33,7 +33,7 @@ test.beforeEach(async ({ context }) => {
 });
 
 test('Shows comment with its child comments', async ({ page }) => {
-  await page.goto(`/${post.slug}`);
+  await page.goto(`/post/${post.slug}`);
 
   await expect(page.getByTestId(`comment-${comment.id}-body`)).toContainText(
     comment.body,
@@ -49,7 +49,7 @@ test('Shows comment with its child comments', async ({ page }) => {
 test('Hides children comments if root comment is collapsed', async ({
   page,
 }) => {
-  await page.goto(`/${post.slug}`);
+  await page.goto(`/post/${post.slug}`);
 
   await page.getByTestId(`comment-${comment.id}-expander`).click();
 
@@ -77,7 +77,7 @@ test.describe('Votes', () => {
   };
 
   test('Upvotes a comment', async ({ page }) => {
-    await page.goto(`/${post.slug}`);
+    await page.goto(`/post/${post.slug}`);
 
     await page.getByTestId(`comment-${comment.id}-body`).isVisible();
 
@@ -100,7 +100,7 @@ test.describe('Votes', () => {
   });
 
   test('Downvotes a comment', async ({ page }) => {
-    await page.goto(`/${post.slug}`);
+    await page.goto(`/post/${post.slug}`);
 
     await page.getByTestId(`comment-${comment.id}-body`).isVisible();
 
@@ -142,7 +142,7 @@ test.describe('Votes', () => {
       });
     });
 
-    await page.goto(`/${post.slug}`);
+    await page.goto(`/post/${post.slug}`);
 
     await expect(page.getByTestId(dataTestIds.upvote)).toHaveClass(
       /comments__item-main-block-meta-upvote_active/,
@@ -183,7 +183,7 @@ test.describe('Votes', () => {
       });
     });
 
-    await page.goto(`/${post.slug}`);
+    await page.goto(`/post/${post.slug}`);
 
     await expect(page.getByTestId(dataTestIds.downvote)).toHaveClass(
       /comments__item-main-block-meta-downvote_active/,

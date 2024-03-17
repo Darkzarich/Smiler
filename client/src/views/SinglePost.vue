@@ -146,7 +146,7 @@ export default {
     async setPost(post) {
       this.post = post;
       this.showPost = true;
-      window.document.title = this.post.title;
+      window.document.title = `${this.post.title} | Smiler`;
 
       // comments
 

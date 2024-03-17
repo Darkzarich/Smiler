@@ -26,7 +26,7 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-new': 'error',
     'no-var': 'error',
-    curly: 'warn',
+    curly: ['warn', 'all'],
     'operator-assignment': ['error', 'never'],
     'import/order': [
       'error',

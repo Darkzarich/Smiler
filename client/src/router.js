@@ -169,11 +169,6 @@ const router = new Router({
       },
     },
     {
-      path: '/:slug',
-      name: 'Single',
-      component: SinglePost,
-    },
-    {
       path: '/post/create',
       name: 'PostCreate',
       component: PostCreate,
@@ -185,7 +180,12 @@ const router = new Router({
       },
     },
     {
-      path: '/:slug/edit',
+      path: '/post/:slug',
+      name: 'Single',
+      component: SinglePost,
+    },
+    {
+      path: '/post/:slug/edit',
       name: 'PostEdit',
       component: PostCreate,
       beforeEnter(to, from, next) {

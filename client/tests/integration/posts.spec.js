@@ -115,8 +115,15 @@ test.describe('Post groups', () => {
     });
 
     await allPostsRequest;
+
     await expect(page).toHaveURL(/.*posts\/all/);
     await expect(page).toHaveTitle('All Posts | Smiler');
+    await expect(page.getByTestId('posts-container')).toBeVisible();
+    for (const post of posts) {
+      await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+        post.title,
+      );
+    }
   });
 
   test('Fetches "blowing" posts', async ({ page, isMobile }) => {
@@ -142,8 +149,15 @@ test.describe('Post groups', () => {
     });
 
     await blowingPostsRequest;
+
     await expect(page).toHaveURL(/.*posts\/blowing/);
     await expect(page).toHaveTitle('Blowing | Smiler');
+    await expect(page.getByTestId('posts-container')).toBeVisible();
+    for (const post of posts) {
+      await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+        post.title,
+      );
+    }
   });
 
   test('Fetches "top this week" posts', async ({ page, isMobile }) => {
@@ -169,8 +183,15 @@ test.describe('Post groups', () => {
     });
 
     await topThisWeekRequest;
+
     await expect(page).toHaveURL(/.*posts\/top-this-week/);
     await expect(page).toHaveTitle('Top This Week | Smiler');
+    await expect(page.getByTestId('posts-container')).toBeVisible();
+    for (const post of posts) {
+      await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+        post.title,
+      );
+    }
   });
 
   test('Fetches "new" posts', async ({ page, isMobile }) => {
@@ -195,8 +216,15 @@ test.describe('Post groups', () => {
     });
 
     await newPostsRequest;
+
     await expect(page).toHaveURL(/.*posts\/new/);
     await expect(page).toHaveTitle('Recent | Smiler');
+    await expect(page.getByTestId('posts-container')).toBeVisible();
+    for (const post of posts) {
+      await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+        post.title,
+      );
+    }
   });
 
   test('Fetches "today" posts', async ({ page, isMobile }) => {
@@ -222,8 +250,15 @@ test.describe('Post groups', () => {
     });
 
     await todayPostsRequest;
+
     await expect(page).toHaveURL(/.*/);
     await expect(page).toHaveTitle('Home | Smiler');
+    await expect(page.getByTestId('posts-container')).toBeVisible();
+    for (const post of posts) {
+      await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+        post.title,
+      );
+    }
   });
 });
 
