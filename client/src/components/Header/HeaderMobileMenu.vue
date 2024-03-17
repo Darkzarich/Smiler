@@ -16,6 +16,7 @@
     <div class="mobile-menu__nav-container">
       <template v-if="user.authState">
         <RouterLink
+          data-testid="feed-link"
           class="mobile-menu__nav-link"
           :to="{ name: 'Feed' }"
           @click.native="closeMenu()"
@@ -25,6 +26,7 @@
       </template>
       <template v-else>
         <a
+          data-testid="feed-link"
           title="Log in to access this page"
           class="mobile-menu__nav-link mobile-menu__nav-link_disabled"
         >

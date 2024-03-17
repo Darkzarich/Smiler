@@ -61,12 +61,16 @@
           </RouterLink>
 
           <template v-if="user.authState">
-            <RouterLink :to="{ name: 'Feed' }">
+            <RouterLink
+              :to="{ name: 'Feed' }"
+              data-testid="feed-link"
+            >
               <div>MY FEED</div>
             </RouterLink>
           </template>
           <template v-else>
             <a
+              data-testid="feed-link"
               title="Log in to access this page"
               class="header-container__nav-link_disabled"
             >

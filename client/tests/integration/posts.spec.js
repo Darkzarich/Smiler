@@ -74,7 +74,7 @@ async function clickPostGroup({ page, group, isMobile }) {
 }
 
 test.describe('Post groups', () => {
-  test.beforeEach(async ({ page, context }) => {
+  test.beforeEach(async ({ context }) => {
     // playwright.config.js has Europe/Amsterdam (GMT+1) timezone set
     const mockedDate = new Date('2024-03-06T00:00:00.000Z');
 
@@ -93,172 +93,246 @@ test.describe('Post groups', () => {
       const __DateNow = Date.now
       Date.now = () => __DateNow() + __DateNowOffset
     }`);
-
-    await page.goto('/');
   });
 
-  test('Fetches all posts', async ({ page, isMobile }) => {
-    const searchParams = new URLSearchParams({
-      limit: '20',
-      offset: '0',
-      sort: '-rating',
+  test.describe('Not requiring auth', () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto('/');
     });
 
-    const allPostsRequest = page.waitForRequest((res) =>
-      res.url().includes(`/posts?${searchParams.toString()}`),
-    );
+    test('Fetches all posts', async ({ page, isMobile }) => {
+      const searchParams = new URLSearchParams({
+        limit: '20',
+        offset: '0',
+        sort: '-rating',
+      });
 
-    await clickPostGroup({
-      group: 'all-link',
-      isMobile,
-      page,
-    });
-
-    await allPostsRequest;
-
-    await expect(page).toHaveURL(/.*posts\/all/);
-    await expect(page).toHaveTitle('All Posts | Smiler');
-    await expect(page.getByTestId('posts-container')).toBeVisible();
-    for (const post of posts) {
-      await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
-        post.title,
+      const allPostsRequest = page.waitForRequest((res) =>
+        res.url().includes(`/posts?${searchParams.toString()}`),
       );
-    }
+
+      await clickPostGroup({
+        group: 'all-link',
+        isMobile,
+        page,
+      });
+
+      await allPostsRequest;
+
+      await expect(page).toHaveURL(/.*posts\/all/);
+      await expect(page).toHaveTitle('All Posts | Smiler');
+      await expect(page.getByTestId('posts-container')).toBeVisible();
+      for (const post of posts) {
+        await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+          post.title,
+        );
+      }
+    });
+
+    test('Fetches "blowing" posts', async ({ page, isMobile }) => {
+      const searchParams = new URLSearchParams({
+        limit: '20',
+        offset: '0',
+        sort: '-rating',
+        ratingFrom: '50',
+        // Two hours ago from the mocked date and rating is already at least 50
+        dateFrom: '2024-03-05T22:00:00.000Z',
+      });
+
+      const blowingPostsRequest = page.waitForRequest((res) =>
+        res
+          .url()
+          .includes(`/posts?${decodeURIComponent(searchParams.toString())}`),
+      );
+
+      await clickPostGroup({
+        group: 'blowing-link',
+        isMobile,
+        page,
+      });
+
+      await blowingPostsRequest;
+
+      await expect(page).toHaveURL(/.*posts\/blowing/);
+      await expect(page).toHaveTitle('Blowing | Smiler');
+      await expect(page.getByTestId('posts-container')).toBeVisible();
+      for (const post of posts) {
+        await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+          post.title,
+        );
+      }
+    });
+
+    test('Fetches "top this week" posts', async ({ page, isMobile }) => {
+      const searchParams = new URLSearchParams({
+        limit: '20',
+        offset: '0',
+        sort: '-createdAt',
+        // Posts with createdAt starting from the date of the start of this week
+        dateFrom: '2024-03-02T23:00:00.000Z',
+        dateTo: '2024-03-05T23:00:00.999Z',
+      });
+
+      const topThisWeekRequest = page.waitForRequest((res) =>
+        res
+          .url()
+          .includes(`/posts?${decodeURIComponent(searchParams.toString())}`),
+      );
+
+      await clickPostGroup({
+        group: 'top-this-week-link',
+        isMobile,
+        page,
+      });
+
+      await topThisWeekRequest;
+
+      await expect(page).toHaveURL(/.*posts\/top-this-week/);
+      await expect(page).toHaveTitle('Top This Week | Smiler');
+      await expect(page.getByTestId('posts-container')).toBeVisible();
+      for (const post of posts) {
+        await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+          post.title,
+        );
+      }
+    });
+
+    test('Fetches "new" posts', async ({ page, isMobile }) => {
+      const searchParams = new URLSearchParams({
+        limit: '20',
+        offset: '0',
+        sort: '-createdAt',
+        // Within two hours from the mocked date
+        dateFrom: '2024-03-05T22:00:00.000Z',
+      });
+
+      const newPostsRequest = page.waitForRequest((res) =>
+        res
+          .url()
+          .includes(`/posts?${decodeURIComponent(searchParams.toString())}`),
+      );
+
+      await clickPostGroup({
+        group: 'new-link',
+        isMobile,
+        page,
+      });
+
+      await newPostsRequest;
+
+      await expect(page).toHaveURL(/.*posts\/new/);
+      await expect(page).toHaveTitle('Recent | Smiler');
+      await expect(page.getByTestId('posts-container')).toBeVisible();
+      for (const post of posts) {
+        await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+          post.title,
+        );
+      }
+    });
+
+    test('Fetches "today" posts', async ({ page, isMobile }) => {
+      const searchParams = new URLSearchParams({
+        limit: '20',
+        offset: '0',
+        sort: '-rating',
+        // Within two hours from the mocked date
+        dateFrom: '2024-03-05T23:00:00.000Z',
+        dateTo: '2024-03-06T22:59:59.999Z',
+      });
+
+      const todayPostsRequest = page.waitForRequest((res) =>
+        res
+          .url()
+          .includes(`/posts?${decodeURIComponent(searchParams.toString())}`),
+      );
+
+      await clickPostGroup({
+        group: 'today-link',
+        isMobile,
+        page,
+      });
+
+      await todayPostsRequest;
+
+      await expect(page).toHaveURL(/.*/);
+      await expect(page).toHaveTitle('Home | Smiler');
+      await expect(page.getByTestId('posts-container')).toBeVisible();
+      for (const post of posts) {
+        await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+          post.title,
+        );
+      }
+    });
+
+    test('Feed link is disabled if user is not logged in', async ({
+      page,
+      isMobile,
+    }) => {
+      // eslint-disable-next-line playwright/no-conditional-in-test
+      if (isMobile) {
+        page.getByTestId('mobile-menu').click();
+      }
+
+      await expect(page.getByTestId('feed-link')).toHaveAttribute(
+        'title',
+        'Log in to access this page',
+      );
+    });
   });
 
-  test('Fetches "blowing" posts', async ({ page, isMobile }) => {
-    const searchParams = new URLSearchParams({
-      limit: '20',
-      offset: '0',
-      sort: '-rating',
-      ratingFrom: '50',
-      // Two hours ago from the mocked date and rating is already at least 50
-      dateFrom: '2024-03-05T22:00:00.000Z',
+  test.describe('Requires auth', () => {
+    test.beforeEach(async ({ page, context }) => {
+      await context.route('*/**/users/get-auth', async (route) => {
+        await route.fulfill({
+          json: generateAuth({
+            isAuth: true,
+          }),
+        });
+      });
+
+      await page.goto('/');
     });
 
-    const blowingPostsRequest = page.waitForRequest((res) =>
-      res
-        .url()
-        .includes(`/posts?${decodeURIComponent(searchParams.toString())}`),
-    );
+    test("Fetches current user's feed", async ({ page, context, isMobile }) => {
+      await context.route('*/**/posts/feed*', async (route) => {
+        await route.fulfill({
+          json: {
+            pages: 0,
+            posts,
+          },
+        });
+      });
 
-    await clickPostGroup({
-      group: 'blowing-link',
-      isMobile,
-      page,
-    });
+      const searchParams = new URLSearchParams({
+        limit: '20',
+        offset: '0',
+      });
 
-    await blowingPostsRequest;
-
-    await expect(page).toHaveURL(/.*posts\/blowing/);
-    await expect(page).toHaveTitle('Blowing | Smiler');
-    await expect(page.getByTestId('posts-container')).toBeVisible();
-    for (const post of posts) {
-      await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
-        post.title,
+      const feedRequest = page.waitForRequest((res) =>
+        res
+          .url()
+          .includes(
+            `/posts/feed?${decodeURIComponent(searchParams.toString())}`,
+          ),
       );
-    }
-  });
 
-  test('Fetches "top this week" posts', async ({ page, isMobile }) => {
-    const searchParams = new URLSearchParams({
-      limit: '20',
-      offset: '0',
-      sort: '-createdAt',
-      // Posts with createdAt starting from the date of the start of this week
-      dateFrom: '2024-03-02T23:00:00.000Z',
-      dateTo: '2024-03-05T23:00:00.999Z',
+      await clickPostGroup({
+        group: 'feed-link',
+        isMobile,
+        page,
+      });
+
+      await feedRequest;
+
+      await expect(page).toHaveURL(/.*\/feed/);
+      await expect(page).toHaveTitle('Feed | Smiler');
+      await expect(page.getByTestId('posts-container')).toBeVisible();
+      for (const post of posts) {
+        await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
+          post.title,
+        );
+      }
     });
-
-    const topThisWeekRequest = page.waitForRequest((res) =>
-      res
-        .url()
-        .includes(`/posts?${decodeURIComponent(searchParams.toString())}`),
-    );
-
-    await clickPostGroup({
-      group: 'top-this-week-link',
-      isMobile,
-      page,
-    });
-
-    await topThisWeekRequest;
-
-    await expect(page).toHaveURL(/.*posts\/top-this-week/);
-    await expect(page).toHaveTitle('Top This Week | Smiler');
-    await expect(page.getByTestId('posts-container')).toBeVisible();
-    for (const post of posts) {
-      await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
-        post.title,
-      );
-    }
-  });
-
-  test('Fetches "new" posts', async ({ page, isMobile }) => {
-    const searchParams = new URLSearchParams({
-      limit: '20',
-      offset: '0',
-      sort: '-createdAt',
-      // Within two hours from the mocked date
-      dateFrom: '2024-03-05T22:00:00.000Z',
-    });
-
-    const newPostsRequest = page.waitForRequest((res) =>
-      res
-        .url()
-        .includes(`/posts?${decodeURIComponent(searchParams.toString())}`),
-    );
-
-    await clickPostGroup({
-      group: 'new-link',
-      isMobile,
-      page,
-    });
-
-    await newPostsRequest;
-
-    await expect(page).toHaveURL(/.*posts\/new/);
-    await expect(page).toHaveTitle('Recent | Smiler');
-    await expect(page.getByTestId('posts-container')).toBeVisible();
-    for (const post of posts) {
-      await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
-        post.title,
-      );
-    }
-  });
-
-  test('Fetches "today" posts', async ({ page, isMobile }) => {
-    const searchParams = new URLSearchParams({
-      limit: '20',
-      offset: '0',
-      sort: '-rating',
-      // Within two hours from the mocked date
-      dateFrom: '2024-03-05T23:00:00.000Z',
-      dateTo: '2024-03-06T22:59:59.999Z',
-    });
-
-    const todayPostsRequest = page.waitForRequest((res) =>
-      res
-        .url()
-        .includes(`/posts?${decodeURIComponent(searchParams.toString())}`),
-    );
-
-    await clickPostGroup({
-      group: 'today-link',
-      isMobile,
-      page,
-    });
-
-    await todayPostsRequest;
-
-    await expect(page).toHaveURL(/.*/);
-    await expect(page).toHaveTitle('Home | Smiler');
-    await expect(page.getByTestId('posts-container')).toBeVisible();
-    for (const post of posts) {
-      await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
-        post.title,
-      );
-    }
   });
 });
 

@@ -5,6 +5,7 @@ import { test, expect } from '@playwright/test';
 import generateAuth from './fixtures/auth';
 import generateComment from './fixtures/comment';
 import generatePost from './fixtures/post';
+import generateProfile from './fixtures/profile';
 
 const post = generatePost();
 
@@ -21,6 +22,15 @@ test.beforeEach(async ({ context }) => {
     });
   });
 
+  await context.route('*/**/posts*', async (route) => {
+    await route.fulfill({
+      json: {
+        pages: 0,
+        posts: [post],
+      },
+    });
+  });
+
   await context.route('*/**/comments*', async (route) => {
     await route.fulfill({
       json: {
@@ -31,10 +41,56 @@ test.beforeEach(async ({ context }) => {
   });
 });
 
-test('Fetches the post by post slug', async ({ page }) => {
+test.describe('Fetches the post by the slug of the post', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+  });
+
+  test('Mobile', async ({ page, isMobile }) => {
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (!isMobile) {
+      return;
+    }
+
+    const postBySlugRequest = page.waitForRequest(`*/**/posts/${post.slug}`);
+
+    await page.getByTestId(`post-${post.id}-title`).click();
+
+    await postBySlugRequest;
+
+    await expect(page).toHaveURL(`/post/${post.slug}`);
+    await expect(page).toHaveTitle(`${post.title} | Smiler`);
+    await expect(page.getByTestId(`post-${post.id}-title`)).toHaveText(
+      post.title,
+    );
+  });
+  test('Desktop', async ({ context, page, isMobile }) => {
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (isMobile) {
+      return;
+    }
+
+    const [newPage] = await Promise.all([
+      context.waitForEvent('page'),
+      page.getByTestId(`post-${post.id}-title`).click(),
+    ]);
+
+    const postBySlugRequest = newPage.waitForRequest(`*/**/posts/${post.slug}`);
+
+    await postBySlugRequest;
+
+    await expect(newPage).toHaveURL(`/post/${post.slug}`);
+    await expect(newPage).toHaveTitle(`${post.title} | Smiler`);
+    await expect(newPage.getByTestId(`post-${post.id}-title`)).toHaveText(
+      post.title,
+    );
+  });
+});
+
+test('Opens the post from the list of posts', async ({ page }) => {
   const postBySlugRequest = page.waitForRequest(`*/**/posts/${post.slug}`);
 
-  await page.goto(`/${post.slug}`);
+  await page.goto(`/post/${post.slug}`);
 
   await postBySlugRequest;
 
@@ -55,7 +111,7 @@ test('Redirect to 404 if the post is not found', async ({ page, context }) => {
     });
   });
 
-  await page.goto(`/${post.slug}`);
+  await page.goto(`/post/${post.slug}`);
 
   await expect(page).toHaveURL('/error/404');
   await expect(page).toHaveTitle('404 Not Found | Smiler');
@@ -67,11 +123,29 @@ test('Redirect to 404 if the post is not found', async ({ page, context }) => {
 test('Fetches post comments by post id', async ({ page }) => {
   const commentsRequest = page.waitForRequest('*/**/comments*');
 
-  await page.goto(`/${post.slug}`);
+  await page.goto(`/post/${post.slug}`);
 
   const commentsResponse = await commentsRequest;
 
   expect(commentsResponse.url()).toContain(`limit=10&post=${post.id}`);
+});
+
+test('Opens user profile after clicking on the author of the post', async ({
+  page,
+  context,
+}) => {
+  await context.route(`**/users/${post.author.login}`, async (route) => {
+    await route.fulfill({
+      json: generateProfile(),
+    });
+  });
+
+  await page.goto(`/post/${post.slug}`);
+
+  await page.getByTestId(`post-${post.id}-author`).click();
+
+  await expect(page).toHaveURL(`/user/@${post.author.login}`);
+  await expect(page).toHaveTitle(`${post.author.login} | Smiler`);
 });
 
 test.describe('Sections', () => {
@@ -99,7 +173,7 @@ test.describe('Sections', () => {
 
     const mockedPost = await mockPostSection(context, section);
 
-    await page.goto(`/${mockedPost.slug}`);
+    await page.goto(`/post/${mockedPost.slug}`);
 
     await expect(
       page.getByTestId(`post-${mockedPost.id}-text-${section.hash}`),
@@ -115,7 +189,7 @@ test.describe('Sections', () => {
 
     const mockedPost = await mockPostSection(context, section);
 
-    await page.goto(`/${mockedPost.slug}`);
+    await page.goto(`/post/${mockedPost.slug}`);
 
     await expect(
       page.getByTestId(`post-${mockedPost.id}-pic-${section.hash}`),
@@ -134,7 +208,7 @@ test.describe('Sections', () => {
 
     const mockedPost = await mockPostSection(context, section);
 
-    await page.goto(`/${mockedPost.slug}`);
+    await page.goto(`/post/${mockedPost.slug}`);
 
     await expect(
       page.getByTestId(`post-${mockedPost.id}-vid-${section.hash}`),
@@ -168,7 +242,7 @@ test.describe('Sections', () => {
 
     const mockedPost = await mockPostSection(context, sections);
 
-    await page.goto(`/${mockedPost.slug}`);
+    await page.goto(`/post/${mockedPost.slug}`);
 
     await expect(
       page.getByTestId(`post-${mockedPost.id}-pic-${sections[0].hash}`),

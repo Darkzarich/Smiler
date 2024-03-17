@@ -22,7 +22,7 @@ const post = {
   commentCount: 0,
   rating: 2,
   createdAt: '2023-01-01T00:00:00.000Z',
-  tags: [],
+  tags: ['test_tag1', 'test_tag2'],
   rated: {
     isRated: false,
     negative: false,

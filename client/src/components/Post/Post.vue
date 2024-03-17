@@ -47,14 +47,14 @@
           <template v-if="canEdit">
             <RouterLink
               title="Edit post"
-              :to="postData.slug + '/edit'"
+              :to="{ name: 'PostEdit', params: { slug: postData.slug } }"
             >
               <EditIcon />
             </RouterLink>
             <span @click="deletePost(postData.id)">
               <RouterLink
                 title="Delete post"
-                :to="'/'"
+                :to="{ name: 'Home' }"
               >
                 <DeleteIcon />
               </RouterLink>
@@ -173,6 +173,7 @@
                   login: postData.author.login,
                 },
               }"
+              :data-testid="`post-${postData.id}-author`"
             >
               <span class="post-main__meta-author">
                 <span> {{ postData.author.login }} </span>
