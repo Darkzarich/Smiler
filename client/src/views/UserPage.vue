@@ -7,29 +7,17 @@
       v-scroll="handleScroll"
       class="post-container"
     >
-      <div
-        v-for="post in posts"
-        :key="post.id"
-      >
+      <div v-for="post in posts" :key="post.id">
         <Post :post="post" />
       </div>
-      <div
-        v-if="posts.length == 0"
-        class="post-container__no-post"
-      >
+      <div v-if="posts.length == 0" class="post-container__no-post">
         Author has no posts yet.
       </div>
     </div>
-    <div
-      v-if="loading"
-      class="post-loading"
-    >
+    <div v-if="loading" class="post-loading">
       <CircularLoader />
     </div>
-    <div
-      v-else-if="noMorePost"
-      class="post-container__no-more"
-    >
+    <div v-else-if="noMorePost" class="post-container__no-more">
       Congratulations! You've read every post this author had!
     </div>
   </div>

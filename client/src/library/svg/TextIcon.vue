@@ -7,16 +7,10 @@
     viewBox="0 0 24 24"
   >
     <defs>
-      <path
-        id="a"
-        d="M24 24H0V0h24v24z"
-      />
+      <path id="a" d="M24 24H0V0h24v24z" />
     </defs>
     <clipPath id="b">
-      <use
-        xlink:href="#a"
-        overflow="visible"
-      />
+      <use xlink:href="#a" overflow="visible" />
     </clipPath>
     <path
       clip-path="url(#b)"

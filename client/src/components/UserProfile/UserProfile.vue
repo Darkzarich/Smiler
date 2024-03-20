@@ -3,16 +3,10 @@
     <div class="user-profile__offset" />
     <div class="user-profile__block">
       <div class="user-profile__avatar">
-        <img
-          :src="$resolveAvatar(data.avatar)"
-          :alt="data.avatar"
-        />
+        <img :src="$resolveAvatar(data.avatar)" :alt="data.avatar" />
       </div>
       <div class="user-profile__main-info">
-        <div
-          class="user-profile__login"
-          data-testid="user-profile-login"
-        >
+        <div class="user-profile__login" data-testid="user-profile-login">
           {{ data.login }}
 
           <template v-if="user.authState && !isSameUser">

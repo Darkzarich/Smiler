@@ -52,10 +52,7 @@
               <EditIcon />
             </RouterLink>
             <span @click="deletePost(postData.id)">
-              <RouterLink
-                title="Delete post"
-                :to="{ name: 'Home' }"
-              >
+              <RouterLink title="Delete post" :to="{ name: 'Home' }">
                 <DeleteIcon />
               </RouterLink>
             </span>
@@ -63,10 +60,7 @@
         </div>
       </RouterLink>
 
-      <div
-        v-if="postData.tags.length > 0"
-        class="post-main__tags"
-      >
+      <div v-if="postData.tags.length > 0" class="post-main__tags">
         <div
           v-for="tag in postData.tags"
           :key="tag"
@@ -187,10 +181,7 @@
           <template v-else>
             <span class="post-main__meta-author">
               <span> Anonymous </span>
-              <img
-                :src="$resolveAvatar('')"
-                :alt="'avatar'"
-              />
+              <img :src="$resolveAvatar('')" :alt="'avatar'" />
             </span>
           </template>
         </div>

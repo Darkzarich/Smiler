@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="notifications"
-    data-testid="system-notification"
-  >
+  <div class="notifications" data-testid="system-notification">
     <TransitionGroup name="notifications__item">
       <div
         v-for="notif in notifications"

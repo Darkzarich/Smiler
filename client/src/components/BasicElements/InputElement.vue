@@ -3,11 +3,7 @@
     class="input"
     :class="(error || errorOnlyStyle) && wasChanged ? 'input--error' : ''"
   >
-    <label
-      v-if="label"
-      class="input__label"
-      for="label"
-    >
+    <label v-if="label" class="input__label" for="label">
       {{ label }}
     </label>
 
@@ -25,14 +21,8 @@
       @keyup.enter="enterCallback"
     />
 
-    <div
-      class="input__icon"
-      @click="iconClickCallback"
-    >
-      <Component
-        :is="icon"
-        v-if="icon"
-      />
+    <div class="input__icon" @click="iconClickCallback">
+      <Component :is="icon" v-if="icon" />
     </div>
 
     <textarea

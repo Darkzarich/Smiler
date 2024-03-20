@@ -6,10 +6,7 @@
         rel="noopener noreferrer"
         target="_blank"
       >
-        <img
-          src="@/assets/GitHub-Mark-Light-64px.png"
-          alt="GitHub"
-        />
+        <img src="@/assets/GitHub-Mark-Light-64px.png" alt="GitHub" />
       </a>
     </div>
   </footer>

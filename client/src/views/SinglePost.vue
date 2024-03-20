@@ -1,18 +1,10 @@
 <template>
   <div>
     <div class="post-container">
-      <Post
-        v-if="showPost"
-        :post="post"
-        :can-edit="$postCanEdit(post)"
-      />
+      <Post v-if="showPost" :post="post" :can-edit="$postCanEdit(post)" />
     </div>
 
-    <div
-      id="comments"
-      ref="comments"
-      class="comments"
-    >
+    <div id="comments" ref="comments" class="comments">
       <div
         title="Refresh comments"
         :class="commentsRefreshing ? 'comments__update_refreshing' : ''"
@@ -59,16 +51,10 @@
         :level="0"
         :first="true"
       />
-      <div
-        v-else-if="!commentsLoading"
-        class="comments__no-comments"
-      >
+      <div v-else-if="!commentsLoading" class="comments__no-comments">
         No comments yet... Be the first!
       </div>
-      <div
-        v-else
-        class="comments__loading"
-      >
+      <div v-else class="comments__loading">
         <CircularLoader />
       </div>
     </div>

@@ -1,49 +1,20 @@
 <template>
   <div class="text-editor-container">
-    <div
-      class="text-editor-control"
-      :data-testid="dataTestid"
-    >
-      <button
-        type="button"
-        title="bold"
-        @click="styleSelected('b')"
-      >
-        B
-      </button>
-      <button
-        type="button"
-        title="italic"
-        @click="styleSelected('i')"
-      >
+    <div class="text-editor-control" :data-testid="dataTestid">
+      <button type="button" title="bold" @click="styleSelected('b')">B</button>
+      <button type="button" title="italic" @click="styleSelected('i')">
         I
       </button>
-      <button
-        type="button"
-        title="strike"
-        @click="styleSelected('s')"
-      >
+      <button type="button" title="strike" @click="styleSelected('s')">
         S
       </button>
-      <button
-        type="button"
-        title="underline"
-        @click="styleSelected('u')"
-      >
+      <button type="button" title="underline" @click="styleSelected('u')">
         U
       </button>
-      <button
-        type="button"
-        title="quote"
-        @click="styleSelected('cite')"
-      >
+      <button type="button" title="quote" @click="styleSelected('cite')">
         Q
       </button>
-      <button
-        type="button"
-        title="remove styles"
-        @click="removeStyles()"
-      >
+      <button type="button" title="remove styles" @click="removeStyles()">
         REMOVE STYLES
       </button>
     </div>

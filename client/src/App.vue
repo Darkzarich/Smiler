@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="show"
-    id="app"
-  >
+  <div v-if="show" id="app">
     <SystemNotification />
     <HeaderElement />
     <!-- <div id="nav">
@@ -13,10 +10,7 @@
       <content class="content-box__main">
         <RouterView />
       </content>
-      <div
-        v-if="!$isMobile()"
-        class="content-box__sidebar"
-      >
+      <div v-if="!$isMobile()" class="content-box__sidebar">
         <User />
       </div>
     </div>

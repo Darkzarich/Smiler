@@ -29,22 +29,13 @@
       </RouterLink>
       <nav>
         <template v-if="!$isMobile()">
-          <RouterLink
-            :to="{ name: 'Home' }"
-            data-testid="today-link"
-          >
+          <RouterLink :to="{ name: 'Home' }" data-testid="today-link">
             <div>TODAY</div>
           </RouterLink>
-          <RouterLink
-            :to="{ name: 'All' }"
-            data-testid="all-link"
-          >
+          <RouterLink :to="{ name: 'All' }" data-testid="all-link">
             <div>ALL</div>
           </RouterLink>
-          <RouterLink
-            :to="{ name: 'Blowing' }"
-            data-testid="blowing-link"
-          >
+          <RouterLink :to="{ name: 'Blowing' }" data-testid="blowing-link">
             <div title="posted recently, 50+ rating">BLOWING</div>
           </RouterLink>
           <RouterLink
@@ -53,18 +44,12 @@
           >
             <div title="current week posts sorted by newer">TOP THIS WEEK</div>
           </RouterLink>
-          <RouterLink
-            :to="{ name: 'New' }"
-            data-testid="new-link"
-          >
+          <RouterLink :to="{ name: 'New' }" data-testid="new-link">
             <div title="posts posted 2 hours ago sorted by newer">NEW</div>
           </RouterLink>
 
           <template v-if="user.authState">
-            <RouterLink
-              :to="{ name: 'Feed' }"
-              data-testid="feed-link"
-            >
+            <RouterLink :to="{ name: 'Feed' }" data-testid="feed-link">
               <div>MY FEED</div>
             </RouterLink>
           </template>
@@ -79,10 +64,7 @@
           </template>
         </template>
       </nav>
-      <div
-        v-if="$route.name !== 'Search'"
-        class="header-container__search"
-      >
+      <div v-if="$route.name !== 'Search'" class="header-container__search">
         <InputElement
           v-model.trim="title"
           :placeholder="'Search'"
@@ -93,10 +75,7 @@
           :icon-click-callback="search"
         />
       </div>
-      <div
-        v-if="user.authState"
-        class="header-container__avatar"
-      >
+      <div v-if="user.authState" class="header-container__avatar">
         <RouterLink
           :to="{
             name: 'UserPage',
@@ -105,10 +84,7 @@
             },
           }"
         >
-          <img
-            :src="$resolveAvatar(user.avatar)"
-            alt="avatar"
-          />
+          <img :src="$resolveAvatar(user.avatar)" alt="avatar" />
         </RouterLink>
       </div>
     </div>

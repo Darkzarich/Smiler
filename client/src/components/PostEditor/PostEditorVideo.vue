@@ -1,9 +1,6 @@
 <template>
   <div class="post-video-upload">
-    <div
-      v-if="!value"
-      class="post-video-upload__container"
-    >
+    <div v-if="!value" class="post-video-upload__container">
       <div class="post-video-upload__input-url">
         <InputElement
           v-model.lazy="url"

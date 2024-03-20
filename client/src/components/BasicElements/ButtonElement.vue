@@ -1,10 +1,7 @@
 <template>
   <!-- TODO: refactor: make <button> root element 
     then I won't need :callback prop -->
-  <div
-    class="button"
-    :class="loading ? 'button_loading' : ''"
-  >
+  <div class="button" :class="loading ? 'button_loading' : ''">
     <button
       :data-testid="dataTestid"
       type="button"
@@ -15,10 +12,7 @@
       <span class="button__element-content">
         <slot />
       </span>
-      <div
-        v-if="loading"
-        class="button__element-loader"
-      >
+      <div v-if="loading" class="button__element-loader">
         <CircularLoader />
       </div>
     </button>

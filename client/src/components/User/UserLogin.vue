@@ -1,11 +1,6 @@
 <template>
   <div class="user-login">
-    <div
-      class="user-login__header"
-      data-testid="user-signin-form"
-    >
-      Login
-    </div>
+    <div class="user-login__header" data-testid="user-signin-form">Login</div>
     <div class="user-login__form-input">
       <InputElement
         v-model="email"

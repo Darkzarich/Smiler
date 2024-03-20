@@ -5,32 +5,17 @@
       v-scroll="handleScroll"
       class="post-container"
     >
-      <div
-        v-for="post in posts"
-        :key="post.id"
-      >
-        <Post
-          :post="post"
-          :can-edit="$postCanEdit(post)"
-        />
+      <div v-for="post in posts" :key="post.id">
+        <Post :post="post" :can-edit="$postCanEdit(post)" />
       </div>
-      <div
-        v-if="posts.length == 0"
-        class="post-container__no-post"
-      >
+      <div v-if="posts.length == 0" class="post-container__no-post">
         We're sorry. No posts for this time yet.
       </div>
     </div>
-    <div
-      v-if="loading"
-      class="post-loading"
-    >
+    <div v-if="loading" class="post-loading">
       <CircularLoader />
     </div>
-    <div
-      v-else-if="noMorePost"
-      class="post-container__no-more"
-    >
+    <div v-else-if="noMorePost" class="post-container__no-more">
       Congratulations! You've read everything available. Thanks! Please, come
       later to see more!
     </div>

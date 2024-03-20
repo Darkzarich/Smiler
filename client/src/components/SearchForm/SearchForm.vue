@@ -35,22 +35,13 @@
       </div>
     </div>
     <div class="search-form__tags">
-      <PostEditorTags
-        v-model="filters.tags"
-        data-testid="search-form-tags"
-      />
+      <PostEditorTags v-model="filters.tags" data-testid="search-form-tags" />
     </div>
     <div class="search-form__submit">
-      <ButtonElement
-        data-testid="search-form-submit"
-        :callback="search"
-      >
+      <ButtonElement data-testid="search-form-submit" :callback="search">
         Submit
       </ButtonElement>
-      <ButtonElement
-        data-testid="search-form-clear"
-        :callback="clear"
-      >
+      <ButtonElement data-testid="search-form-clear" :callback="clear">
         Clear filters
       </ButtonElement>
     </div>

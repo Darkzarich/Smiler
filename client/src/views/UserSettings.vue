@@ -1,9 +1,6 @@
 <template>
   <div class="user-settings">
-    <div
-      v-if="!loading"
-      class="user-settings__data"
-    >
+    <div v-if="!loading" class="user-settings__data">
       <div class="user-settings__block">
         <div class="user-settings__data-title">Following</div>
         <template v-if="usersFollowed.length || tagsFollowed.length">
@@ -80,10 +77,7 @@
       <div class="user-settings__block">
         <div class="user-settings__data-title">Edit Avatar</div>
         <div class="user-settings__current-avatar">
-          <img
-            :src="$resolveAvatar(avatar)"
-            :alt="avatar"
-          />
+          <img :src="$resolveAvatar(avatar)" :alt="avatar" />
         </div>
         <InputElement
           v-model="avatarEditInput"
@@ -103,10 +97,7 @@
         </div>
       </div>
     </div>
-    <div
-      v-else
-      class="user-settings__loading"
-    >
+    <div v-else class="user-settings__loading">
       <CircularLoader />
     </div>
   </div>

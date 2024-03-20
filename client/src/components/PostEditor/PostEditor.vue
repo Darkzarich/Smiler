@@ -15,10 +15,7 @@
       ghost-class="post-editor__section_moving"
       chosen-class="post-editor__section_chosen"
     >
-      <TransitionGroup
-        name="post-editor__section"
-        data-testid="post-sections"
-      >
+      <TransitionGroup name="post-editor__section" data-testid="post-sections">
         <div
           v-for="section in sections"
           :key="section.hash"
@@ -32,10 +29,7 @@
               v-model="section.content"
               data-testid="text-section"
             />
-            <div
-              class="post-editor__delete"
-              @click="deleteSection(section)"
-            >
+            <div class="post-editor__delete" @click="deleteSection(section)">
               <CloseIcon
                 title="Delete"
                 :data-testid="`delete-section-${section.hash}`"
@@ -48,10 +42,7 @@
               data-testid="pic-section"
               @set-section="setSection"
             />
-            <div
-              class="post-editor__delete"
-              @click="deleteSection(section)"
-            >
+            <div class="post-editor__delete" @click="deleteSection(section)">
               <CloseIcon
                 title="Delete"
                 :data-testid="`delete-section-${section.hash}`"
@@ -63,10 +54,7 @@
               v-model="section.url"
               data-testid="video-section"
             />
-            <div
-              class="post-editor__delete"
-              @click="deleteSection(section)"
-            >
+            <div class="post-editor__delete" @click="deleteSection(section)">
               <CloseIcon
                 title="Delete"
                 :data-testid="`delete-section-${section.hash}`"
@@ -108,10 +96,7 @@
         <VideoIcon />
       </div>
     </div>
-    <div
-      v-else
-      class="post-editor__control-error"
-    >
+    <div v-else class="post-editor__control-error">
       Can't add any more sections. Max amount of sections is
       {{ POST_MAX_SECTIONS }}.
     </div>

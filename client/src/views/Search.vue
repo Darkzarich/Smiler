@@ -3,10 +3,7 @@
     <div class="search-form">
       <SearchForm v-model="filter" />
     </div>
-    <PostsContainer
-      v-if="isAnyFilterActive"
-      :search-filter="filter"
-    />
+    <PostsContainer v-if="isAnyFilterActive" :search-filter="filter" />
   </div>
 </template>
 

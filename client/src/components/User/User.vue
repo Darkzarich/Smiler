@@ -2,10 +2,7 @@
   <div class="user">
     <template v-if="!getUserAuthState">
       <template v-if="mode == USER_LOGIN_MODE">
-        <UserLogin
-          @close="closeMenu"
-          @mode-change="setMode(USER_REG_MODE)"
-        />
+        <UserLogin @close="closeMenu" @mode-change="setMode(USER_REG_MODE)" />
       </template>
       <template v-else-if="mode == USER_REG_MODE">
         <UserRegistration
@@ -32,10 +29,7 @@
                 :src="$resolveAvatar(getUser.avatar)"
                 :alt="getUser.avatar"
               />
-              <div
-                class="user__logged-meta-login"
-                data-testid="user-login"
-              >
+              <div class="user__logged-meta-login" data-testid="user-login">
                 {{ getUser.login }}
               </div>
             </RouterLink>

@@ -1,17 +1,11 @@
 <template>
   <div class="mobile-menu">
-    <div
-      class="mobile-menu__close-icon"
-      @click="closeMenu()"
-    >
+    <div class="mobile-menu__close-icon" @click="closeMenu()">
       <ExitIcon />
     </div>
     <div class="mobile-menu__user">
       <!-- vue requires .native to catch click event for vue-router links -->
-      <User
-        :nav-native="true"
-        @close="closeMenu()"
-      />
+      <User :nav-native="true" @close="closeMenu()" />
     </div>
     <div class="mobile-menu__nav-container">
       <template v-if="user.authState">

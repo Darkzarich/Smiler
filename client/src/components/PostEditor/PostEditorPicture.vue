@@ -3,10 +3,7 @@
     class="post-image-upload"
     :class="value ? 'post-image-upload_uploaded' : ''"
   >
-    <div
-      v-if="!value"
-      class="post-image-upload__container"
-    >
+    <div v-if="!value" class="post-image-upload__container">
       <UploadElement v-model="file" />
       <div class="post-image-upload__or">OR</div>
       <div class="post-image-upload__input-url">
@@ -33,10 +30,7 @@
         @error="error()"
       />
     </div>
-    <div
-      v-else
-      class="post-image-upload__image"
-    >
+    <div v-else class="post-image-upload__image">
       <img
         :src="$resolveImage(value)"
         :alt="value"

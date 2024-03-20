@@ -1,19 +1,9 @@
 <template>
-  <div
-    v-if="show"
-    class="post-create"
-  >
-    <div
-      class="post-create__header"
-      data-testid="post-create-header"
-    >
+  <div v-if="show" class="post-create">
+    <div class="post-create__header" data-testid="post-create-header">
       {{ edit ? 'Edit' : 'Create' }} Post
     </div>
-    <PostEditor
-      :key="key"
-      :edit="edit"
-      :post="post"
-    />
+    <PostEditor :key="key" :edit="edit" :post="post" />
   </div>
 </template>
 
