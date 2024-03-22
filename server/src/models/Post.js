@@ -41,7 +41,7 @@ const schema = new Schema({
 
 schema.index({ slug: 1 }, { unique: true });
 
-schema.index({ rating: -1, createdAt: -1 });
+schema.index({ createdAt: -1, rating: -1 });
 
 schema.index({ rating: -1 });
 
