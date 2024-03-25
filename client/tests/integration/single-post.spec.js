@@ -6,6 +6,7 @@ import generateAuth from './fixtures/auth';
 import generateComment from './fixtures/comment';
 import generatePost from './fixtures/post';
 import generateProfile from './fixtures/profile';
+import mockDate from './utils/mock-date';
 
 const post = generatePost();
 
@@ -259,5 +260,206 @@ test.describe('Sections', () => {
     await expect(
       page.getByTestId(`post-${mockedPost.id}-vid-${sections[2].hash}`),
     ).toHaveAttribute('src', sections[2].url);
+  });
+});
+
+test.describe('Post edit', () => {
+  test.beforeEach(async ({ context }) => {
+    await context.route('*/**/users/get-auth', async (route) => {
+      await route.fulfill({
+        json: generateAuth({
+          isAuth: true,
+        }),
+      });
+    });
+  });
+
+  test('Cannot edit or delete a post if the post is older than 10 mins', async ({
+    page,
+    context,
+  }) => {
+    const dateToMock = '2024-03-06T00:00:00.000Z';
+
+    mockDate(context, dateToMock);
+
+    await context.route(`*/**/posts/${post.slug}`, async (route) => {
+      await route.fulfill({
+        json: generatePost({
+          createdAt: new Date(
+            new Date(dateToMock).getTime() - 1000 * 60 * 11, // 11 mins
+          ).toISOString(),
+        }),
+      });
+    });
+
+    await page.goto(`/post/${post.slug}`);
+
+    await expect(page.getByTestId('post-edit-icon')).toBeHidden();
+    await expect(page.getByTestId('post-delete-icon')).toBeHidden();
+  });
+
+  test('Cannot open edit page for a post if the post is older than 10 mins', async ({
+    page,
+    context,
+  }) => {
+    const dateToMock = '2024-03-06T00:00:00.000Z';
+
+    mockDate(context, dateToMock);
+
+    await context.route(`*/**/posts/${post.slug}`, async (route) => {
+      await route.fulfill({
+        json: generatePost({
+          createdAt: new Date(
+            new Date(dateToMock).getTime() - 1000 * 60 * 11, // 11 mins
+          ).toISOString(),
+        }),
+      });
+    });
+
+    await page.goto(`/post/${post.slug}/edit`);
+
+    await expect(page).toHaveURL('/');
+    await expect(page).toHaveTitle('Home | Smiler');
+    await expect(page.getByTestId('system-notification')).toContainText(
+      'You cannot edit this post anymore. Edit time has expired',
+    );
+  });
+
+  test('Cannot open edit page for a post if the post author is not the logged in user', async ({
+    page,
+    context,
+  }) => {
+    const dateToMock = '2024-03-06T00:00:00.000Z';
+
+    mockDate(context, dateToMock);
+
+    await context.route(`*/**/posts/${post.slug}`, async (route) => {
+      await route.fulfill({
+        json: generatePost({
+          createdAt: new Date(
+            new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
+          ).toISOString(),
+          author: {
+            id: '2',
+            login: 'EditTester',
+          },
+        }),
+      });
+    });
+
+    await page.goto(`/post/${post.slug}/edit`);
+
+    await expect(page).toHaveURL('/');
+    await expect(page).toHaveTitle('Home | Smiler');
+    await expect(page.getByTestId('system-notification')).toContainText(
+      "Only post's author can edit this post",
+    );
+  });
+
+  test('Opens edit a post page if the post is not older than 10 mins', async ({
+    page,
+    context,
+  }) => {
+    const dateToMock = '2024-03-06T00:00:00.000Z';
+
+    mockDate(context, dateToMock);
+
+    await context.route(`*/**/posts/${post.slug}`, async (route) => {
+      await route.fulfill({
+        json: generatePost({
+          createdAt: new Date(
+            new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
+          ).toISOString(),
+        }),
+      });
+    });
+
+    await page.goto(`/post/${post.slug}`);
+
+    await page.getByTestId('post-edit-icon').click();
+
+    await expect(page).toHaveURL(`/post/${post.slug}/edit`);
+    await expect(page).toHaveTitle(`Edit Post | Smiler`);
+    await expect(page.getByTestId('text-editor')).toHaveText(
+      post.sections[0].content,
+    );
+  });
+
+  test('Open edit a post page, edit the post and save', async ({
+    page,
+    context,
+  }) => {
+    const dateToMock = '2024-03-06T00:00:00.000Z';
+
+    mockDate(context, dateToMock);
+
+    await context.route(`*/**/posts/${post.slug}`, async (route) => {
+      await route.fulfill({
+        json: generatePost({
+          createdAt: new Date(
+            new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
+          ).toISOString(),
+        }),
+      });
+    });
+
+    await page.goto(`/post/${post.slug}/edit`);
+
+    await page.getByTestId('text-editor').focus();
+    await page.keyboard.type('edited');
+
+    const editPostRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/posts/${post.id}`) && res.method() === 'PUT',
+    );
+
+    await page.getByTestId('finish-edit-post-button').click();
+
+    const editPostResponse = await editPostRequest;
+
+    expect(editPostResponse.postDataJSON()).toMatchObject({
+      sections: [
+        {
+          type: 'text',
+          content: `edited${post.sections[0].content}`,
+        },
+      ],
+    });
+  });
+
+  test('Deletes a post, sends delete request', async ({ page, context }) => {
+    await context.route(`*/**/posts/${post.id}`, async (route) => {
+      await route.fulfill({
+        status: 200,
+      });
+    });
+
+    const dateToMock = '2024-03-06T00:00:00.000Z';
+
+    mockDate(context, dateToMock);
+
+    await context.route(`*/**/posts/${post.slug}`, async (route) => {
+      await route.fulfill({
+        json: generatePost({
+          createdAt: new Date(
+            new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
+          ).toISOString(),
+        }),
+      });
+    });
+
+    await page.goto(`/post/${post.slug}`);
+
+    const deletePostRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/posts/${post.id}`) && res.method() === 'DELETE',
+    );
+
+    await page.getByTestId('post-delete-icon').click();
+
+    await deletePostRequest;
+
+    await expect(page).toHaveURL('/');
+    await expect(page).toHaveTitle('Home | Smiler');
   });
 });

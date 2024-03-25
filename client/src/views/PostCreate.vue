@@ -55,10 +55,11 @@ export default {
       this.show = false;
       this.key = 'edit';
 
+      // TODO: Check id instead
       if (data.author.login !== this.login) {
         this.$store.dispatch('newSystemNotification', {
           error: {
-            message: 'Only post author can access this page',
+            message: "Only post's author can edit this post",
           },
         });
         this.$router.push({
@@ -67,7 +68,7 @@ export default {
       } else if (!this.$postCanEdit(data)) {
         this.$store.dispatch('newSystemNotification', {
           error: {
-            message: 'You cannot edit this post anymore. Edit time is expired',
+            message: 'You cannot edit this post anymore. Edit time has expired',
           },
         });
         this.$router.push({

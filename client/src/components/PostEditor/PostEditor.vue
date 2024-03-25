@@ -121,6 +121,7 @@
       </template>
       <template v-else>
         <ButtonElement
+          data-testid="finish-edit-post-button"
           :loading="saving"
           :disabled="!sections.length"
           :callback="saveEdited"

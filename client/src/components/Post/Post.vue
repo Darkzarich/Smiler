@@ -31,6 +31,8 @@
     </div>
     <div class="post-main">
       <RouterLink
+        class="post-main__title"
+        tag="div"
         :to="{
           name: 'Single',
           params: {
@@ -38,26 +40,21 @@
           },
         }"
         :target="$isMobile() ? '' : '_blank'"
+        :data-testid="`post-${postData.id}-title`"
       >
-        <div
-          class="post-main__title"
-          :data-testid="`post-${postData.id}-title`"
-        >
-          {{ postData.title }}
-          <template v-if="canEdit">
-            <RouterLink
-              title="Edit post"
-              :to="{ name: 'PostEdit', params: { slug: postData.slug } }"
-            >
-              <EditIcon />
-            </RouterLink>
-            <span @click="deletePost(postData.id)">
-              <RouterLink title="Delete post" :to="{ name: 'Home' }">
-                <DeleteIcon />
-              </RouterLink>
-            </span>
-          </template>
-        </div>
+        {{ postData.title }}
+
+        <template v-if="canEdit">
+          <RouterLink
+            title="Edit post"
+            :to="{ name: 'PostEdit', params: { slug: postData.slug } }"
+          >
+            <EditIcon data-testid="post-edit-icon" />
+          </RouterLink>
+          <span @click="deletePost(postData.id)">
+            <DeleteIcon data-testid="post-delete-icon" />
+          </span>
+        </template>
       </RouterLink>
 
       <div v-if="postData.tags.length > 0" class="post-main__tags">
@@ -345,7 +342,7 @@ export default {
     async deletePost(id) {
       const res = await api.posts.deletePostById(id);
       if (!res.data.error) {
-        document.location.reload();
+        this.$router.push({ name: 'Home' });
       }
     },
     openContextMenu(ev, tag) {
@@ -490,26 +487,17 @@ export default {
       }
     }
 
-    a {
+    &__title {
       color: $light-gray;
       text-decoration: none;
+      margin-bottom: 1rem;
+      font-weight: 400;
+      font-size: 20px;
 
-      .post-main {
-        &__title {
-          margin-bottom: 1rem;
-          font-weight: 400;
-          font-size: 20px;
-
-          a {
-            display: inline;
-
-            svg {
-              position: relative;
-              top: 3px;
-              fill: $light-gray;
-            }
-          }
-        }
+      svg {
+        position: relative;
+        top: 3px;
+        fill: $light-gray;
       }
     }
 

@@ -4,6 +4,7 @@
 import { test, expect } from '@playwright/test';
 import generateAuth from './fixtures/auth';
 import generatePost from './fixtures/post';
+import mockDate from './utils/mock-date';
 
 const post1 = generatePost({
   id: '1',
@@ -76,23 +77,8 @@ async function clickPostGroup({ page, group, isMobile }) {
 test.describe('Post groups', () => {
   test.beforeEach(async ({ context }) => {
     // playwright.config.js has Europe/Amsterdam (GMT+1) timezone set
-    const mockedDate = new Date('2024-03-06T00:00:00.000Z');
 
-    await context.addInitScript(`{
-      Date = class extends Date {
-        constructor(...args) {
-          if (args.length === 0) {
-            super(${mockedDate.getTime()})
-          } else {
-            super(...args)
-          }
-        }
-      }
-      
-      const __DateNowOffset = ${mockedDate.getTime()} - Date.now()
-      const __DateNow = Date.now
-      Date.now = () => __DateNow() + __DateNowOffset
-    }`);
+    mockDate(context, '2024-03-06T00:00:00.000Z');
   });
 
   test.describe('Not requiring auth', () => {
