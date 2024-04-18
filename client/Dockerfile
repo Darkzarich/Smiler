@@ -11,7 +11,7 @@ RUN npm run build
 
 # Step 2
 
-FROM nginx:1.22.1 
+FROM nginxinc/nginx-unprivileged:alpine3.19-slim
 
 EXPOSE 80  
 
