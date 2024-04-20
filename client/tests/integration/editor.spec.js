@@ -88,7 +88,7 @@ test('Creates a post with title, tags and content', async ({
   }
 
   await page.getByTestId('add-text-button').click();
-  await page.getByTestId('text-editor').fill('test text');
+  await page.getByTestId('text-section-input').fill('test text');
 
   await page.getByTestId('add-pic-button').click();
   await page.getByTestId('image-url-input').fill(picUrl);
@@ -310,7 +310,7 @@ test('Saves draft template', async ({ page }) => {
   await page.keyboard.press('Enter');
 
   await page.getByTestId('add-text-button').click();
-  await page.getByTestId('text-editor').fill('test text');
+  await page.getByTestId('text-section-input').fill('test text');
 
   await page.getByTestId('add-pic-button').click();
   await page.getByTestId('image-url-input').fill(picUrl);

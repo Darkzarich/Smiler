@@ -380,7 +380,7 @@ test.describe('Post edit', () => {
 
     await expect(page).toHaveURL(`/post/${post.slug}/edit`);
     await expect(page).toHaveTitle(`Edit Post | Smiler`);
-    await expect(page.getByTestId('text-editor')).toHaveText(
+    await expect(page.getByTestId('text-section-input')).toHaveText(
       post.sections[0].content,
     );
   });
@@ -405,7 +405,7 @@ test.describe('Post edit', () => {
 
     await page.goto(`/post/${post.slug}/edit`);
 
-    await page.getByTestId('text-editor').focus();
+    await page.getByTestId('text-section-input').focus();
     await page.keyboard.type('edited');
 
     const editPostRequest = page.waitForRequest(

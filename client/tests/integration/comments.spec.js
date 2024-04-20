@@ -61,6 +61,100 @@ test('Hides children comments if root comment is collapsed', async ({
   ).toBeHidden();
 });
 
+test.describe('Replies', () => {
+  const newCommentId = 'test';
+
+  test.beforeEach(async ({ context }) => {
+    await context.route('*/**/users/get-auth', async (route) => {
+      await route.fulfill({
+        json: generateAuth({
+          isAuth: true,
+        }),
+      });
+    });
+
+    await context.route(`*/**/comments`, async (route) => {
+      if (route.request().method() === 'POST') {
+        await route.fulfill({
+          status: 200,
+          json: {
+            ...route.request().postDataJSON(),
+            children: [],
+            id: newCommentId,
+          },
+        });
+      }
+    });
+  });
+
+  test('Replies to a comment', async ({ page }) => {
+    const newCommentText = 'new comment';
+
+    await page.goto(`/post/${post.slug}`);
+
+    await page.getByTestId(`comment-${comment.id}-toggle-reply`).click();
+
+    await page.getByTestId(`comment-reply-input`).fill(newCommentText);
+
+    const replyRequest = page.waitForRequest(
+      (res) => res.url().includes(`/comments`) && res.method() === 'POST',
+    );
+
+    await page.getByTestId(`comment-reply-btn`).click();
+
+    const replyResponse = await replyRequest;
+
+    expect(replyResponse.postDataJSON()).toEqual({
+      post: post.id,
+      parent: comment.id,
+      body: newCommentText,
+    });
+
+    await expect(
+      page.getByTestId(`comment-${newCommentId}-body`),
+    ).toContainText(newCommentText);
+  });
+
+  test('Cannot reply if the user is not logged in', async ({
+    page,
+    context,
+  }) => {
+    await context.route('*/**/users/get-auth', async (route) => {
+      await route.fulfill({
+        json: generateAuth(),
+      });
+    });
+
+    await page.goto(`/post/${post.slug}`);
+
+    await expect(
+      page.getByTestId(`comment-${comment.id}-toggle-reply`),
+    ).toBeHidden();
+  });
+
+  test('Closes reply form', async ({ page }) => {
+    await page.goto(`/post/${post.slug}`);
+
+    await page.getByTestId(`comment-${comment.id}-toggle-reply`).click();
+    await page.getByTestId(`comment-reply-close-btn`).click();
+
+    await expect(page.getByTestId(`comment-reply-input`)).toBeHidden();
+  });
+
+  // TODO: Make it work this way
+
+  // test('Only one reply form exists', async ({ page }) => {
+  //   await page.goto(`/post/${post.slug}`);
+
+  //   await page.getByTestId(`comment-${comment.id}-toggle-reply`).click();
+  //   await page
+  //     .getByTestId(`comment-${comment.children[0].id}-toggle-reply`)
+  //     .click();
+
+  //   await expect(page.getByTestId(`comment-reply-input`)).toHaveCount(1);
+  // });
+});
+
 test.describe('Votes', () => {
   test.beforeEach(async ({ context }) => {
     await context.route(`*/**/comments/${comment.id}/rate`, async (route) => {

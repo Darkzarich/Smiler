@@ -23,7 +23,7 @@
         :id="id"
         :ref="'text-editor#' + id"
         class="text-editor__input"
-        data-testid="text-editor"
+        :data-testid="`${dataTestid}-input`"
         role="textbox"
         tabIndex="0"
         contenteditable

@@ -117,16 +117,23 @@
                 v-if="replyFieldShowFor == comment.id"
                 class="comments__item-main-answer-editor"
               >
-                <TextEditorElement v-model="replyBody">
+                <TextEditorElement
+                  v-model="replyBody"
+                  data-testid="comment-reply"
+                >
                   <div class="comments__item-main-answer-buttons">
                     <ButtonElement
                       :loading="replySending"
                       :callback="reply"
                       :argument="comment.id"
+                      data-testid="comment-reply-btn"
                     >
                       Send
                     </ButtonElement>
-                    <ButtonElement :callback="toggleReply">
+                    <ButtonElement
+                      :callback="toggleReply"
+                      data-testid="comment-reply-close-btn"
+                    >
                       Close
                     </ButtonElement>
                   </div>
@@ -136,6 +143,7 @@
                 <div
                   v-if="level < COMMENTS_NESTED_LIMIT && user.authState"
                   class="comments__item-main-answer-toggler"
+                  :data-testid="`comment-${comment.id}-toggle-reply`"
                   @click="toggleReply(comment.id)"
                 >
                   Reply
