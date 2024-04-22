@@ -27,11 +27,15 @@
       >
         <template v-if="user.authState">
           <div class="comments__form-title">Leave the commentary</div>
-          <TextEditorElement v-model="sendCommentBody">
+          <TextEditorElement
+            v-model="sendCommentBody"
+            data-testid="new-comment-form"
+          >
             <div class="comments__form-submit">
               <ButtonElement
                 :loading="sendCommentLoading"
                 :callback="sendComment"
+                data-testid="new-comment-button"
               >
                 Send
               </ButtonElement>

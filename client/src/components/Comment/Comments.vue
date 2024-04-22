@@ -159,7 +159,7 @@
             </div>
           </template>
           <template v-else>
-            <i>This comment is deleted</i>
+            <i>This comment has been deleted</i>
           </template>
         </div>
         <div

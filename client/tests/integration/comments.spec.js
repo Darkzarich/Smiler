@@ -12,7 +12,9 @@ const comment = generateComment();
 test.beforeEach(async ({ context }) => {
   await context.route('*/**/users/get-auth', async (route) => {
     await route.fulfill({
-      json: generateAuth(),
+      json: generateAuth({
+        isAuth: true,
+      }),
     });
   });
 
@@ -32,7 +34,7 @@ test.beforeEach(async ({ context }) => {
   });
 });
 
-test('Shows comment with its child comments', async ({ page }) => {
+test('Shows a comment with its replies', async ({ page }) => {
   await page.goto(`/post/${post.slug}`);
 
   await expect(page.getByTestId(`comment-${comment.id}-body`)).toContainText(
@@ -61,8 +63,87 @@ test('Hides children comments if root comment is collapsed', async ({
   ).toBeHidden();
 });
 
+test('Shows a deleted comment with different text and no reply button', async ({
+  page,
+  context,
+}) => {
+  const deletedComment = generateComment({
+    children: [],
+    deleted: true,
+  });
+
+  await context.route('*/**/comments*', async (route) => {
+    await route.fulfill({
+      json: {
+        pages: 0,
+        comments: [deletedComment],
+      },
+    });
+  });
+
+  await page.goto(`/post/${post.slug}`);
+
+  await expect(page.getByTestId(`comment-${comment.id}-body`)).toContainText(
+    'This comment has been deleted',
+  );
+  await expect(
+    page.getByTestId(`comment-${comment.id}-toggle-reply`),
+  ).toBeHidden();
+});
+
+test('Posts a new comment to a post', async ({ page, context }) => {
+  const newCommentId = 'new-comment';
+  const newCommentText = 'new comment';
+
+  await context.route(`*/**/comments`, async (route) => {
+    if (route.request().method() === 'POST') {
+      await route.fulfill({
+        status: 200,
+        json: {
+          ...route.request().postDataJSON(),
+          children: [],
+          id: newCommentId,
+        },
+      });
+    }
+  });
+
+  await page.goto(`/post/${post.slug}`);
+
+  await page.getByTestId('new-comment-form-input').fill('new comment');
+
+  const newCommentRequest = page.waitForRequest(
+    (res) => res.url().includes(`/comments`) && res.method() === 'POST',
+  );
+
+  await page.getByTestId(`new-comment-button`).click();
+
+  const newCommentResponse = await newCommentRequest;
+
+  expect(newCommentResponse.postDataJSON()).toEqual({
+    post: post.id,
+    body: newCommentText,
+  });
+
+  await expect(page.getByTestId(`comment-${newCommentId}-body`)).toContainText(
+    newCommentText,
+  );
+});
+
+test('Cannot post comments if not logged in', async ({ page, context }) => {
+  await context.route('*/**/users/get-auth', async (route) => {
+    await route.fulfill({
+      json: generateAuth(),
+    });
+  });
+
+  await page.goto(`/post/${post.slug}`);
+
+  await expect(page.getByTestId('new-comment-form')).toBeHidden();
+});
+
 test.describe('Replies', () => {
-  const newCommentId = 'test';
+  const newCommentId = 'new-reply';
 
   test.beforeEach(async ({ context }) => {
     await context.route('*/**/users/get-auth', async (route) => {
@@ -115,7 +196,7 @@ test.describe('Replies', () => {
     ).toContainText(newCommentText);
   });
 
-  test('Cannot reply if the user is not logged in', async ({
+  test('Cannot reply to a comment if not logged in', async ({
     page,
     context,
   }) => {
@@ -132,7 +213,7 @@ test.describe('Replies', () => {
     ).toBeHidden();
   });
 
-  test('Closes reply form', async ({ page }) => {
+  test('Closes the reply form', async ({ page }) => {
     await page.goto(`/post/${post.slug}`);
 
     await page.getByTestId(`comment-${comment.id}-toggle-reply`).click();
