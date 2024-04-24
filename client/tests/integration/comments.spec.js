@@ -5,6 +5,7 @@ import { test, expect } from '@playwright/test';
 import generateAuth from './fixtures/auth';
 import generateComment from './fixtures/comment';
 import generatePost from './fixtures/post';
+import mockDate from './utils/mock-date';
 
 const post = generatePost();
 const comment = generateComment();
@@ -376,6 +377,122 @@ test.describe('Votes', () => {
 
     await expect(page.getByTestId(dataTestIds.downvote)).not.toHaveClass(
       /comments__item-main-block-meta-downvote_active/,
+    );
+  });
+});
+
+test.describe('Editing or deleting a comment', () => {
+  test('Cannot edit or delete a comment if the comment is older than 10 mins', async ({
+    page,
+    context,
+  }) => {
+    const dateToMock = '2024-03-06T00:00:00.000Z';
+
+    const oldComment = generateComment({
+      createdAt: new Date(
+        new Date(dateToMock).getTime() - 1000 * 60 * 11, // 11 mins
+      ).toISOString(),
+    });
+
+    mockDate(context, dateToMock);
+
+    await context.route('*/**/comments*', async (route) => {
+      await route.fulfill({
+        json: {
+          pages: 0,
+          comments: [oldComment],
+        },
+      });
+    });
+
+    await page.goto(`/post/${post.slug}`);
+
+    await expect(
+      page.getByTestId(`comment-${oldComment.id}-edit`),
+    ).toBeHidden();
+    await expect(
+      page.getByTestId(`comment-${oldComment.id}-delete`),
+    ).toBeHidden();
+  });
+
+  test('Deletes a comment that is not older than 10 mins, sends the delete request', async ({
+    page,
+    context,
+  }) => {
+    await context.route('*/**/comments*', async (route) => {
+      if (route.request().method() === 'GET') {
+        const noChildrenComment = generateComment();
+        noChildrenComment.children = [];
+
+        await route.fulfill({
+          json: {
+            pages: 0,
+            comments: [noChildrenComment],
+          },
+        });
+      }
+    });
+
+    await context.route(`*/**/comments/${comment.id}`, async (route) => {
+      await route.fulfill({
+        status: 200,
+      });
+    });
+
+    const dateToMock = new Date(comment.createdAt).toISOString();
+
+    await mockDate(context, dateToMock);
+
+    await page.goto(`/post/${post.slug}`);
+
+    const deleteCommentRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/comments/${comment.id}`) &&
+        res.method() === 'DELETE',
+    );
+
+    await page.getByTestId(`comment-${comment.id}-delete`).click();
+
+    await deleteCommentRequest;
+
+    await expect(page.getByTestId(`comment-${comment.id}-body`)).toBeHidden();
+  });
+
+  test('Edits a comment that is not older than 10 mins, sends the edit request', async ({
+    page,
+    context,
+  }) => {
+    const editCommentText = 'edited comment';
+
+    await context.route(`*/**/comments/${comment.id}`, async (route) => {
+      await route.fulfill({
+        status: 200,
+      });
+    });
+
+    const dateToMock = new Date(comment.createdAt).toISOString();
+
+    await mockDate(context, dateToMock);
+
+    await page.goto(`/post/${post.slug}`);
+
+    await page.getByTestId(`comment-${comment.id}-edit`).click();
+    await page.getByTestId('comment-edit-input').fill(editCommentText);
+
+    const editCommentRequest = page.waitForRequest(
+      (res) =>
+        res.url().includes(`/comments/${comment.id}`) && res.method() === 'PUT',
+    );
+
+    await page.getByTestId('comment-edit-btn').click();
+
+    const editCommentResponse = await editCommentRequest;
+
+    expect(editCommentResponse.postDataJSON()).toEqual({
+      body: editCommentText,
+    });
+    await expect(page.getByTestId(`comment-${comment.id}-body`)).toContainText(
+      editCommentText,
     );
   });
 });

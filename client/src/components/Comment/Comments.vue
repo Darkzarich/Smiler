@@ -68,12 +68,14 @@
             <template v-if="$commentCanEdit(comment)">
               <div
                 class="comments__item-main-block-meta-edit"
+                :data-testid="`comment-${comment.id}-edit`"
                 @click="toggleEdit(comment.id)"
               >
                 <EditIcon />
               </div>
               <div
                 class="comments__item-main-block-meta-delete"
+                :data-testid="`comment-${comment.id}-delete`"
                 @click="deleteCom(comment.id)"
               >
                 <DeleteIcon />
@@ -95,16 +97,23 @@
 
             <template v-else>
               <div class="comments__item-main-answer-editor">
-                <TextEditorElement v-model="commentEditInput">
+                <TextEditorElement
+                  v-model="commentEditInput"
+                  data-testid="comment-edit"
+                >
                   <div class="comments__item-main-answer-buttons">
                     <ButtonElement
                       :loading="editSending"
                       :callback="edit"
                       :argument="comment.id"
+                      data-testid="comment-edit-btn"
                     >
                       Send
                     </ButtonElement>
-                    <ButtonElement :callback="toggleEdit">
+                    <ButtonElement
+                      :callback="toggleEdit"
+                      data-testid="comment-edit-close-btn"
+                    >
                       Close
                     </ButtonElement>
                   </div>
