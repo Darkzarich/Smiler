@@ -495,4 +495,27 @@ test.describe('Editing or deleting a comment', () => {
       editCommentText,
     );
   });
+
+  test('Deletes a comment that has replies', async ({ page, context }) => {
+    await context.route(`*/**/comments/${comment.id}`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        json: {
+          success: true,
+        },
+      });
+    });
+
+    const dateToMock = new Date(comment.createdAt).toISOString();
+
+    await mockDate(context, dateToMock);
+
+    await page.goto(`/post/${post.slug}`);
+
+    await page.getByTestId(`comment-${comment.id}-delete`).click();
+
+    await expect(page.getByTestId(`comment-${comment.id}-body`)).toContainText(
+      'This comment has been deleted',
+    );
+  });
 });

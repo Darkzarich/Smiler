@@ -1,7 +1,7 @@
 <template>
   <div class="comments__item">
     <div
-      v-for="comment in data"
+      v-for="comment in commentData"
       :key="comment.id"
       class="comments__item-main"
       :class="{
@@ -266,7 +266,9 @@ export default {
     toggleEdit(id) {
       if (id) {
         this.commentEdit = id;
-        const foundCom = this.data.find((el) => el.id === this.commentEdit);
+        const foundCom = this.commentData.find(
+          (el) => el.id === this.commentEdit,
+        );
         this.commentEditInput = foundCom.body;
       } else {
         this.commentEdit = '';
@@ -280,7 +282,9 @@ export default {
       });
 
       if (!res.data.error) {
-        const foundCom = this.data.find((el) => el.id === this.commentEdit);
+        const foundCom = this.commentData.find(
+          (el) => el.id === this.commentEdit,
+        );
         foundCom.body = this.commentEditInput;
         this.toggleEdit();
       }
@@ -295,12 +299,12 @@ export default {
         const res = await api.comments.deleteComment(id);
 
         if (!res.data.error) {
-          const foundCom = this.data.find((el) => el.id === id);
+          const foundCom = this.commentData.find((el) => el.id === id);
 
           if (foundCom.children.length > 0) {
             foundCom.deleted = true;
           } else {
-            this.data.splice(this.data.indexOf(foundCom), 1);
+            this.commentData.splice(this.commentData.indexOf(foundCom), 1);
           }
         }
         this.deleteSending = false;
@@ -308,7 +312,7 @@ export default {
     },
     async reply(parent) {
       this.replySending = true;
-      const parentCom = this.data.find((el) => el.id === parent);
+      const parentCom = this.commentData.find((el) => el.id === parent);
 
       const res = await api.comments.createComment({
         post: this.post,
@@ -330,7 +334,9 @@ export default {
           created: true,
         };
 
-        this.data[this.data.indexOf(parentCom)].children.unshift(newComment);
+        this.commentData[this.commentData.indexOf(parentCom)].children.unshift(
+          newComment,
+        );
         this.replyBody = '';
         this.replyFieldShowFor = false;
       }

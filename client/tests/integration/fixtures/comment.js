@@ -16,6 +16,7 @@ const comment = {
     isRated: false,
     negative: false,
   },
+  deleted: false,
   children: [
     {
       id: '2',
@@ -32,6 +33,7 @@ const comment = {
         isRated: false,
         negative: false,
       },
+      deleted: false,
       children: [
         {
           id: '3',
@@ -48,6 +50,7 @@ const comment = {
             isRated: false,
             negative: false,
           },
+          
           children: [],
         },
       ],
