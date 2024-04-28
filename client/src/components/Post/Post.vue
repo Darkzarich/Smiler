@@ -32,7 +32,7 @@
     <div class="post-main">
       <RouterLink
         class="post-main__title"
-        tag="div"
+        tag="a"
         :to="{
           name: 'Single',
           params: {
