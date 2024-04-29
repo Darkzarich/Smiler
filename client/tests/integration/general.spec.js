@@ -2,7 +2,7 @@
 // @ts-check
 
 import { test, expect } from '@playwright/test';
-import generateAuth from './fixtures/auth';
+import generateAuth from './factory/auth';
 
 test.beforeEach(async ({ context }) => {
   await context.route('*/**/users/get-auth', async (route) => {

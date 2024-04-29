@@ -2,10 +2,10 @@
 // @ts-check
 
 import { test, expect } from '@playwright/test';
-import generateAuth from './fixtures/auth';
-import generateComment from './fixtures/comment';
-import generatePost from './fixtures/post';
-import generateProfile from './fixtures/profile';
+import generateAuth from './factory/auth';
+import generateComment from './factory/comment';
+import generatePost from './factory/post';
+import generateProfile from './factory/profile';
 import mockDate from './utils/mock-date';
 
 const post = generatePost();

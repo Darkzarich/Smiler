@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import generateAuth from './fixtures/auth';
-import generateProfile from './fixtures/profile';
+import generateAuth from './factory/auth';
+import generateProfile from './factory/profile';
 
 const testUser = generateAuth({
   isAuth: true,

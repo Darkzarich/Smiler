@@ -2,8 +2,8 @@
 // @ts-check
 
 import { test, expect } from '@playwright/test';
-import generateAuth from './fixtures/auth';
-import generatePost from './fixtures/post';
+import generateAuth from './factory/auth';
+import generatePost from './factory/post';
 import mockDate from './utils/mock-date';
 
 const post1 = generatePost({

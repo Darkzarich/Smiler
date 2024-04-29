@@ -2,8 +2,8 @@
 // @ts-check
 
 import { test, expect } from '@playwright/test';
-import generateAuth from './fixtures/auth';
-import generatePost from './fixtures/post';
+import generateAuth from './factory/auth';
+import generatePost from './factory/post';
 
 const tags = ['tag1', 'tag2', 'tag3'];
 const post = generatePost({
