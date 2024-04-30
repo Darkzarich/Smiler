@@ -1,14 +1,13 @@
 /* eslint-disable no-await-in-loop */
 // @ts-check
 
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import generateAuth from './factory/auth';
+import test from './page-objects';
 
-test.beforeEach(async ({ context }) => {
-  await context.route('*/**/users/get-auth', async (route) => {
-    await route.fulfill({
-      json: generateAuth(),
-    });
+test.beforeEach(async ({ Api }) => {
+  Api.routes.users.checkAuthState.mock({
+    body: generateAuth(),
   });
 });
 
