@@ -9,7 +9,7 @@ export default class Route {
    * @param {'GET'|'POST'|'DELETE'|'PUT'} [method]
    */
   constructor(url = '', method = 'GET') {
-    this.url = `*/**/${url}`;
+    this.url = url;
     this.method = method;
   }
 
@@ -44,15 +44,22 @@ export default class Route {
       throw new Error('Context is not set');
     }
 
+    const url = params ? this.processTemplate(params) : this.url;
+
     await this.context.route(
-      params ? this.processTemplate(params) : this.url,
+      // Matches any query param if present
+      new RegExp(`${url}(\\?{1}.*)?$`, 'm'),
       async (route) => {
         if (route.request().method() === this.method) {
           route.fulfill({
             json: body,
             status,
           });
+
+          return;
         }
+
+        route.fallback();
       },
     );
   }
@@ -70,7 +77,8 @@ export default class Route {
 
     const request = this.page.waitForRequest(
       (res) =>
-        res.url().includes(url.replace('*/**/', '')) &&
+        // Matches any query param if present
+        new RegExp(`${url}(\\?{1}.*)?$`, 'm').test(res.url()) &&
         res.method() === this.method,
     );
 
