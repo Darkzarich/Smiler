@@ -1,37 +1,35 @@
 /* eslint-disable no-await-in-loop */
 // @ts-check
 
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import generateAuth from './factory/auth';
 import generateComment from './factory/comment';
 import generatePost from './factory/post';
+import test from './page-objects';
 import mockDate from './utils/mock-date';
 
 const post = generatePost();
 const comment = generateComment();
 
-test.beforeEach(async ({ context }) => {
-  await context.route('*/**/users/get-auth', async (route) => {
-    await route.fulfill({
-      json: generateAuth({
-        isAuth: true,
-      }),
-    });
+test.beforeEach(async ({ Api }) => {
+  Api.routes.users.checkAuthState.mock({
+    body: generateAuth({
+      isAuth: true,
+    }),
   });
 
-  await context.route(`*/**/posts/${post.slug}`, async (route) => {
-    await route.fulfill({
-      json: post,
-    });
+  Api.routes.posts.getPostBySlug.mock({
+    body: post,
+    params: {
+      slug: post.slug,
+    },
   });
 
-  await context.route('*/**/comments*', async (route) => {
-    await route.fulfill({
-      json: {
-        pages: 0,
-        comments: [comment],
-      },
-    });
+  Api.routes.comments.getComments.mock({
+    body: {
+      pages: 0,
+      comments: [comment],
+    },
   });
 });
 
@@ -66,20 +64,18 @@ test('Hides children comments if root comment is collapsed', async ({
 
 test('Shows a deleted comment with different text and no reply button', async ({
   page,
-  context,
+  Api,
 }) => {
   const deletedComment = generateComment({
     children: [],
     deleted: true,
   });
 
-  await context.route('*/**/comments*', async (route) => {
-    await route.fulfill({
-      json: {
-        pages: 0,
-        comments: [deletedComment],
-      },
-    });
+  Api.routes.comments.getComments.mock({
+    body: {
+      pages: 0,
+      comments: [deletedComment],
+    },
   });
 
   await page.goto(`/post/${post.slug}`);
@@ -92,36 +88,30 @@ test('Shows a deleted comment with different text and no reply button', async ({
   ).toBeHidden();
 });
 
-test('Posts a new comment to a post', async ({ page, context }) => {
+test('Posts a new comment to a post', async ({ page, Api }) => {
   const newCommentId = 'new-comment';
   const newCommentText = 'new comment';
 
-  await context.route(`*/**/comments`, async (route) => {
-    if (route.request().method() === 'POST') {
-      await route.fulfill({
-        status: 200,
-        json: {
-          ...route.request().postDataJSON(),
-          children: [],
-          id: newCommentId,
-        },
-      });
-    }
+  Api.routes.comments.createComment.mock({
+    body: {
+      body: newCommentText,
+      children: [],
+      id: newCommentId,
+    },
   });
 
   await page.goto(`/post/${post.slug}`);
 
   await page.getByTestId('new-comment-form-input').fill('new comment');
 
-  const newCommentRequest = page.waitForRequest(
-    (res) => res.url().includes(`/comments`) && res.method() === 'POST',
-  );
+  const createCommentResponse =
+    await Api.routes.comments.createComment.waitForRequest({
+      beforeAction: async () => {
+        await page.getByTestId(`new-comment-button`).click();
+      },
+    });
 
-  await page.getByTestId(`new-comment-button`).click();
-
-  const newCommentResponse = await newCommentRequest;
-
-  expect(newCommentResponse.postDataJSON()).toEqual({
+  expect(createCommentResponse.postDataJSON()).toEqual({
     post: post.id,
     body: newCommentText,
   });
@@ -131,11 +121,9 @@ test('Posts a new comment to a post', async ({ page, context }) => {
   );
 });
 
-test('Cannot post comments if not logged in', async ({ page, context }) => {
-  await context.route('*/**/users/get-auth', async (route) => {
-    await route.fulfill({
-      json: generateAuth(),
-    });
+test('Cannot post comments if not logged in', async ({ page, Api }) => {
+  Api.routes.users.checkAuthState.mock({
+    body: generateAuth(),
   });
 
   await page.goto(`/post/${post.slug}`);
@@ -144,67 +132,53 @@ test('Cannot post comments if not logged in', async ({ page, context }) => {
 });
 
 test.describe('Replies', () => {
-  const newCommentId = 'new-reply';
+  const newReplyId = 'new-reply';
+  const newReplyText = 'new reply';
 
-  test.beforeEach(async ({ context }) => {
-    await context.route('*/**/users/get-auth', async (route) => {
-      await route.fulfill({
-        json: generateAuth({
-          isAuth: true,
-        }),
-      });
+  test.beforeEach(async ({ Api }) => {
+    Api.routes.users.checkAuthState.mock({
+      body: generateAuth({
+        isAuth: true,
+      }),
     });
 
-    await context.route(`*/**/comments`, async (route) => {
-      if (route.request().method() === 'POST') {
-        await route.fulfill({
-          status: 200,
-          json: {
-            ...route.request().postDataJSON(),
-            children: [],
-            id: newCommentId,
-          },
-        });
-      }
+    Api.routes.comments.createComment.mock({
+      body: {
+        body: newReplyText,
+        children: [],
+        id: newReplyId,
+      },
     });
   });
 
-  test('Replies to a comment', async ({ page }) => {
-    const newCommentText = 'new comment';
-
+  test('Replies to a comment', async ({ page, Api }) => {
     await page.goto(`/post/${post.slug}`);
 
     await page.getByTestId(`comment-${comment.id}-toggle-reply`).click();
 
-    await page.getByTestId(`comment-reply-input`).fill(newCommentText);
+    await page.getByTestId(`comment-reply-input`).fill(newReplyText);
 
-    const replyRequest = page.waitForRequest(
-      (res) => res.url().includes(`/comments`) && res.method() === 'POST',
-    );
-
-    await page.getByTestId(`comment-reply-btn`).click();
-
-    const replyResponse = await replyRequest;
+    const replyResponse =
+      await Api.routes.comments.createComment.waitForRequest({
+        beforeAction: async () => {
+          await page.getByTestId(`comment-reply-btn`).click();
+        },
+      });
 
     expect(replyResponse.postDataJSON()).toEqual({
       post: post.id,
       parent: comment.id,
-      body: newCommentText,
+      body: newReplyText,
     });
 
-    await expect(
-      page.getByTestId(`comment-${newCommentId}-body`),
-    ).toContainText(newCommentText);
+    await expect(page.getByTestId(`comment-${newReplyId}-body`)).toContainText(
+      newReplyText,
+    );
   });
 
-  test('Cannot reply to a comment if not logged in', async ({
-    page,
-    context,
-  }) => {
-    await context.route('*/**/users/get-auth', async (route) => {
-      await route.fulfill({
-        json: generateAuth(),
-      });
+  test('Cannot reply to a comment if not logged in', async ({ page, Api }) => {
+    Api.routes.users.checkAuthState.mock({
+      body: generateAuth(),
     });
 
     await page.goto(`/post/${post.slug}`);
@@ -238,11 +212,18 @@ test.describe('Replies', () => {
 });
 
 test.describe('Votes', () => {
-  test.beforeEach(async ({ context }) => {
-    await context.route(`*/**/comments/${comment.id}/rate`, async (route) => {
-      await route.fulfill({
-        status: 200,
-      });
+  test.beforeEach(async ({ Api }) => {
+    Api.routes.comments.updateRate.mock({
+      status: 200,
+      params: {
+        id: comment.id,
+      },
+    });
+    Api.routes.comments.removeRate.mock({
+      status: 200,
+      params: {
+        id: comment.id,
+      },
     });
   });
 
@@ -252,20 +233,19 @@ test.describe('Votes', () => {
     downvote: `comment-${comment.id}-downvote`,
   };
 
-  test('Upvotes a comment', async ({ page }) => {
+  test('Upvotes a comment', async ({ page, Api }) => {
     await page.goto(`/post/${post.slug}`);
 
     await page.getByTestId(`comment-${comment.id}-body`).isVisible();
 
-    const upvoteRequest = page.waitForRequest(
-      (res) =>
-        res.url().includes(`/comments/${comment.id}/rate`) &&
-        res.method() === 'PUT',
-    );
-
-    await page.getByTestId(dataTestIds.upvote).click();
-
-    const upvoteResponse = await upvoteRequest;
+    const upvoteResponse = await Api.routes.comments.updateRate.waitForRequest({
+      beforeAction: async () => {
+        await page.getByTestId(dataTestIds.upvote).click();
+      },
+      params: {
+        id: comment.id,
+      },
+    });
 
     expect(upvoteResponse.postDataJSON()).toEqual({
       negative: false,
@@ -275,20 +255,20 @@ test.describe('Votes', () => {
     );
   });
 
-  test('Downvotes a comment', async ({ page }) => {
+  test('Downvotes a comment', async ({ page, Api }) => {
     await page.goto(`/post/${post.slug}`);
 
     await page.getByTestId(`comment-${comment.id}-body`).isVisible();
 
-    const downvoteRequest = page.waitForRequest(
-      (res) =>
-        res.url().includes(`/comments/${comment.id}/rate`) &&
-        res.method() === 'PUT',
-    );
-
-    await page.getByTestId(dataTestIds.downvote).click();
-
-    const downvoteResponse = await downvoteRequest;
+    const downvoteResponse =
+      await Api.routes.comments.updateRate.waitForRequest({
+        beforeAction: async () => {
+          await page.getByTestId(dataTestIds.downvote).click();
+        },
+        params: {
+          id: comment.id,
+        },
+      });
 
     expect(downvoteResponse.postDataJSON()).toEqual({
       negative: true,
@@ -300,22 +280,20 @@ test.describe('Votes', () => {
 
   test('Removes a vote from a comment if it was upvoted before', async ({
     page,
-    context,
+    Api,
   }) => {
-    await context.route('*/**/comments*', async (route) => {
-      await route.fulfill({
-        json: {
-          pages: 0,
-          comments: [
-            generateComment({
-              rated: {
-                isRated: true,
-                negative: false,
-              },
-            }),
-          ],
-        },
-      });
+    Api.routes.comments.getComments.mock({
+      body: {
+        pages: 0,
+        comments: [
+          generateComment({
+            rated: {
+              isRated: true,
+              negative: false,
+            },
+          }),
+        ],
+      },
     });
 
     await page.goto(`/post/${post.slug}`);
@@ -324,15 +302,14 @@ test.describe('Votes', () => {
       /comments__item-main-block-meta-upvote_active/,
     );
 
-    const removeUpvoteRequest = page.waitForRequest(
-      (res) =>
-        res.url().includes(`/comments/${comment.id}/rate`) &&
-        res.method() === 'DELETE',
-    );
-
-    await page.getByTestId(dataTestIds.downvote).click();
-
-    await removeUpvoteRequest;
+    await Api.routes.comments.removeRate.waitForRequest({
+      beforeAction: async () => {
+        await page.getByTestId(dataTestIds.downvote).click();
+      },
+      params: {
+        id: comment.id,
+      },
+    });
 
     await expect(page.getByTestId(dataTestIds.upvote)).not.toHaveClass(
       /comments__item-main-block-meta-upvote_active/,
@@ -341,22 +318,20 @@ test.describe('Votes', () => {
 
   test('Removes a vote from a comment if it was downvoted before', async ({
     page,
-    context,
+    Api,
   }) => {
-    await context.route('*/**/comments*', async (route) => {
-      await route.fulfill({
-        json: {
-          pages: 0,
-          comments: [
-            generateComment({
-              rated: {
-                isRated: true,
-                negative: true,
-              },
-            }),
-          ],
-        },
-      });
+    Api.routes.comments.getComments.mock({
+      body: {
+        pages: 0,
+        comments: [
+          generateComment({
+            rated: {
+              isRated: true,
+              negative: true,
+            },
+          }),
+        ],
+      },
     });
 
     await page.goto(`/post/${post.slug}`);
@@ -365,15 +340,14 @@ test.describe('Votes', () => {
       /comments__item-main-block-meta-downvote_active/,
     );
 
-    const removeDownVoteRequest = page.waitForRequest(
-      (res) =>
-        res.url().includes(`/comments/${comment.id}/rate`) &&
-        res.method() === 'DELETE',
-    );
-
-    await page.getByTestId(dataTestIds.upvote).click();
-
-    await removeDownVoteRequest;
+    await Api.routes.comments.removeRate.waitForRequest({
+      beforeAction: async () => {
+        await page.getByTestId(dataTestIds.upvote).click();
+      },
+      params: {
+        id: comment.id,
+      },
+    });
 
     await expect(page.getByTestId(dataTestIds.downvote)).not.toHaveClass(
       /comments__item-main-block-meta-downvote_active/,
@@ -385,6 +359,7 @@ test.describe('Editing or deleting a comment', () => {
   test('Cannot edit or delete a comment if the comment is older than 10 mins', async ({
     page,
     context,
+    Api,
   }) => {
     const dateToMock = '2024-03-06T00:00:00.000Z';
 
@@ -396,13 +371,11 @@ test.describe('Editing or deleting a comment', () => {
 
     mockDate(context, dateToMock);
 
-    await context.route('*/**/comments*', async (route) => {
-      await route.fulfill({
-        json: {
-          pages: 0,
-          comments: [oldComment],
-        },
-      });
+    Api.routes.comments.getComments.mock({
+      body: {
+        pages: 0,
+        comments: [oldComment],
+      },
     });
 
     await page.goto(`/post/${post.slug}`);
@@ -418,25 +391,23 @@ test.describe('Editing or deleting a comment', () => {
   test('Deletes a comment that is not older than 10 mins, sends the delete request', async ({
     page,
     context,
+    Api,
   }) => {
-    await context.route('*/**/comments*', async (route) => {
-      if (route.request().method() === 'GET') {
-        const noChildrenComment = generateComment();
-        noChildrenComment.children = [];
+    const noChildrenComment = generateComment();
+    noChildrenComment.children = [];
 
-        await route.fulfill({
-          json: {
-            pages: 0,
-            comments: [noChildrenComment],
-          },
-        });
-      }
+    Api.routes.comments.getComments.mock({
+      body: {
+        pages: 0,
+        comments: [noChildrenComment],
+      },
     });
 
-    await context.route(`*/**/comments/${comment.id}`, async (route) => {
-      await route.fulfill({
-        status: 200,
-      });
+    Api.routes.comments.deleteComment.mock({
+      status: 200,
+      params: {
+        id: noChildrenComment.id,
+      },
     });
 
     const dateToMock = new Date(comment.createdAt).toISOString();
@@ -445,15 +416,14 @@ test.describe('Editing or deleting a comment', () => {
 
     await page.goto(`/post/${post.slug}`);
 
-    const deleteCommentRequest = page.waitForRequest(
-      (res) =>
-        res.url().includes(`/comments/${comment.id}`) &&
-        res.method() === 'DELETE',
-    );
-
-    await page.getByTestId(`comment-${comment.id}-delete`).click();
-
-    await deleteCommentRequest;
+    await Api.routes.comments.deleteComment.waitForRequest({
+      beforeAction: async () => {
+        await page.getByTestId(`comment-${comment.id}-delete`).click();
+      },
+      params: {
+        id: noChildrenComment.id,
+      },
+    });
 
     await expect(page.getByTestId(`comment-${comment.id}-body`)).toBeHidden();
   });
@@ -461,13 +431,15 @@ test.describe('Editing or deleting a comment', () => {
   test('Edits a comment that is not older than 10 mins, sends the edit request', async ({
     page,
     context,
+    Api,
   }) => {
     const editCommentText = 'edited comment';
 
-    await context.route(`*/**/comments/${comment.id}`, async (route) => {
-      await route.fulfill({
-        status: 200,
-      });
+    Api.routes.comments.updateComment.mock({
+      status: 200,
+      params: {
+        id: comment.id,
+      },
     });
 
     const dateToMock = new Date(comment.createdAt).toISOString();
@@ -479,14 +451,15 @@ test.describe('Editing or deleting a comment', () => {
     await page.getByTestId(`comment-${comment.id}-edit`).click();
     await page.getByTestId('comment-edit-input').fill(editCommentText);
 
-    const editCommentRequest = page.waitForRequest(
-      (res) =>
-        res.url().includes(`/comments/${comment.id}`) && res.method() === 'PUT',
-    );
-
-    await page.getByTestId('comment-edit-btn').click();
-
-    const editCommentResponse = await editCommentRequest;
+    const editCommentResponse =
+      await Api.routes.comments.updateComment.waitForRequest({
+        beforeAction: async () => {
+          await page.getByTestId('comment-edit-btn').click();
+        },
+        params: {
+          id: comment.id,
+        },
+      });
 
     expect(editCommentResponse.postDataJSON()).toEqual({
       body: editCommentText,
@@ -496,14 +469,15 @@ test.describe('Editing or deleting a comment', () => {
     );
   });
 
-  test('Deletes a comment that has replies', async ({ page, context }) => {
-    await context.route(`*/**/comments/${comment.id}`, async (route) => {
-      await route.fulfill({
-        status: 200,
-        json: {
-          success: true,
-        },
-      });
+  test('Deletes a comment that has replies', async ({ page, context, Api }) => {
+    Api.routes.comments.deleteComment.mock({
+      status: 200,
+      body: {
+        success: true,
+      },
+      params: {
+        id: comment.id,
+      },
     });
 
     const dateToMock = new Date(comment.createdAt).toISOString();
