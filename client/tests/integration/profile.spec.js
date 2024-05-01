@@ -1,10 +1,11 @@
 /* eslint-disable no-await-in-loop */
 // @ts-check
 
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import generateAuth from './factory/auth';
 import generatePost from './factory/post';
 import generateProfile from './factory/profile';
+import test from './page-objects';
 
 const post = generatePost({
   id: '1',
@@ -13,39 +14,31 @@ const post = generatePost({
 const testUser = generateProfile();
 const auth = generateAuth();
 
-test.beforeEach(async ({ context }) => {
-  await context.route('**/users/get-auth', async (route) => {
-    await route.fulfill({
-      json: auth,
-    });
+test.beforeEach(async ({ Api }) => {
+  Api.routes.auth.getAuth.mock({
+    body: auth,
   });
 
-  await context.route('**/posts*', async (route) => {
-    await route.fulfill({
-      json: {
-        pages: 0,
-        posts: [post],
-      },
-    });
+  Api.routes.posts.getPosts.mock({
+    body: {
+      pages: 0,
+      posts: [post],
+    },
   });
 
-  await context.route(`**/users/${testUser.login}`, async (route) => {
-    await route.fulfill({
-      json: testUser,
-    });
+  Api.routes.users.getUserProfile.mock({
+    body: testUser,
   });
 });
 
-test('Goes to 404 if user does not exist', async ({ context, page }) => {
-  await context.route('**/users/non-existing-user', async (route) => {
-    await route.fulfill({
-      status: 404,
-      json: {
-        error: {
-          message: 'User not found',
-        },
+test('Goes to 404 if user does not exist', async ({ page, Api }) => {
+  Api.routes.users.getUserProfile.mock({
+    status: 404,
+    body: {
+      error: {
+        message: 'User not found',
       },
-    });
+    },
   });
 
   await page.goto('/user/@non-existing-user');
@@ -57,13 +50,14 @@ test('Goes to 404 if user does not exist', async ({ context, page }) => {
   );
 });
 
-test('Fetches and shows user profile', async ({ page }) => {
-  const userRequest = page.waitForRequest(`**/users/${testUser.login}`);
+test('Fetches and shows user profile', async ({ page, Api }) => {
+  const userResponse = await Api.routes.users.getUserProfile.waitForRequest({
+    beforeAction: async () => {
+      await page.goto(`/user/@${testUser.login}`);
+    },
+  });
 
-  await page.goto(`/user/@${testUser.login}`);
-
-  await userRequest;
-
+  expect(userResponse.url()).toContain(`/users/${testUser.login}`);
   await expect(page).toHaveTitle(`${testUser.login} | Smiler`);
   await expect(page.getByTestId('user-profile-login')).toContainText(
     testUser.login,
@@ -81,12 +75,12 @@ test('Fetches and shows user profile', async ({ page }) => {
   await expect(page.getByTestId('user-profile-follow-btn')).toBeHidden();
 });
 
-test('Fetches user posts with expected filters', async ({ page }) => {
-  const postRequest = page.waitForRequest('*/**/posts*');
-
-  await page.goto(`/user/@${testUser.login}`);
-
-  const postResponse = await postRequest;
+test('Fetches user posts with expected filters', async ({ page, Api }) => {
+  const postResponse = await Api.routes.posts.getPosts.waitForRequest({
+    beforeAction: async () => {
+      await page.goto(`/user/@${testUser.login}`);
+    },
+  });
 
   expect(postResponse.url()).toContain(
     `author=${testUser.login}&limit=20&offset=0`,
@@ -98,40 +92,40 @@ test('Fetches user posts with expected filters', async ({ page }) => {
 });
 
 test.describe('Follows and unfollow', () => {
-  test.beforeEach(async ({ context }) => {
-    await context.route('**/users/get-auth', async (route) => {
-      await route.fulfill({
-        json: generateAuth({
-          isAuth: true,
-          login: `_${testUser.login}`,
-        }),
-      });
+  test.beforeEach(async ({ Api }) => {
+    Api.routes.auth.getAuth.mock({
+      body: generateAuth({
+        isAuth: true,
+        login: `_${testUser.login}`,
+      }),
     });
 
-    await context.route(`**/users/${testUser.id}/follow`, async (route) => {
-      await route.fulfill({
-        json: {
-          ok: true,
-        },
-      });
+    Api.routes.users.followUser.mock({
+      body: {
+        ok: true,
+      },
+    });
+
+    Api.routes.users.unfollowUser.mock({
+      body: {
+        ok: true,
+      },
     });
   });
 
   test('Follows a different user, followers count increases', async ({
     page,
+    Api,
   }) => {
     await page.goto(`/user/@${testUser.login}`);
 
-    const followRequest = page.waitForRequest(
-      (res) =>
-        res.url().includes(`/users/${testUser.id}/follow`) &&
-        res.method() === 'PUT',
-    );
+    const followResponse = await Api.routes.users.followUser.waitForRequest({
+      beforeAction: async () => {
+        await page.getByTestId('user-profile-follow-btn').click();
+      },
+    });
 
-    await page.getByTestId('user-profile-follow-btn').click();
-
-    await followRequest;
-
+    expect(followResponse.url()).toContain(testUser.id);
     await expect(page.getByTestId('user-profile-unfollow-btn')).toBeVisible();
     await expect(page.getByTestId('user-profile-followers')).toContainText(
       (testUser.followersAmount + 1).toString(),
@@ -140,40 +134,35 @@ test.describe('Follows and unfollow', () => {
 
   test('Unfollows a followed user, followers count decreases', async ({
     page,
-    context,
+    Api,
   }) => {
-    await context.route(`**/users/${testUser.login}`, async (route) => {
-      await route.fulfill({
-        json: generateProfile({
-          followersAmount: testUser.followersAmount + 1,
-          isFollowed: true,
-        }),
-      });
+    Api.routes.users.getUserProfile.mock({
+      body: generateProfile({
+        followersAmount: testUser.followersAmount + 1,
+        isFollowed: true,
+      }),
     });
 
     await page.goto(`/user/@${testUser.login}`);
 
-    const unfollowRequest = page.waitForRequest(
-      (res) =>
-        res.url().includes(`/users/${testUser.id}/follow`) &&
-        res.method() === 'DELETE',
+    const unfollowResponse = await Api.routes.users.unfollowUser.waitForRequest(
+      {
+        beforeAction: async () => {
+          await page.getByTestId('user-profile-unfollow-btn').click();
+        },
+      },
     );
 
-    await page.getByTestId('user-profile-unfollow-btn').click();
-
-    await unfollowRequest;
-
+    expect(unfollowResponse.url()).toContain(testUser.id);
     await expect(page.getByTestId('user-profile-follow-btn')).toBeVisible();
     await expect(page.getByTestId('user-profile-followers')).toContainText('0');
   });
 
-  test('Can not follow or unfollow yourself', async ({ page, context }) => {
-    await context.route('**/users/get-auth', async (route) => {
-      await route.fulfill({
-        json: generateAuth({
-          isAuth: true,
-        }),
-      });
+  test('Cannot follow or unfollow yourself', async ({ page, Api }) => {
+    Api.routes.auth.getAuth.mock({
+      body: generateAuth({
+        isAuth: true,
+      }),
     });
 
     await page.goto(`/user/@${testUser.login}`);
