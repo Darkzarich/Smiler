@@ -1,6 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import generateAuth from './factory/auth';
 import generateProfile from './factory/profile';
+import test from './page-objects';
 
 const testUser = generateAuth({
   isAuth: true,
@@ -18,33 +19,24 @@ const author2 = generateProfile({
 const authors = [author1, author2];
 const tags = ['tag1', 'tag2', 'tag3'];
 
-test.beforeEach(async ({ context }) => {
-  await context.route('*/**/users/get-auth', async (route) => {
-    route.fulfill({
-      json: testUser,
-    });
+test.beforeEach(async ({ Api }) => {
+  Api.routes.users.checkAuthState.mock({
+    body: testUser,
   });
 
-  await context.route('*/**/users/me/following', async (route) => {
-    route.fulfill({
-      json: {
-        authors,
-        tags,
-      },
-    });
+  Api.routes.users.getUsersFollowing.mock({
+    body: {
+      authors,
+      tags,
+    },
   });
 });
 
-test('Only authenticated user can see Settings page', async ({
-  page,
-  context,
-}) => {
-  await context.route('*/**/users/get-auth', async (route) => {
-    route.fulfill({
-      json: generateAuth({
-        isAuth: false,
-      }),
-    });
+test('Only authenticated user can see Settings page', async ({ page, Api }) => {
+  Api.routes.users.checkAuthState.mock({
+    body: generateAuth({
+      isAuth: false,
+    }),
   });
 
   await page.goto('/user/settings');
@@ -58,12 +50,13 @@ test('Only authenticated user can see Settings page', async ({
 
 test('Open settings page, shows expected authors and tags the user is following', async ({
   page,
+  Api,
 }) => {
-  const getFollowingRequest = page.waitForRequest('*/**/users/me/following');
-
-  await page.goto('/user/settings');
-
-  await getFollowingRequest;
+  await Api.routes.users.getUsersFollowing.waitForRequest({
+    beforeAction: async () => {
+      await page.goto('/user/settings');
+    },
+  });
 
   for (const author of authors) {
     // eslint-disable-next-line no-await-in-loop
@@ -85,15 +78,13 @@ test('Open settings page, shows expected authors and tags the user is following'
 
 test('Shows empty list of authors and tags if the user is not following any', async ({
   page,
-  context,
+  Api,
 }) => {
-  await context.route('*/**/users/me/following', async (route) => {
-    route.fulfill({
-      json: {
-        authors: [],
-        tags: [],
-      },
-    });
+  Api.routes.users.getUsersFollowing.mock({
+    body: {
+      authors: [],
+      tags: [],
+    },
   });
 
   await page.goto('/user/settings');
@@ -103,27 +94,23 @@ test('Shows empty list of authors and tags if the user is not following any', as
 
 test('Unfollows an author, removes that author from the list of following', async ({
   page,
-  context,
+  Api,
 }) => {
-  await context.route(`**/users/${author1.id}/follow`, async (route) => {
-    await route.fulfill({
-      json: {
-        ok: true,
-      },
-    });
+  Api.routes.users.unfollowUser.mock({
+    body: {
+      ok: true,
+    },
   });
 
   await page.goto('/user/settings');
 
-  const unfollowRequest = page.waitForRequest(
-    (res) =>
-      res.url().includes(`/users/${author1.id}/follow`) &&
-      res.method() === 'DELETE',
-  );
-
-  await page.getByTestId(`user-settings-author-${author1.id}-unfollow`).click();
-
-  await unfollowRequest;
+  await Api.routes.users.unfollowUser.waitForRequest({
+    beforeAction: async () => {
+      await page
+        .getByTestId(`user-settings-author-${author1.id}-unfollow`)
+        .click();
+    },
+  });
 
   await expect(
     page.getByTestId(`user-settings-author-${author1.id}`),
@@ -132,63 +119,57 @@ test('Unfollows an author, removes that author from the list of following', asyn
 
 test('Unfollows a tag, removes that tag from the list of following', async ({
   page,
-  context,
+  Api,
 }) => {
-  await context.route(`**/tags/${tags[0]}/follow`, async (route) => {
-    await route.fulfill({
-      json: {
-        ok: true,
-      },
-    });
+  Api.routes.tags.unfollow.mock({
+    body: {
+      ok: true,
+    },
   });
 
   await page.goto('/user/settings');
 
-  const unfollowRequest = page.waitForRequest(
-    (res) =>
-      res.url().includes(`/tags/${tags[0]}/follow`) &&
-      res.method() === 'DELETE',
-  );
-
-  await page.getByTestId(`user-settings-tag-${tags[0]}-unfollow`).click();
-
-  await unfollowRequest;
+  await Api.routes.tags.unfollow.waitForRequest({
+    beforeAction: async () => {
+      await page.getByTestId(`user-settings-tag-${tags[0]}-unfollow`).click();
+    },
+  });
 
   await expect(page.getByTestId(`user-settings-tag-${tags[0]}`)).toBeHidden();
 });
 
 test("Edits current user's bio with expected request body", async ({
   page,
+  Api,
 }) => {
   await page.goto('/user/settings');
 
-  const editRequest = page.waitForRequest(
-    (res) => res.url().includes('/users/me') && res.method() === 'PUT',
-  );
-
   await page.getByTestId('user-settings-bio-input').fill('New bio');
-  await page.getByTestId('user-settings-bio-submit').click();
 
-  const editResponse = await editRequest;
+  const editResponse = await Api.routes.users.updateUserProfile.waitForRequest({
+    beforeAction: async () => {
+      await page.getByTestId('user-settings-bio-submit').click();
+    },
+  });
 
   expect(editResponse.postDataJSON()).toMatchObject({ bio: 'New bio' });
 });
 
 test("Edits current user's avatar with expected request body", async ({
   page,
+  Api,
 }) => {
   await page.goto('/user/settings');
-
-  const editRequest = page.waitForRequest(
-    (res) => res.url().includes('/users/me') && res.method() === 'PUT',
-  );
 
   await page
     .getByTestId('user-settings-avatar-input')
     .fill('https://placehold.co/128x128');
-  await page.getByTestId('user-settings-avatar-submit').click();
 
-  const editResponse = await editRequest;
+  const editResponse = await Api.routes.users.updateUserProfile.waitForRequest({
+    beforeAction: async () => {
+      await page.getByTestId('user-settings-avatar-submit').click();
+    },
+  });
 
   expect(editResponse.postDataJSON()).toMatchObject({
     avatar: 'https://placehold.co/128x128',
