@@ -16,6 +16,169 @@
     }
   ],
   "paths": {
+    "/auth/current": {
+      "get": {
+        "summary": "Check login state",
+        "description": "Return user auth status",
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthState"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/signin": {
+      "post": {
+        "summary": "Sign in to the application",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "description": "user's credential",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthState"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string",
+                  "example": "JSESSIONID=abcde12345; Path=/; HttpOnly"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid."
+          },
+          "422": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "summary": "Sign up a user",
+        "tags": [
+          "Auth"
+        ],
+        "description": "Sign up a new user and return its cookie token (connect.sid)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "login",
+                  "password",
+                  "confirm",
+                  "email"
+                ],
+                "properties": {
+                  "login": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 10
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 6
+                  },
+                  "confirm": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthState"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string",
+                  "example": "JSESSIONID=abcde12345; Path=/; HttpOnly"
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Log out the current user",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          }
+        }
+      }
+    },
     "/comments": {
       "get": {
         "summary": "Get user's comments or comments in a post",
@@ -940,27 +1103,6 @@
         }
       }
     },
-    "/users/get-auth": {
-      "get": {
-        "summary": "Check login state",
-        "description": "Return user auth status",
-        "tags": [
-          "Users"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthState"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/users/{login}": {
       "get": {
         "tags": [
@@ -1339,152 +1481,39 @@
           }
         }
       }
-    },
-    "/users": {
-      "post": {
-        "summary": "Register a user",
-        "tags": [
-          "Users"
-        ],
-        "description": "Register a new user and return its cookie token (connect.sid)",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "login",
-                  "password",
-                  "confirm",
-                  "email"
-                ],
-                "properties": {
-                  "login": {
-                    "type": "string",
-                    "minLength": 3,
-                    "maxLength": 10
-                  },
-                  "email": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string",
-                    "minLength": 6
-                  },
-                  "confirm": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthState"
-                }
-              }
-            },
-            "headers": {
-              "Set-Cookie": {
-                "schema": {
-                  "type": "string",
-                  "example": "JSESSIONID=abcde12345; Path=/; HttpOnly"
-                }
-              }
-            }
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
-    "/users/auth": {
-      "post": {
-        "summary": "Login to the application",
-        "tags": [
-          "Users"
-        ],
-        "requestBody": {
-          "description": "user's credential",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "email",
-                  "password"
-                ],
-                "properties": {
-                  "email": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthState"
-                }
-              }
-            },
-            "headers": {
-              "Set-Cookie": {
-                "schema": {
-                  "type": "string",
-                  "example": "JSESSIONID=abcde12345; Path=/; HttpOnly"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Authorization information is missing or invalid."
-          },
-          "422": {
-            "description": "Validation error"
-          },
-          "500": {
-            "description": "Server error"
-          }
-        }
-      }
-    },
-    "/users/logout": {
-      "post": {
-        "summary": "Log out the current user",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "tags": [
-          "Users"
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/OK"
-          }
-        }
-      }
     }
   },
   "components": {
     "schemas": {
+      "AuthState": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "isAuth": {
+            "type": "boolean"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "followersAmount": {
+            "type": "number"
+          },
+          "tagsFollowed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "Comment": {
         "type": "object",
         "properties": {
@@ -1752,35 +1781,6 @@
           }
         }
       },
-      "AuthState": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "login": {
-            "type": "string"
-          },
-          "avatar": {
-            "type": "string"
-          },
-          "isAuth": {
-            "type": "boolean"
-          },
-          "rating": {
-            "type": "number"
-          },
-          "followersAmount": {
-            "type": "number"
-          },
-          "tagsFollowed": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
       "Error": {
         "type": "object",
         "properties": {
@@ -1908,6 +1908,10 @@
     }
   },
   "tags": [
+    {
+      "name": "Auth",
+      "description": "Actions related to user authentication"
+    },
     {
       "name": "Comments",
       "description": "Actions with comments"

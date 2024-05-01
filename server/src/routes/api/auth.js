@@ -237,3 +237,5 @@ router.post('/signup', authController.signUp);
 }
 */
 router.post('/logout', auth.required, authController.logout);
+
+module.exports = router;
