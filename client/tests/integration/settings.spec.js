@@ -20,7 +20,7 @@ const authors = [author1, author2];
 const tags = ['tag1', 'tag2', 'tag3'];
 
 test.beforeEach(async ({ Api }) => {
-  Api.routes.users.checkAuthState.mock({
+  Api.routes.auth.getAuth.mock({
     body: testUser,
   });
 
@@ -33,7 +33,7 @@ test.beforeEach(async ({ Api }) => {
 });
 
 test('Only authenticated user can see Settings page', async ({ page, Api }) => {
-  Api.routes.users.checkAuthState.mock({
+  Api.routes.auth.getAuth.mock({
     body: generateAuth({
       isAuth: false,
     }),

@@ -12,7 +12,7 @@ import store from '@/store/index';
 Vue.use(Router);
 
 const authGuard = async (to, from, next) => {
-  await store.dispatch('userCheckAuthState');
+  await store.dispatch('userGetAuthState');
 
   if (store.getters.getUserAuthState) {
     next();

@@ -2,10 +2,10 @@
   <div class="user">
     <template v-if="!getUserAuthState">
       <template v-if="mode == USER_LOGIN_MODE">
-        <UserLogin @close="closeMenu" @mode-change="setMode(USER_REG_MODE)" />
+        <SignInForm @close="closeMenu" @mode-change="setMode(USER_REG_MODE)" />
       </template>
       <template v-else-if="mode == USER_REG_MODE">
-        <UserRegistration
+        <SignUpForm
           @close="closeMenu"
           @mode-change="setMode(USER_LOGIN_MODE)"
         />
@@ -84,8 +84,8 @@
 
 <script>
 import api from '@/api';
-import UserLogin from '@/components/User/UserLogin.vue';
-import UserRegistration from '@/components/User/UserRegistration.vue';
+import SignInForm from '@/components/User/SignInForm.vue';
+import SignUpForm from '@/components/User/SignUpForm.vue';
 import consts from '@/const/const';
 import AddIcon from '@/library/svg/AddIcon.vue';
 import ExitIcon from '@/library/svg/ExitIcon.vue';
@@ -93,8 +93,8 @@ import SettingsIcon from '@/library/svg/SettingsIcon.vue';
 
 export default {
   components: {
-    UserLogin,
-    UserRegistration,
+    SignInForm,
+    SignUpForm,
     AddIcon,
     ExitIcon,
     SettingsIcon,
@@ -120,7 +120,7 @@ export default {
       this.mode = mode;
     },
     async logout() {
-      const res = await api.users.logoutUser();
+      const res = await api.auth.logout();
 
       if (res.data.ok) {
         this.$store.commit('clearUser');

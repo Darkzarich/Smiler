@@ -1,61 +1,62 @@
 <template>
-  <div class="user-registration">
-    <div class="user-registration__header">Registration</div>
+  <div class="user-signup">
+    <div class="user-signup__header">Sign Up</div>
 
-    <div class="user-registration__form-input">
+    <div class="user-signup__form-input">
+      <!-- TODO: Wrap everything in form and catch enter then enter-callback won't be needed -->
       <InputElement
         v-model="email"
         data-testid="user-signup-email"
         label="Email"
         name="email"
         placeholder="Enter email"
-        :enter-callback="register"
+        :enter-callback="signUp"
         :error="validation.email"
       />
     </div>
 
-    <div class="user-registration__form-input">
+    <div class="user-signup__form-input">
       <InputElement
         v-model="login"
         data-testid="user-signup-login"
         label="Login"
         name="login"
         placeholder="Enter login"
-        :enter-callback="register"
+        :enter-callback="signUp"
         :error="validation.login"
       />
     </div>
 
-    <div class="user-registration__form-input">
+    <div class="user-signup__form-input">
       <InputElement
         v-model="password"
         data-testid="user-signup-password"
         label="Password"
         :type="'password'"
-        :enter-callback="register"
+        :enter-callback="signUp"
         name="password"
         :error="validation.password"
         placeholder="Enter password"
       />
     </div>
 
-    <div class="user-registration__form-input">
+    <div class="user-signup__form-input">
       <InputElement
         v-model="confirm"
         data-testid="user-signup-confirm"
         label="Confirm password"
         type="password"
-        :enter-callback="register"
+        :enter-callback="signUp"
         name="confirm"
         :error="validation.confirm"
         placeholder="Enter password again"
       />
     </div>
 
-    <div class="user-registration__submit">
+    <div class="user-signup__submit">
       <ButtonElement
         data-testid="user-signup-submit"
-        :callback="register"
+        :callback="signUp"
         :loading="loading"
         :disabled="isSubmitDisabled"
       >
@@ -65,10 +66,10 @@
 
     <div
       data-testid="user-form-mode-toggler"
-      class="user-registration__mode-toggler"
+      class="user-signup__mode-toggler"
       @click="$emit('mode-change')"
     >
-      OR LOGIN
+      OR SIGN IN
     </div>
   </div>
 </template>
@@ -162,10 +163,10 @@ export default {
     },
   },
   methods: {
-    async register() {
+    async signUp() {
       this.loading = true;
 
-      const res = await api.users.createUser({
+      const res = await api.auth.signUp({
         email: this.email,
         password: this.password,
         login: this.login,
@@ -197,7 +198,7 @@ export default {
 @import '@/styles/mixins';
 @import '@/styles/colors';
 
-.user-registration {
+.user-signup {
   @include flex-col;
 
   align-items: center;

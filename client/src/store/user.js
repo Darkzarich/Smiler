@@ -56,8 +56,8 @@ export default {
     },
   },
   actions: {
-    async userCheckAuthState(context) {
-      const user = await api.users.checkAuthState();
+    async userGetAuthState(context) {
+      const user = await api.auth.getAuth();
 
       if (user && user.data.isAuth) {
         context.commit('setUser', user.data);

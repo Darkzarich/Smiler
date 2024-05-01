@@ -12,7 +12,7 @@ const post = generatePost();
 const comment = generateComment();
 
 test.beforeEach(async ({ Api }) => {
-  Api.routes.users.checkAuthState.mock({
+  Api.routes.auth.getAuth.mock({
     body: generateAuth({
       isAuth: true,
     }),
@@ -119,7 +119,7 @@ test('Posts a new comment to a post', async ({ page, Api }) => {
 });
 
 test('Cannot post comments if not logged in', async ({ page, Api }) => {
-  Api.routes.users.checkAuthState.mock({
+  Api.routes.auth.getAuth.mock({
     body: generateAuth(),
   });
 
@@ -133,7 +133,7 @@ test.describe('Replies', () => {
   const newReplyText = 'new reply';
 
   test.beforeEach(async ({ Api }) => {
-    Api.routes.users.checkAuthState.mock({
+    Api.routes.auth.getAuth.mock({
       body: generateAuth({
         isAuth: true,
       }),
@@ -174,7 +174,7 @@ test.describe('Replies', () => {
   });
 
   test('Cannot reply to a comment if not logged in', async ({ page, Api }) => {
-    Api.routes.users.checkAuthState.mock({
+    Api.routes.auth.getAuth.mock({
       body: generateAuth(),
     });
 

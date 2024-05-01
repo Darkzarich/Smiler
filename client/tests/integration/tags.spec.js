@@ -13,7 +13,7 @@ const post = generatePost({
 const tagToClick = tags[0];
 
 test.beforeEach(async ({ Api }) => {
-  Api.routes.users.checkAuthState.mock({
+  Api.routes.auth.getAuth.mock({
     body: generateAuth({
       isAuth: true,
     }),
@@ -67,7 +67,7 @@ test('Follows a tag', async ({ page, Api }) => {
 });
 
 test('Unfollows a tag', async ({ page, Api }) => {
-  Api.routes.users.checkAuthState.mock({
+  Api.routes.auth.getAuth.mock({
     body: generateAuth({
       isAuth: true,
       tagsFollowed: [tagToClick],
@@ -100,7 +100,7 @@ test('Cannot follow or unfollow a tag if not logged in', async ({
   page,
   Api,
 }) => {
-  Api.routes.users.checkAuthState.mock({
+  Api.routes.auth.getAuth.mock({
     body: generateAuth(),
   });
 

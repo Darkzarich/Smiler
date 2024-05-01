@@ -39,7 +39,7 @@ export default {
     };
   },
   beforeCreate() {
-    this.$store.dispatch('userCheckAuthState').then(() => {
+    this.$store.dispatch('userGetAuthState').then(() => {
       this.show = true;
     });
   },

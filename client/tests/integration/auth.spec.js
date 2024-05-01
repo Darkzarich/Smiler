@@ -6,7 +6,7 @@ import generateAuth from './factory/auth';
 import test from './page-objects';
 
 test.beforeEach(async ({ Api }) => {
-  Api.routes.users.checkAuthState.mock({
+  Api.routes.auth.getAuth.mock({
     body: generateAuth(),
   });
 
@@ -24,7 +24,7 @@ test.describe('Auth state', () => {
     page,
     isMobile,
   }) => {
-    await Api.routes.users.checkAuthState.waitForRequest({
+    await Api.routes.auth.getAuth.waitForRequest({
       beforeAction: async () => {
         await page.goto('/');
       },
@@ -42,7 +42,7 @@ test.describe('Auth state', () => {
       isAuth: true,
     });
 
-    Api.routes.users.checkAuthState.mock({
+    Api.routes.auth.getAuth.mock({
       body: auth,
     });
 
@@ -67,13 +67,13 @@ test.describe('Auth state', () => {
     page,
     isMobile,
   }) => {
-    Api.routes.users.checkAuthState.mock({
+    Api.routes.auth.getAuth.mock({
       body: generateAuth({
         isAuth: true,
       }),
     });
 
-    Api.routes.users.logoutUser.mock({
+    Api.routes.auth.logout.mock({
       body: {
         ok: true,
       },
@@ -85,7 +85,7 @@ test.describe('Auth state', () => {
       await page.getByTestId('mobile-menu').click();
     }
 
-    await Api.routes.users.logoutUser.waitForRequest({
+    await Api.routes.auth.logout.waitForRequest({
       beforeAction: async () => {
         await page.getByTestId('logout-btn').click();
       },
@@ -119,7 +119,7 @@ test.describe('Sign In and Sign Up requests', () => {
     await page.getByTestId('user-signin-email').fill(formData.email);
     await page.getByTestId('user-signin-password').fill(formData.password);
 
-    const authResponse = await Api.routes.users.authUser.waitForRequest({
+    const authResponse = await Api.routes.auth.signIn.waitForRequest({
       beforeAction: async () => {
         await page.getByTestId('user-signin-submit').click();
       },
@@ -152,7 +152,7 @@ test.describe('Sign In and Sign Up requests', () => {
     await page.getByTestId('user-signup-password').fill(formData.password);
     await page.getByTestId('user-signup-confirm').fill(formData.password);
 
-    const createUserResponse = await Api.routes.users.createUser.waitForRequest(
+    const createUserResponse = await Api.routes.auth.signUp.waitForRequest(
       {
         beforeAction: async () => {
           await page.getByTestId('user-signup-submit').click();

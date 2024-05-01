@@ -1,33 +1,35 @@
 <template>
-  <div class="user-login">
-    <div class="user-login__header" data-testid="user-signin-form">Login</div>
-    <div class="user-login__form-input">
+  <div class="user-signin">
+    <div class="user-signin__header" data-testid="user-signin-form">
+      Sign In
+    </div>
+    <div class="user-signin__form-input">
       <InputElement
         v-model="email"
         data-testid="user-signin-email"
         label="Email"
         name="email"
         placeholder="Enter email"
-        :enter-callback="login"
+        :enter-callback="signIn"
         :error="validation.email"
       />
     </div>
-    <div class="user-login__form-input">
+    <div class="user-signin__form-input">
       <InputElement
         v-model="password"
         data-testid="user-signin-password"
         label="Password"
         type="password"
         name="password"
-        :enter-callback="login"
+        :enter-callback="signIn"
         :error="validation.password"
         placeholder="Enter password"
       />
     </div>
-    <div class="user-login__submit">
+    <div class="user-signin__submit">
       <ButtonElement
         data-testid="user-signin-submit"
-        :callback="login"
+        :callback="signIn"
         :loading="loading"
         :disabled="isSubmitDisabled"
       >
@@ -36,10 +38,10 @@
     </div>
     <div
       data-testid="user-form-mode-toggler"
-      class="user-login__mode-toggler"
+      class="user-signin__mode-toggler"
       @click="$emit('mode-change')"
     >
-      OR REGISTRATION
+      OR SIGN UP
     </div>
   </div>
 </template>
@@ -101,10 +103,10 @@ export default {
     },
   },
   methods: {
-    async login() {
+    async signIn() {
       this.loading = true;
 
-      const res = await api.users.authUser({
+      const res = await api.auth.signIn({
         email: this.email,
         password: this.password,
       });
@@ -132,7 +134,7 @@ export default {
 @import '@/styles/mixins';
 @import '@/styles/colors';
 
-.user-login {
+.user-signin {
   @include flex-col;
 
   align-items: center;

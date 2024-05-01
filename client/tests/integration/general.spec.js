@@ -6,7 +6,7 @@ import generateAuth from './factory/auth';
 import test from './page-objects';
 
 test.beforeEach(async ({ Api }) => {
-  Api.routes.users.checkAuthState.mock({
+  Api.routes.auth.getAuth.mock({
     body: generateAuth(),
   });
 });

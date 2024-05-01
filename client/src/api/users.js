@@ -9,12 +9,6 @@ export default {
       method: 'get',
     });
   },
-  checkAuthState() {
-    return Query({
-      url: `${CONTROLLER_URL}/get-auth`,
-      method: 'get',
-    });
-  },
   updateUserProfile(data) {
     return Query({
       url: `${CONTROLLER_URL}/me`,
@@ -39,26 +33,6 @@ export default {
       url: `${CONTROLLER_URL}/${login}/template`,
       method: 'put',
       data,
-    });
-  },
-  createUser(data) {
-    return Query({
-      url: CONTROLLER_URL,
-      method: 'post',
-      data,
-    });
-  },
-  authUser(data) {
-    return Query({
-      url: `${CONTROLLER_URL}/auth`,
-      method: 'post',
-      data,
-    });
-  },
-  logoutUser() {
-    return Query({
-      url: `${CONTROLLER_URL}/logout`,
-      method: 'post',
     });
   },
   followUser(id) {
