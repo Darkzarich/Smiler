@@ -20,9 +20,6 @@ test.beforeEach(async ({ Api }) => {
 
   Api.routes.posts.getPostBySlug.mock({
     body: post,
-    params: {
-      slug: post.slug,
-    },
   });
 
   Api.routes.comments.getComments.mock({
@@ -215,15 +212,9 @@ test.describe('Votes', () => {
   test.beforeEach(async ({ Api }) => {
     Api.routes.comments.updateRate.mock({
       status: 200,
-      params: {
-        id: comment.id,
-      },
     });
     Api.routes.comments.removeRate.mock({
       status: 200,
-      params: {
-        id: comment.id,
-      },
     });
   });
 
@@ -241,9 +232,6 @@ test.describe('Votes', () => {
     const upvoteResponse = await Api.routes.comments.updateRate.waitForRequest({
       beforeAction: async () => {
         await page.getByTestId(dataTestIds.upvote).click();
-      },
-      params: {
-        id: comment.id,
       },
     });
 
@@ -264,9 +252,6 @@ test.describe('Votes', () => {
       await Api.routes.comments.updateRate.waitForRequest({
         beforeAction: async () => {
           await page.getByTestId(dataTestIds.downvote).click();
-        },
-        params: {
-          id: comment.id,
         },
       });
 
@@ -306,9 +291,6 @@ test.describe('Votes', () => {
       beforeAction: async () => {
         await page.getByTestId(dataTestIds.downvote).click();
       },
-      params: {
-        id: comment.id,
-      },
     });
 
     await expect(page.getByTestId(dataTestIds.upvote)).not.toHaveClass(
@@ -343,9 +325,6 @@ test.describe('Votes', () => {
     await Api.routes.comments.removeRate.waitForRequest({
       beforeAction: async () => {
         await page.getByTestId(dataTestIds.upvote).click();
-      },
-      params: {
-        id: comment.id,
       },
     });
 
@@ -405,9 +384,6 @@ test.describe('Editing or deleting a comment', () => {
 
     Api.routes.comments.deleteComment.mock({
       status: 200,
-      params: {
-        id: noChildrenComment.id,
-      },
     });
 
     const dateToMock = new Date(comment.createdAt).toISOString();
@@ -419,9 +395,6 @@ test.describe('Editing or deleting a comment', () => {
     await Api.routes.comments.deleteComment.waitForRequest({
       beforeAction: async () => {
         await page.getByTestId(`comment-${comment.id}-delete`).click();
-      },
-      params: {
-        id: noChildrenComment.id,
       },
     });
 
@@ -437,9 +410,6 @@ test.describe('Editing or deleting a comment', () => {
 
     Api.routes.comments.updateComment.mock({
       status: 200,
-      params: {
-        id: comment.id,
-      },
     });
 
     const dateToMock = new Date(comment.createdAt).toISOString();
@@ -456,9 +426,6 @@ test.describe('Editing or deleting a comment', () => {
         beforeAction: async () => {
           await page.getByTestId('comment-edit-btn').click();
         },
-        params: {
-          id: comment.id,
-        },
       });
 
     expect(editCommentResponse.postDataJSON()).toEqual({
@@ -474,9 +441,6 @@ test.describe('Editing or deleting a comment', () => {
       status: 200,
       body: {
         success: true,
-      },
-      params: {
-        id: comment.id,
       },
     });
 

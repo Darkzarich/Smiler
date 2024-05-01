@@ -21,9 +21,6 @@ test.beforeEach(async ({ Api }) => {
 
   Api.routes.posts.getPostBySlug.mock({
     body: post,
-    params: {
-      slug: post.slug,
-    },
   });
 
   Api.routes.comments.getComments.mock({
@@ -37,18 +34,11 @@ test.beforeEach(async ({ Api }) => {
     body: {
       ok: true,
     },
-    params: {
-      tag: tagToClick,
-    },
   });
 
   Api.routes.tags.unfollow.mock({
     body: {
       ok: true,
-    },
-    // TODO remove params requirement
-    params: {
-      tag: tagToClick,
     },
   });
 });
@@ -64,9 +54,6 @@ test('Follows a tag', async ({ page, Api }) => {
         .getByTestId('context-menu')
         .filter({ has: page.getByText('Follow tag') })
         .click();
-    },
-    params: {
-      tag: tagToClick,
     },
   });
 
@@ -97,9 +84,6 @@ test('Unfollows a tag', async ({ page, Api }) => {
         .getByTestId('context-menu')
         .filter({ has: page.getByText('Unfollow tag') })
         .click();
-    },
-    params: {
-      tag: tagToClick,
     },
   });
 

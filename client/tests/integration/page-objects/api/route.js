@@ -1,7 +1,5 @@
 // @ts-check
 
-import { template } from 'lodash';
-
 export default class Route {
   /**
    *
@@ -27,41 +25,50 @@ export default class Route {
     this.page = page;
   }
 
-  processTemplate(params = {}) {
-    const compile = template(this.url);
+  /**
+   * Replaces all * to prepare URL for regexp to catch request with any URL param
+   */
+  getPreparedUrl() {
+    return this.url.replace(/\*/g, '[-a-zA-Z0-9_.~]+');
+  }
 
-    return compile(params);
+  /**
+   * Returns a RegExp that will match set url with any query params
+   * @example
+   * const route = new Route('/post/*', 'DELETE');
+   * const regexp = route.getURLRegexp();
+   *
+   * regexp.test('/post/1?foo=bar') // true
+   * regexp.test('/post/1') // true
+   * regexp.test('/post/something') // true
+   * regexp.test('/post/something/test') // false
+   */
+  getURLRegExp() {
+    return new RegExp(`${this.getPreparedUrl()}(\\?.*)?$`, 'm');
   }
 
   /**
    * @param {Object} [options]
    * @param {Object} [options.body]
    * @param {Number} [options.status]
-   * @param {Object} [options.params] - Params to pass in the url template
    */
-  async mock({ body = undefined, status = 200, params } = {}) {
+  async mock({ body = undefined, status = 200 } = {}) {
     if (!this.context) {
       throw new Error('Context is not set');
     }
 
-    const url = params ? this.processTemplate(params) : this.url;
+    await this.context.route(this.getURLRegExp(), async (route) => {
+      if (route.request().method() === this.method) {
+        route.fulfill({
+          json: body,
+          status,
+        });
 
-    await this.context.route(
-      // Matches any query param if present
-      new RegExp(`${url}(\\?{1}.*)?$`, 'm'),
-      async (route) => {
-        if (route.request().method() === this.method) {
-          route.fulfill({
-            json: body,
-            status,
-          });
+        return;
+      }
 
-          return;
-        }
-
-        route.fallback();
-      },
-    );
+      route.fallback();
+    });
   }
 
   /**
@@ -70,16 +77,11 @@ export default class Route {
    * @param {Object} [options]
    * @param {Function} [options.beforeAction] - An optional function to be executed
    * before waiting for the request.
-   * @param {Object} [options.params] - Params to pass in the url template
    */
-  async waitForRequest({ beforeAction = () => undefined, params } = {}) {
-    const url = params ? this.processTemplate(params) : this.url;
-
+  async waitForRequest({ beforeAction = () => undefined } = {}) {
     const request = this.page.waitForRequest(
       (res) =>
-        // Matches any query param if present
-        new RegExp(`${url}(\\?{1}.*)?$`, 'm').test(res.url()) &&
-        res.method() === this.method,
+        this.getURLRegExp().test(res.url()) && res.method() === this.method,
     );
 
     await beforeAction();
