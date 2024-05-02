@@ -1,71 +1,66 @@
 /* eslint-disable no-await-in-loop */
 // @ts-check
 
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import generateAuth from './factory/auth';
 import generateComment from './factory/comment';
 import generatePost from './factory/post';
 import generateProfile from './factory/profile';
+import test from './page-objects';
 import mockDate from './utils/mock-date';
 
 const post = generatePost();
 
-test.beforeEach(async ({ context }) => {
-  await context.route('*/**/users/get-auth', async (route) => {
-    await route.fulfill({
-      json: generateAuth(),
-    });
+test.beforeEach(async ({ Api }) => {
+  Api.routes.auth.getAuth.mock({
+    body: generateAuth(),
   });
 
-  await context.route(`*/**/posts/${post.slug}`, async (route) => {
-    await route.fulfill({
-      json: post,
-    });
+  Api.routes.posts.getPostBySlug.mock({
+    body: post,
   });
 
-  await context.route('*/**/posts*', async (route) => {
-    await route.fulfill({
-      json: {
-        pages: 0,
-        posts: [post],
-      },
-    });
+  Api.routes.posts.getPosts.mock({
+    body: {
+      pages: 0,
+      posts: [post],
+    },
   });
 
-  await context.route('*/**/comments*', async (route) => {
-    await route.fulfill({
-      json: {
-        pages: 0,
-        comments: [generateComment()],
-      },
-    });
+  Api.routes.comments.getComments.mock({
+    body: {
+      pages: 0,
+      comments: [generateComment()],
+    },
   });
 });
 
-test.describe('Fetches the post by the slug of the post', () => {
+test.describe('Fetches a post by the slug of the post after clicking it in the list of posts', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
   });
 
-  test('Mobile', async ({ page, isMobile }) => {
+  test('Mobile', async ({ page, isMobile, Api }) => {
     // eslint-disable-next-line playwright/no-conditional-in-test
     if (!isMobile) {
       return;
     }
 
-    const postBySlugRequest = page.waitForRequest(`*/**/posts/${post.slug}`);
+    const postBySlugResponse =
+      await Api.routes.posts.getPostBySlug.waitForRequest({
+        beforeAction: async () => {
+          await page.getByTestId(`post-${post.id}-title`).click();
+        },
+      });
 
-    await page.getByTestId(`post-${post.id}-title`).click();
-
-    await postBySlugRequest;
-
+    expect(postBySlugResponse.url()).toContain(post.slug);
     await expect(page).toHaveURL(`/post/${post.slug}`);
     await expect(page).toHaveTitle(`${post.title} | Smiler`);
     await expect(page.getByTestId(`post-${post.id}-title`)).toHaveText(
       post.title,
     );
   });
-  test('Desktop', async ({ context, page, isMobile }) => {
+  test('Desktop', async ({ context, Api, page, isMobile }) => {
     // eslint-disable-next-line playwright/no-conditional-in-test
     if (isMobile) {
       return;
@@ -76,10 +71,12 @@ test.describe('Fetches the post by the slug of the post', () => {
       page.getByTestId(`post-${post.id}-title`).click(),
     ]);
 
-    const postBySlugRequest = newPage.waitForRequest(`*/**/posts/${post.slug}`);
+    const postBySlugResponse =
+      await Api.routes.posts.getPostBySlug.waitForRequest({
+        page: newPage,
+      });
 
-    await postBySlugRequest;
-
+    expect(postBySlugResponse.url()).toContain(post.slug);
     await expect(newPage).toHaveURL(`/post/${post.slug}`);
     await expect(newPage).toHaveTitle(`${post.title} | Smiler`);
     await expect(newPage.getByTestId(`post-${post.id}-title`)).toHaveText(
@@ -88,28 +85,28 @@ test.describe('Fetches the post by the slug of the post', () => {
   });
 });
 
-test('Opens the post from the list of posts', async ({ page }) => {
-  const postBySlugRequest = page.waitForRequest(`*/**/posts/${post.slug}`);
+test('Opens a post by its link', async ({ page, Api }) => {
+  const postBySlugResponse =
+    await Api.routes.posts.getPostBySlug.waitForRequest({
+      beforeAction: async () => {
+        await page.goto(`/post/${post.slug}`);
+      },
+    });
 
-  await page.goto(`/post/${post.slug}`);
-
-  await postBySlugRequest;
-
+  expect(postBySlugResponse.url()).toContain(post.slug);
   await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
     post.title,
   );
 });
 
-test('Redirect to 404 if the post is not found', async ({ page, context }) => {
-  await context.route(`*/**/posts/${post.slug}`, async (route) => {
-    await route.fulfill({
-      status: 404,
-      json: {
-        error: {
-          message: 'Post does not exist',
-        },
+test('Redirect to 404 if the post is not found', async ({ page, Api }) => {
+  Api.routes.posts.getPostBySlug.mock({
+    status: 404,
+    body: {
+      error: {
+        message: 'Post does not exist',
       },
-    });
+    },
   });
 
   await page.goto(`/post/${post.slug}`);
@@ -121,108 +118,117 @@ test('Redirect to 404 if the post is not found', async ({ page, context }) => {
   );
 });
 
-test('Fetches post comments by post id', async ({ page }) => {
-  const commentsRequest = page.waitForRequest('*/**/comments*');
+test('Fetches post comments by post id', async ({ page, Api }) => {
+  const commentsResponse = await Api.routes.comments.getComments.waitForRequest(
+    {
+      beforeAction: async () => {
+        await page.goto(`/post/${post.slug}`);
+      },
+    },
+  );
 
-  await page.goto(`/post/${post.slug}`);
+  const requestUrl = commentsResponse.url();
 
-  const commentsResponse = await commentsRequest;
-
-  expect(commentsResponse.url()).toContain(`limit=10&post=${post.id}`);
+  expect(requestUrl).toContain(post.id);
+  expect(requestUrl).toContain(`limit=10&post=${post.id}`);
 });
 
 test('Opens user profile after clicking on the author of the post', async ({
   page,
-  context,
+  Api,
 }) => {
-  await context.route(`**/users/${post.author.login}`, async (route) => {
-    await route.fulfill({
-      json: generateProfile(),
-    });
+  Api.routes.users.getUserProfile.mock({
+    body: generateProfile(),
   });
 
   await page.goto(`/post/${post.slug}`);
 
-  await page.getByTestId(`post-${post.id}-author`).click();
+  const getUserProfileResponse =
+    await Api.routes.users.getUserProfile.waitForRequest({
+      beforeAction: async () => {
+        await page.getByTestId(`post-${post.id}-author`).click();
+      },
+    });
 
+  expect(getUserProfileResponse.url()).toContain(post.author.login);
   await expect(page).toHaveURL(`/user/@${post.author.login}`);
   await expect(page).toHaveTitle(`${post.author.login} | Smiler`);
 });
 
 test.describe('Sections', () => {
-  async function mockPostSection(context, section) {
-    const postWithSections = {
-      id: '1',
-      sections: Array.isArray(section) ? section : [section],
-    };
-
-    await context.route(`*/**/posts/${post.slug}`, async (route) => {
-      await route.fulfill({
-        json: generatePost(postWithSections),
-      });
-    });
-
-    return post;
-  }
-
-  test('Shows text section', async ({ context, page }) => {
+  test('Shows text section', async ({ Api, page }) => {
     const section = {
       hash: '1',
       type: 'text',
       content: 'test',
     };
 
-    const mockedPost = await mockPostSection(context, section);
+    const postWithSections = generatePost({
+      sections: [section],
+    });
 
-    await page.goto(`/post/${mockedPost.slug}`);
+    Api.routes.posts.getPostBySlug.mock({
+      body: postWithSections,
+    });
+
+    await page.goto(`/post/${postWithSections.slug}`);
 
     await expect(
-      page.getByTestId(`post-${mockedPost.id}-text-${section.hash}`),
+      page.getByTestId(`post-${postWithSections.id}-text-${section.hash}`),
     ).toContainText(section.content);
   });
 
-  test('Shows pic section', async ({ context, page }) => {
+  test('Shows pic section', async ({ Api, page }) => {
     const section = {
       hash: '2',
       type: 'pic',
       url: 'test',
     };
 
-    const mockedPost = await mockPostSection(context, section);
+    const postWithSections = generatePost({
+      sections: [section],
+    });
 
-    await page.goto(`/post/${mockedPost.slug}`);
+    Api.routes.posts.getPostBySlug.mock({
+      body: postWithSections,
+    });
+
+    await page.goto(`/post/${postWithSections.slug}`);
 
     await expect(
-      page.getByTestId(`post-${mockedPost.id}-pic-${section.hash}`),
+      page.getByTestId(`post-${postWithSections.id}-pic-${section.hash}`),
     ).toBeVisible();
     await expect(
-      page.getByTestId(`post-${mockedPost.id}-pic-${section.hash}`),
+      page.getByTestId(`post-${postWithSections.id}-pic-${section.hash}`),
     ).toHaveAttribute('alt', section.url);
   });
 
-  test('Shows video section', async ({ context, page }) => {
+  test('Shows video section', async ({ Api, page }) => {
     const section = {
       hash: '3',
       type: 'vid',
       url: 'test',
     };
 
-    const mockedPost = await mockPostSection(context, section);
+    const postWithSections = generatePost({
+      sections: [section],
+    });
 
-    await page.goto(`/post/${mockedPost.slug}`);
+    Api.routes.posts.getPostBySlug.mock({
+      body: postWithSections,
+    });
+
+    await page.goto(`/post/${postWithSections.slug}`);
 
     await expect(
-      page.getByTestId(`post-${mockedPost.id}-vid-${section.hash}`),
+      page.getByTestId(`post-${postWithSections.id}-vid-${section.hash}`),
     ).toBeVisible();
     await expect(
-      page.getByTestId(`post-${mockedPost.id}-vid-${section.hash}`),
+      page.getByTestId(`post-${postWithSections.id}-vid-${section.hash}`),
     ).toHaveAttribute('src', section.url);
   });
 
-  test('Shows multiple sections at the same time', async ({
-    context,
-    page,
-  }) => {
+  test('Shows multiple sections at the same time', async ({ Api, page }) => {
     const sections = [
       {
         hash: '1',
@@ -241,55 +247,58 @@ test.describe('Sections', () => {
       },
     ];
 
-    const mockedPost = await mockPostSection(context, sections);
+    const postWithSections = generatePost({
+      sections,
+    });
 
-    await page.goto(`/post/${mockedPost.slug}`);
+    Api.routes.posts.getPostBySlug.mock({
+      body: postWithSections,
+    });
+
+    await page.goto(`/post/${postWithSections.slug}`);
 
     await expect(
-      page.getByTestId(`post-${mockedPost.id}-pic-${sections[0].hash}`),
+      page.getByTestId(`post-${postWithSections.id}-pic-${sections[0].hash}`),
     ).toBeVisible();
     await expect(
-      page.getByTestId(`post-${mockedPost.id}-pic-${sections[0].hash}`),
+      page.getByTestId(`post-${postWithSections.id}-pic-${sections[0].hash}`),
     ).toHaveAttribute('alt', sections[0].url);
     await expect(
-      page.getByTestId(`post-${mockedPost.id}-text-${sections[1].hash}`),
+      page.getByTestId(`post-${postWithSections.id}-text-${sections[1].hash}`),
     ).toContainText(sections[1].content);
     await expect(
-      page.getByTestId(`post-${mockedPost.id}-vid-${sections[2].hash}`),
+      page.getByTestId(`post-${postWithSections.id}-vid-${sections[2].hash}`),
     ).toBeVisible();
     await expect(
-      page.getByTestId(`post-${mockedPost.id}-vid-${sections[2].hash}`),
+      page.getByTestId(`post-${postWithSections.id}-vid-${sections[2].hash}`),
     ).toHaveAttribute('src', sections[2].url);
   });
 });
 
 test.describe('Post edit', () => {
-  test.beforeEach(async ({ context }) => {
-    await context.route('*/**/users/get-auth', async (route) => {
-      await route.fulfill({
-        json: generateAuth({
-          isAuth: true,
-        }),
-      });
+  test.beforeEach(async ({ Api }) => {
+    Api.routes.auth.getAuth.mock({
+      body: generateAuth({
+        isAuth: true,
+      }),
     });
   });
 
   test('Cannot edit or delete a post if the post is older than 10 mins', async ({
     page,
     context,
+    Api,
   }) => {
     const dateToMock = '2024-03-06T00:00:00.000Z';
 
-    mockDate(context, dateToMock);
+    await mockDate(context, dateToMock);
 
-    await context.route(`*/**/posts/${post.slug}`, async (route) => {
-      await route.fulfill({
-        json: generatePost({
-          createdAt: new Date(
-            new Date(dateToMock).getTime() - 1000 * 60 * 11, // 11 mins
-          ).toISOString(),
-        }),
-      });
+    Api.routes.posts.getPostBySlug.mock({
+      body: generatePost({
+        createdAt: new Date(
+          new Date(dateToMock).getTime() - 1000 * 60 * 11, // 11 mins
+        ).toISOString(),
+      }),
     });
 
     await page.goto(`/post/${post.slug}`);
@@ -301,19 +310,18 @@ test.describe('Post edit', () => {
   test('Cannot open edit page for a post if the post is older than 10 mins', async ({
     page,
     context,
+    Api,
   }) => {
     const dateToMock = '2024-03-06T00:00:00.000Z';
 
-    mockDate(context, dateToMock);
+    await mockDate(context, dateToMock);
 
-    await context.route(`*/**/posts/${post.slug}`, async (route) => {
-      await route.fulfill({
-        json: generatePost({
-          createdAt: new Date(
-            new Date(dateToMock).getTime() - 1000 * 60 * 11, // 11 mins
-          ).toISOString(),
-        }),
-      });
+    Api.routes.posts.getPostBySlug.mock({
+      body: generatePost({
+        createdAt: new Date(
+          new Date(dateToMock).getTime() - 1000 * 60 * 11, // 11 mins
+        ).toISOString(),
+      }),
     });
 
     await page.goto(`/post/${post.slug}/edit`);
@@ -328,23 +336,22 @@ test.describe('Post edit', () => {
   test('Cannot open edit page for a post if the post author is not the logged in user', async ({
     page,
     context,
+    Api,
   }) => {
     const dateToMock = '2024-03-06T00:00:00.000Z';
 
-    mockDate(context, dateToMock);
+    await mockDate(context, dateToMock);
 
-    await context.route(`*/**/posts/${post.slug}`, async (route) => {
-      await route.fulfill({
-        json: generatePost({
-          createdAt: new Date(
-            new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
-          ).toISOString(),
-          author: {
-            id: '2',
-            login: 'EditTester',
-          },
-        }),
-      });
+    Api.routes.posts.getPostBySlug.mock({
+      body: generatePost({
+        createdAt: new Date(
+          new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
+        ).toISOString(),
+        author: {
+          id: '2',
+          login: 'EditTester',
+        },
+      }),
     });
 
     await page.goto(`/post/${post.slug}/edit`);
@@ -359,19 +366,18 @@ test.describe('Post edit', () => {
   test('Opens edit a post page if the post is not older than 10 mins', async ({
     page,
     context,
+    Api,
   }) => {
     const dateToMock = '2024-03-06T00:00:00.000Z';
 
-    mockDate(context, dateToMock);
+    await mockDate(context, dateToMock);
 
-    await context.route(`*/**/posts/${post.slug}`, async (route) => {
-      await route.fulfill({
-        json: generatePost({
-          createdAt: new Date(
-            new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
-          ).toISOString(),
-        }),
-      });
+    Api.routes.posts.getPostBySlug.mock({
+      body: generatePost({
+        createdAt: new Date(
+          new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
+        ).toISOString(),
+      }),
     });
 
     await page.goto(`/post/${post.slug}`);
@@ -388,19 +394,18 @@ test.describe('Post edit', () => {
   test('Open edit a post page, edit the post and save', async ({
     page,
     context,
+    Api,
   }) => {
     const dateToMock = '2024-03-06T00:00:00.000Z';
 
-    mockDate(context, dateToMock);
+    await mockDate(context, dateToMock);
 
-    await context.route(`*/**/posts/${post.slug}`, async (route) => {
-      await route.fulfill({
-        json: generatePost({
-          createdAt: new Date(
-            new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
-          ).toISOString(),
-        }),
-      });
+    Api.routes.posts.getPostBySlug.mock({
+      body: generatePost({
+        createdAt: new Date(
+          new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
+        ).toISOString(),
+      }),
     });
 
     await page.goto(`/post/${post.slug}/edit`);
@@ -408,15 +413,14 @@ test.describe('Post edit', () => {
     await page.getByTestId('text-section-input').focus();
     await page.keyboard.type('edited');
 
-    const editPostRequest = page.waitForRequest(
-      (res) =>
-        res.url().includes(`/posts/${post.id}`) && res.method() === 'PUT',
-    );
+    const editPostResponse =
+      await Api.routes.posts.updatePostById.waitForRequest({
+        beforeAction: async () => {
+          await page.getByTestId('finish-edit-post-button').click();
+        },
+      });
 
-    await page.getByTestId('finish-edit-post-button').click();
-
-    const editPostResponse = await editPostRequest;
-
+    expect(editPostResponse.url()).toContain(post.id);
     expect(editPostResponse.postDataJSON()).toMatchObject({
       sections: [
         {
@@ -427,38 +431,37 @@ test.describe('Post edit', () => {
     });
   });
 
-  test('Deletes a post, sends delete request', async ({ page, context }) => {
-    await context.route(`*/**/posts/${post.id}`, async (route) => {
-      await route.fulfill({
-        status: 200,
-      });
+  test('Deletes a post, sends delete request', async ({
+    page,
+    context,
+    Api,
+  }) => {
+    Api.routes.posts.deletePostById.mock({
+      status: 200,
     });
 
     const dateToMock = '2024-03-06T00:00:00.000Z';
 
-    mockDate(context, dateToMock);
+    await mockDate(context, dateToMock);
 
-    await context.route(`*/**/posts/${post.slug}`, async (route) => {
-      await route.fulfill({
-        json: generatePost({
-          createdAt: new Date(
-            new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
-          ).toISOString(),
-        }),
-      });
+    Api.routes.posts.getPostBySlug.mock({
+      body: generatePost({
+        createdAt: new Date(
+          new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
+        ).toISOString(),
+      }),
     });
 
     await page.goto(`/post/${post.slug}`);
 
-    const deletePostRequest = page.waitForRequest(
-      (res) =>
-        res.url().includes(`/posts/${post.id}`) && res.method() === 'DELETE',
-    );
+    const deletePostByIdResponse =
+      await Api.routes.posts.deletePostById.waitForRequest({
+        beforeAction: async () => {
+          await page.getByTestId('post-delete-icon').click();
+        },
+      });
 
-    await page.getByTestId('post-delete-icon').click();
-
-    await deletePostRequest;
-
+    expect(deletePostByIdResponse.url()).toContain(post.id);
     await expect(page).toHaveURL('/');
     await expect(page).toHaveTitle('Home | Smiler');
   });

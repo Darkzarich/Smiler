@@ -77,9 +77,14 @@ export default class Route {
    * @param {Object} [options]
    * @param {Function} [options.beforeAction] - An optional function to be executed
    * before waiting for the request.
+   * @param {import('@playwright/test').Page} [options.page] - Some tests open another tab and then
+   * the context set in the init will not work. This option allows to provide a page
+   * instead of this.page
    */
-  async waitForRequest({ beforeAction = () => undefined } = {}) {
-    const request = this.page.waitForRequest(
+  async waitForRequest({ beforeAction = () => undefined, page } = {}) {
+    const currentPage = page || this.page;
+
+    const request = currentPage.waitForRequest(
       (res) =>
         this.getURLRegExp().test(res.url()) && res.method() === this.method,
     );

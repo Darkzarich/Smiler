@@ -2,7 +2,7 @@
 
 // TODO: Replace with lodash-es when moving to TypeScript
 import cloneDeep from 'lodash/cloneDeep';
-import defaultsDeep from 'lodash/defaultsDeep';
+import defaults from 'lodash/defaults';
 
 const post = {
   title: 'Test post',
@@ -29,6 +29,8 @@ const post = {
   },
 };
 
+// TODO: Maybe use Builder pattern?
+
 /**
  * Generates a new post object with optional overrides.
  *
@@ -37,7 +39,7 @@ const post = {
  * @return {object} The newly generated post object.
  */
 export default function generatePost(overrides = {}) {
-  const newPost = defaultsDeep(overrides, cloneDeep(post));
+  const newPost = defaults(overrides, cloneDeep(post));
 
   return newPost;
 }
