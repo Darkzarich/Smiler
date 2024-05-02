@@ -1,61 +1,45 @@
+/* eslint-disable playwright/no-conditional-in-test */
 /* eslint-disable no-await-in-loop */
+
 // @ts-check
 
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import generateAuth from './factory/auth';
 import generatePost from './factory/post';
+import test from './page-objects';
 
 const authUser = generateAuth({
   isAuth: true,
 });
+
 const title = 'Test post';
 const picUrl = 'https://placehold.co/600x400';
 const vidCode = 'dQw4w9WgXcQ';
 
-async function mockPostsRoute(context) {
-  await context.route('*/**/api/posts', async (route, request) => {
-    if (request.method() === 'POST') {
-      await route.fulfill({
-        json: generatePost(),
-      });
+const createdPost = generatePost();
 
-      return;
-    }
-
-    await route.continue();
-  });
-}
-
-test.beforeEach(async ({ context }) => {
-  await context.route('*/**/users/get-auth', async (route) => {
-    await route.fulfill({
-      json: authUser,
-    });
+test.beforeEach(async ({ Api }) => {
+  Api.routes.posts.createPost.mock({
+    body: createdPost,
   });
 
-  await context.route(
-    `*/**/api/users/${authUser.login}/template`,
-    async (route) => {
-      await route.fulfill({
-        json: { title: '', sections: [], tags: [] },
-      });
-    },
-  );
+  Api.routes.posts.getPostBySlug.mock({
+    body: createdPost,
+  });
+
+  Api.routes.auth.getAuth.mock({
+    body: authUser,
+  });
+
+  Api.routes.users.getUserTemplate.mock({
+    body: { title: '', sections: [], tags: [] },
+  });
 });
 
-test('Goes to create post page from user menu', async ({
+test('Goes to post create page from the user menu', async ({
   page,
-  context,
   isMobile,
 }) => {
-  await context.route('*/**/users/get-auth', async (route) => {
-    await route.fulfill({
-      json: generateAuth({
-        isAuth: true,
-      }),
-    });
-  });
-
   await page.goto('/');
 
   if (isMobile) {
@@ -68,12 +52,7 @@ test('Goes to create post page from user menu', async ({
   await expect(page.getByTestId('post-create-header')).toBeVisible();
 });
 
-test('Creates a post with title, tags and content', async ({
-  page,
-  context,
-}) => {
-  await mockPostsRoute(context);
-
+test('Creates a post with title, tags and content', async ({ page, Api }) => {
   const tags = ['test tag', 'test tag 2'];
 
   await page.goto('/post/create');
@@ -100,14 +79,17 @@ test('Creates a post with title, tags and content', async ({
     .fill(`https://www.youtube.com/watch?v=${vidCode}`);
   await page.getByTestId('video-upload-button').click();
 
-  const createPostRequest = page.waitForRequest(
-    (res) => res.url().includes('/posts') && res.method() === 'POST',
+  const createPostResponse = await Api.routes.posts.createPost.waitForRequest({
+    beforeAction: async () => {
+      await page.getByTestId('create-post-button').click();
+    },
+  });
+
+  await expect(page).toHaveURL(`/post/${createdPost.slug}`);
+  await expect(page).toHaveTitle(`${createdPost.title} | Smiler`);
+  await expect(page.getByTestId(`post-${createdPost.id}-title`)).toHaveText(
+    createdPost.title,
   );
-
-  page.getByTestId('create-post-button').click();
-
-  const createPostResponse = await createPostRequest;
-
   expect(createPostResponse.postDataJSON()).toMatchObject({
     title,
     tags,
@@ -128,16 +110,14 @@ test('Creates a post with title, tags and content', async ({
   });
 });
 
-test('Uploads a picture in the picture section', async ({ page, context }) => {
-  await context.route('*/**/posts/upload', async (route) => {
-    await route.fulfill({
-      json: {
-        type: 'pic',
-        url: 'https://placehold.co/600x400',
-        hash: (Math.random() * Math.random()).toString(36),
-        isFile: true,
-      },
-    });
+test('Uploads a picture in the picture section', async ({ page, Api }) => {
+  Api.routes.posts.uploadAttachment.mock({
+    body: {
+      type: 'pic',
+      url: 'https://placehold.co/600x400',
+      hash: (Math.random() * Math.random()).toString(36),
+      isFile: true,
+    },
   });
 
   await page.goto('/post/create');
@@ -150,13 +130,13 @@ test('Uploads a picture in the picture section', async ({ page, context }) => {
     mimeType: 'image/jpeg',
   });
 
-  const uploadRequest = page.waitForRequest(
-    (res) => res.url().includes('/posts/upload') && res.method() === 'POST',
+  const uploadResponse = await Api.routes.posts.uploadAttachment.waitForRequest(
+    {
+      beforeAction: async () => {
+        await page.getByTestId('image-upload-button').click();
+      },
+    },
   );
-
-  await page.getByTestId('image-upload-button').click();
-
-  const uploadResponse = await uploadRequest;
 
   expect(uploadResponse.headers()['content-type']).toContain(
     'multipart/form-data; boundary=',
@@ -190,15 +170,13 @@ test('Deletes sections in a post', async ({ page }) => {
 
 test('D&D post sections to change order of sections', async ({
   page,
-  context,
+  Api,
   isMobile,
 }) => {
   // TODO: D&D test doesn't pass for mobile but the feature works
   if (isMobile) {
     return;
   }
-
-  await mockPostsRoute(context);
 
   await page.goto('/post/create');
 
@@ -231,13 +209,11 @@ test('D&D post sections to change order of sections', async ({
   // Pic Section -> Text Section order of sections
   expect(newInnerHTML).toMatch(/pic-section.*text-section/);
 
-  const createPostRequest = page.waitForRequest(
-    (res) => res.url().includes('/posts') && res.method() === 'POST',
-  );
-
-  await page.getByTestId('create-post-button').click();
-
-  const createPostResponse = await createPostRequest;
+  const createPostResponse = await Api.routes.posts.createPost.waitForRequest({
+    beforeAction: async () => {
+      await page.getByTestId('create-post-button').click();
+    },
+  });
 
   expect(createPostResponse.postDataJSON()).toMatchObject({
     sections: [
@@ -251,7 +227,7 @@ test('D&D post sections to change order of sections', async ({
   });
 });
 
-test('Fetch and show draft template', async ({ context, page }) => {
+test('Fetch and show draft template', async ({ Api, page }) => {
   const savedTitle = 'Saved title';
   const savedSections = [
     {
@@ -272,16 +248,18 @@ test('Fetch and show draft template', async ({ context, page }) => {
   ];
   const savedTags = ['test tag 1', 'test tag 2'];
 
-  await context.route(
-    `*/**/api/users/${authUser.login}/template`,
-    async (route) => {
-      await route.fulfill({
-        json: { title: savedTitle, sections: savedSections, tags: savedTags },
-      });
-    },
-  );
+  Api.routes.users.getUserTemplate.mock({
+    body: { title: savedTitle, sections: savedSections, tags: savedTags },
+  });
 
-  await page.goto('/post/create');
+  const getUserTemplateResponse =
+    await Api.routes.users.getUserTemplate.waitForRequest({
+      beforeAction: async () => {
+        await page.goto('/post/create');
+      },
+    });
+
+  expect(getUserTemplateResponse.url()).toContain(authUser.login);
 
   await expect(page.getByTestId('post-section').first()).toContainText(
     savedSections[0].content,
@@ -299,7 +277,7 @@ test('Fetch and show draft template', async ({ context, page }) => {
   ).toBeVisible();
 });
 
-test('Saves draft template', async ({ page }) => {
+test('Saves draft template', async ({ page, Api }) => {
   const tag = 'test tag';
 
   await page.goto('/post/create');
@@ -322,18 +300,15 @@ test('Saves draft template', async ({ page }) => {
     .fill(`https://www.youtube.com/watch?v=${vidCode}`);
   await page.getByTestId('video-upload-button').click();
 
-  // eslint-disable-next-line no-unused-vars
-  const saveDraftRequest = page.waitForRequest(
-    (res) =>
-      res.url().includes(`/users/${authUser.login}/template`) &&
-      res.method() === 'PUT',
-  );
+  const updateUserTemplateResponse =
+    await Api.routes.users.updateUserTemplate.waitForRequest({
+      beforeAction: async () => {
+        await page.getByTestId('save-draft-button').click();
+      },
+    });
 
-  await page.getByTestId('save-draft-button').click();
-
-  const saveDraftResponse = await saveDraftRequest;
-
-  expect(saveDraftResponse.postDataJSON()).toMatchObject({
+  expect(updateUserTemplateResponse.url()).toContain(authUser.login);
+  expect(updateUserTemplateResponse.postDataJSON()).toMatchObject({
     title,
     tags: [tag],
     sections: [

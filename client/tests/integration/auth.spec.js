@@ -152,13 +152,11 @@ test.describe('Sign In and Sign Up requests', () => {
     await page.getByTestId('user-signup-password').fill(formData.password);
     await page.getByTestId('user-signup-confirm').fill(formData.password);
 
-    const createUserResponse = await Api.routes.auth.signUp.waitForRequest(
-      {
-        beforeAction: async () => {
-          await page.getByTestId('user-signup-submit').click();
-        },
+    const createUserResponse = await Api.routes.auth.signUp.waitForRequest({
+      beforeAction: async () => {
+        await page.getByTestId('user-signup-submit').click();
       },
-    );
+    });
 
     expect(createUserResponse.postDataJSON()).toEqual({
       ...formData,
