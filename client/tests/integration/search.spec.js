@@ -1,44 +1,39 @@
 /* eslint-disable no-await-in-loop */
 // @ts-check
-
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import generateAuth from './factory/auth';
 import generatePost from './factory/post';
+import test from './page-objects';
 
 const post = generatePost({
   id: '1',
 });
 
-test.beforeEach(async ({ context }) => {
-  await context.route('*/**/users/get-auth', async (route) => {
-    await route.fulfill({
-      json: generateAuth(),
-    });
+test.beforeEach(async ({ Api }) => {
+  Api.routes.auth.getAuth.mock({
+    body: generateAuth(),
   });
 
-  await context.route('*/**/posts*', async (route) => {
-    await route.fulfill({
-      json: {
-        pages: 0,
-        posts: [post],
-      },
-    });
+  Api.routes.posts.getPosts.mock({
+    body: {
+      pages: 0,
+      posts: [post],
+    },
   });
 });
 
-test('Searches posts using the search bar', async ({ page }) => {
+test('Searches posts using the search bar', async ({ page, Api }) => {
   await page.goto('/');
 
   await page.getByTestId('header-search-input').fill('test');
 
-  const postsRequest = page.waitForRequest(
-    (req) => req.url().includes('/posts') && req.url().includes('title=test'),
-  );
+  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+    beforeAction: async () => {
+      await page.getByTestId('header-search-input').press('Enter');
+    },
+  });
 
-  await page.getByTestId('header-search-input').press('Enter');
-
-  await postsRequest;
-
+  expect(postsResponse.url()).toContain('title=test');
   await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL(/\/posts\/search\?.*title=test/);
   await expect(page.getByTestId('search-form-input')).toHaveValue('test');
@@ -46,11 +41,13 @@ test('Searches posts using the search bar', async ({ page }) => {
 
 test("Doesn't send posts request when just opened search page", async ({
   page,
+  Api,
 }) => {
+  // TODO: Move this logic to the page object
   let isPostsRequestSent = false;
 
   page.on('request', (req) => {
-    if (req.url().includes('api/posts')) {
+    if (req.url().includes(`api${Api.routes.posts.getPosts.url}`)) {
       console.log(req.url());
       isPostsRequestSent = true;
     }
@@ -64,24 +61,23 @@ test("Doesn't send posts request when just opened search page", async ({
   expect(isPostsRequestSent).toBe(false);
 });
 
-test('Searches posts by title using search page', async ({ page }) => {
+test('Searches posts by title using search page', async ({ page, Api }) => {
   await page.goto('/posts/search');
 
   await page.getByTestId('search-form-input').fill('test');
 
-  const postsRequest = page.waitForRequest(
-    (req) => req.url().includes('/posts') && req.url().includes('title=test'),
-  );
+  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+    beforeAction: async () => {
+      await page.getByTestId('search-form-input').press('Enter');
+    },
+  });
 
-  await page.getByTestId('search-form-input').press('Enter');
-
-  await postsRequest;
-
+  expect(postsResponse.url()).toContain('title=test');
   await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL(/\/posts\/search\?.*title=test/);
 });
 
-test('Searches posts by dateTo and dateFrom', async ({ page }) => {
+test('Searches posts by dateTo and dateFrom', async ({ page, Api }) => {
   const dates = {
     from: '2000-01-01',
     to: '2000-01-05',
@@ -92,23 +88,22 @@ test('Searches posts by dateTo and dateFrom', async ({ page }) => {
   await page.getByTestId('search-form-date-from').fill(dates.from);
   await page.getByTestId('search-form-date-to').fill(dates.to);
 
-  const postsRequest = page.waitForRequest(
-    (req) =>
-      req.url().includes('/posts') &&
-      req.url().includes(`dateFrom=${dates.from}&dateTo=${dates.to}`),
+  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+    beforeAction: async () => {
+      await page.getByTestId('search-form-input').press('Enter');
+    },
+  });
+
+  expect(postsResponse.url()).toContain(
+    `dateFrom=${dates.from}&dateTo=${dates.to}`,
   );
-
-  await page.getByTestId('search-form-input').press('Enter');
-
-  await postsRequest;
-
   await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL(
     new RegExp(`/posts/search?.*dateFrom=${dates.from}&dateTo=${dates.to}`),
   );
 });
 
-test('Searches posts by ratingFrom and ratingTo', async ({ page }) => {
+test('Searches posts by ratingFrom and ratingTo', async ({ page, Api }) => {
   const ratings = {
     from: -500,
     to: 500,
@@ -121,16 +116,15 @@ test('Searches posts by ratingFrom and ratingTo', async ({ page }) => {
     .fill(ratings.from.toString());
   await page.getByTestId('search-form-rating-to').fill(ratings.to.toString());
 
-  const postsRequest = page.waitForRequest(
-    (req) =>
-      req.url().includes('/posts') &&
-      req.url().includes(`ratingFrom=${ratings.from}&ratingTo=${ratings.to}`),
+  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+    beforeAction: async () => {
+      await page.getByTestId('search-form-input').press('Enter');
+    },
+  });
+
+  expect(postsResponse.url()).toContain(
+    `ratingFrom=${ratings.from}&ratingTo=${ratings.to}`,
   );
-
-  await page.getByTestId('search-form-input').press('Enter');
-
-  await postsRequest;
-
   await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL(
     new RegExp(
@@ -139,7 +133,7 @@ test('Searches posts by ratingFrom and ratingTo', async ({ page }) => {
   );
 });
 
-test('Searches posts by tags', async ({ page }) => {
+test('Searches posts by tags', async ({ page, Api }) => {
   await page.goto('/posts/search');
 
   const tags = ['tag1', 'tag2'];
@@ -151,20 +145,18 @@ test('Searches posts by tags', async ({ page }) => {
     await page.getByTestId('post-tag-input').press('Enter');
   }
 
-  const postsRequest = page.waitForRequest(
-    (req) =>
-      req.url().includes('/posts') && req.url().includes(requestQueryTags),
-  );
+  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+    beforeAction: async () => {
+      await page.getByTestId('search-form-input').press('Enter');
+    },
+  });
 
-  await page.getByTestId('search-form-input').press('Enter');
-
-  await postsRequest;
-
+  expect(postsResponse.url()).toContain(requestQueryTags);
   await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL(new RegExp(`/posts/search?.*${urlTags}`));
 });
 
-test('Sets all filters from URL', async ({ page }) => {
+test('Sets all filters from URL', async ({ page, Api }) => {
   const tags = ['tag1', 'tag2'];
   const requestQueryTags = tags.map((t) => `tags[]=${t}`).join('&');
 
@@ -181,75 +173,64 @@ test('Sets all filters from URL', async ({ page }) => {
   searchParams.append('tags', tags[0]);
   searchParams.append('tags', tags[1]);
 
-  const postsRequest = page.waitForRequest(
-    (req) =>
-      req.url().includes('/posts') &&
-      req.url().includes(requestQueryTags) &&
-      req.url().includes(`title=${filters.title}`) &&
-      req
-        .url()
-        .includes(`dateFrom=${filters.dateFrom}&dateTo=${filters.dateTo}`) &&
-      req
-        .url()
-        .includes(
-          `ratingFrom=${filters.ratingFrom}&ratingTo=${filters.ratingTo}`,
-        ),
+  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+    beforeAction: async () => {
+      await page.goto(`/posts/search?${searchParams.toString()}`);
+    },
+  });
+
+  expect(postsResponse.url()).toContain(
+    `dateFrom=${filters.dateFrom}&dateTo=${filters.dateTo}`,
   );
-
-  await page.goto(`/posts/search?${searchParams.toString()}`);
-
-  await postsRequest;
-
+  expect(postsResponse.url()).toContain(
+    `ratingFrom=${filters.ratingFrom}&ratingTo=${filters.ratingTo}`,
+  );
+  expect(postsResponse.url()).toContain(`title=${filters.title}`);
+  expect(postsResponse.url()).toContain(requestQueryTags);
   await expect(page).toHaveTitle('Search | Smiler');
 });
 
 test('Searches posts by clicking on a tag name and then "Search tag" option in the context menu', async ({
   page,
-  context,
+  Api,
 }) => {
   const tags = ['test'];
 
-  await context.route('*/**/posts*', async (route) => {
-    await route.fulfill({
-      json: {
-        pages: 0,
-        posts: [
-          generatePost({
-            tags,
-          }),
-        ],
-      },
-    });
+  Api.routes.posts.getPosts.mock({
+    body: {
+      pages: 0,
+      posts: [
+        generatePost({
+          tags,
+        }),
+      ],
+    },
   });
 
   await page.goto('/posts/all');
 
   await page.getByTestId(`post-${post.id}-tag-${tags[0]}`).click();
 
-  const postsRequest = page.waitForRequest(
-    (req) =>
-      req.url().includes('/posts') && req.url().includes(`tags[]=${tags[0]}`),
-  );
+  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+    beforeAction: async () => {
+      await page
+        .getByTestId('context-menu')
+        .filter({ has: page.getByText('Search tag') })
+        .click();
+    },
+  });
 
-  await page
-    .getByTestId('context-menu')
-    .filter({ has: page.getByText('Search tag') })
-    .click();
-
-  await postsRequest;
-
+  expect(postsResponse.url()).toContain(`tags[]=${tags[0]}`);
   await expect(page).toHaveTitle('Search | Smiler');
   await expect(page).toHaveURL(new RegExp(`/posts/search?.*tags=${tags[0]}`));
 });
 
-test('Empty posts lists after search', async ({ page, context }) => {
-  await context.route('*/**/posts*', async (route) => {
-    await route.fulfill({
-      json: {
-        pages: 0,
-        posts: [],
-      },
-    });
+test('Empty posts lists after search', async ({ page, Api }) => {
+  Api.routes.posts.getPosts.mock({
+    body: {
+      pages: 0,
+      posts: [],
+    },
   });
 
   await page.goto('/');
