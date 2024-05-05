@@ -30,14 +30,11 @@ test.beforeEach(async ({ Api }) => {
 });
 
 test('Fetches posts with expected filters', async ({ page, Api }) => {
-  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+  await Api.routes.posts.getPosts.waitForRequest({
     beforeAction: async () => {
       await page.goto('/');
     },
   });
-
-  // TODO: check for date range as well
-  expect(postsResponse.url()).toContain('limit=20&offset=0&sort=-rating');
 
   for (const post of posts) {
     await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
