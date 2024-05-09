@@ -11,9 +11,12 @@ test.beforeEach(async ({ Api }) => {
   });
 });
 
-test('Redirects to 404 page if page does not exist', async ({ page }) => {
-  await page.goto('/not/existing-page');
+test('Redirects to 404 page if page does not exist', async ({
+  page: currentPage,
+  NotFoundPage,
+}) => {
+  await currentPage.goto('100-percent/not/existing/page');
 
-  await expect(page).toHaveURL('/error/404');
-  await expect(page).toHaveTitle('404 Not Found | Smiler');
+  await expect(currentPage).toHaveURL(NotFoundPage.url);
+  await expect(currentPage).toHaveTitle(NotFoundPage.title);
 });
