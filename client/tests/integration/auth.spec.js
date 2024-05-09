@@ -126,8 +126,8 @@ test.describe('Sign In and Sign Up requests', () => {
 
     await Menu.openIfMobile();
 
-    await AuthForm.signInEmailInput.fill(formData.email);
-    await AuthForm.signInPasswordInput.fill(formData.password);
+    await AuthForm.signInEmail.fill(formData.email);
+    await AuthForm.signInPassword.fill(formData.password);
 
     const authResponse = await Api.routes.auth.signIn.waitForRequest({
       beforeAction: AuthForm.clickSignInBtn.bind(AuthForm),
@@ -154,10 +154,10 @@ test.describe('Sign In and Sign Up requests', () => {
 
     await AuthForm.toggleAuthFormMode();
 
-    await AuthForm.signUpEmailInput.fill(formData.email);
-    await AuthForm.signUpLoginInput.fill(formData.login);
-    await AuthForm.signUpPasswordInput.fill(formData.password);
-    await AuthForm.signUpConfirmInput.fill(formData.password);
+    await AuthForm.signUpEmail.fill(formData.email);
+    await AuthForm.signUpLogin.fill(formData.login);
+    await AuthForm.signUpPassword.fill(formData.password);
+    await AuthForm.signUpConfirm.fill(formData.password);
 
     const createUserResponse = await Api.routes.auth.signUp.waitForRequest({
       beforeAction: AuthForm.clickSignUpBtn.bind(AuthForm),
@@ -188,14 +188,14 @@ test.describe('Sign In validation', () => {
   });
 
   test('Errors on not a valid email', async ({ AuthForm }) => {
-    await AuthForm.signInEmailInput.fill('1234');
+    await AuthForm.signInEmail.fill('1234');
 
     await expect(AuthForm.signInEmailError).toContainText('Email is not valid');
   });
 
   test('Errors on emptied after entering email', async ({ AuthForm }) => {
-    await AuthForm.signInEmailInput.fill('1234');
-    await AuthForm.signInEmailInput.clear();
+    await AuthForm.signInEmail.fill('1234');
+    await AuthForm.signInEmail.clear();
 
     await expect(AuthForm.signInEmailError).toContainText(
       "Email can't be empty",
@@ -203,7 +203,7 @@ test.describe('Sign In validation', () => {
   });
 
   test('Errors if password length is not minimum 6', async ({ AuthForm }) => {
-    await AuthForm.signInPasswordInput.fill('1234');
+    await AuthForm.signInPassword.fill('1234');
 
     await expect(AuthForm.signInPasswordError).toContainText(
       'Password length must be minimum 6',
@@ -211,8 +211,8 @@ test.describe('Sign In validation', () => {
   });
 
   test('Errors on emptied after entering password', async ({ AuthForm }) => {
-    await AuthForm.signInPasswordInput.fill('1234');
-    await AuthForm.signInPasswordInput.clear();
+    await AuthForm.signInPassword.fill('1234');
+    await AuthForm.signInPassword.clear();
 
     await expect(AuthForm.signInPasswordError).toContainText(
       "Password can't be empty",
@@ -241,14 +241,14 @@ test.describe('Sign Up validation', () => {
   });
 
   test('Errors on not a valid email', async ({ AuthForm }) => {
-    await AuthForm.signUpEmailInput.fill('1234');
+    await AuthForm.signUpEmail.fill('1234');
 
     await expect(AuthForm.signUpEmailError).toContainText('Email is not valid');
   });
 
   test('Errors on emptied after entering email', async ({ AuthForm }) => {
-    await AuthForm.signUpEmailInput.fill('1234');
-    await AuthForm.signUpEmailInput.clear();
+    await AuthForm.signUpEmail.fill('1234');
+    await AuthForm.signUpEmail.clear();
 
     await expect(AuthForm.signUpEmailError).toContainText(
       "Email can't be empty",
@@ -256,7 +256,7 @@ test.describe('Sign Up validation', () => {
   });
 
   test('Errors if login length is not minimum 3', async ({ AuthForm }) => {
-    await AuthForm.signUpLoginInput.fill('te');
+    await AuthForm.signUpLogin.fill('te');
 
     await expect(AuthForm.signUpLoginError).toContainText(
       'Login length must be 3-10',
@@ -264,7 +264,7 @@ test.describe('Sign Up validation', () => {
   });
 
   test('Errors if login length is over 10', async ({ AuthForm }) => {
-    await AuthForm.signUpLoginInput.fill('12345678910');
+    await AuthForm.signUpLogin.fill('12345678910');
 
     await expect(AuthForm.signUpLoginError).toContainText(
       'Login length must be 3-10',
@@ -272,7 +272,7 @@ test.describe('Sign Up validation', () => {
   });
 
   test('Errors if password length is not minimum 6', async ({ AuthForm }) => {
-    await AuthForm.signUpPasswordInput.fill('1234');
+    await AuthForm.signUpPassword.fill('1234');
 
     await expect(AuthForm.signUpPasswordError).toContainText(
       'Password length must be minimum 6',
@@ -280,8 +280,8 @@ test.describe('Sign Up validation', () => {
   });
 
   test('Errors on emptied after entering password', async ({ AuthForm }) => {
-    await AuthForm.signUpPasswordInput.fill('1234');
-    await AuthForm.signUpPasswordInput.clear();
+    await AuthForm.signUpPassword.fill('1234');
+    await AuthForm.signUpPassword.clear();
 
     await expect(AuthForm.signUpPasswordError).toContainText(
       "Password can't be empty",
@@ -289,7 +289,7 @@ test.describe('Sign Up validation', () => {
   });
 
   test('Errors if confirm length is not minimum 6', async ({ AuthForm }) => {
-    await AuthForm.signUpConfirmInput.fill('1234');
+    await AuthForm.signUpConfirm.fill('1234');
 
     await expect(AuthForm.signUpConfirmError).toContainText(
       'Password confirm length must be minimum 6',
@@ -297,8 +297,8 @@ test.describe('Sign Up validation', () => {
   });
 
   test('Errors on emptied after entering confirm', async ({ AuthForm }) => {
-    await AuthForm.signUpConfirmInput.fill('1234');
-    await AuthForm.signUpConfirmInput.clear();
+    await AuthForm.signUpConfirm.fill('1234');
+    await AuthForm.signUpConfirm.clear();
 
     await expect(AuthForm.signUpConfirmError).toContainText(
       "Password confirm can't be empty",
@@ -306,8 +306,8 @@ test.describe('Sign Up validation', () => {
   });
 
   test('Errors if password and confirm are not equal', async ({ AuthForm }) => {
-    await AuthForm.signUpPasswordInput.fill('123456');
-    await AuthForm.signUpConfirmInput.fill('abcdef');
+    await AuthForm.signUpPassword.fill('123456');
+    await AuthForm.signUpConfirm.fill('abcdef');
 
     await expect(AuthForm.signUpConfirmError).toContainText(
       'Password and password confirm must be equal',
