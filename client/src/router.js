@@ -209,7 +209,7 @@ const router = new Router({
       name: '404',
       component: NotFound,
       meta: {
-        title: '404 Not Found',
+        title: 'Not Found',
       },
     },
     {
