@@ -7,7 +7,6 @@ import generateAuth from './factory/auth';
 import generatePost from './factory/post';
 import generateProfile from './factory/profile';
 import test from './page-objects';
-import Post from './page-objects/components/Post';
 
 const post = generatePost({
   id: '1',
@@ -15,12 +14,6 @@ const post = generatePost({
 
 const testUser = generateProfile();
 const auth = generateAuth();
-
-test.use({
-  Post: async ({ page, isMobile }, use) => {
-    await use(new Post(page, isMobile));
-  },
-});
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({

@@ -43,30 +43,20 @@ test.beforeEach(async ({ Api }) => {
   });
 });
 
-test('Follows a tag', async ({ page, Api }) => {
-  await page.goto(`/post/${post.slug}`);
+test('Follows a tag', async ({ SinglePostPage, Post, Api }) => {
+  await SinglePostPage.goto(post.slug);
 
-  await page.getByTestId(`post-${post.id}-tag-${tagToClick}`).click();
-
-  await Api.routes.tags.follow.waitForRequest({
-    beforeAction: async () => {
-      await page
-        .getByTestId('context-menu')
-        .filter({ has: page.getByText('Follow tag') })
-        .click();
-    },
+  const followResponse = await Api.routes.tags.follow.waitForRequest({
+    beforeAction: Post.followTag.bind(Post, post.id, tagToClick),
   });
 
-  await page.getByTestId(`post-${post.id}-tag-${tagToClick}`).click();
+  await Post.clickTag(post.id, tagToClick);
 
-  await expect(
-    page
-      .getByTestId('context-menu')
-      .filter({ has: page.getByText('Unfollow tag') }),
-  ).toBeVisible();
+  await expect(Post.getUnfollowTagBtn()).toBeVisible();
+  expect(followResponse.url()).toContain(tagToClick);
 });
 
-test('Unfollows a tag', async ({ page, Api }) => {
+test('Unfollows a tag', async ({ SinglePostPage, Post, Api }) => {
   Api.routes.auth.getAuth.mock({
     body: generateAuth({
       isAuth: true,
@@ -74,49 +64,31 @@ test('Unfollows a tag', async ({ page, Api }) => {
     }),
   });
 
-  await page.goto(`/post/${post.slug}`);
+  await SinglePostPage.goto(post.slug);
 
-  await page.getByTestId(`post-${post.id}-tag-${tagToClick}`).click();
-
-  await Api.routes.tags.unfollow.waitForRequest({
-    beforeAction: async () => {
-      await page
-        .getByTestId('context-menu')
-        .filter({ has: page.getByText('Unfollow tag') })
-        .click();
-    },
+  const unfollowResponse = await Api.routes.tags.unfollow.waitForRequest({
+    beforeAction: Post.unfollowTag.bind(Post, post.id, tagToClick),
   });
 
-  await page.getByTestId(`post-${post.id}-tag-${tagToClick}`).click();
+  await Post.clickTag(post.id, tagToClick);
 
-  await expect(
-    page
-      .getByTestId('context-menu')
-      .filter({ has: page.getByText('Follow tag') }),
-  ).toBeVisible();
+  await expect(Post.getFollowTagBtn()).toBeVisible();
+  expect(unfollowResponse.url()).toContain(tagToClick);
 });
 
 test('Cannot follow or unfollow a tag if not logged in', async ({
-  page,
+  SinglePostPage,
+  Post,
   Api,
 }) => {
   Api.routes.auth.getAuth.mock({
     body: generateAuth(),
   });
 
-  await page.goto(`/post/${post.slug}`);
+  await SinglePostPage.goto(post.slug);
 
-  await page.getByTestId(`post-${post.id}-tag-${tagToClick}`).click();
+  await Post.clickTag(post.id, tagToClick);
 
-  await expect(
-    page
-      .getByTestId('context-menu')
-      .filter({ has: page.getByText('Follow tag') }),
-  ).toBeHidden();
-
-  await expect(
-    page
-      .getByTestId('context-menu')
-      .filter({ has: page.getByText('Unfollow tag') }),
-  ).toBeHidden();
+  await expect(Post.getFollowTagBtn()).toBeHidden();
+  await expect(Post.getUnfollowTagBtn()).toBeHidden();
 });

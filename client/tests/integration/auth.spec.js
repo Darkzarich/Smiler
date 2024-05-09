@@ -5,17 +5,6 @@
 import { expect } from '@playwright/test';
 import generateAuth from './factory/auth';
 import test from './page-objects';
-import AuthForm from './page-objects/components/AuthForm';
-import CurrentUser from './page-objects/components/CurrentUser';
-
-test.use({
-  AuthForm: async ({ page }, use) => {
-    await use(new AuthForm(page));
-  },
-  CurrentUser: async ({ page }, use) => {
-    await use(new CurrentUser(page));
-  },
-});
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
