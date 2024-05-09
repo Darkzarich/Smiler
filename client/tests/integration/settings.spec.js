@@ -32,53 +32,55 @@ test.beforeEach(async ({ Api }) => {
   });
 });
 
-test('Only authenticated user can see Settings page', async ({ page, Api }) => {
+test('Only authenticated user can see Settings page', async ({
+  Api,
+  SettingsPage,
+  SystemNotification,
+}) => {
   Api.routes.auth.getAuth.mock({
     body: generateAuth({
       isAuth: false,
     }),
   });
 
-  await page.goto('/user/settings');
+  await SettingsPage.goto();
 
-  await expect(page.getByTestId('system-notification')).toContainText(
-    'Only authenticated users can access this page.',
+  await expect(SystemNotification.list).toContainText(
+    SystemNotification.pageNoAccessText,
   );
-  await expect(page).toHaveURL('/');
-  await expect(page).toHaveTitle('Home | Smiler');
+  await expect(SettingsPage.page).toHaveURL('/');
+  await expect(SettingsPage.page).toHaveTitle('Home | Smiler');
 });
 
 test('Open settings page, shows expected authors and tags the user is following', async ({
-  page,
   Api,
+  SettingsPage,
 }) => {
   await Api.routes.users.getUsersFollowing.waitForRequest({
     beforeAction: async () => {
-      await page.goto('/user/settings');
+      await SettingsPage.goto();
     },
   });
 
   for (const author of authors) {
     // eslint-disable-next-line no-await-in-loop
-    await expect(
-      page.getByTestId(`user-settings-author-${author.id}`),
-    ).toContainText(author.login);
+    await expect(SettingsPage.getAuthorById(author.id)).toContainText(
+      author.login,
+    );
   }
 
   for (const tag of tags) {
     // eslint-disable-next-line no-await-in-loop
-    await expect(page.getByTestId(`user-settings-tags-${tag}`)).toContainText(
-      tag,
-    );
+    await expect(SettingsPage.getTagByText(tag)).toContainText(tag);
   }
 
-  await expect(page.getByTestId('user-settings-no-following')).toBeHidden();
-  await expect(page).toHaveTitle('Settings | Smiler');
+  await expect(SettingsPage.noSubscriptionsBlock).toBeHidden();
+  await expect(SettingsPage.page).toHaveTitle('Settings | Smiler');
 });
 
 test('Shows empty list of authors and tags if the user is not following any', async ({
-  page,
   Api,
+  SettingsPage,
 }) => {
   Api.routes.users.getUsersFollowing.mock({
     body: {
@@ -87,14 +89,14 @@ test('Shows empty list of authors and tags if the user is not following any', as
     },
   });
 
-  await page.goto('/user/settings');
+  await SettingsPage.goto();
 
-  await expect(page.getByTestId('user-settings-no-following')).toBeVisible();
+  await expect(SettingsPage.noSubscriptionsBlock).toBeVisible();
 });
 
 test('Unfollows an author, removes that author from the list of following', async ({
-  page,
   Api,
+  SettingsPage,
 }) => {
   Api.routes.users.unfollowUser.mock({
     body: {
@@ -102,24 +104,20 @@ test('Unfollows an author, removes that author from the list of following', asyn
     },
   });
 
-  await page.goto('/user/settings');
+  await SettingsPage.goto();
 
   await Api.routes.users.unfollowUser.waitForRequest({
     beforeAction: async () => {
-      await page
-        .getByTestId(`user-settings-author-${author1.id}-unfollow`)
-        .click();
+      await SettingsPage.unfollowAuthor(author1.id);
     },
   });
 
-  await expect(
-    page.getByTestId(`user-settings-author-${author1.id}`),
-  ).toBeHidden();
+  await expect(SettingsPage.getAuthorById(author1.id)).toBeHidden();
 });
 
 test('Unfollows a tag, removes that tag from the list of following', async ({
-  page,
   Api,
+  SettingsPage,
 }) => {
   Api.routes.tags.unfollow.mock({
     body: {
@@ -127,64 +125,58 @@ test('Unfollows a tag, removes that tag from the list of following', async ({
     },
   });
 
-  await page.goto('/user/settings');
+  await SettingsPage.goto();
 
   await Api.routes.tags.unfollow.waitForRequest({
     beforeAction: async () => {
-      await page.getByTestId(`user-settings-tag-${tags[0]}-unfollow`).click();
+      await SettingsPage.unfollowTag(tags[0]);
     },
   });
 
-  await expect(page.getByTestId(`user-settings-tag-${tags[0]}`)).toBeHidden();
+  await expect(SettingsPage.getTagByText(tags[0])).toBeHidden();
 });
 
 test("Edits current user's bio with expected request body", async ({
-  page,
   Api,
+  SettingsPage,
 }) => {
-  await page.goto('/user/settings');
+  await SettingsPage.goto();
 
-  await page.getByTestId('user-settings-bio-input').fill('New bio');
+  await SettingsPage.bioInput.fill('New bio');
 
   const editResponse = await Api.routes.users.updateUserProfile.waitForRequest({
-    beforeAction: async () => {
-      await page.getByTestId('user-settings-bio-submit').click();
-    },
+    beforeAction: SettingsPage.submitBio.bind(SettingsPage),
   });
 
   expect(editResponse.postDataJSON()).toMatchObject({ bio: 'New bio' });
 });
 
 test("Edits current user's avatar with expected request body", async ({
-  page,
   Api,
+  SettingsPage,
 }) => {
-  await page.goto('/user/settings');
+  await SettingsPage.goto();
 
-  await page
-    .getByTestId('user-settings-avatar-input')
-    .fill('https://placehold.co/128x128');
+  await SettingsPage.avatarInput.fill(SettingsPage.avatarPlaceholderUrl);
 
   const editResponse = await Api.routes.users.updateUserProfile.waitForRequest({
-    beforeAction: async () => {
-      await page.getByTestId('user-settings-avatar-submit').click();
-    },
+    beforeAction: SettingsPage.submitAvatar.bind(SettingsPage),
   });
 
   expect(editResponse.postDataJSON()).toMatchObject({
-    avatar: 'https://placehold.co/128x128',
+    avatar: SettingsPage.avatarPlaceholderUrl,
   });
 });
 
 test('If typed more than 300 symbols in bio shows validation error and blocks submit', async ({
-  page,
+  SettingsPage,
 }) => {
-  await page.goto('/user/settings');
+  const longText = 't'.repeat(301);
 
-  await page.getByTestId('user-settings-bio-input').fill('t'.repeat(301));
+  await SettingsPage.goto();
 
-  await expect(page.getByTestId('user-settings-bio-input-error')).toHaveText(
-    'Bio is too long',
-  );
-  await expect(page.getByTestId('user-settings-bio-submit')).toBeDisabled();
+  await SettingsPage.bioInput.fill(longText);
+
+  await expect(SettingsPage.bioError).toHaveText('Bio is too long');
+  await expect(SettingsPage.bioSubmitBtn).toBeDisabled();
 });

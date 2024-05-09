@@ -113,7 +113,7 @@ test('Redirect to 404 if the post is not found', async ({ page, Api }) => {
 
   await expect(page).toHaveURL('/error/404');
   await expect(page).toHaveTitle('404 Not Found | Smiler');
-  await expect(page.getByTestId('system-notification')).toContainText(
+  await expect(page.getByTestId('system-notifications')).toContainText(
     'Post does not exist',
   );
 });
@@ -328,7 +328,7 @@ test.describe('Post edit', () => {
 
     await expect(page).toHaveURL('/');
     await expect(page).toHaveTitle('Home | Smiler');
-    await expect(page.getByTestId('system-notification')).toContainText(
+    await expect(page.getByTestId('system-notifications')).toContainText(
       'You cannot edit this post anymore. Edit time has expired',
     );
   });
@@ -358,7 +358,7 @@ test.describe('Post edit', () => {
 
     await expect(page).toHaveURL('/');
     await expect(page).toHaveTitle('Home | Smiler');
-    await expect(page.getByTestId('system-notification')).toContainText(
+    await expect(page.getByTestId('system-notifications')).toContainText(
       "Only post's author can edit this post",
     );
   });

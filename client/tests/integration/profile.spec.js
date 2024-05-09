@@ -45,7 +45,7 @@ test('Goes to 404 if user does not exist', async ({ page, Api }) => {
 
   await page.waitForURL('**/error/404');
   await expect(page).toHaveTitle('404 Not Found | Smiler');
-  await expect(page.getByTestId('system-notification')).toContainText(
+  await expect(page.getByTestId('system-notifications')).toContainText(
     'User not found',
   );
 });

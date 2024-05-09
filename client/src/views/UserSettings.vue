@@ -48,7 +48,7 @@
         <div
           v-else
           class="user-settings__data-group"
-          data-testid="user-settings-no-following"
+          data-testid="user-settings-no-subscriptions"
         >
           <i>You don't follow any authors or tags...</i>
         </div>

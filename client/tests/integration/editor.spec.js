@@ -382,13 +382,14 @@ test.describe('Tags', () => {
 test('Cannot open the editor if the user is not logged in', async ({
   page,
   Api,
+  SystemNotification,
 }) => {
   Api.routes.auth.getAuth.mock({ body: generateAuth() });
 
   await page.goto('/post/create');
 
-  await expect(page.getByTestId('system-notification')).toContainText(
-    'Only authenticated users can access this page.',
+  await expect(SystemNotification.list).toContainText(
+    SystemNotification.pageNoAccessText,
   );
   await expect(page).toHaveURL('/');
   await expect(page).toHaveTitle('Home | Smiler');
