@@ -70,7 +70,7 @@ const router = new Router({
             ms: 999,
           }),
         },
-        title: 'Home',
+        title: 'Today',
       },
     },
     {

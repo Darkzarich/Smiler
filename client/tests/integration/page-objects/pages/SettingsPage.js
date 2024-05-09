@@ -1,4 +1,8 @@
 export default class SettingsPage {
+  url = '/user/settings';
+
+  title = 'Settings | Smiler';
+
   avatarPlaceholderUrl = 'https://placehold.co/128x128';
 
   /**
@@ -19,7 +23,7 @@ export default class SettingsPage {
   }
 
   async goto() {
-    await this.page.goto('/user/settings');
+    await this.page.goto(this.url);
   }
 
   getAuthorById(id = '') {

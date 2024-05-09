@@ -32,9 +32,11 @@ test.beforeEach(async ({ Api }) => {
   });
 });
 
-test('Only authenticated user can see Settings page', async ({
+test("Only authenticated user can see Settings page, redirect to the today's posts page", async ({
   Api,
+  page: currentPage,
   SettingsPage,
+  PostsPage,
   SystemNotification,
 }) => {
   Api.routes.auth.getAuth.mock({
@@ -48,8 +50,8 @@ test('Only authenticated user can see Settings page', async ({
   await expect(SystemNotification.list).toContainText(
     SystemNotification.pageNoAccessText,
   );
-  await expect(SettingsPage.page).toHaveURL('/');
-  await expect(SettingsPage.page).toHaveTitle('Home | Smiler');
+  await expect(currentPage).toHaveURL(PostsPage.urls.today);
+  await expect(currentPage).toHaveTitle(PostsPage.titles.today);
 });
 
 test('Open settings page, shows expected authors and tags the user is following', async ({
@@ -75,7 +77,8 @@ test('Open settings page, shows expected authors and tags the user is following'
   }
 
   await expect(SettingsPage.noSubscriptionsBlock).toBeHidden();
-  await expect(SettingsPage.page).toHaveTitle('Settings | Smiler');
+  await expect(SettingsPage.page).toHaveURL(SettingsPage.url);
+  await expect(SettingsPage.page).toHaveTitle(SettingsPage.title);
 });
 
 test('Shows empty list of authors and tags if the user is not following any', async ({

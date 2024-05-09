@@ -1,4 +1,13 @@
 export default class PostsPage {
+  // TODO: Move "| Smiler" part in the base class
+  titles = {
+    today: 'Today | Smiler',
+  };
+
+  urls = {
+    today: '/',
+  };
+
   /**
    * @param {import('@playwright/test').Page} page
    */
@@ -6,7 +15,7 @@ export default class PostsPage {
     this.page = page;
   }
 
-  async goto() {
-    await this.page.goto('/');
+  async goto(url = this.urls.today) {
+    await this.page.goto(url);
   }
 }
