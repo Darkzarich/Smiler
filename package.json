@@ -9,7 +9,8 @@
     "front:dev": "cd client && npm run dev",
     "back:dev": "cd server && npm run dev",
     "back:serve": "cd server && npm start",
-    "postinstall": "(cd client && npm i); (cd server && npm i);"
+    "postinstall": "(cd client && npm i); (cd server && npm i);",
+    "lint:spell": "cspell --no-progress ."
   },
   "license": "MIT",
   "bugs": {
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/Darkzarich/Smiler#readme",
   "devDependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^7.6.0",
+    "cspell": "^8.8.1"
   }
 }

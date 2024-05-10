@@ -328,7 +328,7 @@ module.exports = {
     }
   }),
   update: asyncErrorHandler(async (req, res, next) => {
-    // TODO: validate sections on update by type and othher stuff the same as when creating post
+    // TODO: validate sections on update by type and other stuff the same as when creating post
 
     const { userId } = req.session;
     const { id } = req.params;
@@ -357,7 +357,7 @@ module.exports = {
         if (sections) {
           foundPost.sections = sections;
 
-          // seaching for pics that got removed from post
+          // Searching for pics that got removed from post
           foundPost.sections.forEach((rowSec) => {
             if (rowSec.type === consts.POST_SECTION_TYPES.PICTURE && rowSec.isFile) {
               const item = sections.find(el => (el.url === rowSec.url));
@@ -515,7 +515,7 @@ module.exports = {
       generateError('Post doesn\'t exist', 404, next);
     }
   }),
-  unrate: asyncErrorHandler(async (req, res, next) => {
+  unvote: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
     const { id } = req.params;
 

@@ -60,17 +60,17 @@ Vue.mixin({
     $videoGenerateEmbedLink(url) {
       try {
         const youtubeRegExp = consts.POST_SECTION_VIDEO_REGEXP.YOUTUBE;
-        let mathedURL = url.match(youtubeRegExp);
+        let matchedURL = url.match(youtubeRegExp);
 
-        if (mathedURL) {
-          if (mathedURL.length > 0 && (mathedURL[6] || mathedURL[8])) {
-            return `${consts.POST_SECTION_VIDEO_EMBED.YOUTUBE}${mathedURL[6] || mathedURL[8]}`;
+        if (matchedURL) {
+          if (matchedURL.length > 0 && (matchedURL[6] || matchedURL[8])) {
+            return `${consts.POST_SECTION_VIDEO_EMBED.YOUTUBE}${matchedURL[6] || matchedURL[8]}`;
           }
         }
 
-        mathedURL = consts.POST_SECTION_VIDEO_REGEXP.OTHERS.test(url);
+        matchedURL = consts.POST_SECTION_VIDEO_REGEXP.OTHERS.test(url);
 
-        if (mathedURL) {
+        if (matchedURL) {
           return url;
         }
 

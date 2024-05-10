@@ -112,7 +112,7 @@ test('Redirect to 404 if the post is not found', async ({ page, Api }) => {
   await page.goto(`/post/${post.slug}`);
 
   await expect(page).toHaveURL('/error/404');
-  await expect(page).toHaveTitle('404 Not Found | Smiler');
+  await expect(page).toHaveTitle('Not Found | Smiler');
   await expect(page.getByTestId('system-notifications')).toContainText(
     'Post does not exist',
   );
@@ -327,7 +327,7 @@ test.describe('Post edit', () => {
     await page.goto(`/post/${post.slug}/edit`);
 
     await expect(page).toHaveURL('/');
-    await expect(page).toHaveTitle('Home | Smiler');
+    await expect(page).toHaveTitle('Today | Smiler');
     await expect(page.getByTestId('system-notifications')).toContainText(
       'You cannot edit this post anymore. Edit time has expired',
     );
@@ -357,7 +357,7 @@ test.describe('Post edit', () => {
     await page.goto(`/post/${post.slug}/edit`);
 
     await expect(page).toHaveURL('/');
-    await expect(page).toHaveTitle('Home | Smiler');
+    await expect(page).toHaveTitle('Today | Smiler');
     await expect(page.getByTestId('system-notifications')).toContainText(
       "Only post's author can edit this post",
     );
@@ -463,6 +463,6 @@ test.describe('Post edit', () => {
 
     expect(deletePostByIdResponse.url()).toContain(post.id);
     await expect(page).toHaveURL('/');
-    await expect(page).toHaveTitle('Home | Smiler');
+    await expect(page).toHaveTitle('Today | Smiler');
   });
 });

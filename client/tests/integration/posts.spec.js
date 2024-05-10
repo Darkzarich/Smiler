@@ -233,7 +233,7 @@ test.describe('Post groups', () => {
         decodeURIComponent(searchParams.toString()),
       );
       await expect(page).toHaveURL(/.*/);
-      await expect(page).toHaveTitle('Home | Smiler');
+      await expect(page).toHaveTitle('Today | Smiler');
       await expect(page.getByTestId('posts-container')).toBeVisible();
       for (const post of posts) {
         await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(

@@ -2,15 +2,15 @@
   <div class="notifications" data-testid="system-notifications">
     <TransitionGroup name="notifications__item">
       <div
-        v-for="notif in notifications"
-        :key="notif.timer"
+        v-for="notification in notifications"
+        :key="notification.timer"
         class="notifications__item"
       >
-        Error occured. {{ notif.error }}
+        An error occurred. {{ notification.error }}
 
         <div
           class="notifications__close"
-          @click="closeNotification(notif.timer)"
+          @click="closeNotification(notification.timer)"
         >
           <ExitIcon />
         </div>

@@ -392,5 +392,5 @@ test('Cannot open the editor if the user is not logged in', async ({
     SystemNotification.pageNoAccessText,
   );
   await expect(page).toHaveURL('/');
-  await expect(page).toHaveTitle('Home | Smiler');
+  await expect(page).toHaveTitle('Today | Smiler');
 });

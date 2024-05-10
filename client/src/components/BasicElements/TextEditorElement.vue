@@ -171,7 +171,7 @@ export default {
 
         /* TODO: clear the style when a tab button is clicked 
         and selection was already styled <b> some text </b> ----> <b></b> 
-        sometext <b></b> and then clean empty tags 
+        some text <b></b> and then clean empty tags 
         */
 
         this.$emit('input', document.getElementById(this.id).innerHTML);

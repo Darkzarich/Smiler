@@ -32,14 +32,14 @@ export default {
   },
   updateRate(id, data) {
     return Query({
-      url: `${CONTROLLER_URL}/${id}/rate`,
+      url: `${CONTROLLER_URL}/${id}/vote`,
       method: 'put',
       data,
     });
   },
   removeRate(id) {
     return Query({
-      url: `${CONTROLLER_URL}/${id}/rate`,
+      url: `${CONTROLLER_URL}/${id}/vote`,
       method: 'delete',
     });
   },

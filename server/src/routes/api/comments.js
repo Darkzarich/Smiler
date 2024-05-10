@@ -349,7 +349,7 @@ router.delete('/:id', auth.required, commentsController.deleteComment);
 /**
 @swagger
 {
-  "/comments/{id}/rate": {
+  "/comments/{id}/vote": {
     "put": {
       "summary": "Change rate on comment",
       "description": "Changes rate for comment. `negative` decides direction. You can't rate comment again before deleting previous rate",
@@ -402,8 +402,8 @@ router.delete('/:id', auth.required, commentsController.deleteComment);
       }
     },
     "delete": {
-      "summary": "Unrate comment",
-      "description": "Delete already existing rate for user for comment",
+      "summary": "Unvote a comment",
+      "description": "Unvotes an already voted comment",
       "tags": [
         "Comments"
       ],
@@ -440,7 +440,7 @@ router.delete('/:id', auth.required, commentsController.deleteComment);
   }
 }
  */
-router.delete('/:id/rate', auth.required, commentsController.unrate);
-router.put('/:id/rate', auth.required, commentsController.rate);
+router.delete('/:id/vote', auth.required, commentsController.unvote);
+router.put('/:id/vote', auth.required, commentsController.vote);
 
 module.exports = router;

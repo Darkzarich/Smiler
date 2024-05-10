@@ -3,7 +3,7 @@
   "info": {
     "title": "Smiler Api",
     "version": "1.0.0",
-    "description": "An open API to my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.com or pikabu.ru (mostly copies many pikabu features) with many different and awesome features, open swagger API documentation. Main reason of making this site is fun and learning new things while making it"
+    "description": "Smiler is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.com or 9gag.com (mostly takes many known features) with many different and awesome features, open Swagger API docs, tests, interesting tools and more. Main reason of making this site is fun and learning new things while making it"
   },
   "servers": [
     {
@@ -412,7 +412,7 @@
         }
       }
     },
-    "/comments/{id}/rate": {
+    "/comments/{id}/vote": {
       "put": {
         "summary": "Change rate on comment",
         "description": "Changes rate for comment. `negative` decides direction. You can't rate comment again before deleting previous rate",
@@ -465,7 +465,7 @@
         }
       },
       "delete": {
-        "summary": "Unrate comment",
+        "summary": "Unvote a comment",
         "description": "Delete already existing rate for user for comment",
         "tags": [
           "Comments"
@@ -571,7 +571,7 @@
           {
             "in": "query",
             "name": "title",
-            "description": "Seach post by title",
+            "description": "Search post by title",
             "schema": {
               "type": "string"
             }
@@ -899,7 +899,7 @@
           "Posts"
         ],
         "summary": "upload picture",
-        "description": "Upload the picture to template. Allowed extentions: `jpg|jpeg|png|gif`",
+        "description": "Upload the picture to template. Allowed extensions: `jpg|jpeg|png|gif`",
         "security": [
           {
             "cookieAuth": []
@@ -948,7 +948,7 @@
         }
       }
     },
-    "/posts/{id}/rate": {
+    "/posts/{id}/vote": {
       "put": {
         "summary": "Change rate on post",
         "description": "Changes rate for post. `negative` decides direction. You can't rate post again before deleting previous rate",
@@ -1001,8 +1001,8 @@
         }
       },
       "delete": {
-        "summary": "Unrate post",
-        "description": "Delete already existing rate for user for post",
+        "summary": "Unvote a post",
+        "description": "Unvote an already voted post",
         "tags": [
           "Posts"
         ],

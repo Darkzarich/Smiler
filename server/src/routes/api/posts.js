@@ -220,7 +220,7 @@ const auth = require('../auth');
         {
           "in": "query",
           "name": "title",
-          "description": "Seach post by title",
+          "description": "Search post by title",
           "schema": {
             "type": "string"
           }
@@ -573,7 +573,7 @@ router.get('/:slug', postsController.getBySlug);
         "Posts"
       ],
       "summary": "upload picture",
-      "description": "Upload the picture to template. Allowed extentions: `jpg|jpeg|png|gif`",
+      "description": "Upload the picture to template. Allowed extensions: `jpg|jpeg|png|gif`",
       "security": [
         {
           "cookieAuth": []
@@ -629,10 +629,10 @@ router.post('/upload', auth.required, postsController.upload);
 /**
 @swagger
 {
-  "/posts/{id}/rate": {
+  "/posts/{id}/vote": {
     "put": {
-      "summary": "Change rate on post",
-      "description": "Changes rate for post. `negative` decides direction. You can't rate post again before deleting previous rate",
+      "summary": "Change vote on post",
+      "description": "Changes vote for post. `negative` decides direction. You can't rate post again before deleting previous rate",
       "tags": [
         "Posts"
       ],
@@ -682,7 +682,7 @@ router.post('/upload', auth.required, postsController.upload);
       }
     },
     "delete": {
-      "summary": "Unrate post",
+      "summary": "Unvote a post",
       "description": "Delete already existing rate for user for post",
       "tags": [
         "Posts"
@@ -720,7 +720,7 @@ router.post('/upload', auth.required, postsController.upload);
   }
 }
  */
-router.delete('/:id/rate', auth.required, postsController.unrate);
-router.put('/:id/rate', auth.required, postsController.rate);
+router.delete('/:id/vote', auth.required, postsController.unvote);
+router.put('/:id/vote', auth.required, postsController.vote);
 
 module.exports = router;

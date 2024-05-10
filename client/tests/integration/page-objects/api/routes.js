@@ -15,8 +15,8 @@ export default {
     getPostBySlug: new Route('/posts/*', 'GET'),
     updatePostById: new Route('/posts/*', 'PUT'),
     deletePostById: new Route('/posts/*', 'DELETE'),
-    updateRateById: new Route('/posts/*/rate', 'PUT'),
-    removeRateById: new Route('/posts/*/rate', 'DELETE'),
+    updateRateById: new Route('/posts/*/vote', 'PUT'),
+    removeRateById: new Route('/posts/*/vote', 'DELETE'),
   },
   auth: {
     getAuth: new Route('/current', 'GET'),
@@ -39,8 +39,8 @@ export default {
     createComment: new Route('/comments', 'POST'),
     updateComment: new Route('/comments/*', 'PUT'),
     deleteComment: new Route('/comments/*', 'DELETE'),
-    updateRate: new Route('/comments/*/rate', 'PUT'),
-    removeRate: new Route('/comments/*/rate', 'DELETE'),
+    updateRate: new Route('/comments/*/vote', 'PUT'),
+    removeRate: new Route('/comments/*/vote', 'DELETE'),
   },
   tags: {
     follow: new Route('/tags/*/follow', 'PUT'),

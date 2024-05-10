@@ -228,7 +228,7 @@ module.exports = {
       generateError('Comment doesn\'t exist', 404, next);
     }
   }),
-  unrate: asyncErrorHandler(async (req, res, next) => {
+  unvote: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
     const { id } = req.params;
 

@@ -4,26 +4,28 @@ export default {
   },
   getters: {},
   mutations: {
-    pushSystemNotification(state, notif) {
-      state.notifications.push(notif);
+    pushSystemNotification(state, notification) {
+      state.notifications.push(notification);
     },
     removeSystemNotification(state, timerId) {
-      const notif = state.notifications.find((el) => el.timer === timerId);
-      clearTimeout(notif.timer);
-      state.notifications.splice(state.notifications.indexOf(notif), 1);
+      const notification = state.notifications.find(
+        (el) => el.timer === timerId,
+      );
+      clearTimeout(notification.timer);
+      state.notifications.splice(state.notifications.indexOf(notification), 1);
     },
   },
   actions: {
     newSystemNotification(context, payload) {
-      const notif = {
+      const notification = {
         error: payload.error.message,
       };
 
-      notif.timer = setTimeout(() => {
-        context.commit('removeSystemNotification', notif.timer);
+      notification.timer = setTimeout(() => {
+        context.commit('removeSystemNotification', notification.timer);
       }, 5000);
 
-      context.commit('pushSystemNotification', notif);
+      context.commit('pushSystemNotification', notification);
     },
   },
 };
