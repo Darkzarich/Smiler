@@ -8,6 +8,8 @@ export default class Post extends AbstractComponent {
   constructor(page, isMobile) {
     super(page);
     this.isMobile = isMobile;
+
+    this.postsList = page.getByTestId('posts-container');
   }
 
   getTitleById(id) {
@@ -22,6 +24,14 @@ export default class Post extends AbstractComponent {
     return this.findContextMenuOption('Unfollow tag');
   }
 
+  getSearchTagBtn() {
+    return this.findContextMenuOption('Search tag');
+  }
+
+  getNoContentText() {
+    return this.page.getByTestId('no-content');
+  }
+
   async clickTag(postId = '', tag = '') {
     await this.page.getByTestId(`post-${postId}-tag-${tag}`).click();
   }
@@ -34,5 +44,10 @@ export default class Post extends AbstractComponent {
   async unfollowTag(postId = '', tag = '') {
     await this.clickTag(postId, tag);
     await this.getUnfollowTagBtn().click();
+  }
+
+  async searchTag(postId = '', tag = '') {
+    await this.clickTag(postId, tag);
+    await this.getSearchTagBtn().click();
   }
 }

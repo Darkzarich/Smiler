@@ -93,4 +93,22 @@ export default class Route {
 
     return request;
   }
+
+  /**
+   * Watches if a request was called and if it was changes the flag that can be checked
+   * by calling the returned callback
+   */
+  watchIfRequestWasCalled() {
+    let wasRequestSent = false;
+
+    this.page.on('request', (req) => {
+      if (req.url().includes(`api${this.url}`)) {
+        wasRequestSent = true;
+      }
+    });
+
+    return () => {
+      return wasRequestSent;
+    };
+  }
 }

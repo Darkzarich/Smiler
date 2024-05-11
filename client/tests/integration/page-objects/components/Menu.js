@@ -14,4 +14,12 @@ export default class Menu {
       await this.page.getByTestId('mobile-menu').click();
     }
   }
+
+  async fillSearchInput(text = '') {
+    await this.page.getByTestId('header-search-input').fill(text);
+  }
+
+  async submitSearch() {
+    await this.page.getByTestId('header-search-input').press('Enter');
+  }
 }

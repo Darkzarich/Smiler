@@ -22,141 +22,141 @@ test.beforeEach(async ({ Api }) => {
   });
 });
 
-test('Searches posts using the search bar', async ({ page, Api }) => {
-  await page.goto('/');
-
-  await page.getByTestId('header-search-input').fill('test');
-
-  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: async () => {
-      await page.getByTestId('header-search-input').press('Enter');
-    },
-  });
-
-  expect(postsResponse.url()).toContain('title=test');
-  await expect(page).toHaveTitle('Search | Smiler');
-  await expect(page).toHaveURL(/\/posts\/search\?.*title=test/);
-  await expect(page.getByTestId('search-form-input')).toHaveValue('test');
-});
-
-test("Doesn't send posts request when just opened search page", async ({
-  page,
+test('Searches posts using the search bar in the header', async ({
+  page: currentPage,
+  PostsPage,
+  SearchPage,
+  Menu,
   Api,
 }) => {
-  // TODO: Move this logic to the page object
-  let isPostsRequestSent = false;
+  await PostsPage.goto();
 
-  page.on('request', (req) => {
-    if (req.url().includes(`api${Api.routes.posts.getPosts.url}`)) {
-      console.log(req.url());
-      isPostsRequestSent = true;
-    }
-  });
-
-  await page.goto('/posts/search');
-
-  await expect(page).toHaveTitle('Search | Smiler');
-  await expect(page).toHaveURL('posts/search');
-  await expect(page.getByTestId('posts-container')).toBeHidden();
-  expect(isPostsRequestSent).toBe(false);
-});
-
-test('Searches posts by title using search page', async ({ page, Api }) => {
-  await page.goto('/posts/search');
-
-  await page.getByTestId('search-form-input').fill('test');
+  await Menu.fillSearchInput('test');
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: async () => {
-      await page.getByTestId('search-form-input').press('Enter');
-    },
+    beforeAction: Menu.submitSearch.bind(Menu),
   });
 
   expect(postsResponse.url()).toContain('title=test');
-  await expect(page).toHaveTitle('Search | Smiler');
-  await expect(page).toHaveURL(/\/posts\/search\?.*title=test/);
+  await expect(currentPage).toHaveTitle(SearchPage.title);
+  expect(SearchPage.pageHasTitleQueryParam('test')).toBe(true);
+  await expect(SearchPage.searchInput).toHaveValue('test');
 });
 
-test('Searches posts by dateTo and dateFrom', async ({ page, Api }) => {
+test("Doesn't send posts request when just opened the search page", async ({
+  page: currentPage,
+  SearchPage,
+  Post,
+  Api,
+}) => {
+  const checkWasRequestSent =
+    Api.routes.posts.getPosts.watchIfRequestWasCalled();
+
+  await SearchPage.goto();
+
+  await expect(currentPage).toHaveTitle(SearchPage.title);
+  await expect(currentPage).toHaveURL(SearchPage.url);
+  await expect(Post.postsList).toBeHidden();
+  expect(checkWasRequestSent()).toBe(false);
+});
+
+test('Searches posts by title using search page', async ({
+  page: currentPage,
+  SearchPage,
+  Api,
+}) => {
+  await SearchPage.goto();
+
+  await SearchPage.searchInput.fill('test');
+
+  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+    beforeAction: SearchPage.submitSearch.bind(SearchPage),
+  });
+
+  expect(postsResponse.url()).toContain('title=test');
+  await expect(currentPage).toHaveTitle(SearchPage.title);
+  await expect(SearchPage.pageHasTitleQueryParam('test')).toBe(true);
+});
+
+test('Searches posts by dateTo and dateFrom', async ({
+  page: currentPage,
+  SearchPage,
+  Api,
+}) => {
   const dates = {
     from: '2000-01-01',
     to: '2000-01-05',
   };
 
-  await page.goto('/posts/search');
+  await SearchPage.goto();
 
-  await page.getByTestId('search-form-date-from').fill(dates.from);
-  await page.getByTestId('search-form-date-to').fill(dates.to);
+  await SearchPage.dateFrom.fill(dates.from);
+  await SearchPage.dateTo.fill(dates.to);
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: async () => {
-      await page.getByTestId('search-form-input').press('Enter');
-    },
+    beforeAction: SearchPage.submitSearch.bind(SearchPage),
   });
 
   expect(postsResponse.url()).toContain(
     `dateFrom=${dates.from}&dateTo=${dates.to}`,
   );
-  await expect(page).toHaveTitle('Search | Smiler');
-  await expect(page).toHaveURL(
-    new RegExp(`/posts/search?.*dateFrom=${dates.from}&dateTo=${dates.to}`),
-  );
+  await expect(currentPage).toHaveTitle(SearchPage.title);
+  await expect(SearchPage.pageHasDateQueryParams(dates)).toBe(true);
 });
 
-test('Searches posts by ratingFrom and ratingTo', async ({ page, Api }) => {
+test('Searches posts by ratingFrom and ratingTo', async ({
+  page: currentPage,
+  SearchPage,
+  Api,
+}) => {
   const ratings = {
     from: -500,
     to: 500,
   };
 
-  await page.goto('/posts/search');
+  await SearchPage.goto();
 
-  await page
-    .getByTestId('search-form-rating-from')
-    .fill(ratings.from.toString());
-  await page.getByTestId('search-form-rating-to').fill(ratings.to.toString());
+  await SearchPage.ratingFrom.fill(ratings.from.toString());
+  await SearchPage.ratingTo.fill(ratings.to.toString());
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: async () => {
-      await page.getByTestId('search-form-input').press('Enter');
-    },
+    beforeAction: SearchPage.submitSearch.bind(SearchPage),
   });
 
   expect(postsResponse.url()).toContain(
     `ratingFrom=${ratings.from}&ratingTo=${ratings.to}`,
   );
-  await expect(page).toHaveTitle('Search | Smiler');
-  await expect(page).toHaveURL(
-    new RegExp(
-      `/posts/search?.*ratingFrom=${ratings.from}&ratingTo=${ratings.to}`,
-    ),
-  );
+  await expect(currentPage).toHaveTitle(SearchPage.title);
+  await expect(SearchPage.pageHasRatingQueryParams(ratings)).toBe(true);
 });
 
-test('Searches posts by tags', async ({ page, Api }) => {
-  await page.goto('/posts/search');
+test('Searches posts by tags', async ({
+  page: currentPage,
+  TagsList,
+  SearchPage,
+  Api,
+}) => {
+  await SearchPage.goto();
 
   const tags = ['tag1', 'tag2'];
   const requestQueryTags = tags.map((t) => `tags[]=${t}`).join('&');
-  const urlTags = tags.map((t) => `tags=${t}`).join('&');
 
-  for (const tag of tags) {
-    await page.getByTestId('post-tag-input').fill(tag);
-    await page.getByTestId('post-tag-input').press('Enter');
-  }
+  await TagsList.addEachTag(tags);
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: async () => {
-      await page.getByTestId('search-form-input').press('Enter');
-    },
+    beforeAction: SearchPage.submitSearch.bind(SearchPage),
   });
 
   expect(postsResponse.url()).toContain(requestQueryTags);
-  await expect(page).toHaveTitle('Search | Smiler');
-  await expect(page).toHaveURL(new RegExp(`/posts/search?.*${urlTags}`));
+  await expect(currentPage).toHaveTitle(SearchPage.title);
+  await expect(SearchPage.pageHasTagsQueryParams(tags)).toBe(true);
 });
 
-test('Sets all filters from URL', async ({ page, Api }) => {
+test('Sets all filters from URL', async ({
+  page: currentPage,
+  SearchPage,
+  Api,
+}) => {
   const tags = ['tag1', 'tag2'];
   const requestQueryTags = tags.map((t) => `tags[]=${t}`).join('&');
 
@@ -169,29 +169,38 @@ test('Sets all filters from URL', async ({ page, Api }) => {
   };
 
   const searchParams = new URLSearchParams(filters);
+
   // Array for URLSearchParams doesn't work properly so have to use append
   searchParams.append('tags', tags[0]);
   searchParams.append('tags', tags[1]);
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: async () => {
-      await page.goto(`/posts/search?${searchParams.toString()}`);
-    },
+    beforeAction: SearchPage.goto.bind(SearchPage, searchParams.toString()),
   });
 
-  expect(postsResponse.url()).toContain(
-    `dateFrom=${filters.dateFrom}&dateTo=${filters.dateTo}`,
-  );
-  expect(postsResponse.url()).toContain(
-    `ratingFrom=${filters.ratingFrom}&ratingTo=${filters.ratingTo}`,
-  );
-  expect(postsResponse.url()).toContain(`title=${filters.title}`);
+  await expect(SearchPage.pageHasTitleQueryParam(filters.title)).toBe(true);
+  await expect(
+    SearchPage.pageHasDateQueryParams({
+      from: filters.dateFrom,
+      to: filters.dateTo,
+    }),
+  ).toBe(true);
+  await expect(
+    SearchPage.pageHasRatingQueryParams({
+      from: filters.ratingFrom,
+      to: filters.ratingTo,
+    }),
+  ).toBe(true);
+  await expect(SearchPage.pageHasTagsQueryParams(tags)).toBe(true);
+  await expect(currentPage).toHaveTitle(SearchPage.title);
   expect(postsResponse.url()).toContain(requestQueryTags);
-  await expect(page).toHaveTitle('Search | Smiler');
 });
 
 test('Searches posts by clicking on a tag name and then "Search tag" option in the context menu', async ({
-  page,
+  Post,
+  PostsPage,
+  page: currentPage,
+  SearchPage,
   Api,
 }) => {
   const tags = ['test'];
@@ -207,25 +216,25 @@ test('Searches posts by clicking on a tag name and then "Search tag" option in t
     },
   });
 
-  await page.goto('/posts/all');
-
-  await page.getByTestId(`post-${post.id}-tag-${tags[0]}`).click();
+  await Api.routes.posts.getPosts.waitForRequest({
+    beforeAction: PostsPage.goto.bind(Post, PostsPage.urls.all),
+  });
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: async () => {
-      await page
-        .getByTestId('context-menu')
-        .filter({ has: page.getByText('Search tag') })
-        .click();
-    },
+    beforeAction: Post.searchTag.bind(Post, post.id, tags[0]),
   });
 
   expect(postsResponse.url()).toContain(`tags[]=${tags[0]}`);
-  await expect(page).toHaveTitle('Search | Smiler');
-  await expect(page).toHaveURL(new RegExp(`/posts/search?.*tags=${tags[0]}`));
+  await expect(currentPage).toHaveTitle(SearchPage.title);
+  await expect(SearchPage.pageHasTagsQueryParams([tags[0]])).toBe(true);
 });
 
-test('Empty posts lists after search', async ({ page, Api }) => {
+test('Empty posts lists after search', async ({
+  PostsPage,
+  Post,
+  Menu,
+  Api,
+}) => {
   Api.routes.posts.getPosts.mock({
     body: {
       pages: 0,
@@ -233,13 +242,11 @@ test('Empty posts lists after search', async ({ page, Api }) => {
     },
   });
 
-  await page.goto('/');
+  await PostsPage.goto();
 
-  await page.getByTestId('header-search-input').fill('test');
-  await page.getByTestId('header-search-input').press('Enter');
+  await Menu.fillSearchInput('test');
+  await Menu.submitSearch();
 
-  await expect(page.getByTestId('posts-container')).toBeVisible();
-  await expect(
-    page.getByText("We're sorry. No posts for this time yet."),
-  ).toBeVisible();
+  await expect(Post.postsList).toBeVisible();
+  await expect(Post.getNoContentText()).toBeVisible();
 });

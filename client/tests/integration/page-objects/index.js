@@ -8,9 +8,11 @@ import CurrentUser from './components/CurrentUser';
 import Menu from './components/Menu';
 import Post from './components/Post';
 import SystemNotification from './components/SystemNotification';
+import TagsList from './components/TagsList';
 import NotFoundPage from './pages/NotFoundPage';
 import PostsPage from './pages/PostsPage';
 import ProfilePage from './pages/ProfilePage';
+import SearchPage from './pages/SearchPage';
 import SettingsPage from './pages/SettingsPage';
 import SinglePostPage from './pages/SinglePostPage';
 
@@ -32,6 +34,9 @@ export default test.extend({
   ProfilePage: async ({ page }, use) => {
     await use(new ProfilePage(page));
   },
+  SearchPage: async ({ page }, use) => {
+    await use(new SearchPage(page));
+  },
   NotFoundPage: async ({ page }, use) => {
     await use(new NotFoundPage(page));
   },
@@ -52,5 +57,8 @@ export default test.extend({
   },
   SystemNotification: async ({ page }, use) => {
     await use(new SystemNotification(page));
+  },
+  TagsList: async ({ page }, use) => {
+    await use(new TagsList(page));
   },
 });

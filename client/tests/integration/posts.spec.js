@@ -43,7 +43,7 @@ test('Fetches posts with expected filters', async ({ page, Api }) => {
   }
 });
 
-test('Empty posts lists', async ({ page, Api }) => {
+test('Empty posts lists', async ({ page, Api, Post }) => {
   Api.routes.posts.getPosts.mock({
     body: {
       pages: 0,
@@ -54,9 +54,7 @@ test('Empty posts lists', async ({ page, Api }) => {
   await page.goto('/');
 
   await expect(page.getByTestId('posts-container')).toBeVisible();
-  await expect(
-    page.getByText("We're sorry. No posts for this time yet."),
-  ).toBeVisible();
+  await expect(Post.getNoContentText()).toBeVisible();
 });
 
 async function clickPostGroup({ page, group, isMobile }) {

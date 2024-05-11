@@ -8,16 +8,21 @@
       <div v-for="post in posts" :key="post.id">
         <Post :post="post" :can-edit="$postCanEdit(post)" />
       </div>
-      <div v-if="posts.length == 0" class="post-container__no-post">
-        We're sorry. No posts for this time yet.
+      <div
+        v-if="posts.length == 0"
+        class="post-container__no-post"
+        data-testid="no-content"
+      >
+        No content found at the moment. Please check back later for updates.
+        Thank you.
       </div>
     </div>
     <div v-if="loading" class="post-loading">
       <CircularLoader />
     </div>
     <div v-else-if="noMorePost" class="post-container__no-more">
-      Congratulations! You've read everything available. Thanks! Please, come
-      later to see more!
+      Thank you for exploring all available content in this category. Please
+      check back later for more updates.
     </div>
   </div>
 </template>
