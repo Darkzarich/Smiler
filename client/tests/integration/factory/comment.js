@@ -50,7 +50,7 @@ const comment = {
             isRated: false,
             negative: false,
           },
-          
+
           children: [],
         },
       ],

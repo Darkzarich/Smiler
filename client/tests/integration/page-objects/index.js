@@ -3,6 +3,7 @@
 import { test } from '@playwright/test';
 import Api from './api';
 import AuthForm from './components/AuthForm';
+import Comments from './components/Comments';
 import CurrentUser from './components/CurrentUser';
 import Menu from './components/Menu';
 import Post from './components/Post';
@@ -36,6 +37,9 @@ export default test.extend({
   },
   Post: async ({ page, isMobile }, use) => {
     await use(new Post(page, isMobile));
+  },
+  Comments: async ({ page }, use) => {
+    await use(new Comments(page));
   },
   AuthForm: async ({ page }, use) => {
     await use(new AuthForm(page));

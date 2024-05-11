@@ -30,37 +30,40 @@ test.beforeEach(async ({ Api }) => {
   });
 });
 
-test('Shows a comment with its replies', async ({ page }) => {
-  await page.goto(`/post/${post.slug}`);
+test('Shows a comment with its replies', async ({
+  SinglePostPage,
+  Comments,
+}) => {
+  await SinglePostPage.goto(post.slug);
 
-  await expect(page.getByTestId(`comment-${comment.id}-body`)).toContainText(
-    comment.body,
+  await expect(Comments.getCommentById(comment.id)).toContainText(comment.body);
+
+  await expect(Comments.getCommentById(comment.children[0].id)).toContainText(
+    comment.children[0].body,
   );
+
   await expect(
-    page.getByTestId(`comment-${comment.children[0].id}-body`),
-  ).toContainText(comment.children[0].body);
-  await expect(
-    page.getByTestId(`comment-${comment.children[0].children[0].id}-body`),
+    Comments.getCommentById(comment.children[0].children[0].id),
   ).toContainText(comment.children[0].children[0].body);
 });
 
-test('Hides children comments if root comment is collapsed', async ({
-  page,
+test('Hides replies to a comments if root comment is collapsed', async ({
+  SinglePostPage,
+  Comments,
 }) => {
-  await page.goto(`/post/${post.slug}`);
+  await SinglePostPage.goto(post.slug);
 
-  await page.getByTestId(`comment-${comment.id}-expander`).click();
+  await Comments.toggleRepliesExpanderById(comment.id);
 
+  await expect(Comments.getCommentById(comment.children[0].id)).toBeHidden();
   await expect(
-    page.getByTestId(`comment-${comment.children[0].id}-body`),
-  ).toBeHidden();
-  await expect(
-    page.getByTestId(`comment-${comment.children[0].children[0].id}-body`),
+    Comments.getCommentById(comment.children[0].children[0].id),
   ).toBeHidden();
 });
 
 test('Shows a deleted comment with different text and no reply button', async ({
-  page,
+  SinglePostPage,
+  Comments,
   Api,
 }) => {
   const deletedComment = generateComment({
@@ -75,17 +78,19 @@ test('Shows a deleted comment with different text and no reply button', async ({
     },
   });
 
-  await page.goto(`/post/${post.slug}`);
+  await SinglePostPage.goto(post.slug);
 
-  await expect(page.getByTestId(`comment-${comment.id}-body`)).toContainText(
+  await expect(Comments.getCommentById(deletedComment.id)).toContainText(
     'This comment has been deleted',
   );
-  await expect(
-    page.getByTestId(`comment-${comment.id}-toggle-reply`),
-  ).toBeHidden();
+  await expect(Comments.getCommentReplyTogglerById(comment.id)).toBeHidden();
 });
 
-test('Posts a new comment to a post', async ({ page, Api }) => {
+test('Posts a new comment to a post', async ({
+  SinglePostPage,
+  Comments,
+  Api,
+}) => {
   const newCommentId = 'new-comment';
   const newCommentText = 'new comment';
 
@@ -97,15 +102,13 @@ test('Posts a new comment to a post', async ({ page, Api }) => {
     },
   });
 
-  await page.goto(`/post/${post.slug}`);
+  await SinglePostPage.goto(post.slug);
 
-  await page.getByTestId('new-comment-form-editor-input').fill('new comment');
+  await Comments.newCommentFormInput.fill('new comment');
 
   const createCommentResponse =
     await Api.routes.comments.createComment.waitForRequest({
-      beforeAction: async () => {
-        await page.getByTestId(`new-comment-button`).click();
-      },
+      beforeAction: Comments.submitNewComment.bind(Comments),
     });
 
   expect(createCommentResponse.postDataJSON()).toEqual({
@@ -113,20 +116,24 @@ test('Posts a new comment to a post', async ({ page, Api }) => {
     body: newCommentText,
   });
 
-  await expect(page.getByTestId(`comment-${newCommentId}-body`)).toContainText(
+  await expect(Comments.getCommentById(newCommentId)).toContainText(
     newCommentText,
   );
 });
 
-test('Cannot post comments if not logged in', async ({ page, Api }) => {
+test('Cannot post comments if not logged in', async ({
+  SinglePostPage,
+  Comments,
+  Api,
+}) => {
   Api.routes.auth.getAuth.mock({
     body: generateAuth(),
   });
 
-  await page.goto(`/post/${post.slug}`);
+  await SinglePostPage.goto(post.slug);
 
-  await expect(page.getByTestId('new-comment-form-editor')).toBeHidden();
-  await expect(page.getByTestId('new-comment-form')).toContainText(
+  await expect(Comments.newCommentFormEditor).toBeHidden();
+  await expect(Comments.newCommentForm).toContainText(
     'Please log in or create an account to leave a comment.',
   );
 });
@@ -151,18 +158,16 @@ test.describe('Replies', () => {
     });
   });
 
-  test('Replies to a comment', async ({ page, Api }) => {
-    await page.goto(`/post/${post.slug}`);
+  test('Replies to a comment', async ({ SinglePostPage, Comments, Api }) => {
+    await SinglePostPage.goto(post.slug);
 
-    await page.getByTestId(`comment-${comment.id}-toggle-reply`).click();
+    await Comments.clickCommentReplyTogglerById(comment.id);
 
-    await page.getByTestId(`comment-reply-input`).fill(newReplyText);
+    await Comments.fillCommentReplyInput(newReplyText);
 
     const replyResponse =
       await Api.routes.comments.createComment.waitForRequest({
-        beforeAction: async () => {
-          await page.getByTestId(`comment-reply-btn`).click();
-        },
+        beforeAction: Comments.submitCommentReply.bind(Comments),
       });
 
     expect(replyResponse.postDataJSON()).toEqual({
@@ -171,36 +176,37 @@ test.describe('Replies', () => {
       body: newReplyText,
     });
 
-    await expect(page.getByTestId(`comment-${newReplyId}-body`)).toContainText(
+    await expect(Comments.getCommentById(newReplyId)).toContainText(
       newReplyText,
     );
   });
 
-  test('Cannot reply to a comment if not logged in', async ({ page, Api }) => {
+  test('Cannot reply to a comment if not logged in', async ({
+    SinglePostPage,
+    Comments,
+    Api,
+  }) => {
     Api.routes.auth.getAuth.mock({
       body: generateAuth(),
     });
 
-    await page.goto(`/post/${post.slug}`);
+    await SinglePostPage.goto(post.slug);
 
-    await expect(
-      page.getByTestId(`comment-${comment.id}-toggle-reply`),
-    ).toBeHidden();
+    await expect(Comments.getCommentReplyTogglerById(comment.id)).toBeHidden();
   });
 
-  test('Closes the reply form', async ({ page }) => {
-    await page.goto(`/post/${post.slug}`);
+  test('Closes the reply form', async ({ SinglePostPage, Comments }) => {
+    await SinglePostPage.goto(post.slug);
 
-    await page.getByTestId(`comment-${comment.id}-toggle-reply`).click();
-    await page.getByTestId(`comment-reply-close-btn`).click();
+    await Comments.clickCommentReplyTogglerById(comment.id);
+    await Comments.closeCommentReplyForm();
 
-    await expect(page.getByTestId(`comment-reply-input`)).toBeHidden();
+    await expect(Comments.getCommentReplyInput()).toBeHidden();
   });
 
   // TODO: Make it work this way
-
   // test('Only one reply form exists', async ({ page }) => {
-  //   await page.goto(`/post/${post.slug}`);
+  //   await SinglePostPage.goto(post.slug);
 
   //   await page.getByTestId(`comment-${comment.id}-toggle-reply`).click();
   //   await page
@@ -221,53 +227,38 @@ test.describe('Votes', () => {
     });
   });
 
-  // TODO: Introduce page object to make it better
-  const dataTestIds = {
-    upvote: `comment-${comment.id}-upvote`,
-    downvote: `comment-${comment.id}-downvote`,
-  };
-
-  test('Upvotes a comment', async ({ page, Api }) => {
-    await page.goto(`/post/${post.slug}`);
-
-    await page.getByTestId(`comment-${comment.id}-body`).isVisible();
+  test('Upvotes a comment', async ({ SinglePostPage, Comments, Api }) => {
+    await SinglePostPage.goto(post.slug);
 
     const upvoteResponse = await Api.routes.comments.updateRate.waitForRequest({
-      beforeAction: async () => {
-        await page.getByTestId(dataTestIds.upvote).click();
-      },
+      beforeAction: Comments.upvoteCommentById.bind(Comments, comment.id),
     });
 
     expect(upvoteResponse.postDataJSON()).toEqual({
       negative: false,
     });
-    await expect(page.getByTestId(dataTestIds.upvote)).toHaveClass(
-      /comments__item-main-block-meta-upvote_active/,
-    );
+    await expect(await Comments.getIsCommentByIdUpvoted(comment.id)).toBe(true);
   });
 
-  test('Downvotes a comment', async ({ page, Api }) => {
-    await page.goto(`/post/${post.slug}`);
-
-    await page.getByTestId(`comment-${comment.id}-body`).isVisible();
+  test('Downvotes a comment', async ({ SinglePostPage, Comments, Api }) => {
+    await SinglePostPage.goto(post.slug);
 
     const downvoteResponse =
       await Api.routes.comments.updateRate.waitForRequest({
-        beforeAction: async () => {
-          await page.getByTestId(dataTestIds.downvote).click();
-        },
+        beforeAction: Comments.downvoteCommentById.bind(Comments, comment.id),
       });
 
     expect(downvoteResponse.postDataJSON()).toEqual({
       negative: true,
     });
-    await expect(page.getByTestId(dataTestIds.downvote)).toHaveClass(
-      /comments__item-main-block-meta-downvote_active/,
+    await expect(await Comments.getIsCommentByIdDownvoted(comment.id)).toBe(
+      true,
     );
   });
 
   test('Removes a vote from a comment if it was upvoted before', async ({
-    page,
+    SinglePostPage,
+    Comments,
     Api,
   }) => {
     Api.routes.comments.getComments.mock({
@@ -284,25 +275,22 @@ test.describe('Votes', () => {
       },
     });
 
-    await page.goto(`/post/${post.slug}`);
+    await SinglePostPage.goto(post.slug);
 
-    await expect(page.getByTestId(dataTestIds.upvote)).toHaveClass(
-      /comments__item-main-block-meta-upvote_active/,
-    );
+    await expect(await Comments.getIsCommentByIdUpvoted(comment.id)).toBe(true);
 
     await Api.routes.comments.removeRate.waitForRequest({
-      beforeAction: async () => {
-        await page.getByTestId(dataTestIds.downvote).click();
-      },
+      beforeAction: Comments.downvoteCommentById.bind(Comments, comment.id),
     });
 
-    await expect(page.getByTestId(dataTestIds.upvote)).not.toHaveClass(
-      /comments__item-main-block-meta-upvote_active/,
+    await expect(await Comments.getIsCommentByIdUpvoted(comment.id)).toBe(
+      false,
     );
   });
 
   test('Removes a vote from a comment if it was downvoted before', async ({
-    page,
+    SinglePostPage,
+    Comments,
     Api,
   }) => {
     Api.routes.comments.getComments.mock({
@@ -319,27 +307,26 @@ test.describe('Votes', () => {
       },
     });
 
-    await page.goto(`/post/${post.slug}`);
+    await SinglePostPage.goto(post.slug);
 
-    await expect(page.getByTestId(dataTestIds.downvote)).toHaveClass(
-      /comments__item-main-block-meta-downvote_active/,
+    await expect(await Comments.getIsCommentByIdDownvoted(comment.id)).toBe(
+      true,
     );
 
     await Api.routes.comments.removeRate.waitForRequest({
-      beforeAction: async () => {
-        await page.getByTestId(dataTestIds.upvote).click();
-      },
+      beforeAction: Comments.upvoteCommentById.bind(Comments, comment.id),
     });
 
-    await expect(page.getByTestId(dataTestIds.downvote)).not.toHaveClass(
-      /comments__item-main-block-meta-downvote_active/,
+    await expect(await Comments.getIsCommentByIdDownvoted(comment.id)).toBe(
+      false,
     );
   });
 });
 
 test.describe('Editing or deleting a comment', () => {
   test('Cannot edit or delete a comment if the comment is older than 10 mins', async ({
-    page,
+    SinglePostPage,
+    Comments,
     context,
     Api,
   }) => {
@@ -360,18 +347,15 @@ test.describe('Editing or deleting a comment', () => {
       },
     });
 
-    await page.goto(`/post/${post.slug}`);
+    await SinglePostPage.goto(post.slug);
 
-    await expect(
-      page.getByTestId(`comment-${oldComment.id}-edit`),
-    ).toBeHidden();
-    await expect(
-      page.getByTestId(`comment-${oldComment.id}-delete`),
-    ).toBeHidden();
+    await expect(Comments.getEditBtnById(oldComment.id)).toBeHidden();
+    await expect(Comments.getDeleteBtnById(oldComment.id)).toBeHidden();
   });
 
   test('Deletes a comment that is not older than 10 mins, sends the delete request', async ({
-    page,
+    SinglePostPage,
+    Comments,
     context,
     Api,
   }) => {
@@ -393,19 +377,18 @@ test.describe('Editing or deleting a comment', () => {
 
     await mockDate(context, dateToMock);
 
-    await page.goto(`/post/${post.slug}`);
+    await SinglePostPage.goto(post.slug);
 
     await Api.routes.comments.deleteComment.waitForRequest({
-      beforeAction: async () => {
-        await page.getByTestId(`comment-${comment.id}-delete`).click();
-      },
+      beforeAction: Comments.deleteCommentById.bind(Comments, comment.id),
     });
 
-    await expect(page.getByTestId(`comment-${comment.id}-body`)).toBeHidden();
+    await expect(Comments.getCommentById(comment.id)).toBeHidden();
   });
 
   test('Edits a comment that is not older than 10 mins, sends the edit request', async ({
-    page,
+    SinglePostPage,
+    Comments,
     context,
     Api,
   }) => {
@@ -419,27 +402,30 @@ test.describe('Editing or deleting a comment', () => {
 
     await mockDate(context, dateToMock);
 
-    await page.goto(`/post/${post.slug}`);
+    await SinglePostPage.goto(post.slug);
 
-    await page.getByTestId(`comment-${comment.id}-edit`).click();
-    await page.getByTestId('comment-edit-input').fill(editCommentText);
+    await Comments.toggleCommentEditById(comment.id);
+    await Comments.getCommentEditInput().fill(editCommentText);
 
     const editCommentResponse =
       await Api.routes.comments.updateComment.waitForRequest({
-        beforeAction: async () => {
-          await page.getByTestId('comment-edit-btn').click();
-        },
+        beforeAction: Comments.submitEditedComment.bind(Comments, comment.id),
       });
 
     expect(editCommentResponse.postDataJSON()).toEqual({
       body: editCommentText,
     });
-    await expect(page.getByTestId(`comment-${comment.id}-body`)).toContainText(
+    await expect(Comments.getCommentById(comment.id)).toContainText(
       editCommentText,
     );
   });
 
-  test('Deletes a comment that has replies', async ({ page, context, Api }) => {
+  test('Deletes a comment that has replies', async ({
+    SinglePostPage,
+    Comments,
+    context,
+    Api,
+  }) => {
     Api.routes.comments.deleteComment.mock({
       status: 200,
       body: {
@@ -451,11 +437,11 @@ test.describe('Editing or deleting a comment', () => {
 
     await mockDate(context, dateToMock);
 
-    await page.goto(`/post/${post.slug}`);
+    await SinglePostPage.goto(post.slug);
 
-    await page.getByTestId(`comment-${comment.id}-delete`).click();
+    await Comments.deleteCommentById(comment.id);
 
-    await expect(page.getByTestId(`comment-${comment.id}-body`)).toContainText(
+    await expect(Comments.getCommentById(comment.id)).toContainText(
       'This comment has been deleted',
     );
   });

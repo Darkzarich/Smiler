@@ -28,7 +28,7 @@
               :data-testid="`comment-${comment.id}-upvote`"
               :class="
                 comment.rated.isRated && !comment.rated.negative
-                  ? 'comments__item-main-block-meta-upvote_active'
+                  ? 'comments__item-main-block-meta-upvote--active'
                   : ''
               "
               @click="upvote(comment.id)"
@@ -40,7 +40,7 @@
               class="comments__item-main-block-meta-downvote"
               :class="
                 comment.rated.isRated && comment.rated.negative
-                  ? 'comments__item-main-block-meta-downvote_active'
+                  ? 'comments__item-main-block-meta-downvote--active'
                   : ''
               "
               @click="downvote(comment.id)"
@@ -182,7 +182,7 @@
         <div
           v-else-if="comment.children.length > 0"
           :data-testid="`comment-${comment.id}-expander`"
-          class="comments__child-toggler comments__child-toggler_active"
+          class="comments__child-toggler comments__child-toggler--active"
           @click="toggleShowChild(comment.id)"
         >
           [+]
@@ -436,11 +436,11 @@ export default {
     cursor: pointer;
 
     &:hover,
-    &_active {
+    &--active {
       color: $firm;
     }
 
-    &_active {
+    &--active {
       font-weight: bold;
     }
 
@@ -551,14 +551,14 @@ export default {
           }
 
           &-upvote:hover svg,
-          &-upvote_active svg,
+          &-upvote--active svg,
           &-edit:hover svg {
             cursor: pointer;
             fill: $dark-firm;
           }
 
           &-downvote:hover svg,
-          &-downvote_active svg,
+          &-downvote--active svg,
           &-delete:hover svg {
             cursor: pointer;
             fill: $dark-red;
