@@ -99,7 +99,7 @@ test('Posts a new comment to a post', async ({ page, Api }) => {
 
   await page.goto(`/post/${post.slug}`);
 
-  await page.getByTestId('new-comment-form-input').fill('new comment');
+  await page.getByTestId('new-comment-form-editor-input').fill('new comment');
 
   const createCommentResponse =
     await Api.routes.comments.createComment.waitForRequest({
@@ -125,7 +125,10 @@ test('Cannot post comments if not logged in', async ({ page, Api }) => {
 
   await page.goto(`/post/${post.slug}`);
 
-  await expect(page.getByTestId('new-comment-form')).toBeHidden();
+  await expect(page.getByTestId('new-comment-form-editor')).toBeHidden();
+  await expect(page.getByTestId('new-comment-form')).toContainText(
+    'Please log in or create an account to leave a comment.',
+  );
 });
 
 test.describe('Replies', () => {

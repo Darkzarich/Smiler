@@ -24,12 +24,13 @@
         v-if="!commentsLoading"
         class="comments__form"
         :class="!user.authState ? 'comments__form_disabled' : ''"
+        data-testid="new-comment-form"
       >
         <template v-if="user.authState">
-          <div class="comments__form-title">Leave the commentary</div>
+          <div class="comments__form-title">Share your thoughts!</div>
           <TextEditorElement
             v-model="sendCommentBody"
-            data-testid="new-comment-form"
+            data-testid="new-comment-form-editor"
           >
             <div class="comments__form-submit">
               <ButtonElement
@@ -43,8 +44,7 @@
           </TextEditorElement>
         </template>
         <template v-else>
-          Please, <b>login</b> \ <b>register</b> to be able to leave any
-          comments
+          Please <b>log in</b> or <b>create an account</b> to leave a comment.
         </template>
       </div>
       <Comments
@@ -56,7 +56,7 @@
         :first="true"
       />
       <div v-else-if="!commentsLoading" class="comments__no-comments">
-        No comments yet... Be the first!
+        There are no comments yet... Be the first!
       </div>
       <div v-else class="comments__loading">
         <CircularLoader />
@@ -70,13 +70,13 @@
       <template v-if="moreCommentsLoading">
         <CircularLoader />
       </template>
-      <template v-else> Click to load more comments </template>
+      <template v-else> Click here to see more comments </template>
     </div>
     <div
       v-if="comments.length > 0 && curPage === maxPages"
       class="comments__load-more-cant"
     >
-      You've read all the comments. It's time to post some your own!
+      You've read all the comments. Now it's your turn to share your thoughts!
     </div>
   </div>
 </template>
