@@ -57,7 +57,7 @@ test('Goes to 404 if user does not exist', async ({
 
 test('Fetches and shows user profile', async ({ ProfilePage, Api }) => {
   const userResponse = await Api.routes.users.getUserProfile.waitForRequest({
-    beforeAction: async () => {
+    preRequestAction: async () => {
       await ProfilePage.goto(testUser.login);
     },
   });
@@ -82,7 +82,7 @@ test('Fetches user posts with expected filters', async ({
   Api,
 }) => {
   const postResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: async () => {
+    preRequestAction: async () => {
       await ProfilePage.goto(testUser.login);
     },
   });
@@ -123,7 +123,7 @@ test.describe('Follows and unfollow', () => {
     await ProfilePage.goto(testUser.login);
 
     const followResponse = await Api.routes.users.followUser.waitForRequest({
-      beforeAction: ProfilePage.follow.bind(ProfilePage),
+      preRequestAction: ProfilePage.follow.bind(ProfilePage),
     });
 
     expect(followResponse.url()).toContain(testUser.id);
@@ -148,7 +148,7 @@ test.describe('Follows and unfollow', () => {
 
     const unfollowResponse = await Api.routes.users.unfollowUser.waitForRequest(
       {
-        beforeAction: ProfilePage.unfollow.bind(ProfilePage),
+        preRequestAction: ProfilePage.unfollow.bind(ProfilePage),
       },
     );
 

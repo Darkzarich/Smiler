@@ -80,7 +80,7 @@ test('Creates a post with title, tags and content', async ({ page, Api }) => {
   await page.getByTestId('video-upload-button').click();
 
   const createPostResponse = await Api.routes.posts.createPost.waitForRequest({
-    beforeAction: async () => {
+    preRequestAction: async () => {
       await page.getByTestId('create-post-button').click();
     },
   });
@@ -132,7 +132,7 @@ test('Uploads a picture in the picture section', async ({ page, Api }) => {
 
   const uploadResponse = await Api.routes.posts.uploadAttachment.waitForRequest(
     {
-      beforeAction: async () => {
+      preRequestAction: async () => {
         await page.getByTestId('image-upload-button').click();
       },
     },
@@ -210,7 +210,7 @@ test('D&D post sections to change order of sections', async ({
   expect(newInnerHTML).toMatch(/pic-section.*text-section/);
 
   const createPostResponse = await Api.routes.posts.createPost.waitForRequest({
-    beforeAction: async () => {
+    preRequestAction: async () => {
       await page.getByTestId('create-post-button').click();
     },
   });
@@ -254,7 +254,7 @@ test('Fetch and show draft template', async ({ Api, page }) => {
 
   const getUserTemplateResponse =
     await Api.routes.users.getUserTemplate.waitForRequest({
-      beforeAction: async () => {
+      preRequestAction: async () => {
         await page.goto('/post/create');
       },
     });
@@ -302,7 +302,7 @@ test('Saves draft template', async ({ page, Api }) => {
 
   const updateUserTemplateResponse =
     await Api.routes.users.updateUserTemplate.waitForRequest({
-      beforeAction: async () => {
+      preRequestAction: async () => {
         await page.getByTestId('save-draft-button').click();
       },
     });

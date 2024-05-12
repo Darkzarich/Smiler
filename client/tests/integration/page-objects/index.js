@@ -7,9 +7,11 @@ import Comments from './components/Comments';
 import CurrentUser from './components/CurrentUser';
 import Menu from './components/Menu';
 import Post from './components/Post';
+import PostEditor from './components/PostEditor';
 import SystemNotification from './components/SystemNotification';
 import TagsList from './components/TagsList';
 import NotFoundPage from './pages/NotFoundPage';
+import PostEditPage from './pages/PostEditPage';
 import PostsPage from './pages/PostsPage';
 import ProfilePage from './pages/ProfilePage';
 import SearchPage from './pages/SearchPage';
@@ -27,6 +29,9 @@ export default test.extend({
   },
   SinglePostPage: async ({ page }, use) => {
     await use(new SinglePostPage(page));
+  },
+  PostEditPage: async ({ page }, use) => {
+    await use(new PostEditPage(page));
   },
   SettingsPage: async ({ page }, use) => {
     await use(new SettingsPage(page));
@@ -51,6 +56,9 @@ export default test.extend({
   },
   Menu: async ({ page, isMobile }, use) => {
     await use(new Menu(page, isMobile));
+  },
+  PostEditor: async ({ page }, use) => {
+    await use(new PostEditor(page));
   },
   CurrentUser: async ({ page }, use) => {
     await use(new CurrentUser(page));

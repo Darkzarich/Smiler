@@ -59,7 +59,7 @@ test('Open settings page, shows expected authors and tags the user is following'
   SettingsPage,
 }) => {
   await Api.routes.users.getUsersFollowing.waitForRequest({
-    beforeAction: async () => {
+    preRequestAction: async () => {
       await SettingsPage.goto();
     },
   });
@@ -110,7 +110,7 @@ test('Unfollows an author, removes that author from the list of following', asyn
   await SettingsPage.goto();
 
   await Api.routes.users.unfollowUser.waitForRequest({
-    beforeAction: async () => {
+    preRequestAction: async () => {
       await SettingsPage.unfollowAuthor(author1.id);
     },
   });
@@ -131,7 +131,7 @@ test('Unfollows a tag, removes that tag from the list of following', async ({
   await SettingsPage.goto();
 
   await Api.routes.tags.unfollow.waitForRequest({
-    beforeAction: async () => {
+    preRequestAction: async () => {
       await SettingsPage.unfollowTag(tags[0]);
     },
   });
@@ -148,7 +148,7 @@ test("Edits current user's bio with expected request body", async ({
   await SettingsPage.bioInput.fill('New bio');
 
   const editResponse = await Api.routes.users.updateUserProfile.waitForRequest({
-    beforeAction: SettingsPage.submitBio.bind(SettingsPage),
+    preRequestAction: SettingsPage.submitBio.bind(SettingsPage),
   });
 
   expect(editResponse.postDataJSON()).toMatchObject({ bio: 'New bio' });
@@ -163,7 +163,7 @@ test("Edits current user's avatar with expected request body", async ({
   await SettingsPage.avatarInput.fill(SettingsPage.avatarPlaceholderUrl);
 
   const editResponse = await Api.routes.users.updateUserProfile.waitForRequest({
-    beforeAction: SettingsPage.submitAvatar.bind(SettingsPage),
+    preRequestAction: SettingsPage.submitAvatar.bind(SettingsPage),
   });
 
   expect(editResponse.postDataJSON()).toMatchObject({

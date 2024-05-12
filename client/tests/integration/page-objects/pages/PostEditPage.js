@@ -1,5 +1,5 @@
-export default class SinglePostPage {
-  title = ' | Smiler';
+export default class PostEditPage {
+  title = 'Edit Post | Smiler';
 
   /**
    * @param {import('@playwright/test').Page} page
@@ -8,20 +8,12 @@ export default class SinglePostPage {
     this.page = page;
   }
 
-  getTitle(title = '') {
-    return `${title}${this.title}`;
-  }
-
   // eslint-disable-next-line class-methods-use-this
   getUrlWithSlug(slug = '') {
-    return `/post/${slug}`;
+    return `/post/${slug}/edit`;
   }
 
   async goto(slug = '') {
     await this.page.goto(this.getUrlWithSlug(slug));
-  }
-
-  async gotoEditPage(slug = '') {
-    await this.page.goto(`${this.getUrlWithSlug(slug)}/edit`);
   }
 }

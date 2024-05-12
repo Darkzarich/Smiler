@@ -34,7 +34,7 @@ test('Searches posts using the search bar in the header', async ({
   await Menu.fillSearchInput('test');
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: Menu.submitSearch.bind(Menu),
+    preRequestAction: Menu.submitSearch.bind(Menu),
   });
 
   expect(postsResponse.url()).toContain('title=test');
@@ -70,7 +70,7 @@ test('Searches posts by title using search page', async ({
   await SearchPage.searchInput.fill('test');
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: SearchPage.submitSearch.bind(SearchPage),
+    preRequestAction: SearchPage.submitSearch.bind(SearchPage),
   });
 
   expect(postsResponse.url()).toContain('title=test');
@@ -94,7 +94,7 @@ test('Searches posts by dateTo and dateFrom', async ({
   await SearchPage.dateTo.fill(dates.to);
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: SearchPage.submitSearch.bind(SearchPage),
+    preRequestAction: SearchPage.submitSearch.bind(SearchPage),
   });
 
   expect(postsResponse.url()).toContain(
@@ -120,7 +120,7 @@ test('Searches posts by ratingFrom and ratingTo', async ({
   await SearchPage.ratingTo.fill(ratings.to.toString());
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: SearchPage.submitSearch.bind(SearchPage),
+    preRequestAction: SearchPage.submitSearch.bind(SearchPage),
   });
 
   expect(postsResponse.url()).toContain(
@@ -144,7 +144,7 @@ test('Searches posts by tags', async ({
   await TagsList.addEachTag(tags);
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: SearchPage.submitSearch.bind(SearchPage),
+    preRequestAction: SearchPage.submitSearch.bind(SearchPage),
   });
 
   expect(postsResponse.url()).toContain(requestQueryTags);
@@ -175,7 +175,7 @@ test('Sets all filters from URL', async ({
   searchParams.append('tags', tags[1]);
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: SearchPage.goto.bind(SearchPage, searchParams.toString()),
+    preRequestAction: SearchPage.goto.bind(SearchPage, searchParams.toString()),
   });
 
   await expect(SearchPage.pageHasTitleQueryParam(filters.title)).toBe(true);
@@ -217,11 +217,11 @@ test('Searches posts by clicking on a tag name and then "Search tag" option in t
   });
 
   await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: PostsPage.goto.bind(Post, PostsPage.urls.all),
+    preRequestAction: PostsPage.goto.bind(Post, PostsPage.urls.all),
   });
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: Post.searchTag.bind(Post, post.id, tags[0]),
+    preRequestAction: Post.searchTag.bind(Post, post.id, tags[0]),
   });
 
   expect(postsResponse.url()).toContain(`tags[]=${tags[0]}`);

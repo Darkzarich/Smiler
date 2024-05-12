@@ -21,8 +21,13 @@ export default class ProfilePage {
     return `${login}${this.title}`;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  getUrlWithLogin(login = '') {
+    return `/user/@${login}`;
+  }
+
   async goto(login = '') {
-    await this.page.goto(`/user/@${login}`);
+    await this.page.goto(this.getUrlWithLogin(login));
   }
 
   async follow() {

@@ -47,7 +47,7 @@ test('Follows a tag', async ({ SinglePostPage, Post, Api }) => {
   await SinglePostPage.goto(post.slug);
 
   const followResponse = await Api.routes.tags.follow.waitForRequest({
-    beforeAction: Post.followTag.bind(Post, post.id, tagToClick),
+    preRequestAction: Post.followTag.bind(Post, post.id, tagToClick),
   });
 
   await Post.clickTag(post.id, tagToClick);
@@ -67,7 +67,7 @@ test('Unfollows a tag', async ({ SinglePostPage, Post, Api }) => {
   await SinglePostPage.goto(post.slug);
 
   const unfollowResponse = await Api.routes.tags.unfollow.waitForRequest({
-    beforeAction: Post.unfollowTag.bind(Post, post.id, tagToClick),
+    preRequestAction: Post.unfollowTag.bind(Post, post.id, tagToClick),
   });
 
   await Post.clickTag(post.id, tagToClick);

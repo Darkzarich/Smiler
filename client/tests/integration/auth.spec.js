@@ -27,7 +27,7 @@ test.describe('Auth state', () => {
     Menu,
   }) => {
     await Api.routes.auth.getAuth.waitForRequest({
-      beforeAction: async () => {
+      preRequestAction: async () => {
         await PostsPage.goto();
       },
     });
@@ -87,7 +87,7 @@ test.describe('Auth state', () => {
     await Menu.openIfMobile();
 
     await Api.routes.auth.logout.waitForRequest({
-      beforeAction: CurrentUser.clickLogoutBtn.bind(CurrentUser),
+      preRequestAction: CurrentUser.clickLogoutBtn.bind(CurrentUser),
     });
 
     await expect(CurrentUser.login).toBeHidden();
@@ -119,7 +119,7 @@ test.describe('Sign In and Sign Up requests', () => {
     await AuthForm.signInPassword.fill(formData.password);
 
     const authResponse = await Api.routes.auth.signIn.waitForRequest({
-      beforeAction: AuthForm.clickSignInBtn.bind(AuthForm),
+      preRequestAction: AuthForm.clickSignInBtn.bind(AuthForm),
     });
 
     expect(authResponse.postDataJSON()).toEqual(formData);
@@ -149,7 +149,7 @@ test.describe('Sign In and Sign Up requests', () => {
     await AuthForm.signUpConfirm.fill(formData.password);
 
     const createUserResponse = await Api.routes.auth.signUp.waitForRequest({
-      beforeAction: AuthForm.clickSignUpBtn.bind(AuthForm),
+      preRequestAction: AuthForm.clickSignUpBtn.bind(AuthForm),
     });
 
     expect(createUserResponse.postDataJSON()).toEqual({

@@ -108,7 +108,7 @@ test('Posts a new comment to a post', async ({
 
   const createCommentResponse =
     await Api.routes.comments.createComment.waitForRequest({
-      beforeAction: Comments.submitNewComment.bind(Comments),
+      preRequestAction: Comments.submitNewComment.bind(Comments),
     });
 
   expect(createCommentResponse.postDataJSON()).toEqual({
@@ -167,7 +167,7 @@ test.describe('Replies', () => {
 
     const replyResponse =
       await Api.routes.comments.createComment.waitForRequest({
-        beforeAction: Comments.submitCommentReply.bind(Comments),
+        preRequestAction: Comments.submitCommentReply.bind(Comments),
       });
 
     expect(replyResponse.postDataJSON()).toEqual({
@@ -231,7 +231,7 @@ test.describe('Votes', () => {
     await SinglePostPage.goto(post.slug);
 
     const upvoteResponse = await Api.routes.comments.updateRate.waitForRequest({
-      beforeAction: Comments.upvoteCommentById.bind(Comments, comment.id),
+      preRequestAction: Comments.upvoteCommentById.bind(Comments, comment.id),
     });
 
     expect(upvoteResponse.postDataJSON()).toEqual({
@@ -245,7 +245,10 @@ test.describe('Votes', () => {
 
     const downvoteResponse =
       await Api.routes.comments.updateRate.waitForRequest({
-        beforeAction: Comments.downvoteCommentById.bind(Comments, comment.id),
+        preRequestAction: Comments.downvoteCommentById.bind(
+          Comments,
+          comment.id,
+        ),
       });
 
     expect(downvoteResponse.postDataJSON()).toEqual({
@@ -280,7 +283,7 @@ test.describe('Votes', () => {
     await expect(await Comments.getIsCommentByIdUpvoted(comment.id)).toBe(true);
 
     await Api.routes.comments.removeRate.waitForRequest({
-      beforeAction: Comments.downvoteCommentById.bind(Comments, comment.id),
+      preRequestAction: Comments.downvoteCommentById.bind(Comments, comment.id),
     });
 
     await expect(await Comments.getIsCommentByIdUpvoted(comment.id)).toBe(
@@ -314,7 +317,7 @@ test.describe('Votes', () => {
     );
 
     await Api.routes.comments.removeRate.waitForRequest({
-      beforeAction: Comments.upvoteCommentById.bind(Comments, comment.id),
+      preRequestAction: Comments.upvoteCommentById.bind(Comments, comment.id),
     });
 
     await expect(await Comments.getIsCommentByIdDownvoted(comment.id)).toBe(
@@ -380,7 +383,7 @@ test.describe('Editing or deleting a comment', () => {
     await SinglePostPage.goto(post.slug);
 
     await Api.routes.comments.deleteComment.waitForRequest({
-      beforeAction: Comments.deleteCommentById.bind(Comments, comment.id),
+      preRequestAction: Comments.deleteCommentById.bind(Comments, comment.id),
     });
 
     await expect(Comments.getCommentById(comment.id)).toBeHidden();
@@ -409,7 +412,10 @@ test.describe('Editing or deleting a comment', () => {
 
     const editCommentResponse =
       await Api.routes.comments.updateComment.waitForRequest({
-        beforeAction: Comments.submitEditedComment.bind(Comments, comment.id),
+        preRequestAction: Comments.submitEditedComment.bind(
+          Comments,
+          comment.id,
+        ),
       });
 
     expect(editCommentResponse.postDataJSON()).toEqual({

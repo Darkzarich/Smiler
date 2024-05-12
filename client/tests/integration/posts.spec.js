@@ -31,7 +31,7 @@ test.beforeEach(async ({ Api }) => {
 
 test('Fetches posts with expected filters', async ({ page, Api }) => {
   await Api.routes.posts.getPosts.waitForRequest({
-    beforeAction: async () => {
+    preRequestAction: async () => {
       await page.goto('/');
     },
   });
@@ -74,7 +74,7 @@ test.describe('Post groups', () => {
   test.describe('Not requiring auth', () => {
     test.beforeEach(async ({ page, Api }) => {
       await Api.routes.posts.getPosts.waitForRequest({
-        beforeAction: async () => {
+        preRequestAction: async () => {
           await page.goto('/');
         },
       });
@@ -88,7 +88,7 @@ test.describe('Post groups', () => {
       });
 
       const allPostsResponse = await Api.routes.posts.getPosts.waitForRequest({
-        beforeAction: async () => {
+        preRequestAction: async () => {
           await clickPostGroup({
             group: 'all-link',
             isMobile,
@@ -120,7 +120,7 @@ test.describe('Post groups', () => {
 
       const blowingPostsResponse =
         await Api.routes.posts.getPosts.waitForRequest({
-          beforeAction: async () => {
+          preRequestAction: async () => {
             await clickPostGroup({
               group: 'blowing-link',
               isMobile,
@@ -154,7 +154,7 @@ test.describe('Post groups', () => {
 
       const topThisWeekResponse =
         await Api.routes.posts.getPosts.waitForRequest({
-          beforeAction: async () => {
+          preRequestAction: async () => {
             await clickPostGroup({
               group: 'top-this-week-link',
               isMobile,
@@ -186,7 +186,7 @@ test.describe('Post groups', () => {
       });
 
       const newPostsResponse = await Api.routes.posts.getPosts.waitForRequest({
-        beforeAction: async () => {
+        preRequestAction: async () => {
           await clickPostGroup({
             group: 'new-link',
             isMobile,
@@ -220,7 +220,7 @@ test.describe('Post groups', () => {
 
       const todayPostsResponse = await Api.routes.posts.getPosts.waitForRequest(
         {
-          beforeAction: async () => {
+          preRequestAction: async () => {
             // Default page is "today"
             await page.goto('/');
           },
@@ -281,7 +281,7 @@ test.describe('Post groups', () => {
       });
 
       const feedResponse = await Api.routes.posts.getPosts.waitForRequest({
-        beforeAction: async () => {
+        preRequestAction: async () => {
           await clickPostGroup({
             group: 'feed-link',
             isMobile,
@@ -330,7 +330,7 @@ test.describe('Post votes', () => {
 
     const upvoteResponse = await Api.routes.posts.updateRateById.waitForRequest(
       {
-        beforeAction: async () => {
+        preRequestAction: async () => {
           await page.getByTestId(dataTestIds.upvote).click();
         },
       },
@@ -351,7 +351,7 @@ test.describe('Post votes', () => {
 
     const downvoteResponse =
       await Api.routes.posts.updateRateById.waitForRequest({
-        beforeAction: async () => {
+        preRequestAction: async () => {
           await page.getByTestId(dataTestIds.downvote).click();
         },
       });
@@ -392,7 +392,7 @@ test.describe('Post votes', () => {
 
     const removeUpvoteResponse =
       await Api.routes.posts.removeRateById.waitForRequest({
-        beforeAction: async () => {
+        preRequestAction: async () => {
           await page.getByTestId(dataTestIds.downvote).click();
         },
       });
@@ -430,7 +430,7 @@ test.describe('Post votes', () => {
 
     const removeDownvoteResponse =
       await Api.routes.posts.removeRateById.waitForRequest({
-        beforeAction: async () => {
+        preRequestAction: async () => {
           await page.getByTestId(dataTestIds.upvote).click();
         },
       });

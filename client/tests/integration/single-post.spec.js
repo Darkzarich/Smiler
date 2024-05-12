@@ -36,11 +36,17 @@ test.beforeEach(async ({ Api }) => {
 });
 
 test.describe('Fetches a post by the slug of the post after clicking it in the list of posts', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+  test.beforeEach(async ({ PostsPage }) => {
+    await PostsPage.goto();
   });
 
-  test('Mobile', async ({ page, isMobile, Api }) => {
+  test('Mobile', async ({
+    SinglePostPage,
+    page: currentPage,
+    Post,
+    isMobile,
+    Api,
+  }) => {
     // eslint-disable-next-line playwright/no-conditional-in-test
     if (!isMobile) {
       return;
@@ -48,58 +54,57 @@ test.describe('Fetches a post by the slug of the post after clicking it in the l
 
     const postBySlugResponse =
       await Api.routes.posts.getPostBySlug.waitForRequest({
-        beforeAction: async () => {
-          await page.getByTestId(`post-${post.id}-title`).click();
-        },
+        preRequestAction: Post.openPostById.bind(Post, post.id),
       });
 
     expect(postBySlugResponse.url()).toContain(post.slug);
-    await expect(page).toHaveURL(`/post/${post.slug}`);
-    await expect(page).toHaveTitle(`${post.title} | Smiler`);
-    await expect(page.getByTestId(`post-${post.id}-title`)).toHaveText(
-      post.title,
+    await expect(currentPage).toHaveURL(
+      SinglePostPage.getUrlWithSlug(post.slug),
     );
+    await expect(currentPage).toHaveTitle(SinglePostPage.getTitle(post.title));
+    await expect(Post.getTitleById(post.id)).toHaveText(post.title);
   });
-  test('Desktop', async ({ context, Api, page, isMobile }) => {
+
+  test('Desktop', async ({ Api, SinglePostPage, Post, isMobile }) => {
     // eslint-disable-next-line playwright/no-conditional-in-test
     if (isMobile) {
       return;
     }
 
-    const [newPage] = await Promise.all([
-      context.waitForEvent('page'),
-      page.getByTestId(`post-${post.id}-title`).click(),
-    ]);
+    const newPage = await Post.openPostByIdInNewTab(post.id);
 
     const postBySlugResponse =
       await Api.routes.posts.getPostBySlug.waitForRequest({
         page: newPage,
       });
 
+    // Setting a new browser tab context
+    Post.setPage(newPage);
+
     expect(postBySlugResponse.url()).toContain(post.slug);
-    await expect(newPage).toHaveURL(`/post/${post.slug}`);
-    await expect(newPage).toHaveTitle(`${post.title} | Smiler`);
-    await expect(newPage.getByTestId(`post-${post.id}-title`)).toHaveText(
-      post.title,
-    );
+    await expect(newPage).toHaveURL(SinglePostPage.getUrlWithSlug(post.slug));
+    await expect(newPage).toHaveTitle(SinglePostPage.getTitle(post.title));
+    await expect(Post.getTitleById(post.id)).toHaveText(post.title);
   });
 });
 
-test('Opens a post by its link', async ({ page, Api }) => {
+test('Opens a post by its link', async ({ SinglePostPage, Post, Api }) => {
   const postBySlugResponse =
     await Api.routes.posts.getPostBySlug.waitForRequest({
-      beforeAction: async () => {
-        await page.goto(`/post/${post.slug}`);
-      },
+      preRequestAction: SinglePostPage.goto.bind(SinglePostPage, post.slug),
     });
 
   expect(postBySlugResponse.url()).toContain(post.slug);
-  await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
-    post.title,
-  );
+  await expect(Post.getTitleById(post.id)).toContainText(post.title);
 });
 
-test('Redirect to 404 if the post is not found', async ({ page, Api }) => {
+test('Redirect to 404 if the post is not found', async ({
+  SinglePostPage,
+  NotFoundPage,
+  SystemNotification,
+  page: currentPage,
+  Api,
+}) => {
   Api.routes.posts.getPostBySlug.mock({
     status: 404,
     body: {
@@ -109,21 +114,17 @@ test('Redirect to 404 if the post is not found', async ({ page, Api }) => {
     },
   });
 
-  await page.goto(`/post/${post.slug}`);
+  await SinglePostPage.goto(post.slug);
 
-  await expect(page).toHaveURL('/error/404');
-  await expect(page).toHaveTitle('Not Found | Smiler');
-  await expect(page.getByTestId('system-notifications')).toContainText(
-    'Post does not exist',
-  );
+  await NotFoundPage.waitForNotFoundPage();
+  await expect(currentPage).toHaveTitle(NotFoundPage.title);
+  await expect(SystemNotification.list).toContainText('Post does not exist');
 });
 
-test('Fetches post comments by post id', async ({ page, Api }) => {
+test('Fetches post comments by post id', async ({ SinglePostPage, Api }) => {
   const commentsResponse = await Api.routes.comments.getComments.waitForRequest(
     {
-      beforeAction: async () => {
-        await page.goto(`/post/${post.slug}`);
-      },
+      preRequestAction: SinglePostPage.goto.bind(SinglePostPage, post.slug),
     },
   );
 
@@ -134,29 +135,34 @@ test('Fetches post comments by post id', async ({ page, Api }) => {
 });
 
 test('Opens user profile after clicking on the author of the post', async ({
-  page,
+  SinglePostPage,
+  ProfilePage,
+  Post,
+  page: currentPage,
   Api,
 }) => {
   Api.routes.users.getUserProfile.mock({
     body: generateProfile(),
   });
 
-  await page.goto(`/post/${post.slug}`);
+  await SinglePostPage.goto(post.slug);
 
   const getUserProfileResponse =
     await Api.routes.users.getUserProfile.waitForRequest({
-      beforeAction: async () => {
-        await page.getByTestId(`post-${post.id}-author`).click();
-      },
+      preRequestAction: Post.openPostAuthorProfile.bind(Post, post.id),
     });
 
   expect(getUserProfileResponse.url()).toContain(post.author.login);
-  await expect(page).toHaveURL(`/user/@${post.author.login}`);
-  await expect(page).toHaveTitle(`${post.author.login} | Smiler`);
+  await expect(currentPage).toHaveURL(
+    ProfilePage.getUrlWithLogin(post.author.login),
+  );
+  await expect(currentPage).toHaveTitle(
+    ProfilePage.getTitle(post.author.login),
+  );
 });
 
 test.describe('Sections', () => {
-  test('Shows text section', async ({ Api, page }) => {
+  test('Shows text section', async ({ Api, SinglePostPage, Post }) => {
     const section = {
       hash: '1',
       type: 'text',
@@ -171,14 +177,14 @@ test.describe('Sections', () => {
       body: postWithSections,
     });
 
-    await page.goto(`/post/${postWithSections.slug}`);
+    await SinglePostPage.goto(postWithSections.slug);
 
     await expect(
-      page.getByTestId(`post-${postWithSections.id}-text-${section.hash}`),
+      Post.getTextSectionByHash(postWithSections.id, section.hash),
     ).toContainText(section.content);
   });
 
-  test('Shows pic section', async ({ Api, page }) => {
+  test('Shows pic section', async ({ Api, SinglePostPage, Post }) => {
     const section = {
       hash: '2',
       type: 'pic',
@@ -193,17 +199,17 @@ test.describe('Sections', () => {
       body: postWithSections,
     });
 
-    await page.goto(`/post/${postWithSections.slug}`);
+    await SinglePostPage.goto(postWithSections.slug);
 
     await expect(
-      page.getByTestId(`post-${postWithSections.id}-pic-${section.hash}`),
+      Post.getPicSectionByHash(postWithSections.id, section.hash),
     ).toBeVisible();
     await expect(
-      page.getByTestId(`post-${postWithSections.id}-pic-${section.hash}`),
+      Post.getPicSectionByHash(postWithSections.id, section.hash),
     ).toHaveAttribute('alt', section.url);
   });
 
-  test('Shows video section', async ({ Api, page }) => {
+  test('Shows video section', async ({ Api, SinglePostPage, Post }) => {
     const section = {
       hash: '3',
       type: 'vid',
@@ -218,17 +224,21 @@ test.describe('Sections', () => {
       body: postWithSections,
     });
 
-    await page.goto(`/post/${postWithSections.slug}`);
+    await SinglePostPage.goto(postWithSections.slug);
 
     await expect(
-      page.getByTestId(`post-${postWithSections.id}-vid-${section.hash}`),
+      Post.getVideoSectionByHash(postWithSections.id, section.hash),
     ).toBeVisible();
     await expect(
-      page.getByTestId(`post-${postWithSections.id}-vid-${section.hash}`),
+      Post.getVideoSectionByHash(postWithSections.id, section.hash),
     ).toHaveAttribute('src', section.url);
   });
 
-  test('Shows multiple sections at the same time', async ({ Api, page }) => {
+  test('Shows multiple sections at the same time', async ({
+    Api,
+    SinglePostPage,
+    Post,
+  }) => {
     const sections = [
       {
         hash: '1',
@@ -255,22 +265,24 @@ test.describe('Sections', () => {
       body: postWithSections,
     });
 
-    await page.goto(`/post/${postWithSections.slug}`);
+    await SinglePostPage.goto(postWithSections.slug);
 
     await expect(
-      page.getByTestId(`post-${postWithSections.id}-pic-${sections[0].hash}`),
-    ).toBeVisible();
-    await expect(
-      page.getByTestId(`post-${postWithSections.id}-pic-${sections[0].hash}`),
+      Post.getPicSectionByHash(postWithSections.id, sections[0].hash),
     ).toHaveAttribute('alt', sections[0].url);
+
     await expect(
-      page.getByTestId(`post-${postWithSections.id}-text-${sections[1].hash}`),
-    ).toContainText(sections[1].content);
-    await expect(
-      page.getByTestId(`post-${postWithSections.id}-vid-${sections[2].hash}`),
+      Post.getTextSectionByHash(postWithSections.id, sections[1].hash),
     ).toBeVisible();
     await expect(
-      page.getByTestId(`post-${postWithSections.id}-vid-${sections[2].hash}`),
+      Post.getTextSectionByHash(postWithSections.id, sections[1].hash),
+    ).toContainText(sections[1].content);
+
+    await expect(
+      Post.getVideoSectionByHash(postWithSections.id, sections[2].hash),
+    ).toBeVisible();
+    await expect(
+      Post.getVideoSectionByHash(postWithSections.id, sections[2].hash),
     ).toHaveAttribute('src', sections[2].url);
   });
 });
@@ -285,7 +297,8 @@ test.describe('Post edit', () => {
   });
 
   test('Cannot edit or delete a post if the post is older than 10 mins', async ({
-    page,
+    SinglePostPage,
+    Post,
     context,
     Api,
   }) => {
@@ -301,14 +314,17 @@ test.describe('Post edit', () => {
       }),
     });
 
-    await page.goto(`/post/${post.slug}`);
+    await SinglePostPage.goto(post.slug);
 
-    await expect(page.getByTestId('post-edit-icon')).toBeHidden();
-    await expect(page.getByTestId('post-delete-icon')).toBeHidden();
+    await expect(Post.editBtn).toBeHidden();
+    await expect(Post.deleteBtn).toBeHidden();
   });
 
   test('Cannot open edit page for a post if the post is older than 10 mins', async ({
-    page,
+    SinglePostPage,
+    PostsPage,
+    SystemNotification,
+    page: currentPage,
     context,
     Api,
   }) => {
@@ -324,17 +340,20 @@ test.describe('Post edit', () => {
       }),
     });
 
-    await page.goto(`/post/${post.slug}/edit`);
+    await SinglePostPage.gotoEditPage(post.slug);
 
-    await expect(page).toHaveURL('/');
-    await expect(page).toHaveTitle('Today | Smiler');
-    await expect(page.getByTestId('system-notifications')).toContainText(
+    await expect(currentPage).toHaveURL(PostsPage.urls.today);
+    await expect(currentPage).toHaveTitle(PostsPage.titles.today);
+    await expect(SystemNotification.list).toContainText(
       'You cannot edit this post anymore. Edit time has expired',
     );
   });
 
   test('Cannot open edit page for a post if the post author is not the logged in user', async ({
-    page,
+    SinglePostPage,
+    PostsPage,
+    page: currentPage,
+    SystemNotification,
     context,
     Api,
   }) => {
@@ -354,17 +373,21 @@ test.describe('Post edit', () => {
       }),
     });
 
-    await page.goto(`/post/${post.slug}/edit`);
+    await SinglePostPage.gotoEditPage(post.slug);
 
-    await expect(page).toHaveURL('/');
-    await expect(page).toHaveTitle('Today | Smiler');
-    await expect(page.getByTestId('system-notifications')).toContainText(
+    await expect(currentPage).toHaveURL('/');
+    await expect(currentPage).toHaveTitle(PostsPage.titles.today);
+    await expect(SystemNotification.list).toContainText(
       "Only post's author can edit this post",
     );
   });
 
-  test('Opens edit a post page if the post is not older than 10 mins', async ({
-    page,
+  test('Opens post edit page if the post is not older than 10 mins', async ({
+    SinglePostPage,
+    PostEditPage,
+    Post,
+    page: currentPage,
+    PostEditor,
     context,
     Api,
   }) => {
@@ -380,19 +403,20 @@ test.describe('Post edit', () => {
       }),
     });
 
-    await page.goto(`/post/${post.slug}`);
+    await SinglePostPage.goto(post.slug);
 
-    await page.getByTestId('post-edit-icon').click();
+    await Post.startEditingPost();
 
-    await expect(page).toHaveURL(`/post/${post.slug}/edit`);
-    await expect(page).toHaveTitle(`Edit Post | Smiler`);
-    await expect(page.getByTestId('text-section-input')).toHaveText(
+    await expect(currentPage).toHaveURL(PostEditPage.getUrlWithSlug(post.slug));
+    await expect(currentPage).toHaveTitle(PostEditPage.title);
+    await expect(PostEditor.textSectionInput).toHaveText(
       post.sections[0].content,
     );
   });
 
-  test('Open edit a post page, edit the post and save', async ({
-    page,
+  test('Opens post edit page, edits the post and saves it', async ({
+    SinglePostPage,
+    PostEditor,
     context,
     Api,
   }) => {
@@ -408,16 +432,13 @@ test.describe('Post edit', () => {
       }),
     });
 
-    await page.goto(`/post/${post.slug}/edit`);
+    await SinglePostPage.gotoEditPage(post.slug);
 
-    await page.getByTestId('text-section-input').focus();
-    await page.keyboard.type('edited');
+    await PostEditor.typeInTextSection('edited');
 
     const editPostResponse =
       await Api.routes.posts.updatePostById.waitForRequest({
-        beforeAction: async () => {
-          await page.getByTestId('finish-edit-post-button').click();
-        },
+        preRequestAction: PostEditor.submitEditedPost.bind(PostEditor),
       });
 
     expect(editPostResponse.url()).toContain(post.id);
@@ -432,8 +453,11 @@ test.describe('Post edit', () => {
   });
 
   test('Deletes a post, sends delete request', async ({
-    page,
+    SinglePostPage,
+    Post,
+    PostsPage,
     context,
+    page: currentPage,
     Api,
   }) => {
     Api.routes.posts.deletePostById.mock({
@@ -452,17 +476,15 @@ test.describe('Post edit', () => {
       }),
     });
 
-    await page.goto(`/post/${post.slug}`);
+    await SinglePostPage.goto(post.slug);
 
     const deletePostByIdResponse =
       await Api.routes.posts.deletePostById.waitForRequest({
-        beforeAction: async () => {
-          await page.getByTestId('post-delete-icon').click();
-        },
+        preRequestAction: Post.deletePost.bind(Post),
       });
 
     expect(deletePostByIdResponse.url()).toContain(post.id);
-    await expect(page).toHaveURL('/');
-    await expect(page).toHaveTitle('Today | Smiler');
+    await expect(currentPage).toHaveURL(PostsPage.urls.today);
+    await expect(currentPage).toHaveTitle(PostsPage.titles.today);
   });
 });
