@@ -466,7 +466,7 @@
       },
       "delete": {
         "summary": "Unvote a comment",
-        "description": "Delete already existing rate for user for comment",
+        "description": "Unvotes an already voted comment",
         "tags": [
           "Comments"
         ],
@@ -950,8 +950,8 @@
     },
     "/posts/{id}/vote": {
       "put": {
-        "summary": "Change rate on post",
-        "description": "Changes rate for post. `negative` decides direction. You can't rate post again before deleting previous rate",
+        "summary": "Change vote on post",
+        "description": "Changes vote for post. `negative` decides direction. You can't rate post again before deleting previous rate",
         "tags": [
           "Posts"
         ],
@@ -1002,7 +1002,7 @@
       },
       "delete": {
         "summary": "Unvote a post",
-        "description": "Unvote an already voted post",
+        "description": "Delete already existing rate for user for post",
         "tags": [
           "Posts"
         ],
