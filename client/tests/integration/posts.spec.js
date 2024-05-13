@@ -29,21 +29,21 @@ test.beforeEach(async ({ Api }) => {
   });
 });
 
-test('Fetches posts with expected filters', async ({ page, Api }) => {
+test('Fetches posts with expected filters', async ({
+  PostsPage,
+  Post,
+  Api,
+}) => {
   await Api.routes.posts.getPosts.waitForRequest({
-    preRequestAction: async () => {
-      await page.goto('/');
-    },
+    preRequestAction: PostsPage.goto.bind(PostsPage, PostsPage.urls.today),
   });
 
   for (const post of posts) {
-    await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
-      post.title,
-    );
+    await expect(Post.getTitleById(post.id)).toContainText(post.title);
   }
 });
 
-test('Empty posts lists', async ({ page, Api, Post }) => {
+test('Empty posts lists', async ({ Api, Post, PostsPage }) => {
   Api.routes.posts.getPosts.mock({
     body: {
       pages: 0,
@@ -51,36 +51,32 @@ test('Empty posts lists', async ({ page, Api, Post }) => {
     },
   });
 
-  await page.goto('/');
+  await PostsPage.goto(PostsPage.urls.today);
 
-  await expect(page.getByTestId('posts-container')).toBeVisible();
+  await expect(Post.postsList).toBeVisible();
   await expect(Post.getNoContentText()).toBeVisible();
 });
-
-async function clickPostGroup({ page, group, isMobile }) {
-  if (isMobile) {
-    page.getByTestId('mobile-menu').click();
-  }
-  await page.getByTestId(group).click();
-}
 
 test.describe('Post groups', () => {
   test.beforeEach(async ({ context }) => {
     // playwright.config.js has Europe/Amsterdam (GMT+1) timezone set
-
     await mockDate(context, '2024-03-06T00:00:00.000Z');
   });
 
   test.describe('Not requiring auth', () => {
-    test.beforeEach(async ({ page, Api }) => {
+    test.beforeEach(async ({ PostsPage, Api, Menu }) => {
       await Api.routes.posts.getPosts.waitForRequest({
-        preRequestAction: async () => {
-          await page.goto('/');
-        },
+        preRequestAction: PostsPage.goto.bind(PostsPage, PostsPage.urls.today),
       });
+      await Menu.openIfMobile();
     });
 
-    test('Fetches all posts', async ({ page, isMobile, Api }) => {
+    test('Fetches all posts', async ({
+      page: currentPage,
+      PostsPage,
+      Post,
+      Api,
+    }) => {
       const searchParams = new URLSearchParams({
         limit: '20',
         offset: '0',
@@ -88,27 +84,27 @@ test.describe('Post groups', () => {
       });
 
       const allPostsResponse = await Api.routes.posts.getPosts.waitForRequest({
-        preRequestAction: async () => {
-          await clickPostGroup({
-            group: 'all-link',
-            isMobile,
-            page,
-          });
-        },
+        preRequestAction: PostsPage.selectPostGroup.bind(
+          PostsPage,
+          PostsPage.groups.all,
+        ),
       });
 
       expect(allPostsResponse.url()).toContain(searchParams.toString());
-      await expect(page).toHaveURL(/.*posts\/all/);
-      await expect(page).toHaveTitle('All Posts | Smiler');
-      await expect(page.getByTestId('posts-container')).toBeVisible();
+      await expect(currentPage).toHaveURL(PostsPage.urls.all);
+      await expect(currentPage).toHaveTitle(PostsPage.titles.all);
+      await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
-        await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
-          post.title,
-        );
+        await expect(Post.getTitleById(post.id)).toContainText(post.title);
       }
     });
 
-    test('Fetches "blowing" posts', async ({ page, isMobile, Api }) => {
+    test('Fetches "blowing" posts', async ({
+      page: currentPage,
+      PostsPage,
+      Post,
+      Api,
+    }) => {
       const searchParams = new URLSearchParams({
         limit: '20',
         offset: '0',
@@ -120,29 +116,29 @@ test.describe('Post groups', () => {
 
       const blowingPostsResponse =
         await Api.routes.posts.getPosts.waitForRequest({
-          preRequestAction: async () => {
-            await clickPostGroup({
-              group: 'blowing-link',
-              isMobile,
-              page,
-            });
-          },
+          preRequestAction: PostsPage.selectPostGroup.bind(
+            PostsPage,
+            PostsPage.groups.blowing,
+          ),
         });
 
       expect(blowingPostsResponse.url()).toContain(
         decodeURIComponent(searchParams.toString()),
       );
-      await expect(page).toHaveURL(/.*posts\/blowing/);
-      await expect(page).toHaveTitle('Blowing | Smiler');
-      await expect(page.getByTestId('posts-container')).toBeVisible();
+      await expect(currentPage).toHaveURL(PostsPage.urls.blowing);
+      await expect(currentPage).toHaveTitle(PostsPage.titles.blowing);
+      await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
-        await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
-          post.title,
-        );
+        await expect(Post.getTitleById(post.id)).toContainText(post.title);
       }
     });
 
-    test('Fetches "top this week" posts', async ({ page, isMobile, Api }) => {
+    test('Fetches "top this week" posts', async ({
+      page: currentPage,
+      PostsPage,
+      Post,
+      Api,
+    }) => {
       const searchParams = new URLSearchParams({
         limit: '20',
         offset: '0',
@@ -154,29 +150,29 @@ test.describe('Post groups', () => {
 
       const topThisWeekResponse =
         await Api.routes.posts.getPosts.waitForRequest({
-          preRequestAction: async () => {
-            await clickPostGroup({
-              group: 'top-this-week-link',
-              isMobile,
-              page,
-            });
-          },
+          preRequestAction: PostsPage.selectPostGroup.bind(
+            PostsPage,
+            PostsPage.groups.topThisWeek,
+          ),
         });
 
       expect(topThisWeekResponse.url()).toContain(
         decodeURIComponent(searchParams.toString()),
       );
-      await expect(page).toHaveURL(/.*posts\/top-this-week/);
-      await expect(page).toHaveTitle('Top This Week | Smiler');
-      await expect(page.getByTestId('posts-container')).toBeVisible();
+      await expect(currentPage).toHaveURL(PostsPage.urls.topThisWeek);
+      await expect(currentPage).toHaveTitle(PostsPage.titles.topThisWeek);
+      await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
-        await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
-          post.title,
-        );
+        await expect(Post.getTitleById(post.id)).toContainText(post.title);
       }
     });
 
-    test('Fetches "new" posts', async ({ page, isMobile, Api }) => {
+    test('Fetches "new" posts', async ({
+      page: currentPage,
+      PostsPage,
+      Post,
+      Api,
+    }) => {
       const searchParams = new URLSearchParams({
         limit: '20',
         offset: '0',
@@ -186,29 +182,29 @@ test.describe('Post groups', () => {
       });
 
       const newPostsResponse = await Api.routes.posts.getPosts.waitForRequest({
-        preRequestAction: async () => {
-          await clickPostGroup({
-            group: 'new-link',
-            isMobile,
-            page,
-          });
-        },
+        preRequestAction: PostsPage.selectPostGroup.bind(
+          PostsPage,
+          PostsPage.groups.new,
+        ),
       });
 
       expect(newPostsResponse.url()).toContain(
         decodeURIComponent(searchParams.toString()),
       );
-      await expect(page).toHaveURL(/.*posts\/new/);
-      await expect(page).toHaveTitle('Recent | Smiler');
-      await expect(page.getByTestId('posts-container')).toBeVisible();
+      await expect(currentPage).toHaveURL(PostsPage.urls.new);
+      await expect(currentPage).toHaveTitle(PostsPage.titles.new);
+      await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
-        await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
-          post.title,
-        );
+        await expect(Post.getTitleById(post.id)).toContainText(post.title);
       }
     });
 
-    test('Fetches "today" posts', async ({ page, Api }) => {
+    test('Fetches "today" posts', async ({
+      page: currentPage,
+      PostsPage,
+      Post,
+      Api,
+    }) => {
       const searchParams = new URLSearchParams({
         limit: '20',
         offset: '0',
@@ -220,36 +216,28 @@ test.describe('Post groups', () => {
 
       const todayPostsResponse = await Api.routes.posts.getPosts.waitForRequest(
         {
-          preRequestAction: async () => {
-            // Default page is "today"
-            await page.goto('/');
-          },
+          preRequestAction: PostsPage.goto.bind(
+            PostsPage,
+            PostsPage.urls.today,
+          ),
         },
       );
 
       expect(todayPostsResponse.url()).toContain(
         decodeURIComponent(searchParams.toString()),
       );
-      await expect(page).toHaveURL(/.*/);
-      await expect(page).toHaveTitle('Today | Smiler');
-      await expect(page.getByTestId('posts-container')).toBeVisible();
+      await expect(currentPage).toHaveURL(PostsPage.urls.today);
+      await expect(currentPage).toHaveTitle(PostsPage.titles.today);
+      await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
-        await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
-          post.title,
-        );
+        await expect(Post.getTitleById(post.id)).toContainText(post.title);
       }
     });
 
     test('Feed link is disabled if user is not logged in', async ({
-      page,
-      isMobile,
+      PostsPage,
     }) => {
-      // eslint-disable-next-line playwright/no-conditional-in-test
-      if (isMobile) {
-        page.getByTestId('mobile-menu').click();
-      }
-
-      await expect(page.getByTestId('feed-link')).toHaveAttribute(
+      await expect(PostsPage.getFeedLink()).toHaveAttribute(
         'title',
         'Log in to access this page',
       );
@@ -257,17 +245,24 @@ test.describe('Post groups', () => {
   });
 
   test.describe('Requires auth', () => {
-    test.beforeEach(async ({ page, Api }) => {
+    test.beforeEach(async ({ PostsPage, Menu, Api }) => {
       Api.routes.auth.getAuth.mock({
         body: generateAuth({
           isAuth: true,
         }),
       });
 
-      await page.goto('/');
+      await PostsPage.goto(PostsPage.urls.today);
+
+      await Menu.openIfMobile();
     });
 
-    test("Fetches current user's feed", async ({ page, Api, isMobile }) => {
+    test("Fetches current user's feed", async ({
+      page: currentPage,
+      PostsPage,
+      Post,
+      Api,
+    }) => {
       Api.routes.posts.getFeed.mock({
         body: {
           pages: 0,
@@ -281,39 +276,24 @@ test.describe('Post groups', () => {
       });
 
       const feedResponse = await Api.routes.posts.getPosts.waitForRequest({
-        preRequestAction: async () => {
-          await clickPostGroup({
-            group: 'feed-link',
-            isMobile,
-            page,
-          });
-        },
+        preRequestAction: PostsPage.selectPostGroup.bind(
+          PostsPage,
+          PostsPage.groups.feed,
+        ),
       });
 
       expect(feedResponse.url()).toContain(searchParams.toString());
-      await expect(page).toHaveURL(/.*\/feed/);
-      await expect(page).toHaveTitle('Feed | Smiler');
-      await expect(page.getByTestId('posts-container')).toBeVisible();
+      await expect(currentPage).toHaveURL(PostsPage.urls.feed);
+      await expect(currentPage).toHaveTitle(PostsPage.titles.feed);
+      await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
-        await expect(page.getByTestId(`post-${post.id}-title`)).toContainText(
-          post.title,
-        );
+        await expect(Post.getTitleById(post.id)).toContainText(post.title);
       }
     });
   });
 });
 
 test.describe('Post votes', () => {
-  let dataTestIds;
-
-  test.beforeAll(async ({ isMobile }) => {
-    // TODO: Introduce page object to make it better
-    dataTestIds = {
-      upvote: `${isMobile ? 'm-' : ''}post-${post1.id}-upvote`,
-      downvote: `${isMobile ? 'm-' : ''}post-${post1.id}-downvote`,
-    };
-  });
-
   test.beforeEach(async ({ Api }) => {
     Api.routes.posts.updateRateById.mock({
       status: 200,
@@ -324,15 +304,13 @@ test.describe('Post votes', () => {
     });
   });
 
-  test('Upvotes a post', async ({ page, Api }) => {
-    await page.goto('/');
-    await page.getByTestId(`post-${post1.id}-title`).isVisible();
+  test('Upvotes a post', async ({ Api, Post, PostsPage }) => {
+    await PostsPage.goto(PostsPage.urls.today);
+    await Post.getTitleById(post1.id).isVisible();
 
     const upvoteResponse = await Api.routes.posts.updateRateById.waitForRequest(
       {
-        preRequestAction: async () => {
-          await page.getByTestId(dataTestIds.upvote).click();
-        },
+        preRequestAction: Post.upvotePostById.bind(Post, post1.id),
       },
     );
 
@@ -340,33 +318,28 @@ test.describe('Post votes', () => {
     expect(upvoteResponse.postDataJSON()).toEqual({
       negative: false,
     });
-    await expect(page.getByTestId(dataTestIds.upvote)).toHaveClass(
-      /post-side__upvote_active/,
-    );
+    await expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(true);
   });
 
-  test('Downvotes a post', async ({ page, Api }) => {
-    await page.goto('/');
-    await page.getByTestId(`post-${post1.id}-title`).isVisible();
+  test('Downvotes a post', async ({ Post, PostsPage, Api }) => {
+    await PostsPage.goto(PostsPage.urls.today);
+    await Post.getTitleById(post1.id).isVisible();
 
     const downvoteResponse =
       await Api.routes.posts.updateRateById.waitForRequest({
-        preRequestAction: async () => {
-          await page.getByTestId(dataTestIds.downvote).click();
-        },
+        preRequestAction: Post.downvotePostById.bind(Post, post1.id),
       });
 
     expect(downvoteResponse.url()).toContain(post1.id);
     expect(downvoteResponse.postDataJSON()).toEqual({
       negative: true,
     });
-    await expect(page.getByTestId(dataTestIds.downvote)).toHaveClass(
-      /post-side__downvote_active/,
-    );
+    await expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(true);
   });
 
   test('Removes a vote from a post if it was upvoted before', async ({
-    page,
+    Post,
+    PostsPage,
     Api,
   }) => {
     Api.routes.posts.getPosts.mock({
@@ -384,27 +357,22 @@ test.describe('Post votes', () => {
       },
     });
 
-    await page.goto('/');
+    await PostsPage.goto(PostsPage.urls.today);
 
-    await expect(page.getByTestId(dataTestIds.upvote)).toHaveClass(
-      /post-side__upvote_active/,
-    );
+    await expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(true);
 
     const removeUpvoteResponse =
       await Api.routes.posts.removeRateById.waitForRequest({
-        preRequestAction: async () => {
-          await page.getByTestId(dataTestIds.downvote).click();
-        },
+        preRequestAction: Post.downvotePostById.bind(Post, post1.id),
       });
 
     expect(removeUpvoteResponse.url()).toContain(post1.id);
-    await expect(page.getByTestId(dataTestIds.upvote)).not.toHaveClass(
-      /post-side__upvote_active/,
-    );
+    await expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(false);
   });
 
   test('Removes a vote from a post if it was downvoted before', async ({
-    page,
+    Post,
+    PostsPage,
     Api,
   }) => {
     Api.routes.posts.getPosts.mock({
@@ -422,28 +390,22 @@ test.describe('Post votes', () => {
       },
     });
 
-    await page.goto('/');
+    await PostsPage.goto(PostsPage.urls.today);
 
-    await expect(page.getByTestId(dataTestIds.downvote)).toHaveClass(
-      /post-side__downvote_active/,
-    );
+    await expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(true);
 
     const removeDownvoteResponse =
       await Api.routes.posts.removeRateById.waitForRequest({
-        preRequestAction: async () => {
-          await page.getByTestId(dataTestIds.upvote).click();
-        },
+        preRequestAction: Post.upvotePostById.bind(Post, post1.id),
       });
 
     expect(removeDownvoteResponse.url()).toContain(post1.id);
-    await expect(page.getByTestId(dataTestIds.downvote)).not.toHaveClass(
-      /post-side__downvote_active/,
-    );
+    await expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(false);
   });
 });
 
 test.describe('Sections', () => {
-  test('Shows text section', async ({ Api, page }) => {
+  test('Shows text section', async ({ Post, PostsPage, Api }) => {
     const section = {
       hash: '1',
       type: 'text',
@@ -461,14 +423,14 @@ test.describe('Sections', () => {
       },
     });
 
-    await page.goto('/');
+    await PostsPage.goto(PostsPage.urls.today);
 
     await expect(
-      page.getByTestId(`post-${post.id}-text-${section.hash}`),
+      Post.getTextSectionByHash(post.id, section.hash),
     ).toContainText(section.content);
   });
 
-  test('Shows pic section', async ({ Api, page }) => {
+  test('Shows pic section', async ({ Post, PostsPage, Api }) => {
     const section = {
       hash: '2',
       type: 'pic',
@@ -486,17 +448,15 @@ test.describe('Sections', () => {
       },
     });
 
-    await page.goto('/');
+    await PostsPage.goto(PostsPage.urls.today);
 
+    await expect(Post.getPicSectionByHash(post.id, section.hash)).toBeVisible();
     await expect(
-      page.getByTestId(`post-${post.id}-pic-${section.hash}`),
-    ).toBeVisible();
-    await expect(
-      page.getByTestId(`post-${post.id}-pic-${section.hash}`),
+      Post.getPicSectionByHash(post.id, section.hash),
     ).toHaveAttribute('alt', section.url);
   });
 
-  test('Shows video section', async ({ Api, page }) => {
+  test('Shows video section', async ({ Post, PostsPage, Api }) => {
     const section = {
       hash: '3',
       type: 'vid',
@@ -514,17 +474,17 @@ test.describe('Sections', () => {
       },
     });
 
-    await page.goto('/');
+    await PostsPage.goto(PostsPage.urls.today);
 
     await expect(
-      page.getByTestId(`post-${post.id}-vid-${section.hash}`),
+      Post.getVideoSectionByHash(post.id, section.hash),
     ).toBeVisible();
     await expect(
-      page.getByTestId(`post-${post.id}-vid-${section.hash}`),
+      Post.getVideoSectionByHash(post.id, section.hash),
     ).toHaveAttribute('src', section.url);
   });
 
-  test('Shows multiple sections', async ({ Api, page }) => {
+  test('Shows multiple sections', async ({ Post, PostsPage, Api }) => {
     const sections = [
       {
         hash: '1',
@@ -554,22 +514,24 @@ test.describe('Sections', () => {
       },
     });
 
-    await page.goto('/');
+    await PostsPage.goto(PostsPage.urls.today);
 
     await expect(
-      page.getByTestId(`post-${post.id}-pic-${sections[0].hash}`),
+      Post.getPicSectionByHash(post.id, sections[0].hash),
     ).toBeVisible();
     await expect(
-      page.getByTestId(`post-${post.id}-pic-${sections[0].hash}`),
+      Post.getPicSectionByHash(post.id, sections[0].hash),
     ).toHaveAttribute('alt', sections[0].url);
+
     await expect(
-      page.getByTestId(`post-${post.id}-text-${sections[1].hash}`),
+      Post.getTextSectionByHash(post.id, sections[1].hash),
     ).toContainText(sections[1].content);
+
     await expect(
-      page.getByTestId(`post-${post.id}-vid-${sections[2].hash}`),
+      Post.getVideoSectionByHash(post.id, sections[2].hash),
     ).toBeVisible();
     await expect(
-      page.getByTestId(`post-${post.id}-vid-${sections[2].hash}`),
+      Post.getVideoSectionByHash(post.id, sections[2].hash),
     ).toHaveAttribute('src', sections[2].url);
   });
 });

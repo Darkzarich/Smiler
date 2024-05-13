@@ -25,6 +25,22 @@ export default class Post extends AbstractComponent {
     return this.page.getByTestId(`post-${id}-title`);
   }
 
+  getUpvoteBtnById(postId = '') {
+    const selector = this.isMobile
+      ? `m-post-${postId}-upvote`
+      : `post-${postId}-upvote`;
+
+    return this.page.getByTestId(selector);
+  }
+
+  getDownvoteBtnById(postId = '') {
+    const selector = this.isMobile
+      ? `m-post-${postId}-downvote`
+      : `post-${postId}-downvote`;
+
+    return this.page.getByTestId(selector);
+  }
+
   getFollowTagBtn() {
     return this.findContextMenuOption('Follow tag');
   }
@@ -51,6 +67,19 @@ export default class Post extends AbstractComponent {
 
   getVideoSectionByHash(postId = '', hash = '') {
     return this.page.getByTestId(`post-${postId}-vid-${hash}`);
+  }
+
+  async getIsPostByIdUpvoted(postId = '') {
+    const postClass = await this.getUpvoteBtnById(postId).getAttribute('class');
+
+    return /upvote--active/.test(postClass);
+  }
+
+  async getIsPostByIdDownvoted(postId = '') {
+    const postClass =
+      await this.getDownvoteBtnById(postId).getAttribute('class');
+
+    return /downvote--active/.test(postClass);
   }
 
   async clickTag(postId = '', tag = '') {
@@ -97,5 +126,13 @@ export default class Post extends AbstractComponent {
 
   async deletePost() {
     await this.deleteBtn.click();
+  }
+
+  async upvotePostById(postId = '') {
+    await this.getUpvoteBtnById(postId).click();
+  }
+
+  async downvotePostById(postId = '') {
+    await this.getDownvoteBtnById(postId).click();
   }
 }

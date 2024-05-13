@@ -6,7 +6,7 @@
         class="post-side__upvote"
         :class="
           postData.rated.isRated && !postData.rated.negative
-            ? 'post-side__upvote_active'
+            ? 'post-side__upvote--active'
             : ''
         "
         @click="upvote(postData.id)"
@@ -21,7 +21,7 @@
         class="post-side__downvote"
         :class="
           postData.rated.isRated && postData.rated.negative
-            ? 'post-side__downvote_active'
+            ? 'post-side__downvote--active'
             : ''
         "
         @click="downvote(postData.id)"
@@ -111,7 +111,7 @@
           :data-testid="`m-post-${postData.id}-upvote`"
           :class="
             postData.rated.isRated && !postData.rated.negative
-              ? 'post-side__upvote_active'
+              ? 'post-side__upvote--active'
               : ''
           "
           @click="upvote(postData.id)"
@@ -126,7 +126,7 @@
           :data-testid="`m-post-${postData.id}-downvote`"
           :class="
             postData.rated.isRated && postData.rated.negative
-              ? 'post-side__downvote_active'
+              ? 'post-side__downvote--active'
               : ''
           "
           @click="downvote(postData.id)"
@@ -448,7 +448,7 @@ export default {
     }
   }
 
-  &__upvote_active svg,
+  &__upvote--active svg,
   &__upvote:hover svg {
     cursor: pointer;
     fill: $dark-firm;
@@ -599,7 +599,7 @@ export default {
     }
 
     &__downvote:hover svg,
-    &__downvote_active svg {
+    &__downvote--active svg {
       cursor: pointer;
       fill: $dark-red;
     }

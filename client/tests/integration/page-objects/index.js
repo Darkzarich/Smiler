@@ -24,8 +24,8 @@ export default test.extend({
   Api: async ({ page, context }, use) => {
     await use(new Api(page, context));
   },
-  PostsPage: async ({ page }, use) => {
-    await use(new PostsPage(page));
+  PostsPage: async ({ page, isMobile }, use) => {
+    await use(new PostsPage(page, isMobile));
   },
   SinglePostPage: async ({ page }, use) => {
     await use(new SinglePostPage(page));

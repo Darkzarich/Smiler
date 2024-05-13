@@ -146,7 +146,7 @@ const router = new Router({
         authGuard(to, from, next);
       },
       meta: {
-        title: 'Feed',
+        title: 'My Feed',
       },
     },
     {
