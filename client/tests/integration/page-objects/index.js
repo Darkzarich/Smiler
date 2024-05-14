@@ -11,6 +11,7 @@ import PostEditor from './components/PostEditor';
 import SystemNotification from './components/SystemNotification';
 import TagsList from './components/TagsList';
 import NotFoundPage from './pages/NotFoundPage';
+import PostCreatePage from './pages/PostCreatePage';
 import PostEditPage from './pages/PostEditPage';
 import PostsPage from './pages/PostsPage';
 import ProfilePage from './pages/ProfilePage';
@@ -32,6 +33,9 @@ export default test.extend({
   },
   PostEditPage: async ({ page }, use) => {
     await use(new PostEditPage(page));
+  },
+  PostCreatePage: async ({ page }, use) => {
+    await use(new PostCreatePage(page));
   },
   SettingsPage: async ({ page }, use) => {
     await use(new SettingsPage(page));

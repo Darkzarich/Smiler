@@ -22,4 +22,8 @@ export default class Menu {
   async submitSearch() {
     await this.page.getByTestId('header-search-input').press('Enter');
   }
+
+  async goToCreatePostPage() {
+    await this.createPostBtn.click();
+  }
 }

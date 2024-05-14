@@ -37,59 +37,60 @@ test.beforeEach(async ({ Api }) => {
 });
 
 test('Goes to post create page from the user menu', async ({
-  page,
-  isMobile,
+  PostsPage,
+  page: currentPage,
+  PostCreatePage,
+  Menu,
 }) => {
-  await page.goto('/');
+  await PostsPage.goto(PostsPage.urls.today);
 
-  if (isMobile) {
-    await page.getByTestId('mobile-menu').click();
-  }
+  Menu.openIfMobile();
 
-  await page.getByTestId('create-post-btn').click();
+  await Menu.goToCreatePostPage();
 
-  await expect(page).toHaveURL('/post/create');
-  await expect(page.getByTestId('post-create-header')).toBeVisible();
+  await expect(currentPage).toHaveURL(PostCreatePage.url);
+  await expect(PostCreatePage.header).toBeVisible();
 });
 
-test('Creates a post with title, tags and content', async ({ page, Api }) => {
+test('Creates a post with title, tags and content', async ({
+  PostCreatePage,
+  page: currentPage,
+  SinglePostPage,
+  Post,
+  Api,
+}) => {
   const tags = ['test tag', 'test tag 2'];
 
-  await page.goto('/post/create');
+  await PostCreatePage.goto();
 
-  await expect(page.getByTestId('post-create-header')).toBeVisible();
+  await expect(PostCreatePage.header).toBeVisible();
 
-  await page.getByTestId('post-title-input').fill(title);
+  await PostCreatePage.postTitleInput.fill(title);
 
   for (const tag of tags) {
-    await page.getByTestId('post-tag-input').fill(tag);
-    await page.keyboard.press('Enter');
+    await PostCreatePage.addTag(tag);
   }
 
-  await page.getByTestId('add-text-button').click();
-  await page.getByTestId('text-section-input').fill('test text');
+  await PostCreatePage.addTextSection();
+  await PostCreatePage.fillTextSection('test text');
 
-  await page.getByTestId('add-pic-button').click();
-  await page.getByTestId('image-url-input').fill(picUrl);
-  await page.getByTestId('image-upload-button').click();
+  await PostCreatePage.addPictureSection();
+  await PostCreatePage.uploadPictureWithUrl(picUrl);
 
-  await page.getByTestId('add-video-button').click();
-  await page
-    .getByTestId('video-url-input')
-    .fill(`https://www.youtube.com/watch?v=${vidCode}`);
-  await page.getByTestId('video-upload-button').click();
+  await PostCreatePage.addVideoSection();
+  await PostCreatePage.uploadVideoWithUrl(vidCode);
 
   const createPostResponse = await Api.routes.posts.createPost.waitForRequest({
-    preRequestAction: async () => {
-      await page.getByTestId('create-post-button').click();
-    },
+    preRequestAction: PostCreatePage.submitPost.bind(PostCreatePage),
   });
 
-  await expect(page).toHaveURL(`/post/${createdPost.slug}`);
-  await expect(page).toHaveTitle(`${createdPost.title} | Smiler`);
-  await expect(page.getByTestId(`post-${createdPost.id}-title`)).toHaveText(
-    createdPost.title,
+  await expect(currentPage).toHaveURL(
+    SinglePostPage.getUrlWithSlug(createdPost.slug),
   );
+  await expect(currentPage).toHaveTitle(
+    SinglePostPage.getTitle(createdPost.title),
+  );
+  await expect(Post.getTitleById(createdPost.id)).toHaveText(createdPost.title);
   expect(createPostResponse.postDataJSON()).toMatchObject({
     title,
     tags,
@@ -110,31 +111,27 @@ test('Creates a post with title, tags and content', async ({ page, Api }) => {
   });
 });
 
-test('Uploads a picture in the picture section', async ({ page, Api }) => {
+test('Uploads a picture in the picture section', async ({
+  PostCreatePage,
+  Api,
+}) => {
   Api.routes.posts.uploadAttachment.mock({
     body: {
       type: 'pic',
-      url: 'https://placehold.co/600x400',
+      url: picUrl,
       hash: (Math.random() * Math.random()).toString(36),
       isFile: true,
     },
   });
 
-  await page.goto('/post/create');
+  await PostCreatePage.goto();
 
-  await page.getByTestId('add-pic-button').click();
-
-  await page.getByLabel('Upload image').setInputFiles({
-    name: 'test.jpeg',
-    buffer: Buffer.from('test', 'utf-8'),
-    mimeType: 'image/jpeg',
-  });
+  await PostCreatePage.addPictureSection();
 
   const uploadResponse = await Api.routes.posts.uploadAttachment.waitForRequest(
     {
-      preRequestAction: async () => {
-        await page.getByTestId('image-upload-button').click();
-      },
+      preRequestAction:
+        PostCreatePage.uploadPictureWithFile.bind(PostCreatePage),
     },
   );
 
@@ -143,33 +140,24 @@ test('Uploads a picture in the picture section', async ({ page, Api }) => {
   );
 });
 
-test('Deletes sections in a post', async ({ page }) => {
-  await page.goto('/post/create');
+test('Deletes sections in a post', async ({ PostCreatePage }) => {
+  await PostCreatePage.goto();
 
-  await page.getByTestId('add-text-button').click();
-  await page.getByTestId('add-pic-button').click();
-  await page.getByTestId('add-video-button').click();
+  await PostCreatePage.addTextSection();
+  await PostCreatePage.addPictureSection();
+  await PostCreatePage.addVideoSection();
 
-  await page
-    .getByTestId(/delete-section/)
-    .first()
-    .click();
-  await page
-    .getByTestId(/delete-section/)
-    .last()
-    .click();
-  await page
-    .getByTestId(/delete-section/)
-    .first()
-    .click();
+  await PostCreatePage.removeFirstSection();
+  await PostCreatePage.removeLastSection();
+  await PostCreatePage.removeFirstSection();
 
-  await expect(page.getByTestId('text-section')).toBeHidden();
-  await expect(page.getByTestId('pic-section')).toBeHidden();
-  await expect(page.getByTestId('video-section')).toBeHidden();
+  await expect(PostCreatePage.getTextSection()).toBeHidden();
+  await expect(PostCreatePage.getPictureSection()).toBeHidden();
+  await expect(PostCreatePage.getVideoSection()).toBeHidden();
 });
 
 test('D&D post sections to change order of sections', async ({
-  page,
+  PostCreatePage,
   Api,
   isMobile,
 }) => {
@@ -178,41 +166,26 @@ test('D&D post sections to change order of sections', async ({
     return;
   }
 
-  await page.goto('/post/create');
+  await PostCreatePage.goto();
 
-  await page.getByTestId('post-title-input').fill(title);
+  await PostCreatePage.postTitleInput.fill(title);
 
-  await page.getByTestId('add-text-button').click();
-  await page.getByTestId('add-pic-button').click();
+  await PostCreatePage.addTextSection();
+  await PostCreatePage.addPictureSection();
 
-  await page.getByTestId('text-section').isVisible();
+  await PostCreatePage.awaitDragAndDropAnimation();
 
-  // Wait until animation if finished
-  await page.waitForFunction(() => {
-    const element = document.querySelector(
-      '[data-testid="post-sections"] > div:last-child',
-    );
-    const computedStyle = window.getComputedStyle(element);
-    console.log(computedStyle.opacity);
-    return computedStyle.opacity === '1' && computedStyle.transform === 'none';
-  });
+  const assertNewOrderOfSections =
+    await PostCreatePage.assertOldOrderOfSections();
 
-  const oldInnerHTML = await page.getByTestId('post-sections').innerHTML();
-  // Text Section -> Pic Section order of sections
-  expect(oldInnerHTML).toMatch(/text-section.*pic-section/);
+  await PostCreatePage.getTextSection().dragTo(
+    PostCreatePage.getPictureSection(),
+  );
 
-  await page
-    .getByTestId('text-section')
-    .dragTo(page.getByTestId('pic-section'));
-
-  const newInnerHTML = await page.getByTestId('post-sections').innerHTML();
-  // Pic Section -> Text Section order of sections
-  expect(newInnerHTML).toMatch(/pic-section.*text-section/);
+  await assertNewOrderOfSections();
 
   const createPostResponse = await Api.routes.posts.createPost.waitForRequest({
-    preRequestAction: async () => {
-      await page.getByTestId('create-post-button').click();
-    },
+    preRequestAction: PostCreatePage.submitPost.bind(PostCreatePage),
   });
 
   expect(createPostResponse.postDataJSON()).toMatchObject({
@@ -227,7 +200,7 @@ test('D&D post sections to change order of sections', async ({
   });
 });
 
-test('Fetch and show draft template', async ({ Api, page }) => {
+test('Fetch and show draft template', async ({ Api, page, PostCreatePage }) => {
   const savedTitle = 'Saved title';
   const savedSections = [
     {
@@ -254,9 +227,7 @@ test('Fetch and show draft template', async ({ Api, page }) => {
 
   const getUserTemplateResponse =
     await Api.routes.users.getUserTemplate.waitForRequest({
-      preRequestAction: async () => {
-        await page.goto('/post/create');
-      },
+      preRequestAction: PostCreatePage.goto.bind(PostCreatePage),
     });
 
   expect(getUserTemplateResponse.url()).toContain(authUser.login);
@@ -277,34 +248,27 @@ test('Fetch and show draft template', async ({ Api, page }) => {
   ).toBeVisible();
 });
 
-test('Saves draft template', async ({ page, Api }) => {
+test('Saves draft template', async ({ PostCreatePage, Api }) => {
   const tag = 'test tag';
 
-  await page.goto('/post/create');
+  await PostCreatePage.goto();
 
-  await page.getByTestId('post-title-input').fill(title);
+  await PostCreatePage.postTitleInput.fill(title);
 
-  await page.getByTestId('post-tag-input').fill(tag);
-  await page.keyboard.press('Enter');
+  await PostCreatePage.addTag(tag);
 
-  await page.getByTestId('add-text-button').click();
-  await page.getByTestId('text-section-input').fill('test text');
+  await PostCreatePage.addTextSection();
+  await PostCreatePage.fillTextSection('test text');
 
-  await page.getByTestId('add-pic-button').click();
-  await page.getByTestId('image-url-input').fill(picUrl);
-  await page.getByTestId('image-upload-button').click();
+  await PostCreatePage.addPictureSection();
+  await PostCreatePage.uploadPictureWithUrl(picUrl);
 
-  await page.getByTestId('add-video-button').click();
-  await page
-    .getByTestId('video-url-input')
-    .fill(`https://www.youtube.com/watch?v=${vidCode}`);
-  await page.getByTestId('video-upload-button').click();
+  await PostCreatePage.addVideoSection();
+  await PostCreatePage.uploadVideoWithUrl(vidCode);
 
   const updateUserTemplateResponse =
     await Api.routes.users.updateUserTemplate.waitForRequest({
-      preRequestAction: async () => {
-        await page.getByTestId('save-draft-button').click();
-      },
+      preRequestAction: PostCreatePage.saveDraft.bind(PostCreatePage),
     });
 
   expect(updateUserTemplateResponse.url()).toContain(authUser.login);
@@ -329,39 +293,36 @@ test('Saves draft template', async ({ page, Api }) => {
 });
 
 test.describe('Tags', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/post/create');
+  test.beforeEach(async ({ PostCreatePage }) => {
+    await PostCreatePage.goto();
   });
 
-  async function addPostTagsFrom(page, tags) {
-    for (const tag of tags) {
-      await page.getByTestId('post-tag-input').fill(tag);
-      await page.keyboard.press('Enter');
-    }
-  }
-
-  test('Adds and shows tags', async ({ page }) => {
+  test('Adds and shows tags', async ({ PostCreatePage }) => {
     const tags = ['test tag 1', 'test tag 2', 'test tag 3'];
 
-    await addPostTagsFrom(page, tags);
+    for (const tag of tags) {
+      await PostCreatePage.addTag(tag);
+    }
 
     for (const tag of tags) {
-      await expect(page.getByTestId('post-tags-list')).toContainText(tag);
+      await expect(PostCreatePage.postTagList).toContainText(tag);
     }
   });
 
-  test('Removes tags', async ({ page }) => {
+  test('Removes tags', async ({ PostCreatePage }) => {
     const tags = ['test tag 1', 'test tag 2'];
 
-    await addPostTagsFrom(page, tags);
+    for (const tag of tags) {
+      await PostCreatePage.addTag(tag);
+    }
 
     for (const tag of tags) {
-      await page.getByTestId(`remove-tag-button-${tag}`).click();
-      await expect(page.getByTestId('post-tags-list')).not.toContainText(tag);
+      await PostCreatePage.removeTag(tag);
+      await expect(PostCreatePage.postTagList).not.toContainText(tag);
     }
   });
 
-  test('Can add not more than 8 tags', async ({ page }) => {
+  test('Can add not more than 8 tags', async ({ PostCreatePage }) => {
     const tags = [
       'test tag 1',
       'test tag 2',
@@ -373,24 +334,28 @@ test.describe('Tags', () => {
       'test tag 8',
     ];
 
-    await addPostTagsFrom(page, tags);
+    for (const tag of tags) {
+      await PostCreatePage.addTag(tag);
+    }
 
-    await expect(page.getByTestId('post-tag-input')).toBeHidden();
+    await expect(PostCreatePage.postTagInput).toBeHidden();
   });
 });
 
 test('Cannot open the editor if the user is not logged in', async ({
-  page,
+  page: currentPage,
+  PostsPage,
   Api,
   SystemNotification,
+  PostCreatePage,
 }) => {
   Api.routes.auth.getAuth.mock({ body: generateAuth() });
 
-  await page.goto('/post/create');
+  await PostCreatePage.goto();
 
   await expect(SystemNotification.list).toContainText(
     SystemNotification.pageNoAccessText,
   );
-  await expect(page).toHaveURL('/');
-  await expect(page).toHaveTitle('Today | Smiler');
+  await expect(currentPage).toHaveURL(PostsPage.urls.today);
+  await expect(currentPage).toHaveTitle(PostsPage.titles.today);
 });
