@@ -468,7 +468,7 @@ module.exports = {
       next(e);
     }
   }),
-  rate: asyncErrorHandler(async (req, res, next) => {
+  vote: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
     const { id } = req.params;
     const { negative } = req.body;
