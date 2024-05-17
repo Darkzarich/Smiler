@@ -1,27 +1,29 @@
 <template>
-  <div class="post-container-item">
-    <div class="post-side">
+  <div class="post">
+    <div class="post__left">
       <div
         :data-testid="`post-${postData.id}-upvote`"
-        class="post-side__upvote"
+        class="post__upvote"
         :class="
           postData.rated.isRated && !postData.rated.negative
-            ? 'post-side__upvote--active'
+            ? 'post__upvote--active'
             : ''
         "
         @click="upvote(postData.id)"
       >
         <PlusIcon />
       </div>
-      <div class="post-side__rating">
+
+      <div class="post__rating">
         {{ postData.rating }}
       </div>
+
       <div
         :data-testid="`post-${postData.id}-downvote`"
-        class="post-side__downvote"
+        class="post__downvote"
         :class="
           postData.rated.isRated && postData.rated.negative
-            ? 'post-side__downvote--active'
+            ? 'post__downvote--active'
             : ''
         "
         @click="downvote(postData.id)"
@@ -29,9 +31,10 @@
         <MinusIcon />
       </div>
     </div>
-    <div class="post-main">
+
+    <div class="post__main">
       <RouterLink
-        class="post-main__title"
+        class="post__title"
         tag="a"
         :to="{
           name: 'Single',
@@ -57,23 +60,23 @@
         </template>
       </RouterLink>
 
-      <div v-if="postData.tags.length > 0" class="post-main__tags">
+      <div v-if="postData.tags.length > 0" class="post__tags">
         <div
           v-for="tag in postData.tags"
           :key="tag"
           :data-testid="`post-${postData.id}-tag-${tag}`"
-          class="post-main__tags-item"
+          class="post__tags-item"
           @click="openContextMenu($event, tag)"
         >
           {{ tag }}
         </div>
       </div>
 
-      <div class="post-main__body">
+      <div class="post__body">
         <div
           v-for="section in postData.sections"
           :key="section.hash"
-          class="post-main__body-section"
+          class="post__sections"
         >
           <template v-if="section.type === POST_SECTION_TYPES.TEXT">
             <div
@@ -81,9 +84,11 @@
               v-html="section.content"
             />
           </template>
+
           <template v-else-if="section.type === POST_SECTION_TYPES.PICTURE">
-            <div class="post-main__attachments-item">
+            <div class="post__section-attachment">
               <img
+                class="post__section-image"
                 :src="$resolveImage(section.url)"
                 :alt="section.url"
                 :data-testid="`post-${postData.id}-pic-${section.hash}`"
@@ -91,13 +96,17 @@
               />
             </div>
           </template>
+
           <template v-else-if="section.type === POST_SECTION_TYPES.VIDEO">
-            <div class="post-main__attachments-item">
+            <div class="post__section-attachment">
               <video
+                class="post__section-video"
                 controls
                 :src="section.url"
                 :data-testid="`post-${postData.id}-vid-${section.hash}`"
-              />
+              >
+                <track kind="captions" />
+              </video>
             </div>
           </template>
         </div>
@@ -105,28 +114,28 @@
 
       <!-- for mobile -->
 
-      <div class="post-main__rate-mobile">
+      <div class="post__rate-mobile">
         <div
-          class="post-side__upvote"
+          class="post__upvote"
           :data-testid="`m-post-${postData.id}-upvote`"
           :class="
             postData.rated.isRated && !postData.rated.negative
-              ? 'post-side__upvote--active'
+              ? 'post__upvote--active'
               : ''
           "
           @click="upvote(postData.id)"
         >
           <PlusIcon />
         </div>
-        <div class="post-side__rating">
+        <div class="post__rating">
           {{ postData.rating }}
         </div>
         <div
-          class="post-side__downvote"
+          class="post__downvote"
           :data-testid="`m-post-${postData.id}-downvote`"
           :class="
             postData.rated.isRated && postData.rated.negative
-              ? 'post-side__downvote--active'
+              ? 'post__downvote--active'
               : ''
           "
           @click="downvote(postData.id)"
@@ -136,56 +145,54 @@
       </div>
 
       <!-- for mobile -->
-      <div class="post-main__footer">
-        <div class="post-main__meta">
-          <span class="post-main__meta-date">
+      <div class="post__footer">
+        <div class="post__meta-info">
+          <span class="post__date">
             {{ postData.createdAt | $fromNow }}
           </span>
-          <span class="post-main__meta-comments">
-            <RouterLink
-              :target="$isMobile() ? '' : '_blank'"
-              :to="{
-                name: 'Single',
-                hash: '#comments',
-                params: {
-                  slug: postData.slug,
-                },
-              }"
-            >
-              <CommentsIcon /> {{ postData.commentCount }}
-            </RouterLink>
-          </span>
 
-          <template v-if="postData.author">
-            <RouterLink
-              :to="{
-                name: 'UserPage',
-                params: {
-                  login: postData.author.login,
-                },
-              }"
-              :data-testid="`post-${postData.id}-author`"
-            >
-              <span class="post-main__meta-author">
-                <span> {{ postData.author.login }} </span>
-                <img
-                  :src="$resolveAvatar(postData.author.avatar)"
-                  :alt="postData.author.avatar"
-                />
-              </span>
-            </RouterLink>
-          </template>
-          <template v-else>
-            <span class="post-main__meta-author">
-              <span> Anonymous </span>
-              <img :src="$resolveAvatar('')" :alt="'avatar'" />
+          <RouterLink
+            class="post__comments-count"
+            :target="$isMobile() ? '' : '_blank'"
+            :to="{
+              name: 'Single',
+              hash: '#comments',
+              params: {
+                slug: postData.slug,
+              },
+            }"
+          >
+            <CommentsIcon /> {{ postData.commentCount }}
+          </RouterLink>
+
+          <RouterLink
+            v-if="postData.author"
+            :to="{
+              name: 'UserPage',
+              params: {
+                login: postData.author.login,
+              },
+            }"
+            :data-testid="`post-${postData.id}-author`"
+            class="post__author-container"
+          >
+            <span class="post__author-login">
+              {{ postData.author.login }}
             </span>
-          </template>
+            <img
+              class="post__author-avatar"
+              :src="$resolveAvatar(postData.author.avatar)"
+              :alt="postData.author.avatar"
+            />
+          </RouterLink>
+          <span v-else class="post__author-container">
+            <span> Anonymous </span>
+            <img :src="$resolveAvatar('')" :alt="'avatar'" />
+          </span>
         </div>
-        <!-- {{ post.createdAt !== post.updatedAt ? 
-          'updated: ' + post.updatedAt : ''}} -->
       </div>
     </div>
+
     <ContextMenuWrapper
       v-click-outside="closeContextMenu"
       :show="contextMenuData.show"
@@ -389,17 +396,173 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '@/styles/variables';
 @import '@/styles/mixins';
 @import '@/styles/colors';
 
-.post-container-item {
+.post {
   display: flex;
   flex-flow: row nowrap;
   margin-bottom: $widget-margin;
 
-  &__meta {
+  &__left {
+    width: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    @include for-size(phone-only) {
+      display: none;
+    }
+  }
+
+  &__rating {
+    font-size: 20px;
+    margin-bottom: -1rem;
+    margin-top: -1rem;
+  }
+
+  &__title {
+    display: block;
+    color: $light-gray;
+    text-decoration: none;
+    margin-bottom: 1rem;
+    font-weight: 400;
+    font-size: 20px;
+
+    svg {
+      position: relative;
+      top: 3px;
+      fill: $light-gray;
+    }
+  }
+
+  &__upvote,
+  &__rating,
+  &__downvote {
+    color: $light-gray;
+
+    svg {
+      fill: $light-gray;
+      width: 5rem;
+
+      @include for-size(phone-only) {
+        width: 3rem;
+      }
+    }
+  }
+
+  &__downvote {
+    &--active,
+    &:hover {
+      svg {
+        cursor: pointer;
+        fill: $dark-red;
+      }
+    }
+  }
+
+  &__upvote {
+    &--active,
+    &:hover {
+      /* stylelint-disable-next-line no-descending-specificity */
+      svg {
+        cursor: pointer;
+        fill: $dark-firm;
+      }
+    }
+  }
+
+  &__tags {
+    @include flex-row;
+
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  &__tags-item {
+    margin-top: 0.5rem;
+    color: $firm;
+    font-weight: bold;
+    background: transparent;
+    font-size: 0.8rem;
+    font-family: monospace;
+    user-select: none;
+    cursor: pointer;
+    padding: 0.1rem;
+    margin-right: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid $firm;
+  }
+
+  &__main {
+    background: $widget-bg;
+    width: 90%;
+    padding: 1rem;
+    color: $main-text;
+    border: 1px solid $light-gray;
+    border-radius: 2px;
+
+    @include for-size(phone-only) {
+      border: none;
+      border-bottom: 1px solid $light-gray;
+      width: 100%;
+    }
+  }
+
+  &__rate-mobile {
+    display: none;
+
+    @include for-size(phone-only) {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  &__body {
+    line-height: 1.5rem;
+
+    cite {
+      border: 1px solid $light-gray;
+      padding: 0.5rem;
+      padding-left: 1rem;
+      display: block;
+      background: $bg;
+      margin-top: 0.5rem;
+    }
+  }
+
+  &__section-attachment {
+    display: flex;
+    flex-flow: row nowrap;
+    border: 1px solid $light-gray;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+
+    @include for-size(phone-only) {
+      margin-left: -1rem;
+      border: none;
+      width: 110%;
+    }
+  }
+
+  &__section-image,
+  &__section-video {
+    width: 100%;
+    height: 100%;
+  }
+
+  &__footer {
+    margin-top: 1rem;
+
+    @include for-size(phone-only) {
+      margin-top: -1rem;
+    }
+  }
+
+  &__meta-info {
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
@@ -413,196 +576,43 @@ export default {
     @include for-size(phone-only) {
       border-top: none;
     }
+  }
 
-    &-comments svg {
+  &__comments-count {
+    text-decoration: none;
+    color: $light-gray;
+
+    /* stylelint-disable-next-line no-descending-specificity */
+    svg {
       fill: $main-text;
       width: 1rem;
       height: 1rem;
       margin-right: 0.2rem;
-    }
-
-    &-author {
-      display: flex;
-      align-items: center;
-      color: $main-text;
-
-      span {
-        border-bottom: 1px solid transparent;
-
-        &:hover {
-          border-bottom: 1px solid $main-text;
-        }
-      }
-
-      img {
-        width: 2rem;
-        height: 2rem;
-        margin-left: 0.5rem;
-        border-radius: 50%;
-      }
-    }
-
-    &-date {
-      flex-basis: 33%;
-      display: inline-block;
+      position: relative;
+      top: 2px;
     }
   }
 
-  &__upvote--active svg,
-  &__upvote:hover svg {
-    cursor: pointer;
-    fill: $dark-firm;
-  }
-
-  > a {
-    flex-basis: 33%;
+  &__author-container {
     display: flex;
-    justify-content: flex-end;
-  }
-
-  .post-main {
-    background: $widget-bg;
-    width: 90%;
-    padding: 1rem;
-    color: $main-text;
-    border: 1px solid $light-gray;
-
-    @include for-size(phone-only) {
-      border: none;
-      border-bottom: 1px solid $light-gray;
-      width: 100%;
-    }
-
-    border-radius: 2px;
-
-    &__rate-mobile {
-      display: none;
-    }
-
-    @include for-size(phone-only) {
-      &__rate-mobile {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-    }
-
-    &__title {
-      color: $light-gray;
-      text-decoration: none;
-      margin-bottom: 1rem;
-      font-weight: 400;
-      font-size: 20px;
-
-      svg {
-        position: relative;
-        top: 3px;
-        fill: $light-gray;
-      }
-    }
-
-    &__tags {
-      @include flex-row;
-
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-
-      &-item {
-        margin-top: 0.5rem;
-        color: $firm;
-        font-weight: bold;
-        background: transparent;
-        font-size: 0.8rem;
-        font-family: monospace;
-        user-select: none;
-        cursor: pointer;
-        padding: 0.1rem;
-        margin-right: 0.5rem;
-        border-radius: 5px;
-        border: 1px solid $firm;
-      }
-    }
-
-    &__footer {
-      margin-top: 1rem;
-
-      @include for-size(phone-only) {
-        margin-top: -1rem;
-      }
-    }
-
-    &__body {
-      line-height: 1.5rem;
-
-      cite {
-        border: 1px solid $light-gray;
-        padding: 0.5rem;
-        padding-left: 1rem;
-        display: block;
-        background: $bg;
-        margin-top: 0.5rem;
-      }
-    }
-
-    &__attachments {
-      &-item {
-        display: flex;
-        flex-flow: row nowrap;
-        border: 1px solid $light-gray;
-        margin-bottom: 1rem;
-        margin-top: 1rem;
-
-        img,
-        video {
-          width: 100%;
-          height: 100%;
-        }
-
-        @include for-size(phone-only) {
-          margin-left: -1rem;
-          border: none;
-          width: 110%;
-        }
-      }
-    }
-  }
-
-  .post-side {
-    width: 10%;
-    display: flex;
-    flex-direction: column;
     align-items: center;
+    color: $main-text;
+    text-decoration: none;
+  }
 
-    @include for-size(phone-only) {
-      display: none;
+  &__author-login {
+    border-bottom: 1px solid transparent;
+
+    &:hover {
+      border-bottom: 1px solid $main-text;
     }
+  }
 
-    &__upvote,
-    &__rating,
-    &__downvote {
-      color: $light-gray;
-
-      svg {
-        fill: $light-gray;
-        width: 5rem;
-
-        @include for-size(phone-only) {
-          width: 3rem;
-        }
-      }
-    }
-
-    &__rating {
-      font-size: 20px;
-      margin-bottom: -1rem;
-      margin-top: -1rem;
-    }
-
-    &__downvote:hover svg,
-    &__downvote--active svg {
-      cursor: pointer;
-      fill: $dark-red;
-    }
+  &__author-avatar {
+    width: 2rem;
+    height: 2rem;
+    margin-left: 0.5rem;
+    border-radius: 50%;
   }
 }
 </style>

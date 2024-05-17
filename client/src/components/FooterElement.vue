@@ -23,7 +23,7 @@ export default {};
 footer {
   width: 100%;
   height: 4rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   background: $header;
   align-items: center;
 

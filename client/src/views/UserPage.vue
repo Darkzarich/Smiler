@@ -7,18 +7,19 @@
       v-scroll="handleScroll"
       class="post-container"
     >
+      <!-- TODO: Add instead PostsContainer -->
       <div v-for="post in posts" :key="post.id">
         <Post :post="post" />
       </div>
       <div v-if="posts.length == 0" class="post-container__no-post">
-        Author has no posts yet.
+        This author has not posted anything yet.
       </div>
     </div>
     <div v-if="loading" class="post-loading">
       <CircularLoader />
     </div>
     <div v-else-if="noMorePost" class="post-container__no-more">
-      Congratulations! You've read every post this author had!
+      You've read all the posts this author had posted!
     </div>
   </div>
 </template>
@@ -132,6 +133,11 @@ export default {
   &__no-post,
   &__no-more {
     @include widget;
+
+    @include for-size(phone-only) {
+      margin-left: 0% !important;
+      border: none !important;
+    }
 
     color: $main-text;
     display: flex;

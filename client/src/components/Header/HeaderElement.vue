@@ -143,6 +143,9 @@ export default {
   z-index: 2;
   padding: 0.5rem;
   height: 40px;
+  box-shadow:
+    0 1px 3px rgb(0 0 0 / 12%),
+    0 1px 2px rgb(0 0 0 / 24%);
 
   @include for-size(phone-only) {
     height: 30px;

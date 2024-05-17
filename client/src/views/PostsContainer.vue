@@ -3,26 +3,27 @@
     <div
       v-if="!loading || posts.length > 0"
       v-scroll="handleScroll"
-      class="post-container"
+      class="posts-container"
     >
       <div v-for="post in posts" :key="post.id">
         <Post :post="post" :can-edit="$postCanEdit(post)" />
       </div>
       <div
         v-if="posts.length == 0"
-        class="post-container__no-post"
+        class="posts-container__no-posts"
         data-testid="no-content"
       >
-        No content found at the moment. Please check back later for updates.
+        No content found at the moment. <br />
+        Please check back later for updates. <br />
         Thank you.
       </div>
     </div>
-    <div v-if="loading" class="post-loading">
+    <div v-if="loading" class="posts-container__loading">
       <CircularLoader />
     </div>
-    <div v-else-if="noMorePost" class="post-container__no-more">
-      Thank you for exploring all available content in this category. Please
-      check back later for more updates.
+    <div v-else-if="noMorePost" class="posts-container__no-more">
+      Thank you for exploring all available content in this category. <br />
+      Please check back later for more updates.
     </div>
   </div>
 </template>
@@ -131,39 +132,40 @@ export default {
 @import '@/styles/mixins';
 @import '@/styles/colors';
 
-.post-loading {
-  @include widget;
-  @include flex-row;
+.posts-container {
+  &__loading {
+    @include widget;
+    @include flex-row;
 
-  justify-content: center;
-  margin-left: 10%;
+    @include for-size(phone-only) {
+      margin-left: 0%;
+      border: none !important;
+    }
 
-  @include for-size(phone-only) {
-    margin-left: 0%;
-    border: none !important;
+    justify-content: center;
+    margin-left: 10%;
   }
-}
 
-.post-container {
-  &__no-post,
+  &__no-posts,
   &__no-more {
     @include widget;
-
-    color: $main-text;
-    display: flex;
-    justify-content: center;
-    font-size: 1.3rem;
 
     @include for-size(phone-only) {
       margin-left: 0% !important;
       border: none !important;
     }
+
+    color: $main-text;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.7rem;
+    font-size: 1.3rem;
   }
 
   &__no-more {
     margin-left: 10%;
     text-align: center;
-    justify-content: none;
   }
 }
 </style>

@@ -2,10 +2,6 @@
   <div v-if="show" id="app">
     <SystemNotification />
     <HeaderElement />
-    <!-- <div id="nav">
-        <router-link to="/">Home</router-link> |
-        <router-link to="/about">About</router-link>
-      </div> -->
     <div class="content-box">
       <content class="content-box__main">
         <RouterView />
