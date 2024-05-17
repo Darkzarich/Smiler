@@ -24,7 +24,7 @@ test.beforeEach(async ({ Api }) => {
     body: testUser,
   });
 
-  Api.routes.users.getUsersFollowing.mock({
+  Api.routes.users.getUserSettings.mock({
     body: {
       authors,
       tags,
@@ -58,7 +58,7 @@ test('Open settings page, shows expected authors and tags the user is following'
   Api,
   SettingsPage,
 }) => {
-  await Api.routes.users.getUsersFollowing.waitForRequest({
+  await Api.routes.users.getUserSettings.waitForRequest({
     preRequestAction: async () => {
       await SettingsPage.goto();
     },
@@ -85,7 +85,7 @@ test('Shows empty list of authors and tags if the user is not following any', as
   Api,
   SettingsPage,
 }) => {
-  Api.routes.users.getUsersFollowing.mock({
+  Api.routes.users.getUserSettings.mock({
     body: {
       authors: [],
       tags: [],

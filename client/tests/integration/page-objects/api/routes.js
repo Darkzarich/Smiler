@@ -32,7 +32,7 @@ export default {
     updateUserTemplate: new Route('/users/*/template', 'PUT'),
     followUser: new Route('/users/*/follow', 'PUT'),
     unfollowUser: new Route('/users/*/follow', 'DELETE'),
-    getUsersFollowing: new Route('/users/me/following', 'GET'),
+    getUserSettings: new Route('/users/me/settings', 'GET'),
   },
   comments: {
     getComments: new Route('/comments', 'GET'),

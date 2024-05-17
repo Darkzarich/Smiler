@@ -47,9 +47,9 @@ export default {
       method: 'delete',
     });
   },
-  getUsersFollowing() {
+  getUserSettings() {
     return Query({
-      url: `${CONTROLLER_URL}/me/following`,
+      url: `${CONTROLLER_URL}/me/settings`,
       method: 'get',
     });
   },

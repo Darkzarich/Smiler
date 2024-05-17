@@ -77,10 +77,10 @@
       <div class="user-settings__block">
         <div class="user-settings__data-title">Edit Avatar</div>
         <div class="user-settings__current-avatar">
-          <img :src="$resolveAvatar(avatar)" :alt="avatar" />
+          <img :src="$resolveAvatar(avatarEditInput)" alt="current avatar" />
         </div>
         <InputElement
-          v-model="avatarEditInput"
+          v-model.lazy.trim="avatarEditInput"
           class="user-settings__avatar-edit"
           data-testid="user-settings-avatar-input"
           placeholder="URL to avatar..."
@@ -104,7 +104,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import api from '@/api';
 import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
 import InputElement from '@/components/BasicElements/InputElement.vue';
@@ -124,7 +123,6 @@ export default {
       loading: true,
       requestingForTags: false,
       requestingForUsers: false,
-      // TODO: Show the current bio
       bioEditInput: '',
       bioEditRequesting: false,
       avatarEditInput: '',
@@ -134,10 +132,6 @@ export default {
     };
   },
   computed: {
-    ...mapState({
-      avatar: (state) => state.user.avatar,
-      bio: (state) => state.user.bio,
-    }),
     isBioTooLong() {
       return this.bioEditInput.length > this.USER_MAX_BIO_LENGTH;
     },
@@ -148,12 +142,16 @@ export default {
   methods: {
     async getData() {
       this.loading = true;
-      const res = await api.users.getUsersFollowing();
+
+      const res = await api.users.getUserSettings();
 
       if (!res.data.error) {
         this.usersFollowed = res.data.authors;
         this.tagsFollowed = res.data.tags;
+        this.bioEditInput = res.data.bio;
+        this.avatarEditInput = res.data.avatar;
       }
+
       this.loading = false;
     },
     async editBio() {
@@ -266,6 +264,7 @@ export default {
 
   &__current-avatar {
     width: 8rem;
+    height: 8rem;
     border: 1px solid $light-gray;
     margin-bottom: 0.5rem;
     margin-left: 1rem;
