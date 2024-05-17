@@ -58,7 +58,7 @@ const auth = require('../auth');
           }
         }
       },
-      "UserFollowing": {
+      "UserSettings": {
         "type": "object",
         "properties": {
           "tags": {
@@ -72,6 +72,12 @@ const auth = require('../auth');
             "items": {
               "$ref": "#/components/schemas/Author"
             }
+          },
+          "bio": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": string
           }
         }
       }
@@ -320,13 +326,13 @@ router.put('/:login/template', auth.required, usersController.updateUserPostTemp
 /**
 @swagger
 {
-  "/users/me/following": {
+  "/users/me/settings": {
     "get": {
       "tags": [
         "Users"
       ],
-      "summary": "Get the current user's following",
-      "description": "Gets who the current user is following",
+      "summary": "Get the current user's settings",
+      "description": "Gets the current user's settings: bio, followed users, tags etc",
       "security": [
         {
           "cookieAuth": []
@@ -338,7 +344,7 @@ router.put('/:login/template', auth.required, usersController.updateUserPostTemp
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserFollowing"
+                "$ref": "#/components/schemas/UserSettings"
               }
             }
           }
@@ -358,7 +364,7 @@ router.put('/:login/template', auth.required, usersController.updateUserPostTemp
 }
  */
 
-router.get('/me/following', auth.required, usersController.getFollowing);
+router.get('/me/settings', auth.required, usersController.getSettings);
 
 /**
 @swagger

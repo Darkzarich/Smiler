@@ -1322,13 +1322,13 @@
         }
       }
     },
-    "/users/me/following": {
+    "/users/me/settings": {
       "get": {
         "tags": [
           "Users"
         ],
-        "summary": "Get the current user's following",
-        "description": "Gets who the current user is following",
+        "summary": "Get the current user's settings",
+        "description": "Gets the current user's settings: bio, followed users, tags etc",
         "security": [
           {
             "cookieAuth": []
@@ -1340,7 +1340,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserFollowing"
+                  "$ref": "#/components/schemas/UserSettings"
                 }
               }
             }
@@ -1764,7 +1764,7 @@
           }
         }
       },
-      "UserFollowing": {
+      "UserSettings": {
         "type": "object",
         "properties": {
           "tags": {
@@ -1778,6 +1778,12 @@
             "items": {
               "$ref": "#/components/schemas/Author"
             }
+          },
+          "bio": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
           }
         }
       },

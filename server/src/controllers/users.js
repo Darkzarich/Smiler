@@ -70,7 +70,7 @@ module.exports = {
 
     success(req, res);
   }),
-  getFollowing: asyncErrorHandler(async (req, res, next) => {
+  getSettings: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
 
     const user = await User.findById(userId).populate('usersFollowed', 'login avatar id');
@@ -79,6 +79,8 @@ module.exports = {
       const following = {
         authors: user.usersFollowed,
         tags: user.tagsFollowed,
+        bio: user.bio,
+        avatar: user.avatar,
       };
 
       success(req, res, following);
