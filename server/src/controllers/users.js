@@ -50,30 +50,25 @@ module.exports = {
   }),
   updateUser: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
-    const { bio } = req.body;
-    const { avatar } = req.body;
+    const update = req.body;
 
-    if (bio && bio.length > consts.USER_MAX_BIO_LENGTH) {
+    if (update.bio && update.bio.length > consts.USER_MAX_BIO_LENGTH) {
       generateError(`bio can't be longer than ${consts.USER_MAX_BIO_LENGTH}`, 422, next); return;
     }
 
-    if (avatar && avatar.length > consts.USER_MAX_AVATAR_LENGTH) {
+    if (update.avatar && update.avatar.length > consts.USER_MAX_AVATAR_LENGTH) {
       generateError(`Avatar link can't be longer than ${consts.USER_MAX_AVATAR_LENGTH}`, 422, next); return;
     }
 
-    // TODO: Call mongodb update instead of changing the fields and calling save
-    const user = await User.findById(userId);
+    const user = await User.findByIdAndUpdate(userId, update, {
+      runValidators: true,
+    });
 
-    if (user) {
-      user.bio = bio || '';
-      user.avatar = avatar || '';
-
-      await user.save();
-
-      success(req, res);
-    } else {
-      generateError('User is not found', 404, next);
+    if (!user) {
+      generateError('User is not found', 404, next); return;
     }
+
+    success(req, res);
   }),
   getFollowing: asyncErrorHandler(async (req, res, next) => {
     const { userId } = req.session;
