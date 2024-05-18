@@ -1,20 +1,21 @@
 <template>
   <div class="user-settings">
     <div v-if="!loading" class="user-settings__data">
+      <h1 class="user-settings__title">Settings</h1>
       <div class="user-settings__block">
-        <div class="user-settings__data-title">Following</div>
-        <template v-if="usersFollowed.length || tagsFollowed.length">
-          <div class="user-settings__data-group">
-            <div class="user-settings__data-group-title">Authors:</div>
+        <h3 class="user-settings__block-title">Following</h3>
+        <template v-if="isFollowingAnything">
+          <div v-if="usersFollowed.length" class="user-settings__following">
+            <div class="user-settings__following-type">Authors:</div>
             <div
               v-for="author in usersFollowed"
               :key="author.id"
               :data-testid="`user-settings-author-${author.id}`"
-              class="user-settings__data-group-author"
+              class="user-settings__following-item"
             >
               {{ author.login }}
               <span
-                class="user-settings__data-group-unfollow"
+                class="user-settings__unfollow"
                 :data-testid="`user-settings-author-${author.id}-unfollow`"
                 @click="unfollowUser(author.id)"
               >
@@ -24,19 +25,20 @@
           </div>
 
           <div
-            class="user-settings__data-group"
+            v-if="tagsFollowed.length"
+            class="user-settings__following"
             data-testid="user-settings-tags"
           >
-            <div class="user-settings__data-group-title">Tags:</div>
+            <div class="user-settings__following-type">Tags:</div>
             <div
               v-for="tag in tagsFollowed"
               :key="tag"
               :data-testid="`user-settings-tags-${tag}`"
-              class="user-settings__data-group-tag"
+              class="user-settings__following-item"
             >
               {{ tag }}
               <span
-                class="user-settings__data-group-unfollow"
+                class="user-settings__unfollow"
                 :data-testid="`user-settings-tag-${tag}-unfollow`"
                 @click="unfollowTag(tag)"
               >
@@ -47,35 +49,39 @@
         </template>
         <div
           v-else
-          class="user-settings__data-group"
+          class="user-settings__following"
           data-testid="user-settings-no-subscriptions"
         >
-          <i>You don't follow any authors or tags...</i>
+          <i class="user-settings__no-subscriptions"
+            >You don't follow any authors or tags...</i
+          >
         </div>
       </div>
 
       <div class="user-settings__block">
-        <div class="user-settings__data-title">Edit Bio</div>
+        <h3 class="user-settings__block-title">Edit Bio</h3>
         <InputElement
           v-model="bioEditInput"
           data-testid="user-settings-bio-input"
           class="user-settings__bio-edit"
           :multiline="true"
-          :error="isBioTooLong ? 'Bio is too long' : ''"
+          :error="bioTooLongError"
         />
-        <div class="user-settings__bio-buttons">
+        <div class="user-settings__submit">
           <ButtonElement
+            class="user-settings__submit-btn"
             data-testid="user-settings-bio-submit"
             :loading="bioEditRequesting"
             :callback="editBio"
-            :disabled="isBioTooLong"
+            :disabled="Boolean(bioTooLongError)"
           >
             Submit
           </ButtonElement>
         </div>
       </div>
+
       <div class="user-settings__block">
-        <div class="user-settings__data-title">Edit Avatar</div>
+        <h3 class="user-settings__block-title">Edit Avatar</h3>
         <div class="user-settings__current-avatar">
           <img :src="$resolveAvatar(avatarEditInput)" alt="current avatar" />
         </div>
@@ -85,12 +91,13 @@
           data-testid="user-settings-avatar-input"
           placeholder="URL to avatar..."
         />
-        <div class="user-settings__bio-buttons">
+        <div class="user-settings__submit">
           <ButtonElement
+            class="user-settings__submit-btn"
             data-testid="user-settings-avatar-submit"
             :loading="avatarEditRequesting"
             :callback="editAvatar"
-            :disabled="bioEditInput.length > USER_MAX_AVATAR_LENGTH"
+            :disabled="avatarEditInput.length > USER_MAX_AVATAR_LENGTH"
           >
             Submit
           </ButtonElement>
@@ -132,8 +139,15 @@ export default {
     };
   },
   computed: {
-    isBioTooLong() {
-      return this.bioEditInput.length > this.USER_MAX_BIO_LENGTH;
+    isFollowingAnything() {
+      return this.usersFollowed.length || this.tagsFollowed.length;
+    },
+    bioTooLongError() {
+      if (this.bioEditInput.length > this.USER_MAX_BIO_LENGTH) {
+        return 'Bio is too long';
+      }
+
+      return '';
     },
   },
   created() {
@@ -223,18 +237,27 @@ export default {
     justify-content: center;
   }
 
-  &__data-group-unfollow {
-    color: $error;
-    font-family: monospace;
-    cursor: pointer;
+  &__title {
+    color: $main-text;
+    font-size: 1.5rem;
+    text-align: center;
+    font-weight: 500;
+    margin: 0;
   }
 
-  &__bio-buttons {
-    @include flex-row;
+  &__block {
+    border-bottom: 1px solid $light-gray;
+    padding: 1rem 0;
 
-    .button {
-      width: 20%;
+    &:last-child {
+      border-bottom: none;
     }
+  }
+
+  &__block-title {
+    color: $main-text;
+    text-align: center;
+    margin: 1rem 0;
   }
 
   &__bio-edit {
@@ -275,19 +298,23 @@ export default {
 
     img {
       border-radius: 50%;
-      width: 8rem;
+      width: 128px;
     }
   }
 
-  &__data-title {
-    font-size: 1.5rem;
-    color: $main-text;
-    text-align: center;
-    margin-top: 1.5rem;
-    margin-bottom: 1rem;
+  &__submit {
+    @include flex-row;
   }
 
-  &__data-group {
+  &__submit-btn {
+    width: 100px;
+  }
+
+  &__no-subscriptions {
+    color: $main-text;
+  }
+
+  &__following {
     display: flex;
     flex-wrap: wrap;
     margin-top: 0.5rem;
@@ -296,20 +323,21 @@ export default {
     @include for-size(phone-only) {
       padding-left: 0;
     }
-
-    i {
-      color: $main-text;
-    }
   }
 
-  &__data-group-title {
+  &__following-type {
     color: $light-gray;
     font-weight: bold;
     margin-top: 0.5rem;
   }
 
-  &__data-group-tag,
-  &__data-group-author {
+  &__unfollow {
+    color: $error;
+    font-family: monospace;
+    cursor: pointer;
+  }
+
+  &__following-item {
     color: $main-text;
     margin-left: 0.5rem;
     margin-top: 0.5rem;

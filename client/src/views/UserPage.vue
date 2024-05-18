@@ -15,9 +15,11 @@
         This author has not posted anything yet.
       </div>
     </div>
+
     <div v-if="loading" class="post-loading">
       <CircularLoader />
     </div>
+
     <div v-else-if="noMorePost" class="post-container__no-more">
       You've read all the posts this author had posted!
     </div>

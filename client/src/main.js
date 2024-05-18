@@ -1,3 +1,4 @@
+import 'normalize.css';
 import moment from 'moment';
 import vClickOutside from 'v-click-outside';
 import Vue from 'vue';
