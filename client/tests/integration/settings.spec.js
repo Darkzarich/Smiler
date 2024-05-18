@@ -28,6 +28,8 @@ test.beforeEach(async ({ Api }) => {
     body: {
       authors,
       tags,
+      bio: '',
+      avatar: '',
     },
   });
 });
@@ -89,6 +91,8 @@ test('Shows empty list of authors and tags if the user is not following any', as
     body: {
       authors: [],
       tags: [],
+      bio: '',
+      avatar: '',
     },
   });
 
@@ -137,6 +141,22 @@ test('Unfollows a tag, removes that tag from the list of following', async ({
   });
 
   await expect(SettingsPage.getTagByText(tags[0])).toBeHidden();
+});
+
+test('Shows current bio and avatar', async ({ Api, SettingsPage }) => {
+  Api.routes.users.getUserSettings.mock({
+    body: {
+      authors: [],
+      tags: [],
+      bio: 'test bio',
+      avatar: 'test avatar',
+    },
+  });
+
+  await SettingsPage.goto();
+
+  await expect(SettingsPage.bioInput).toHaveValue('test bio');
+  await expect(SettingsPage.avatarInput).toHaveValue('test avatar');
 });
 
 test("Edits current user's bio with expected request body", async ({

@@ -252,6 +252,13 @@ test.describe('Post groups', () => {
         }),
       });
 
+      Api.routes.posts.getFeed.mock({
+        body: {
+          pages: 0,
+          posts,
+        },
+      });
+
       await PostsPage.goto(PostsPage.urls.today);
 
       await Menu.openIfMobile();
@@ -263,13 +270,6 @@ test.describe('Post groups', () => {
       Post,
       Api,
     }) => {
-      Api.routes.posts.getFeed.mock({
-        body: {
-          pages: 0,
-          posts,
-        },
-      });
-
       const searchParams = new URLSearchParams({
         limit: '20',
         offset: '0',
