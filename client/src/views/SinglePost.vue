@@ -7,7 +7,7 @@
     <div id="comments" ref="comments" class="comments">
       <div
         title="Refresh comments"
-        :class="commentsRefreshing ? 'comments__update_refreshing' : ''"
+        :class="commentsRefreshing ? 'comments__update--refreshing' : ''"
         class="comments__update"
         @click="refreshComments()"
       >
@@ -16,37 +16,18 @@
           <span>+{{ newCommentsCount }}</span>
         </template>
       </div>
-      <div class="comments__title">
+
+      <div class="comments__count">
         Commentaries (
-        <span class="comments__title-number"> {{ post.commentCount }} </span> )
+        <span class="comments__count-value"> {{ post.commentCount }} </span> )
       </div>
-      <div
+
+      <NewCommentForm
         v-if="!commentsLoading"
-        class="comments__form"
-        :class="!user.authState ? 'comments__form_disabled' : ''"
-        data-testid="new-comment-form"
-      >
-        <template v-if="user.authState">
-          <div class="comments__form-title">Share your thoughts!</div>
-          <TextEditorElement
-            v-model="sendCommentBody"
-            data-testid="new-comment-form-editor"
-          >
-            <div class="comments__form-submit">
-              <ButtonElement
-                :loading="sendCommentLoading"
-                :callback="sendComment"
-                data-testid="new-comment-button"
-              >
-                Send
-              </ButtonElement>
-            </div>
-          </TextEditorElement>
-        </template>
-        <template v-else>
-          Please <b>log in</b> or <b>create an account</b> to leave a comment.
-        </template>
-      </div>
+        :post-id="post.id"
+        @new-comment="handleNewComment"
+      />
+
       <Comments
         v-if="!commentsLoading && comments.length > 0"
         :data="comments"
@@ -62,6 +43,7 @@
         <CircularLoader />
       </div>
     </div>
+
     <div
       v-if="comments.length > 0 && curPage !== maxPages"
       class="comments__load-more"
@@ -72,9 +54,10 @@
       </template>
       <template v-else> Click here to see more comments </template>
     </div>
+
     <div
       v-if="comments.length > 0 && curPage === maxPages"
-      class="comments__load-more-cant"
+      class="comments__no-more"
     >
       You've read all the comments. Now it's your turn to share your thoughts!
     </div>
@@ -84,9 +67,8 @@
 <script>
 import { mapState } from 'vuex';
 import api from '@/api';
-import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
-import TextEditorElement from '@/components/BasicElements/TextEditorElement.vue';
 import Comments from '@/components/Comment/Comments.vue';
+import NewCommentForm from '@/components/Comment/NewCommentForm.vue';
 import Post from '@/components/Post/Post.vue';
 import consts from '@/const/const';
 import RefreshIcon from '@/library/svg/RefreshIcon.vue';
@@ -95,8 +77,7 @@ import CircularLoader from '@/library/svg/animation/CircularLoader.vue';
 export default {
   components: {
     Post,
-    TextEditorElement,
-    ButtonElement,
+    NewCommentForm,
     Comments,
     RefreshIcon,
     CircularLoader,
@@ -117,9 +98,7 @@ export default {
       post: {},
       showPost: false,
       comments: [],
-      commentsLoading: false,
-      sendCommentBody: '',
-      sendCommentLoading: false,
+      commentsLoading: true,
       commentsRefreshing: false,
       newCommentsCount: 0,
       curPage: 1,
@@ -218,30 +197,9 @@ export default {
         }
       }
     },
-    async sendComment() {
-      this.sendCommentLoading = true;
-      const res = await api.comments.createComment({
-        post: this.post.id,
-        body: this.sendCommentBody,
-      });
-      if (!res.data.error) {
-        const newComment = {
-          ...res.data,
-          rated: {
-            isRated: false,
-            negative: false,
-          },
-          author: {
-            avatar: this.user.avatar,
-            login: this.user.login,
-          },
-          created: true,
-        };
-        this.post.commentCount = this.post.commentCount + 1;
-        this.comments.unshift(newComment);
-        this.sendCommentBody = '';
-      }
-      this.sendCommentLoading = false;
+    handleNewComment(newComment) {
+      this.post.commentCount = this.post.commentCount + 1;
+      this.comments.unshift(newComment);
     },
   },
 };
@@ -253,13 +211,12 @@ export default {
 
 .comments {
   border: 1px solid $light-gray;
+  padding: 1rem;
+  margin-bottom: 2rem;
 
   @include for-size(phone-only) {
     border: none;
   }
-
-  padding: 1rem;
-  margin-bottom: 2rem;
 
   &__update {
     cursor: pointer;
@@ -271,14 +228,13 @@ export default {
     border-radius: 5px;
     opacity: 0.5;
     transition: opacity 0.1s ease-out;
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid $light-gray;
 
     &:hover {
       opacity: 1;
     }
-
-    width: 1rem;
-    height: 1rem;
-    border: 1px solid $light-gray;
 
     svg {
       fill: $light-gray;
@@ -286,12 +242,7 @@ export default {
       height: 1rem;
     }
 
-    span {
-      color: $firm;
-      position: absolute;
-    }
-
-    &_refreshing svg {
+    &--refreshing svg {
       animation: spin 0.5s linear infinite;
 
       @keyframes spin {
@@ -304,42 +255,25 @@ export default {
         }
       }
     }
-  }
 
-  &__form {
-    width: 85%;
-    padding: 1rem;
-
-    @include for-size(phone-only) {
-      width: 100%;
-      padding: 0;
-    }
-
-    margin-top: 0.5rem;
-
-    &_disabled {
-      border: 1px solid $light-gray;
-      background: $widget-bg;
-      color: $main-text;
-    }
-
-    .text-editor {
-      height: 6rem;
-    }
-
-    &-title {
-      color: $main-text;
-      font-size: 1.2rem;
+    span {
+      color: $firm;
+      position: absolute;
     }
   }
 
-  &__title {
+  &__count {
     color: $main-text;
     margin-top: -2rem;
+  }
 
-    &-number {
-      font-weight: bold;
-    }
+  &__count-number {
+    font-weight: bold;
+  }
+
+  &__loading {
+    display: flex;
+    justify-content: center;
   }
 
   &__no-comments {
@@ -350,7 +284,7 @@ export default {
   }
 
   &__load-more,
-  &__load-more-cant {
+  &__no-more {
     color: $main-text;
     font-size: 1.2rem;
     text-align: center;
@@ -361,11 +295,6 @@ export default {
 
   &__load-more {
     cursor: pointer;
-  }
-
-  &__loading {
-    display: flex;
-    justify-content: center;
   }
 }
 </style>

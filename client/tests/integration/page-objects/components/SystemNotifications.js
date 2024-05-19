@@ -1,4 +1,4 @@
-export default class SystemNotification {
+export default class SystemNotifications {
   pageNoAccessText = 'Only authenticated users can access this page';
 
   /**

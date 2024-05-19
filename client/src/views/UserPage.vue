@@ -20,6 +20,7 @@
       <CircularLoader />
     </div>
 
+    <!-- Move to to a component -->
     <div v-else-if="noMorePost" class="post-container__no-more">
       You've read all the posts this author had posted!
     </div>

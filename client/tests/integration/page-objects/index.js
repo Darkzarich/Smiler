@@ -8,7 +8,7 @@ import CurrentUser from './components/CurrentUser';
 import Menu from './components/Menu';
 import Post from './components/Post';
 import PostEditor from './components/PostEditor';
-import SystemNotification from './components/SystemNotification';
+import SystemNotifications from './components/SystemNotifications';
 import TagsList from './components/TagsList';
 import NotFoundPage from './pages/NotFoundPage';
 import PostCreatePage from './pages/PostCreatePage';
@@ -67,8 +67,8 @@ export default test.extend({
   CurrentUser: async ({ page }, use) => {
     await use(new CurrentUser(page));
   },
-  SystemNotification: async ({ page }, use) => {
-    await use(new SystemNotification(page));
+  SystemNotifications: async ({ page }, use) => {
+    await use(new SystemNotifications(page));
   },
   TagsList: async ({ page }, use) => {
     await use(new TagsList(page));

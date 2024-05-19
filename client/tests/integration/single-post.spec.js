@@ -101,7 +101,7 @@ test('Opens a post by its link', async ({ SinglePostPage, Post, Api }) => {
 test('Redirect to 404 if the post is not found', async ({
   SinglePostPage,
   NotFoundPage,
-  SystemNotification,
+  SystemNotifications,
   page: currentPage,
   Api,
 }) => {
@@ -118,7 +118,7 @@ test('Redirect to 404 if the post is not found', async ({
 
   await NotFoundPage.waitForNotFoundPage();
   await expect(currentPage).toHaveTitle(NotFoundPage.title);
-  await expect(SystemNotification.list).toContainText('Post does not exist');
+  await expect(SystemNotifications.list).toContainText('Post does not exist');
 });
 
 test('Fetches post comments by post id', async ({ SinglePostPage, Api }) => {
@@ -323,7 +323,7 @@ test.describe('Post edit', () => {
   test('Cannot open edit page for a post if the post is older than 10 mins', async ({
     SinglePostPage,
     PostsPage,
-    SystemNotification,
+    SystemNotifications,
     page: currentPage,
     context,
     Api,
@@ -344,7 +344,7 @@ test.describe('Post edit', () => {
 
     await expect(currentPage).toHaveURL(PostsPage.urls.today);
     await expect(currentPage).toHaveTitle(PostsPage.titles.today);
-    await expect(SystemNotification.list).toContainText(
+    await expect(SystemNotifications.list).toContainText(
       'You cannot edit this post anymore. Edit time has expired',
     );
   });
@@ -353,7 +353,7 @@ test.describe('Post edit', () => {
     SinglePostPage,
     PostsPage,
     page: currentPage,
-    SystemNotification,
+    SystemNotifications,
     context,
     Api,
   }) => {
@@ -377,7 +377,7 @@ test.describe('Post edit', () => {
 
     await expect(currentPage).toHaveURL('/');
     await expect(currentPage).toHaveTitle(PostsPage.titles.today);
-    await expect(SystemNotification.list).toContainText(
+    await expect(SystemNotifications.list).toContainText(
       "Only post's author can edit this post",
     );
   });

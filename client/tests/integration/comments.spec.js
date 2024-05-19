@@ -134,7 +134,7 @@ test('Cannot post comments if not logged in', async ({
 
   await expect(Comments.newCommentFormEditor).toBeHidden();
   await expect(Comments.newCommentForm).toContainText(
-    'Please log in or create an account to leave a comment.',
+    'Please sign in or create an account to leave a comment.',
   );
 });
 

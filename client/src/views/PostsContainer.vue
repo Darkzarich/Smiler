@@ -8,6 +8,7 @@
       <div v-for="post in posts" :key="post.id">
         <Post :post="post" :can-edit="$postCanEdit(post)" />
       </div>
+
       <div
         v-if="posts.length == 0"
         class="posts-container__no-posts"
@@ -18,9 +19,11 @@
         Thank you.
       </div>
     </div>
+
     <div v-if="loading" class="posts-container__loading">
       <CircularLoader />
     </div>
+
     <div v-else-if="noMorePost" class="posts-container__no-more">
       Thank you for exploring all available content in this category. <br />
       Please check back later for more updates.

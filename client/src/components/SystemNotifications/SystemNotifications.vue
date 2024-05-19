@@ -1,15 +1,15 @@
 <template>
-  <div class="notifications" data-testid="system-notifications">
-    <TransitionGroup name="notifications__item">
+  <div class="system-notifications" data-testid="system-notifications">
+    <TransitionGroup name="system-notifications__item">
       <div
         v-for="notification in notifications"
         :key="notification.timer"
-        class="notifications__item"
+        class="system-notifications__item"
       >
         An error occurred. {{ notification.error }}
 
         <div
-          class="notifications__close"
+          class="system-notifications__close"
           @click="closeNotification(notification.timer)"
         >
           <ExitIcon />
@@ -44,7 +44,7 @@ export default {
 @import '@/styles/colors';
 @import '@/styles/mixins';
 
-.notifications {
+.system-notifications {
   position: fixed;
   width: 100%;
   color: #fff;

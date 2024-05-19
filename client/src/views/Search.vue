@@ -57,13 +57,12 @@ export default {
 .search-form {
   @include widget;
 
-  margin-left: 10%;
-
   @include for-size(phone-only) {
     margin-left: 0;
     border: none;
   }
 
+  margin-left: 10%;
   margin-bottom: $widget-margin;
 }
 </style>
