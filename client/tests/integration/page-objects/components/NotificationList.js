@@ -1,4 +1,4 @@
-export default class SystemNotifications {
+export default class NotificationList {
   pageNoAccessText = 'Only authenticated users can access this page';
 
   /**
@@ -6,6 +6,6 @@ export default class SystemNotifications {
    */
   constructor(page) {
     this.page = page;
-    this.list = page.getByTestId('system-notifications');
+    this.root = page.getByTestId('notification-list');
   }
 }

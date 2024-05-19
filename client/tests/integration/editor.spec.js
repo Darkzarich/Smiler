@@ -346,15 +346,15 @@ test('Cannot open the editor if the user is not logged in', async ({
   page: currentPage,
   PostsPage,
   Api,
-  SystemNotifications,
+  NotificationList,
   PostCreatePage,
 }) => {
   Api.routes.auth.getAuth.mock({ body: generateAuth() });
 
   await PostCreatePage.goto();
 
-  await expect(SystemNotifications.list).toContainText(
-    SystemNotifications.pageNoAccessText,
+  await expect(NotificationList.root).toContainText(
+    NotificationList.pageNoAccessText,
   );
   await expect(currentPage).toHaveURL(PostsPage.urls.today);
   await expect(currentPage).toHaveTitle(PostsPage.titles.today);

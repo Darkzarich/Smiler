@@ -1,15 +1,15 @@
 <template>
-  <div class="system-notifications" data-testid="system-notifications">
-    <TransitionGroup name="system-notifications__item">
+  <div class="notification-list" data-testid="notification-list">
+    <TransitionGroup name="notification-list__item">
       <div
         v-for="notification in notifications"
         :key="notification.timer"
-        class="system-notifications__item"
+        class="notification-list__item"
       >
         An error occurred. {{ notification.error }}
 
         <div
-          class="system-notifications__close"
+          class="notification-list__close"
           @click="closeNotification(notification.timer)"
         >
           <ExitIcon />
@@ -44,7 +44,7 @@ export default {
 @import '@/styles/colors';
 @import '@/styles/mixins';
 
-.system-notifications {
+.notification-list {
   position: fixed;
   width: 100%;
   color: #fff;
@@ -52,25 +52,21 @@ export default {
   top: 0;
 
   &__item {
+    @include flex-row;
+
     border-bottom: 1px solid $bg;
     background: $error;
     height: 2rem;
     opacity: 0.5;
-
-    @include for-size(phone-only) {
-      opacity: 1;
-    }
-
     transition: opacity 0.2s 0s ease-in-out;
 
     &:hover {
       opacity: 1;
     }
 
-    @include flex-row;
-
-    align-items: center;
-    justify-content: center;
+    @include for-size(phone-only) {
+      opacity: 1;
+    }
 
     &-enter-active,
     &-leave-active {

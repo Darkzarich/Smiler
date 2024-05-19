@@ -39,7 +39,7 @@ test("Only authenticated user can see Settings page, redirect to the today's pos
   page: currentPage,
   SettingsPage,
   PostsPage,
-  SystemNotifications,
+  NotificationList,
 }) => {
   Api.routes.auth.getAuth.mock({
     body: generateAuth({
@@ -49,8 +49,8 @@ test("Only authenticated user can see Settings page, redirect to the today's pos
 
   await SettingsPage.goto();
 
-  await expect(SystemNotifications.list).toContainText(
-    SystemNotifications.pageNoAccessText,
+  await expect(NotificationList.root).toContainText(
+    NotificationList.pageNoAccessText,
   );
   await expect(currentPage).toHaveURL(PostsPage.urls.today);
   await expect(currentPage).toHaveTitle(PostsPage.titles.today);

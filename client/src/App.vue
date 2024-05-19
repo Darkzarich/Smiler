@@ -1,15 +1,15 @@
 <template>
   <div v-if="show" id="app">
-    <SystemNotifications />
+    <NotificationList />
 
     <HeaderElement />
 
-    <div class="content-box">
-      <content class="content-box__main">
+    <div class="content">
+      <content class="content__main">
         <RouterView />
       </content>
 
-      <div v-if="!$isMobile()" class="content-box__sidebar">
+      <div v-if="!$isMobile()" class="content__sidebar">
         <User />
       </div>
     </div>
@@ -21,7 +21,7 @@
 <script>
 import FooterElement from '@/components/FooterElement.vue';
 import HeaderElement from '@/components/Header/HeaderElement.vue';
-import SystemNotifications from '@/components/SystemNotifications/SystemNotifications.vue';
+import NotificationList from '@/components/NotificationList/NotificationList.vue';
 import User from '@/components/User/User.vue';
 
 // TODO: global mini loader fixed to top
@@ -29,7 +29,7 @@ export default {
   components: {
     HeaderElement,
     FooterElement,
-    SystemNotifications,
+    NotificationList,
     User,
   },
   data() {
@@ -64,7 +64,7 @@ body {
   overflow-x: hidden;
 }
 
-.content-box {
+.content {
   margin-top: $header-height-interval;
   max-width: 1110px;
   min-height: 100vh;

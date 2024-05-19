@@ -36,7 +36,7 @@ test('Goes to 404 if user does not exist', async ({
   ProfilePage,
   NotFoundPage,
   page: currentPage,
-  SystemNotifications,
+  NotificationList,
   Api,
 }) => {
   Api.routes.users.getUserProfile.mock({
@@ -52,7 +52,7 @@ test('Goes to 404 if user does not exist', async ({
 
   await NotFoundPage.waitForNotFoundPage();
   await expect(currentPage).toHaveTitle(NotFoundPage.title);
-  await expect(SystemNotifications.list).toContainText('User was not found');
+  await expect(NotificationList.root).toContainText('User was not found');
 });
 
 test('Fetches and shows user profile', async ({ ProfilePage, Api }) => {
