@@ -1,6 +1,6 @@
 <template>
   <div>
-    <UserProfile :data="userInfo" />
+    <UserProfile :user="user" />
 
     <div
       v-if="!loading || posts.length > 0"
@@ -45,10 +45,10 @@ export default {
 
     if (user.data.error) {
       next({
-        name: '404',
+        name: 'NotFound',
       });
     } else {
-      next((vm) => vm.setUserInfo(user.data));
+      next((vm) => vm.setUser(user.data));
     }
   },
   async beforeRouteUpdate(to, from, next) {
@@ -56,17 +56,17 @@ export default {
 
     if (user.data.error) {
       next({
-        name: '404',
+        name: 'NotFound',
       });
     } else {
-      this.setUserInfo(user.data);
+      this.setUser(user.data);
       this.uploadPosts();
     }
   },
   data() {
     return {
       posts: [],
-      userInfo: {},
+      user: {},
       loading: false,
       curPage: 0,
       noMorePost: false,
@@ -76,14 +76,14 @@ export default {
     this.uploadPosts();
   },
   methods: {
-    setUserInfo(user) {
-      this.userInfo = user;
+    setUser(user) {
+      this.user = user;
     },
     async uploadPosts(add) {
       this.loading = true;
 
       const res = await api.posts.getPosts({
-        author: this.userInfo.login || this.$route.params.login,
+        author: this.user.login || this.$route.params.login,
         limit: consts.POSTS_INITIAL_COUNT,
         offset: 0 + this.curPage * consts.POSTS_INITIAL_COUNT,
       });

@@ -11,7 +11,7 @@ export default class ProfilePage {
 
     this.login = page.getByTestId('user-profile-login');
     this.rating = page.getByTestId('user-profile-rating');
-    this.followers = page.getByTestId('user-profile-followers');
+    this.followersCount = page.getByTestId('user-profile-followers-count');
     this.bio = page.getByTestId('user-profile-bio');
     this.unfollowBtn = page.getByTestId('user-profile-unfollow-btn');
     this.followBtn = page.getByTestId('user-profile-follow-btn');

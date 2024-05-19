@@ -22,7 +22,7 @@ export default {
 
       if (res.data.error) {
         next({
-          name: '404',
+          name: 'NotFound',
         });
       } else {
         next((vm) => vm.setPost(res.data));

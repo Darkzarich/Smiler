@@ -1,6 +1,6 @@
 <template>
   <div class="user">
-    <template v-if="!getUserAuthState">
+    <template v-if="!userAuthState">
       <template v-if="mode == USER_LOGIN_MODE">
         <SignInForm @close="closeMenu" @mode-change="setMode(USER_REG_MODE)" />
       </template>
@@ -20,17 +20,14 @@
               :to="{
                 name: 'UserPage',
                 params: {
-                  login: getUser.login,
+                  login: user.login,
                 },
               }"
               @click.native="navNative ? closeMenu() : ''"
             >
-              <img
-                :src="$resolveAvatar(getUser.avatar)"
-                :alt="getUser.avatar"
-              />
+              <img :src="$resolveAvatar(user.avatar)" :alt="user.avatar" />
               <div class="user__logged-meta-login" data-testid="user-login">
-                {{ getUser.login }}
+                {{ user.login }}
               </div>
             </RouterLink>
           </div>
@@ -39,13 +36,13 @@
           <div class="user__logged-info-rating">
             <div>Rating</div>
             <div data-testid="user-rating">
-              {{ getUser.rating }}
+              {{ user.rating }}
             </div>
           </div>
           <div class="user__logged-info-rating">
             <div>Followers</div>
             <div data-testid="user-followers-amount">
-              {{ getUser.followersAmount }}
+              {{ user.followersAmount }}
             </div>
           </div>
         </div>
@@ -108,11 +105,11 @@ export default {
     };
   },
   computed: {
-    getUserAuthState() {
-      return this.$store.getters.getUserAuthState;
+    userAuthState() {
+      return this.$store.getters.userAuthState;
     },
-    getUser() {
-      return this.$store.getters.getUser;
+    user() {
+      return this.$store.state.user;
     },
   },
   methods: {
@@ -167,6 +164,7 @@ export default {
 
       img {
         border-radius: 50%;
+        border: 1px solid $light-gray;
         width: 8rem;
       }
     }

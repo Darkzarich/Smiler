@@ -68,7 +68,7 @@ test('Fetches and shows user profile', async ({ ProfilePage, Api }) => {
   );
   await expect(ProfilePage.login).toContainText(testUser.login);
   await expect(ProfilePage.rating).toContainText(testUser.rating.toString());
-  await expect(ProfilePage.followers).toContainText(
+  await expect(ProfilePage.followersCount).toContainText(
     testUser.followersAmount.toString(),
   );
   await expect(ProfilePage.bio).toContainText(testUser.bio);
@@ -128,7 +128,7 @@ test.describe('Follows and unfollow', () => {
 
     expect(followResponse.url()).toContain(testUser.id);
     await expect(ProfilePage.unfollowBtn).toBeVisible();
-    await expect(ProfilePage.followers).toContainText(
+    await expect(ProfilePage.followersCount).toContainText(
       (testUser.followersAmount + 1).toString(),
     );
   });
@@ -154,7 +154,7 @@ test.describe('Follows and unfollow', () => {
 
     expect(unfollowResponse.url()).toContain(testUser.id);
     await expect(ProfilePage.followBtn).toBeVisible();
-    await expect(ProfilePage.followers).toContainText('0');
+    await expect(ProfilePage.followersCount).toContainText('0');
   });
 
   test('Cannot follow or unfollow yourself', async ({ ProfilePage, Api }) => {

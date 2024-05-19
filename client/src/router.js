@@ -14,10 +14,10 @@ Vue.use(Router);
 const authGuard = async (to, from, next) => {
   await store.dispatch('userGetAuthState');
 
-  if (store.getters.getUserAuthState) {
+  if (store.getters.userAuthState) {
     next();
   } else {
-    console.log(store.getters.getUserAuthState);
+    console.log(store.getters.userAuthState);
     store.dispatch('newSystemNotification', {
       error: {
         message: 'Only authenticated users can access this page.',
@@ -206,7 +206,7 @@ const router = new Router({
     },
     {
       path: '/error/404',
-      name: '404',
+      name: 'NotFound',
       component: NotFound,
       meta: {
         title: 'Not Found',
@@ -215,7 +215,7 @@ const router = new Router({
     {
       path: '*',
       redirect: {
-        name: '404',
+        name: 'NotFound',
       },
     },
   ],

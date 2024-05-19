@@ -505,6 +505,7 @@ export default {
               height: 1rem;
               margin-left: 0.5rem;
               border-radius: 50%;
+              border: 1px solid $light-gray;
             }
           }
 

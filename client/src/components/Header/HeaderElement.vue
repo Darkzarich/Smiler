@@ -250,9 +250,15 @@ export default {
 
     img {
       border-radius: 50%;
+      border: 1px solid $light-gray;
       width: 2.5rem;
       height: 2.5rem;
       cursor: pointer;
+
+      @include for-size(phone-only) {
+        width: 2rem;
+        height: 2rem;
+      }
     }
   }
 

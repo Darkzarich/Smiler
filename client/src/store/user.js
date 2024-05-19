@@ -14,15 +14,17 @@ export default {
     getUser(state) {
       return state;
     },
-    getUserAuthState(state) {
+    userAuthState(state) {
       return state.authState;
     },
     // cache result to not recalculate every single time
     isTagFollowed(state) {
       const result = {};
+
       state.tagsFollowed.forEach((tag) => {
         result[tag] = tag;
       });
+
       return result;
     },
   },

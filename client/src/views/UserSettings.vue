@@ -288,7 +288,6 @@ export default {
   &__current-avatar {
     width: 8rem;
     height: 8rem;
-    border: 1px solid $light-gray;
     margin-bottom: 0.5rem;
     margin-left: 1rem;
 
@@ -298,6 +297,7 @@ export default {
 
     img {
       border-radius: 50%;
+      border: 1px solid $light-gray;
       width: 128px;
     }
   }

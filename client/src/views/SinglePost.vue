@@ -87,7 +87,7 @@ export default {
 
     if (post.data.error) {
       next({
-        name: '404',
+        name: 'NotFound',
       });
     } else {
       next((vm) => vm.setPost(post.data));

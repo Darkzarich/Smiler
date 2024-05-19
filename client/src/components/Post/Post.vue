@@ -609,10 +609,11 @@ export default {
   }
 
   &__author-avatar {
-    width: 2rem;
-    height: 2rem;
+    width: 1.5rem;
+    height: 1.5rem;
     margin-left: 0.5rem;
     border-radius: 50%;
+    border: 1px solid $light-gray;
   }
 }
 </style>
