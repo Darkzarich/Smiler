@@ -52,14 +52,6 @@ module.exports = {
     const { userId } = req.session;
     const update = req.body;
 
-    if (update.bio && update.bio.length > consts.USER_MAX_BIO_LENGTH) {
-      generateError(`bio can't be longer than ${consts.USER_MAX_BIO_LENGTH}`, 422, next); return;
-    }
-
-    if (update.avatar && update.avatar.length > consts.USER_MAX_AVATAR_LENGTH) {
-      generateError(`Avatar link can't be longer than ${consts.USER_MAX_AVATAR_LENGTH}`, 422, next); return;
-    }
-
     const user = await User.findByIdAndUpdate(userId, update, {
       runValidators: true,
     });

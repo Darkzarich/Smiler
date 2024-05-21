@@ -1,9 +1,9 @@
 /* eslint-disable func-names */
 const mongoose = require('mongoose');
-
-const Rate = require('./Rate');
+const consts = require('../const/const');
 
 const { Schema } = mongoose;
+
 
 const schema = new Schema({
   login: {
@@ -20,10 +20,14 @@ const schema = new Schema({
   },
   avatar: {
     type: String,
+    match: [/^https?:\/\//g, '{VALUE} is not an url'],
+    minLength: 7,
+    maxLength: consts.USER_MAX_AVATAR_LENGTH,
     default: '',
   },
   bio: {
     type: String,
+    maxLength: consts.USER_MAX_BIO_LENGTH,
     default: '',
   },
   salt: {

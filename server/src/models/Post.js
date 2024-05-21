@@ -11,10 +11,12 @@ const schema = new Schema({
   },
   slug: {
     type: String,
+    required: true,
     index: true,
   },
   author: {
     type: Schema.Types.ObjectId,
+    required: true,
     ref: 'User',
   },
   tags: [
