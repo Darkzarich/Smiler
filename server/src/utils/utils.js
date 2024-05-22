@@ -1,4 +1,4 @@
-const logger = require('../../config/winston');
+const logger = require('../config/winston');
 
 module.exports = {
   /**

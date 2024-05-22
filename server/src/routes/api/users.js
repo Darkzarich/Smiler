@@ -186,8 +186,8 @@ const auth = require('../auth');
   }
 }
 */
-router.get('/:login', usersController.getUser);
-router.put('/me', auth.required, usersController.updateUser);
+router.get('/:login', usersController.getByLogin);
+router.put('/me', auth.required, usersController.updateMe);
 
 /**
 @swagger
@@ -319,9 +319,8 @@ router.put('/me', auth.required, usersController.updateUser);
 }
 */
 
-router.get('/:login/template', auth.required, usersController.getUserPostTemplate);
-
-router.put('/:login/template', auth.required, usersController.updateUserPostTemplate);
+router.get('/:login/template', auth.required, usersController.getPostTemplate);
+router.put('/:login/template', auth.required, usersController.updatePostTemplate);
 
 /**
 @swagger
@@ -446,8 +445,8 @@ router.get('/me/settings', auth.required, usersController.getSettings);
 }
  */
 
-router.put('/:id/follow', auth.required, usersController.follow);
-router.delete('/:id/follow', auth.required, usersController.unfollow);
+router.put('/:id/follow', auth.required, usersController.followById);
+router.delete('/:id/follow', auth.required, usersController.unfollowById);
 
 /**
 @swagger
@@ -506,6 +505,6 @@ router.delete('/:id/follow', auth.required, usersController.unfollow);
 }
 */
 
-router.delete('/:login/template/:hash', auth.required, usersController.deleteUserPostTemplatePicture);
+router.delete('/:login/template/:hash', auth.required, usersController.deletePostTemplatePicture);
 
 module.exports = router;

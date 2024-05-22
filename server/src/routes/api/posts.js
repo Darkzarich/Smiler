@@ -347,7 +347,7 @@ const auth = require('../auth');
   }
 }
 */
-router.get('/', postsController.getAll);
+router.get('/', postsController.getList);
 router.post('/', auth.required, postsController.create);
 
 /**
@@ -560,8 +560,8 @@ router.get('/feed', auth.required, postsController.getFeed);
   }
 }
  */
-router.put('/:id', auth.required, postsController.update);
-router.delete('/:id', auth.required, postsController.delete);
+router.put('/:id', auth.required, postsController.updateById);
+router.delete('/:id', auth.required, postsController.deleteById);
 router.get('/:slug', postsController.getBySlug);
 
 /**
@@ -720,7 +720,7 @@ router.post('/upload', auth.required, postsController.upload);
   }
 }
  */
-router.delete('/:id/vote', auth.required, postsController.unvote);
-router.put('/:id/vote', auth.required, postsController.vote);
+router.put('/:id/vote', auth.required, postsController.voteById);
+router.delete('/:id/vote', auth.required, postsController.unvoteById);
 
 module.exports = router;

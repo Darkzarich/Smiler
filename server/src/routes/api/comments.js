@@ -236,9 +236,9 @@ const auth = require('../auth');
   }
 }
 */
-router.get('/', commentsController.getComment);
+router.get('/', commentsController.getList);
 
-router.post('/', auth.required, commentsController.createComment);
+router.post('/', auth.required, commentsController.create);
 
 /**
 @swagger
@@ -343,8 +343,8 @@ router.post('/', auth.required, commentsController.createComment);
 }
 */
 
-router.put('/:id', auth.required, commentsController.editComment);
-router.delete('/:id', auth.required, commentsController.deleteComment);
+router.put('/:id', auth.required, commentsController.updateById);
+router.delete('/:id', auth.required, commentsController.deleteById);
 
 /**
 @swagger
@@ -440,7 +440,7 @@ router.delete('/:id', auth.required, commentsController.deleteComment);
   }
 }
  */
-router.delete('/:id/vote', auth.required, commentsController.unvote);
-router.put('/:id/vote', auth.required, commentsController.vote);
+router.put('/:id/vote', auth.required, commentsController.voteById);
+router.delete('/:id/vote', auth.required, commentsController.unvoteById);
 
 module.exports = router;
