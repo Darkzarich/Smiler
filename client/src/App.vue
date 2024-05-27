@@ -64,6 +64,19 @@ html {
 body {
   margin: 0;
   background: $bg;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $bg;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $light-gray;
+    border-radius: 20px;
+  }
 }
 
 #app {
