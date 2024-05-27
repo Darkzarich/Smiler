@@ -216,6 +216,7 @@ export default {
   }
 
   &__mode-toggler {
+    // TODO: Remove !important, was made because of mobile
     color: $firm;
     font-size: 0.8rem;
     margin-top: 0.5rem;

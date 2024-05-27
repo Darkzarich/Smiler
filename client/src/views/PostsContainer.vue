@@ -1,30 +1,23 @@
 <template>
-  <div data-testid="posts-container">
-    <div
-      v-if="!loading || posts.length > 0"
-      v-scroll="handleScroll"
-      class="posts-container"
-    >
-      <div v-for="post in posts" :key="post.id">
-        <Post :post="post" :can-edit="$postCanEdit(post)" />
-      </div>
+  <div data-testid="posts-container" class="posts-container">
+    <CircularLoader v-if="loading" class="posts-container__loading" />
 
-      <div
-        v-if="posts.length == 0"
-        class="posts-container__no-posts"
-        data-testid="no-content"
-      >
-        No content found at the moment. <br />
-        Please check back later for updates. <br />
-        Thank you.
-      </div>
+    <div v-else-if="posts.length > 0" v-scroll="handleScroll">
+      <Post
+        v-for="post in posts"
+        :key="post.id"
+        :post="post"
+        :can-edit="$postCanEdit(post)"
+      />
     </div>
 
-    <div v-if="loading" class="posts-container__loading">
-      <CircularLoader />
+    <div v-else class="posts-container__no-posts" data-testid="no-content">
+      No content found at the moment. <br />
+      Please check back later for updates. <br />
+      Thank you.
     </div>
 
-    <div v-else-if="noMorePost" class="posts-container__no-more">
+    <div v-if="noMorePost" class="posts-container__no-more">
       Thank you for exploring all available content in this category. <br />
       Please check back later for more updates.
     </div>
@@ -136,27 +129,28 @@ export default {
 @import '@/styles/colors';
 
 .posts-container {
-  &__loading {
-    @include widget;
-    @include flex-row;
-
-    @include for-size(phone-only) {
-      margin-left: 0%;
-      border: none !important;
-    }
-
-    justify-content: center;
+  &__loading,
+  &__no-more,
+  &__no-posts {
     margin-left: 10%;
-  }
-
-  &__no-posts,
-  &__no-more {
-    @include widget;
+    text-align: center;
 
     @include for-size(phone-only) {
       margin-left: 0% !important;
       border: none !important;
     }
+  }
+
+  &__loading {
+    @include widget;
+    @include flex-row;
+
+    justify-content: center;
+  }
+
+  &__no-posts,
+  &__no-more {
+    @include widget;
 
     color: $main-text;
     display: flex;
@@ -164,11 +158,6 @@ export default {
     text-align: center;
     line-height: 1.7rem;
     font-size: 1.3rem;
-  }
-
-  &__no-more {
-    margin-left: 10%;
-    text-align: center;
   }
 }
 </style>

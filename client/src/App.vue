@@ -52,6 +52,13 @@ export default {
 
 html {
   font-family: Roboto, 'Open Sans', Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
 }
 
 body {
@@ -60,18 +67,21 @@ body {
 }
 
 #app {
-  min-height: 100vh;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .content {
-  margin-top: $header-height-interval;
-  max-width: 1110px;
-  min-height: 100vh;
-  margin-left: auto;
-  margin-right: auto;
   display: flex;
   flex-flow: row nowrap;
+  flex-grow: 1;
+  margin-top: $header-height-interval;
+  max-width: 1110px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
   padding-right: 10px;
 
   @include for-size(phone-only) {

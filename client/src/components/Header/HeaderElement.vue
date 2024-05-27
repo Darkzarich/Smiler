@@ -142,13 +142,10 @@ export default {
   top: 0;
   z-index: 2;
   padding: 0.5rem;
-  height: 40px;
-  box-shadow:
-    0 1px 3px rgb(0 0 0 / 12%),
-    0 1px 2px rgb(0 0 0 / 24%);
+  height: 56px;
 
   @include for-size(phone-only) {
-    height: 30px;
+    height: 46px;
   }
 
   display: flex;
@@ -157,8 +154,7 @@ export default {
 
 .header-container {
   display: flex;
-  padding-left: 80px;
-  padding-right: 10px;
+  padding-left: 40px;
 
   @include for-size(phone-only) {
     padding-left: 0;

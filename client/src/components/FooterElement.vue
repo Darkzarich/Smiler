@@ -1,8 +1,9 @@
 <template>
   <footer>
-    <div class="footer-github">
+    <div class="footer-content">
       <a
-        href="https://github.com/Darkzarich/express-blog"
+        class="github-link"
+        href="https://github.com/Darkzarich/Smiler"
         rel="noopener noreferrer"
         target="_blank"
       >
@@ -21,25 +22,42 @@ export default {};
 @import '@/styles/mixins';
 
 footer {
+  @include flex-row;
+
+  @include for-size(phone-only) {
+    height: 2rem;
+  }
+
   width: 100%;
   height: 4rem;
   margin-top: 1.5rem;
   background: $header;
   align-items: center;
 
-  @include flex-row;
+  .footer-content {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    max-width: 1110px;
+  }
 
-  .footer-github {
-    display: inline-block;
-    width: 3rem;
-    height: 3rem;
+  .github-link {
     margin-left: auto;
+    display: flex;
+    height: 100%;
+    align-items: center;
     margin-right: 1rem;
+    opacity: 0.5;
     cursor: pointer;
 
+    &:hover {
+      opacity: 1;
+    }
+
     img {
-      width: 100%;
       height: 100%;
+      padding: 5px;
     }
   }
 }
