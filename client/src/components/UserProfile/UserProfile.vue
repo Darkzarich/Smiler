@@ -111,7 +111,7 @@ export default {
 
       const res = await api.users.followUser(this.user.id);
 
-      if (!res.user.error) {
+      if (!res.data.error) {
         this.user.followersAmount = this.user.followersAmount + 1;
         this.user.isFollowed = true;
       }
@@ -127,7 +127,7 @@ export default {
 
       const res = await api.users.unfollowUser(this.user.id);
 
-      if (!res.user.error) {
+      if (!res.data.error) {
         this.user.followersAmount = this.user.followersAmount - 1;
         this.user.isFollowed = false;
       }
