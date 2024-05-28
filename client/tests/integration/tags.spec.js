@@ -43,7 +43,12 @@ test.beforeEach(async ({ Api }) => {
   });
 });
 
-test('Follows a tag', async ({ SinglePostPage, Post, Api }) => {
+test('Follows a tag', async ({
+  SinglePostPage,
+  Post,
+  NotificationList,
+  Api,
+}) => {
   await SinglePostPage.goto(post.slug);
 
   const followResponse = await Api.routes.tags.follow.waitForRequest({
@@ -54,9 +59,17 @@ test('Follows a tag', async ({ SinglePostPage, Post, Api }) => {
 
   await expect(Post.getUnfollowTagBtn()).toBeVisible();
   expect(followResponse.url()).toContain(tagToClick);
+  await expect(NotificationList.root).toHaveText(
+    "You're now following this tag!",
+  );
 });
 
-test('Unfollows a tag', async ({ SinglePostPage, Post, Api }) => {
+test('Unfollows a tag', async ({
+  SinglePostPage,
+  Post,
+  Api,
+  NotificationList,
+}) => {
   Api.routes.auth.getAuth.mock({
     body: generateAuth({
       isAuth: true,
@@ -74,6 +87,9 @@ test('Unfollows a tag', async ({ SinglePostPage, Post, Api }) => {
 
   await expect(Post.getFollowTagBtn()).toBeVisible();
   expect(unfollowResponse.url()).toContain(tagToClick);
+  await expect(NotificationList.root).toHaveText(
+    'This tag was successfully unfollowed!',
+  );
 });
 
 test('Cannot follow or unfollow a tag if not logged in', async ({

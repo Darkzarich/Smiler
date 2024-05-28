@@ -32,6 +32,12 @@ test.beforeEach(async ({ Api }) => {
       avatar: '',
     },
   });
+
+  Api.routes.users.updateUserProfile.mock({
+    body: {
+      ok: true,
+    },
+  });
 });
 
 test("Only authenticated user can see Settings page, redirect to the today's posts page", async ({
@@ -104,6 +110,7 @@ test('Shows empty list of authors and tags if the user is not following any', as
 test('Unfollows an author, removes that author from the list of following', async ({
   Api,
   SettingsPage,
+  NotificationList,
 }) => {
   Api.routes.users.unfollowUser.mock({
     body: {
@@ -120,11 +127,15 @@ test('Unfollows an author, removes that author from the list of following', asyn
   });
 
   await expect(SettingsPage.getAuthorById(author1.id)).toBeHidden();
+  await expect(NotificationList.root).toHaveText(
+    'This author was successfully unfollowed!',
+  );
 });
 
 test('Unfollows a tag, removes that tag from the list of following', async ({
   Api,
   SettingsPage,
+  NotificationList,
 }) => {
   Api.routes.tags.unfollow.mock({
     body: {
@@ -141,6 +152,9 @@ test('Unfollows a tag, removes that tag from the list of following', async ({
   });
 
   await expect(SettingsPage.getTagByText(tags[0])).toBeHidden();
+  await expect(NotificationList.root).toHaveText(
+    'This tag was successfully unfollowed!',
+  );
 });
 
 test('Shows current bio and avatar', async ({ Api, SettingsPage }) => {
@@ -162,6 +176,7 @@ test('Shows current bio and avatar', async ({ Api, SettingsPage }) => {
 test("Edits current user's bio with expected request body", async ({
   Api,
   SettingsPage,
+  NotificationList,
 }) => {
   await SettingsPage.goto();
 
@@ -172,11 +187,15 @@ test("Edits current user's bio with expected request body", async ({
   });
 
   expect(editResponse.postDataJSON()).toMatchObject({ bio: 'New bio' });
+  await expect(NotificationList.root).toHaveText(
+    'Your bio has been successfully updated!',
+  );
 });
 
 test("Edits current user's avatar with expected request body", async ({
   Api,
   SettingsPage,
+  NotificationList,
 }) => {
   await SettingsPage.goto();
 
@@ -189,6 +208,9 @@ test("Edits current user's avatar with expected request body", async ({
   expect(editResponse.postDataJSON()).toMatchObject({
     avatar: SettingsPage.avatarPlaceholderUrl,
   });
+  await expect(NotificationList.root).toHaveText(
+    'Your avatar has been successfully updated!',
+  );
 });
 
 test('If typed more than 300 symbols in bio shows validation error and blocks submit', async ({

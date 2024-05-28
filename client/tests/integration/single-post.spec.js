@@ -415,11 +415,19 @@ test.describe('Post edit', () => {
   });
 
   test('Opens post edit page, edits the post and saves it', async ({
+    page: currentPage,
     SinglePostPage,
     PostEditor,
+    NotificationList,
     context,
     Api,
   }) => {
+    Api.routes.posts.updatePostById.mock({
+      body: {
+        ok: true,
+      },
+    });
+
     const dateToMock = '2024-03-06T00:00:00.000Z';
 
     await mockDate(context, dateToMock);
@@ -450,6 +458,12 @@ test.describe('Post edit', () => {
         },
       ],
     });
+    await expect(NotificationList.root).toHaveText(
+      'Post has been saved successfully',
+    );
+    await expect(currentPage).toHaveURL(
+      SinglePostPage.getUrlWithSlug(post.slug),
+    );
   });
 
   test('Deletes a post, sends delete request', async ({
@@ -458,6 +472,7 @@ test.describe('Post edit', () => {
     PostsPage,
     context,
     page: currentPage,
+    NotificationList,
     Api,
   }) => {
     Api.routes.posts.deletePostById.mock({
@@ -486,5 +501,8 @@ test.describe('Post edit', () => {
     expect(deletePostByIdResponse.url()).toContain(post.id);
     await expect(currentPage).toHaveURL(PostsPage.urls.today);
     await expect(currentPage).toHaveTitle(PostsPage.titles.today);
+    await expect(NotificationList.root).toHaveText(
+      'The post has been successfully deleted',
+    );
   });
 });

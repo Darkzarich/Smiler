@@ -248,7 +248,17 @@ test('Fetch and show draft template', async ({ Api, page, PostCreatePage }) => {
   ).toBeVisible();
 });
 
-test('Saves draft template', async ({ PostCreatePage, Api }) => {
+test('Saves draft template', async ({
+  PostCreatePage,
+  Api,
+  NotificationList,
+}) => {
+  Api.routes.users.updateUserTemplate.mock({
+    body: {
+      ok: true,
+    },
+  });
+
   const tag = 'test tag';
 
   await PostCreatePage.goto();
@@ -271,6 +281,9 @@ test('Saves draft template', async ({ PostCreatePage, Api }) => {
       preRequestAction: PostCreatePage.saveDraft.bind(PostCreatePage),
     });
 
+  await expect(NotificationList.root).toHaveText(
+    'Draft post has been saved successfully!',
+  );
   expect(updateUserTemplateResponse.url()).toContain(authUser.login);
   expect(updateUserTemplateResponse.postDataJSON()).toMatchObject({
     title,
