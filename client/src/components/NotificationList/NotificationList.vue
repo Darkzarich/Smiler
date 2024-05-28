@@ -5,6 +5,10 @@
         v-for="notification in notifications"
         :key="notification.id"
         class="notification-list__item"
+        :class="{
+          'notification-list__item--error': notification.theme === 'error',
+          'notification-list__item--info': notification.theme === 'info',
+        }"
       >
         <div class="notification-list__item-message">
           {{ notification.message }}
@@ -48,7 +52,6 @@ export default {
 
 .notification-list {
   position: fixed;
-  color: #fff;
   width: 100%;
   z-index: 999;
   top: 0;
@@ -65,6 +68,16 @@ export default {
     background: $error;
     opacity: 1;
     transition: opacity 0.2s 0s ease-in-out;
+
+    &--info {
+      background: $dark-firm;
+      color: $white;
+    }
+
+    &--error {
+      background: $error;
+      color: $white;
+    }
 
     &-enter-active,
     &-leave-active {

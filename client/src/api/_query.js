@@ -13,7 +13,7 @@ export default (requestData) => {
       if (e.response.data.error) {
         console.error(e.response.data.error.message);
 
-        store.dispatch('newNotification', {
+        store.dispatch('showErrorNotification', {
           message: e.response.data.error.message,
         });
       }

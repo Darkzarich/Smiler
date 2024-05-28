@@ -15,7 +15,7 @@ const authGuard = async (to, from, next) => {
   await store.dispatch('userGetAuthState');
 
   if (!store.getters.userAuthState) {
-    store.dispatch('newNotification', {
+    store.dispatch('showErrorNotification', {
       message: 'Only authenticated users can access this page.',
     });
 

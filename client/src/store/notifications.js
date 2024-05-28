@@ -18,16 +18,29 @@ export default {
     },
   },
   actions: {
-    newNotification(context, payload) {
+    showNotification(context, payload) {
       const notification = {
         id: crypto.randomUUID(),
+        theme: payload.theme,
         message: payload.message,
         timer: setTimeout(() => {
           context.commit('removeNotification', notification.id);
-        }, 10000),
+        }, 7000),
       };
 
       context.commit('pushNotification', notification);
+    },
+    showInfoNotification(context, payload) {
+      context.dispatch('showNotification', {
+        theme: 'info',
+        message: payload.message,
+      });
+    },
+    showErrorNotification(context, payload) {
+      context.dispatch('showNotification', {
+        theme: 'error',
+        message: payload.message,
+      });
     },
   },
 };
