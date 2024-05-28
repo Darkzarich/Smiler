@@ -14,17 +14,17 @@ Vue.use(Router);
 const authGuard = async (to, from, next) => {
   await store.dispatch('userGetAuthState');
 
-  if (store.getters.userAuthState) {
-    next();
-  } else {
-    console.log(store.getters.userAuthState);
-    store.dispatch('newSystemNotification', {
-      error: {
-        message: 'Only authenticated users can access this page.',
-      },
+  if (!store.getters.userAuthState) {
+    store.dispatch('newNotification', {
+      message: 'Only authenticated users can access this page.',
     });
+
     next(from);
+
+    return;
   }
+
+  next();
 };
 
 const getFilterDate = ({ h = 0, m = 0, s = 0, ms = 0, d = undefined } = {}) => {

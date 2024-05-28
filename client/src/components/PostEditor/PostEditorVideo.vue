@@ -64,19 +64,18 @@ export default {
         this.$emit('input', this.url);
       } else {
         this.url = '';
-        this.$store.dispatch('newSystemNotification', {
-          error: {
-            message:
-              'Something went wrong while uploading your video. Please, put the video in again.',
-          },
+        this.$store.dispatch('newNotification', {
+          message:
+            'Something went wrong during upload of this video. Please try to upload the video again.',
         });
       }
       this.uploading = false;
     },
     error() {
-      this.$store.dispatch('newSystemNotification', {
+      this.$store.dispatch('newNotification', {
         error: {
-          message: 'Invalid video link',
+          message:
+            'The video link you provided could not be loaded. Please try a different one.',
         },
       });
 

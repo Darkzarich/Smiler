@@ -1,16 +1,18 @@
 <template>
   <div class="notification-list" data-testid="notification-list">
-    <TransitionGroup name="notification-list__item">
+    <TransitionGroup name="notification-list__item" tag="div">
       <div
         v-for="notification in notifications"
-        :key="notification.timer"
+        :key="notification.id"
         class="notification-list__item"
       >
-        An error occurred. {{ notification.error }}
+        <div class="notification-list__item-message">
+          {{ notification.message }}
+        </div>
 
         <div
           class="notification-list__close"
-          @click="closeNotification(notification.timer)"
+          @click="removeNotification(notification.id)"
         >
           <ExitIcon />
         </div>
@@ -33,8 +35,8 @@ export default {
     }),
   },
   methods: {
-    closeNotification(timer) {
-      this.$store.commit('removeSystemNotification', timer);
+    removeNotification(id) {
+      this.$store.commit('removeNotification', id);
     },
   },
 };
@@ -46,27 +48,23 @@ export default {
 
 .notification-list {
   position: fixed;
-  width: 100%;
   color: #fff;
+  width: 100%;
   z-index: 999;
   top: 0;
 
   &__item {
     @include flex-row;
 
+    height: 2rem;
+    padding: 5px;
+    align-items: center;
+    justify-content: center;
+    position: relative;
     border-bottom: 1px solid $bg;
     background: $error;
-    height: 2rem;
-    opacity: 0.5;
+    opacity: 1;
     transition: opacity 0.2s 0s ease-in-out;
-
-    &:hover {
-      opacity: 1;
-    }
-
-    @include for-size(phone-only) {
-      opacity: 1;
-    }
 
     &-enter-active,
     &-leave-active {
@@ -84,9 +82,17 @@ export default {
     }
   }
 
+  &__item-message {
+    margin: 0 20px;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
   &__close {
     position: absolute;
-    right: 1rem;
+    right: 5px;
+    top: 2px;
     cursor: pointer;
 
     svg {

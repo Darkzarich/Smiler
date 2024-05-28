@@ -13,11 +13,9 @@ export default (requestData) => {
       if (e.response.data.error) {
         console.error(e.response.data.error.message);
 
-        const notification = {
-          error: e.response.data.error,
-        };
-
-        store.dispatch('newSystemNotification', notification);
+        store.dispatch('newNotification', {
+          message: e.response.data.error.message,
+        });
       }
 
       if (e.response.status === 401) {

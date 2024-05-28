@@ -79,11 +79,9 @@ export default {
       try {
         await this.upload();
       } catch (e) {
-        this.$store.dispatch('newSystemNotification', {
-          error: {
-            message:
-              'Something went wrong while uploading the file. Please, try to upload the file again.',
-          },
+        this.$store.dispatch('newNotification', {
+          message:
+            'Something went wrong during upload of this picture. Please try to upload the picture again.',
         });
       } finally {
         this.reset();
@@ -108,10 +106,9 @@ export default {
     },
     error() {
       if (!(this.file instanceof File)) {
-        this.$store.dispatch('newSystemNotification', {
-          error: {
-            message: 'Invalid image link',
-          },
+        this.$store.dispatch('newNotification', {
+          message:
+            'The image link you provided is invalid. Please try a different one.',
         });
 
         this.reset();
