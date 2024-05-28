@@ -96,12 +96,24 @@
         <VideoIcon />
       </div>
     </div>
+
     <div v-else class="post-editor__control-error">
       Can't add any more sections. Max amount of sections is
       {{ POST_MAX_SECTIONS }}.
     </div>
+
     <div class="post-editor__submit">
-      <template v-if="!edit">
+      <template v-if="edit">
+        <ButtonElement
+          data-testid="finish-edit-post-button"
+          :loading="saving"
+          :disabled="!sections.length"
+          :callback="saveEdited"
+        >
+          Save Edited
+        </ButtonElement>
+      </template>
+      <template v-else>
         <ButtonElement
           data-testid="create-post-button"
           :loading="sending"
@@ -117,16 +129,6 @@
           :callback="saveDraft"
         >
           Save Draft
-        </ButtonElement>
-      </template>
-      <template v-else>
-        <ButtonElement
-          data-testid="finish-edit-post-button"
-          :loading="saving"
-          :disabled="!sections.length"
-          :callback="saveEdited"
-        >
-          Save Edited
         </ButtonElement>
       </template>
     </div>
@@ -241,6 +243,10 @@ export default {
       });
 
       if (!res.data.error) {
+        this.$store.dispatch('showInfoNotification', {
+          message: 'Post has been saved successfully',
+        });
+
         this.$router.push({
           name: 'Single',
           params: {
@@ -252,11 +258,17 @@ export default {
     async saveDraft() {
       this.saving = true;
 
-      await api.users.updateUserTemplate(this.getUserLogin, {
+      const data = await api.users.updateUserTemplate(this.getUserLogin, {
         title: this.title,
         sections: this.sections,
         tags: this.tags,
       });
+
+      if (!data.data.error) {
+        this.$store.dispatch('showInfoNotification', {
+          message: 'Draft post has been saved successfully!',
+        });
+      }
 
       this.saving = false;
     },

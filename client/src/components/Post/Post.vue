@@ -348,7 +348,12 @@ export default {
     },
     async deletePost(id) {
       const res = await api.posts.deletePostById(id);
+
       if (!res.data.error) {
+        this.$store.dispatch('showInfoNotification', {
+          message: 'The post has been successfully deleted',
+        });
+
         this.$router.push({ name: 'Home' });
       }
     },
@@ -374,13 +379,23 @@ export default {
       this.closeContextMenu();
       const res = await api.tags.follow(tag);
       if (!res.data.error) {
+        this.$store.dispatch('showInfoNotification', {
+          message: "You're now following this tag!",
+        });
+
         this.$store.commit('followTag', tag);
       }
     },
     async unfollowTag(tag) {
       this.closeContextMenu();
+
       const res = await api.tags.unfollow(tag);
+
       if (!res.data.error) {
+        this.$store.dispatch('showInfoNotification', {
+          message: 'This tag was successfully unfollowed!',
+        });
+
         this.$store.commit('unfollowTag', tag);
       }
     },

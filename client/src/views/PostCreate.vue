@@ -57,14 +57,14 @@ export default {
 
       // TODO: Check id instead
       if (data.author.login !== this.login) {
-        this.$store.dispatch('newNotification', {
+        this.$store.dispatch('showErrorNotification', {
           message: "Only post's author can edit this post",
         });
         this.$router.push({
           name: 'Home',
         });
       } else if (!this.$postCanEdit(data)) {
-        this.$store.dispatch('newNotification', {
+        this.$store.dispatch('showErrorNotification', {
           message: 'You cannot edit this post anymore. Edit time has expired',
         });
         this.$router.push({

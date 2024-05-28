@@ -171,9 +171,15 @@ export default {
     async editBio() {
       this.bioEditRequesting = true;
 
-      await api.users.updateUserProfile({
+      const res = await api.users.updateUserProfile({
         bio: this.bioEditInput,
       });
+
+      if (!res.data.error) {
+        this.$store.dispatch('showInfoNotification', {
+          message: 'Your bio has been successfully updated!',
+        });
+      }
 
       this.bioEditRequesting = false;
     },
@@ -186,7 +192,10 @@ export default {
 
       if (!res.data.error) {
         this.$store.commit('setAvatar', this.avatarEditInput);
-        this.avatarEditInput = '';
+
+        this.$store.dispatch('showInfoNotification', {
+          message: 'Your avatar has been successfully updated!',
+        });
       }
 
       this.avatarEditRequesting = false;
@@ -195,10 +204,16 @@ export default {
       if (!this.requestingForUsers) {
         this.requestingForUsers = true;
         const res = await api.tags.unfollow(tag);
+
         if (!res.data.error) {
           this.tagsFollowed.splice(this.tagsFollowed.indexOf(tag), 1);
           this.$store.commit('unfollowTag', tag);
+
+          this.$store.dispatch('showInfoNotification', {
+            message: 'This tag was successfully unfollowed!',
+          });
         }
+
         this.requestingForUsers = false;
       }
     },
@@ -209,9 +224,14 @@ export default {
 
         if (!res.data.error) {
           const foundUser = this.usersFollowed.find((el) => el.id === id);
+
           if (foundUser) {
             this.usersFollowed.splice(this.usersFollowed.indexOf(foundUser), 1);
           }
+
+          this.$store.dispatch('showInfoNotification', {
+            message: 'This author was successfully unfollowed!',
+          });
         }
         this.requestingForTags = false;
       }

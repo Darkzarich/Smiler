@@ -64,7 +64,7 @@ export default {
         this.$emit('input', this.url);
       } else {
         this.url = '';
-        this.$store.dispatch('newNotification', {
+        this.$store.dispatch('showErrorNotification', {
           message:
             'Something went wrong during upload of this video. Please try to upload the video again.',
         });
@@ -72,7 +72,7 @@ export default {
       this.uploading = false;
     },
     error() {
-      this.$store.dispatch('newNotification', {
+      this.$store.dispatch('showErrorNotification', {
         error: {
           message:
             'The video link you provided could not be loaded. Please try a different one.',
