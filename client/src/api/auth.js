@@ -1,6 +1,6 @@
 import Query from './_query';
 
-const CONTROLLER_URL = '/auth';
+const CONTROLLER_URL = 'auth';
 
 export default {
   getAuth() {

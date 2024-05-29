@@ -1,6 +1,6 @@
 import Query from './_query';
 
-const CONTROLLER_URL = '/users';
+const CONTROLLER_URL = 'users';
 
 export default {
   getUserProfile(login) {

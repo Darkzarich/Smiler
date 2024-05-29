@@ -1,6 +1,6 @@
 import Query from './_query';
 
-const CONTROLLER_URL = '/tags';
+const CONTROLLER_URL = 'tags';
 
 export default {
   follow(tag) {

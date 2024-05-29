@@ -59,7 +59,6 @@ export default {
   &__item {
     @include flex-row;
 
-    height: 2rem;
     padding: 5px;
     align-items: center;
     justify-content: center;
@@ -97,9 +96,6 @@ export default {
 
   &__item-message {
     margin: 0 20px;
-    text-wrap: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
   }
 
   &__close {
