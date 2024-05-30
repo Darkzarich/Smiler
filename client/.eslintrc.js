@@ -92,6 +92,7 @@ module.exports = {
           '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.',
       },
     ],
+    'consistent-return': 'off',
   },
   parser: 'vue-eslint-parser',
   settings: {

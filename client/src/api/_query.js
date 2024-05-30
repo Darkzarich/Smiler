@@ -4,33 +4,39 @@ import store from '@/store/index';
 
 axios.defaults.withCredentials = true;
 
-export default (requestData) => {
+export default async (requestData) => {
   const requestDataMod = requestData;
 
   requestDataMod.url = `${config.VUE_APP_API_URL}/api/${requestDataMod.url}`;
 
-  return axios(requestDataMod).catch((e) => {
-    if (e.response) {
-      if (e.response.data.error) {
-        console.error(e.response.data.error.message);
+  try {
+    return await axios(requestDataMod);
+  } catch (error) {
+    const { response } = error;
 
-        store.dispatch('showErrorNotification', {
-          message: e.response.data.error.message,
-        });
-      }
-
-      if (e.response.status === 401) {
-        store.commit('clearUser');
-      }
-    } else {
+    if (!response) {
       store.dispatch('showErrorNotification', {
         message:
           'Oops! Something went wrong. Please try to reload the page and try again.',
       });
 
-      console.error(e);
+      console.error(error);
+
+      return;
     }
 
-    return e.response;
-  });
+    if (response.data.error) {
+      console.error(response.data.error.message);
+
+      store.dispatch('showErrorNotification', {
+        message: response.data.error.message,
+      });
+    }
+
+    if (response.status === 401) {
+      store.commit('clearUser');
+    }
+
+    return response;
+  }
 };
