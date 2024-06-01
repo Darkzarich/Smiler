@@ -12,73 +12,22 @@
 
       <!-- TODO: Should be moved to App.vue -->
       <Transition name="header__mobile-menu">
-        <HeaderMobileMenu
-          v-if="isMobileMenuOpen"
-          @close="isMobileMenuOpen = false"
-        />
+        <HeaderMobileMenu v-if="isMobileMenuOpen" @close="toggleMobileMenu()" />
       </Transition>
 
       <RouterLink class="header__home-link" :to="{ name: 'Home' }">
         <SiteLogo />
       </RouterLink>
 
-      <nav class="header__navigation">
-        <template v-if="!$isMobile()">
-          <RouterLink
-            class="header__nav-link"
-            :to="{ name: 'Home' }"
-            data-testid="today-link"
-          >
-            TODAY
-          </RouterLink>
-          <RouterLink
-            class="header__nav-link"
-            :to="{ name: 'All' }"
-            data-testid="all-link"
-          >
-            ALL
-          </RouterLink>
-          <RouterLink
-            class="header__nav-link"
-            :to="{ name: 'Blowing' }"
-            data-testid="blowing-link"
-          >
-            BLOWING
-          </RouterLink>
-          <RouterLink
-            class="header__nav-link"
-            :to="{ name: 'TopThisWeek' }"
-            data-testid="top-this-week-link"
-          >
-            TOP THIS WEEK
-          </RouterLink>
-          <RouterLink
-            class="header__nav-link"
-            :to="{ name: 'New' }"
-            data-testid="new-link"
-          >
-            NEW
-          </RouterLink>
-
-          <template v-if="isUserAuth">
-            <RouterLink
-              class="header__nav-link"
-              :to="{ name: 'Feed' }"
-              data-testid="feed-link"
-            >
-              MY FEED
-            </RouterLink>
-          </template>
-          <template v-else>
-            <span
-              data-testid="feed-link"
-              title="Log in to access this page"
-              class="header__nav-link header__nav-link--disabled"
-              >MY FEED</span
-            >
-          </template>
+      <Navigation
+        v-if="!$isMobile()"
+        nav-link-class="header__nav-link"
+        class="header__navigation"
+      >
+        <template #after>
+          <NavigationFeedLink class="header__nav-link" />
         </template>
-      </nav>
+      </Navigation>
 
       <!-- TODO: Move to Search component -->
       <div v-if="$route.name !== 'Search'" class="header__search">
@@ -93,7 +42,7 @@
         />
       </div>
 
-      <div v-if="isUserAuth" class="header-container__avatar">
+      <div v-if="isUserAuth" class="header__avatar">
         <!-- TODO: Move everything like that to its own component AvatarLink or something -->
         <RouterLink
           :to="{
@@ -112,6 +61,8 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import Navigation from '../Navigation/Navigation.vue';
+import NavigationFeedLink from '../Navigation/NavigationFeedLink.vue';
 import HeaderMobileMenu from './HeaderMobileMenu.vue';
 import SiteLogo from './SiteLogo.vue';
 import InputElement from '@/components/BasicElements/InputElement.vue';
@@ -123,6 +74,8 @@ export default {
     InputElement,
     MobileMenuIcon,
     SiteLogo,
+    Navigation,
+    NavigationFeedLink,
   },
   data() {
     return {
@@ -136,6 +89,13 @@ export default {
     ...mapState({
       user: (state) => state.user,
     }),
+  },
+  watch: {
+    $route() {
+      if (this.isMobileMenuOpen) {
+        this.toggleMobileMenu();
+      }
+    },
   },
   methods: {
     search() {
@@ -230,6 +190,7 @@ export default {
   &__navigation {
     @include flex-row;
 
+    gap: 16px;
     align-items: center;
     margin-left: 4rem;
 
@@ -239,26 +200,18 @@ export default {
   }
 
   &__nav-link {
-    color: $main-text;
     padding-top: 5px;
     border-bottom: 2px solid transparent;
-    text-decoration: none;
-    font-weight: bold;
-    margin-left: 1rem;
 
     &:hover {
       border-bottom: 2px solid $main-text;
     }
 
-    &--disabled {
-      color: $light-gray;
+    .nav-link--disabled {
       border-bottom: 2px solid transparent;
-      cursor: default;
-      user-select: none;
     }
 
     &.router-link-exact-active {
-      color: $firm;
       border-bottom: 2px solid $firm;
     }
   }
@@ -272,12 +225,7 @@ export default {
   &__avatar {
     display: flex;
     margin-left: auto;
-    margin-right: 3rem;
     align-self: center;
-
-    @include for-size(phone-only) {
-      margin-right: 1rem;
-    }
 
     img {
       border-radius: 50%;

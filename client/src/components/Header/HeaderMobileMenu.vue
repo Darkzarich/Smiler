@@ -4,85 +4,23 @@
       <ExitIcon />
     </div>
 
-    <div class="mobile-menu__user">
-      <!-- vue requires .native to catch click event for vue-router links -->
-      <CurrentUser :nav-native="true" @close="closeMenu()" />
-    </div>
+    <CurrentUser class="mobile-menu__user" />
 
-    <div class="mobile-menu__navigation">
-      <template v-if="isUserAuth">
-        <RouterLink
-          data-testid="feed-link"
-          class="mobile-menu__nav-link"
-          :to="{ name: 'Feed' }"
-          @click.native="closeMenu()"
-        >
-          MY FEED
-        </RouterLink>
+    <Navigation
+      nav-link-class="mobile-menu__nav-link"
+      class="mobile-menu__navigation"
+    >
+      <template #before>
+        <NavigationFeedLink class="mobile-menu__nav-link" />
       </template>
-      <template v-else>
-        <span
-          data-testid="feed-link"
-          title="Log in to access this page"
-          class="mobile-menu__nav-link mobile-menu__nav-link--disabled"
-        >
-          MY FEED
-        </span>
-      </template>
-
-      <!-- TODO: This is repeated in HeaderElement, move to a common constant for both
-      the idea is use go over constant and form menu
-      -->
-      <RouterLink
-        class="mobile-menu__nav-link"
-        :to="{ name: 'Home' }"
-        data-testid="today-link"
-        @click.native="closeMenu()"
-      >
-        TODAY
-      </RouterLink>
-
-      <RouterLink
-        class="mobile-menu__nav-link"
-        :to="{ name: 'All' }"
-        data-testid="all-link"
-        @click.native="closeMenu()"
-      >
-        ALL
-      </RouterLink>
-
-      <RouterLink
-        class="mobile-menu__nav-link"
-        :to="{ name: 'Blowing' }"
-        data-testid="blowing-link"
-        @click.native="closeMenu()"
-      >
-        BLOWING
-      </RouterLink>
-
-      <RouterLink
-        class="mobile-menu__nav-link"
-        :to="{ name: 'TopThisWeek' }"
-        data-testid="top-this-week-link"
-        @click.native="closeMenu()"
-      >
-        TOP THIS WEEK
-      </RouterLink>
-
-      <RouterLink
-        class="mobile-menu__nav-link"
-        :to="{ name: 'New' }"
-        data-testid="new-link"
-        @click.native="closeMenu()"
-      >
-        NEW
-      </RouterLink>
-    </div>
+    </Navigation>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import Navigation from '../Navigation/Navigation.vue';
+import NavigationFeedLink from '../Navigation/NavigationFeedLink.vue';
 import CurrentUser from '@/components/User/CurrentUser.vue';
 import ExitIcon from '@/library/svg/ExitIcon.vue';
 
@@ -90,6 +28,8 @@ export default {
   components: {
     CurrentUser,
     ExitIcon,
+    Navigation,
+    NavigationFeedLink,
   },
   computed: {
     ...mapGetters(['isUserAuth']),
@@ -135,29 +75,15 @@ export default {
   &__nav-link {
     width: 100%;
     padding: 1rem;
-    font-weight: bold;
-    text-decoration: none;
     border-bottom: 1px solid $light-gray;
-    color: $main-text;
 
-    &--disabled {
+    &:first-child {
       border-top: 1px solid $light-gray;
-      color: $light-gray;
-      cursor: default;
-      user-select: none;
-    }
-
-    &.router-link-exact-active {
-      color: $firm;
     }
   }
 
   &__user {
-    margin-bottom: 0.5rem;
-
-    .current-user {
-      border: none;
-    }
+    border: none;
   }
 }
 </style>
