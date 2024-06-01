@@ -2,13 +2,10 @@
   <div class="current-user">
     <template v-if="!isUserAuth">
       <template v-if="mode == USER_LOGIN_MODE">
-        <SignInForm @close="closeMenu" @mode-change="setMode(USER_REG_MODE)" />
+        <SignInForm @mode-change="setMode(USER_REG_MODE)" />
       </template>
       <template v-else-if="mode == USER_REG_MODE">
-        <SignUpForm
-          @close="closeMenu"
-          @mode-change="setMode(USER_LOGIN_MODE)"
-        />
+        <SignUpForm @mode-change="setMode(USER_LOGIN_MODE)" />
       </template>
     </template>
 
@@ -23,7 +20,6 @@
                   login: user.login,
                 },
               }"
-              @click.native="navNative ? closeMenu() : ''"
             >
               <img :src="$resolveAvatar(user.avatar)" :alt="user.avatar" />
               <div
@@ -52,25 +48,21 @@
         <div class="current-user__logged-nav">
           <ul class="current-user__logged-nav-list">
             <RouterLink
+              class="current-user__logged-nav-item"
               data-testid="create-post-btn"
               :to="{
                 name: 'PostCreate',
               }"
-              @click.native="navNative ? closeMenu() : ''"
             >
-              <li class="current-user__logged-nav-item">
-                <AddIcon /> New Post
-              </li>
+              <AddIcon /> New Post
             </RouterLink>
             <RouterLink
+              class="current-user__logged-nav-item"
               :to="{
                 name: 'UserSettings',
               }"
-              @click.native="navNative ? closeMenu() : ''"
             >
-              <li class="current-user__logged-nav-item">
-                <SettingsIcon /> Settings
-              </li>
+              <SettingsIcon /> Settings
             </RouterLink>
             <li
               class="current-user__logged-nav-item"
@@ -103,7 +95,6 @@ export default {
     ExitIcon,
     SettingsIcon,
   },
-  props: ['navNative'],
   data() {
     return {
       USER_LOGIN_MODE: consts.USER_LOGIN_MODE,
@@ -129,10 +120,6 @@ export default {
       if (res.data.ok) {
         this.$store.commit('clearUser');
       }
-    },
-    // emit close event to HeaderMobileMenu, which will close the menu
-    closeMenu() {
-      this.$emit('close');
     },
   },
 };
@@ -228,6 +215,10 @@ export default {
       flex-direction: row;
       align-items: center;
       border-bottom: 1px solid $light-gray;
+
+      &:last-child {
+        border-bottom: none;
+      }
 
       svg {
         fill: $main-text;

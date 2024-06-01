@@ -57,7 +57,6 @@ export default {
     ButtonElement,
     InputElement,
   },
-  props: ['navNative'],
   data() {
     return {
       email: '',
@@ -119,12 +118,7 @@ export default {
         this.requestError = res.data.error.message;
       } else if (res.data.isAuth) {
         this.$store.commit('setUser', res.data);
-        this.closeMenu();
       }
-    },
-    // emit close event to HeaderMobileMenu, which will close the menu
-    closeMenu() {
-      this.$emit('close');
     },
   },
 };
