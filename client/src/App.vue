@@ -9,7 +9,7 @@
         <RouterView />
       </content>
 
-      <div v-if="!$isMobile()" class="content__sidebar">
+      <div v-if="$isDesktop()" class="content__sidebar">
         <CurrentUser />
       </div>
     </div>

@@ -20,7 +20,7 @@
       </RouterLink>
 
       <Navigation
-        v-if="!$isMobile()"
+        v-if="$isDesktop()"
         nav-link-class="header__nav-link"
         class="header__navigation"
       >

@@ -34,10 +34,14 @@ Vue.mixin({
   methods: {
     // TODO: Move to store or something
     $isMobile() {
-      if (window.matchMedia('(max-device-width: 599px)').matches) {
+      if (window.matchMedia('(max-device-width: 600px)').matches) {
         return true;
       }
+
       return false;
+    },
+    $isDesktop() {
+      return !this.$isMobile();
     },
     $resolveAvatar(path) {
       if (path) {
