@@ -54,7 +54,7 @@
                 name: 'PostCreate',
               }"
             >
-              <AddIcon /> New Post
+              <IconAdd /> New Post
             </RouterLink>
             <RouterLink
               class="current-user__logged-nav-item"
@@ -62,14 +62,14 @@
                 name: 'UserSettings',
               }"
             >
-              <SettingsIcon /> Settings
+              <IconSettings /> Settings
             </RouterLink>
             <li
               class="current-user__logged-nav-item"
               data-testid="logout-btn"
               @click="logout"
             >
-              <ExitIcon /> Logout
+              <IconExit /> Logout
             </li>
           </ul>
         </div>
@@ -80,20 +80,20 @@
 
 <script>
 import api from '@/api';
-import SignInForm from '@/components/User/SignInForm.vue';
-import SignUpForm from '@/components/User/SignUpForm.vue';
 import consts from '@/const/const';
-import AddIcon from '@/library/svg/AddIcon.vue';
-import ExitIcon from '@/library/svg/ExitIcon.vue';
-import SettingsIcon from '@/library/svg/SettingsIcon.vue';
+import SignInForm from '@components/User/SignInForm.vue';
+import SignUpForm from '@components/User/SignUpForm.vue';
+import IconAdd from '@icons/IconAdd.vue';
+import IconExit from '@icons/IconExit.vue';
+import IconSettings from '@icons/IconSettings.vue';
 
 export default {
   components: {
     SignInForm,
     SignUpForm,
-    AddIcon,
-    ExitIcon,
-    SettingsIcon,
+    IconAdd,
+    IconExit,
+    IconSettings,
   },
   data() {
     return {

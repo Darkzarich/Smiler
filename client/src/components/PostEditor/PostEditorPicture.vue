@@ -4,23 +4,23 @@
     :class="value ? 'post-image-upload_uploaded' : ''"
   >
     <div v-if="!value" class="post-image-upload__container">
-      <UploadElement v-model="file" />
+      <BaseUploadForm v-model="file" />
       <div class="post-image-upload__or">OR</div>
       <div class="post-image-upload__input-url">
-        <InputElement
+        <BaseInput
           v-model.lazy="imageUrl"
           :disabled="Boolean(file)"
           placeholder="Paste URL"
           data-testid="image-url-input"
         />
-        <ButtonElement
+        <BaseButton
           data-testid="image-upload-button"
           :callback="upload"
           :loading="uploading"
           :disabled="!imageUrl"
         >
           Upload
-        </ButtonElement>
+        </BaseButton>
       </div>
       <img
         v-if="!file && imageUrl"
@@ -41,16 +41,16 @@
 </template>
 
 <script>
-import ButtonElement from '../BasicElements/ButtonElement.vue';
-import InputElement from '../BasicElements/InputElement.vue';
-import UploadElement from '../BasicElements/UploadElement.vue';
 import api from '@/api';
+import BaseButton from '@common/BaseButton.vue';
+import BaseInput from '@common/BaseInput.vue';
+import BaseUploadForm from '@common/BaseUploadForm.vue';
 
 export default {
   components: {
-    UploadElement,
-    ButtonElement,
-    InputElement,
+    BaseUploadForm,
+    BaseButton,
+    BaseInput,
   },
   props: {
     value: {

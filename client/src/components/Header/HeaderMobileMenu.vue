@@ -1,7 +1,7 @@
 <template>
   <div class="mobile-menu">
     <div class="mobile-menu__close-btn" @click="closeMenu()">
-      <ExitIcon />
+      <IconExit />
     </div>
 
     <CurrentUser class="mobile-menu__user" />
@@ -19,15 +19,15 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import Navigation from '../Navigation/Navigation.vue';
-import NavigationFeedLink from '../Navigation/NavigationFeedLink.vue';
-import CurrentUser from '@/components/User/CurrentUser.vue';
-import ExitIcon from '@/library/svg/ExitIcon.vue';
+import Navigation from '@components/Navigation/Navigation.vue';
+import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
+import CurrentUser from '@components/User/CurrentUser.vue';
+import IconExit from '@icons/IconExit.vue';
 
 export default {
   components: {
     CurrentUser,
-    ExitIcon,
+    IconExit,
     Navigation,
     NavigationFeedLink,
   },

@@ -6,20 +6,20 @@
   >
     <template v-if="isUserAuth">
       <div class="new-comment-form__title">Share your thoughts!</div>
-      <TextEditorElement
+      <BaseTextEditor
         v-model="commentBody"
         data-testid="new-comment-form-editor"
       >
         <div class="comments__form-submit">
-          <ButtonElement
+          <BaseButton
             :loading="loading"
             :callback="createComment"
             data-testid="new-comment-button"
           >
             Send
-          </ButtonElement>
+          </BaseButton>
         </div>
-      </TextEditorElement>
+      </BaseTextEditor>
     </template>
     <template v-else>
       Please <b>sign in</b> or <b>create an account</b> to leave a comment.
@@ -30,13 +30,13 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import api from '@/api';
-import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
-import TextEditorElement from '@/components/BasicElements/TextEditorElement.vue';
+import BaseButton from '@common/BaseButton.vue';
+import BaseTextEditor from '@common/BaseTextEditor.vue';
 
 export default {
   components: {
-    ButtonElement,
-    TextEditorElement,
+    BaseButton,
+    BaseTextEditor,
   },
   props: {
     postId: {

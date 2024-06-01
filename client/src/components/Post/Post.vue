@@ -11,7 +11,7 @@
         "
         @click="upvote(postData.id)"
       >
-        <PlusIcon />
+        <IconPlus />
       </div>
 
       <div class="post__rating">
@@ -28,7 +28,7 @@
         "
         @click="downvote(postData.id)"
       >
-        <MinusIcon />
+        <IconMinus />
       </div>
     </div>
 
@@ -52,10 +52,10 @@
             title="Edit post"
             :to="{ name: 'PostEdit', params: { slug: postData.slug } }"
           >
-            <EditIcon data-testid="post-edit-icon" />
+            <IconEdit data-testid="post-edit-icon" />
           </RouterLink>
           <span @click="deletePost(postData.id)">
-            <DeleteIcon data-testid="post-delete-icon" />
+            <IconDelete data-testid="post-delete-icon" />
           </span>
         </template>
       </RouterLink>
@@ -125,7 +125,7 @@
           "
           @click="upvote(postData.id)"
         >
-          <PlusIcon />
+          <IconPlus />
         </div>
         <div class="post__rating">
           {{ postData.rating }}
@@ -140,7 +140,7 @@
           "
           @click="downvote(postData.id)"
         >
-          <MinusIcon />
+          <IconMinus />
         </div>
       </div>
 
@@ -162,7 +162,7 @@
               },
             }"
           >
-            <CommentsIcon /> {{ postData.commentCount }}
+            <IconComments /> {{ postData.commentCount }}
           </RouterLink>
 
           <RouterLink
@@ -193,7 +193,7 @@
       </div>
     </div>
 
-    <ContextMenuWrapper
+    <BaseContextMenuWrapper
       v-click-outside="closeContextMenu"
       :show="contextMenuData.show"
       :pos-x="contextMenuData.x"
@@ -208,22 +208,22 @@
 <script>
 import { mapGetters } from 'vuex';
 import api from '@/api/index';
-import ContextMenuWrapper from '@/components/BasicElements/ContextMenuWrapper.vue';
 import consts from '@/const/const';
-import CommentsIcon from '@/library/svg/CommentsIcon.vue';
-import DeleteIcon from '@/library/svg/DeleteIcon.vue';
-import EditIcon from '@/library/svg/EditIcon.vue';
-import MinusIcon from '@/library/svg/MinusIcon.vue';
-import PlusIcon from '@/library/svg/PlusIcon.vue';
+import BaseContextMenuWrapper from '@common/BaseContextMenuWrapper.vue';
+import IconComments from '@icons/IconComments.vue';
+import IconDelete from '@icons/IconDelete.vue';
+import IconEdit from '@icons/IconEdit.vue';
+import IconMinus from '@icons/IconMinus.vue';
+import IconPlus from '@icons/IconPlus.vue';
 
 export default {
   components: {
-    CommentsIcon,
-    DeleteIcon,
-    EditIcon,
-    MinusIcon,
-    ContextMenuWrapper,
-    PlusIcon,
+    IconComments,
+    IconDelete,
+    IconEdit,
+    IconMinus,
+    BaseContextMenuWrapper,
+    IconPlus,
   },
   props: ['post', 'canEdit'],
   data() {

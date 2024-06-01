@@ -60,7 +60,7 @@
 
       <div class="user-settings__block">
         <h3 class="user-settings__block-title">Edit Bio</h3>
-        <InputElement
+        <BaseInput
           v-model="bioEditInput"
           data-testid="user-settings-bio-input"
           class="user-settings__bio-edit"
@@ -68,7 +68,7 @@
           :error="bioTooLongError"
         />
         <div class="user-settings__submit">
-          <ButtonElement
+          <BaseButton
             class="user-settings__submit-btn"
             data-testid="user-settings-bio-submit"
             :loading="bioEditRequesting"
@@ -76,7 +76,7 @@
             :disabled="Boolean(bioTooLongError)"
           >
             Submit
-          </ButtonElement>
+          </BaseButton>
         </div>
       </div>
 
@@ -85,14 +85,14 @@
         <div class="user-settings__current-avatar">
           <img :src="$resolveAvatar(avatarEditInput)" alt="current avatar" />
         </div>
-        <InputElement
+        <BaseInput
           v-model.lazy.trim="avatarEditInput"
           class="user-settings__avatar-edit"
           data-testid="user-settings-avatar-input"
           placeholder="URL to avatar..."
         />
         <div class="user-settings__submit">
-          <ButtonElement
+          <BaseButton
             class="user-settings__submit-btn"
             data-testid="user-settings-avatar-submit"
             :loading="avatarEditRequesting"
@@ -100,7 +100,7 @@
             :disabled="avatarEditInput.length > USER_MAX_AVATAR_LENGTH"
           >
             Submit
-          </ButtonElement>
+          </BaseButton>
         </div>
       </div>
     </div>
@@ -112,16 +112,16 @@
 
 <script>
 import api from '@/api';
-import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
-import InputElement from '@/components/BasicElements/InputElement.vue';
 import consts from '@/const/const';
-import CircularLoader from '@/library/svg/animation/CircularLoader.vue';
+import BaseButton from '@common/BaseButton.vue';
+import BaseInput from '@common/BaseInput.vue';
+import CircularLoader from '@icons/animation/CircularLoader.vue';
 
 export default {
   components: {
     CircularLoader,
-    InputElement,
-    ButtonElement,
+    BaseInput,
+    BaseButton,
   },
   data() {
     return {

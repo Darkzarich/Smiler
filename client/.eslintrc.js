@@ -101,7 +101,12 @@ module.exports = {
         extensions: ['.js', '.vue'],
       },
       alias: {
-        map: [['@', './src']],
+        map: [
+          ['@', './src'],
+          ['@components', './src/components'],
+          ['@common', './src/components/common'],
+          ['@icons', './src/components/common/icons'],
+        ],
         extensions: ['.js', '.vue'],
       },
     },

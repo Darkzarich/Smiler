@@ -3,17 +3,17 @@
     <div class="not-found__404">404</div>
     <div class="not-found__info">Not found</div>
     <div class="not-found__button-container">
-      <ButtonElement :callback="goBack"> Go back </ButtonElement>
+      <BaseButton :callback="goBack"> Go back </BaseButton>
     </div>
   </div>
 </template>
 
 <script>
-import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
+import BaseButton from '@common/BaseButton.vue';
 
 export default {
   components: {
-    ButtonElement,
+    BaseButton,
   },
   methods: {
     goBack() {

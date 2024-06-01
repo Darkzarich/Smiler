@@ -13,7 +13,7 @@
       </div>
     </div>
     <div v-if="tags.length < POST_MAX_TAGS" class="post-editor__tags-input">
-      <InputElement
+      <BaseInput
         v-model="tagInput"
         data-testid="post-tag-input"
         placeholder="Input up to 8 tags"
@@ -27,12 +27,12 @@
 
 <script>
 // TODO: This can be a BasicElements
-import InputElement from '../BasicElements/InputElement.vue';
 import consts from '@/const/const';
+import BaseInput from '@common/BaseInput.vue';
 
 export default {
   components: {
-    InputElement,
+    BaseInput,
   },
   model: {
     prop: 'tags',

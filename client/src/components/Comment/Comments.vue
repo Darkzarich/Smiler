@@ -33,7 +33,7 @@
               "
               @click="upvote(comment.id)"
             >
-              <PlusIcon />
+              <IconPlus />
             </div>
             <div
               :data-testid="`comment-${comment.id}-downvote`"
@@ -45,7 +45,7 @@
               "
               @click="downvote(comment.id)"
             >
-              <MinusIcon />
+              <IconMinus />
             </div>
             <RouterLink
               :to="{
@@ -71,14 +71,14 @@
                 :data-testid="`comment-${comment.id}-edit`"
                 @click="toggleEdit(comment.id)"
               >
-                <EditIcon />
+                <IconEdit />
               </div>
               <div
                 class="comments__item-main-block-meta-delete"
                 :data-testid="`comment-${comment.id}-delete`"
                 @click="deleteCom(comment.id)"
               >
-                <DeleteIcon />
+                <IconDelete />
               </div>
             </template>
           </template>
@@ -97,27 +97,27 @@
 
             <template v-else>
               <div class="comments__item-main-answer-editor">
-                <TextEditorElement
+                <BaseTextEditor
                   v-model="commentEditInput"
                   data-testid="comment-edit"
                 >
                   <div class="comments__item-main-answer-buttons">
-                    <ButtonElement
+                    <BaseButton
                       :loading="editSending"
                       :callback="edit"
                       :argument="comment.id"
                       data-testid="comment-edit-btn"
                     >
                       Send
-                    </ButtonElement>
-                    <ButtonElement
+                    </BaseButton>
+                    <BaseButton
                       :callback="toggleEdit"
                       data-testid="comment-edit-close-btn"
                     >
                       Close
-                    </ButtonElement>
+                    </BaseButton>
                   </div>
-                </TextEditorElement>
+                </BaseTextEditor>
               </div>
             </template>
 
@@ -126,27 +126,24 @@
                 v-if="replyFieldShowFor == comment.id"
                 class="comments__item-main-answer-editor"
               >
-                <TextEditorElement
-                  v-model="replyBody"
-                  data-testid="comment-reply"
-                >
+                <BaseTextEditor v-model="replyBody" data-testid="comment-reply">
                   <div class="comments__item-main-answer-buttons">
-                    <ButtonElement
+                    <BaseButton
                       :loading="replySending"
                       :callback="reply"
                       :argument="comment.id"
                       data-testid="comment-reply-btn"
                     >
                       Send
-                    </ButtonElement>
-                    <ButtonElement
+                    </BaseButton>
+                    <BaseButton
                       :callback="toggleReply"
                       data-testid="comment-reply-close-btn"
                     >
                       Close
-                    </ButtonElement>
+                    </BaseButton>
                   </div>
-                </TextEditorElement>
+                </BaseTextEditor>
               </div>
               <template v-else>
                 <div
@@ -206,23 +203,23 @@
 import { mapState, mapGetters } from 'vuex';
 import CommentTreeHelper from './CommentTreeHelper.vue';
 import api from '@/api/index';
-import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
-import TextEditorElement from '@/components/BasicElements/TextEditorElement.vue';
 import consts from '@/const/const';
-import DeleteIcon from '@/library/svg/DeleteIcon.vue';
-import EditIcon from '@/library/svg/EditIcon.vue';
-import MinusIcon from '@/library/svg/MinusIcon.vue';
-import PlusIcon from '@/library/svg/PlusIcon.vue';
+import BaseButton from '@common/BaseButton.vue';
+import BaseTextEditor from '@common/BaseTextEditor.vue';
+import IconDelete from '@icons/IconDelete.vue';
+import IconEdit from '@icons/IconEdit.vue';
+import IconMinus from '@icons/IconMinus.vue';
+import IconPlus from '@icons/IconPlus.vue';
 
 export default {
   components: {
     CommentTreeHelper,
-    TextEditorElement,
-    ButtonElement,
-    EditIcon,
-    MinusIcon,
-    PlusIcon,
-    DeleteIcon,
+    BaseTextEditor,
+    BaseButton,
+    IconEdit,
+    IconMinus,
+    IconPlus,
+    IconDelete,
   },
   props: ['data', 'indentLevel', 'post', 'first', 'level'],
   data() {

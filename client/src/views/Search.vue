@@ -8,8 +8,8 @@
 </template>
 
 <script>
-import SearchForm from '@/components/SearchForm/SearchForm.vue';
 import PostsContainer from '@/views/PostsContainer.vue';
+import SearchForm from '@components/SearchForm/SearchForm.vue';
 
 export default {
   components: {

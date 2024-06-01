@@ -11,7 +11,7 @@
         class="comments__update"
         @click="refreshComments()"
       >
-        <RefreshIcon />
+        <IconRefresh />
         <template v-if="newCommentsCount > 0">
           <span>+{{ newCommentsCount }}</span>
         </template>
@@ -67,19 +67,19 @@
 <script>
 import { mapState } from 'vuex';
 import api from '@/api';
-import Comments from '@/components/Comment/Comments.vue';
-import NewCommentForm from '@/components/Comment/NewCommentForm.vue';
-import Post from '@/components/Post/Post.vue';
 import consts from '@/const/const';
-import RefreshIcon from '@/library/svg/RefreshIcon.vue';
-import CircularLoader from '@/library/svg/animation/CircularLoader.vue';
+import Comments from '@components/Comment/Comments.vue';
+import NewCommentForm from '@components/Comment/NewCommentForm.vue';
+import Post from '@components/Post/Post.vue';
+import IconRefresh from '@icons/IconRefresh.vue';
+import CircularLoader from '@icons/animation/CircularLoader.vue';
 
 export default {
   components: {
     Post,
     NewCommentForm,
     Comments,
-    RefreshIcon,
+    IconRefresh,
     CircularLoader,
   },
   async beforeRouteEnter(to, from, next) {

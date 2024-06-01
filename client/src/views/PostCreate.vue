@@ -10,7 +10,7 @@
 <script>
 import { mapState } from 'vuex';
 import api from '@/api/index';
-import PostEditor from '@/components/PostEditor/PostEditor.vue';
+import PostEditor from '@components/PostEditor/PostEditor.vue';
 
 export default {
   components: {

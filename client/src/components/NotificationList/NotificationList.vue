@@ -18,7 +18,7 @@
           class="notification-list__close"
           @click="removeNotification(notification.id)"
         >
-          <ExitIcon />
+          <IconExit />
         </div>
       </div>
     </TransitionGroup>
@@ -27,11 +27,11 @@
 
 <script>
 import { mapState } from 'vuex';
-import ExitIcon from '@/library/svg/ExitIcon.vue';
+import IconExit from '@icons/IconExit.vue';
 
 export default {
   components: {
-    ExitIcon,
+    IconExit,
   },
   computed: {
     ...mapState({

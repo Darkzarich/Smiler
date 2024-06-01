@@ -2,19 +2,19 @@
   <div class="post-video-upload">
     <div v-if="!value" class="post-video-upload__container">
       <div class="post-video-upload__input-url">
-        <InputElement
+        <BaseInput
           v-model.lazy="url"
           placeholder="Paste URL of the video [youtube]"
           data-testid="video-url-input"
         />
-        <ButtonElement
+        <BaseButton
           data-testid="video-upload-button"
           :callback="upload"
           :loading="uploading"
           :disabled="!url"
         >
           Upload
-        </ButtonElement>
+        </BaseButton>
       </div>
     </div>
     <div
@@ -36,13 +36,13 @@
 </template>
 
 <script>
-import ButtonElement from '../BasicElements/ButtonElement.vue';
-import InputElement from '../BasicElements/InputElement.vue';
+import BaseButton from '@common/BaseButton.vue';
+import BaseInput from '@common/BaseInput.vue';
 
 export default {
   components: {
-    ButtonElement,
-    InputElement,
+    BaseButton,
+    BaseInput,
   },
   props: {
     value: {

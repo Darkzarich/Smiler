@@ -29,10 +29,10 @@
 
 <script>
 import api from '@/api';
-import Post from '@/components/Post/Post.vue';
-import UserProfile from '@/components/UserProfile/UserProfile.vue';
 import consts from '@/const/const';
-import CircularLoader from '@/library/svg/animation/CircularLoader.vue';
+import Post from '@components/Post/Post.vue';
+import UserProfile from '@components/UserProfile/UserProfile.vue';
+import CircularLoader from '@icons/animation/CircularLoader.vue';
 
 export default {
   components: {

@@ -49,11 +49,11 @@
 </template>
 
 <script>
-import SearchIcon from '@/library/svg/SearchIcon.vue';
+import IconSearch from '@icons/IconSearch.vue';
 
 export default {
   components: {
-    SearchIcon,
+    IconSearch,
   },
   props: {
     id: {

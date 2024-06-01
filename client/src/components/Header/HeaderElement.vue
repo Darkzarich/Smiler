@@ -7,7 +7,7 @@
         :class="isMobileMenuOpen ? 'header__mobile--active' : ''"
         @click="toggleMobileMenu()"
       >
-        <MobileMenuIcon />
+        <IconMenuMobile />
       </div>
 
       <!-- TODO: Should be moved to App.vue -->
@@ -31,11 +31,11 @@
 
       <!-- TODO: Move to Search component -->
       <div v-if="$route.name !== 'Search'" class="header__search">
-        <InputElement
+        <BaseInput
           v-model.trim="title"
           :placeholder="'Search'"
           data-testid="header-search-input"
-          icon="SearchIcon"
+          icon="IconSearch"
           :style="'flex-direction: row'"
           :enter-callback="search"
           :icon-click-callback="search"
@@ -61,18 +61,18 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import Navigation from '../Navigation/Navigation.vue';
-import NavigationFeedLink from '../Navigation/NavigationFeedLink.vue';
 import HeaderMobileMenu from './HeaderMobileMenu.vue';
 import SiteLogo from './SiteLogo.vue';
-import InputElement from '@/components/BasicElements/InputElement.vue';
-import MobileMenuIcon from '@/library/svg/MobileMenuIcon.vue';
+import BaseInput from '@common/BaseInput.vue';
+import Navigation from '@components/Navigation/Navigation.vue';
+import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
+import IconMenuMobile from '@icons/IconMenuMobile.vue';
 
 export default {
   components: {
     HeaderMobileMenu,
-    InputElement,
-    MobileMenuIcon,
+    BaseInput,
+    IconMenuMobile,
     SiteLogo,
     Navigation,
     NavigationFeedLink,

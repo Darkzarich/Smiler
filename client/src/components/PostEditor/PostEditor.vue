@@ -1,6 +1,6 @@
 <template>
   <div class="post-editor">
-    <InputElement
+    <BaseInput
       v-model="title"
       class="post-editor__title"
       data-testid="post-title-input"
@@ -24,7 +24,7 @@
         >
           <!-- TODO: Refactor this part -->
           <template v-if="section.type === POST_SECTION_TYPES.TEXT">
-            <TextEditorElement
+            <BaseTextEditor
               :id="section.hash"
               v-model="section.content"
               data-testid="text-section"
@@ -75,7 +75,7 @@
         tabindex="0"
         @click="createSection(POST_SECTION_TYPES.TEXT)"
       >
-        <TextIcon />
+        <IconText />
       </div>
       <div
         class="post-editor__control-item"
@@ -84,7 +84,7 @@
         tabindex="0"
         @click="createSection(POST_SECTION_TYPES.PICTURE)"
       >
-        <PictureIcon />
+        <IconPicture />
       </div>
       <div
         class="post-editor__control-item"
@@ -93,7 +93,7 @@
         tabindex="0"
         @click="createSection(POST_SECTION_TYPES.VIDEO)"
       >
-        <VideoIcon />
+        <IconVideo />
       </div>
     </div>
 
@@ -104,32 +104,32 @@
 
     <div class="post-editor__submit">
       <template v-if="edit">
-        <ButtonElement
+        <BaseButton
           data-testid="finish-edit-post-button"
           :loading="saving"
           :disabled="!sections.length"
           :callback="saveEdited"
         >
           Save Edited
-        </ButtonElement>
+        </BaseButton>
       </template>
       <template v-else>
-        <ButtonElement
+        <BaseButton
           data-testid="create-post-button"
           :loading="sending"
           :callback="createPost"
           :disabled="isSubmitDisabled"
         >
           Create Post
-        </ButtonElement>
-        <ButtonElement
+        </BaseButton>
+        <BaseButton
           data-testid="save-draft-button"
           :loading="saving"
           :disabled="!sections.length"
           :callback="saveDraft"
         >
           Save Draft
-        </ButtonElement>
+        </BaseButton>
       </template>
     </div>
   </div>
@@ -138,31 +138,31 @@
 <script>
 import Draggable from 'vuedraggable';
 import { mapState } from 'vuex';
-import ButtonElement from '../BasicElements/ButtonElement.vue';
-import InputElement from '../BasicElements/InputElement.vue';
-import TextEditorElement from '../BasicElements/TextEditorElement.vue';
 import PostEditorPicture from './PostEditorPicture.vue';
 import PostEditorTags from './PostEditorTags.vue';
 import PostEditorVideo from './PostEditorVideo.vue';
 import api from '@/api';
 import consts from '@/const/const';
-import CloseIcon from '@/library/svg/ExitIcon.vue';
-import PictureIcon from '@/library/svg/PictureIcon.vue';
-import TextIcon from '@/library/svg/TextIcon.vue';
-import VideoIcon from '@/library/svg/VideoIcon.vue';
+import BaseButton from '@common/BaseButton.vue';
+import BaseInput from '@common/BaseInput.vue';
+import BaseTextEditor from '@common/BaseTextEditor.vue';
+import CloseIcon from '@icons/IconExit.vue';
+import IconPicture from '@icons/IconPicture.vue';
+import IconText from '@icons/IconText.vue';
+import IconVideo from '@icons/IconVideo.vue';
 
 export default {
   components: {
-    ButtonElement,
-    InputElement,
-    TextEditorElement,
+    BaseButton,
+    BaseInput,
+    BaseTextEditor,
     PostEditorPicture,
     PostEditorVideo,
     PostEditorTags,
     CloseIcon,
-    PictureIcon,
-    TextIcon,
-    VideoIcon,
+    IconPicture,
+    IconText,
+    IconVideo,
     Draggable,
   },
   props: ['edit', 'post'],

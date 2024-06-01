@@ -4,7 +4,7 @@
 
     <div class="user-signup__form-input">
       <!-- TODO: Wrap everything in form and catch enter then enter-callback won't be needed -->
-      <InputElement
+      <BaseInput
         v-model="email"
         data-testid="user-signup-email"
         label="Email"
@@ -16,7 +16,7 @@
     </div>
 
     <div class="user-signup__form-input">
-      <InputElement
+      <BaseInput
         v-model="login"
         data-testid="user-signup-login"
         label="Login"
@@ -28,7 +28,7 @@
     </div>
 
     <div class="user-signup__form-input">
-      <InputElement
+      <BaseInput
         v-model="password"
         data-testid="user-signup-password"
         label="Password"
@@ -41,7 +41,7 @@
     </div>
 
     <div class="user-signup__form-input">
-      <InputElement
+      <BaseInput
         v-model="confirm"
         data-testid="user-signup-confirm"
         label="Confirm password"
@@ -54,14 +54,14 @@
     </div>
 
     <div class="user-signup__submit">
-      <ButtonElement
+      <BaseButton
         data-testid="user-signup-submit"
         :callback="signUp"
         :loading="loading"
         :disabled="isSubmitDisabled"
       >
         FINISH
-      </ButtonElement>
+      </BaseButton>
     </div>
 
     <div
@@ -75,15 +75,15 @@
 </template>
 
 <script>
-import ButtonElement from '../BasicElements/ButtonElement.vue';
-import InputElement from '../BasicElements/InputElement.vue';
 import api from '@/api';
 import consts from '@/const/const';
+import BaseButton from '@common/BaseButton.vue';
+import BaseInput from '@common/BaseInput.vue';
 
 export default {
   components: {
-    ButtonElement,
-    InputElement,
+    BaseButton,
+    BaseInput,
   },
   data() {
     return {

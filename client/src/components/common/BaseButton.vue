@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import CircularLoader from '@/library/svg/animation/CircularLoader.vue';
+import CircularLoader from '@icons/animation/CircularLoader.vue';
 
 export default {
   components: {

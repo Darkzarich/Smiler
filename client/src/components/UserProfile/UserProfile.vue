@@ -9,7 +9,7 @@
         {{ user.login }}
 
         <template v-if="isUserAuth && !isSameUser">
-          <ButtonElement
+          <BaseButton
             class="user-profile__follow-btn"
             :data-testid="
               isFollowed
@@ -20,7 +20,7 @@
             :callback="handleFollow"
           >
             {{ isFollowed ? 'Unfollow' : 'Follow' }}
-          </ButtonElement>
+          </BaseButton>
         </template>
       </div>
 
@@ -65,12 +65,12 @@
 
 <script>
 import moment from 'moment';
-import ButtonElement from '../BasicElements/ButtonElement.vue';
 import api from '@/api/index';
+import BaseButton from '@common/BaseButton.vue';
 
 export default {
   components: {
-    ButtonElement,
+    BaseButton,
   },
   filters: {
     toDate(date) {

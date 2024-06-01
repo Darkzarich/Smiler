@@ -4,7 +4,7 @@
       Sign In
     </div>
     <div class="user-signin__form-input">
-      <InputElement
+      <BaseInput
         v-model="email"
         data-testid="user-signin-email"
         label="Email"
@@ -15,7 +15,7 @@
       />
     </div>
     <div class="user-signin__form-input">
-      <InputElement
+      <BaseInput
         v-model="password"
         data-testid="user-signin-password"
         label="Password"
@@ -27,14 +27,14 @@
       />
     </div>
     <div class="user-signin__submit">
-      <ButtonElement
+      <BaseButton
         data-testid="user-signin-submit"
         :callback="signIn"
         :loading="loading"
         :disabled="isSubmitDisabled"
       >
         SIGN IN
-      </ButtonElement>
+      </BaseButton>
     </div>
     <div
       data-testid="user-form-mode-toggler"
@@ -47,15 +47,15 @@
 </template>
 
 <script>
-import ButtonElement from '../BasicElements/ButtonElement.vue';
-import InputElement from '../BasicElements/InputElement.vue';
 import api from '@/api';
 import consts from '@/const/const';
+import BaseButton from '@common/BaseButton.vue';
+import BaseInput from '@common/BaseInput.vue';
 
 export default {
   components: {
-    ButtonElement,
-    InputElement,
+    BaseButton,
+    BaseInput,
   },
   data() {
     return {

@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
-    "target": "es5",
-    "moduleResolution": "nodenext",
+    "module": "esnext",
+    "target": "es6",
+    "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
+      "@common/*": ["./src/components/common/*"],
+      "@icons/*": ["./src/components/common/icons/*"]
     }
   },
   "exclude": ["node_modules", "dist"]
