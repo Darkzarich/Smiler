@@ -21,7 +21,6 @@ const schema = new Schema({
   avatar: {
     type: String,
     match: [/^https?:\/\//g, '{VALUE} is not an url'],
-    minLength: 7,
     maxLength: consts.USER_MAX_AVATAR_LENGTH,
     default: '',
   },
