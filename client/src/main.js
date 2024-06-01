@@ -82,7 +82,7 @@ Vue.mixin({
       }
     },
     $postCanEdit(post) {
-      const currentLogin = store.getters.getUser.login;
+      const currentLogin = store.state.user.login;
 
       if (!currentLogin || !post.author || post.author.login !== currentLogin) {
         return false;
@@ -98,7 +98,7 @@ Vue.mixin({
       return true;
     },
     $commentCanEdit(comment) {
-      const currentLogin = store.getters.getUser.login;
+      const currentLogin = store.state.user.login;
 
       if (
         !currentLogin ||

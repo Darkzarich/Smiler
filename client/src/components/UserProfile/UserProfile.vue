@@ -8,7 +8,7 @@
       <div class="user-profile__login" data-testid="user-profile-login">
         {{ user.login }}
 
-        <template v-if="userAuthState && !isSameUser">
+        <template v-if="isUserAuth && !isSameUser">
           <ButtonElement
             class="user-profile__follow-btn"
             :data-testid="
@@ -90,8 +90,8 @@ export default {
     };
   },
   computed: {
-    userAuthState() {
-      return this.$store.getters.userAuthState;
+    isUserAuth() {
+      return this.$store.getters.isUserAuth;
     },
     isFollowed() {
       return this.user.isFollowed;

@@ -60,7 +60,7 @@
             NEW
           </RouterLink>
 
-          <template v-if="user.authState">
+          <template v-if="isUserAuth">
             <RouterLink
               class="header__nav-link"
               :to="{ name: 'Feed' }"
@@ -72,6 +72,7 @@
           <template v-else>
             <span
               data-testid="feed-link"
+              title="Log in to access this page"
               class="header__nav-link header__nav-link--disabled"
               >MY FEED</span
             >
@@ -92,7 +93,7 @@
         />
       </div>
 
-      <div v-if="user.authState" class="header-container__avatar">
+      <div v-if="isUserAuth" class="header-container__avatar">
         <!-- TODO: Move everything like that to its own component AvatarLink or something -->
         <RouterLink
           :to="{
@@ -110,7 +111,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import HeaderMobileMenu from './HeaderMobileMenu.vue';
 import SiteLogo from './SiteLogo.vue';
 import InputElement from '@/components/BasicElements/InputElement.vue';
@@ -131,6 +132,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['isUserAuth']),
     ...mapState({
       user: (state) => state.user,
     }),

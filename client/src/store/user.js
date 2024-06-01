@@ -11,13 +11,10 @@ export default {
     email: '',
   },
   getters: {
-    getUser(state) {
-      return state;
-    },
-    userAuthState(state) {
+    isUserAuth(state) {
       return state.authState;
     },
-    // cache result to not recalculate every single time
+    // Cache result to not recalculate every single time
     isTagFollowed(state) {
       const result = {};
 

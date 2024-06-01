@@ -1,6 +1,6 @@
 <template>
   <div class="current-user">
-    <template v-if="!userAuthState">
+    <template v-if="!isUserAuth">
       <template v-if="mode == USER_LOGIN_MODE">
         <SignInForm @close="closeMenu" @mode-change="setMode(USER_REG_MODE)" />
       </template>
@@ -112,8 +112,8 @@ export default {
     };
   },
   computed: {
-    userAuthState() {
-      return this.$store.getters.userAuthState;
+    isUserAuth() {
+      return this.$store.getters.isUserAuth;
     },
     user() {
       return this.$store.state.user;

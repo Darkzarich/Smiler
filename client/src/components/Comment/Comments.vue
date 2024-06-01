@@ -150,7 +150,7 @@
               </div>
               <template v-else>
                 <div
-                  v-if="level < COMMENTS_NESTED_LIMIT && user.authState"
+                  v-if="level < COMMENTS_NESTED_LIMIT && isUserAuth"
                   class="comments__item-main-answer-toggler"
                   :data-testid="`comment-${comment.id}-toggle-reply`"
                   @click="toggleReply(comment.id)"
@@ -203,7 +203,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import CommentTreeHelper from './CommentTreeHelper.vue';
 import api from '@/api/index';
 import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
@@ -244,6 +244,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['isUserAuth']),
     ...mapState({
       user: (state) => state.user,
     }),

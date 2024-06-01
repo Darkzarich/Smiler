@@ -1,10 +1,10 @@
 <template>
   <div
     class="new-comment-form"
-    :class="!user.authState ? 'new-comment-form--disabled' : ''"
+    :class="!isUserAuth ? 'new-comment-form--disabled' : ''"
     data-testid="new-comment-form"
   >
-    <template v-if="user.authState">
+    <template v-if="isUserAuth">
       <div class="new-comment-form__title">Share your thoughts!</div>
       <TextEditorElement
         v-model="commentBody"
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import api from '@/api';
 import ButtonElement from '@/components/BasicElements/ButtonElement.vue';
 import TextEditorElement from '@/components/BasicElements/TextEditorElement.vue';
@@ -51,6 +51,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['isUserAuth']),
     ...mapState({
       user: (state) => state.user,
     }),

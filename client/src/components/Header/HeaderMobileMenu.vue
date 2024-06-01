@@ -10,7 +10,7 @@
     </div>
 
     <div class="mobile-menu__navigation">
-      <template v-if="user.authState">
+      <template v-if="isUserAuth">
         <RouterLink
           data-testid="feed-link"
           class="mobile-menu__nav-link"
@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapGetters } from 'vuex';
 import CurrentUser from '@/components/User/CurrentUser.vue';
 import ExitIcon from '@/library/svg/ExitIcon.vue';
 
@@ -92,9 +92,7 @@ export default {
     ExitIcon,
   },
   computed: {
-    ...mapState({
-      user: (state) => state.user,
-    }),
+    ...mapGetters(['isUserAuth']),
   },
   methods: {
     closeMenu() {

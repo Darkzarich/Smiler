@@ -206,7 +206,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapGetters } from 'vuex';
 import api from '@/api/index';
 import ContextMenuWrapper from '@/components/BasicElements/ContextMenuWrapper.vue';
 import consts from '@/const/const';
@@ -254,7 +254,7 @@ export default {
         it decides what elements to show under conditions */
         filter: (item) => {
           if (item.title === 'Follow tag' || item.title === 'Unfollow tag') {
-            if (!this.authState) {
+            if (!this.isUserAuth) {
               return false;
             }
             const foundTag =
@@ -274,9 +274,7 @@ export default {
     };
   },
   computed: {
-    ...mapState({
-      authState: (state) => state.user.authState,
-    }),
+    ...mapGetters(['isUserAuth']),
   },
   methods: {
     async upvote(id) {
