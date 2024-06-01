@@ -1,13 +1,15 @@
 <template>
   <div class="mobile-menu">
-    <div class="mobile-menu__close-icon" @click="closeMenu()">
+    <div class="mobile-menu__close-btn" @click="closeMenu()">
       <ExitIcon />
     </div>
+
     <div class="mobile-menu__user">
       <!-- vue requires .native to catch click event for vue-router links -->
-      <User :nav-native="true" @close="closeMenu()" />
+      <CurrentUser :nav-native="true" @close="closeMenu()" />
     </div>
-    <div class="mobile-menu__nav-container">
+
+    <div class="mobile-menu__navigation">
       <template v-if="user.authState">
         <RouterLink
           data-testid="feed-link"
@@ -15,58 +17,65 @@
           :to="{ name: 'Feed' }"
           @click.native="closeMenu()"
         >
-          <div>MY FEED</div>
+          MY FEED
         </RouterLink>
       </template>
       <template v-else>
-        <a
+        <span
           data-testid="feed-link"
           title="Log in to access this page"
-          class="mobile-menu__nav-link mobile-menu__nav-link_disabled"
+          class="mobile-menu__nav-link mobile-menu__nav-link--disabled"
         >
-          <div>MY FEED</div>
-        </a>
+          MY FEED
+        </span>
       </template>
 
+      <!-- TODO: This is repeated in HeaderElement, move to a common constant for both
+      the idea is use go over constant and form menu
+      -->
       <RouterLink
         class="mobile-menu__nav-link"
         :to="{ name: 'Home' }"
         data-testid="today-link"
         @click.native="closeMenu()"
       >
-        <div>TODAY</div>
+        TODAY
       </RouterLink>
+
       <RouterLink
         class="mobile-menu__nav-link"
         :to="{ name: 'All' }"
         data-testid="all-link"
         @click.native="closeMenu()"
       >
-        <div>ALL</div>
+        ALL
       </RouterLink>
+
       <RouterLink
         class="mobile-menu__nav-link"
         :to="{ name: 'Blowing' }"
         data-testid="blowing-link"
         @click.native="closeMenu()"
       >
-        <div title="posted recently, 50+ rating">BLOWING</div>
+        BLOWING
       </RouterLink>
+
       <RouterLink
         class="mobile-menu__nav-link"
         :to="{ name: 'TopThisWeek' }"
         data-testid="top-this-week-link"
         @click.native="closeMenu()"
       >
-        <div title="current week posts sorted by newer">TOP THIS WEEK</div>
+        TOP THIS WEEK
       </RouterLink>
+
       <RouterLink
         class="mobile-menu__nav-link"
         :to="{ name: 'New' }"
         data-testid="new-link"
         @click.native="closeMenu()"
       >
-        <div title="posts posted 2 hours ago sorted by newer">NEW</div>
+        NEW
       </RouterLink>
     </div>
   </div>
@@ -74,12 +83,12 @@
 
 <script>
 import { mapState } from 'vuex';
-import User from '@/components/User/User.vue';
+import CurrentUser from '@/components/User/CurrentUser.vue';
 import ExitIcon from '@/library/svg/ExitIcon.vue';
 
 export default {
   components: {
-    User,
+    CurrentUser,
     ExitIcon,
   },
   computed: {
@@ -102,8 +111,6 @@ export default {
 .mobile-menu {
   position: fixed;
   background: $widget-bg;
-
-  // border: 1px solid $light-gray;
   top: 0;
   left: 0;
   height: 100%;
@@ -111,36 +118,7 @@ export default {
   overflow-y: scroll;
   z-index: 1000;
 
-  &__nav-link {
-    width: 100%;
-    padding: 1rem;
-    font-weight: bold;
-    text-decoration: none;
-    border-bottom: 1px solid $light-gray;
-
-    &_disabled {
-      border-top: 1px solid $light-gray;
-
-      div {
-        color: $light-gray !important;
-        border-bottom: 2px solid transparent !important;
-        cursor: default;
-        user-select: none;
-      }
-    }
-  }
-
-  div {
-    color: $main-text;
-  }
-
-  .router-link-exact-active {
-    div {
-      color: $firm !important;
-    }
-  }
-
-  &__close-icon {
+  &__close-btn {
     position: absolute;
     right: 0.5rem;
     top: 0.5rem;
@@ -150,18 +128,38 @@ export default {
     }
   }
 
-  &__user {
-    margin-bottom: 0.5rem;
+  &__navigation {
+    @include flex-col;
 
-    .user {
-      border: none;
+    overflow-x: hidden;
+  }
+
+  &__nav-link {
+    width: 100%;
+    padding: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    border-bottom: 1px solid $light-gray;
+    color: $main-text;
+
+    &--disabled {
+      border-top: 1px solid $light-gray;
+      color: $light-gray;
+      cursor: default;
+      user-select: none;
+    }
+
+    &.router-link-exact-active {
+      color: $firm;
     }
   }
 
-  &__nav-container {
-    overflow-x: hidden;
+  &__user {
+    margin-bottom: 0.5rem;
 
-    @include flex-col;
+    .current-user {
+      border: none;
+    }
   }
 }
 </style>

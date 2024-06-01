@@ -32,6 +32,7 @@ Vue.mixin({
     },
   },
   methods: {
+    // TODO: Move to store or something
     $isMobile() {
       if (window.matchMedia('(max-device-width: 599px)').matches) {
         return true;

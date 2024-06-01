@@ -10,7 +10,7 @@
       </content>
 
       <div v-if="!$isMobile()" class="content__sidebar">
-        <User />
+        <CurrentUser />
       </div>
     </div>
 
@@ -22,7 +22,7 @@
 import FooterElement from '@/components/FooterElement.vue';
 import HeaderElement from '@/components/Header/HeaderElement.vue';
 import NotificationList from '@/components/NotificationList/NotificationList.vue';
-import User from '@/components/User/User.vue';
+import CurrentUser from '@/components/User/CurrentUser.vue';
 
 // TODO: global mini loader fixed to top
 export default {
@@ -30,7 +30,7 @@ export default {
     HeaderElement,
     FooterElement,
     NotificationList,
-    User,
+    CurrentUser,
   },
   data() {
     return {

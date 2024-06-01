@@ -1,70 +1,86 @@
 <template>
   <header class="header">
-    <div class="header-container">
+    <div class="header__container">
       <div
         data-testid="mobile-menu"
-        class="header-container__mobile_menu"
-        :class="mobileMenuShow ? 'header-container__mobile_active' : ''"
-        @click="mobileMenuShow = !mobileMenuShow"
+        class="header__mobile-menu"
+        :class="isMobileMenuOpen ? 'header__mobile--active' : ''"
+        @click="toggleMobileMenu()"
       >
         <MobileMenuIcon />
       </div>
-      <Transition name="header-container__mobile_menu">
+
+      <!-- TODO: Should be moved to App.vue -->
+      <Transition name="header__mobile-menu">
         <HeaderMobileMenu
-          v-if="mobileMenuShow"
-          @close="mobileMenuShow = false"
-        />\
+          v-if="isMobileMenuOpen"
+          @close="isMobileMenuOpen = false"
+        />
       </Transition>
-      <RouterLink :to="{ name: 'Home' }">
-        <img
-          src="@/assets/logo.png"
-          class="header-container__logo"
-          alt="Home"
-        />
-        <img
-          src="@/assets/neutral_avatar.png"
-          class="header-container__logo_mobile"
-          alt="Home"
-        />
+
+      <RouterLink class="header__home-link" :to="{ name: 'Home' }">
+        <SiteLogo />
       </RouterLink>
-      <nav>
+
+      <nav class="header__navigation">
         <template v-if="!$isMobile()">
-          <RouterLink :to="{ name: 'Home' }" data-testid="today-link">
-            <div>TODAY</div>
-          </RouterLink>
-          <RouterLink :to="{ name: 'All' }" data-testid="all-link">
-            <div>ALL</div>
-          </RouterLink>
-          <RouterLink :to="{ name: 'Blowing' }" data-testid="blowing-link">
-            <div title="posted recently, 50+ rating">BLOWING</div>
+          <RouterLink
+            class="header__nav-link"
+            :to="{ name: 'Home' }"
+            data-testid="today-link"
+          >
+            TODAY
           </RouterLink>
           <RouterLink
+            class="header__nav-link"
+            :to="{ name: 'All' }"
+            data-testid="all-link"
+          >
+            ALL
+          </RouterLink>
+          <RouterLink
+            class="header__nav-link"
+            :to="{ name: 'Blowing' }"
+            data-testid="blowing-link"
+          >
+            BLOWING
+          </RouterLink>
+          <RouterLink
+            class="header__nav-link"
             :to="{ name: 'TopThisWeek' }"
             data-testid="top-this-week-link"
           >
-            <div title="current week posts sorted by newer">TOP THIS WEEK</div>
+            TOP THIS WEEK
           </RouterLink>
-          <RouterLink :to="{ name: 'New' }" data-testid="new-link">
-            <div title="posts posted 2 hours ago sorted by newer">NEW</div>
+          <RouterLink
+            class="header__nav-link"
+            :to="{ name: 'New' }"
+            data-testid="new-link"
+          >
+            NEW
           </RouterLink>
 
           <template v-if="user.authState">
-            <RouterLink :to="{ name: 'Feed' }" data-testid="feed-link">
-              <div>MY FEED</div>
+            <RouterLink
+              class="header__nav-link"
+              :to="{ name: 'Feed' }"
+              data-testid="feed-link"
+            >
+              MY FEED
             </RouterLink>
           </template>
           <template v-else>
-            <a
+            <span
               data-testid="feed-link"
-              title="Log in to access this page"
-              class="header-container__nav-link_disabled"
+              class="header__nav-link header__nav-link--disabled"
+              >MY FEED</span
             >
-              <div>MY FEED</div>
-            </a>
           </template>
         </template>
       </nav>
-      <div v-if="$route.name !== 'Search'" class="header-container__search">
+
+      <!-- TODO: Move to Search component -->
+      <div v-if="$route.name !== 'Search'" class="header__search">
         <InputElement
           v-model.trim="title"
           :placeholder="'Search'"
@@ -75,7 +91,9 @@
           :icon-click-callback="search"
         />
       </div>
+
       <div v-if="user.authState" class="header-container__avatar">
+        <!-- TODO: Move everything like that to its own component AvatarLink or something -->
         <RouterLink
           :to="{
             name: 'UserPage',
@@ -94,6 +112,7 @@
 <script>
 import { mapState } from 'vuex';
 import HeaderMobileMenu from './HeaderMobileMenu.vue';
+import SiteLogo from './SiteLogo.vue';
 import InputElement from '@/components/BasicElements/InputElement.vue';
 import MobileMenuIcon from '@/library/svg/MobileMenuIcon.vue';
 
@@ -102,10 +121,11 @@ export default {
     HeaderMobileMenu,
     InputElement,
     MobileMenuIcon,
+    SiteLogo,
   },
   data() {
     return {
-      mobileMenuShow: false,
+      isMobileMenuOpen: false,
       // for search
       title: '',
     };
@@ -126,6 +146,9 @@ export default {
         });
       }
     },
+    toggleMobileMenu() {
+      this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    },
   },
 };
 </script>
@@ -143,122 +166,30 @@ export default {
   z-index: 2;
   padding: 0.5rem;
   height: 56px;
+  display: flex;
+  justify-content: center;
 
   @include for-size(phone-only) {
     height: 46px;
   }
 
-  display: flex;
-  justify-content: center;
-}
-
-.header-container {
-  display: flex;
-  padding-left: 40px;
-
-  @include for-size(phone-only) {
-    padding-left: 0;
-    padding-right: 0;
+  &__home-link {
+    display: flex;
   }
 
-  width: 100%;
-  max-width: 1110px;
-
-  > a {
-    color: $main-text;
-    text-decoration: none;
-    width: 10%;
-
-    .header-container {
-      &__logo {
-        height: 100%;
-
-        @include for-size(phone-only) {
-          display: none;
-        }
-
-        &_mobile {
-          display: none;
-          height: 100%;
-
-          @include for-size(phone-only) {
-            display: inline-block;
-          }
-        }
-      }
-    }
-  }
-
-  nav {
-    @include flex-row;
-
-    align-items: center;
-    margin-left: 4rem;
+  &__container {
+    display: flex;
+    padding-left: 40px;
+    width: 100%;
+    max-width: 1110px;
 
     @include for-size(phone-only) {
-      margin-left: 0;
-    }
-
-    a {
-      color: $main-text;
-      padding-top: 5px;
-      border-bottom: 2px solid transparent;
-      text-decoration: none;
-      font-weight: bold;
-      margin-left: 1rem;
-
-      &:hover {
-        border-bottom: 2px solid $main-text;
-      }
-    }
-
-    .header-container {
-      &__nav-link_disabled {
-        color: $light-gray !important;
-        border-bottom: 2px solid transparent !important;
-        cursor: default;
-        user-select: none;
-      }
-    }
-
-    .router-link-exact-active {
-      color: $firm;
-      border-bottom: 2px solid $firm !important;
+      padding-left: 0;
+      padding-right: 0;
     }
   }
 
-  &__search {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-  }
-
-  &__avatar {
-    display: flex;
-    margin-left: auto;
-    margin-right: 3rem;
-
-    @include for-size(phone-only) {
-      margin-right: 1rem;
-    }
-
-    align-self: center;
-
-    img {
-      border-radius: 50%;
-      border: 1px solid $light-gray;
-      width: 2.5rem;
-      height: 2.5rem;
-      cursor: pointer;
-
-      @include for-size(phone-only) {
-        width: 2rem;
-        height: 2rem;
-      }
-    }
-  }
-
-  &__mobile_menu {
+  &__mobile-menu {
     display: none;
     margin-right: 1rem;
     cursor: pointer;
@@ -286,11 +217,77 @@ export default {
         transform: translateY(-15px);
       }
     }
+
+    &--active {
+      svg {
+        fill: $main-text;
+      }
+    }
   }
 
-  &__mobile_active {
-    svg {
-      fill: $main-text;
+  &__navigation {
+    @include flex-row;
+
+    align-items: center;
+    margin-left: 4rem;
+
+    @include for-size(phone-only) {
+      margin-left: 0;
+    }
+  }
+
+  &__nav-link {
+    color: $main-text;
+    padding-top: 5px;
+    border-bottom: 2px solid transparent;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 1rem;
+
+    &:hover {
+      border-bottom: 2px solid $main-text;
+    }
+
+    &--disabled {
+      color: $light-gray;
+      border-bottom: 2px solid transparent;
+      cursor: default;
+      user-select: none;
+    }
+
+    &.router-link-exact-active {
+      color: $firm;
+      border-bottom: 2px solid $firm;
+    }
+  }
+
+  &__search {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+  }
+
+  &__avatar {
+    display: flex;
+    margin-left: auto;
+    margin-right: 3rem;
+    align-self: center;
+
+    @include for-size(phone-only) {
+      margin-right: 1rem;
+    }
+
+    img {
+      border-radius: 50%;
+      border: 1px solid $light-gray;
+      width: 2.5rem;
+      height: 2.5rem;
+      cursor: pointer;
+
+      @include for-size(phone-only) {
+        width: 2rem;
+        height: 2rem;
+      }
     }
   }
 }

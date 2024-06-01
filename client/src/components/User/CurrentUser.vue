@@ -1,5 +1,5 @@
 <template>
-  <div class="user">
+  <div class="current-user">
     <template v-if="!userAuthState">
       <template v-if="mode == USER_LOGIN_MODE">
         <SignInForm @close="closeMenu" @mode-change="setMode(USER_REG_MODE)" />
@@ -13,9 +13,9 @@
     </template>
 
     <template v-else>
-      <div class="user__logged-block">
-        <div class="user__logged-meta">
-          <div class="user__logged-meta-avatar">
+      <div class="current-user__logged-block">
+        <div class="current-user__logged-meta">
+          <div class="current-user__logged-meta-avatar">
             <RouterLink
               :to="{
                 name: 'UserPage',
@@ -26,28 +26,31 @@
               @click.native="navNative ? closeMenu() : ''"
             >
               <img :src="$resolveAvatar(user.avatar)" :alt="user.avatar" />
-              <div class="user__logged-meta-login" data-testid="user-login">
+              <div
+                class="current-user__logged-meta-login"
+                data-testid="user-login"
+              >
                 {{ user.login }}
               </div>
             </RouterLink>
           </div>
         </div>
-        <div class="user__logged-info">
-          <div class="user__logged-info-rating">
+        <div class="current-user__logged-info">
+          <div class="current-user__logged-info-rating">
             <div>Rating</div>
             <div data-testid="user-rating">
               {{ user.rating }}
             </div>
           </div>
-          <div class="user__logged-info-rating">
+          <div class="current-user__logged-info-rating">
             <div>Followers</div>
             <div data-testid="user-followers-amount">
               {{ user.followersAmount }}
             </div>
           </div>
         </div>
-        <div class="user__logged-nav">
-          <ul class="user__logged-nav-list">
+        <div class="current-user__logged-nav">
+          <ul class="current-user__logged-nav-list">
             <RouterLink
               data-testid="create-post-btn"
               :to="{
@@ -55,7 +58,9 @@
               }"
               @click.native="navNative ? closeMenu() : ''"
             >
-              <li class="user__logged-nav-item"><AddIcon /> New Post</li>
+              <li class="current-user__logged-nav-item">
+                <AddIcon /> New Post
+              </li>
             </RouterLink>
             <RouterLink
               :to="{
@@ -63,10 +68,12 @@
               }"
               @click.native="navNative ? closeMenu() : ''"
             >
-              <li class="user__logged-nav-item"><SettingsIcon /> Settings</li>
+              <li class="current-user__logged-nav-item">
+                <SettingsIcon /> Settings
+              </li>
             </RouterLink>
             <li
-              class="user__logged-nav-item"
+              class="current-user__logged-nav-item"
               data-testid="logout-btn"
               @click="logout"
             >
@@ -135,7 +142,7 @@ export default {
 @import '@/styles/colors';
 @import '@/styles/mixins';
 
-.user {
+.current-user {
   @include widget;
 
   padding: 0;
