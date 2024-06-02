@@ -26,6 +26,7 @@ const schema = new Schema({
   ],
   sections: [
     {
+      // TODO: Describe this type more detailed
       type: Schema.Types.Mixed,
     },
   ],

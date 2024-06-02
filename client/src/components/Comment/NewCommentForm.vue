@@ -80,6 +80,8 @@ export default {
         };
 
         this.$emit('new-comment', newComment);
+
+        this.commentBody = '';
       }
 
       this.loading = false;

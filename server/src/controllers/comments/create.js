@@ -1,3 +1,4 @@
+const sanitizeHtml = require('../../utils/sanitize-html');
 const Comment = require('../../models/Comment');
 const { success, asyncErrorHandler, generateError } = require('../../utils/utils');
 
@@ -7,14 +8,17 @@ exports.create = asyncErrorHandler(async (req, res, next) => {
   const { post } = req.body;
   const { userId } = req.session;
 
-  if (!body) { generateError('Body must be filled', 422, next); return; }
+  if (!body) { generateError('Commentary should not be empty', 422, next); return; }
   if (!post) { generateError('Comment must be assigned to a post', 422, next); return; }
 
+  const sanitizedBody = sanitizeHtml(body);
+
+  // TODO: asyncErrorHandler catches everything anyone don't need try..catch here
   try {
     if (!parent) {
       const comment = await Comment.create({
         post,
-        body,
+        body: sanitizedBody,
         author: userId,
       });
 
@@ -29,7 +33,7 @@ exports.create = asyncErrorHandler(async (req, res, next) => {
 
       const comment = await Comment.create({
         post,
-        body,
+        body: sanitizedBody,
         parent,
         author: userId,
       });

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const sanitizeHtml = require('../../utils/sanitize-html');
 
 const Post = require('../../models/Post');
 const consts = require('../../const/const');
@@ -7,67 +8,90 @@ const { success, asyncErrorHandler, generateError } = require('../../utils/utils
 
 exports.updateById = asyncErrorHandler(async (req, res, next) => {
   // TODO: validate sections on update by type and other stuff the same as when creating post
+  // TODO: move all Post validation in one place
 
   const { userId } = req.session;
   const { id } = req.params;
   const { title } = req.body;
   const { tags } = req.body;
-  const { sections } = req.body;
+  const { sections: newSections } = req.body;
 
-  const foundPost = await Post.findById(id);
+  const post = await Post.findById(id);
 
-  if (foundPost) {
-    if (foundPost.author.toString() !== userId) { generateError('The post is not yours', 403, next); return; }
+  if (!post) {
+    return generateError('Post is not found', 404, next);
+  }
 
-    const curDate = new Date().getTime();
-    const postDate = new Date(foundPost.createdAt.toString()).getTime();
+  if (post.author.toString() !== userId) {
+    return generateError('You can edit only your own posts', 403, next);
+  }
 
-    if (curDate - postDate > consts.POST_TIME_TO_UPDATE) {
-      generateError(`You can edit post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`, 405, next);
-    } else {
-      const toDelete = [];
+  const postCreatedAt = new Date(post.createdAt.toString()).getTime();
+  const { now } = new Date();
 
-      if (tags) {
-        if (tags.length > consts.POST_MAX_TAGS) { generateError('Too many tags', 422, next); return; }
-        if (tags.find(el => el.length > consts.POST_MAX_TAG_LEN)) { generateError('Exceeded max length of a tag', 422, next); return; }
+  if (now - postCreatedAt > consts.POST_TIME_TO_UPDATE) {
+    return generateError(`You can edit post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`, 405, next);
+  }
+
+  if (tags) {
+    if (tags.length > consts.POST_MAX_TAGS) {
+      return generateError(`Too many tags, max amount is ${consts.POST_MAX_TAGS}`, 422, next);
+    }
+
+    if (tags.find(el => el.length > consts.POST_MAX_TAG_LEN)) {
+      return generateError('Exceeded max length of a tag', 422, next);
+    }
+
+    post.tags = tags;
+  }
+
+  const filesToDelete = [];
+
+  if (newSections) {
+    newSections.forEach((section) => {
+      if (section.type === consts.POST_SECTION_TYPES.TEXT) {
+        // eslint-disable-next-line no-param-reassign
+        section.content = sanitizeHtml(section.content);
+      }
+    });
+
+    // Looking for pics that got removed from post
+    post.sections.forEach((section) => {
+      if (section.type !== consts.POST_SECTION_TYPES.PICTURE || !section.isFile) {
+        return;
       }
 
-      if (sections) {
-        foundPost.sections = sections;
+      const item = newSections.find(newSection => newSection.url === section.url);
 
-        // Searching for pics that got removed from post
-        foundPost.sections.forEach((rowSec) => {
-          if (rowSec.type === consts.POST_SECTION_TYPES.PICTURE && rowSec.isFile) {
-            const item = sections.find(el => (el.url === rowSec.url));
-            if (!item) {
-              toDelete.push(rowSec.url);
-            }
-          }
-        });
+      if (!item) {
+        filesToDelete.push(section.url);
       }
+    });
 
-      foundPost.title = title || foundPost.title;
-      foundPost.tags = tags || foundPost.tags;
+    post.sections = newSections;
+  }
 
-      if (toDelete && toDelete instanceof Array && toDelete.length > 0) {
-        toDelete.forEach((el) => {
-          const absolutePath = path.join(process.cwd(), el);
+  if (title) {
+    post.title = title;
+  }
 
-          fs.exists(absolutePath, (exist) => {
-            if (exist) {
-              fs.unlink(absolutePath, (err) => {
-                if (err) {
-                  generateError(err, 500, next);
-                }
-              });
+  if (filesToDelete.length > 0) {
+    filesToDelete.forEach((el) => {
+      const absolutePath = path.join(process.cwd(), el);
+
+      fs.exists(absolutePath, (exist) => {
+        if (exist) {
+          fs.unlink(absolutePath, (err) => {
+            if (err) {
+              generateError(err, 500, next);
             }
           });
-        });
-      }
-      await foundPost.save();
-      success(req, res);
-    }
-  } else {
-    generateError('Post doesn\'t exist', 404, next);
+        }
+      });
+    });
   }
+
+  await post.save();
+
+  success(req, res);
 });
