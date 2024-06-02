@@ -1,18 +1,20 @@
 <template>
-  <div class="post-editor__tags">
-    <div class="post-editor__tags-container" data-testid="post-tags-list">
-      <div v-for="tag in tags" :key="tag" class="post-editor__tags-item">
+  <div class="post-editor-tags">
+    <div class="post-editor-tags__list" data-testid="post-tags-list">
+      <div v-for="tag in tags" :key="tag" class="post-editor-tags__item">
         {{ tag }}
-        <span
+        <button
+          type="button"
           :data-testid="`remove-tag-button-${tag}`"
-          class="post-editor__tags-item-remove"
+          class="post-editor-tags__ghost-btn post-editor-tags__remove-tag-btn"
           @click="removeTag(tag)"
         >
           x
-        </span>
+        </button>
       </div>
     </div>
-    <div v-if="tags.length < POST_MAX_TAGS" class="post-editor__tags-input">
+
+    <div v-if="tags.length < POST_MAX_TAGS" class="post-editor-tags__form">
       <BaseInput
         v-model="tagInput"
         data-testid="post-tag-input"
@@ -20,7 +22,16 @@
         :enter-callback="addTag"
         :error="validation"
       />
-      <span v-if="tagInput.length > 0" @click="addTag"> + </span>
+
+      <!-- TODO: Think of a component for this -->
+      <button
+        v-if="tagInput.length > 0"
+        type="button"
+        class="post-editor-tags__ghost-btn post-editor-tags__add-tag-btn"
+        @click="addTag"
+      >
+        +
+      </button>
     </div>
   </div>
 </template>
@@ -85,50 +96,57 @@ export default {
 @import '@/styles/mixins';
 @import '@/styles/colors';
 
-.post-editor {
-  &__tags {
-    @include flex-row;
+.post-editor-tags {
+  @include flex-row;
 
-    flex-wrap: wrap;
-    margin-bottom: 0.5rem;
-  }
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
 
-  &__tags-container {
+  &__list {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+    gap: 8px;
   }
 
-  &__tags-item {
-    margin-top: 0.5rem;
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: $firm;
     font-weight: bold;
     background: transparent;
     font-size: 0.8rem;
     font-family: monospace;
     user-select: none;
-    cursor: pointer;
-    padding: 0.1rem;
-    margin-right: 0.5rem;
+    padding: 2px 4px;
     border-radius: 5px;
     border: 1px solid $firm;
   }
 
-  &__tags-item-remove {
-    color: $error;
-  }
-
-  &__input {
+  &__form {
     display: flex;
     align-items: center;
+  }
 
-    span {
-      color: $firm;
-      font-weight: bold;
-      font-size: 1.5rem;
-      cursor: pointer;
-      user-select: none;
-    }
+  &__ghost-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    user-select: none;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  &__add-tag-btn {
+    color: $firm;
+  }
+
+  &__remove-tag-btn {
+    color: $error;
+    font-size: 0.8rem;
   }
 }
 </style>
