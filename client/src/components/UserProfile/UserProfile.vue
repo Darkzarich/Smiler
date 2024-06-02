@@ -25,7 +25,7 @@
       </div>
 
       <div class="user-profile__date">
-        With us already {{ user.createdAt | toDate }}
+        Became an author {{ user.createdAt | $fromNow }}
       </div>
 
       <div
@@ -42,7 +42,6 @@
 </template>
 
 <script>
-import moment from 'moment';
 import api from '@/api/index';
 import BaseButton from '@common/BaseButton.vue';
 import UserStats from '@components/User/UserStats.vue';
@@ -51,11 +50,6 @@ export default {
   components: {
     BaseButton,
     UserStats,
-  },
-  filters: {
-    toDate(date) {
-      return moment().to(date, true);
-    },
   },
   props: {
     user: {
@@ -203,7 +197,9 @@ export default {
   }
 
   &__date {
+    margin-bottom: 12px;
     color: $light-gray;
+    font-size: 13px;
   }
 }
 </style>

@@ -17,8 +17,8 @@
   "dependencies": {
     "axios": "^1.6.7",
     "core-js": "^3.27.2",
+    "date-fns": "^3.6.0",
     "lodash": "^4.17.21",
-    "moment": "^2.29.4",
     "normalize.css": "^8.0.1",
     "v-click-outside": "^2.1.4",
     "vue": "^2.7.14",

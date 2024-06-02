@@ -1,5 +1,5 @@
 import 'normalize.css';
-import moment from 'moment';
+import { formatDistanceToNowStrict } from 'date-fns';
 import vClickOutside from 'v-click-outside';
 import Vue from 'vue';
 import App from './App.vue';
@@ -28,7 +28,14 @@ Vue.directive('scroll', {
 Vue.mixin({
   filters: {
     $fromNow(date) {
-      return moment(date).fromNow();
+      if (!date) {
+        return '';
+      }
+
+      return formatDistanceToNowStrict(date, {
+        addSuffix: true,
+        roundingMethod: 'trunc',
+      });
     },
   },
   methods: {

@@ -538,31 +538,31 @@ test('Formate different dates with relation to the current time correctly', asyn
   await SinglePostPage.goto(post.slug);
 
   await expect(Comments.getCommentDateById(comments[0].id)).toContainText(
-    'a few seconds ago',
+    '7 seconds ago',
   );
   await expect(Comments.getCommentDateById(comments[1].id)).toContainText(
     '35 minutes ago',
   );
   await expect(Comments.getCommentDateById(comments[2].id)).toContainText(
-    'an hour ago',
+    '1 hour ago',
   );
   await expect(Comments.getCommentDateById(comments[3].id)).toContainText(
     '3 hours ago',
   );
   await expect(Comments.getCommentDateById(comments[4].id)).toContainText(
-    'a day ago',
+    '1 day ago',
   );
   await expect(Comments.getCommentDateById(comments[5].id)).toContainText(
     '14 days ago',
   );
   await expect(Comments.getCommentDateById(comments[6].id)).toContainText(
-    'a month ago',
+    '1 month ago',
   );
   await expect(Comments.getCommentDateById(comments[7].id)).toContainText(
     '5 months ago',
   );
   await expect(Comments.getCommentDateById(comments[8].id)).toContainText(
-    'a year ago',
+    '1 year ago',
   );
   await expect(Comments.getCommentDateById(comments[9].id)).toContainText(
     '2 years ago',
