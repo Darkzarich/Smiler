@@ -18,6 +18,10 @@ export default class Comments extends AbstractComponent {
     return this.page.getByTestId(`comment-${commentId}-body`);
   }
 
+  getCommentDateById(commentId = '') {
+    return this.page.getByTestId(`comment-${commentId}-date`);
+  }
+
   getCommentReplyTogglerById(commentId = '') {
     return this.page.getByTestId(`comment-${commentId}-toggle-reply`);
   }

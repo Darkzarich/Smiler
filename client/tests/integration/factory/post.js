@@ -34,12 +34,16 @@ const post = {
 /**
  * Generates a new post object with optional overrides.
  *
- * @param {object} overrides - An object containing properties to override in
- * the new post object. Default is an empty object.
+ * @param {object} [overrides] - An object containing properties to override in
+ * the new post object.
  * @return {object} The newly generated post object.
  */
-export default function generatePost(overrides = {}) {
-  const newPost = defaults(overrides, cloneDeep(post));
+export default function generatePost(overrides) {
+  const clonedPost = cloneDeep(post);
 
-  return newPost;
+  if (!overrides) {
+    return clonedPost;
+  }
+
+  return defaults(overrides, clonedPost);
 }

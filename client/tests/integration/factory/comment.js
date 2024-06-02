@@ -1,6 +1,6 @@
 // @ts-check
 import cloneDeep from 'lodash/cloneDeep';
-import defaultsDeep from 'lodash/defaultsDeep';
+import defaults from 'lodash/defaults';
 
 const comment = {
   body: 'test comment',
@@ -62,12 +62,16 @@ const comment = {
  * Generates a new comment object by merging overrides with the default
  * comment object.
  *
- * @param {object} overrides - An object containing properties to override
- * in the new comment object. Defaults to an empty object.
+ * @param {object} [overrides] - An object containing properties to override
+ * in the new comment object.
  * @return {object} The new comment object.
  */
-export default function generateComment(overrides = {}) {
-  const newComment = defaultsDeep(overrides, cloneDeep(comment));
+export default function generateComment(overrides) {
+  const clonedComment = cloneDeep(comment);
 
-  return newComment;
+  if (!overrides) {
+    return clonedComment;
+  }
+
+  return defaults(overrides, clonedComment);
 }

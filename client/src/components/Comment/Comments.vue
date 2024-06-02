@@ -79,7 +79,10 @@
               </div>
             </template>
           </template>
-          <div class="comments__item-main-block-meta-date">
+          <div
+            class="comments__item-main-block-meta-date"
+            :data-testid="`comment-${comment.id}-date`"
+          >
             {{ comment.createdAt | $fromNow }}
           </div>
         </div>

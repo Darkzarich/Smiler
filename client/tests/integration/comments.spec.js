@@ -362,8 +362,9 @@ test.describe('Editing or deleting a comment', () => {
     context,
     Api,
   }) => {
-    const noChildrenComment = generateComment();
-    noChildrenComment.children = [];
+    const noChildrenComment = generateComment({
+      children: [],
+    });
 
     Api.routes.comments.getComments.mock({
       body: {
@@ -376,17 +377,20 @@ test.describe('Editing or deleting a comment', () => {
       status: 200,
     });
 
-    const dateToMock = new Date(comment.createdAt).toISOString();
+    const dateToMock = new Date(noChildrenComment.createdAt).toISOString();
 
     await mockDate(context, dateToMock);
 
     await SinglePostPage.goto(post.slug);
 
     await Api.routes.comments.deleteComment.waitForRequest({
-      preRequestAction: Comments.deleteCommentById.bind(Comments, comment.id),
+      preRequestAction: Comments.deleteCommentById.bind(
+        Comments,
+        noChildrenComment.id,
+      ),
     });
 
-    await expect(Comments.getCommentById(comment.id)).toBeHidden();
+    await expect(Comments.getCommentById(noChildrenComment.id)).toBeHidden();
   });
 
   test('Edits a comment that is not older than 10 mins, sends the edit request', async ({
@@ -451,4 +455,116 @@ test.describe('Editing or deleting a comment', () => {
       'This comment has been deleted',
     );
   });
+});
+
+test('Formate different dates with relation to the current time correctly', async ({
+  context,
+  Api,
+  Comments,
+  SinglePostPage,
+}) => {
+  await mockDate(context, '2024-06-03T00:00:00Z');
+
+  const comments = [
+    generateComment({
+      id: '0',
+      children: [],
+      // 7 seconds ago ~ a few seconds ago
+      createdAt: '2024-06-02T23:59:53Z',
+    }),
+    generateComment({
+      id: '1',
+      children: [],
+      // ~35 minutes ago
+      createdAt: '2024-06-02T23:24:53Z',
+    }),
+    generateComment({
+      id: '2',
+      children: [],
+      // ~ an hour ago
+      createdAt: '2024-06-02T22:59:53Z',
+    }),
+    generateComment({
+      id: '3',
+      children: [],
+      // ~3 hours ago
+      createdAt: '2024-06-02T20:59:53Z',
+    }),
+    generateComment({
+      id: '4',
+      children: [],
+      // ~ a day ago
+      createdAt: '2024-06-01T20:59:53Z',
+    }),
+    generateComment({
+      id: '5',
+      children: [],
+      // ~ 14 days ago
+      createdAt: '2024-05-19T20:59:53Z',
+    }),
+    generateComment({
+      id: '6',
+      children: [],
+      // ~ a month ago
+      createdAt: '2024-04-23T00:00:00Z',
+    }),
+    generateComment({
+      id: '7',
+      children: [],
+      // ~ 5 months ago
+      createdAt: '2023-12-20T00:00:00Z',
+    }),
+    generateComment({
+      id: '8',
+      children: [],
+      // ~ a year ago
+      createdAt: '2022-12-20T00:00:00Z',
+    }),
+    generateComment({
+      id: '9',
+      children: [],
+      // ~ 2 years ago
+      createdAt: '2021-12-20T00:00:00Z',
+    }),
+  ];
+
+  Api.routes.comments.getComments.mock({
+    body: {
+      pages: 0,
+      comments,
+    },
+  });
+
+  await SinglePostPage.goto(post.slug);
+
+  await expect(Comments.getCommentDateById(comments[0].id)).toContainText(
+    'a few seconds ago',
+  );
+  await expect(Comments.getCommentDateById(comments[1].id)).toContainText(
+    '35 minutes ago',
+  );
+  await expect(Comments.getCommentDateById(comments[2].id)).toContainText(
+    'an hour ago',
+  );
+  await expect(Comments.getCommentDateById(comments[3].id)).toContainText(
+    '3 hours ago',
+  );
+  await expect(Comments.getCommentDateById(comments[4].id)).toContainText(
+    'a day ago',
+  );
+  await expect(Comments.getCommentDateById(comments[5].id)).toContainText(
+    '14 days ago',
+  );
+  await expect(Comments.getCommentDateById(comments[6].id)).toContainText(
+    'a month ago',
+  );
+  await expect(Comments.getCommentDateById(comments[7].id)).toContainText(
+    '5 months ago',
+  );
+  await expect(Comments.getCommentDateById(comments[8].id)).toContainText(
+    'a year ago',
+  );
+  await expect(Comments.getCommentDateById(comments[9].id)).toContainText(
+    '2 years ago',
+  );
 });
