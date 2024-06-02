@@ -435,7 +435,9 @@ export default {
     display: inline-block;
     position: absolute;
     margin-top: 1rem;
+    margin-left: -0.7rem;
     color: $light-gray;
+    font-family: monospace;
     cursor: pointer;
 
     &:hover,
@@ -446,9 +448,6 @@ export default {
     &--active {
       font-weight: bold;
     }
-
-    font-family: monospace;
-    margin-left: -0.7rem;
   }
 
   &__item {
@@ -456,8 +455,8 @@ export default {
       border-left: solid 1px $light-gray;
 
       &_first {
-        border-left: none !important;
         margin-left: 0 !important;
+        border-left: none !important;
 
         @include for-size(phone-only) {
           margin-left: -1rem !important;
@@ -465,16 +464,15 @@ export default {
       }
 
       &-block {
-        background: $widget-bg;
         margin: 1rem;
         padding: 1rem;
+        background: $widget-bg;
+        color: $main-text;
 
         @include for-size(phone-only) {
           // margin-left: 0;
           margin-right: 0;
         }
-
-        color: $main-text;
 
         &_created {
           animation: flash 1s ease-out;
@@ -499,8 +497,8 @@ export default {
               width: 1rem;
               height: 1rem;
               margin-left: 0.5rem;
-              border-radius: 50%;
               border: 1px solid $light-gray;
+              border-radius: 50%;
             }
           }
 
@@ -523,11 +521,11 @@ export default {
             color: $light-gray;
 
             svg {
-              fill: $light-gray;
-              width: 2rem;
-              height: 2rem;
               position: relative;
               top: -8px;
+              width: 2rem;
+              height: 2rem;
+              fill: $light-gray;
               transform: scale(1.2);
             }
           }
@@ -537,8 +535,8 @@ export default {
             margin-left: 0.5rem;
 
             svg {
-              transform: scale(1);
               width: 1.3rem;
+              transform: scale(1);
             }
           }
 
@@ -576,11 +574,11 @@ export default {
         }
 
         &-toggler {
-          color: $firm;
-          margin-top: 0.5rem;
           display: inline-block;
-          cursor: pointer;
+          margin-top: 0.5rem;
+          color: $firm;
           font-size: 0.9rem;
+          cursor: pointer;
           font-weight: bold;
           transition: color 0.2s ease;
 

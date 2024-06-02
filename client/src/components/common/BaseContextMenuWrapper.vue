@@ -66,8 +66,8 @@ export default {
 .context-menu {
   position: absolute;
   padding: 0;
-  background: $bg;
   border: 1px solid $light-gray;
+  background: $bg;
 
   &-enter-active,
   &-leave-active {
@@ -81,17 +81,17 @@ export default {
   }
 
   &__list {
-    list-style: none;
     margin: 0;
     padding: 0;
+    list-style: none;
   }
 
   &__item {
     padding: 0.5rem;
-    font-size: 0.9rem;
-    color: #bfbfbf;
-    cursor: pointer;
     border-bottom: 1px solid #6b6e70;
+    color: #bfbfbf;
+    font-size: 0.9rem;
+    cursor: pointer;
 
     &:hover {
       background: #272b2d;

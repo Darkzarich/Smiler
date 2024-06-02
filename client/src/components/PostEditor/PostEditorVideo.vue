@@ -90,14 +90,14 @@ export default {
 @import '@/styles/mixins';
 
 .post-video-upload {
+  width: 100%;
   padding: 1rem;
   border: 1px solid $light-gray;
-  width: 100%;
 
   &__or {
+    color: $firm;
     text-align: center;
     font-weight: bold;
-    color: $firm;
   }
 
   &__video {

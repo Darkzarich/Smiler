@@ -56,33 +56,34 @@ export default {
 @import '@/styles/mixins';
 
 .button {
+  justify-content: center;
+
   // TODO: basic components must not have this style
   margin: 1rem;
-  justify-content: center;
 
   @include flex-row;
 
   &__element {
+    display: flex;
+    justify-content: center;
     width: 100%;
     padding: 0.5rem;
+    outline: none;
     border: 2px solid $firm;
     border-radius: 2px;
     background: $bg;
-    font-weight: bold;
     color: $firm;
-    outline: none;
+    font-weight: bold;
     cursor: pointer;
-    display: flex;
-    justify-content: center;
 
     &:hover {
       background: $widget-bg;
     }
 
     &[disabled] {
-      pointer-events: none;
       border: 2px solid $light-gray;
       color: $light-gray;
+      pointer-events: none;
     }
   }
 

@@ -33,22 +33,22 @@ export default {
   padding: 1rem;
 
   &__input {
-    border: 2px solid $light-gray;
     padding: 1rem;
+    border: 2px solid $light-gray;
     border-radius: 3px;
     background: $bg;
 
     span {
-      color: $main-text;
       display: block;
+      color: $main-text;
       text-align: center;
     }
 
     input[type='file' i] {
-      outline: 0;
-      opacity: 0;
-      pointer-events: none;
       position: absolute;
+      opacity: 0;
+      outline: 0;
+      pointer-events: none;
       user-select: none;
     }
   }

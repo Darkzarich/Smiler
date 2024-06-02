@@ -121,15 +121,15 @@ export default {
 @import '@/styles/colors';
 
 .header {
-  background-color: $header;
-  width: 100%;
+  display: flex;
+  justify-content: center;
   position: fixed;
   top: 0;
   z-index: 2;
-  padding: 0.5rem;
+  width: 100%;
   height: 56px;
-  display: flex;
-  justify-content: center;
+  padding: 0.5rem;
+  background-color: $header;
 
   @include for-size(phone-only) {
     height: 46px;
@@ -141,13 +141,13 @@ export default {
 
   &__container {
     display: flex;
-    padding-left: 40px;
     width: 100%;
     max-width: 1110px;
+    padding-left: 40px;
 
     @include for-size(phone-only) {
-      padding-left: 0;
       padding-right: 0;
+      padding-left: 0;
     }
   }
 
@@ -190,8 +190,8 @@ export default {
   &__navigation {
     @include flex-row;
 
-    gap: 16px;
     align-items: center;
+    gap: 16px;
     margin-left: 4rem;
 
     @include for-size(phone-only) {
@@ -217,9 +217,9 @@ export default {
   }
 
   &__search {
-    margin-left: auto;
     display: flex;
     align-items: center;
+    margin-left: auto;
 
     @include for-size(phone-only) {
       width: 70%;
@@ -228,15 +228,15 @@ export default {
 
   &__avatar {
     display: flex;
+    height: 100%;
     margin-left: auto;
     align-self: center;
-    height: 100%;
 
     img {
-      border-radius: 50%;
-      border: 1px solid $light-gray;
       width: 2.5rem;
       height: 2.5rem;
+      border: 1px solid $light-gray;
+      border-radius: 50%;
       cursor: pointer;
 
       @include for-size(phone-only) {

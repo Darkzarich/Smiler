@@ -186,15 +186,15 @@ export default {
 @import '@/styles/mixins';
 
 .text-editor-container {
+  width: 100%;
   padding: 1rem;
   border: 1px solid $light-gray;
-  width: 100%;
 
   @include for-size(phone-only) {
-    border-left: 1px solid transparent;
-    border-right: 1px solid transparent;
-    padding-left: 0;
     padding-right: 0;
+    padding-left: 0;
+    border-right: 1px solid transparent;
+    border-left: 1px solid transparent;
   }
 }
 
@@ -209,12 +209,12 @@ export default {
   }
 
   button {
-    font-family: monospace;
-    background: $bg;
+    outline: none;
     border: 2px solid $firm;
     border-radius: 3px;
+    background: $bg;
     color: $main-text;
-    outline: none;
+    font-family: monospace;
     font-weight: bold;
     cursor: pointer;
 
@@ -228,37 +228,37 @@ export default {
   @include flex-row;
   @include scroll;
 
-  color: $main-text;
-  border: 1px solid $light-gray;
-  background: $bg;
-  border-radius: 2px;
-  min-height: 15rem;
   height: 100%;
+  min-height: 15rem;
+  border: 1px solid $light-gray;
+  border-radius: 2px;
+  background: $bg;
+  color: $main-text;
   cursor: text;
 
   @include for-size(phone-only) {
     min-height: 9rem;
-    border-left: none;
     border-right: none;
+    border-left: none;
   }
 
   &__input {
     width: 100%;
-    outline: $firm;
     padding: 8px;
+    outline: $firm;
 
     br {
-      margin-bottom: 1rem;
       display: block;
+      margin-bottom: 1rem;
       content: '';
     }
 
     cite {
       display: block;
-      padding: 1rem;
-      border: solid 1px;
       margin-top: 0.5rem;
       margin-bottom: 0.5rem;
+      padding: 1rem;
+      border: solid 1px;
       background-color: $bg;
     }
   }

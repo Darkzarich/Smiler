@@ -421,10 +421,10 @@ export default {
   flex-flow: row nowrap;
 
   &__left {
-    width: 10%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 10%;
 
     @include for-size(phone-only) {
       display: none;
@@ -432,9 +432,9 @@ export default {
   }
 
   &__rating {
-    font-size: 20px;
-    margin-bottom: -1rem;
     margin-top: -1rem;
+    margin-bottom: -1rem;
+    font-size: 20px;
   }
 
   &__title {
@@ -442,8 +442,8 @@ export default {
     align-items: center;
     gap: 8px;
     margin-bottom: 1rem;
-    font-weight: 400;
     font-size: 20px;
+    font-weight: 400;
 
     svg {
       position: relative;
@@ -464,8 +464,8 @@ export default {
     color: $light-gray;
 
     svg {
-      fill: $light-gray;
       width: 5rem;
+      fill: $light-gray;
 
       @include for-size(phone-only) {
         width: 3rem;
@@ -503,31 +503,31 @@ export default {
 
   &__tags-item {
     margin-top: 0.5rem;
-    color: $firm;
-    font-weight: bold;
+    margin-right: 0.5rem;
+    padding: 0.1rem;
+    border: 1px solid $firm;
+    border-radius: 5px;
     background: transparent;
-    font-size: 0.8rem;
+    color: $firm;
     font-family: monospace;
+    font-size: 0.8rem;
+    font-weight: bold;
     user-select: none;
     cursor: pointer;
-    padding: 0.1rem;
-    margin-right: 0.5rem;
-    border-radius: 5px;
-    border: 1px solid $firm;
   }
 
   &__main {
-    background: $widget-bg;
     width: 90%;
     padding: 1rem;
-    color: $main-text;
     border: 1px solid $light-gray;
     border-radius: 2px;
+    background: $widget-bg;
+    color: $main-text;
 
     @include for-size(phone-only) {
+      width: 100%;
       border: none;
       border-bottom: 1px solid $light-gray;
-      width: 100%;
     }
   }
 
@@ -545,26 +545,26 @@ export default {
     line-height: 1.5rem;
 
     cite {
-      border: 1px solid $light-gray;
+      display: block;
+      margin-top: 0.5rem;
       padding: 0.5rem;
       padding-left: 1rem;
-      display: block;
+      border: 1px solid $light-gray;
       background: $bg;
-      margin-top: 0.5rem;
     }
   }
 
   &__section-attachment {
     display: flex;
     flex-flow: row nowrap;
-    border: 1px solid $light-gray;
-    margin-bottom: 1rem;
     margin-top: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid $light-gray;
 
     @include for-size(phone-only) {
+      width: 110%;
       margin-left: -1rem;
       border: none;
-      width: 110%;
     }
   }
 
@@ -586,12 +586,12 @@ export default {
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
-    margin: -1rem;
-    padding: 0.5rem;
     align-items: center;
-    background: $bg;
+    margin: -1rem;
     margin-top: 1rem;
+    padding: 0.5rem;
     border-top: 1px solid $light-gray;
+    background: $bg;
 
     @include for-size(phone-only) {
       border-top: none;
@@ -599,17 +599,17 @@ export default {
   }
 
   &__comments-count {
-    text-decoration: none;
     color: $light-gray;
+    text-decoration: none;
 
     /* stylelint-disable-next-line no-descending-specificity */
     svg {
-      fill: $main-text;
+      position: relative;
+      top: 2px;
       width: 1rem;
       height: 1rem;
       margin-right: 0.2rem;
-      position: relative;
-      top: 2px;
+      fill: $main-text;
     }
   }
 
@@ -632,8 +632,8 @@ export default {
     width: 1.5rem;
     height: 1.5rem;
     margin-left: 0.5rem;
-    border-radius: 50%;
     border: 1px solid $light-gray;
+    border-radius: 50%;
   }
 }
 </style>

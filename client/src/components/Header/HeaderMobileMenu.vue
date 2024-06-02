@@ -48,18 +48,18 @@ export default {
 
 .mobile-menu {
   position: fixed;
-  background: $widget-bg;
   top: 0;
   left: 0;
-  height: 100%;
-  width: 100%;
-  overflow-y: scroll;
   z-index: 1000;
+  width: 100%;
+  height: 100%;
+  background: $widget-bg;
+  overflow-y: scroll;
 
   &__close-btn {
     position: absolute;
-    right: 0.5rem;
     top: 0.5rem;
+    right: 0.5rem;
 
     svg {
       fill: $error;

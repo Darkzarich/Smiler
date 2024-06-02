@@ -52,20 +52,20 @@ export default {
 
 .notification-list {
   position: fixed;
-  width: 100%;
-  z-index: 999;
   top: 0;
+  z-index: 999;
+  width: 100%;
 
   &__item {
     @include flex-row;
 
-    padding: 5px;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     position: relative;
+    opacity: 1;
+    padding: 5px;
     border-bottom: 1px solid $bg;
     background: $error;
-    opacity: 1;
     transition: opacity 0.2s 0s ease-in-out;
 
     &--info {
@@ -100,8 +100,8 @@ export default {
 
   &__close {
     position: absolute;
-    right: 5px;
     top: 2px;
+    right: 5px;
     cursor: pointer;
 
     svg {

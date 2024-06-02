@@ -248,8 +248,8 @@ export default {
   @include widget;
 
   @include for-size(phone-only) {
-    border-left: none;
     border-right: none;
+    border-left: none;
   }
 
   &__loading {
@@ -258,16 +258,16 @@ export default {
   }
 
   &__title {
-    color: $main-text;
-    font-size: 1.5rem;
-    text-align: center;
-    font-weight: 500;
     margin: 0;
+    color: $main-text;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 500;
   }
 
   &__block {
-    border-bottom: 1px solid $light-gray;
     padding: 1rem 0;
+    border-bottom: 1px solid $light-gray;
 
     &:last-child {
       border-bottom: none;
@@ -275,9 +275,9 @@ export default {
   }
 
   &__block-title {
+    margin: 1rem 0;
     color: $main-text;
     text-align: center;
-    margin: 1rem 0;
   }
 
   &__bio-edit {
@@ -286,9 +286,9 @@ export default {
     }
 
     textarea {
-      resize: none;
       width: 50%;
       height: 5rem;
+      resize: none;
 
       @include for-size(phone-only) {
         width: 100%;
@@ -316,9 +316,9 @@ export default {
     }
 
     img {
-      border-radius: 50%;
-      border: 1px solid $light-gray;
       width: 128px;
+      border: 1px solid $light-gray;
+      border-radius: 50%;
     }
   }
 
@@ -346,9 +346,9 @@ export default {
   }
 
   &__following-type {
+    margin-top: 0.5rem;
     color: $light-gray;
     font-weight: bold;
-    margin-top: 0.5rem;
   }
 
   &__unfollow {
@@ -358,9 +358,9 @@ export default {
   }
 
   &__following-item {
-    color: $main-text;
-    margin-left: 0.5rem;
     margin-top: 0.5rem;
+    margin-left: 0.5rem;
+    color: $main-text;
   }
 }
 </style>

@@ -126,39 +126,37 @@ export default {
   padding: 0;
 
   &__logged-meta {
+    justify-content: center;
     border-bottom: 1px solid $light-gray;
+    background: $bg;
 
     @include flex-row;
 
-    background: $bg;
-    justify-content: center;
-
     &-avatar {
-      justify-content: center;
       display: flex;
-      user-select: none;
       flex-flow: column nowrap;
+      justify-content: center;
+      align-items: center;
+      width: 50%;
       padding: 1rem;
+      user-select: none;
 
       @include for-size(phone-only) {
         padding: 0.5rem;
       }
 
-      align-items: center;
-      width: 50%;
-
       img {
-        border-radius: 50%;
-        border: 1px solid $light-gray;
         width: 8rem;
+        border: 1px solid $light-gray;
+        border-radius: 50%;
       }
     }
 
     &-login {
-      color: $main-text;
-      font-size: 1rem;
-      text-align: center;
       margin: 1rem;
+      color: $main-text;
+      text-align: center;
+      font-size: 1rem;
 
       @include for-size(phone-only) {
         margin: 0.5rem;
@@ -171,8 +169,8 @@ export default {
   }
 
   &__stats {
-    justify-content: center;
     flex-flow: row nowrap;
+    justify-content: center;
     padding: 1rem;
     border-bottom: 1px solid $light-gray;
   }
@@ -180,10 +178,10 @@ export default {
   &__logged-nav {
     &-list {
       margin-left: 0;
+      text-align: center;
       padding-inline-start: 0;
       margin-block: 0 0;
       list-style: none;
-      text-align: center;
 
       a {
         text-decoration: none;
@@ -191,14 +189,14 @@ export default {
     }
 
     &-item {
-      cursor: pointer;
-      color: $main-text;
-      font-weight: 500;
-      padding: 1rem;
       display: flex;
       flex-direction: row;
       align-items: center;
+      padding: 1rem;
       border-bottom: 1px solid $light-gray;
+      color: $main-text;
+      cursor: pointer;
+      font-weight: 500;
       line-height: 24px;
 
       &:last-child {
@@ -206,9 +204,9 @@ export default {
       }
 
       svg {
-        fill: $main-text;
-        margin-right: 0.5rem;
         width: 2rem;
+        margin-right: 0.5rem;
+        fill: $main-text;
       }
 
       &:hover {

@@ -74,27 +74,27 @@ body {
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: $light-gray;
     border-radius: 20px;
+    background-color: $light-gray;
   }
 }
 
 #app {
-  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .content {
   display: flex;
-  flex-flow: row nowrap;
   flex-grow: 1;
-  margin-top: $header-height-interval;
-  max-width: 1110px;
+  flex-flow: row nowrap;
   width: 100%;
-  margin-left: auto;
+  max-width: 1110px;
+  margin-top: $header-height-interval;
   margin-right: auto;
+  margin-left: auto;
   padding-right: 10px;
 
   @include for-size(phone-only) {

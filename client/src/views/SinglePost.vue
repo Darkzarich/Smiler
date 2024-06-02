@@ -145,9 +145,9 @@ export default {
 }
 
 .comments {
-  border: 1px solid $light-gray;
-  padding: 1rem;
   margin-bottom: 2rem;
+  padding: 1rem;
+  border: 1px solid $light-gray;
 
   @include for-size(phone-only) {
     border: none;
@@ -159,18 +159,18 @@ export default {
   }
 
   &__no-comments {
-    color: $main-text;
-    font-size: 1.2rem;
-    text-align: center;
     margin-top: 0.5rem;
+    color: $main-text;
+    text-align: center;
+    font-size: 1.2rem;
   }
 
   &__load-more,
   &__no-more {
-    color: $main-text;
-    font-size: 1.2rem;
-    text-align: center;
     margin-top: 0.5rem;
+    color: $main-text;
+    text-align: center;
+    font-size: 1.2rem;
 
     @include widget;
   }

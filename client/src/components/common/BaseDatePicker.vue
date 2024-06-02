@@ -42,10 +42,10 @@ export default {
 
   input[type='date'] {
     padding: 0.5rem;
-    color: $main-text;
-    background: $bg;
     outline: $firm;
     border: 1px solid $light-gray;
+    background: $bg;
+    color: $main-text;
 
     &::-webkit-inner-spin-button {
       display: none;
@@ -57,8 +57,8 @@ export default {
   }
 
   label {
-    min-width: 80px;
     display: inline-block;
+    min-width: 80px;
     color: $light-gray;
   }
 }

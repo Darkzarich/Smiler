@@ -160,12 +160,12 @@ export default {
   &__no-more {
     @include widget;
 
-    color: $main-text;
     display: flex;
     justify-content: center;
+    color: $main-text;
     text-align: center;
-    line-height: 1.7rem;
     font-size: 1.3rem;
+    line-height: 1.7rem;
   }
 }
 </style>

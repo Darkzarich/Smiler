@@ -133,34 +133,34 @@ export default {
 .user-profile {
   @include flex-row;
 
+  position: relative;
   margin-bottom: $widget-margin;
   margin-left: 10%;
-  border: 1px solid $light-gray;
   padding: 1rem;
+  border: 1px solid $light-gray;
   border-radius: 2px;
   background: $widget-bg;
   color: $main-text;
-  position: relative;
 
   @include for-size(phone-only) {
-    margin-left: 0;
     width: 100%;
+    margin-left: 0;
     border: none;
   }
 
   &::after {
-    content: '';
     display: inline-block;
+    position: absolute;
+    right: 5%;
+    opacity: 0.05;
     width: 48%;
     height: 82%;
-    right: 5%;
-    position: absolute;
-    background-repeat: no-repeat;
     background-image: url('../../assets/neutral_avatar.png');
-    opacity: 0.05;
     background-position: center;
-    filter: grayscale(1);
     background-size: cover;
+    background-repeat: no-repeat;
+    content: '';
+    filter: grayscale(1);
 
     @include for-size(phone-only) {
       display: none;
@@ -172,10 +172,10 @@ export default {
     margin-right: 1rem;
 
     img {
-      border-radius: 50%;
       width: 7rem;
       height: 7rem;
       border: 1px solid $light-gray;
+      border-radius: 50%;
     }
   }
 
@@ -191,8 +191,8 @@ export default {
     font-size: 13px;
 
     .button__element {
-      padding: 4px 6px;
       width: 75px;
+      padding: 4px 6px;
     }
   }
 

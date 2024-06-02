@@ -117,10 +117,10 @@ export default {
   }
 
   &__title {
-    color: $main-text;
-    font-size: 1.2rem;
     margin-bottom: 1rem;
+    color: $main-text;
     text-align: center;
+    font-size: 1.2rem;
   }
 
   .text-editor {

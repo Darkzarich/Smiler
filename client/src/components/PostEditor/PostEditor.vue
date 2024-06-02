@@ -309,8 +309,8 @@ export default {
     justify-content: space-around;
 
     .button {
-      white-space: nowrap;
       width: 25%;
+      white-space: nowrap;
     }
   }
 
@@ -322,9 +322,9 @@ export default {
     @include flex-row;
 
     align-items: center;
+    position: relative;
     margin-top: 1rem;
     cursor: move;
-    position: relative;
 
     &_moving {
       opacity: 0.4;
@@ -357,16 +357,15 @@ export default {
     padding: 1rem;
 
     &-item {
-      border: 1px solid $light-gray;
+      margin-left: 1rem;
       padding: 1rem;
+      border: 1px solid $light-gray;
       background: $bg;
       cursor: pointer;
 
       &:hover {
         background: $widget-bg;
       }
-
-      margin-left: 1rem;
 
       svg {
         fill: $light-gray;

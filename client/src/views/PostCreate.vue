@@ -89,15 +89,15 @@ export default {
   @include flex-col;
 
   @include for-size(phone-only) {
-    border: none;
-    padding-left: 0;
     padding-right: 0;
+    padding-left: 0;
+    border: none;
   }
 
   &__header {
-    align-self: center;
-    font-size: 1.5rem;
     color: $main-text;
+    font-size: 1.5rem;
+    align-self: center;
   }
 }
 </style>

@@ -34,16 +34,16 @@ export default {
   align-items: center;
 
   &__404 {
-    color: $main-text;
-    font-weight: bold;
-    font-size: 4rem;
     margin-bottom: 1rem;
+    color: $main-text;
+    font-size: 4rem;
+    font-weight: bold;
   }
 
   &__info {
+    margin-bottom: 1rem;
     color: $main-text;
     font-size: 3rem;
-    margin-bottom: 1rem;
   }
 
   &__button-container {

@@ -62,7 +62,7 @@ export default {
     border: none;
   }
 
-  margin-left: 10%;
   margin-bottom: $widget-margin;
+  margin-left: 10%;
 }
 </style>

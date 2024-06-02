@@ -147,12 +147,12 @@ export default {
       border: none !important;
     }
 
-    color: $main-text;
     display: flex;
-    font-size: 1.3rem;
-    margin-left: 10%;
-    text-align: center;
     justify-content: none;
+    margin-left: 10%;
+    color: $main-text;
+    text-align: center;
+    font-size: 1.3rem;
   }
 }
 </style>

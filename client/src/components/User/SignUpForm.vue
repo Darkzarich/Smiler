@@ -199,23 +199,22 @@ export default {
   padding: 1rem;
 
   &__form-input {
-    margin-bottom: 12px;
     width: 100%;
+    margin-bottom: 12px;
   }
 
   &__header {
+    margin-bottom: 0.5rem;
     color: $main-text;
     font-weight: bold;
-    margin-bottom: 0.5rem;
   }
 
   &__mode-toggler {
-    // TODO: Remove !important, was made because of mobile
+    margin-top: 0.5rem;
+    border-bottom: 1px solid transparent;
     color: $firm;
     font-size: 0.8rem;
-    margin-top: 0.5rem;
     cursor: pointer;
-    border-bottom: 1px solid transparent;
 
     &:hover {
       border-bottom: 1px solid $firm;

@@ -28,27 +28,27 @@ footer {
     height: 2rem;
   }
 
+  align-items: center;
   width: 100%;
   height: 4rem;
   margin-top: 1.5rem;
   background: $header;
-  align-items: center;
 
   .footer-content {
     display: flex;
     width: 100%;
+    max-width: 1110px;
     height: 100%;
     margin: 0 auto;
-    max-width: 1110px;
   }
 
   .github-link {
-    margin-left: auto;
     display: flex;
-    height: 100%;
     align-items: center;
-    margin-right: 1rem;
     opacity: 0.5;
+    height: 100%;
+    margin-right: 1rem;
+    margin-left: auto;
     cursor: pointer;
 
     &:hover {

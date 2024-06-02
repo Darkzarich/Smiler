@@ -136,23 +136,23 @@ export default {
 .input {
   @include flex-col;
 
-  margin-left: 1rem;
   margin-right: 1rem;
+  margin-left: 1rem;
 
   &__label {
+    margin-bottom: -4px;
     color: $main-text;
     font-size: 13px;
-    margin-bottom: -4px;
   }
 
   &__element {
-    background: $bg;
-    padding: 0.5rem;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
-    color: $main-text;
+    padding: 0.5rem;
     border: 1px solid $light-gray;
     border-radius: 2px;
+    background: $bg;
+    color: $main-text;
 
     &:focus {
       outline-color: $firm;

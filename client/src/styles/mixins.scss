@@ -40,10 +40,10 @@
 }
 
 @mixin widget {
-  border: 1px solid $light-gray;
-  background: $widget-bg;
-  border-radius: 2px;
   padding: 1rem;
+  border: 1px solid $light-gray;
+  border-radius: 2px;
+  background: $widget-bg;
 }
 
 @mixin scroll {

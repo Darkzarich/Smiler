@@ -60,34 +60,34 @@ export default {
   }
 
   input[type='range'] {
-    color: $main-text;
-    background: $bg;
     outline: $firm;
     border: 1px solid $light-gray;
+    background: $bg;
+    color: $main-text;
     appearance: none;
 
     &::-webkit-slider-thumb {
-      height: 1rem;
       width: 1rem;
+      height: 1rem;
+      margin-top: -0.3rem;
       border-radius: 12px;
       background: $firm;
       cursor: pointer;
       appearance: none;
-      margin-top: -0.3rem;
     }
 
     &::-webkit-slider-runnable-track {
-      background: $light-gray;
       height: 0.5rem;
-      cursor: pointer;
       border: none;
       border-radius: 5px;
+      background: $light-gray;
+      cursor: pointer;
     }
   }
 
   label {
-    min-width: 85px;
     display: inline-block;
+    min-width: 85px;
     color: $light-gray;
   }
 }

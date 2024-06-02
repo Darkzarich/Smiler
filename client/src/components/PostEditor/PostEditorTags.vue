@@ -104,24 +104,24 @@ export default {
 
   &__list {
     display: flex;
-    align-items: center;
     flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
   }
 
   &__item {
     display: flex;
-    align-items: center;
     justify-content: center;
-    color: $firm;
-    font-weight: bold;
-    background: transparent;
-    font-size: 0.8rem;
-    font-family: monospace;
-    user-select: none;
+    align-items: center;
     padding: 2px 4px;
-    border-radius: 5px;
     border: 1px solid $firm;
+    border-radius: 5px;
+    background: transparent;
+    color: $firm;
+    font-family: monospace;
+    font-size: 0.8rem;
+    font-weight: bold;
+    user-select: none;
   }
 
   &__form {
@@ -131,12 +131,12 @@ export default {
 
   &__ghost-btn {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    border: none;
+    background-color: transparent;
     font-size: 1.5rem;
     user-select: none;
-    background-color: transparent;
-    border: none;
     cursor: pointer;
   }
 
