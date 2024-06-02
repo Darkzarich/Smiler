@@ -6,16 +6,13 @@
       class="comments__item-main"
       :class="{
         'comments__item-main_first': first,
-        'comments__item-main_refresh-new': comment.isRefreshNew,
       }"
       :style="`margin-left: ${indentLevel}rem`"
-      @mouseover="comment.isRefreshNew ? (comment.isRefreshNew = false) : ''"
     >
       <div
         class="comments__item-main-block"
         :class="{
           'comments__item-main-block_created': comment.created,
-          'comments__item-main-block_refresh-new': comment.isRefreshNew,
         }"
       >
         <div class="comments__item-main-block-meta">
@@ -309,6 +306,14 @@ export default {
       }
     },
     async reply(parent) {
+      if (!this.replyBody) {
+        this.$store.dispatch('showErrorNotification', {
+          message: 'Comment cannot be empty. Enter some text first!',
+        });
+
+        return;
+      }
+
       this.replySending = true;
       const parentCom = this.commentData.find((el) => el.id === parent);
 
@@ -459,10 +464,6 @@ export default {
         }
       }
 
-      &_refresh-new {
-        border-left: solid 3px $firm !important;
-      }
-
       &-block {
         background: $widget-bg;
         margin: 1rem;
@@ -474,10 +475,6 @@ export default {
         }
 
         color: $main-text;
-
-        &_refresh-new {
-          background: #86c2321c;
-        }
 
         &_created {
           animation: flash 1s ease-out;
@@ -571,14 +568,10 @@ export default {
 
       &-answer {
         &-editor {
-          width: 85%;
-
-          @include for-size(phone-only) {
-            width: 100%;
-          }
+          margin-top: 1rem;
 
           .text-editor {
-            height: 6rem;
+            min-height: 6rem;
           }
         }
 

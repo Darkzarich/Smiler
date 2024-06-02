@@ -108,5 +108,3 @@ docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
 	- **Creating comments**. With rich editor
 	- **Deleting comments**
 	- **Updating comments**
-	- **Loading new comments**. Small flying button which allows to request comments again but all new comments
-	will be highlighted, also there is a counter which says how many comments were added.
