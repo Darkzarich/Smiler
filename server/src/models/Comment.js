@@ -100,6 +100,7 @@ schema.methods.toResponse = function (user) {
       isRated: rated.result || false,
       negative: rated.negative || false,
     },
+    deleted: false,
   };
 };
 
