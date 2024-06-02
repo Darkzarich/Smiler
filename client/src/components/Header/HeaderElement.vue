@@ -220,12 +220,17 @@ export default {
     margin-left: auto;
     display: flex;
     align-items: center;
+
+    @include for-size(phone-only) {
+      width: 70%;
+    }
   }
 
   &__avatar {
     display: flex;
     margin-left: auto;
     align-self: center;
+    height: 100%;
 
     img {
       border-radius: 50%;
