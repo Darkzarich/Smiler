@@ -5,8 +5,8 @@ export default class CurrentUser {
   constructor(page) {
     this.page = page;
     this.login = page.getByTestId('user-login');
-    this.rating = page.getByTestId('user-rating');
-    this.followersAmount = page.getByTestId('user-followers-amount');
+    this.rating = page.getByTestId('user-profile-rating');
+    this.followersAmount = page.getByTestId('user-profile-followers-count');
     this.createPostBtn = page.getByTestId('create-post-btn');
   }
 

@@ -36,29 +36,7 @@
         <i>{{ user.bio }}</i>
       </div>
 
-      <div class="user-profile__stats">
-        <div
-          :class="{
-            'user-profile__stat--positive': user.rating > 0,
-            'user-profile__stat--negative': user.rating < 0,
-          }"
-          class="user-profile__stat"
-          data-testid="user-profile-rating"
-        >
-          <span class="user-profile__stat-count">{{ user.rating }} </span>
-          <span class="user-profile__stat-count-label">Rating</span>
-        </div>
-
-        <div
-          class="user-profile__stat"
-          data-testid="user-profile-followers-count"
-        >
-          <span class="user-profile__stat-count"
-            >{{ user.followersAmount }}
-          </span>
-          <span class="user-profile__stat-count-label">Followers</span>
-        </div>
-      </div>
+      <UserStats :user="user" />
     </div>
   </div>
 </template>
@@ -67,10 +45,12 @@
 import moment from 'moment';
 import api from '@/api/index';
 import BaseButton from '@common/BaseButton.vue';
+import UserStats from '@components/User/UserStats.vue';
 
 export default {
   components: {
     BaseButton,
+    UserStats,
   },
   filters: {
     toDate(date) {
@@ -222,32 +202,8 @@ export default {
     margin-bottom: 0.5rem;
   }
 
-  &__stats {
-    @include flex-row;
-
-    gap: 2rem;
-  }
-
   &__date {
     color: $light-gray;
-  }
-
-  &__stat-count {
-    font-size: 28px;
-  }
-
-  &__stat {
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
-
-    &--negative .user-profile__stat-count {
-      color: $dark-red;
-    }
-
-    &--positive .user-profile__stat-count {
-      color: $dark-firm;
-    }
   }
 }
 </style>

@@ -31,20 +31,9 @@
             </RouterLink>
           </div>
         </div>
-        <div class="current-user__logged-info">
-          <div class="current-user__logged-info-rating">
-            <div>Rating</div>
-            <div data-testid="user-rating">
-              {{ user.rating }}
-            </div>
-          </div>
-          <div class="current-user__logged-info-rating">
-            <div>Followers</div>
-            <div data-testid="user-followers-amount">
-              {{ user.followersAmount }}
-            </div>
-          </div>
-        </div>
+
+        <UserStats :user="user" class="current-user__stats" />
+
         <div class="current-user__logged-nav">
           <ul class="current-user__logged-nav-list">
             <RouterLink
@@ -83,6 +72,7 @@ import api from '@/api';
 import consts from '@/const/const';
 import SignInForm from '@components/User/SignInForm.vue';
 import SignUpForm from '@components/User/SignUpForm.vue';
+import UserStats from '@components/User/UserStats.vue';
 import IconAdd from '@icons/IconAdd.vue';
 import IconExit from '@icons/IconExit.vue';
 import IconSettings from '@icons/IconSettings.vue';
@@ -91,6 +81,7 @@ export default {
   components: {
     SignInForm,
     SignUpForm,
+    UserStats,
     IconAdd,
     IconExit,
     IconSettings,
@@ -179,18 +170,11 @@ export default {
     }
   }
 
-  &__logged-info {
-    display: flex;
+  &__stats {
     justify-content: center;
     flex-flow: row nowrap;
-    color: $main-text;
     padding: 1rem;
     border-bottom: 1px solid $light-gray;
-
-    div {
-      text-align: center;
-      margin-right: 0.5rem;
-    }
   }
 
   &__logged-nav {

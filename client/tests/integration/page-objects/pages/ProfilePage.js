@@ -10,8 +10,10 @@ export default class ProfilePage {
     this.page = page;
 
     this.login = page.getByTestId('user-profile-login');
-    this.rating = page.getByTestId('user-profile-rating');
-    this.followersCount = page.getByTestId('user-profile-followers-count');
+    this.rating = page.getByTestId('user-profile-rating').first();
+    this.followersCount = page
+      .getByTestId('user-profile-followers-count')
+      .first();
     this.bio = page.getByTestId('user-profile-bio');
     this.unfollowBtn = page.getByTestId('user-profile-unfollow-btn');
     this.followBtn = page.getByTestId('user-profile-follow-btn');
