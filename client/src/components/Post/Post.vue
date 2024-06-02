@@ -33,19 +33,20 @@
     </div>
 
     <div class="post__main">
-      <RouterLink
-        class="post__title"
-        tag="a"
-        :to="{
-          name: 'Single',
-          params: {
-            slug: postData.slug,
-          },
-        }"
-        :target="$isMobile() ? '' : '_blank'"
-        :data-testid="`post-${postData.id}-title`"
-      >
-        {{ postData.title }}
+      <div class="post__title">
+        <RouterLink
+          class="post__title-link"
+          :to="{
+            name: 'Single',
+            params: {
+              slug: postData.slug,
+            },
+          }"
+          :target="$isMobile() ? '' : '_blank'"
+          :data-testid="`post-${postData.id}-title`"
+        >
+          {{ postData.title }}
+        </RouterLink>
 
         <template v-if="canEdit">
           <RouterLink
@@ -54,11 +55,12 @@
           >
             <IconEdit data-testid="post-edit-icon" />
           </RouterLink>
+
           <span @click="deletePost(postData.id)">
             <IconDelete data-testid="post-delete-icon" />
           </span>
         </template>
-      </RouterLink>
+      </div>
 
       <div v-if="postData.tags.length > 0" class="post__tags">
         <div
@@ -437,9 +439,9 @@ export default {
   }
 
   &__title {
-    display: block;
-    color: $light-gray;
-    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 1rem;
     font-weight: 400;
     font-size: 20px;
@@ -448,7 +450,13 @@ export default {
       position: relative;
       top: 3px;
       fill: $light-gray;
+      cursor: pointer;
     }
+  }
+
+  &__title-link {
+    color: $light-gray;
+    text-decoration: none;
   }
 
   &__upvote,

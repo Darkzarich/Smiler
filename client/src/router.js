@@ -12,6 +12,7 @@ import store from '@/store/index';
 Vue.use(Router);
 
 const authGuard = async (to, from, next) => {
+  // TODO: Why check on each move if the user is logged in
   await store.dispatch('userGetAuthState');
 
   if (!store.getters.isUserAuth) {
