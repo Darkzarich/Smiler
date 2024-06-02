@@ -215,6 +215,7 @@ export default {
       flex-direction: row;
       align-items: center;
       border-bottom: 1px solid $light-gray;
+      line-height: 24px;
 
       &:last-child {
         border-bottom: none;

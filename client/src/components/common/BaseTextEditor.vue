@@ -1,6 +1,6 @@
 <template>
   <div class="text-editor-container">
-    <div class="text-editor-control" :data-testid="dataTestid">
+    <div class="text-editor-styles" :data-testid="dataTestid">
       <button type="button" title="bold" @click="styleSelected('b')">B</button>
       <button type="button" title="italic" @click="styleSelected('i')">
         I
@@ -188,21 +188,30 @@ export default {
 .text-editor-container {
   padding: 1rem;
   border: 1px solid $light-gray;
-  margin-top: 0.5rem;
+  width: 100%;
+
+  @include for-size(phone-only) {
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
-.text-editor-control {
-  padding: 1rem;
-
+.text-editor-styles {
   @include flex-row;
 
-  padding-top: 0;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  @include for-size(phone-only) {
+    margin-left: 1rem;
+  }
 
   button {
     font-family: monospace;
     background: $bg;
     border: 2px solid $firm;
-    margin-left: 0.5rem;
     border-radius: 3px;
     color: $main-text;
     outline: none;
@@ -216,20 +225,27 @@ export default {
 }
 
 .text-editor {
-  @include input;
   @include flex-row;
   @include scroll;
 
   color: $main-text;
-  margin-left: 1rem;
-  margin-right: 1.5rem;
-  height: 15rem;
-  overflow-y: scroll;
+  border: 1px solid $light-gray;
+  background: $bg;
+  border-radius: 2px;
+  min-height: 15rem;
+  height: 100%;
   cursor: text;
 
+  @include for-size(phone-only) {
+    min-height: 9rem;
+    border-left: none;
+    border-right: none;
+  }
+
   &__input {
-    width: 95%;
+    width: 100%;
     outline: $firm;
+    padding: 8px;
 
     br {
       margin-bottom: 1rem;

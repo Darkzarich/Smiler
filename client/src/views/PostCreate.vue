@@ -90,6 +90,8 @@ export default {
 
   @include for-size(phone-only) {
     border: none;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   &__header {

@@ -39,7 +39,7 @@
     />
 
     <span
-      v-if="wasChanged"
+      v-if="wasChanged && error"
       :data-testid="`${dataTestid}-error`"
       class="input__error"
     >
@@ -149,7 +149,6 @@ export default {
     background: $bg;
     padding: 0.5rem;
     margin-top: 0.5rem;
-    width: 95%;
     margin-bottom: 0.5rem;
     color: $main-text;
     border: 1px solid $light-gray;

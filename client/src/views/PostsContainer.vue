@@ -8,6 +8,7 @@
       <Post
         v-for="post in posts"
         :key="post.id"
+        class="posts-container__post"
         :post="post"
         :can-edit="$postCanEdit(post)"
       />
@@ -129,6 +130,7 @@ export default {
 <style lang="scss">
 @import '@/styles/mixins';
 @import '@/styles/colors';
+@import '@/styles/variables';
 
 .posts-container {
   &__loading,
@@ -141,6 +143,10 @@ export default {
       margin-left: 0% !important;
       border: none !important;
     }
+  }
+
+  &__post {
+    margin-bottom: $widget-margin;
   }
 
   &__loading {

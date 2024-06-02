@@ -58,6 +58,14 @@ export default {
   },
   methods: {
     async createComment() {
+      if (!this.commentBody) {
+        this.$store.dispatch('showErrorNotification', {
+          message: 'Comment cannot be empty. Enter some text first!',
+        });
+
+        return;
+      }
+
       this.loading = true;
 
       const res = await api.comments.createComment({
@@ -95,9 +103,7 @@ export default {
 @import '@/styles/mixins';
 
 .new-comment-form {
-  width: 85%;
   padding: 1rem;
-  margin-top: 0.5rem;
 
   @include for-size(phone-only) {
     width: 100%;
@@ -113,10 +119,12 @@ export default {
   &__title {
     color: $main-text;
     font-size: 1.2rem;
+    margin-bottom: 1rem;
+    text-align: center;
   }
 
   .text-editor {
-    height: 6rem;
+    min-height: 6rem;
   }
 }
 </style>

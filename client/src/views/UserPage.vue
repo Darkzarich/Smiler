@@ -9,7 +9,7 @@
     >
       <!-- TODO: Add instead PostsContainer -->
       <div v-for="post in posts" :key="post.id">
-        <Post :post="post" />
+        <Post class="post-container__post" :post="post" />
       </div>
       <div v-if="posts.length == 0" class="post-container__no-post">
         This author has not posted anything yet.
@@ -124,6 +124,7 @@ export default {
 <style lang="scss">
 @import '@/styles/mixins';
 @import '@/styles/colors';
+@import '@/styles/variables';
 
 .post-loading {
   @include widget;
@@ -133,6 +134,10 @@ export default {
 }
 
 .post-container {
+  &__post {
+    margin-bottom: $widget-margin;
+  }
+
   &__no-post,
   &__no-more {
     @include widget;

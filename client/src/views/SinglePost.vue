@@ -5,23 +5,6 @@
     </div>
 
     <div id="comments" ref="comments" class="comments">
-      <div
-        title="Refresh comments"
-        :class="commentsRefreshing ? 'comments__update--refreshing' : ''"
-        class="comments__update"
-        @click="refreshComments()"
-      >
-        <IconRefresh />
-        <template v-if="newCommentsCount > 0">
-          <span>+{{ newCommentsCount }}</span>
-        </template>
-      </div>
-
-      <div class="comments__count">
-        Commentaries (
-        <span class="comments__count-value"> {{ post.commentCount }} </span> )
-      </div>
-
       <NewCommentForm
         v-if="!commentsLoading"
         :post-id="post.id"
@@ -71,7 +54,6 @@ import consts from '@/const/const';
 import Comments from '@components/Comment/Comments.vue';
 import NewCommentForm from '@components/Comment/NewCommentForm.vue';
 import Post from '@components/Post/Post.vue';
-import IconRefresh from '@icons/IconRefresh.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 
 export default {
@@ -79,7 +61,6 @@ export default {
     Post,
     NewCommentForm,
     Comments,
-    IconRefresh,
     CircularLoader,
   },
   async beforeRouteEnter(to, from, next) {
@@ -99,11 +80,9 @@ export default {
       showPost: false,
       comments: [],
       commentsLoading: true,
-      commentsRefreshing: false,
-      newCommentsCount: 0,
+      moreCommentsLoading: false,
       curPage: 1,
       maxPages: 1,
-      moreCommentsLoading: false,
     };
   },
   computed: {
@@ -114,6 +93,7 @@ export default {
   methods: {
     async setPost(post) {
       this.post = post;
+      // TODO: Remove this logic
       this.showPost = true;
       window.document.title = `${this.post.title} | Smiler`;
 
@@ -121,6 +101,8 @@ export default {
 
       this.commentsLoading = true;
 
+      // TODO: Come up with a way to track new comments user didn't see yet
+      // e.g. save in store seen comments and then check if each comment is in there
       const res = await api.comments.getComments({
         limit: consts.COMMENTS_INITIAL_COUNT,
         post: post.id,
@@ -132,6 +114,7 @@ export default {
     },
     async loadMoreComments() {
       this.moreCommentsLoading = true;
+
       const res = await api.comments.getComments({
         limit: consts.COMMENTS_INITIAL_COUNT,
         post: this.post.id,
@@ -145,58 +128,6 @@ export default {
 
       this.moreCommentsLoading = false;
     },
-    async refreshComments() {
-      this.commentsRefreshing = true;
-
-      const res = await api.comments.getComments({
-        limit: consts.COMMENTS_INITIAL_COUNT,
-        post: this.post.id,
-      });
-
-      if (!res.data.error) {
-        this.recursiveCommentsCheck(null, res.data.comments);
-        this.commentsRefreshing = false;
-      }
-    },
-    recursiveCommentsCheck(oldCommentsArr, newCommentsArr) {
-      const oldComments = oldCommentsArr || this.comments;
-      // determine if newCommentsArr length is longer, if so, then in cycle there will be a
-      // situation when index return undefined and then that means it's a new comment
-      const maxLen =
-        (oldCommentsArr || this.comments).length > newCommentsArr.length
-          ? (oldCommentsArr || this.comments).length
-          : newCommentsArr.length;
-
-      for (let i = 0; i < maxLen; i = i + 1) {
-        if (oldComments[i]) {
-          if (oldComments[i].children.length > 0) {
-            // recursion
-            this.recursiveCommentsCheck(
-              oldComments[i].children,
-              newCommentsArr[i].children,
-            );
-          } else if (newCommentsArr[i].children.length > 0) {
-            // if oldComments children length is zero but newCommentsArr is not then that means
-            // oldComments got children so we just assign newCommentsArr children to oldComments'
-            this.newCommentsCount = this.newCommentsCount + 1;
-            this.post.commentCount = this.post.commentCount + 1;
-            oldComments[i].children = newCommentsArr[i].children;
-            // make every single child get styles of a new comment
-            for (let j = 0; j < oldComments[i].children.length; j = j + 1) {
-              oldComments[i].children[j].isRefreshNew = true;
-            }
-          }
-          // it's new comment
-        } else {
-          oldComments.push({
-            ...newCommentsArr[i],
-            isRefreshNew: true,
-          });
-          this.newCommentsCount = this.newCommentsCount + 1;
-          this.post.commentCount = this.post.commentCount + 1;
-        }
-      }
-    },
     handleNewComment(newComment) {
       this.post.commentCount = this.post.commentCount + 1;
       this.comments.unshift(newComment);
@@ -209,6 +140,10 @@ export default {
 @import '@/styles/colors';
 @import '@/styles/mixins';
 
+.post-container {
+  margin-bottom: 1.5rem;
+}
+
 .comments {
   border: 1px solid $light-gray;
   padding: 1rem;
@@ -216,59 +151,6 @@ export default {
 
   @include for-size(phone-only) {
     border: none;
-  }
-
-  &__update {
-    cursor: pointer;
-    background: $widget-bg;
-    padding: 0.3rem;
-    position: sticky;
-    top: 50%;
-    display: inline-block;
-    border-radius: 5px;
-    opacity: 0.5;
-    transition: opacity 0.1s ease-out;
-    width: 1rem;
-    height: 1rem;
-    border: 1px solid $light-gray;
-
-    &:hover {
-      opacity: 1;
-    }
-
-    svg {
-      fill: $light-gray;
-      width: 1rem;
-      height: 1rem;
-    }
-
-    &--refreshing svg {
-      animation: spin 0.5s linear infinite;
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-    }
-
-    span {
-      color: $firm;
-      position: absolute;
-    }
-  }
-
-  &__count {
-    color: $main-text;
-    margin-top: -2rem;
-  }
-
-  &__count-number {
-    font-weight: bold;
   }
 
   &__loading {

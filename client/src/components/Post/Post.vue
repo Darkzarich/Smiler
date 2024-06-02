@@ -419,7 +419,6 @@ export default {
 .post {
   display: flex;
   flex-flow: row nowrap;
-  margin-bottom: $widget-margin;
 
   &__left {
     width: 10%;

@@ -324,6 +324,7 @@ export default {
     align-items: center;
     margin-top: 1rem;
     cursor: move;
+    position: relative;
 
     &_moving {
       opacity: 0.4;
@@ -335,10 +336,6 @@ export default {
       .post-video-upload {
         border: 1px solid $firm;
       }
-    }
-
-    .text-editor-container {
-      width: 95%;
     }
 
     &-enter-active,
@@ -378,7 +375,8 @@ export default {
   }
 
   &__delete {
-    width: 0;
+    position: absolute;
+    right: -20px;
 
     @include for-size(phone-only) {
       width: 10px;

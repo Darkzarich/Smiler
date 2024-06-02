@@ -63,7 +63,7 @@ export default {
   @include flex-row;
 
   &__element {
-    width: 95%;
+    width: 100%;
     padding: 0.5rem;
     border: 2px solid $firm;
     border-radius: 2px;
