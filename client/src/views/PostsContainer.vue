@@ -1,6 +1,8 @@
 <template>
   <div data-testid="posts-container" class="posts-container">
-    <CircularLoader v-if="loading" class="posts-container__loading" />
+    <div v-if="loading" class="posts-container__loading">
+      <CircularLoader />
+    </div>
 
     <div v-else-if="posts.length > 0" v-scroll="handleScroll">
       <Post
