@@ -28,10 +28,10 @@
 </template>
 
 <script>
+import UserProfile from '@components/User/UserProfile.vue';
 import api from '@/api';
 import consts from '@/const/const';
 import Post from '@components/Post/Post.vue';
-import UserProfile from '@components/UserProfile/UserProfile.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 
 export default {

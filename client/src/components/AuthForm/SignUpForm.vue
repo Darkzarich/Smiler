@@ -1,12 +1,14 @@
 <template>
-  <div class="user-signup">
-    <div class="user-signup__header">Sign Up</div>
+  <div class="signup-form">
+    <div class="signup-form__header" data-testid="signup-form-form">
+      Sign Up
+    </div>
 
-    <div class="user-signup__form-input">
+    <div class="signup-form__input">
       <!-- TODO: Wrap everything in form and catch enter then enter-callback won't be needed -->
       <BaseInput
         v-model="email"
-        data-testid="user-signup-email"
+        data-testid="signup-form-email"
         label="Email"
         name="email"
         placeholder="Enter email"
@@ -15,10 +17,10 @@
       />
     </div>
 
-    <div class="user-signup__form-input">
+    <div class="signup-form__input">
       <BaseInput
         v-model="login"
-        data-testid="user-signup-login"
+        data-testid="signup-form-login"
         label="Login"
         name="login"
         placeholder="Enter login"
@@ -27,10 +29,10 @@
       />
     </div>
 
-    <div class="user-signup__form-input">
+    <div class="signup-form__input">
       <BaseInput
         v-model="password"
-        data-testid="user-signup-password"
+        data-testid="signup-form-password"
         label="Password"
         :type="'password'"
         :enter-callback="signUp"
@@ -40,10 +42,10 @@
       />
     </div>
 
-    <div class="user-signup__form-input">
+    <div class="signup-form__input">
       <BaseInput
         v-model="confirm"
-        data-testid="user-signup-confirm"
+        data-testid="signup-form-confirm"
         label="Confirm password"
         type="password"
         :enter-callback="signUp"
@@ -53,23 +55,15 @@
       />
     </div>
 
-    <div class="user-signup__submit">
+    <div class="signup-form__submit">
       <BaseButton
-        data-testid="user-signup-submit"
+        data-testid="signup-form-submit"
         :callback="signUp"
         :loading="loading"
         :disabled="isSubmitDisabled"
       >
         FINISH
       </BaseButton>
-    </div>
-
-    <div
-      data-testid="user-form-mode-toggler"
-      class="user-signup__mode-toggler"
-      @click="$emit('mode-change')"
-    >
-      OR SIGN IN
     </div>
   </div>
 </template>
@@ -192,16 +186,11 @@ export default {
 @import '@/styles/mixins';
 @import '@/styles/colors';
 
-.user-signup {
+.signup-form {
   @include flex-col;
 
   align-items: center;
   padding: 1rem;
-
-  &__form-input {
-    width: 100%;
-    margin-bottom: 12px;
-  }
 
   &__header {
     margin-bottom: 0.5rem;
@@ -209,16 +198,9 @@ export default {
     font-weight: bold;
   }
 
-  &__mode-toggler {
-    margin-top: 0.5rem;
-    border-bottom: 1px solid transparent;
-    color: $firm;
-    font-size: 0.8rem;
-    cursor: pointer;
-
-    &:hover {
-      border-bottom: 1px solid $firm;
-    }
+  &__input {
+    width: 100%;
+    margin-bottom: 12px;
   }
 
   &__submit {

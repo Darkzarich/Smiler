@@ -1,12 +1,13 @@
 <template>
-  <div class="user-signin">
-    <div class="user-signin__header" data-testid="user-signin-form">
+  <div class="signin-form">
+    <div class="signin-form__header" data-testid="signin-form-form">
       Sign In
     </div>
-    <div class="user-signin__form-input">
+
+    <div class="signin-form__input">
       <BaseInput
         v-model="email"
-        data-testid="user-signin-email"
+        data-testid="signin-form-email"
         label="Email"
         name="email"
         placeholder="Enter email"
@@ -14,10 +15,11 @@
         :error="validation.email"
       />
     </div>
-    <div class="user-signin__form-input">
+
+    <div class="signin-form__input">
       <BaseInput
         v-model="password"
-        data-testid="user-signin-password"
+        data-testid="signin-form-password"
         label="Password"
         type="password"
         name="password"
@@ -26,22 +28,16 @@
         placeholder="Enter password"
       />
     </div>
-    <div class="user-signin__submit">
+
+    <div class="signin-form__submit">
       <BaseButton
-        data-testid="user-signin-submit"
+        data-testid="signin-form-submit"
         :callback="signIn"
         :loading="loading"
         :disabled="isSubmitDisabled"
       >
         SIGN IN
       </BaseButton>
-    </div>
-    <div
-      data-testid="user-form-mode-toggler"
-      class="user-signin__mode-toggler"
-      @click="$emit('mode-change')"
-    >
-      OR SIGN UP
     </div>
   </div>
 </template>
@@ -128,16 +124,11 @@ export default {
 @import '@/styles/mixins';
 @import '@/styles/colors';
 
-.user-signin {
+.signin-form {
   @include flex-col;
 
   align-items: center;
   padding: 1rem;
-
-  &__form-input {
-    width: 100%;
-    margin-bottom: 12px;
-  }
 
   &__header {
     margin-bottom: 0.5rem;
@@ -145,18 +136,9 @@ export default {
     font-weight: bold;
   }
 
-  &__mode-toggler {
-    margin-top: 0.5rem;
-    border-bottom: 1px solid transparent;
-
-    // TODO: Remove !important, was made because of mobile
-    color: $firm !important;
-    font-size: 0.8rem;
-    cursor: pointer;
-
-    &:hover {
-      border-bottom: 1px solid $firm;
-    }
+  &__input {
+    width: 100%;
+    margin-bottom: 12px;
   }
 
   &__submit {
