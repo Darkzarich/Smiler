@@ -30,8 +30,6 @@ export default {
 .upload {
   @include flex-col;
 
-  padding: 1rem;
-
   &__input {
     padding: 1rem;
     border: 2px solid $light-gray;

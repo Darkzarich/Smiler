@@ -4,7 +4,7 @@
     :class="value ? 'post-image-upload_uploaded' : ''"
   >
     <div v-if="!value" class="post-image-upload__container">
-      <BaseUploadForm v-model="file" />
+      <BaseUploadForm v-model="file" class="post-image-upload__form" />
       <div class="post-image-upload__or">OR</div>
       <div class="post-image-upload__input-url">
         <BaseInput
@@ -135,7 +135,12 @@ export default {
     padding: 0;
   }
 
+  &__form {
+    margin-bottom: 12px;
+  }
+
   &__or {
+    margin-bottom: 12px;
     color: $firm;
     text-align: center;
     font-weight: bold;

@@ -95,11 +95,6 @@ body {
   margin-top: $header-height-interval;
   margin-right: auto;
   margin-left: auto;
-  padding-right: 10px;
-
-  @include for-size(phone-only) {
-    padding-right: 0;
-  }
 
   &__main {
     width: 70%;

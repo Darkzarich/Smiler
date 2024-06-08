@@ -56,6 +56,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import '@/styles/colors';
+
 .current-user-navigation {
   margin-left: 0;
   text-align: center;

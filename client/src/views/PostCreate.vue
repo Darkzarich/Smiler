@@ -95,6 +95,7 @@ export default {
   }
 
   &__header {
+    margin-bottom: 16px;
     color: $main-text;
     font-size: 1.5rem;
     align-self: center;

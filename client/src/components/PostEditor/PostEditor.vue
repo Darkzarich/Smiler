@@ -7,6 +7,7 @@
       :placeholder="'Title'"
       :error="validation.title"
     />
+
     <PostEditorTags v-model="tags" />
 
     <Draggable
@@ -312,6 +313,10 @@ export default {
       width: 25%;
       white-space: nowrap;
     }
+  }
+
+  &__title {
+    margin-bottom: 12px;
   }
 
   &__title input {

@@ -2,6 +2,7 @@
   <div class="user-settings">
     <div v-if="!loading" class="user-settings__data">
       <h1 class="user-settings__title">Settings</h1>
+
       <div class="user-settings__block">
         <h3 class="user-settings__block-title">Following</h3>
         <template v-if="isFollowingAnything">
@@ -47,6 +48,7 @@
             </div>
           </div>
         </template>
+
         <div
           v-else
           class="user-settings__following"
@@ -60,13 +62,14 @@
 
       <div class="user-settings__block">
         <h3 class="user-settings__block-title">Edit Bio</h3>
-        <BaseInput
+
+        <BaseTextarea
           v-model="bioEditInput"
           data-testid="user-settings-bio-input"
           class="user-settings__bio-edit"
-          :multiline="true"
           :error="bioTooLongError"
         />
+
         <div class="user-settings__submit">
           <BaseButton
             class="user-settings__submit-btn"
@@ -82,15 +85,18 @@
 
       <div class="user-settings__block">
         <h3 class="user-settings__block-title">Edit Avatar</h3>
+
         <div class="user-settings__current-avatar">
           <img :src="$resolveAvatar(avatarEditInput)" alt="current avatar" />
         </div>
+
         <BaseInput
           v-model.lazy.trim="avatarEditInput"
           class="user-settings__avatar-edit"
           data-testid="user-settings-avatar-input"
           placeholder="URL to avatar..."
         />
+
         <div class="user-settings__submit">
           <BaseButton
             class="user-settings__submit-btn"
@@ -104,6 +110,7 @@
         </div>
       </div>
     </div>
+
     <div v-else class="user-settings__loading">
       <CircularLoader />
     </div>
@@ -115,12 +122,14 @@ import api from '@/api';
 import consts from '@/const/const';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
+import BaseTextarea from '@common/BaseTextarea.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 
 export default {
   components: {
     CircularLoader,
     BaseInput,
+    BaseTextarea,
     BaseButton,
   },
   data() {
@@ -308,12 +317,7 @@ export default {
   &__current-avatar {
     width: 8rem;
     height: 8rem;
-    margin-bottom: 0.5rem;
-    margin-left: 1rem;
-
-    @include for-size(phone-only) {
-      margin-left: 0;
-    }
+    margin-bottom: 12px;
 
     img {
       width: 128px;

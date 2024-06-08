@@ -1,30 +1,27 @@
 <template>
-  <div class="base-input" :class="error && isDirty ? 'base-input--error' : ''">
-    <label v-if="label" class="base-input__label" :for="id">
+  <div
+    class="base-textarea"
+    :class="error && isDirty ? 'base-textarea--error' : ''"
+  >
+    <label v-if="label" class="base-textarea__label" :for="id">
       {{ label }}
     </label>
 
-    <input
+    <textarea
       :id="id"
       :data-testid="dataTestid"
       :disabled="disabled"
-      :type="type"
       :name="name"
       :value="value"
       :placeholder="placeholder"
-      class="base-input__input"
-      @keyup.enter="$emit('keyup:enter')"
+      class="base-textarea__textarea"
       @input="setValue($event.target.value)"
     />
-
-    <div v-if="icon" class="base-input__icon" @click="$emit('click-icon')">
-      <Component :is="icon" />
-    </div>
 
     <span
       v-if="isDirty && error"
       :data-testid="`${dataTestid}-error`"
-      class="base-input__error"
+      class="base-textarea__error"
     >
       {{ error }}
     </span>
@@ -32,12 +29,7 @@
 </template>
 
 <script>
-import IconSearch from '@icons/IconSearch.vue';
-
 export default {
-  components: {
-    IconSearch,
-  },
   props: {
     id: {
       type: String,
@@ -59,13 +51,6 @@ export default {
       type: String,
       default: '',
     },
-    type: {
-      type: String,
-      default: 'text',
-      validator(val) {
-        return ['text', 'password'].indexOf(val) !== -1;
-      },
-    },
     name: {
       type: String,
       default: '',
@@ -78,9 +63,9 @@ export default {
       type: String,
       default: '',
     },
-    icon: {
-      type: String,
-      default: '',
+    enterCallback: {
+      type: Function,
+      default: () => {},
     },
   },
   data() {
@@ -101,10 +86,8 @@ export default {
 @import '@/styles/colors';
 @import '@/styles/mixins';
 
-.base-input {
+.base-textarea {
   @include flex-col;
-
-  position: relative;
 
   &__label {
     margin-bottom: 4px;
@@ -112,7 +95,7 @@ export default {
     font-size: 13px;
   }
 
-  &__input {
+  &__textarea {
     padding: 0.5rem;
     border: 1px solid $light-gray;
     border-radius: 2px;
@@ -126,12 +109,12 @@ export default {
   }
 
   &--error {
-    .base-input {
+    .base-textarea {
       &__label {
         color: $error;
       }
 
-      &__input {
+      &__textarea {
         border: 1px solid $error;
 
         &:focus {
@@ -145,19 +128,6 @@ export default {
     margin-top: 6px;
     color: $error;
     font-size: 12px;
-  }
-
-  &__icon {
-    display: flex;
-    align-items: center;
-    position: absolute;
-    top: 6px;
-    right: 7px;
-
-    svg {
-      fill: $light-gray;
-      cursor: pointer;
-    }
   }
 }
 </style>

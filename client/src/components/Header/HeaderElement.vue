@@ -32,13 +32,13 @@
       <!-- TODO: Move to Search component -->
       <div v-if="$route.name !== 'Search'" class="header__search">
         <BaseInput
-          v-model.trim="title"
-          :placeholder="'Search'"
+          v-model.trim="searchInputValue"
+          placeholder="Search"
           data-testid="header-search-input"
           icon="IconSearch"
           :style="'flex-direction: row'"
-          :enter-callback="search"
-          :icon-click-callback="search"
+          @keyup:enter="search"
+          @click-icon="search"
         />
       </div>
 
@@ -80,8 +80,7 @@ export default {
   data() {
     return {
       isMobileMenuOpen: false,
-      // for search
-      title: '',
+      searchInputValue: '',
     };
   },
   computed: {
@@ -99,13 +98,15 @@ export default {
   },
   methods: {
     search() {
-      if (this.title.length > 0) {
+      if (this.searchInputValue.length > 0) {
         this.$router.push({
           name: 'Search',
           query: {
-            title: this.title,
+            title: this.searchInputValue,
           },
         });
+
+        this.searchInputValue = '';
       }
     },
     toggleMobileMenu() {

@@ -1,6 +1,10 @@
 <template>
   <div class="post-editor-tags">
-    <div class="post-editor-tags__list" data-testid="post-tags-list">
+    <div
+      v-if="tags.length"
+      class="post-editor-tags__list"
+      data-testid="post-tags-list"
+    >
       <div v-for="tag in tags" :key="tag" class="post-editor-tags__item">
         {{ tag }}
         <button
@@ -19,8 +23,8 @@
         v-model="tagInput"
         data-testid="post-tag-input"
         placeholder="Input up to 8 tags"
-        :enter-callback="addTag"
         :error="validation"
+        @keyup:enter="addTag"
       />
 
       <!-- TODO: Think of a component for this -->
@@ -100,7 +104,8 @@ export default {
   @include flex-row;
 
   flex-wrap: wrap;
-  margin-bottom: 0.5rem;
+  align-items: center;
+  gap: 8px;
 
   &__list {
     display: flex;

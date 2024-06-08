@@ -12,8 +12,8 @@
         label="Email"
         name="email"
         placeholder="Enter email"
-        :enter-callback="signUp"
         :error="validation.email"
+        @keyup:enter="signUp"
       />
     </div>
 
@@ -24,8 +24,8 @@
         label="Login"
         name="login"
         placeholder="Enter login"
-        :enter-callback="signUp"
         :error="validation.login"
+        @keyup:enter="signUp"
       />
     </div>
 
@@ -35,10 +35,10 @@
         data-testid="signup-form-password"
         label="Password"
         :type="'password'"
-        :enter-callback="signUp"
         name="password"
         :error="validation.password"
         placeholder="Enter password"
+        @keyup:enter="signUp"
       />
     </div>
 
@@ -48,10 +48,10 @@
         data-testid="signup-form-confirm"
         label="Confirm password"
         type="password"
-        :enter-callback="signUp"
         name="confirm"
         :error="validation.confirm"
         placeholder="Enter password again"
+        @keyup:enter="signUp"
       />
     </div>
 
@@ -200,7 +200,7 @@ export default {
 
   &__input {
     width: 100%;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
   }
 
   &__submit {

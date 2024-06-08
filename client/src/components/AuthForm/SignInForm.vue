@@ -11,8 +11,8 @@
         label="Email"
         name="email"
         placeholder="Enter email"
-        :enter-callback="signIn"
         :error="validation.email"
+        @keyup:enter="signIn"
       />
     </div>
 
@@ -23,9 +23,9 @@
         label="Password"
         type="password"
         name="password"
-        :enter-callback="signIn"
         :error="validation.password"
         placeholder="Enter password"
+        @keyup:enter="signIn"
       />
     </div>
 
@@ -138,7 +138,7 @@ export default {
 
   &__input {
     width: 100%;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
   }
 
   &__submit {

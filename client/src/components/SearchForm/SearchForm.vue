@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div class="search-form">
     <div class="search-form__string">
       <BaseInput
         v-model="filters.title"
         placeholder="Title"
         data-testid="search-form-input"
-        :enter-callback="search"
+        @keyup:enter="search"
       />
     </div>
     <div class="search-form__extra">
@@ -104,6 +104,10 @@ export default {
 @import '@/styles/mixins';
 
 .search-form {
+  &__string {
+    margin-bottom: 12px;
+  }
+
   &__extra {
     @include flex-row;
 
