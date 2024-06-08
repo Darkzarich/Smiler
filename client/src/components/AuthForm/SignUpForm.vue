@@ -190,7 +190,6 @@ export default {
   @include flex-col;
 
   align-items: center;
-  padding: 1rem;
 
   &__header {
     margin-bottom: 0.5rem;

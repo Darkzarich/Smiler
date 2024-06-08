@@ -8,7 +8,7 @@
       class="auth-form-switcher__mode-toggler"
       @click="toggleMode()"
     >
-      {{ isSignIn ? 'OR SIGN UP' : 'OR SIGN IN' }}
+      {{ isSignIn ? 'SIGN UP' : 'SIGN IN' }}
     </div>
   </div>
 </template>
@@ -39,8 +39,12 @@ export default {
 @import '@/styles/colors';
 
 .auth-form-switcher {
+  padding: 16px;
+
   &__mode-toggler {
-    margin-top: 0.5rem;
+    width: fit-content;
+    margin: 0 auto;
+    margin-top: 12px;
     border-bottom: 1px solid transparent;
     color: $firm;
     font-size: 0.8rem;
