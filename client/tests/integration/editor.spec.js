@@ -318,7 +318,7 @@ test.describe('Tags', () => {
     }
 
     for (const tag of tags) {
-      await expect(PostCreatePage.postTagList).toContainText(tag);
+      await expect(PostCreatePage.getTagsList()).toContainText(tag);
     }
   });
 
@@ -331,8 +331,9 @@ test.describe('Tags', () => {
 
     for (const tag of tags) {
       await PostCreatePage.removeTag(tag);
-      await expect(PostCreatePage.postTagList).not.toContainText(tag);
     }
+
+    await expect(PostCreatePage.getTagsList()).toBeHidden();
   });
 
   test('Can add not more than 8 tags', async ({ PostCreatePage }) => {

@@ -1,8 +1,6 @@
 <template>
   <div class="signin-form">
-    <div class="signin-form__header" data-testid="signin-form-form">
-      Sign In
-    </div>
+    <div class="signin-form__header" data-testid="signin-form">Sign In</div>
 
     <div class="signin-form__input">
       <BaseInput

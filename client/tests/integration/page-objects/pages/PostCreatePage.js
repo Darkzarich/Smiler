@@ -15,11 +15,14 @@ export default class PostCreatePage {
 
     this.postTitleInput = page.getByTestId('post-title-input');
     this.postTagInput = page.getByTestId('post-tag-input');
-    this.postTagList = page.getByTestId('post-tags-list');
   }
 
   async goto() {
     await this.page.goto(this.url);
+  }
+
+  getTagsList() {
+    return this.page.getByTestId('post-tags-list');
   }
 
   getImageUploadBtn() {

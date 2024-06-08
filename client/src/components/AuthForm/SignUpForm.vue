@@ -1,8 +1,6 @@
 <template>
   <div class="signup-form">
-    <div class="signup-form__header" data-testid="signup-form-form">
-      Sign Up
-    </div>
+    <div class="signup-form__header" data-testid="signup-form">Sign Up</div>
 
     <div class="signup-form__input">
       <!-- TODO: Wrap everything in form and catch enter then enter-callback won't be needed -->
