@@ -3,7 +3,7 @@
     <AuthFormSwitcher v-if="!isUserAuth" />
 
     <template v-else>
-      <div class="current-user__data">
+      <div class="current-user__main">
         <div class="current-user__avatar-container">
           <RouterLink
             class="current-user__profile-link"
@@ -65,21 +65,16 @@ export default {
 
   padding: 0;
 
-  &__data {
-    @include flex-row;
-
-    justify-content: center;
-    border-bottom: 1px solid $light-gray;
-    background: $bg;
-  }
-
   &__avatar-container {
     display: flex;
     flex-flow: column nowrap;
     justify-content: center;
     align-items: center;
-    width: 50%;
+    width: 100%;
+    margin: 0 auto;
     padding: 1rem;
+    border-bottom: 1px solid #6b6e70;
+    background: $bg;
     user-select: none;
 
     @include for-size(phone-only) {
