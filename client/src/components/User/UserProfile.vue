@@ -8,20 +8,17 @@
       <div class="user-profile__login" data-testid="user-profile-login">
         {{ user.login }}
 
-        <template v-if="isUserAuth && !isSameUser">
-          <BaseButton
-            class="user-profile__follow-btn"
-            :data-testid="
-              isFollowed
-                ? 'user-profile-unfollow-btn'
-                : 'user-profile-follow-btn'
-            "
-            :loading="requesting"
-            :callback="handleFollow"
-          >
-            {{ isFollowed ? 'Unfollow' : 'Follow' }}
-          </BaseButton>
-        </template>
+        <BaseButton
+          v-if="isUserAuth && !isSameUser"
+          class="user-profile__follow-btn"
+          :data-testid="
+            isFollowed ? 'user-profile-unfollow-btn' : 'user-profile-follow-btn'
+          "
+          :loading="requesting"
+          :callback="handleFollow"
+        >
+          {{ isFollowed ? 'Unfollow' : 'Follow' }}
+        </BaseButton>
       </div>
 
       <div class="user-profile__date">
@@ -176,18 +173,15 @@ export default {
   &__login {
     @include flex-row;
 
+    align-items: center;
     font-size: 1.5rem;
   }
 
+  // TODO Make red button for unfollow, make it as BaseButton type
   &__follow-btn {
-    margin: 0;
+    width: 100px;
     margin-left: 1rem;
     font-size: 13px;
-
-    .button__element {
-      width: 75px;
-      padding: 4px 6px;
-    }
   }
 
   &__login,

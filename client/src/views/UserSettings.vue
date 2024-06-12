@@ -70,17 +70,15 @@
           :error="bioTooLongError"
         />
 
-        <div class="user-settings__submit">
-          <BaseButton
-            class="user-settings__submit-btn"
-            data-testid="user-settings-bio-submit"
-            :loading="bioEditRequesting"
-            :callback="editBio"
-            :disabled="Boolean(bioTooLongError)"
-          >
-            Submit
-          </BaseButton>
-        </div>
+        <BaseButton
+          class="user-settings__submit-btn"
+          data-testid="user-settings-bio-submit"
+          :loading="bioEditRequesting"
+          :callback="editBio"
+          :disabled="Boolean(bioTooLongError)"
+        >
+          Save
+        </BaseButton>
       </div>
 
       <div class="user-settings__block">
@@ -97,17 +95,15 @@
           placeholder="URL to avatar..."
         />
 
-        <div class="user-settings__submit">
-          <BaseButton
-            class="user-settings__submit-btn"
-            data-testid="user-settings-avatar-submit"
-            :loading="avatarEditRequesting"
-            :callback="editAvatar"
-            :disabled="avatarEditInput.length > USER_MAX_AVATAR_LENGTH"
-          >
-            Submit
-          </BaseButton>
-        </div>
+        <BaseButton
+          class="user-settings__submit-btn"
+          data-testid="user-settings-avatar-submit"
+          :loading="avatarEditRequesting"
+          :callback="editAvatar"
+          :disabled="avatarEditInput.length > USER_MAX_AVATAR_LENGTH"
+        >
+          Save
+        </BaseButton>
       </div>
     </div>
 
@@ -267,7 +263,7 @@ export default {
   }
 
   &__title {
-    margin: 0;
+    margin-bottom: 12px;
     color: $main-text;
     text-align: center;
     font-size: 1.5rem;
@@ -275,7 +271,7 @@ export default {
   }
 
   &__block {
-    padding: 1rem 0;
+    padding: 16px 0;
     border-bottom: 1px solid $light-gray;
 
     &:last-child {
@@ -284,9 +280,10 @@ export default {
   }
 
   &__block-title {
-    margin: 1rem 0;
+    margin-bottom: 16px;
     color: $main-text;
     text-align: center;
+    font-weight: 400;
   }
 
   &__bio-edit {
@@ -326,12 +323,9 @@ export default {
     }
   }
 
-  &__submit {
-    @include flex-row;
-  }
-
   &__submit-btn {
-    width: 100px;
+    width: 140px;
+    margin-top: 16px;
   }
 
   &__no-subscriptions {

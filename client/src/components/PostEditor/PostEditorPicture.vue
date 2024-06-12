@@ -14,7 +14,9 @@
           data-testid="image-url-input"
         />
         <BaseButton
+          class="post-image-upload__upload-btn"
           data-testid="image-upload-button"
+          stretched
           :callback="upload"
           :loading="uploading"
           :disabled="!imageUrl"
@@ -144,6 +146,10 @@ export default {
     color: $firm;
     text-align: center;
     font-weight: bold;
+  }
+
+  &__upload-btn {
+    margin-top: 20px;
   }
 
   &__image {

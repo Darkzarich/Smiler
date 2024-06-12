@@ -103,6 +103,7 @@
                 >
                   <div class="comments__item-main-answer-buttons">
                     <BaseButton
+                      class="comments__form-btn"
                       :loading="editSending"
                       :callback="edit"
                       :argument="comment.id"
@@ -111,6 +112,7 @@
                       Send
                     </BaseButton>
                     <BaseButton
+                      class="comments__form-btn"
                       :callback="toggleEdit"
                       data-testid="comment-edit-close-btn"
                     >
@@ -129,6 +131,7 @@
                 <BaseTextEditor v-model="replyBody" data-testid="comment-reply">
                   <div class="comments__item-main-answer-buttons">
                     <BaseButton
+                      class="comments__form-btn"
                       :loading="replySending"
                       :callback="reply"
                       :argument="comment.id"
@@ -137,6 +140,7 @@
                       Send
                     </BaseButton>
                     <BaseButton
+                      class="comments__form-btn"
                       :callback="toggleReply"
                       data-testid="comment-reply-close-btn"
                     >
@@ -145,9 +149,9 @@
                   </div>
                 </BaseTextEditor>
               </div>
-              <template v-else>
+              <template v-else-if="level < COMMENTS_NESTED_LIMIT">
                 <div
-                  v-if="level < COMMENTS_NESTED_LIMIT && isUserAuth"
+                  v-if="isUserAuth"
                   class="comments__item-main-answer-toggler"
                   :data-testid="`comment-${comment.id}-toggle-reply`"
                   @click="toggleReply(comment.id)"
@@ -155,9 +159,9 @@
                   Reply
                 </div>
                 <div
-                  v-else-if="level < COMMENTS_NESTED_LIMIT"
+                  v-else
                   class="comments__item-main-answer-toggler comments__item-main-answer-toggler_disabled"
-                  title="Please, Log in to be able to answer"
+                  title="Sign up to be able to leave a reply"
                 >
                   Reply
                 </div>
@@ -453,6 +457,10 @@ export default {
     }
   }
 
+  &__form-btn {
+    width: 140px;
+  }
+
   &__item {
     &-main {
       border-left: solid 1px $light-gray;
@@ -596,9 +604,10 @@ export default {
         }
 
         &-buttons {
-          margin-bottom: -1rem;
-
           @include flex-row;
+
+          gap: 16px;
+          margin-top: 20px;
 
           .button {
             width: 100%;

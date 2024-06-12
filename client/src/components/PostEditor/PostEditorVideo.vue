@@ -8,6 +8,8 @@
           data-testid="video-url-input"
         />
         <BaseButton
+          class="post-video-upload__upload-btn"
+          stretched
           data-testid="video-upload-button"
           :callback="upload"
           :loading="uploading"
@@ -94,10 +96,8 @@ export default {
   padding: 1rem;
   border: 1px solid $light-gray;
 
-  &__or {
-    color: $firm;
-    text-align: center;
-    font-weight: bold;
+  &__upload-btn {
+    margin-top: 20px;
   }
 
   &__video {

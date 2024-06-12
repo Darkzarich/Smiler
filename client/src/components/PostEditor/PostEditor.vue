@@ -106,6 +106,7 @@
     <div class="post-editor__submit">
       <template v-if="edit">
         <BaseButton
+          class="post-editor__submit-btn"
           data-testid="finish-edit-post-button"
           :loading="saving"
           :disabled="!sections.length"
@@ -116,6 +117,8 @@
       </template>
       <template v-else>
         <BaseButton
+          class="post-editor__submit-btn"
+          stretched
           data-testid="create-post-button"
           :loading="sending"
           :callback="createPost"
@@ -124,6 +127,8 @@
           Create Post
         </BaseButton>
         <BaseButton
+          stretched
+          class="post-editor__submit-btn"
           data-testid="save-draft-button"
           :loading="saving"
           :disabled="!sections.length"
@@ -256,6 +261,7 @@ export default {
         });
       }
     },
+    // TODO: Fix cannot save empty draft
     async saveDraft() {
       this.saving = true;
 
@@ -308,6 +314,7 @@ export default {
   &__submit {
     display: flex;
     justify-content: space-around;
+    gap: 16px;
 
     .button {
       width: 25%;

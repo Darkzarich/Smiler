@@ -1,8 +1,8 @@
 <template>
   <div v-if="show" class="post-create">
-    <div class="post-create__header" data-testid="post-create-header">
-      {{ edit ? 'Edit' : 'Create' }} Post
-    </div>
+    <h1 class="post-create__header" data-testid="post-create-header">
+      {{ edit ? 'Edit' : 'Make' }} Post
+    </h1>
     <PostEditor :key="key" :edit="edit" :post="post" />
   </div>
 </template>
@@ -99,6 +99,7 @@ export default {
     color: $main-text;
     font-size: 1.5rem;
     align-self: center;
+    font-weight: 500;
   }
 }
 </style>

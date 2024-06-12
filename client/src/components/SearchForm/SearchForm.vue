@@ -1,5 +1,7 @@
 <template>
   <div class="search-form">
+    <h1 class="search-form__title">Search</h1>
+
     <div class="search-form__string">
       <BaseInput
         v-model="filters.title"
@@ -38,10 +40,10 @@
       <PostEditorTags v-model="filters.tags" data-testid="search-form-tags" />
     </div>
     <div class="search-form__submit">
-      <BaseButton data-testid="search-form-submit" :callback="search">
+      <BaseButton data-testid="search-form-submit" stretched :callback="search">
         Submit
       </BaseButton>
-      <BaseButton data-testid="search-form-clear" :callback="clear">
+      <BaseButton data-testid="search-form-clear" stretched :callback="clear">
         Clear filters
       </BaseButton>
     </div>
@@ -104,6 +106,14 @@ export default {
 @import '@/styles/mixins';
 
 .search-form {
+  &__title {
+    margin-bottom: 12px;
+    color: $main-text;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+
   &__string {
     margin-bottom: 12px;
   }
@@ -122,6 +132,9 @@ export default {
 
   &__submit {
     @include flex-row;
+
+    gap: 16px;
+    margin-top: 24px;
 
     .button {
       width: 50%;

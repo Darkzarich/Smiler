@@ -10,15 +10,14 @@
         v-model="commentBody"
         data-testid="new-comment-form-editor"
       >
-        <div class="comments__form-submit">
-          <BaseButton
-            :loading="loading"
-            :callback="createComment"
-            data-testid="new-comment-button"
-          >
-            Send
-          </BaseButton>
-        </div>
+        <BaseButton
+          class="new-comment-form__submit-btn"
+          :loading="loading"
+          :callback="createComment"
+          data-testid="new-comment-button"
+        >
+          Send
+        </BaseButton>
       </BaseTextEditor>
     </template>
     <template v-else>
@@ -125,6 +124,11 @@ export default {
 
   .text-editor {
     min-height: 6rem;
+  }
+
+  &__submit-btn {
+    width: 140px;
+    margin-top: 20px;
   }
 }
 </style>

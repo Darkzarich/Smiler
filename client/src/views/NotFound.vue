@@ -1,10 +1,12 @@
 <template>
   <div class="not-found">
     <div class="not-found__404">404</div>
-    <div class="not-found__info">Not found</div>
-    <div class="not-found__button-container">
-      <BaseButton :callback="goBack"> Go back </BaseButton>
-    </div>
+
+    <div class="not-found__info">Not existing page</div>
+
+    <BaseButton class="not-found__go-home-btn" :callback="goHome">
+      Go home
+    </BaseButton>
   </div>
 </template>
 
@@ -16,8 +18,10 @@ export default {
     BaseButton,
   },
   methods: {
-    goBack() {
-      this.$router.go(-2);
+    goHome() {
+      this.$router.push({
+        name: 'Home',
+      });
     },
   },
 };
@@ -34,20 +38,23 @@ export default {
   align-items: center;
 
   &__404 {
-    margin-bottom: 1rem;
     color: $main-text;
-    font-size: 4rem;
+    font-size: 48px;
     font-weight: bold;
   }
 
   &__info {
     margin-bottom: 1rem;
     color: $main-text;
-    font-size: 3rem;
+    font-size: 48px;
+
+    @include for-size(phone-only) {
+      font-size: 32px;
+    }
   }
 
-  &__button-container {
-    width: 50%;
+  &__go-home-btn {
+    width: 180px;
   }
 }
 </style>

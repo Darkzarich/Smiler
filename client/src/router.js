@@ -177,7 +177,7 @@ const router = new Router({
         authGuard(to, from, next);
       },
       meta: {
-        title: 'Create New Post',
+        title: 'Make New Post',
       },
     },
     {

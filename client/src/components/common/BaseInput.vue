@@ -104,6 +104,8 @@ export default {
 .base-input {
   @include flex-col;
 
+  // TODO: Width 100%?
+
   position: relative;
 
   &__label {

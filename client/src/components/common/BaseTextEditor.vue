@@ -33,6 +33,7 @@
         v-html="value"
       />
     </div>
+    <!-- TODO: Add button name for this slot it's not obvious when its "default" -->
     <slot />
   </div>
 </template>

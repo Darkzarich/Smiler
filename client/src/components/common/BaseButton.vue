@@ -1,22 +1,21 @@
 <template>
-  <!-- TODO: refactor: make <button> root element 
-    then I won't need :callback prop -->
-  <div class="button" :class="loading ? 'button_loading' : ''">
-    <button
-      :data-testid="dataTestid"
-      type="button"
-      class="button__element"
-      :disabled="disabled"
-      @click="callback(argument)"
-    >
-      <span class="button__element-content">
-        <slot />
-      </span>
-      <div v-if="loading" class="button__element-loader">
-        <CircularLoader />
-      </div>
-    </button>
-  </div>
+  <button
+    :data-testid="dataTestid"
+    type="button"
+    class="base-button"
+    :class="{
+      'base-button--stretched': stretched,
+      'base-button--loading': loading,
+    }"
+    :disabled="disabled"
+    @click="callback(argument)"
+  >
+    <template v-if="!loading">
+      <slot />
+    </template>
+
+    <CircularLoader v-else class="base-button__loader" />
+  </button>
 </template>
 
 <script>
@@ -47,6 +46,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    stretched: {
+      type: Boolean,
+      default: false,
+    },
   },
 };
 </script>
@@ -55,60 +58,43 @@ export default {
 @import '@/styles/colors';
 @import '@/styles/mixins';
 
-.button {
+.base-button {
+  display: flex;
   justify-content: center;
+  padding: 8px;
+  outline: none;
+  border: 2px solid $firm;
+  border-radius: 2px;
+  background: $bg;
+  color: $firm;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
 
-  // TODO: basic components must not have this style
-  margin: 1rem;
-
-  @include flex-row;
-
-  &__element {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    padding: 0.5rem;
-    outline: none;
-    border: 2px solid $firm;
-    border-radius: 2px;
-    background: $bg;
-    color: $firm;
-    font-weight: bold;
-    cursor: pointer;
-
-    &:hover {
-      background: $widget-bg;
-    }
-
-    &[disabled] {
-      border: 2px solid $light-gray;
-      color: $light-gray;
-      pointer-events: none;
-    }
+  &:hover {
+    background: $widget-bg;
   }
 
-  &__element-loader {
-    position: absolute;
-
-    svg {
-      width: 1rem;
-      height: 1rem;
-    }
-  }
-
-  &_loading {
+  &[disabled] {
+    border: 2px solid $light-gray;
+    color: $light-gray;
     pointer-events: none;
+  }
 
-    .button {
-      &__element {
-        border: 2px solid rgba($firm, 0.5);
-      }
+  &--loading {
+    opacity: 0.5;
+    border: 2px solid rgba($firm, 0.5);
+    pointer-events: none;
+    user-select: none;
+  }
 
-      &__element-content {
-        opacity: 0.5;
-        user-select: none;
-      }
-    }
+  &--stretched {
+    width: 100%;
+  }
+
+  &__loader {
+    width: 15px;
+    height: 15px;
   }
 }
 </style>

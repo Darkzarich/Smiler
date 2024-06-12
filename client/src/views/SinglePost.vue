@@ -160,6 +160,8 @@ export default {
 
   &__no-comments {
     margin-top: 0.5rem;
+
+    // TODO: Set this text for <body> and remove everywhere else
     color: $main-text;
     text-align: center;
     font-size: 1.2rem;

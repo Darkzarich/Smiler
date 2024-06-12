@@ -43,11 +43,10 @@ export default {
 
   &__mode-toggler {
     width: fit-content;
-    margin: 0 auto;
-    margin-top: 12px;
+    margin: 16px auto 0;
     border-bottom: 1px solid transparent;
     color: $firm;
-    font-size: 0.8rem;
+    font-size: 13px;
     cursor: pointer;
 
     &:hover {

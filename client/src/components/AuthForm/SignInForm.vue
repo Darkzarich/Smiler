@@ -27,16 +27,16 @@
       />
     </div>
 
-    <div class="signin-form__submit">
-      <BaseButton
-        data-testid="signin-form-submit"
-        :callback="signIn"
-        :loading="loading"
-        :disabled="isSubmitDisabled"
-      >
-        SIGN IN
-      </BaseButton>
-    </div>
+    <BaseButton
+      class="signin-form__submit"
+      stretched
+      data-testid="signin-form-submit"
+      :callback="signIn"
+      :loading="loading"
+      :disabled="isSubmitDisabled"
+    >
+      SIGN IN
+    </BaseButton>
   </div>
 </template>
 
@@ -135,11 +135,11 @@ export default {
 
   &__input {
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
 
   &__submit {
-    width: 100%;
+    margin-top: 8px;
   }
 }
 </style>
