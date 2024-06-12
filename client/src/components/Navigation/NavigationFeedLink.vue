@@ -1,6 +1,6 @@
 <template>
   <NavigationLink
-    :title="isUserAuth ? '' : 'Log in to access this page'"
+    :title="isUserAuth ? '' : 'Sign in to access this page'"
     :to="{ name: 'Feed' }"
     data-testid="feed-link"
     :disabled="!isUserAuth"

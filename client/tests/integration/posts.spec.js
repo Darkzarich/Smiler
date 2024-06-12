@@ -239,7 +239,7 @@ test.describe('Post groups', () => {
     }) => {
       await expect(PostsPage.getFeedLink()).toHaveAttribute(
         'title',
-        'Log in to access this page',
+        'Sign in to access this page',
       );
     });
   });
