@@ -13,8 +13,8 @@
         <BaseButton
           class="new-comment-form__submit-btn"
           :loading="loading"
-          :callback="createComment"
           data-testid="new-comment-button"
+          @click.native="createComment"
         >
           Send
         </BaseButton>

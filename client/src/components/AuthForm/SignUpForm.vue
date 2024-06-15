@@ -57,9 +57,9 @@
       class="signup-form__submit"
       stretched
       data-testid="signup-form-submit"
-      :callback="signUp"
       :loading="loading"
       :disabled="isSubmitDisabled"
+      @click.native="signUp"
     >
       FINISH
     </BaseButton>

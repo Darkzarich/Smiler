@@ -74,8 +74,8 @@
           class="user-settings__submit-btn"
           data-testid="user-settings-bio-submit"
           :loading="bioEditRequesting"
-          :callback="editBio"
           :disabled="Boolean(bioTooLongError)"
+          @click.native="editBio"
         >
           Save
         </BaseButton>
@@ -99,8 +99,8 @@
           class="user-settings__submit-btn"
           data-testid="user-settings-avatar-submit"
           :loading="avatarEditRequesting"
-          :callback="editAvatar"
           :disabled="avatarEditInput.length > USER_MAX_AVATAR_LENGTH"
+          @click.native="editAvatar"
         >
           Save
         </BaseButton>

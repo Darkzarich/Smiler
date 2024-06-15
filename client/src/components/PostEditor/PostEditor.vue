@@ -110,7 +110,7 @@
           data-testid="finish-edit-post-button"
           :loading="saving"
           :disabled="!sections.length"
-          :callback="saveEdited"
+          @click.native="saveEdited"
         >
           Save Edited
         </BaseButton>
@@ -121,8 +121,8 @@
           stretched
           data-testid="create-post-button"
           :loading="sending"
-          :callback="createPost"
           :disabled="isSubmitDisabled"
+          @click.native="createPost"
         >
           Create Post
         </BaseButton>
@@ -132,7 +132,7 @@
           data-testid="save-draft-button"
           :loading="saving"
           :disabled="!sections.length"
-          :callback="saveDraft"
+          @click.native="saveDraft"
         >
           Save Draft
         </BaseButton>

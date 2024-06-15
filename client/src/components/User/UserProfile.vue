@@ -15,7 +15,7 @@
             isFollowed ? 'user-profile-unfollow-btn' : 'user-profile-follow-btn'
           "
           :loading="requesting"
-          :callback="handleFollow"
+          @click.native="handleFollow"
         >
           {{ isFollowed ? 'Unfollow' : 'Follow' }}
         </BaseButton>

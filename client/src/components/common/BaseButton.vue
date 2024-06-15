@@ -8,7 +8,6 @@
       'base-button--loading': loading,
     }"
     :disabled="disabled"
-    @click="callback(argument)"
   >
     <template v-if="!loading">
       <slot />
@@ -29,14 +28,6 @@ export default {
     dataTestid: {
       type: String,
       default: 'button',
-    },
-    callback: {
-      type: Function,
-      default: () => {},
-    },
-    argument: {
-      type: String,
-      default: '',
     },
     disabled: {
       type: [Boolean, String],

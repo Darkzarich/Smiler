@@ -40,10 +40,18 @@
       <PostEditorTags v-model="filters.tags" data-testid="search-form-tags" />
     </div>
     <div class="search-form__submit">
-      <BaseButton data-testid="search-form-submit" stretched :callback="search">
+      <BaseButton
+        data-testid="search-form-submit"
+        stretched
+        @click.native="search"
+      >
         Submit
       </BaseButton>
-      <BaseButton data-testid="search-form-clear" stretched :callback="clear">
+      <BaseButton
+        data-testid="search-form-clear"
+        stretched
+        @click.native="clear"
+      >
         Clear filters
       </BaseButton>
     </div>

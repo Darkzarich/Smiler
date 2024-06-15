@@ -105,16 +105,15 @@
                     <BaseButton
                       class="comments__form-btn"
                       :loading="editSending"
-                      :callback="edit"
-                      :argument="comment.id"
                       data-testid="comment-edit-btn"
+                      @click.native="edit(comment.id)"
                     >
                       Send
                     </BaseButton>
                     <BaseButton
                       class="comments__form-btn"
-                      :callback="toggleEdit"
                       data-testid="comment-edit-close-btn"
+                      @click.native="toggleEdit"
                     >
                       Close
                     </BaseButton>
@@ -133,16 +132,15 @@
                     <BaseButton
                       class="comments__form-btn"
                       :loading="replySending"
-                      :callback="reply"
-                      :argument="comment.id"
                       data-testid="comment-reply-btn"
+                      @click.native="reply(comment.id)"
                     >
                       Send
                     </BaseButton>
                     <BaseButton
                       class="comments__form-btn"
-                      :callback="toggleReply"
                       data-testid="comment-reply-close-btn"
+                      @click.native="toggleReply"
                     >
                       Close
                     </BaseButton>

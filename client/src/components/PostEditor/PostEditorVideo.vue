@@ -11,9 +11,9 @@
           class="post-video-upload__upload-btn"
           stretched
           data-testid="video-upload-button"
-          :callback="upload"
           :loading="uploading"
           :disabled="!url"
+          @click.native="upload"
         >
           Upload
         </BaseButton>

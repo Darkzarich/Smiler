@@ -17,9 +17,9 @@
           class="post-image-upload__upload-btn"
           data-testid="image-upload-button"
           stretched
-          :callback="upload"
           :loading="uploading"
           :disabled="!imageUrl"
+          @click.native="upload"
         >
           Upload
         </BaseButton>

@@ -31,9 +31,9 @@
       class="signin-form__submit"
       stretched
       data-testid="signin-form-submit"
-      :callback="signIn"
       :loading="loading"
       :disabled="isSubmitDisabled"
+      @click.native="signIn"
     >
       SIGN IN
     </BaseButton>
