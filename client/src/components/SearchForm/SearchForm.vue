@@ -2,7 +2,7 @@
   <div class="search-form">
     <h1 class="search-form__title">Search</h1>
 
-    <div class="search-form__string">
+    <div class="search-form__title-field">
       <BaseInput
         v-model="filters.title"
         placeholder="Title"
@@ -10,8 +10,9 @@
         @keyup:enter="search"
       />
     </div>
-    <div class="search-form__extra">
-      <div class="search-form__extra-date">
+
+    <div class="search-form__columns">
+      <div class="search-form__column">
         <BaseDatePicker
           v-model="filters.dateFrom"
           data-testid="search-form-date-from"
@@ -23,7 +24,8 @@
           :label="'Date to'"
         />
       </div>
-      <div class="search-form__extra-slider">
+
+      <div class="search-form__column">
         <BaseSlider
           v-model="filters.ratingFrom"
           data-testid="search-form-rating-from"
@@ -36,10 +38,12 @@
         />
       </div>
     </div>
+
     <div class="search-form__tags">
       <PostEditorTags v-model="filters.tags" data-testid="search-form-tags" />
     </div>
-    <div class="search-form__submit">
+
+    <div class="search-form__actions">
       <BaseButton
         data-testid="search-form-submit"
         stretched
@@ -122,31 +126,28 @@ export default {
     font-weight: 500;
   }
 
-  &__string {
+  &__title-field {
     margin-bottom: 12px;
   }
 
-  &__extra {
+  &__columns {
     @include flex-row;
 
     justify-content: space-around;
-
-    &-slider {
-      @include flex-col;
-
-      justify-content: center;
-    }
+    margin-bottom: 12px;
   }
 
-  &__submit {
+  &__column {
+    @include flex-col;
+
+    justify-content: center;
+  }
+
+  &__actions {
     @include flex-row;
 
     gap: 16px;
     margin-top: 24px;
-
-    .button {
-      width: 50%;
-    }
   }
 }
 </style>
