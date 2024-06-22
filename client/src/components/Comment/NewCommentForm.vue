@@ -9,6 +9,7 @@
       <BaseTextEditor
         v-model="commentBody"
         data-testid="new-comment-form-editor"
+        class="new-comment-form__editor"
       >
         <BaseButton
           class="new-comment-form__submit-btn"
@@ -103,6 +104,7 @@ export default {
 
 .new-comment-form {
   padding: 1rem;
+  padding-top: 0;
 
   @include for-size(phone-only) {
     width: 100%;
@@ -122,8 +124,8 @@ export default {
     font-size: 1.2rem;
   }
 
-  .text-editor {
-    min-height: 6rem;
+  .base-text-editor__contenteditable {
+    min-height: 120px;
   }
 
   &__submit-btn {

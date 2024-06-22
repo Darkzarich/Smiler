@@ -577,7 +577,7 @@ export default {
         &-editor {
           margin-top: 1rem;
 
-          .text-editor {
+          .base-text-editor__contenteditable {
             min-height: 6rem;
           }
         }

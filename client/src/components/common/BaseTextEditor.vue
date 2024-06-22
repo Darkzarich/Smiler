@@ -1,38 +1,70 @@
 <template>
-  <div class="text-editor-container">
-    <div class="text-editor-styles" :data-testid="dataTestid">
-      <button type="button" title="bold" @click="styleSelected('b')">B</button>
-      <button type="button" title="italic" @click="styleSelected('i')">
+  <div class="base-text-editor">
+    <div class="base-text-editor__style-buttons" :data-testid="dataTestid">
+      <button
+        class="base-text-editor__style-button"
+        type="button"
+        title="bold"
+        @click="styleSelected('b')"
+      >
+        B
+      </button>
+      <button
+        class="base-text-editor__style-button"
+        type="button"
+        title="italic"
+        @click="styleSelected('i')"
+      >
         I
       </button>
-      <button type="button" title="strike" @click="styleSelected('s')">
+      <button
+        class="base-text-editor__style-button"
+        type="button"
+        title="strike"
+        @click="styleSelected('s')"
+      >
         S
       </button>
-      <button type="button" title="underline" @click="styleSelected('u')">
+      <button
+        class="base-text-editor__style-button"
+        type="button"
+        title="underline"
+        @click="styleSelected('u')"
+      >
         U
       </button>
-      <button type="button" title="quote" @click="styleSelected('cite')">
+      <button
+        class="base-text-editor__style-button"
+        type="button"
+        title="quote"
+        @click="styleSelected('cite')"
+      >
         Q
       </button>
-      <button type="button" title="remove styles" @click="removeStyles()">
+      <button
+        class="base-text-editor__style-button"
+        type="button"
+        title="remove styles"
+        @click="removeStyles()"
+      >
         REMOVE STYLES
       </button>
     </div>
-    <div class="text-editor">
-      <div
-        :id="id"
-        :ref="'text-editor#' + id"
-        class="text-editor__input"
-        :data-testid="`${dataTestid}-input`"
-        role="textbox"
-        tabIndex="0"
-        contenteditable
-        @selectstart="selecting = true"
-        @mouseup="endSelect()"
-        @focusout="setText()"
-        v-html="value"
-      />
-    </div>
+
+    <div
+      :id="id"
+      :ref="'text-editor#' + id"
+      class="base-text-editor__contenteditable"
+      :data-testid="`${dataTestid}-input`"
+      role="textbox"
+      tabIndex="0"
+      contenteditable
+      @selectstart="selecting = true"
+      @mouseup="endSelect()"
+      @focusout="setText()"
+      v-html="value"
+    />
+
     <!-- TODO: Add button name for this slot it's not obvious when its "default" -->
     <slot />
   </div>
@@ -186,7 +218,7 @@ export default {
 @import '@/styles/colors';
 @import '@/styles/mixins';
 
-.text-editor-container {
+.base-text-editor {
   width: 100%;
   padding: 1rem;
   border: 1px solid $light-gray;
@@ -197,21 +229,23 @@ export default {
     border-right: 1px solid transparent;
     border-left: 1px solid transparent;
   }
-}
 
-.text-editor-styles {
-  @include flex-row;
+  &__style-buttons {
+    @include flex-row;
 
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+    gap: 8px;
+    margin-bottom: 1rem;
 
-  @include for-size(phone-only) {
-    margin-left: 1rem;
+    @include for-size(phone-only) {
+      margin-left: 1rem;
+    }
   }
 
-  button {
+  &__style-button {
+    min-width: 22px;
+    min-height: 22px;
     outline: none;
-    border: 2px solid $firm;
+    border: 1px solid $firm;
     border-radius: 3px;
     background: $bg;
     color: $main-text;
@@ -223,30 +257,18 @@ export default {
       background: $widget-bg;
     }
   }
-}
 
-.text-editor {
-  @include flex-row;
-  @include scroll;
-
-  height: 100%;
-  min-height: 15rem;
-  border: 1px solid $light-gray;
-  border-radius: 2px;
-  background: $bg;
-  color: $main-text;
-  cursor: text;
-
-  @include for-size(phone-only) {
-    min-height: 9rem;
-    border-right: none;
-    border-left: none;
-  }
-
-  &__input {
+  &__contenteditable {
     width: 100%;
-    padding: 8px;
+    height: 100%;
+    min-height: 240px;
+    padding: 16px;
     outline: $firm;
+    border: 1px solid $light-gray;
+    border-radius: 3px;
+    background: $bg;
+    color: $main-text;
+    cursor: text;
 
     br {
       display: block;
@@ -256,11 +278,17 @@ export default {
 
     cite {
       display: block;
-      margin-top: 0.5rem;
-      margin-bottom: 0.5rem;
-      padding: 1rem;
-      border: solid 1px;
-      background-color: $bg;
+      margin-top: 8px;
+      margin-bottom: 8px;
+      padding: 16px;
+      border: $gray solid 1px;
+      background-color: $widget-bg;
+    }
+
+    @include for-size(phone-only) {
+      min-height: 9rem;
+      border-right: none;
+      border-left: none;
     }
   }
 }

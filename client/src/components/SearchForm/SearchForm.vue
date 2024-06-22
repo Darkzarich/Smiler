@@ -15,6 +15,7 @@
       <div class="search-form__column">
         <BaseDatePicker
           v-model="filters.dateFrom"
+          class="search-form__date-picker-from"
           data-testid="search-form-date-from"
           :label="'Date from'"
         />
@@ -29,6 +30,7 @@
         <BaseSlider
           v-model="filters.ratingFrom"
           data-testid="search-form-rating-from"
+          class="search-form__slider-from"
           :label="'Rating from'"
         />
         <BaseSlider
@@ -141,6 +143,11 @@ export default {
     @include flex-col;
 
     justify-content: center;
+  }
+
+  &__date-picker-from,
+  &__slider-from {
+    margin-bottom: 12px;
   }
 
   &__actions {

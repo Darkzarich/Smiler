@@ -1,10 +1,12 @@
 <template>
-  <div class="slider">
-    <label :for="label">
+  <div class="base-slider">
+    <label class="base-slider__label" :for="label">
       {{ label }}
     </label>
+
     <input
       :id="label"
+      class="base-slider__input"
       :data-testid="dataTestid"
       type="range"
       :max="max"
@@ -13,7 +15,8 @@
       :value="value"
       @input="$emit('input', $event.target.value)"
     />
-    <span class="slider__val">
+
+    <span class="base-slider__value">
       {{ value }}
     </span>
   </div>
@@ -50,26 +53,31 @@ export default {
 @import '@/styles/colors';
 @import '@/styles/mixins';
 
-.slider {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+.base-slider {
+  &__label {
+    display: inline-block;
+    min-width: 85px;
+    color: $light-gray;
+  }
 
-  &__val {
+  &__value {
     position: absolute;
     color: $main-text;
   }
 
-  input[type='range'] {
+  &__input {
+    margin: 0 8px;
     outline: $firm;
     border: 1px solid $light-gray;
+    border-radius: 5px;
     background: $bg;
     color: $main-text;
     appearance: none;
 
     &::-webkit-slider-thumb {
-      width: 1rem;
-      height: 1rem;
-      margin-top: -0.3rem;
+      width: 16px;
+      height: 16px;
+      margin-top: -4px;
       border-radius: 12px;
       background: $firm;
       cursor: pointer;
@@ -83,12 +91,6 @@ export default {
       background: $light-gray;
       cursor: pointer;
     }
-  }
-
-  label {
-    display: inline-block;
-    min-width: 85px;
-    color: $light-gray;
   }
 }
 </style>
