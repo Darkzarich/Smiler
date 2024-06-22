@@ -131,7 +131,7 @@
           class="post-editor__submit-btn"
           data-testid="save-draft-button"
           :loading="saving"
-          :disabled="!sections.length"
+          :disabled="!isDirty"
           @click.native="saveDraft"
         >
           Save Draft
@@ -174,6 +174,7 @@ export default {
   props: ['edit', 'post'],
   data() {
     return {
+      isDirty: false,
       title: '',
       sending: false,
       saving: false,
@@ -278,6 +279,7 @@ export default {
       }
 
       this.saving = false;
+      this.isDirty = false;
     },
     async deleteSection(section) {
       if (section.type === this.POST_SECTION_TYPES.PICTURE && section.isFile) {
@@ -285,22 +287,30 @@ export default {
           this.getUserLogin,
           section.hash,
         );
+
         if (!res.data.error) {
           this.sections.splice(this.sections.indexOf(section), 1);
         }
       } else {
         this.sections.splice(this.sections.indexOf(section), 1);
       }
+
+      this.isDirty = true;
     },
     setSection(data) {
       const section = this.sections.find((el) => el.url === data.url);
+
       this.sections[this.sections.indexOf(section)] = data;
+
+      this.isDirty = true;
     },
     createSection(type) {
       this.sections.push({
         type,
         hash: (Math.random() * Math.random()).toString(36),
       });
+
+      this.isDirty = true;
     },
   },
 };
