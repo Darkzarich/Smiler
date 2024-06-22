@@ -98,16 +98,14 @@ export default {
   },
   methods: {
     search() {
-      if (this.searchInputValue.length > 0) {
-        this.$router.push({
-          name: 'Search',
-          query: {
-            title: this.searchInputValue,
-          },
-        });
+      this.$router.push({
+        name: 'Search',
+        query: {
+          title: this.searchInputValue,
+        },
+      });
 
-        this.searchInputValue = '';
-      }
+      this.searchInputValue = '';
     },
     toggleMobileMenu() {
       this.isMobileMenuOpen = !this.isMobileMenuOpen;
