@@ -354,8 +354,8 @@ export default {
 
     &_chosen {
       .text-editor-container,
-      .post-image-upload,
-      .post-video-upload {
+      .post-editor-picture,
+      .post-editor-video {
         border: 1px solid $firm;
       }
     }

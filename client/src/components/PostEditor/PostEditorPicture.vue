@@ -1,20 +1,23 @@
 <template>
   <div
-    class="post-image-upload"
-    :class="value ? 'post-image-upload_uploaded' : ''"
+    class="post-editor-picture"
+    :class="value ? 'post-editor-picture--uploaded' : ''"
   >
-    <div v-if="!value" class="post-image-upload__container">
-      <BaseUploadForm v-model="file" class="post-image-upload__form" />
-      <div class="post-image-upload__or">OR</div>
-      <div class="post-image-upload__input-url">
+    <div v-if="!value" class="post-editor-picture__container">
+      <BaseUploadForm v-model="file" class="post-editor-picture__upload-form" />
+
+      <div class="post-editor-picture__or">OR</div>
+
+      <div class="post-editor-picture__input-url">
         <BaseInput
           v-model.lazy="imageUrl"
           :disabled="Boolean(file)"
           placeholder="Paste URL"
           data-testid="image-url-input"
         />
+
         <BaseButton
-          class="post-image-upload__upload-btn"
+          class="post-editor-picture__upload-btn"
           data-testid="image-upload-button"
           stretched
           :loading="uploading"
@@ -24,6 +27,8 @@
           Upload
         </BaseButton>
       </div>
+
+      <!-- A way to check if the image is inserted successfully -->
       <img
         v-if="!file && imageUrl"
         hidden
@@ -32,7 +37,8 @@
         @error="error()"
       />
     </div>
-    <div v-else class="post-image-upload__image">
+
+    <div v-else class="post-editor-picture__image">
       <img
         :src="$resolveImage(value)"
         :alt="value"
@@ -128,16 +134,16 @@ export default {
 @import '@/styles/colors';
 @import '@/styles/mixins';
 
-.post-image-upload {
+.post-editor-picture {
   width: 100%;
-  padding: 1rem;
+  padding: 16px;
   border: 1px solid $light-gray;
 
-  &_uploaded {
+  &--uploaded {
     padding: 0;
   }
 
-  &__form {
+  &__upload-form {
     margin-bottom: 12px;
   }
 

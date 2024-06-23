@@ -1,14 +1,15 @@
 <template>
-  <div class="post-video-upload">
-    <div v-if="!value" class="post-video-upload__container">
-      <div class="post-video-upload__input-url">
+  <div class="post-editor-video">
+    <div v-if="!value" class="post-editor-video__container">
+      <div class="post-editor-video__input-url">
         <BaseInput
           v-model.lazy="url"
           placeholder="Paste URL of the video [youtube]"
           data-testid="video-url-input"
         />
+
         <BaseButton
-          class="post-video-upload__upload-btn"
+          class="post-editor-video__upload-btn"
           stretched
           data-testid="video-upload-button"
           :loading="uploading"
@@ -19,9 +20,10 @@
         </BaseButton>
       </div>
     </div>
+
     <div
       v-else
-      class="post-video-upload__video"
+      class="post-editor-video__video"
       :test-dataid="`video-${value}`"
     >
       <iframe
@@ -91,7 +93,7 @@ export default {
 @import '@/styles/colors';
 @import '@/styles/mixins';
 
-.post-video-upload {
+.post-editor-video {
   width: 100%;
   padding: 1rem;
   border: 1px solid $light-gray;
