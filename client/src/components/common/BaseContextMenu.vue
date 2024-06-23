@@ -1,22 +1,20 @@
 <template>
-  <Transition name="context-menu">
-    <div
+  <Transition name="base-context-menu">
+    <ul
       v-if="show"
-      data-testid="context-menu"
-      class="context-menu"
+      data-testid="base-context-menu"
+      class="base-context-menu"
       :style="getPositionStyle"
     >
-      <ul class="context-menu__list">
-        <li
-          v-for="item in list.filter((el) => filter(el))"
-          :key="item.title"
-          class="context-menu__item"
-          @click="item.callback(target)"
-        >
-          {{ item.title }}
-        </li>
-      </ul>
-    </div>
+      <li
+        v-for="item in list.filter((el) => filter(el))"
+        :key="item.title"
+        class="base-context-menu__item"
+        @click="item.callback(target)"
+      >
+        {{ item.title }}
+      </li>
+    </ul>
   </Transition>
 </template>
 
@@ -63,11 +61,13 @@ export default {
 <style lang="scss">
 @import '@/styles/colors';
 
-.context-menu {
+.base-context-menu {
   position: absolute;
+  margin: 0;
   padding: 0;
   border: 1px solid $light-gray;
   background: $bg;
+  list-style: none;
 
   &-enter-active,
   &-leave-active {
@@ -80,21 +80,15 @@ export default {
     transform: translateY(-20px);
   }
 
-  &__list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
   &__item {
     padding: 0.5rem;
-    border-bottom: 1px solid #6b6e70;
-    color: #bfbfbf;
+    border-bottom: 1px solid $light-gray;
+    color: $main-text;
     font-size: 0.9rem;
     cursor: pointer;
 
     &:hover {
-      background: #272b2d;
+      background: $widget-bg;
     }
 
     &:last-child {

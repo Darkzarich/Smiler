@@ -195,7 +195,7 @@
       </div>
     </div>
 
-    <BaseContextMenuWrapper
+    <BaseContextMenu
       v-click-outside="closeContextMenu"
       :show="contextMenuData.show"
       :pos-x="contextMenuData.x"
@@ -208,10 +208,10 @@
 </template>
 
 <script>
+import BaseContextMenu from '@common/BaseContextMenu.vue';
 import { mapGetters } from 'vuex';
 import api from '@/api/index';
 import consts from '@/const/const';
-import BaseContextMenuWrapper from '@common/BaseContextMenuWrapper.vue';
 import IconComments from '@icons/IconComments.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
@@ -224,7 +224,7 @@ export default {
     IconDelete,
     IconEdit,
     IconMinus,
-    BaseContextMenuWrapper,
+    BaseContextMenu,
     IconPlus,
   },
   props: ['post', 'canEdit'],
