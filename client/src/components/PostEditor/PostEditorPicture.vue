@@ -148,7 +148,7 @@ export default {
 
   &__or {
     margin-bottom: 12px;
-    color: var(--color-primary);
+    color: var(--color-gray-light);
     text-align: center;
     font-weight: bold;
   }

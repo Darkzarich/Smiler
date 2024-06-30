@@ -30,87 +30,47 @@
               v-model="section.content"
               data-testid="text-section"
             />
-            <div class="post-editor__delete" @click="deleteSection(section)">
-              <CloseIcon
-                title="Delete"
-                :data-testid="`delete-section-${section.hash}`"
-              />
-            </div>
           </template>
 
-          <template v-if="section.type === POST_SECTION_TYPES.PICTURE">
+          <template v-else-if="section.type === POST_SECTION_TYPES.PICTURE">
             <PostEditorPicture
               v-model="section.url"
               data-testid="pic-section"
               @set-section="setSection"
             />
-            <div class="post-editor__delete" @click="deleteSection(section)">
-              <CloseIcon
-                title="Delete"
-                :data-testid="`delete-section-${section.hash}`"
-              />
-            </div>
           </template>
 
-          <template v-if="section.type === POST_SECTION_TYPES.VIDEO">
+          <template v-else-if="section.type === POST_SECTION_TYPES.VIDEO">
             <PostEditorVideo
               v-model="section.url"
               data-testid="video-section"
             />
-            <div class="post-editor__delete" @click="deleteSection(section)">
-              <CloseIcon
-                title="Delete"
-                :data-testid="`delete-section-${section.hash}`"
-              />
-            </div>
           </template>
+
+          <button
+            type="button"
+            class="post-editor__delete-btn"
+            @click="deleteSection(section)"
+          >
+            <CloseIcon
+              title="Delete"
+              :data-testid="`delete-section-${section.hash}`"
+            />
+          </button>
         </div>
       </TransitionGroup>
     </Draggable>
-    <div
+
+    <PostEditorAddSectionButtons
       v-if="sections.length < POST_MAX_SECTIONS"
-      class="post-editor__control"
-    >
-      <div
-        class="post-editor__control-item"
-        data-testid="add-text-button"
-        role="button"
-        tabindex="0"
-        @click="createSection(POST_SECTION_TYPES.TEXT)"
-      >
-        <IconText />
-      </div>
+      class="post-editor__add-section-buttons"
+      @add-section-by-type="createSection"
+    />
 
-      <div
-        class="post-editor__control-item"
-        data-testid="add-pic-button"
-        role="button"
-        tabindex="0"
-        @click="createSection(POST_SECTION_TYPES.PICTURE)"
-      >
-        <IconPicture />
-      </div>
-
-      <div
-        class="post-editor__control-item"
-        data-testid="add-video-button"
-        role="button"
-        tabindex="0"
-        @click="createSection(POST_SECTION_TYPES.VIDEO)"
-      >
-        <IconVideo />
-      </div>
-    </div>
-
-    <div v-else class="post-editor__control-error">
-      Can't add any more sections. Max amount of sections is
-      {{ POST_MAX_SECTIONS }}.
-    </div>
-
-    <div class="post-editor__submit">
+    <div class="post-editor__submit-form">
       <template v-if="isEdit">
         <BaseButton
-          class="post-editor__submit-btn"
+          class="post-editor__submit-form-btn"
           data-testid="finish-edit-post-button"
           :loading="saving"
           :disabled="!sections.length"
@@ -119,9 +79,10 @@
           Save Edited
         </BaseButton>
       </template>
+
       <template v-else>
         <BaseButton
-          class="post-editor__submit-btn"
+          class="post-editor__submit-form-btn"
           stretched
           data-testid="create-post-button"
           :loading="sending"
@@ -132,7 +93,7 @@
         </BaseButton>
         <BaseButton
           stretched
-          class="post-editor__submit-btn"
+          class="post-editor__submit-form-btn"
           data-testid="save-draft-button"
           :loading="saving"
           :disabled="!isDirty"
@@ -148,6 +109,7 @@
 <script>
 import Draggable from 'vuedraggable';
 import { mapState } from 'vuex';
+import PostEditorAddSectionButtons from './PostEditorAddSectionButtons.vue';
 import PostEditorPicture from './PostEditorPicture.vue';
 import PostEditorTags from './PostEditorTags.vue';
 import PostEditorVideo from './PostEditorVideo.vue';
@@ -157,22 +119,17 @@ import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 import CloseIcon from '@icons/IconExit.vue';
-import IconPicture from '@icons/IconPicture.vue';
-import IconText from '@icons/IconText.vue';
-import IconVideo from '@icons/IconVideo.vue';
 
 export default {
   components: {
     BaseButton,
     BaseInput,
     BaseTextEditor,
+    PostEditorAddSectionButtons,
     PostEditorPicture,
     PostEditorVideo,
     PostEditorTags,
     CloseIcon,
-    IconPicture,
-    IconText,
-    IconVideo,
     Draggable,
   },
   props: ['isEdit', 'post'],
@@ -323,22 +280,8 @@ export default {
 @import '@/styles/mixins';
 
 .post-editor {
-  &__submit {
-    display: flex;
-    justify-content: space-around;
-    gap: 16px;
-
-    .button {
-      width: 25%;
-      white-space: nowrap;
-    }
-  }
-
   &__title {
     margin-bottom: 12px;
-  }
-
-  &__title input {
     font-size: 20px;
   }
 
@@ -347,7 +290,7 @@ export default {
 
     align-items: center;
     position: relative;
-    margin-top: 1rem;
+    margin-top: 16px;
     cursor: move;
 
     &--moving {
@@ -374,46 +317,36 @@ export default {
     }
   }
 
-  &__control {
-    display: flex;
-    justify-content: center;
-    margin: 1rem;
-    padding: 1rem;
-
-    &-item {
-      margin-left: 1rem;
-      padding: 1rem;
-      border: 1px solid var(--color-gray-light);
-      background: var(--color-bg);
-      cursor: pointer;
-
-      &:hover {
-        background: var(--color-widget-bg);
-      }
-
-      svg {
-        fill: var(--color-gray-light);
-      }
-    }
-  }
-
-  &__delete {
+  &__delete-btn {
     position: absolute;
     right: -20px;
+    padding: 0;
+    border: none;
+    background-color: transparent;
 
     @include for-size(phone-only) {
       width: 10px;
+    }
+
+    &:hover {
+      filter: brightness(120%);
     }
 
     svg {
       cursor: pointer;
       transition: fill 0.3s ease-in-out;
       fill: var(--color-danger);
-
-      &:hover {
-        filter: brightness(120%);
-      }
     }
+  }
+
+  &__add-section-buttons {
+    margin: 32px;
+  }
+
+  &__submit-form {
+    display: flex;
+    justify-content: space-around;
+    gap: 16px;
   }
 }
 </style>
