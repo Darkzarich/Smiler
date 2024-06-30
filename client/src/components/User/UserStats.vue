@@ -32,14 +32,13 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .user-stats {
   @include flex-row;
 
   gap: 2rem;
-  color: $main-text;
+  color: var(--color-main-text);
 
   &__stat-count {
     font-size: 28px;
@@ -51,11 +50,11 @@ export default {
     font-size: 14px;
 
     &--negative .user-stats__stat-count {
-      color: $dark-red;
+      color: var(--color-dark-red);
     }
 
     &--positive .user-stats__stat-count {
-      color: $dark-firm;
+      color: var(--color-dark-primary);
     }
   }
 }

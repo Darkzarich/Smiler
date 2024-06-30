@@ -83,7 +83,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .base-textarea {
@@ -91,34 +90,34 @@ export default {
 
   &__label {
     margin-bottom: 4px;
-    color: $main-text;
+    color: var(--color-main-text);
     font-size: 13px;
   }
 
   &__textarea {
     padding: 0.5rem;
-    border: 1px solid $light-gray;
+    border: 1px solid var(--color-light-gray);
     border-radius: 2px;
-    background: $bg;
-    color: $main-text;
+    background: var(--color-bg);
+    color: var(--color-main-text);
 
     &:focus {
       outline: none;
-      border: 1px solid $firm;
+      border: 1px solid var(--color-primary);
     }
   }
 
   &--error {
     .base-textarea {
       &__label {
-        color: $error;
+        color: var(--color-error);
       }
 
       &__textarea {
-        border: 1px solid $error;
+        border: 1px solid var(--color-error);
 
         &:focus {
-          outline-color: $error;
+          outline-color: var(--color-error);
         }
       }
     }
@@ -126,7 +125,7 @@ export default {
 
   &__error {
     margin-top: 6px;
-    color: $error;
+    color: var(--color-error);
     font-size: 12px;
   }
 }

@@ -59,14 +59,12 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
-
 .base-context-menu {
   position: absolute;
   margin: 0;
   padding: 0;
-  border: 1px solid $light-gray;
-  background: $bg;
+  border: 1px solid var(--color-light-gray);
+  background: var(--color-bg);
   list-style: none;
 
   &-enter-active,
@@ -82,13 +80,13 @@ export default {
 
   &__item {
     padding: 0.5rem;
-    border-bottom: 1px solid $light-gray;
-    color: $main-text;
+    border-bottom: 1px solid var(--color-light-gray);
+    color: var(--color-main-text);
     font-size: 0.9rem;
     cursor: pointer;
 
     &:hover {
-      background: $widget-bg;
+      background: var(--color-widget-bg);
     }
 
     &:last-child {

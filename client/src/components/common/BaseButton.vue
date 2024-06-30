@@ -46,7 +46,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .base-button {
@@ -54,27 +53,27 @@ export default {
   justify-content: center;
   padding: 8px;
   outline: none;
-  border: 2px solid $firm;
+  border: 2px solid var(--color-primary);
   border-radius: 2px;
-  background: $bg;
-  color: $firm;
+  background: var(--color-bg);
+  color: var(--color-primary);
   font-size: 13px;
   font-weight: bold;
   cursor: pointer;
 
   &:hover {
-    background: $widget-bg;
+    background: var(--color-widget-bg);
   }
 
   &[disabled] {
-    border: 2px solid $light-gray;
-    color: $light-gray;
+    border: 2px solid var(--color-light-gray);
+    color: var(--color-light-gray);
     pointer-events: none;
   }
 
   &--loading {
     opacity: 0.5;
-    border: 2px solid rgba($firm, 0.5);
+    border: 2px solid rgb(var(--color-primary) 0.5);
     pointer-events: none;
     user-select: none;
   }

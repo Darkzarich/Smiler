@@ -117,21 +117,19 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/variables';
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .user-profile {
   @include flex-row;
 
   position: relative;
-  margin-bottom: $widget-margin;
+  margin-bottom: var(--variable-widget-margin);
   margin-left: 10%;
   padding: 1rem;
-  border: 1px solid $light-gray;
+  border: 1px solid var(--color-light-gray);
   border-radius: 2px;
-  background: $widget-bg;
-  color: $main-text;
+  background: var(--color-widget-bg);
+  color: var(--color-main-text);
 
   @include for-size(phone-only) {
     width: 100%;
@@ -165,7 +163,7 @@ export default {
     img {
       width: 7rem;
       height: 7rem;
-      border: 1px solid $light-gray;
+      border: 1px solid var(--color-light-gray);
       border-radius: 50%;
     }
   }
@@ -192,7 +190,7 @@ export default {
 
   &__date {
     margin-bottom: 12px;
-    color: $light-gray;
+    color: var(--color-light-gray);
     font-size: 13px;
   }
 }

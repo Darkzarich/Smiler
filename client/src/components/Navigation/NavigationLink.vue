@@ -25,21 +25,19 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
-
 .nav-link {
-  color: $main-text;
+  color: var(--color-main-text);
   text-decoration: none;
   font-weight: bold;
 
   &--disabled {
-    color: $light-gray;
+    color: var(--color-light-gray);
     user-select: none;
     pointer-events: none;
   }
 
   &.router-link-exact-active {
-    color: $firm;
+    color: var(--color-primary);
   }
 }
 </style>

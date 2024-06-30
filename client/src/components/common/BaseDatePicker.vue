@@ -35,23 +35,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .base-date-picker {
   &__label {
     display: inline-block;
     min-width: 80px;
-    color: $light-gray;
+    color: var(--color-light-gray);
   }
 
   &__input {
     width: 135px;
     padding: 8px;
-    outline: $firm;
-    border: 1px solid $light-gray;
-    background: $bg;
-    color: $main-text;
+    outline: var(--color-primary);
+    border: 1px solid var(--color-light-gray);
+    background: var(--color-bg);
+    color: var(--color-main-text);
     color-scheme: dark;
 
     &::-webkit-inner-spin-button {

@@ -28,10 +28,10 @@
 </template>
 
 <script>
-import UserProfile from '@components/User/UserProfile.vue';
 import api from '@/api';
 import consts from '@/const/const';
 import Post from '@components/Post/Post.vue';
+import UserProfile from '@components/User/UserProfile.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 
 export default {
@@ -123,8 +123,6 @@ export default {
 
 <style lang="scss">
 @import '@/styles/mixins';
-@import '@/styles/colors';
-@import '@/styles/variables';
 
 .post-loading {
   @include widget;
@@ -135,7 +133,7 @@ export default {
 
 .post-container {
   &__post {
-    margin-bottom: $widget-margin;
+    margin-bottom: var(--variable-widget-margin);
   }
 
   &__no-post,
@@ -150,7 +148,7 @@ export default {
     display: flex;
     justify-content: none;
     margin-left: 10%;
-    color: $main-text;
+    color: var(--color-main-text);
     text-align: center;
     font-size: 1.3rem;
   }

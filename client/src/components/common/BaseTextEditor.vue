@@ -215,13 +215,12 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .base-text-editor {
   width: 100%;
   padding: 1rem;
-  border: 1px solid $light-gray;
+  border: 1px solid var(--color-light-gray);
 
   @include for-size(phone-only) {
     padding-right: 0;
@@ -245,16 +244,16 @@ export default {
     min-width: 22px;
     min-height: 22px;
     outline: none;
-    border: 1px solid $firm;
+    border: 1px solid var(--color-primary);
     border-radius: 3px;
-    background: $bg;
-    color: $main-text;
+    background: var(--color-bg);
+    color: var(--color-main-text);
     font-family: monospace;
     font-weight: bold;
     cursor: pointer;
 
     &:hover {
-      background: $widget-bg;
+      background: var(--color-widget-bg);
     }
   }
 
@@ -263,11 +262,11 @@ export default {
     height: 100%;
     min-height: 240px;
     padding: 16px;
-    outline: $firm;
-    border: 1px solid $light-gray;
+    outline: var(--color-primary);
+    border: 1px solid var(--color-light-gray);
     border-radius: 3px;
-    background: $bg;
-    color: $main-text;
+    background: var(--color-bg);
+    color: var(--color-main-text);
     cursor: text;
 
     br {
@@ -281,8 +280,8 @@ export default {
       margin-top: 8px;
       margin-bottom: 8px;
       padding: 16px;
-      border: $gray solid 1px;
-      background-color: $widget-bg;
+      border: var(--color-gray) solid 1px;
+      background-color: var(--color-widget-bg);
     }
 
     @include for-size(phone-only) {

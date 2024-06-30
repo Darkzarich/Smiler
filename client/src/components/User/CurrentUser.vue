@@ -57,7 +57,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .current-user {
@@ -73,8 +72,8 @@ export default {
     width: 100%;
     margin: 0 auto;
     padding: 1rem;
-    border-bottom: 1px solid #6b6e70;
-    background: $bg;
+    border-bottom: 1px solid var(--color-light-gray);
+    background: var(--color-bg);
     user-select: none;
 
     @include for-size(phone-only) {
@@ -88,13 +87,13 @@ export default {
 
   &__avatar {
     width: 8rem;
-    border: 1px solid $light-gray;
+    border: 1px solid var(--color-light-gray);
     border-radius: 50%;
   }
 
   &__login {
     margin: 1rem;
-    color: $main-text;
+    color: var(--color-main-text);
     text-align: center;
     font-size: 1rem;
 
@@ -107,7 +106,7 @@ export default {
     flex-flow: row nowrap;
     justify-content: center;
     padding: 1rem;
-    border-bottom: 1px solid $light-gray;
+    border-bottom: 1px solid var(--color-light-gray);
   }
 }
 </style>

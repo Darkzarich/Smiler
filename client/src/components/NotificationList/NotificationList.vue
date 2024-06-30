@@ -47,7 +47,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .notification-list {
@@ -64,18 +63,18 @@ export default {
     position: relative;
     opacity: 1;
     padding: 5px;
-    border-bottom: 1px solid $bg;
-    background: $error;
+    border-bottom: 1px solid var(--color-bg);
+    background: var(--color-error);
     transition: opacity 0.2s 0s ease-in-out;
 
     &--info {
-      background: $dark-firm;
-      color: $white;
+      background: var(--color-dark-primary);
+      color: var(--color-white);
     }
 
     &--error {
-      background: $error;
-      color: $white;
+      background: var(--color-error);
+      color: var(--color-white);
     }
 
     &-enter-active,
@@ -105,7 +104,7 @@ export default {
     cursor: pointer;
 
     svg {
-      fill: $bg;
+      fill: var(--color-bg);
     }
   }
 }

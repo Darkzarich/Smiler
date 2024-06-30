@@ -90,13 +90,12 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .post-editor-video {
   width: 100%;
   padding: 1rem;
-  border: 1px solid $light-gray;
+  border: 1px solid var(--color-light-gray);
 
   &__upload-btn {
     margin-top: 20px;
@@ -105,7 +104,7 @@ export default {
   &__video {
     display: flex;
     flex-flow: row nowrap;
-    border: 1px solid $light-gray;
+    border: 1px solid var(--color-light-gray);
 
     video,
     iframe {

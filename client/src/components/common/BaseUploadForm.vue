@@ -26,7 +26,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .base-upload-form {
@@ -35,10 +34,10 @@ export default {
   &__label {
     display: block;
     padding: 1rem;
-    border: 2px solid $light-gray;
+    border: 2px solid var(--color-light-gray);
     border-radius: 3px;
-    background: $bg;
-    color: $main-text;
+    background: var(--color-bg);
+    color: var(--color-main-text);
     text-align: center;
   }
 

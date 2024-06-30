@@ -36,8 +36,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
-
 .auth-form-switcher {
   padding: 16px;
 
@@ -45,12 +43,12 @@ export default {
     width: fit-content;
     margin: 16px auto 0;
     border-bottom: 1px solid transparent;
-    color: $firm;
+    color: var(--color-primary);
     font-size: 13px;
     cursor: pointer;
 
     &:hover {
-      border-bottom: 1px solid $firm;
+      border-bottom: 1px solid var(--color-primary);
     }
   }
 }

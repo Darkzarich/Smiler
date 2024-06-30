@@ -56,8 +56,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
-
 .current-user-navigation {
   margin-left: 0;
   text-align: center;
@@ -70,8 +68,8 @@ export default {
     flex-direction: row;
     align-items: center;
     padding: 1rem;
-    border-bottom: 1px solid $light-gray;
-    color: $main-text;
+    border-bottom: 1px solid var(--color-light-gray);
+    color: var(--color-main-text);
     text-decoration: none;
     cursor: pointer;
     font-weight: 500;
@@ -82,14 +80,14 @@ export default {
     }
 
     &:hover {
-      background: $bg;
+      background: var(--color-bg);
     }
   }
 
   &__item-icon {
     width: 2rem;
     margin-right: 0.5rem;
-    fill: $main-text;
+    fill: var(--color-main-text);
   }
 }
 </style>

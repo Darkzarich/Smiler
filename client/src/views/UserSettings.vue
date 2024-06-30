@@ -247,7 +247,6 @@ export default {
 
 <style lang="scss">
 @import '@/styles/mixins';
-@import '@/styles/colors';
 
 .user-settings {
   @include widget;
@@ -264,7 +263,7 @@ export default {
 
   &__title {
     margin-bottom: 12px;
-    color: $main-text;
+    color: var(--color-main-text);
     text-align: center;
     font-size: 1.5rem;
     font-weight: 500;
@@ -272,7 +271,7 @@ export default {
 
   &__block {
     padding: 16px 0;
-    border-bottom: 1px solid $light-gray;
+    border-bottom: 1px solid var(--color-light-gray);
 
     &:last-child {
       border-bottom: none;
@@ -281,7 +280,7 @@ export default {
 
   &__block-title {
     margin-bottom: 16px;
-    color: $main-text;
+    color: var(--color-main-text);
     text-align: center;
     font-weight: 400;
   }
@@ -318,7 +317,7 @@ export default {
 
     img {
       width: 128px;
-      border: 1px solid $light-gray;
+      border: 1px solid var(--color-light-gray);
       border-radius: 50%;
     }
   }
@@ -329,7 +328,7 @@ export default {
   }
 
   &__no-subscriptions {
-    color: $main-text;
+    color: var(--color-main-text);
   }
 
   &__following {
@@ -345,12 +344,12 @@ export default {
 
   &__following-type {
     margin-top: 0.5rem;
-    color: $light-gray;
+    color: var(--color-light-gray);
     font-weight: bold;
   }
 
   &__unfollow {
-    color: $error;
+    color: var(--color-error);
     font-family: monospace;
     cursor: pointer;
   }
@@ -358,7 +357,7 @@ export default {
   &__following-item {
     margin-top: 0.5rem;
     margin-left: 0.5rem;
-    color: $main-text;
+    color: var(--color-main-text);
   }
 }
 </style>

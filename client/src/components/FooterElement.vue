@@ -18,7 +18,6 @@ export default {};
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 footer {
@@ -32,7 +31,7 @@ footer {
   width: 100%;
   height: 4rem;
   margin-top: 1.5rem;
-  background: $header;
+  background: var(--color-header);
 
   .footer-content {
     display: flex;

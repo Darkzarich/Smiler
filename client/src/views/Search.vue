@@ -51,9 +51,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
-@import '@/styles/variables';
 
 .search {
   &__form {
@@ -64,7 +62,7 @@ export default {
       border: none;
     }
 
-    margin-bottom: $widget-margin;
+    margin-bottom: var(--variable-widget-margin);
     margin-left: 10%;
   }
 }

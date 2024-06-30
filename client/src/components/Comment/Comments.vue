@@ -432,7 +432,6 @@ export default {
 
 <style lang="scss">
 @use 'sass:color';
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .comments {
@@ -441,13 +440,13 @@ export default {
     position: absolute;
     margin-top: 1rem;
     margin-left: -0.7rem;
-    color: $light-gray;
+    color: var(--color-light-gray);
     font-family: monospace;
     cursor: pointer;
 
     &:hover,
     &--active {
-      color: $firm;
+      color: var(--color-primary);
     }
 
     &--active {
@@ -461,7 +460,7 @@ export default {
 
   &__item {
     &-main {
-      border-left: solid 1px $light-gray;
+      border-left: solid 1px var(--color-light-gray);
 
       &_first {
         margin-left: 0 !important;
@@ -475,8 +474,8 @@ export default {
       &-block {
         margin: 1rem;
         padding: 1rem;
-        background: $widget-bg;
-        color: $main-text;
+        background: var(--color-widget-bg);
+        color: var(--color-main-text);
 
         @include for-size(phone-only) {
           // margin-left: 0;
@@ -488,11 +487,11 @@ export default {
 
           @keyframes flash {
             0% {
-              background: $comments-animation;
+              background: var(--color-comments-animation);
             }
 
             100% {
-              background: $widget-bg;
+              background: var(--color-widget-bg);
             }
           }
         }
@@ -506,20 +505,20 @@ export default {
               width: 1rem;
               height: 1rem;
               margin-left: 0.5rem;
-              border: 1px solid $light-gray;
+              border: 1px solid var(--color-light-gray);
               border-radius: 50%;
             }
           }
 
           a {
             display: flex;
-            color: $main-text;
+            color: var(--color-main-text);
             text-decoration: none;
           }
 
           &-date {
             margin-left: 0.5rem;
-            color: $light-gray;
+            color: var(--color-light-gray);
           }
 
           &-upvote,
@@ -527,14 +526,14 @@ export default {
           &-downvote,
           &-edit,
           &-delete {
-            color: $light-gray;
+            color: var(--color-light-gray);
 
             svg {
               position: relative;
               top: -8px;
               width: 2rem;
               height: 2rem;
-              fill: $light-gray;
+              fill: var(--color-light-gray);
               transform: scale(1.2);
             }
           }
@@ -557,14 +556,14 @@ export default {
           &-upvote--active svg,
           &-edit:hover svg {
             cursor: pointer;
-            fill: $dark-firm;
+            fill: var(--color-dark-primary);
           }
 
           &-downvote:hover svg,
           &-downvote--active svg,
           &-delete:hover svg {
             cursor: pointer;
-            fill: $dark-red;
+            fill: var(--color-dark-red);
           }
         }
 
@@ -585,18 +584,18 @@ export default {
         &-toggler {
           display: inline-block;
           margin-top: 0.5rem;
-          color: $firm;
+          color: var(--color-primary);
           font-size: 0.9rem;
           cursor: pointer;
           font-weight: bold;
           transition: color 0.2s ease;
 
           &:hover {
-            color: color.adjust($firm, $lightness: -20%);
+            filter: brightness(120%);
           }
 
           &_disabled {
-            color: $light-gray !important;
+            color: var(--color-light-gray) !important;
             cursor: default;
           }
         }

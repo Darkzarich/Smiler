@@ -182,7 +182,6 @@ export default {
 
 <style lang="scss">
 @import '@/styles/mixins';
-@import '@/styles/colors';
 
 .signup-form {
   @include flex-col;
@@ -191,7 +190,7 @@ export default {
 
   &__header {
     margin-bottom: 0.5rem;
-    color: $main-text;
+    color: var(--color-main-text);
     font-weight: bold;
   }
 

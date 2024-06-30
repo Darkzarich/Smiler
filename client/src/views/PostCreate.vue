@@ -82,7 +82,6 @@ export default {
 
 <style lang="scss">
 @import '@/styles/mixins';
-@import '@/styles/colors';
 
 .post-create {
   @include widget;
@@ -96,7 +95,7 @@ export default {
 
   &__header {
     margin-bottom: 16px;
-    color: $main-text;
+    color: var(--color-main-text);
     font-size: 1.5rem;
     align-self: center;
     font-weight: 500;

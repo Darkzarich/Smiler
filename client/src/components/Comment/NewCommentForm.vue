@@ -99,7 +99,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .new-comment-form {
@@ -112,14 +111,14 @@ export default {
   }
 
   &--disabled {
-    border: 1px solid $light-gray;
-    background: $widget-bg;
-    color: $main-text;
+    border: 1px solid var(--color-light-gray);
+    background: var(--color-widget-bg);
+    color: var(--color-main-text);
   }
 
   &__title {
     margin-bottom: 1rem;
-    color: $main-text;
+    color: var(--color-main-text);
     text-align: center;
     font-size: 1.2rem;
   }

@@ -412,9 +412,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/variables';
 @import '@/styles/mixins';
-@import '@/styles/colors';
 
 .post {
   display: flex;
@@ -448,24 +446,24 @@ export default {
     svg {
       position: relative;
       top: 3px;
-      fill: $light-gray;
+      fill: var(--color-light-gray);
       cursor: pointer;
     }
   }
 
   &__title-link {
-    color: $light-gray;
+    color: var(--color-light-gray);
     text-decoration: none;
   }
 
   &__upvote,
   &__rating,
   &__downvote {
-    color: $light-gray;
+    color: var(--color-light-gray);
 
     svg {
       width: 5rem;
-      fill: $light-gray;
+      fill: var(--color-light-gray);
 
       @include for-size(phone-only) {
         width: 3rem;
@@ -478,7 +476,7 @@ export default {
     &:hover {
       svg {
         cursor: pointer;
-        fill: $dark-red;
+        fill: var(--color-dark-red);
       }
     }
   }
@@ -489,7 +487,7 @@ export default {
       /* stylelint-disable-next-line no-descending-specificity */
       svg {
         cursor: pointer;
-        fill: $dark-firm;
+        fill: var(--color-dark-primary);
       }
     }
   }
@@ -505,10 +503,10 @@ export default {
     margin-top: 0.5rem;
     margin-right: 0.5rem;
     padding: 0.1rem;
-    border: 1px solid $firm;
+    border: 1px solid var(--color-primary);
     border-radius: 5px;
     background: transparent;
-    color: $firm;
+    color: var(--color-primary);
     font-family: monospace;
     font-size: 0.8rem;
     font-weight: bold;
@@ -519,15 +517,15 @@ export default {
   &__main {
     width: 90%;
     padding: 1rem;
-    border: 1px solid $light-gray;
+    border: 1px solid var(--color-light-gray);
     border-radius: 2px;
-    background: $widget-bg;
-    color: $main-text;
+    background: var(--color-widget-bg);
+    color: var(--color-main-text);
 
     @include for-size(phone-only) {
       width: 100%;
       border: none;
-      border-bottom: 1px solid $light-gray;
+      border-bottom: 1px solid var(--color-light-gray);
     }
   }
 
@@ -549,8 +547,8 @@ export default {
       margin-top: 0.5rem;
       padding: 0.5rem;
       padding-left: 1rem;
-      border: 1px solid $light-gray;
-      background: $bg;
+      border: 1px solid var(--color-light-gray);
+      background: var(--color-bg);
     }
   }
 
@@ -559,7 +557,7 @@ export default {
     flex-flow: row nowrap;
     margin-top: 1rem;
     margin-bottom: 1rem;
-    border: 1px solid $light-gray;
+    border: 1px solid var(--color-light-gray);
 
     @include for-size(phone-only) {
       width: 110%;
@@ -590,8 +588,8 @@ export default {
     margin: -1rem;
     margin-top: 1rem;
     padding: 0.5rem;
-    border-top: 1px solid $light-gray;
-    background: $bg;
+    border-top: 1px solid var(--color-light-gray);
+    background: var(--color-bg);
 
     @include for-size(phone-only) {
       border-top: none;
@@ -599,7 +597,7 @@ export default {
   }
 
   &__comments-count {
-    color: $light-gray;
+    color: var(--color-light-gray);
     text-decoration: none;
 
     /* stylelint-disable-next-line no-descending-specificity */
@@ -609,14 +607,14 @@ export default {
       width: 1rem;
       height: 1rem;
       margin-right: 0.2rem;
-      fill: $main-text;
+      fill: var(--color-main-text);
     }
   }
 
   &__author-container {
     display: flex;
     align-items: center;
-    color: $main-text;
+    color: var(--color-main-text);
     text-decoration: none;
   }
 
@@ -624,7 +622,7 @@ export default {
     border-bottom: 1px solid transparent;
 
     &:hover {
-      border-bottom: 1px solid $main-text;
+      border-bottom: 1px solid var(--color-main-text);
     }
   }
 
@@ -632,7 +630,7 @@ export default {
     width: 1.5rem;
     height: 1.5rem;
     margin-left: 0.5rem;
-    border: 1px solid $light-gray;
+    border: 1px solid var(--color-light-gray);
     border-radius: 50%;
   }
 }

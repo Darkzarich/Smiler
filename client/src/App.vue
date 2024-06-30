@@ -46,9 +46,28 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/variables';
-@import '@/styles/colors';
 @import '@/styles/mixins';
+
+:root {
+  --variable-widget-margin: 24px;
+}
+
+[color-scheme='dark'] {
+  --color-primary: #86c232;
+  --color-dark-primary: #61892f;
+  --color-error: #ff4646;
+  --color-dark-red: #892f2f;
+  --color-header: #1f2529;
+  --color-bg: #1c2125;
+  --color-widget-bg: #272b2d;
+  --color-gray: #474b4f;
+  --color-light-gray: #6b6e70;
+  --color-main-text: #bfbfbf;
+  --color-comments-animation: #7fbc3236;
+  --color-white: #fff;
+  --color-black: #000;
+  --color-scrollbar: #f5f5f5;
+}
 
 html {
   font-family: Roboto, 'Open Sans', Helvetica, Arial, sans-serif;
@@ -63,19 +82,19 @@ html {
 
 body {
   margin: 0;
-  background: $bg;
+  background: var(--color-bg);
 
   &::-webkit-scrollbar {
     width: 4px;
   }
 
   &::-webkit-scrollbar-track {
-    background: $bg;
+    background: var(--color-bg);
   }
 
   &::-webkit-scrollbar-thumb {
     border-radius: 20px;
-    background-color: $light-gray;
+    background-color: var(--color-light-gray);
   }
 }
 
@@ -101,13 +120,13 @@ h6 {
   flex-flow: row nowrap;
   width: 100%;
   max-width: 1110px;
-  margin-top: $header-height-interval;
+  margin-top: 72px;
   margin-right: auto;
   margin-left: auto;
 
   &__main {
     width: 70%;
-    margin-right: $widget-margin;
+    margin-right: var(--variable-widget-margin);
 
     @include for-size(phone-only) {
       width: 100%;

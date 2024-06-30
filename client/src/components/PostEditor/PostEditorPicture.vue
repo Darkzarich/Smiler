@@ -131,13 +131,12 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .post-editor-picture {
   width: 100%;
   padding: 16px;
-  border: 1px solid $light-gray;
+  border: 1px solid var(--color-light-gray);
 
   &--uploaded {
     padding: 0;
@@ -149,7 +148,7 @@ export default {
 
   &__or {
     margin-bottom: 12px;
-    color: $firm;
+    color: var(--color-primary);
     text-align: center;
     font-weight: bold;
   }

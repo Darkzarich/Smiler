@@ -28,7 +28,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .not-found {
@@ -38,14 +37,14 @@ export default {
   align-items: center;
 
   &__404 {
-    color: $main-text;
+    color: var(--color-main-text);
     font-size: 48px;
     font-weight: bold;
   }
 
   &__info {
     margin-bottom: 1rem;
-    color: $main-text;
+    color: var(--color-main-text);
     font-size: 48px;
 
     @include for-size(phone-only) {

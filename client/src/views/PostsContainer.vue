@@ -129,8 +129,6 @@ export default {
 
 <style lang="scss">
 @import '@/styles/mixins';
-@import '@/styles/colors';
-@import '@/styles/variables';
 
 .posts-container {
   &__loading,
@@ -146,7 +144,7 @@ export default {
   }
 
   &__post {
-    margin-bottom: $widget-margin;
+    margin-bottom: var(--variable-widget-margin);
   }
 
   &__loading {
@@ -162,7 +160,7 @@ export default {
 
     display: flex;
     justify-content: center;
-    color: $main-text;
+    color: var(--color-main-text);
     text-align: center;
     font-size: 1.3rem;
     line-height: 1.7rem;

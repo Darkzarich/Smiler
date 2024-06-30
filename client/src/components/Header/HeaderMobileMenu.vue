@@ -44,7 +44,6 @@ export default {
 
 <style lang="scss">
 @import '@/styles/mixins';
-@import '@/styles/colors';
 
 .mobile-menu {
   position: fixed;
@@ -53,7 +52,7 @@ export default {
   z-index: 1000;
   width: 100%;
   height: 100%;
-  background: $widget-bg;
+  background: var(--color-widget-bg);
   overflow-y: scroll;
 
   &__close-btn {
@@ -62,7 +61,7 @@ export default {
     right: 0.5rem;
 
     svg {
-      fill: $error;
+      fill: var(--color-error);
     }
   }
 
@@ -75,10 +74,10 @@ export default {
   &__nav-link {
     width: 100%;
     padding: 1rem;
-    border-bottom: 1px solid $light-gray;
+    border-bottom: 1px solid var(--color-light-gray);
 
     &:first-child {
-      border-top: 1px solid $light-gray;
+      border-top: 1px solid var(--color-light-gray);
     }
   }
 

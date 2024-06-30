@@ -116,13 +116,12 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .search-form {
   &__title {
     margin-bottom: 12px;
-    color: $main-text;
+    color: var(--color-main-text);
     text-align: center;
     font-size: 1.5rem;
     font-weight: 500;

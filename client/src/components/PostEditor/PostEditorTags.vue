@@ -98,7 +98,6 @@ export default {
 
 <style lang="scss">
 @import '@/styles/mixins';
-@import '@/styles/colors';
 
 .post-editor-tags {
   @include flex-row;
@@ -119,10 +118,10 @@ export default {
     justify-content: center;
     align-items: center;
     padding: 2px 4px;
-    border: 1px solid $firm;
+    border: 1px solid var(--color-primary);
     border-radius: 5px;
     background: transparent;
-    color: $firm;
+    color: var(--color-primary);
     font-family: monospace;
     font-size: 0.8rem;
     font-weight: bold;
@@ -146,11 +145,11 @@ export default {
   }
 
   &__add-tag-btn {
-    color: $firm;
+    color: var(--color-primary);
   }
 
   &__remove-tag-btn {
-    color: $error;
+    color: var(--color-error);
     font-size: 0.8rem;
   }
 }

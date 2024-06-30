@@ -115,9 +115,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/variables';
 @import '@/styles/mixins';
-@import '@/styles/colors';
 
 .header {
   display: flex;
@@ -128,7 +126,7 @@ export default {
   width: 100%;
   height: 56px;
   padding: 0.5rem;
-  background-color: $header;
+  background-color: var(--color-header);
 
   @include for-size(phone-only) {
     height: 46px;
@@ -160,7 +158,7 @@ export default {
 
       svg {
         height: 100%;
-        fill: $light-gray;
+        fill: var(--color-light-gray);
       }
     }
 
@@ -181,7 +179,7 @@ export default {
 
     &--active {
       svg {
-        fill: $main-text;
+        fill: var(--color-main-text);
       }
     }
   }
@@ -203,7 +201,7 @@ export default {
     border-bottom: 2px solid transparent;
 
     &:hover {
-      border-bottom: 2px solid $main-text;
+      border-bottom: 2px solid var(--color-main-text);
     }
 
     .nav-link--disabled {
@@ -211,7 +209,7 @@ export default {
     }
 
     &.router-link-exact-active {
-      border-bottom: 2px solid $firm;
+      border-bottom: 2px solid var(--color-primary);
     }
   }
 
@@ -234,7 +232,7 @@ export default {
     img {
       width: 2.5rem;
       height: 2.5rem;
-      border: 1px solid $light-gray;
+      border: 1px solid var(--color-light-gray);
       border-radius: 50%;
       cursor: pointer;
 

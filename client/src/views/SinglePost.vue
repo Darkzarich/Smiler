@@ -137,7 +137,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .post-container {
@@ -147,7 +146,7 @@ export default {
 .comments {
   margin-bottom: 2rem;
   padding: 1rem;
-  border: 1px solid $light-gray;
+  border: 1px solid var(--color-light-gray);
 
   @include for-size(phone-only) {
     border: none;
@@ -162,7 +161,7 @@ export default {
     margin-top: 0.5rem;
 
     // TODO: Set this text for <body> and remove everywhere else
-    color: $main-text;
+    color: var(--color-main-text);
     text-align: center;
     font-size: 1.2rem;
   }
@@ -170,7 +169,7 @@ export default {
   &__load-more,
   &__no-more {
     margin-top: 0.5rem;
-    color: $main-text;
+    color: var(--color-main-text);
     text-align: center;
     font-size: 1.2rem;
 

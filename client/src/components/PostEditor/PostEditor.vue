@@ -13,8 +13,8 @@
     <Draggable
       :list="sections"
       :animation="200"
-      ghost-class="post-editor__section_moving"
-      chosen-class="post-editor__section_chosen"
+      ghost-class="post-editor__section--moving"
+      chosen-class="post-editor__section--chosen"
     >
       <TransitionGroup name="post-editor__section" data-testid="post-sections">
         <div
@@ -37,6 +37,7 @@
               />
             </div>
           </template>
+
           <template v-if="section.type === POST_SECTION_TYPES.PICTURE">
             <PostEditorPicture
               v-model="section.url"
@@ -50,6 +51,7 @@
               />
             </div>
           </template>
+
           <template v-if="section.type === POST_SECTION_TYPES.VIDEO">
             <PostEditorVideo
               v-model="section.url"
@@ -262,7 +264,6 @@ export default {
         });
       }
     },
-    // TODO: Fix cannot save empty draft
     async saveDraft() {
       this.saving = true;
 
@@ -348,15 +349,15 @@ export default {
     margin-top: 1rem;
     cursor: move;
 
-    &_moving {
+    &--moving {
       opacity: 0.4;
     }
 
-    &_chosen {
+    &--chosen {
       .text-editor-container,
       .post-editor-picture,
       .post-editor-video {
-        border: 1px solid $firm;
+        border: 1px solid var(--color-primary);
       }
     }
 
@@ -381,16 +382,16 @@ export default {
     &-item {
       margin-left: 1rem;
       padding: 1rem;
-      border: 1px solid $light-gray;
-      background: $bg;
+      border: 1px solid var(--color-light-gray);
+      background: var(--color-bg);
       cursor: pointer;
 
       &:hover {
-        background: $widget-bg;
+        background: var(--color-widget-bg);
       }
 
       svg {
-        fill: $light-gray;
+        fill: var(--color-light-gray);
       }
     }
   }
@@ -406,10 +407,10 @@ export default {
     svg {
       cursor: pointer;
       transition: fill 0.3s ease-in-out;
-      fill: $error;
+      fill: var(--color-error);
 
       &:hover {
-        fill: color.adjust($error, $lightness: -20%);
+        filter: brightness(120%);
       }
     }
   }

@@ -50,28 +50,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/colors';
 @import '@/styles/mixins';
 
 .base-slider {
   &__label {
     display: inline-block;
     min-width: 85px;
-    color: $light-gray;
+    color: var(--color-light-gray);
   }
 
   &__value {
     position: absolute;
-    color: $main-text;
+    color: var(--color-main-text);
   }
 
   &__input {
     margin: 0 8px;
-    outline: $firm;
-    border: 1px solid $light-gray;
+    outline: var(--color-primary);
+    border: 1px solid var(--color-light-gray);
     border-radius: 5px;
-    background: $bg;
-    color: $main-text;
+    background: var(--color-bg);
+    color: var(--color-main-text);
     appearance: none;
 
     &::-webkit-slider-thumb {
@@ -79,7 +78,7 @@ export default {
       height: 16px;
       margin-top: -4px;
       border-radius: 12px;
-      background: $firm;
+      background: var(--color-primary);
       cursor: pointer;
       appearance: none;
     }
@@ -88,7 +87,7 @@ export default {
       height: 0.5rem;
       border: none;
       border-radius: 5px;
-      background: $light-gray;
+      background: var(--color-light-gray);
       cursor: pointer;
     }
   }
