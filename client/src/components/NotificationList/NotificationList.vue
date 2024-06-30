@@ -64,16 +64,16 @@ export default {
     opacity: 1;
     padding: 5px;
     border-bottom: 1px solid var(--color-bg);
-    background: var(--color-error);
+    background: var(--color-danger);
     transition: opacity 0.2s 0s ease-in-out;
 
     &--info {
-      background: var(--color-dark-primary);
+      background: var(--color-primary-dark);
       color: var(--color-white);
     }
 
     &--error {
-      background: var(--color-error);
+      background: var(--color-danger);
       color: var(--color-white);
     }
 

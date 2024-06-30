@@ -431,7 +431,6 @@ export default {
 </script>
 
 <style lang="scss">
-@use 'sass:color';
 @import '@/styles/mixins';
 
 .comments {
@@ -440,7 +439,7 @@ export default {
     position: absolute;
     margin-top: 1rem;
     margin-left: -0.7rem;
-    color: var(--color-light-gray);
+    color: var(--color-gray-light);
     font-family: monospace;
     cursor: pointer;
 
@@ -460,7 +459,7 @@ export default {
 
   &__item {
     &-main {
-      border-left: solid 1px var(--color-light-gray);
+      border-left: solid 1px var(--color-gray-light);
 
       &_first {
         margin-left: 0 !important;
@@ -505,7 +504,7 @@ export default {
               width: 1rem;
               height: 1rem;
               margin-left: 0.5rem;
-              border: 1px solid var(--color-light-gray);
+              border: 1px solid var(--color-gray-light);
               border-radius: 50%;
             }
           }
@@ -518,7 +517,7 @@ export default {
 
           &-date {
             margin-left: 0.5rem;
-            color: var(--color-light-gray);
+            color: var(--color-gray-light);
           }
 
           &-upvote,
@@ -526,14 +525,14 @@ export default {
           &-downvote,
           &-edit,
           &-delete {
-            color: var(--color-light-gray);
+            color: var(--color-gray-light);
 
             svg {
               position: relative;
               top: -8px;
               width: 2rem;
               height: 2rem;
-              fill: var(--color-light-gray);
+              fill: var(--color-gray-light);
               transform: scale(1.2);
             }
           }
@@ -556,14 +555,14 @@ export default {
           &-upvote--active svg,
           &-edit:hover svg {
             cursor: pointer;
-            fill: var(--color-dark-primary);
+            fill: var(--color-primary);
           }
 
           &-downvote:hover svg,
           &-downvote--active svg,
           &-delete:hover svg {
             cursor: pointer;
-            fill: var(--color-dark-red);
+            fill: var(--color-danger);
           }
         }
 
@@ -595,7 +594,7 @@ export default {
           }
 
           &_disabled {
-            color: var(--color-light-gray) !important;
+            color: var(--color-gray-light) !important;
             cursor: default;
           }
         }

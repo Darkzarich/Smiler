@@ -31,7 +31,7 @@ export default {
   font-weight: bold;
 
   &--disabled {
-    color: var(--color-light-gray);
+    color: var(--color-gray-light);
     user-select: none;
     pointer-events: none;
   }

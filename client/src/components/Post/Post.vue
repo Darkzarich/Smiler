@@ -208,10 +208,10 @@
 </template>
 
 <script>
-import BaseContextMenu from '@common/BaseContextMenu.vue';
 import { mapGetters } from 'vuex';
 import api from '@/api/index';
 import consts from '@/const/const';
+import BaseContextMenu from '@common/BaseContextMenu.vue';
 import IconComments from '@icons/IconComments.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
@@ -446,24 +446,24 @@ export default {
     svg {
       position: relative;
       top: 3px;
-      fill: var(--color-light-gray);
+      fill: var(--color-gray-light);
       cursor: pointer;
     }
   }
 
   &__title-link {
-    color: var(--color-light-gray);
+    color: var(--color-gray-light);
     text-decoration: none;
   }
 
   &__upvote,
   &__rating,
   &__downvote {
-    color: var(--color-light-gray);
+    color: var(--color-gray-light);
 
     svg {
       width: 5rem;
-      fill: var(--color-light-gray);
+      fill: var(--color-gray-light);
 
       @include for-size(phone-only) {
         width: 3rem;
@@ -476,7 +476,7 @@ export default {
     &:hover {
       svg {
         cursor: pointer;
-        fill: var(--color-dark-red);
+        fill: var(--color-danger);
       }
     }
   }
@@ -487,7 +487,7 @@ export default {
       /* stylelint-disable-next-line no-descending-specificity */
       svg {
         cursor: pointer;
-        fill: var(--color-dark-primary);
+        fill: var(--color-primary);
       }
     }
   }
@@ -517,7 +517,7 @@ export default {
   &__main {
     width: 90%;
     padding: 1rem;
-    border: 1px solid var(--color-light-gray);
+    border: 1px solid var(--color-gray-light);
     border-radius: 2px;
     background: var(--color-widget-bg);
     color: var(--color-main-text);
@@ -525,7 +525,7 @@ export default {
     @include for-size(phone-only) {
       width: 100%;
       border: none;
-      border-bottom: 1px solid var(--color-light-gray);
+      border-bottom: 1px solid var(--color-gray-light);
     }
   }
 
@@ -547,7 +547,7 @@ export default {
       margin-top: 0.5rem;
       padding: 0.5rem;
       padding-left: 1rem;
-      border: 1px solid var(--color-light-gray);
+      border: 1px solid var(--color-gray-light);
       background: var(--color-bg);
     }
   }
@@ -557,7 +557,7 @@ export default {
     flex-flow: row nowrap;
     margin-top: 1rem;
     margin-bottom: 1rem;
-    border: 1px solid var(--color-light-gray);
+    border: 1px solid var(--color-gray-light);
 
     @include for-size(phone-only) {
       width: 110%;
@@ -588,7 +588,7 @@ export default {
     margin: -1rem;
     margin-top: 1rem;
     padding: 0.5rem;
-    border-top: 1px solid var(--color-light-gray);
+    border-top: 1px solid var(--color-gray-light);
     background: var(--color-bg);
 
     @include for-size(phone-only) {
@@ -597,7 +597,7 @@ export default {
   }
 
   &__comments-count {
-    color: var(--color-light-gray);
+    color: var(--color-gray-light);
     text-decoration: none;
 
     /* stylelint-disable-next-line no-descending-specificity */
@@ -630,7 +630,7 @@ export default {
     width: 1.5rem;
     height: 1.5rem;
     margin-left: 0.5rem;
-    border: 1px solid var(--color-light-gray);
+    border: 1px solid var(--color-gray-light);
     border-radius: 50%;
   }
 }

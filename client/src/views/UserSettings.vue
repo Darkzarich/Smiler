@@ -271,7 +271,7 @@ export default {
 
   &__block {
     padding: 16px 0;
-    border-bottom: 1px solid var(--color-light-gray);
+    border-bottom: 1px solid var(--color-gray-light);
 
     &:last-child {
       border-bottom: none;
@@ -317,7 +317,7 @@ export default {
 
     img {
       width: 128px;
-      border: 1px solid var(--color-light-gray);
+      border: 1px solid var(--color-gray-light);
       border-radius: 50%;
     }
   }
@@ -344,12 +344,12 @@ export default {
 
   &__following-type {
     margin-top: 0.5rem;
-    color: var(--color-light-gray);
+    color: var(--color-gray-light);
     font-weight: bold;
   }
 
   &__unfollow {
-    color: var(--color-error);
+    color: var(--color-danger);
     font-family: monospace;
     cursor: pointer;
   }

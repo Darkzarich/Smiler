@@ -39,7 +39,7 @@
 
 @mixin widget {
   padding: 1rem;
-  border: 1px solid var(--color-light-gray);
+  border: 1px solid var(--color-gray-light);
   border-radius: 2px;
   background: var(--color-widget-bg);
 }
@@ -51,7 +51,7 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: var(--color-light-gray);
+    background-color: var(--color-gray-light);
   }
 
   &::-webkit-scrollbar-track {

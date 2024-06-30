@@ -63,7 +63,7 @@ export default {
   position: absolute;
   margin: 0;
   padding: 0;
-  border: 1px solid var(--color-light-gray);
+  border: 1px solid var(--color-gray-light);
   background: var(--color-bg);
   list-style: none;
 
@@ -80,7 +80,7 @@ export default {
 
   &__item {
     padding: 0.5rem;
-    border-bottom: 1px solid var(--color-light-gray);
+    border-bottom: 1px solid var(--color-gray-light);
     color: var(--color-main-text);
     font-size: 0.9rem;
     cursor: pointer;

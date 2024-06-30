@@ -66,8 +66,8 @@ export default {
   }
 
   &[disabled] {
-    border: 2px solid var(--color-light-gray);
-    color: var(--color-light-gray);
+    border: 2px solid var(--color-gray-light);
+    color: var(--color-gray-light);
     pointer-events: none;
   }
 

@@ -158,7 +158,7 @@ export default {
 
       svg {
         height: 100%;
-        fill: var(--color-light-gray);
+        fill: var(--color-gray-light);
       }
     }
 
@@ -232,7 +232,7 @@ export default {
     img {
       width: 2.5rem;
       height: 2.5rem;
-      border: 1px solid var(--color-light-gray);
+      border: 1px solid var(--color-gray-light);
       border-radius: 50%;
       cursor: pointer;
 

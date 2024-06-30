@@ -56,7 +56,7 @@ export default {
   &__label {
     display: inline-block;
     min-width: 85px;
-    color: var(--color-light-gray);
+    color: var(--color-gray-light);
   }
 
   &__value {
@@ -67,7 +67,7 @@ export default {
   &__input {
     margin: 0 8px;
     outline: var(--color-primary);
-    border: 1px solid var(--color-light-gray);
+    border: 1px solid var(--color-gray-light);
     border-radius: 5px;
     background: var(--color-bg);
     color: var(--color-main-text);
@@ -87,7 +87,7 @@ export default {
       height: 0.5rem;
       border: none;
       border-radius: 5px;
-      background: var(--color-light-gray);
+      background: var(--color-gray-light);
       cursor: pointer;
     }
   }

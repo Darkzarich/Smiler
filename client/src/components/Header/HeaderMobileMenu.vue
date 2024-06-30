@@ -61,7 +61,7 @@ export default {
     right: 0.5rem;
 
     svg {
-      fill: var(--color-error);
+      fill: var(--color-danger);
     }
   }
 
@@ -74,10 +74,10 @@ export default {
   &__nav-link {
     width: 100%;
     padding: 1rem;
-    border-bottom: 1px solid var(--color-light-gray);
+    border-bottom: 1px solid var(--color-gray-light);
 
     &:first-child {
-      border-top: 1px solid var(--color-light-gray);
+      border-top: 1px solid var(--color-gray-light);
     }
   }
 

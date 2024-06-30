@@ -72,7 +72,7 @@ export default {
     width: 100%;
     margin: 0 auto;
     padding: 1rem;
-    border-bottom: 1px solid var(--color-light-gray);
+    border-bottom: 1px solid var(--color-gray-light);
     background: var(--color-bg);
     user-select: none;
 
@@ -87,7 +87,7 @@ export default {
 
   &__avatar {
     width: 8rem;
-    border: 1px solid var(--color-light-gray);
+    border: 1px solid var(--color-gray-light);
     border-radius: 50%;
   }
 
@@ -106,7 +106,7 @@ export default {
     flex-flow: row nowrap;
     justify-content: center;
     padding: 1rem;
-    border-bottom: 1px solid var(--color-light-gray);
+    border-bottom: 1px solid var(--color-gray-light);
   }
 }
 </style>

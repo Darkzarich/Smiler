@@ -54,18 +54,18 @@ export default {
 
 [color-scheme='dark'] {
   --color-primary: #86c232;
-  --color-dark-primary: #61892f;
-  --color-error: #ff4646;
-  --color-dark-red: #892f2f;
+  --color-primary-dark: #61892f;
+  --color-danger: #ff4646;
+  --color-danger-dark: #892f2f;
+  --color-gray: #474b4f;
+  --color-gray-light: #6b6e70;
+  --color-white: #fff;
+  --color-black: #000;
+  --color-main-text: #bfbfbf;
   --color-header: #1f2529;
   --color-bg: #1c2125;
   --color-widget-bg: #272b2d;
-  --color-gray: #474b4f;
-  --color-light-gray: #6b6e70;
-  --color-main-text: #bfbfbf;
   --color-comments-animation: #7fbc3236;
-  --color-white: #fff;
-  --color-black: #000;
   --color-scrollbar: #f5f5f5;
 }
 
@@ -94,7 +94,7 @@ body {
 
   &::-webkit-scrollbar-thumb {
     border-radius: 20px;
-    background-color: var(--color-light-gray);
+    background-color: var(--color-gray-light);
   }
 }
 

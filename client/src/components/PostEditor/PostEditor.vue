@@ -80,6 +80,7 @@
       >
         <IconText />
       </div>
+
       <div
         class="post-editor__control-item"
         data-testid="add-pic-button"
@@ -89,6 +90,7 @@
       >
         <IconPicture />
       </div>
+
       <div
         class="post-editor__control-item"
         data-testid="add-video-button"
@@ -106,7 +108,7 @@
     </div>
 
     <div class="post-editor__submit">
-      <template v-if="edit">
+      <template v-if="isEdit">
         <BaseButton
           class="post-editor__submit-btn"
           data-testid="finish-edit-post-button"
@@ -173,7 +175,7 @@ export default {
     IconVideo,
     Draggable,
   },
-  props: ['edit', 'post'],
+  props: ['isEdit', 'post'],
   data() {
     return {
       isDirty: false,
@@ -211,7 +213,7 @@ export default {
     },
   },
   async created() {
-    if (this.edit) {
+    if (this.isEdit) {
       this.sections = this.post.sections;
       this.title = this.post.title;
       this.tags = this.post.tags;
@@ -318,7 +320,6 @@ export default {
 </script>
 
 <style lang="scss">
-@use 'sass:color';
 @import '@/styles/mixins';
 
 .post-editor {
@@ -382,7 +383,7 @@ export default {
     &-item {
       margin-left: 1rem;
       padding: 1rem;
-      border: 1px solid var(--color-light-gray);
+      border: 1px solid var(--color-gray-light);
       background: var(--color-bg);
       cursor: pointer;
 
@@ -391,7 +392,7 @@ export default {
       }
 
       svg {
-        fill: var(--color-light-gray);
+        fill: var(--color-gray-light);
       }
     }
   }
@@ -407,7 +408,7 @@ export default {
     svg {
       cursor: pointer;
       transition: fill 0.3s ease-in-out;
-      fill: var(--color-error);
+      fill: var(--color-danger);
 
       &:hover {
         filter: brightness(120%);

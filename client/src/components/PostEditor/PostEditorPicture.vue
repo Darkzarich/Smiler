@@ -136,7 +136,7 @@ export default {
 .post-editor-picture {
   width: 100%;
   padding: 16px;
-  border: 1px solid var(--color-light-gray);
+  border: 1px solid var(--color-gray-light);
 
   &--uploaded {
     padding: 0;

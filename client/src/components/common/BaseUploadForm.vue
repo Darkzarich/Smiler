@@ -34,7 +34,7 @@ export default {
   &__label {
     display: block;
     padding: 1rem;
-    border: 2px solid var(--color-light-gray);
+    border: 2px solid var(--color-gray-light);
     border-radius: 3px;
     background: var(--color-bg);
     color: var(--color-main-text);

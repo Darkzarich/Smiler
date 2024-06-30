@@ -111,7 +111,7 @@ export default {
   }
 
   &--disabled {
-    border: 1px solid var(--color-light-gray);
+    border: 1px solid var(--color-gray-light);
     background: var(--color-widget-bg);
     color: var(--color-main-text);
   }

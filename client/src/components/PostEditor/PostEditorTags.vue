@@ -149,7 +149,7 @@ export default {
   }
 
   &__remove-tag-btn {
-    color: var(--color-error);
+    color: var(--color-danger);
     font-size: 0.8rem;
   }
 }

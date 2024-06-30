@@ -95,7 +95,7 @@ export default {
 .post-editor-video {
   width: 100%;
   padding: 1rem;
-  border: 1px solid var(--color-light-gray);
+  border: 1px solid var(--color-gray-light);
 
   &__upload-btn {
     margin-top: 20px;
@@ -104,7 +104,7 @@ export default {
   &__video {
     display: flex;
     flex-flow: row nowrap;
-    border: 1px solid var(--color-light-gray);
+    border: 1px solid var(--color-gray-light);
 
     video,
     iframe {

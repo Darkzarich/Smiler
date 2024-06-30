@@ -126,7 +126,7 @@ export default {
   margin-bottom: var(--variable-widget-margin);
   margin-left: 10%;
   padding: 1rem;
-  border: 1px solid var(--color-light-gray);
+  border: 1px solid var(--color-gray-light);
   border-radius: 2px;
   background: var(--color-widget-bg);
   color: var(--color-main-text);
@@ -163,7 +163,7 @@ export default {
     img {
       width: 7rem;
       height: 7rem;
-      border: 1px solid var(--color-light-gray);
+      border: 1px solid var(--color-gray-light);
       border-radius: 50%;
     }
   }
@@ -190,7 +190,7 @@ export default {
 
   &__date {
     margin-bottom: 12px;
-    color: var(--color-light-gray);
+    color: var(--color-gray-light);
     font-size: 13px;
   }
 }

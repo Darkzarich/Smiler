@@ -96,7 +96,7 @@ export default {
 
   &__textarea {
     padding: 0.5rem;
-    border: 1px solid var(--color-light-gray);
+    border: 1px solid var(--color-gray-light);
     border-radius: 2px;
     background: var(--color-bg);
     color: var(--color-main-text);
@@ -110,14 +110,14 @@ export default {
   &--error {
     .base-textarea {
       &__label {
-        color: var(--color-error);
+        color: var(--color-danger);
       }
 
       &__textarea {
-        border: 1px solid var(--color-error);
+        border: 1px solid var(--color-danger);
 
         &:focus {
-          outline-color: var(--color-error);
+          outline-color: var(--color-danger);
         }
       }
     }
@@ -125,7 +125,7 @@ export default {
 
   &__error {
     margin-top: 6px;
-    color: var(--color-error);
+    color: var(--color-danger);
     font-size: 12px;
   }
 }

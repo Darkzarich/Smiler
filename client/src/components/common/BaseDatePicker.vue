@@ -41,14 +41,14 @@ export default {
   &__label {
     display: inline-block;
     min-width: 80px;
-    color: var(--color-light-gray);
+    color: var(--color-gray-light);
   }
 
   &__input {
     width: 135px;
     padding: 8px;
     outline: var(--color-primary);
-    border: 1px solid var(--color-light-gray);
+    border: 1px solid var(--color-gray-light);
     background: var(--color-bg);
     color: var(--color-main-text);
     color-scheme: dark;

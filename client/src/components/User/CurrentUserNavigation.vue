@@ -68,7 +68,7 @@ export default {
     flex-direction: row;
     align-items: center;
     padding: 1rem;
-    border-bottom: 1px solid var(--color-light-gray);
+    border-bottom: 1px solid var(--color-gray-light);
     color: var(--color-main-text);
     text-decoration: none;
     cursor: pointer;

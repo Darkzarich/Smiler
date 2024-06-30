@@ -220,7 +220,7 @@ export default {
 .base-text-editor {
   width: 100%;
   padding: 1rem;
-  border: 1px solid var(--color-light-gray);
+  border: 1px solid var(--color-gray-light);
 
   @include for-size(phone-only) {
     padding-right: 0;
@@ -263,7 +263,7 @@ export default {
     min-height: 240px;
     padding: 16px;
     outline: var(--color-primary);
-    border: 1px solid var(--color-light-gray);
+    border: 1px solid var(--color-gray-light);
     border-radius: 3px;
     background: var(--color-bg);
     color: var(--color-main-text);

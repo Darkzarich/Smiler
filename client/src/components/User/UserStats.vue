@@ -50,11 +50,11 @@ export default {
     font-size: 14px;
 
     &--negative .user-stats__stat-count {
-      color: var(--color-dark-red);
+      color: var(--color-danger-dark);
     }
 
     &--positive .user-stats__stat-count {
-      color: var(--color-dark-primary);
+      color: var(--color-primary-dark);
     }
   }
 }
