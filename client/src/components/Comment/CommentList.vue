@@ -50,19 +50,15 @@ export default {
   },
   methods: {
     handleRemoveComment(id) {
-      const foundCom = this.comments.find((comment) => comment.id === id);
+      const commentIndex = this.comments.findIndex(
+        (comment) => comment.id === id,
+      );
 
-      if (!foundCom) {
+      if (commentIndex === -1) {
         return;
       }
 
-      if (foundCom.children.length > 0) {
-        foundCom.deleted = true;
-
-        return;
-      }
-
-      this.comments.splice(this.comments.indexOf(foundCom), 1);
+      this.comments.splice(commentIndex, 1);
     },
   },
 };

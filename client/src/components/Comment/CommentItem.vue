@@ -3,20 +3,20 @@
     <div
       class="comment-item__content"
       :class="{
-        'comment-item__content--created': Boolean(comment.created),
+        'comment-item__content--created': Boolean(commentData.created),
       }"
     >
       <div class="comment-item__header">
-        <template v-if="!comment.deleted">
+        <template v-if="!commentData.deleted">
           <div class="comment-item__rating">
-            {{ comment.rating }}
+            {{ commentData.rating }}
           </div>
 
           <div
             class="comment-item__upvote-btn"
-            :data-testid="`comment-${comment.id}-upvote`"
+            :data-testid="`comment-${commentData.id}-upvote`"
             :class="
-              comment.rated.isRated && !comment.rated.negative
+              commentData.rated.isRated && !commentData.rated.negative
                 ? 'comment-item__upvote-btn--active'
                 : ''
             "
@@ -26,10 +26,10 @@
           </div>
 
           <div
-            :data-testid="`comment-${comment.id}-downvote`"
+            :data-testid="`comment-${commentData.id}-downvote`"
             class="comment-item__downvote-btn"
             :class="
-              comment.rated.isRated && comment.rated.negative
+              commentData.rated.isRated && commentData.rated.negative
                 ? 'comment-item__downvote-btn--active'
                 : ''
             "
@@ -42,18 +42,18 @@
             :to="{
               name: 'UserPage',
               params: {
-                login: comment.author.login,
+                login: commentData.author.login,
               },
             }"
           >
             <div class="comment-item__author">
-              {{ comment.author.login }}
+              {{ commentData.author.login }}
             </div>
 
             <div class="comment-item__avatar">
               <img
-                :src="$resolveAvatar(comment.author.avatar)"
-                :alt="comment.author.avatar"
+                :src="$resolveAvatar(commentData.author.avatar)"
+                :alt="commentData.author.avatar"
               />
             </div>
           </RouterLink>
@@ -61,7 +61,7 @@
           <template v-if="$commentCanEdit(comment)">
             <div
               class="comment-item__edit-btn"
-              :data-testid="`comment-${comment.id}-edit`"
+              :data-testid="`comment-${commentData.id}-edit`"
               @click="toggleEdit()"
             >
               <IconEdit />
@@ -69,7 +69,7 @@
 
             <div
               class="comment-item__delete-btn"
-              :data-testid="`comment-${comment.id}-delete`"
+              :data-testid="`comment-${commentData.id}-delete`"
               @click="handleDeleteComment()"
             >
               <IconDelete />
@@ -79,33 +79,30 @@
 
         <div
           class="comment-item__date"
-          :data-testid="`comment-${comment.id}-date`"
+          :data-testid="`comment-${commentData.id}-date`"
         >
-          {{ comment.createdAt | $fromNow }}
+          {{ commentData.createdAt | $fromNow }}
         </div>
       </div>
 
       <div
         class="comment-item__body"
-        :data-testid="`comment-${comment.id}-body`"
+        :data-testid="`comment-${commentData.id}-body`"
       >
-        <template v-if="!comment.deleted">
+        <template v-if="!commentData.deleted">
           <template v-if="!isEditComment">
-            <div v-html="comment.body" />
+            <div v-html="commentData.body" />
           </template>
 
           <template v-else>
             <div class="comment-item__answer-editor">
-              <BaseTextEditor
-                v-model="commentEditInput"
-                data-testid="comment-edit"
-              >
+              <BaseTextEditor v-model="editBody" data-testid="comment-edit">
                 <div class="comment-item__answer-actions">
                   <BaseButton
                     class="comment-item__answer-form-btn"
                     :loading="isRequesting"
                     data-testid="comment-edit-btn"
-                    @click.native="edit(comment.id)"
+                    @click.native="edit(commentData.id)"
                   >
                     Send
                   </BaseButton>
@@ -150,7 +147,7 @@
               <div
                 v-if="isUserAuth"
                 class="comment-item__answer-toggler"
-                :data-testid="`comment-${comment.id}-toggle-reply`"
+                :data-testid="`comment-${commentData.id}-toggle-reply`"
                 @click="toggleReply()"
               >
                 Reply
@@ -173,17 +170,17 @@
       </div>
 
       <CommentChildExpander
-        v-if="comment.children.length > 0"
-        :data-testid="`comment-${comment.id}-expander`"
+        v-if="commentData.children.length > 0"
+        :data-testid="`comment-${commentData.id}-expander`"
         :is-expanded="isChildrenExpanded"
-        :children-count="comment.children.length"
+        :children-count="commentData.children.length"
         @click.native="isChildrenExpanded = !isChildrenExpanded"
       />
     </div>
 
     <CommentTreeHelper
       v-if="isChildrenExpanded"
-      :data="comment.children"
+      :data="commentData.children"
       :post-id="postId"
       :level="level + 1"
     />
@@ -230,15 +227,14 @@ export default {
   },
   data() {
     return {
-      COMMENTS_NESTED_LIMIT: consts.COMMENTS_NESTED_LIMIT,
-      isChildrenExpanded: this.level <= consts.COMMENT_AUTO_HIDE_LEVEL,
+      commentData: { ...this.comment },
       isRequesting: false,
-      commentData: this.comment,
+      isChildrenExpanded: this.level <= consts.COMMENT_AUTO_HIDE_LEVEL,
+      COMMENTS_NESTED_LIMIT: consts.COMMENTS_NESTED_LIMIT,
       replyBody: '',
-      replyFieldShowFor: '',
-      isEditComment: false,
       isReplyComment: false,
-      commentEditInput: '',
+      editBody: '',
+      isEditComment: false,
     };
   },
   computed: {
@@ -252,25 +248,24 @@ export default {
       this.isReplyComment = !this.isReplyComment;
     },
     toggleEdit() {
+      this.editBody = this.commentData.body;
       this.isEditComment = !this.isEditComment;
-      this.commentEditInput = this.comment.body;
     },
     async edit() {
       this.isRequesting = true;
 
-      const res = await api.comments.updateComment(this.commentEdit, {
-        body: this.commentEditInput,
+      const res = await api.comments.updateComment(this.commentData.id, {
+        body: this.editBody,
       });
 
       if (!res.data.error) {
-        const foundCom = this.comments.find((el) => el.id === this.commentEdit);
-        foundCom.body = this.commentEditInput;
+        this.commentData.body = this.editBody;
         this.toggleEdit();
       }
 
       this.isRequesting = false;
     },
-    // TODO: events for changing post comment count on delete
+    // TODO: Changing post comment count on delete
     async handleDeleteComment() {
       if (this.isRequesting) {
         return;
@@ -278,13 +273,26 @@ export default {
 
       this.isRequesting = true;
 
-      const res = await api.comments.deleteComment(this.comment.id);
+      const { id } = this.commentData;
 
-      if (!res.data.error) {
-        this.$emit('remove');
-      }
+      const res = await api.comments.deleteComment(id);
 
       this.isRequesting = false;
+
+      if (res.data.error) {
+        return;
+      }
+
+      if (
+        !this.commentData.children ||
+        this.commentData.children.length === 0
+      ) {
+        this.$emit('remove');
+
+        return;
+      }
+
+      this.commentData.deleted = true;
     },
     async upvote() {
       if (this.isRequesting) {
@@ -293,28 +301,32 @@ export default {
 
       this.isRequesting = true;
 
-      if (!this.comment.rated.isRated) {
-        this.comment.rated.isRated = true;
-        this.comment.rated.negative = false;
-        this.comment.rating = this.comment.rating + consts.COMMENT_RATE_VALUE;
+      if (!this.commentData.rated.isRated) {
+        this.commentData.rated.isRated = true;
+        this.commentData.rated.negative = false;
+        this.commentData.rating =
+          this.commentData.rating + consts.COMMENT_RATE_VALUE;
 
-        const res = await api.comments.updateRate(this.comment.id, {
+        const res = await api.comments.updateRate(this.commentData.id, {
           negative: false,
         });
 
         if (res.data.error) {
-          this.comment.rated.isRated = false;
-          this.comment.rating = this.comment.rating - consts.COMMENT_RATE_VALUE;
+          this.commentData.rated.isRated = false;
+          this.commentData.rating =
+            this.commentData.rating - consts.COMMENT_RATE_VALUE;
         }
-      } else if (this.comment.rated.negative) {
-        this.comment.rated.isRated = false;
-        this.comment.rating = this.comment.rating + consts.COMMENT_RATE_VALUE;
+      } else if (this.commentData.rated.negative) {
+        this.commentData.rated.isRated = false;
+        this.commentData.rating =
+          this.commentData.rating + consts.COMMENT_RATE_VALUE;
 
-        const res = await api.comments.removeRate(this.comment.id);
+        const res = await api.comments.removeRate(this.commentData.id);
 
         if (res.data.error) {
-          this.comment.rated.isRated = true;
-          this.comment.rating = this.comment.rating - consts.COMMENT_RATE_VALUE;
+          this.commentData.rated.isRated = true;
+          this.commentData.rating =
+            this.commentData.rating - consts.COMMENT_RATE_VALUE;
         }
       }
 
@@ -327,28 +339,32 @@ export default {
 
       this.isRequesting = true;
 
-      if (!this.comment.rated.isRated) {
-        this.comment.rated.isRated = true;
-        this.comment.rated.negative = true;
-        this.comment.rating = this.comment.rating - consts.COMMENT_RATE_VALUE;
+      if (!this.commentData.rated.isRated) {
+        this.commentData.rated.isRated = true;
+        this.commentData.rated.negative = true;
+        this.commentData.rating =
+          this.commentData.rating - consts.COMMENT_RATE_VALUE;
 
-        const res = await api.comments.updateRate(this.comment.id, {
+        const res = await api.comments.updateRate(this.commentData.id, {
           negative: true,
         });
 
         if (res.data.error) {
-          this.comment.rated.isRated = false;
-          this.comment.rating = this.comment.rating + consts.COMMENT_RATE_VALUE;
+          this.commentData.rated.isRated = false;
+          this.commentData.rating =
+            this.commentData.rating + consts.COMMENT_RATE_VALUE;
         }
-      } else if (!this.comment.rated.negative) {
-        this.comment.rated.isRated = false;
-        this.comment.rating = this.comment.rating - consts.COMMENT_RATE_VALUE;
+      } else if (!this.commentData.rated.negative) {
+        this.commentData.rated.isRated = false;
+        this.commentData.rating =
+          this.commentData.rating - consts.COMMENT_RATE_VALUE;
 
-        const res = await api.comments.removeRate(this.comment.id);
+        const res = await api.comments.removeRate(this.commentData.id);
 
         if (res.data.error) {
-          this.comment.rated.isRated = true;
-          this.comment.rating = this.comment.rating + consts.COMMENT_RATE_VALUE;
+          this.commentData.rated.isRated = true;
+          this.commentData.rating =
+            this.commentData.rating + consts.COMMENT_RATE_VALUE;
         }
       }
 
@@ -365,11 +381,9 @@ export default {
 
       this.isRequesting = true;
 
-      const { id } = this.comment;
-
       const res = await api.comments.createComment({
         post: this.postId,
-        parent: id,
+        parent: this.commentData.id,
         body: this.replyBody,
       });
 
@@ -387,10 +401,9 @@ export default {
           created: true,
         };
 
-        this.comment.children.unshift(newComment);
+        this.commentData.children.unshift(newComment);
 
         this.replyBody = '';
-        this.replyFieldShowFor = false;
       }
       this.isRequesting = false;
     },
