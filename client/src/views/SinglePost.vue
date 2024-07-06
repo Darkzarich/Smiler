@@ -11,17 +11,19 @@
         @new-comment="handleNewComment"
       />
 
-      <Comments
+      <CommentList
         v-if="!commentsLoading && comments.length > 0"
         :data="comments"
         :indent-level="1"
         :post="post.id"
         :level="0"
-        :first="true"
+        :is-first="true"
       />
+
       <div v-else-if="!commentsLoading" class="comments__no-comments">
         There are no comments yet... Be the first!
       </div>
+
       <div v-else class="comments__loading">
         <CircularLoader />
       </div>
@@ -50,8 +52,8 @@
 <script>
 import { mapState } from 'vuex';
 import api from '@/api';
+import CommentList from '@/components/Comment/CommentList.vue';
 import consts from '@/const/const';
-import Comments from '@components/Comment/Comments.vue';
 import NewCommentForm from '@components/Comment/NewCommentForm.vue';
 import Post from '@components/Post/Post.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
@@ -60,7 +62,7 @@ export default {
   components: {
     Post,
     NewCommentForm,
-    Comments,
+    CommentList,
     CircularLoader,
   },
   async beforeRouteEnter(to, from, next) {

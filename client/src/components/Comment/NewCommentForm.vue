@@ -111,6 +111,7 @@ export default {
   }
 
   &--disabled {
+    padding-top: 1rem;
     border: 1px solid var(--color-gray-light);
     background: var(--color-widget-bg);
     color: var(--color-main-text);
