@@ -54,14 +54,14 @@ export default class Comments extends AbstractComponent {
     const commentClass =
       await this.getUpvoteBtnById(commentId).getAttribute('class');
 
-    return /upvote--active/.test(commentClass);
+    return /upvote-btn--active/.test(commentClass);
   }
 
   async getIsCommentByIdDownvoted(commentId = '') {
     const commentClass =
       await this.getDownvoteBtnById(commentId).getAttribute('class');
 
-    return /downvote--active/.test(commentClass);
+    return /downvote-btn--active/.test(commentClass);
   }
 
   async toggleRepliesExpanderById(commentId = '') {

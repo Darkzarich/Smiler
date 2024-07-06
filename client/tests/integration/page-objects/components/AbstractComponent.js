@@ -9,7 +9,7 @@ export default class AbstractComponent {
 
   findContextMenuOption(text = '') {
     return this.page
-      .getByTestId('context-menu')
+      .getByTestId('base-context-menu')
       .filter({ has: this.page.getByText(text) });
   }
 }

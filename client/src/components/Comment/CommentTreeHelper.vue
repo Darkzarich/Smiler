@@ -1,5 +1,5 @@
 <template>
-  <CommentList :data="data" :post="post" :level="level + 1" :indent-level="2" />
+  <CommentList :data="data" :post-id="postId" :level="level" />
 </template>
 
 <script>
@@ -7,6 +7,6 @@ export default {
   components: {
     CommentList: () => import('./CommentList.vue'),
   },
-  props: ['data', 'indentLevel', 'post', 'level'],
+  props: ['data', 'postId', 'level'],
 };
 </script>

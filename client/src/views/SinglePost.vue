@@ -15,7 +15,7 @@
         v-if="!commentsLoading && comments.length > 0"
         :data="comments"
         :indent-level="1"
-        :post="post.id"
+        :post-id="post.id"
         :level="0"
         :is-first="true"
       />

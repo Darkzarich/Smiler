@@ -1,9 +1,9 @@
 <template>
   <div v-if="show" class="post-create">
     <h1 class="post-create__header" data-testid="post-create-header">
-      {{ edit ? 'Edit' : 'Make' }} Post
+      {{ isEdit ? 'Edit' : 'Make' }} Post
     </h1>
-    <PostEditor :key="key" :edit="edit" :post="post" />
+    <PostEditor :key="key" :is-edit="isEdit" :post="post" />
   </div>
 </template>
 
@@ -33,7 +33,7 @@ export default {
   },
   data() {
     return {
-      edit: false,
+      isEdit: false,
       post: {},
       show: false,
       key: '',
@@ -72,7 +72,7 @@ export default {
         });
       } else {
         this.post = data;
-        this.edit = true;
+        this.isEdit = true;
         this.show = true;
       }
     },
