@@ -78,7 +78,7 @@
         </template>
 
         <div
-          class="comment-item__date"
+          class="comment-item__created-at"
           :data-testid="`comment-${commentData.id}-date`"
         >
           {{ commentData.createdAt | $fromNow }}
@@ -89,83 +89,48 @@
         class="comment-item__body"
         :data-testid="`comment-${commentData.id}-body`"
       >
-        <template v-if="!commentData.deleted">
-          <template v-if="!isEditComment">
-            <div v-html="commentData.body" />
-          </template>
+        <template v-if="commentData.deleted">
+          <i>This comment has been deleted</i>
+        </template>
 
-          <template v-else>
-            <div class="comment-item__answer-editor">
-              <BaseTextEditor v-model="editBody" data-testid="comment-edit">
-                <div class="comment-item__answer-actions">
-                  <BaseButton
-                    class="comment-item__answer-form-btn"
-                    :loading="isRequesting"
-                    data-testid="comment-edit-btn"
-                    @click.native="edit(commentData.id)"
-                  >
-                    Send
-                  </BaseButton>
+        <!-- TODO: Make only one CommentForm form -->
+        <CommentForm
+          v-else-if="isEditComment"
+          v-model="editBody"
+          class="comment-item__comment-form"
+          :loading="isRequesting"
+          data-testid="comment-edit"
+          @submit="edit(commentData.id)"
+          @close="toggleEdit"
+        />
 
-                  <BaseButton
-                    class="comment-item__answer-form-btn"
-                    data-testid="comment-edit-close-btn"
-                    @click.native="toggleEdit"
-                  >
-                    Close
-                  </BaseButton>
-                </div>
-              </BaseTextEditor>
-            </div>
-          </template>
+        <template v-else>
+          <div v-html="commentData.body" />
 
-          <div class="comment-item__answer">
-            <div v-if="isReplyComment" class="comment-item__answer-editor">
-              <BaseTextEditor v-model="replyBody" data-testid="comment-reply">
-                <div class="comment-item__answer-actions">
-                  <BaseButton
-                    class="comment-item__answer-form-btn"
-                    :loading="isRequesting"
-                    data-testid="comment-reply-btn"
-                    @click.native="reply()"
-                  >
-                    Send
-                  </BaseButton>
-
-                  <BaseButton
-                    class="comment-item__answer-form-btn"
-                    data-testid="comment-reply-close-btn"
-                    @click.native="toggleReply"
-                  >
-                    Close
-                  </BaseButton>
-                </div>
-              </BaseTextEditor>
-            </div>
+          <div class="comment-item__reply">
+            <CommentForm
+              v-if="isReplyComment"
+              v-model="replyBody"
+              class="comment-item__comment-form"
+              :loading="isRequesting"
+              data-testid="comment-reply"
+              @submit="reply()"
+              @close="toggleReply"
+            />
 
             <template v-else-if="level < COMMENTS_NESTED_LIMIT">
               <div
-                v-if="isUserAuth"
-                class="comment-item__answer-toggler"
+                :class="{
+                  'comment-item__reply-toggler--disabled': !isUserAuth,
+                }"
+                class="comment-item__reply-toggler"
                 :data-testid="`comment-${commentData.id}-toggle-reply`"
                 @click="toggleReply()"
               >
-                Reply
-              </div>
-
-              <div
-                v-else
-                class="comment-item__answer-toggler comment-item__answer-toggler--disabled"
-                title="Sign up to be able to leave a reply"
-              >
-                Reply
+                Reply ``
               </div>
             </template>
           </div>
-        </template>
-
-        <template v-else>
-          <i>This comment has been deleted</i>
         </template>
       </div>
 
@@ -173,7 +138,6 @@
         v-if="commentData.children.length > 0"
         :data-testid="`comment-${commentData.id}-expander`"
         :is-expanded="isChildrenExpanded"
-        :children-count="commentData.children.length"
         @click.native="isChildrenExpanded = !isChildrenExpanded"
       />
     </div>
@@ -190,11 +154,10 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import CommentChildExpander from './CommentChildExpander.vue';
+import CommentForm from './CommentForm.vue';
 import CommentTreeHelper from './CommentTreeHelper.vue';
 import api from '@/api';
 import consts from '@/const/const';
-import BaseButton from '@common/BaseButton.vue';
-import BaseTextEditor from '@common/BaseTextEditor.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';
@@ -204,12 +167,11 @@ export default {
   components: {
     CommentTreeHelper,
     CommentChildExpander,
-    BaseTextEditor,
-    BaseButton,
     IconEdit,
     IconMinus,
     IconPlus,
     IconDelete,
+    CommentForm,
   },
   props: {
     postId: {
@@ -245,6 +207,14 @@ export default {
   },
   methods: {
     toggleReply() {
+      if (!this.isUserAuth) {
+        this.$store.dispatch('showErrorNotification', {
+          message: 'Please sign in or create an account to leave a reply.',
+        });
+
+        return;
+      }
+
       this.isReplyComment = !this.isReplyComment;
     },
     toggleEdit() {
@@ -404,7 +374,9 @@ export default {
         this.commentData.children.unshift(newComment);
 
         this.replyBody = '';
+        this.toggleReply();
       }
+
       this.isRequesting = false;
     },
   },
@@ -464,6 +436,7 @@ export default {
   &__edit-btn,
   &__delete-btn {
     color: var(--color-gray-light);
+    cursor: pointer;
 
     svg {
       position: relative;
@@ -493,7 +466,6 @@ export default {
   &__upvote-btn:hover,
   &__edit:hover {
     svg {
-      cursor: pointer;
       fill: var(--color-primary);
     }
   }
@@ -508,7 +480,7 @@ export default {
     }
   }
 
-  &__date {
+  &__created-at {
     margin-left: 0.5rem;
     color: var(--color-gray-light);
   }
@@ -517,17 +489,13 @@ export default {
     line-height: 1.5rem;
   }
 
-  &__answer-editor {
-    margin-top: 1rem;
-
-    .base-text-editor__contenteditable {
-      min-height: 6rem;
-    }
+  &__comment-form {
+    margin-top: 16px;
   }
 
-  &__answer-toggler {
+  &__reply-toggler {
     display: inline-block;
-    margin-top: 0.5rem;
+    margin-top: 8px;
     color: var(--color-primary);
     font-size: 0.9rem;
     cursor: pointer;
@@ -540,19 +508,7 @@ export default {
 
     &--disabled {
       color: var(--color-gray-light) !important;
-      cursor: default;
     }
-  }
-
-  &__answer-actions {
-    @include flex-row;
-
-    gap: 16px;
-    margin-top: 20px;
-  }
-
-  &__answer-form-btn {
-    width: 140px;
   }
 }
 </style>

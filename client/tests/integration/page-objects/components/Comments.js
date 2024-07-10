@@ -81,7 +81,11 @@ export default class Comments extends AbstractComponent {
   }
 
   async submitCommentReply() {
-    await this.page.getByTestId('comment-reply-btn').click();
+    await this.page.getByTestId('comment-reply-submit-btn').click();
+  }
+
+  async submitEditedComment() {
+    await this.page.getByTestId('comment-edit-submit-btn').click();
   }
 
   async closeCommentReplyForm() {
@@ -102,9 +106,5 @@ export default class Comments extends AbstractComponent {
 
   async toggleCommentEditById(commentId = '') {
     await this.getEditBtnById(commentId).click();
-  }
-
-  async submitEditedComment() {
-    await this.page.getByTestId('comment-edit-btn').click();
   }
 }

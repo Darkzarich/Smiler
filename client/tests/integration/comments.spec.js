@@ -182,6 +182,7 @@ test.describe('Replies', () => {
   });
 
   test('Cannot reply to a comment if not logged in', async ({
+    NotificationList,
     SinglePostPage,
     Comments,
     Api,
@@ -192,7 +193,12 @@ test.describe('Replies', () => {
 
     await SinglePostPage.goto(post.slug);
 
-    await expect(Comments.getCommentReplyTogglerById(comment.id)).toBeHidden();
+    await Comments.clickCommentReplyTogglerById(comment.id);
+
+    await expect(NotificationList.root).toHaveText(
+      'Please sign in or create an account to leave a reply.',
+    );
+    await expect(Comments.getCommentReplyInput()).toBeHidden();
   });
 
   test('Closes the reply form', async ({ SinglePostPage, Comments }) => {
