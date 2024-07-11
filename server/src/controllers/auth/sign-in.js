@@ -44,26 +44,27 @@ exports.signIn = asyncErrorHandler(async (req, res, next) => {
       .pbkdf2Sync(user.password, foundUser.salt, 10000, 512, 'sha512')
       .toString('hex');
 
-    if (hash === foundUser.hash) {
-      req.session.userId = foundUser._id;
-      req.session.userLogin = foundUser.login;
-
-      // TODO: Maybe move to getters of the model
-      const userAuth = {
-        login: foundUser.login,
-        isAuth: true,
-        rating: foundUser.rating || 0,
-        avatar: foundUser.avatar || '',
-        email: foundUser.email || '',
-        tagsFollowed: foundUser.tagsFollowed || [],
-        followersAmount: foundUser.followersAmount,
-      };
-
-      success(req, res, userAuth);
-    } else {
+    if (
+      crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(foundUser.hash))
+    ) {
       generateError('Invalid email or password', 401, next);
-      return;
     }
+
+    req.session.userId = foundUser._id;
+    req.session.userLogin = foundUser.login;
+
+    // TODO: Maybe move to getters of the model
+    const userAuth = {
+      login: foundUser.login,
+      isAuth: true,
+      rating: foundUser.rating || 0,
+      avatar: foundUser.avatar || '',
+      email: foundUser.email || '',
+      tagsFollowed: foundUser.tagsFollowed || [],
+      followersAmount: foundUser.followersAmount,
+    };
+
+    success(req, res, userAuth);
   } catch (e) {
     next(e);
   }

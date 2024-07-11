@@ -28,8 +28,6 @@ const whitelist = [
   `http://localhost:${PORT}`,
 ];
 
-console.log('CORS whitelist: ', whitelist.join(','));
-
 app.use(
   cors({
     credentials: true,
@@ -76,7 +74,7 @@ app.use(
 );
 
 // logging
-morgan.token('request-body', (req, res) => {
+morgan.token('request-body', (req) => {
   const body = { ...req.body };
   // is not safe to leave insecure user's passwords in logs
   if ('password' in body) {
@@ -89,9 +87,12 @@ morgan.token('request-body', (req, res) => {
 
   return JSON.stringify(body);
 });
-morgan.token('request-id', (req, res) => req.id);
-morgan.token('user', (req, res) => {
-  if (req.session && req.session.userId) return req.session.userId;
+morgan.token('request-id', (req) => req.id);
+morgan.token('user', (req) => {
+  if (req.session && req.session.userId) {
+    return req.session.userId;
+  }
+
   return 'no user';
 });
 

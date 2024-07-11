@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable func-names */
 const mongoose = require('mongoose');
 
