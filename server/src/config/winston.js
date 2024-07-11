@@ -51,7 +51,7 @@ logger.error = (err, errObj = null) => {
 };
 
 logger.stream = {
-  write(message, encoding) {
+  write(message) {
     logger.info(message);
   },
 };

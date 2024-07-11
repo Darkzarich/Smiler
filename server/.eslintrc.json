@@ -5,7 +5,12 @@
     "es6": true,
     "node": true
   },
-  "extends": ["airbnb-base", "plugin:security/recommended-legacy", "prettier"],
+  "extends": [
+    "airbnb-base",
+    "plugin:node/recommended",
+    "plugin:security/recommended-legacy",
+    "prettier"
+  ],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"

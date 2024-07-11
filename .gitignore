@@ -1,7 +1,2 @@
-server/node_modules
-client/node_modules
 node_modules
 .env
-server/uploads/*
-server/logs/*
-!server/uploads/.keep
