@@ -17,10 +17,13 @@ if (cluster.isMaster) {
   });
 
   cluster.on('exit', (worker, code, signal) => {
-    logger.error(`Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`);
+    logger.error(
+      `Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`,
+    );
     logger.info('Starting a new worker');
     cluster.fork();
   });
 } else {
+  // eslint-disable-next-line global-require
   require('./worker');
 }

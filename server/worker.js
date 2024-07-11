@@ -15,7 +15,11 @@ const router = require('./src/routes');
 const app = express();
 
 const {
-  PORT, FRONT_ORIGIN_LOCAL, FRONT_ORIGIN_REMOTE, SESSION_SECRET, IS_PRODUCTION,
+  PORT,
+  FRONT_ORIGIN_LOCAL,
+  FRONT_ORIGIN_REMOTE,
+  SESSION_SECRET,
+  IS_PRODUCTION,
 } = config;
 
 const whitelist = [
@@ -26,17 +30,23 @@ const whitelist = [
 
 console.log('CORS whitelist: ', whitelist.join(','));
 
-app.use(cors({
-  credentials: true,
-  origin(origin, callback) {
-    if (origin === undefined || whitelist.indexOf(origin) !== -1 || !IS_PRODUCTION) {
-      callback(null, true);
-    } else {
-      logger.warn(`"${origin}" is not allowed by CORS`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-}));
+app.use(
+  cors({
+    credentials: true,
+    origin(origin, callback) {
+      if (
+        origin === undefined ||
+        whitelist.indexOf(origin) !== -1 ||
+        !IS_PRODUCTION
+      ) {
+        callback(null, true);
+      } else {
+        logger.warn(`"${origin}" is not allowed by CORS`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+  }),
+);
 
 // X-Request-Id header
 app.use(addRequestId);
@@ -67,7 +77,7 @@ app.use(
 
 // logging
 morgan.token('request-body', (req, res) => {
-  const body = Object.assign({}, req.body);
+  const body = { ...req.body };
   // is not safe to leave insecure user's passwords in logs
   if ('password' in body) {
     body.password = '***';
@@ -85,27 +95,34 @@ morgan.token('user', (req, res) => {
   return 'no user';
 });
 
-const loggerFormat = '[req_id: :request-id][uid: :user] [:status] :remote-addr :method :url :response-time ms - :res[content-length] \n body :request-body';
+const loggerFormat =
+  '[req_id: :request-id][uid: :user] [:status] :remote-addr :method :url :response-time ms - :res[content-length] \n body :request-body';
 
-app.use(morgan(loggerFormat, {
-  skip(req, res) {
-    return res.statusCode < 400;
-  },
-  stream: logger.stream,
-}));
-app.use(morgan(loggerFormat, {
-  skip(req, res) {
-    return res.statusCode >= 400;
-  },
-  stream: logger.stream,
-}));
+app.use(
+  morgan(loggerFormat, {
+    skip(req, res) {
+      return res.statusCode < 400;
+    },
+    stream: logger.stream,
+  }),
+);
+app.use(
+  morgan(loggerFormat, {
+    skip(req, res) {
+      return res.statusCode >= 400;
+    },
+    stream: logger.stream,
+  }),
+);
 
 // routes
 app.use(router);
 
 // set files folder
 
-logger.info(`Worker is running in ${IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode...`);
+logger.info(
+  `Worker is running in ${IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode...`,
+);
 
 // TODO: make it conditional, make static only for dev
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

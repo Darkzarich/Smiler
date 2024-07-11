@@ -4,7 +4,11 @@ const sanitizeHtml = require('../../utils/sanitize-html');
 
 const Post = require('../../models/Post');
 const consts = require('../../const/const');
-const { success, asyncErrorHandler, generateError } = require('../../utils/utils');
+const {
+  success,
+  asyncErrorHandler,
+  generateError,
+} = require('../../utils/utils');
 
 exports.updateById = asyncErrorHandler(async (req, res, next) => {
   // TODO: validate sections on update by type and other stuff the same as when creating post
@@ -30,15 +34,23 @@ exports.updateById = asyncErrorHandler(async (req, res, next) => {
   const { now } = new Date();
 
   if (now - postCreatedAt > consts.POST_TIME_TO_UPDATE) {
-    return generateError(`You can edit post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`, 405, next);
+    return generateError(
+      `You can edit post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`,
+      405,
+      next,
+    );
   }
 
   if (tags) {
     if (tags.length > consts.POST_MAX_TAGS) {
-      return generateError(`Too many tags, max amount is ${consts.POST_MAX_TAGS}`, 422, next);
+      return generateError(
+        `Too many tags, max amount is ${consts.POST_MAX_TAGS}`,
+        422,
+        next,
+      );
     }
 
-    if (tags.find(el => el.length > consts.POST_MAX_TAG_LEN)) {
+    if (tags.find((el) => el.length > consts.POST_MAX_TAG_LEN)) {
       return generateError('Exceeded max length of a tag', 422, next);
     }
 
@@ -57,11 +69,16 @@ exports.updateById = asyncErrorHandler(async (req, res, next) => {
 
     // Looking for pics that got removed from post
     post.sections.forEach((section) => {
-      if (section.type !== consts.POST_SECTION_TYPES.PICTURE || !section.isFile) {
+      if (
+        section.type !== consts.POST_SECTION_TYPES.PICTURE ||
+        !section.isFile
+      ) {
         return;
       }
 
-      const item = newSections.find(newSection => newSection.url === section.url);
+      const item = newSections.find(
+        (newSection) => newSection.url === section.url,
+      );
 
       if (!item) {
         filesToDelete.push(section.url);

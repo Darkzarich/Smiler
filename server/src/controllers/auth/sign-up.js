@@ -1,6 +1,10 @@
 const crypto = require('crypto');
 const User = require('../../models/User');
-const { success, generateError, asyncErrorHandler } = require('../../utils/utils');
+const {
+  success,
+  generateError,
+  asyncErrorHandler,
+} = require('../../utils/utils');
 
 const validateUserRegistration = (user, next) => {
   if (user.login && user.password && user.confirm && user.email) {
@@ -34,7 +38,9 @@ exports.signUp = asyncErrorHandler(async (req, res, next) => {
   }
 
   const salt = crypto.randomBytes(16).toString('hex');
-  const hash = crypto.pbkdf2Sync(user.password, salt, 10000, 512, 'sha512').toString('hex');
+  const hash = crypto
+    .pbkdf2Sync(user.password, salt, 10000, 512, 'sha512')
+    .toString('hex');
 
   try {
     const newUser = await User.create({

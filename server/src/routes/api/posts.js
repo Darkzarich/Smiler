@@ -146,7 +146,6 @@ const auth = require('../auth');
 }
 */
 
-
 /**
 @swagger
 {

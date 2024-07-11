@@ -58,21 +58,21 @@ schema.pre('save', async function (next) {
 });
 
 schema.pre('remove', async function (next) {
-  Promise.all(
-    [
-      this.updateOne(this.parent, {
-        $pull: {
-          children: this.id,
-        },
-      }),
+  Promise.all([
+    this.updateOne(this.parent, {
+      $pull: {
+        children: this.id,
+      },
+    }),
 
-      Post.commentCountDec(this.post),
-    ],
-  ).then(() => {
-    next();
-  }).catch((e) => {
-    next(e);
-  });
+    Post.commentCountDec(this.post),
+  ])
+    .then(() => {
+      next();
+    })
+    .catch((e) => {
+      next(e);
+    });
 });
 
 schema.methods.toResponse = function (user) {
@@ -110,6 +110,5 @@ schema.set('toJSON', {
   virtuals: true,
   versionKey: false,
 });
-
 
 module.exports = mongoose.model('Comment', schema);

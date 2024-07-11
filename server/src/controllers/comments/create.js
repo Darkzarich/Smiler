@@ -1,6 +1,10 @@
 const sanitizeHtml = require('../../utils/sanitize-html');
 const Comment = require('../../models/Comment');
-const { success, asyncErrorHandler, generateError } = require('../../utils/utils');
+const {
+  success,
+  asyncErrorHandler,
+  generateError,
+} = require('../../utils/utils');
 
 exports.create = asyncErrorHandler(async (req, res, next) => {
   const { body } = req.body;
@@ -8,8 +12,14 @@ exports.create = asyncErrorHandler(async (req, res, next) => {
   const { post } = req.body;
   const { userId } = req.session;
 
-  if (!body) { generateError('Commentary should not be empty', 422, next); return; }
-  if (!post) { generateError('Comment must be assigned to a post', 422, next); return; }
+  if (!body) {
+    generateError('Commentary should not be empty', 422, next);
+    return;
+  }
+  if (!post) {
+    generateError('Comment must be assigned to a post', 422, next);
+    return;
+  }
 
   const sanitizedBody = sanitizeHtml(body);
 
@@ -29,7 +39,10 @@ exports.create = asyncErrorHandler(async (req, res, next) => {
         post,
       });
 
-      if (!parentCommentary) { generateError('Parent commentary is not found', 404, next); return; }
+      if (!parentCommentary) {
+        generateError('Parent commentary is not found', 404, next);
+        return;
+      }
 
       const comment = await Comment.create({
         post,

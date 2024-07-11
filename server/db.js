@@ -10,9 +10,13 @@ mongoose.connect(config.DB_URL, {
 
 const db = mongoose.connection;
 
-db.on('error', global.console.error.bind(console, 'connection error:'))
-  .once('open', () => {
-    logger.info(`${process.pid} [pid]: Successfully connected to MongoDB database`);
-  });
+db.on('error', global.console.error.bind(console, 'connection error:')).once(
+  'open',
+  () => {
+    logger.info(
+      `${process.pid} [pid]: Successfully connected to MongoDB database`,
+    );
+  },
+);
 
 module.exports = db;

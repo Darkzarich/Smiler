@@ -1,6 +1,10 @@
 const User = require('../../models/User');
 
-const { generateError, success, asyncErrorHandler } = require('../../utils/utils');
+const {
+  generateError,
+  success,
+  asyncErrorHandler,
+} = require('../../utils/utils');
 
 exports.unfollowById = asyncErrorHandler(async (req, res, next) => {
   const { id } = req.params;
@@ -11,39 +15,40 @@ exports.unfollowById = asyncErrorHandler(async (req, res, next) => {
     return;
   }
 
-  Promise.all([
-    User.findById(userId),
-    User.findById(id),
-  ]).then((users) => {
-    const userUnfollowing = users[0];
-    const userUnfollowed = users[1];
+  Promise.all([User.findById(userId), User.findById(id)])
+    .then((users) => {
+      const userUnfollowing = users[0];
+      const userUnfollowed = users[1];
 
-    if (userUnfollowed) {
-      if (!userUnfollowing.usersFollowed.includes(id)) {
-        generateError('You\'re not following this author', 404, next);
-        return;
+      if (userUnfollowed) {
+        if (!userUnfollowing.usersFollowed.includes(id)) {
+          generateError("You're not following this author", 404, next);
+          return;
+        }
+
+        Promise.all([
+          userUnfollowing.updateOne({
+            $pull: {
+              usersFollowed: id,
+            },
+          }),
+          userUnfollowed.updateOne({
+            $inc: {
+              followersAmount: -1,
+            },
+          }),
+        ])
+          .then(() => {
+            success(req, res);
+          })
+          .catch((e) => {
+            next(e);
+          });
+      } else {
+        generateError('User is not found', 404, next);
       }
-
-      Promise.all([
-        userUnfollowing.updateOne({
-          $pull: {
-            usersFollowed: id,
-          },
-        }),
-        userUnfollowed.updateOne({
-          $inc: {
-            followersAmount: -1,
-          },
-        }),
-      ]).then(() => {
-        success(req, res);
-      }).catch((e) => {
-        next(e);
-      });
-    } else {
-      generateError('User is not found', 404, next);
-    }
-  }).catch((e) => {
-    next(e);
-  });
+    })
+    .catch((e) => {
+      next(e);
+    });
 });

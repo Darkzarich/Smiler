@@ -9,7 +9,9 @@ router.use('/tags', require('./tags'));
 
 router.use((err, req, res, next) => {
   if (err.status) {
-    logger.warn(`[req_id: ${req.id}][uid: ${req.session.userId}] [${err.status}] ${err.error.message}`);
+    logger.warn(
+      `[req_id: ${req.id}][uid: ${req.session.userId}] [${err.status}] ${err.error.message}`,
+    );
     res.status(err.status).json({
       error: {
         message: err.error.message,

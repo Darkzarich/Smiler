@@ -20,9 +20,12 @@ const {
 
 module.exports = {
   PORT: BACKEND_PORT || 3000,
-  DB_URL: DB_URL || `mongodb://localhost:${DB_PORT || 27017}/${MONGO_INITDB_DATABASE}?authSource=admin`,
+  DB_URL:
+    DB_URL ||
+    `mongodb://localhost:${DB_PORT || 27017}/${MONGO_INITDB_DATABASE}?authSource=admin`,
   IS_PRODUCTION: NODE_ENV === 'production',
   SESSION_SECRET: SESSION_SECRET || 'no-secret',
-  FRONT_ORIGIN_LOCAL: FRONT_ORIGIN_LOCAL || `http://localhost:${FRONTEND_PORT || 8000}`,
+  FRONT_ORIGIN_LOCAL:
+    FRONT_ORIGIN_LOCAL || `http://localhost:${FRONTEND_PORT || 8000}`,
   FRONT_ORIGIN_REMOTE,
 };

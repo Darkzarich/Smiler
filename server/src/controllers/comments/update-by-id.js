@@ -1,7 +1,11 @@
 const sanitizeHtml = require('../../utils/sanitize-html');
 const Comment = require('../../models/Comment');
 const consts = require('../../const/const');
-const { success, asyncErrorHandler, generateError } = require('../../utils/utils');
+const {
+  success,
+  asyncErrorHandler,
+  generateError,
+} = require('../../utils/utils');
 
 exports.updateById = asyncErrorHandler(async (req, res, next) => {
   const { userId } = req.session;
@@ -19,14 +23,22 @@ exports.updateById = asyncErrorHandler(async (req, res, next) => {
   }
 
   if (comment.children.length > 0) {
-    return generateError('You can\'t edit a comment if someone already answered it', 405, next);
+    return generateError(
+      "You can't edit a comment if someone already answered it",
+      405,
+      next,
+    );
   }
 
   const commentCreatedAt = new Date(comment.createdAt.toString()).getTime();
   const { now } = new Date();
 
   if (now - commentCreatedAt > consts.COMMENT_TIME_TO_UPDATE) {
-    return generateError(`You can update comment only within first ${consts.COMMENT_TIME_TO_UPDATE / 1000 / 60} min`, 405, next);
+    return generateError(
+      `You can update comment only within first ${consts.COMMENT_TIME_TO_UPDATE / 1000 / 60} min`,
+      405,
+      next,
+    );
   }
 
   comment.body = sanitizeHtml(body);

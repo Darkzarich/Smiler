@@ -1,6 +1,10 @@
 const crypto = require('crypto');
 const User = require('../../models/User');
-const { success, asyncErrorHandler, generateError } = require('../../utils/utils');
+const {
+  success,
+  asyncErrorHandler,
+  generateError,
+} = require('../../utils/utils');
 
 const validateUserAuth = (user, next) => {
   if (user.password && user.email) {
@@ -36,7 +40,9 @@ exports.signIn = asyncErrorHandler(async (req, res, next) => {
       return;
     }
 
-    const hash = crypto.pbkdf2Sync(user.password, foundUser.salt, 10000, 512, 'sha512').toString('hex');
+    const hash = crypto
+      .pbkdf2Sync(user.password, foundUser.salt, 10000, 512, 'sha512')
+      .toString('hex');
 
     if (hash === foundUser.hash) {
       req.session.userId = foundUser._id;

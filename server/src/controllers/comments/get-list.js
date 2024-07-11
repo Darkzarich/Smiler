@@ -1,6 +1,10 @@
 const Comment = require('../../models/Comment');
 const User = require('../../models/User');
-const { success, asyncErrorHandler, generateError } = require('../../utils/utils');
+const {
+  success,
+  asyncErrorHandler,
+  generateError,
+} = require('../../utils/utils');
 
 exports.getList = asyncErrorHandler(async (req, res, next) => {
   const { userId } = req.session;
@@ -12,14 +16,23 @@ exports.getList = asyncErrorHandler(async (req, res, next) => {
 
   const query = {};
 
-  if (limit > 30) { generateError('Limit can\'t be more than 30', 422, next); return; }
-  if (!post) { generateError('Can\'t get comments without set post', 422, next); return; }
+  if (limit > 30) {
+    generateError("Limit can't be more than 30", 422, next);
+    return;
+  }
+  if (!post) {
+    generateError("Can't get comments without set post", 422, next);
+    return;
+  }
 
   if (author) {
     const foundAuthor = await User.findOne({
       login: author,
     });
-    if (!foundAuthor) { generateError('User is not found', 404, next); return; }
+    if (!foundAuthor) {
+      generateError('User is not found', 404, next);
+      return;
+    }
 
     query.author = foundAuthor.id;
   }
@@ -35,46 +48,48 @@ exports.getList = asyncErrorHandler(async (req, res, next) => {
         .exists('parent', false),
       User.findById(userId).select('rates').populate('rates'),
       Comment.countDocuments(query).exists('parent', false),
-    ]).then((result) => {
-      const comments = result[0];
-      const user = result[1];
-      const pages = Math.ceil(result[2] / limit);
+    ])
+      .then((result) => {
+        const comments = result[0];
+        const user = result[1];
+        const pages = Math.ceil(result[2] / limit);
 
-      function formRecursive(array) {
-        const newArray = [];
-        function deep(nestedArray) {
-          if (nestedArray.children.length > 0) {
-            nestedArray = nestedArray.children.map((el) => {
-              const el2 = el.toResponse(user);
-              el2.children = deep(el);
-              return el2;
-            });
+        function formRecursive(array) {
+          const newArray = [];
+          function deep(nestedArray) {
+            if (nestedArray.children.length > 0) {
+              nestedArray = nestedArray.children.map((el) => {
+                const el2 = el.toResponse(user);
+                el2.children = deep(el);
+                return el2;
+              });
 
-            return nestedArray;
+              return nestedArray;
+            }
+            return [];
           }
-          return [];
+
+          array.forEach((el) => {
+            const el2 = el.toResponse(user);
+            if (el2.children.length > 0) {
+              el2.children = deep(el2);
+            }
+            newArray.push(el2);
+          });
+
+          return newArray;
         }
 
-        array.forEach((el) => {
-          const el2 = el.toResponse(user);
-          if (el2.children.length > 0) {
-            el2.children = deep(el2);
-          }
-          newArray.push(el2);
+        const transComments = formRecursive(comments);
+
+        success(req, res, {
+          comments: transComments,
+          pages,
         });
-
-        return newArray;
-      }
-
-      const transComments = formRecursive(comments);
-
-      success(req, res, {
-        comments: transComments,
-        pages,
+      })
+      .catch((e) => {
+        next(e);
       });
-    }).catch((e) => {
-      next(e);
-    });
   } catch (e) {
     next(e);
   }

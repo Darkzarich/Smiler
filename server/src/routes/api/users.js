@@ -320,7 +320,11 @@ router.put('/me', auth.required, usersController.updateMe);
 */
 
 router.get('/:login/template', auth.required, usersController.getPostTemplate);
-router.put('/:login/template', auth.required, usersController.updatePostTemplate);
+router.put(
+  '/:login/template',
+  auth.required,
+  usersController.updatePostTemplate,
+);
 
 /**
 @swagger
@@ -505,6 +509,10 @@ router.delete('/:id/follow', auth.required, usersController.unfollowById);
 }
 */
 
-router.delete('/:login/template/:hash', auth.required, usersController.deletePostTemplatePicture);
+router.delete(
+  '/:login/template/:hash',
+  auth.required,
+  usersController.deletePostTemplatePicture,
+);
 
 module.exports = router;

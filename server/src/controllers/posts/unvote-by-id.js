@@ -2,7 +2,11 @@ const User = require('../../models/User');
 const Post = require('../../models/Post');
 const Rate = require('../../models/Rate');
 const consts = require('../../const/const');
-const { success, asyncErrorHandler, generateError } = require('../../utils/utils');
+const {
+  success,
+  asyncErrorHandler,
+  generateError,
+} = require('../../utils/utils');
 
 exports.unvoteById = asyncErrorHandler(async (req, res, next) => {
   const { userId } = req.session;
@@ -15,7 +19,9 @@ exports.unvoteById = asyncErrorHandler(async (req, res, next) => {
     const rated = user.isRated(foundPost.id);
 
     if (rated.result) {
-      foundPost.rating += rated.negative ? consts.POST_RATE_VALUE : -consts.POST_RATE_VALUE;
+      foundPost.rating += rated.negative
+        ? consts.POST_RATE_VALUE
+        : -consts.POST_RATE_VALUE;
 
       Promise.all([
         Rate.deleteOne({
@@ -23,23 +29,27 @@ exports.unvoteById = asyncErrorHandler(async (req, res, next) => {
         }),
         foundPost.save(),
         User.findById(foundPost.author),
-      ]).then((result) => {
-        const postAuthor = result[2];
+      ])
+        .then((result) => {
+          const postAuthor = result[2];
 
-        user.rates.remove(rated.rated);
-        postAuthor.rating += rated.negative ? consts.POST_RATE_VALUE : -consts.POST_RATE_VALUE;
+          user.rates.remove(rated.rated);
+          postAuthor.rating += rated.negative
+            ? consts.POST_RATE_VALUE
+            : -consts.POST_RATE_VALUE;
 
-        user.save();
-        postAuthor.save();
+          user.save();
+          postAuthor.save();
 
-        success(req, res);
-      }).catch((e) => {
-        next(e);
-      });
+          success(req, res);
+        })
+        .catch((e) => {
+          next(e);
+        });
     } else {
-      generateError('You didn\'t rate this post', 405, next);
+      generateError("You didn't rate this post", 405, next);
     }
   } else {
-    generateError('Post doesn\'t exist', 404, next);
+    generateError("Post doesn't exist", 404, next);
   }
 });

@@ -1,7 +1,11 @@
 const User = require('../../models/User');
 const Post = require('../../models/Post');
 const consts = require('../../const/const');
-const { success, asyncErrorHandler, generateError } = require('../../utils/utils');
+const {
+  success,
+  asyncErrorHandler,
+  generateError,
+} = require('../../utils/utils');
 
 exports.getList = asyncErrorHandler(async (req, res, next) => {
   const limit = +req.query.limit || 100;
@@ -16,7 +20,10 @@ exports.getList = asyncErrorHandler(async (req, res, next) => {
   const tags = req.query.tags || [];
   const { userId } = req.session;
 
-  if (limit > 100) { generateError('Limit can\'t be more than 100', 422, next); return; }
+  if (limit > 100) {
+    generateError("Limit can't be more than 100", 422, next);
+    return;
+  }
 
   try {
     const query = {};
@@ -26,7 +33,7 @@ exports.getList = asyncErrorHandler(async (req, res, next) => {
         login: author,
       });
       if (!result) {
-        generateError('User doesn\'t exist', 404, next);
+        generateError("User doesn't exist", 404, next);
         return;
       }
       query.author = result.id;
@@ -45,7 +52,8 @@ exports.getList = asyncErrorHandler(async (req, res, next) => {
       if (dateFrom) {
         const dateFromCheck = new Date(dateFrom);
         if (dateFromCheck.toString() === 'Invalid Date') {
-          generateError('Invalid date', 422, next); return;
+          generateError('Invalid date', 422, next);
+          return;
         }
         query.createdAt.$gte = dateFromCheck;
       }
@@ -53,7 +61,8 @@ exports.getList = asyncErrorHandler(async (req, res, next) => {
       if (dateTo) {
         const dateToCheck = new Date(dateTo);
         if (dateToCheck.toString() === 'Invalid Date') {
-          generateError('Invalid date', 422, next); return;
+          generateError('Invalid date', 422, next);
+          return;
         }
         query.createdAt.$lte = dateToCheck;
       }
@@ -83,20 +92,22 @@ exports.getList = asyncErrorHandler(async (req, res, next) => {
         .skip(offset),
       User.findById(userId).select('rates').populate('rates'),
       Post.countDocuments(query),
-    ]).then((result) => {
-      const posts = result[0];
-      const user = result[1];
-      const pages = Math.ceil(result[2] / limit);
+    ])
+      .then((result) => {
+        const posts = result[0];
+        const user = result[1];
+        const pages = Math.ceil(result[2] / limit);
 
-      const transPosts = posts.map(el => el.toResponse(user));
+        const transPosts = posts.map((el) => el.toResponse(user));
 
-      success(req, res, {
-        pages,
-        posts: transPosts,
+        success(req, res, {
+          pages,
+          posts: transPosts,
+        });
+      })
+      .catch((e) => {
+        next(e);
       });
-    }).catch((e) => {
-      next(e);
-    });
   } catch (e) {
     next(e);
   }

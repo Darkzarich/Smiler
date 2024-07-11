@@ -5,7 +5,11 @@ const sanitizeHtml = require('../../utils/sanitize-html');
 const User = require('../../models/User');
 const Post = require('../../models/Post');
 const consts = require('../../const/const');
-const { success, asyncErrorHandler, generateError } = require('../../utils/utils');
+const {
+  success,
+  asyncErrorHandler,
+  generateError,
+} = require('../../utils/utils');
 
 const allowedSectionTypes = Object.values(consts.POST_SECTION_TYPES);
 
@@ -38,7 +42,7 @@ exports.create = asyncErrorHandler(async (req, res, next) => {
       return generateError('Too many tags', 422, next);
     }
 
-    if (tags.some(tag => tag.length > consts.POST_MAX_TAG_LEN)) {
+    if (tags.some((tag) => tag.length > consts.POST_MAX_TAG_LEN)) {
       return generateError('Exceeded max length of a tag', 422, next);
     }
   }
@@ -46,7 +50,11 @@ exports.create = asyncErrorHandler(async (req, res, next) => {
   // eslint-disable-next-line no-restricted-syntax
   for (const section of sections) {
     if (!allowedSectionTypes.includes(section.type)) {
-      return generateError(`Unsupported section type: ${section.type}`, 422, next);
+      return generateError(
+        `Unsupported section type: ${section.type}`,
+        422,
+        next,
+      );
     }
 
     let textContentSumLength = 0;
@@ -57,7 +65,11 @@ exports.create = asyncErrorHandler(async (req, res, next) => {
     }
 
     if (textContentSumLength > consts.POST_SECTIONS_MAX_LENGTH) {
-      return generateError(`Text sections sum length exceeded max allowed length of ${consts.POST_SECTIONS_MAX_LENGTH} symbols`, 422, next);
+      return generateError(
+        `Text sections sum length exceeded max allowed length of ${consts.POST_SECTIONS_MAX_LENGTH} symbols`,
+        422,
+        next,
+      );
     }
   }
 

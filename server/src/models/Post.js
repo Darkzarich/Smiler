@@ -4,43 +4,46 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const schema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  slug: {
-    type: String,
-    required: true,
-    index: true,
-  },
-  author: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    ref: 'User',
-  },
-  tags: [
-    {
-      type: Schema.Types.String,
+const schema = new Schema(
+  {
+    title: {
+      type: String,
+      required: true,
     },
-  ],
-  sections: [
-    {
-      // TODO: Describe this type more detailed
-      type: Schema.Types.Mixed,
+    slug: {
+      type: String,
+      required: true,
+      index: true,
     },
-  ],
-  commentCount: {
-    type: Number,
-    default: 0,
+    author: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
+    },
+    tags: [
+      {
+        type: Schema.Types.String,
+      },
+    ],
+    sections: [
+      {
+        // TODO: Describe this type more detailed
+        type: Schema.Types.Mixed,
+      },
+    ],
+    commentCount: {
+      type: Number,
+      default: 0,
+    },
+    rating: {
+      type: Number,
+      default: 0,
+    },
   },
-  rating: {
-    type: Number,
-    default: 0,
+  {
+    timestamps: true,
   },
-}, {
-  timestamps: true,
-});
+);
 
 schema.index({ slug: 1 }, { unique: true });
 
@@ -51,19 +54,27 @@ schema.index({ rating: -1 });
 schema.index({ createdAt: -1 });
 
 schema.static('commentCountInc', function (postId) {
-  return this.findByIdAndUpdate(postId, {
-    $inc: { commentCount: 1 },
-  }, {
-    new: true,
-  });
+  return this.findByIdAndUpdate(
+    postId,
+    {
+      $inc: { commentCount: 1 },
+    },
+    {
+      new: true,
+    },
+  );
 });
 
 schema.static('commentCountDec', function (postId) {
-  return this.findByIdAndUpdate(postId, {
-    $inc: { commentCount: -1 },
-  }, {
-    new: true,
-  });
+  return this.findByIdAndUpdate(
+    postId,
+    {
+      $inc: { commentCount: -1 },
+    },
+    {
+      new: true,
+    },
+  );
 });
 
 schema.methods.toResponse = function (user) {
@@ -91,6 +102,5 @@ schema.set('toJSON', {
   virtuals: true,
   versionKey: false,
 });
-
 
 module.exports = mongoose.model('Post', schema);

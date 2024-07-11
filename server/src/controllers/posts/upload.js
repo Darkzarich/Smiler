@@ -7,7 +7,11 @@ const diskStorage = require('../../utils/DiskStorage');
 const User = require('../../models/User');
 const consts = require('../../const/const');
 
-const { success, asyncErrorHandler, generateError } = require('../../utils/utils');
+const {
+  success,
+  asyncErrorHandler,
+  generateError,
+} = require('../../utils/utils');
 
 const uploader = multer({
   storage: diskStorage({
@@ -76,23 +80,35 @@ exports.upload = asyncErrorHandler(async (req, res, next) => {
     const user = await User.findById(req.session.userId).select('template');
 
     if (user.template.sections.length === consts.POST_SECTIONS_MAX) {
-      generateError(`Exceed limit of post sections: ${consts.POST_SECTIONS_MAX}`, 409, next);
+      generateError(
+        `Exceed limit of post sections: ${consts.POST_SECTIONS_MAX}`,
+        409,
+        next,
+      );
       return;
     }
 
-    await !fs.exists(path.join(__dirname, '../..', '/uploads', req.session.userLogin), async (exists) => {
-      if (!exists) {
-        await fs.mkdir(path.join(__dirname, '../..', '/uploads', req.session.userLogin), (err) => {
-          if (err) {
-            next(new Error(`Something went wrong while uploading... : ${err}`));
-          } else {
-            startUpload(req, res, next);
-          }
-        });
-      } else {
-        startUpload(req, res, next);
-      }
-    });
+    await !fs.exists(
+      path.join(__dirname, '../..', '/uploads', req.session.userLogin),
+      async (exists) => {
+        if (!exists) {
+          await fs.mkdir(
+            path.join(__dirname, '../..', '/uploads', req.session.userLogin),
+            (err) => {
+              if (err) {
+                next(
+                  new Error(`Something went wrong while uploading... : ${err}`),
+                );
+              } else {
+                startUpload(req, res, next);
+              }
+            },
+          );
+        } else {
+          startUpload(req, res, next);
+        }
+      },
+    );
   } catch (e) {
     next(e);
   }
