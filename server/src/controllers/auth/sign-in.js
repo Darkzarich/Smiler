@@ -44,9 +44,12 @@ exports.signIn = asyncErrorHandler(async (req, res, next) => {
       .pbkdf2Sync(user.password, foundUser.salt, 10000, 512, 'sha512')
       .toString('hex');
 
-    if (
-      crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(foundUser.hash))
-    ) {
+    const isEqual = crypto.timingSafeEqual(
+      Buffer.from(hash),
+      Buffer.from(foundUser.hash),
+    );
+
+    if (!isEqual) {
       generateError('Invalid email or password', 401, next);
     }
 
