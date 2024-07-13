@@ -127,7 +127,7 @@
                 :data-testid="`comment-${commentData.id}-toggle-reply`"
                 @click="toggleReply()"
               >
-                Reply ``
+                Reply
               </div>
             </template>
           </div>

@@ -20,7 +20,9 @@
       "get": {
         "summary": "Check login state",
         "description": "Return user auth status",
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -38,7 +40,9 @@
     "/auth/signin": {
       "post": {
         "summary": "Sign in to the application",
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "requestBody": {
           "description": "user's credential",
           "required": true,
@@ -46,7 +50,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email", "password"],
+                "required": [
+                  "email",
+                  "password"
+                ],
                 "properties": {
                   "email": {
                     "type": "string"
@@ -93,14 +100,21 @@
     "/auth/signup": {
       "post": {
         "summary": "Sign up a user",
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "description": "Sign up a new user and return its cookie token (connect.sid)",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["login", "password", "confirm", "email"],
+                "required": [
+                  "login",
+                  "password",
+                  "confirm",
+                  "email"
+                ],
                 "properties": {
                   "login": {
                     "type": "string",
@@ -155,7 +169,9 @@
             "cookieAuth": []
           }
         ],
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/OK"
@@ -166,7 +182,9 @@
     "/comments": {
       "get": {
         "summary": "Get user's comments or comments in a post",
-        "tags": ["Comments"],
+        "tags": [
+          "Comments"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -239,7 +257,9 @@
       },
       "post": {
         "summary": "Create a comment",
-        "tags": ["Comments"],
+        "tags": [
+          "Comments"
+        ],
         "description": "Create a comment to a post",
         "security": [
           {
@@ -251,7 +271,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["post"],
+                "required": [
+                  "post"
+                ],
                 "properties": {
                   "body": {
                     "type": "string",
@@ -296,7 +318,9 @@
     "/comments/{id}": {
       "put": {
         "summary": "Edit comment",
-        "tags": ["Comments"],
+        "tags": [
+          "Comments"
+        ],
         "description": "Edit comment by its `id`",
         "parameters": [
           {
@@ -349,7 +373,9 @@
         }
       },
       "delete": {
-        "tags": ["Comments"],
+        "tags": [
+          "Comments"
+        ],
         "summary": "Delete comment",
         "description": "Delete comment by its `id`",
         "parameters": [
@@ -390,7 +416,9 @@
       "put": {
         "summary": "Change rate on comment",
         "description": "Changes rate for comment. `negative` decides direction. You can't rate comment again before deleting previous rate",
-        "tags": ["Comments"],
+        "tags": [
+          "Comments"
+        ],
         "security": [
           {
             "cookieAuth": []
@@ -439,7 +467,9 @@
       "delete": {
         "summary": "Unvote a comment",
         "description": "Unvotes an already voted comment",
-        "tags": ["Comments"],
+        "tags": [
+          "Comments"
+        ],
         "security": [
           {
             "cookieAuth": []
@@ -473,7 +503,9 @@
     },
     "/posts": {
       "get": {
-        "tags": ["Posts"],
+        "tags": [
+          "Posts"
+        ],
         "description": "Get all posts",
         "summary": "Get all posts",
         "parameters": [
@@ -604,7 +636,9 @@
         }
       },
       "post": {
-        "tags": ["Posts"],
+        "tags": [
+          "Posts"
+        ],
         "description": "Create a post with `title` and `sections`. Creating a post clears the template.",
         "summary": "create a post",
         "security": [
@@ -617,7 +651,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["title", "sections"],
+                "required": [
+                  "title",
+                  "sections"
+                ],
                 "properties": {
                   "title": {
                     "type": "string"
@@ -661,7 +698,9 @@
     },
     "/posts/feed": {
       "get": {
-        "tags": ["Posts"],
+        "tags": [
+          "Posts"
+        ],
         "description": "Get feed",
         "summary": "Get feed",
         "parameters": [
@@ -718,7 +757,9 @@
     },
     "/posts/{id}": {
       "put": {
-        "tags": ["Posts"],
+        "tags": [
+          "Posts"
+        ],
         "security": [
           {
             "cookieAuth": []
@@ -781,7 +822,9 @@
         }
       },
       "delete": {
-        "tags": ["Posts"],
+        "tags": [
+          "Posts"
+        ],
         "summary": "delete a post by its Id",
         "description": "delete a post by its `Id`",
         "security": [
@@ -818,7 +861,9 @@
         }
       },
       "get": {
-        "tags": ["Posts"],
+        "tags": [
+          "Posts"
+        ],
         "summary": "get a post by its slug",
         "description": "Get a post by its `slug`",
         "parameters": [
@@ -850,7 +895,9 @@
     },
     "/posts/upload": {
       "post": {
-        "tags": ["Posts"],
+        "tags": [
+          "Posts"
+        ],
         "summary": "upload picture",
         "description": "Upload the picture to template. Allowed extensions: `jpg|jpeg|png|gif`",
         "security": [
@@ -905,7 +952,9 @@
       "put": {
         "summary": "Change vote on post",
         "description": "Changes vote for post. `negative` decides direction. You can't rate post again before deleting previous rate",
-        "tags": ["Posts"],
+        "tags": [
+          "Posts"
+        ],
         "security": [
           {
             "cookieAuth": []
@@ -954,7 +1003,9 @@
       "delete": {
         "summary": "Unvote a post",
         "description": "Delete already existing rate for user for post",
-        "tags": ["Posts"],
+        "tags": [
+          "Posts"
+        ],
         "security": [
           {
             "cookieAuth": []
@@ -988,7 +1039,9 @@
     },
     "/tags/{tag}/follow": {
       "put": {
-        "tags": ["Tags"],
+        "tags": [
+          "Tags"
+        ],
         "summary": "Follow the tag",
         "security": [
           {
@@ -1018,7 +1071,9 @@
         }
       },
       "delete": {
-        "tags": ["Tags"],
+        "tags": [
+          "Tags"
+        ],
         "summary": "Unfollow the tag",
         "security": [
           {
@@ -1050,7 +1105,9 @@
     },
     "/users/{login}": {
       "get": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Get user profile",
         "description": "Get user profile",
         "parameters": [
@@ -1082,7 +1139,9 @@
     },
     "/users/me": {
       "put": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Update user info",
         "description": "Update user info with payload",
         "security": [
@@ -1142,7 +1201,9 @@
     "/users/{login}/template": {
       "get": {
         "summary": "Get user saved template",
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "security": [
           {
             "cookieAuth": []
@@ -1199,7 +1260,9 @@
       },
       "put": {
         "summary": "Update user template",
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "description": "Update user post template `sections`, `title` and `tags`",
         "security": [
           {
@@ -1261,7 +1324,9 @@
     },
     "/users/me/settings": {
       "get": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Get the current user's settings",
         "description": "Gets the current user's settings: bio, followed users, tags etc",
         "security": [
@@ -1294,7 +1359,9 @@
     },
     "/users/{id}/follow": {
       "put": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Follow a user",
         "description": "Follow a user",
         "parameters": [
@@ -1328,7 +1395,9 @@
         }
       },
       "delete": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Unfollow a user",
         "description": "Unfollow a user",
         "parameters": [
@@ -1364,7 +1433,9 @@
     },
     "/users/{login}/template/{hash}": {
       "delete": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Delete section file picture",
         "description": "Deletes file picture section and the image from the server. Works only for sections with `isFile` set as true",
         "security": [
@@ -1597,7 +1668,9 @@
         "properties": {
           "type": {
             "type": "string",
-            "enum": ["text"]
+            "enum": [
+              "text"
+            ]
           },
           "content": {
             "type": "string",
@@ -1613,7 +1686,9 @@
         "properties": {
           "type": {
             "type": "string",
-            "enum": ["pic"]
+            "enum": [
+              "pic"
+            ]
           },
           "url": {
             "type": "string"
@@ -1632,7 +1707,9 @@
         "properties": {
           "type": {
             "type": "string",
-            "enum": ["vid"]
+            "enum": [
+              "vid"
+            ]
           },
           "url": {
             "type": "string"
@@ -1722,7 +1799,9 @@
             }
           }
         },
-        "required": ["message"]
+        "required": [
+          "message"
+        ]
       },
       "OK": {
         "type": "object",

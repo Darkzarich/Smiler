@@ -85,6 +85,7 @@ schema.methods.toResponse = function (user) {
       createdAt: this.createdAt,
     };
   }
+
   const rated = user ? user.isRated(this.id) : {};
 
   return {

@@ -6,6 +6,25 @@ const {
   generateError,
 } = require('../../utils/utils');
 
+function fillWithUserRecursive({ comments, user }) {
+  if (!comments) {
+    return [];
+  }
+
+  return comments.map((comment) => {
+    const commentWithUser = comment.toResponse(user);
+
+    if (commentWithUser.children && commentWithUser.children.length > 0) {
+      commentWithUser.children = fillWithUserRecursive({
+        comments: comment.children,
+        user,
+      });
+    }
+
+    return commentWithUser;
+  });
+}
+
 exports.getList = asyncErrorHandler(async (req, res, next) => {
   const { userId } = req.session;
   const { post } = req.query;
@@ -54,36 +73,8 @@ exports.getList = asyncErrorHandler(async (req, res, next) => {
         const user = result[1];
         const pages = Math.ceil(result[2] / limit);
 
-        function formRecursive(array) {
-          const newArray = [];
-          function deep(nestedArray) {
-            if (nestedArray.children.length > 0) {
-              nestedArray = nestedArray.children.map((el) => {
-                const el2 = el.toResponse(user);
-                el2.children = deep(el);
-                return el2;
-              });
-
-              return nestedArray;
-            }
-            return [];
-          }
-
-          array.forEach((el) => {
-            const el2 = el.toResponse(user);
-            if (el2.children.length > 0) {
-              el2.children = deep(el2);
-            }
-            newArray.push(el2);
-          });
-
-          return newArray;
-        }
-
-        const transComments = formRecursive(comments);
-
         success(req, res, {
-          comments: transComments,
+          comments: fillWithUserRecursive({ comments, user }),
           pages,
         });
       })
