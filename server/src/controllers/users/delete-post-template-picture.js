@@ -56,8 +56,8 @@ exports.deletePostTemplatePicture = asyncErrorHandler(
 
         const absolutePath = path.join(process.cwd(), url);
 
-        fs.exists(absolutePath, (exists) => {
-          if (exists) {
+        fs.access(absolutePath, (accessErr) => {
+          if (!accessErr) {
             fs.unlink(absolutePath, (err) => {
               if (err) {
                 generateError(err, 500, next);
@@ -65,9 +65,11 @@ exports.deletePostTemplatePicture = asyncErrorHandler(
                 userTemplate.deleteSection(foundSection, delCb);
               }
             });
-          } else {
-            userTemplate.deleteSection(foundSection, delCb);
+
+            return;
           }
+
+          userTemplate.deleteSection(foundSection, delCb);
         });
       } else {
         generateError(

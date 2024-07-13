@@ -88,10 +88,10 @@ exports.upload = asyncErrorHandler(async (req, res, next) => {
       return;
     }
 
-    await !fs.exists(
+    await !fs.access(
       path.join(__dirname, '../..', '/uploads', req.session.userLogin),
-      async (exists) => {
-        if (!exists) {
+      async (accessErr) => {
+        if (accessErr) {
           await fs.mkdir(
             path.join(__dirname, '../..', '/uploads', req.session.userLogin),
             (err) => {
@@ -104,9 +104,11 @@ exports.upload = asyncErrorHandler(async (req, res, next) => {
               }
             },
           );
-        } else {
-          startUpload(req, res, next);
+
+          return;
         }
+
+        startUpload(req, res, next);
       },
     );
   } catch (e) {

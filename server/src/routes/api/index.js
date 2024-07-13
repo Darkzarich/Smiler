@@ -7,7 +7,7 @@ router.use('/posts', require('./posts'));
 router.use('/comments', require('./comments'));
 router.use('/tags', require('./tags'));
 
-router.use((err, req, res, next) => {
+router.use((err, req, res) => {
   if (err.status) {
     logger.warn(
       `[req_id: ${req.id}][uid: ${req.session.userId}] [${err.status}] ${err.error.message}`,

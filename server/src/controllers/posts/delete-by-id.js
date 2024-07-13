@@ -48,14 +48,18 @@ exports.deleteById = asyncErrorHandler(async (req, res, next) => {
       filePicSections.forEach((sec) => {
         const absolutePath = path.join(process.cwd(), sec.url);
 
-        fs.exists(absolutePath, (exists) => {
-          if (exists) {
-            fs.unlink(absolutePath, (err) => {
-              if (err) {
-                generateError(err, 500, next);
-              }
-            });
+        fs.access(absolutePath, (err) => {
+          if (err) {
+            generateError(err, 500, next);
+
+            return;
           }
+
+          fs.unlink(absolutePath, (unlinkErr) => {
+            if (unlinkErr) {
+              generateError(err, 500, next);
+            }
+          });
         });
       });
 

@@ -96,8 +96,8 @@ exports.updateById = asyncErrorHandler(async (req, res, next) => {
     filesToDelete.forEach((el) => {
       const absolutePath = path.join(process.cwd(), el);
 
-      fs.exists(absolutePath, (exist) => {
-        if (exist) {
+      fs.access(absolutePath, (accessErr) => {
+        if (!accessErr) {
           fs.unlink(absolutePath, (err) => {
             if (err) {
               generateError(err, 500, next);
