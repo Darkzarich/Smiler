@@ -46,7 +46,11 @@ exports.getList = asyncErrorHandler(async (req, res, next) => {
         generateError('Title is too long', 422, next);
         return;
       }
-      query.title = new RegExp(`${title.trim()}`, 'gi');
+
+      const sanitizedTitle = title.trim().replace(/[^0-9A-Za-z\s]/g, '');
+
+      // eslint-disable-next-line security/detect-non-literal-regexp
+      query.title = new RegExp(sanitizedTitle, 'gi');
     }
 
     if (dateFrom || dateTo) {
