@@ -126,7 +126,7 @@ logger.info(
 );
 
 // TODO: make it conditional, make static only for dev
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.listen(PORT, () => {
   logger.info(`${process.pid} [pid]: Server is listening on the port ${PORT}`);

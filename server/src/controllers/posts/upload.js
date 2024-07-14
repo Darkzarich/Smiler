@@ -14,9 +14,9 @@ const {
 } = require('../../utils/utils');
 
 const uploader = multer({
-  storage: DiskStorage({
+  storage: new DiskStorage({
     destination: async (req, file, cb) => {
-      cb(null, path.join(process.cwd(), '/uploads', req.session.userLogin));
+      cb(null, path.join(process.cwd(), 'uploads', req.session.userLogin));
     },
     filename: (req, file, cb) => {
       cb(null, `${Date.now()}${path.extname(file.originalname)}`);
@@ -40,7 +40,7 @@ const uploader = multer({
     fileSize: 3 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
-    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
       cb(new Error('Invalid file extension'), false);
     } else {
       cb(null, true);
@@ -89,18 +89,18 @@ exports.upload = asyncErrorHandler(async (req, res, next) => {
       return;
     }
 
+    const rootFolder = process.cwd();
+
     await !fs.access(
-      path.join(__dirname, '../..', '/uploads', req.session.userLogin),
+      path.join(rootFolder, 'uploads', req.session.userLogin),
       async (accessErr) => {
         if (accessErr) {
           // eslint-disable-next-line security/detect-non-literal-fs-filename
           await fs.mkdir(
-            path.join(__dirname, '../..', '/uploads', req.session.userLogin),
+            path.join(rootFolder, 'uploads', req.session.userLogin),
             (err) => {
               if (err) {
-                next(
-                  new Error(`Something went wrong while uploading... : ${err}`),
-                );
+                next(new Error(`Something went wrong while uploading: ${err}`));
               } else {
                 startUpload(user, req, res, next);
               }

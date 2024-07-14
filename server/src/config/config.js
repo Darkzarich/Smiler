@@ -1,10 +1,8 @@
 const dotenv = require('dotenv');
 const path = require('path');
 
-const root = path.join.bind(this, path.join(__dirname, '../../'));
-
 // Load environment variables from .env file, won't override any existing environment variables.
-dotenv.config({ path: root('../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
 
 const {
   BACKEND_PORT,
