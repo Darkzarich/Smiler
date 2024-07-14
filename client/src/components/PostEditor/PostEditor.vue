@@ -325,6 +325,8 @@ export default {
     background-color: transparent;
 
     @include for-size(phone-only) {
+      top: -14px;
+      right: 12px;
       width: 10px;
     }
 
