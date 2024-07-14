@@ -2,7 +2,7 @@ const multer = require('multer');
 const Sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
-const diskStorage = require('../../utils/DiskStorage');
+const DiskStorage = require('../../utils/DiskStorage');
 
 const User = require('../../models/User');
 const consts = require('../../const/const');
@@ -14,7 +14,7 @@ const {
 } = require('../../utils/utils');
 
 const uploader = multer({
-  storage: diskStorage({
+  storage: DiskStorage({
     destination: async (req, file, cb) => {
       cb(null, path.join(process.cwd(), '/uploads', req.session.userLogin));
     },
@@ -36,7 +36,7 @@ const uploader = multer({
     },
   }),
   limits: {
-    fieldSize: 3 * 1024 * 1024,
+    fieldSize: 3 * 1024 * 1024, // 3MB
     fileSize: 3 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
@@ -46,32 +46,33 @@ const uploader = multer({
       cb(null, true);
     }
   },
-}).single('picture');
+}).single('picture'); // frontend form-data name for file
 
-function startUpload(req, res, next) {
+function startUpload(user, req, res, next) {
   uploader(req, res, async (err) => {
     if (err) {
       generateError(err.message, 413, next);
-    } else {
-      const user = await User.findById(req.session.userId).select('template');
-      // /uploads/username/file.jpg
-      const fileRelativePath = req.file.path.replace(process.cwd(), '');
 
-      const newSection = {
-        type: 'pic',
-        url: fileRelativePath,
-        hash: (Math.random() * Math.random()).toString(36),
-        isFile: true,
-      };
-
-      user.template.sections.push(newSection);
-
-      user.markModified('template');
-
-      await user.save();
-
-      success(req, res, newSection);
+      return;
     }
+
+    // /uploads/username/file.jpg
+    const fileRelativePath = req.file.path.replace(process.cwd(), '');
+
+    const newSection = {
+      type: 'pic',
+      url: fileRelativePath,
+      hash: (Math.random() * Math.random()).toString(36),
+      isFile: true,
+    };
+
+    user.template.sections.push(newSection);
+
+    user.markModified('template');
+
+    await user.save();
+
+    success(req, res, newSection);
   });
 }
 
@@ -79,7 +80,7 @@ exports.upload = asyncErrorHandler(async (req, res, next) => {
   try {
     const user = await User.findById(req.session.userId).select('template');
 
-    if (user.template.sections.length === consts.POST_SECTIONS_MAX) {
+    if (user.template.sections.length >= consts.POST_SECTIONS_MAX) {
       generateError(
         `Exceed limit of post sections: ${consts.POST_SECTIONS_MAX}`,
         409,
@@ -92,6 +93,7 @@ exports.upload = asyncErrorHandler(async (req, res, next) => {
       path.join(__dirname, '../..', '/uploads', req.session.userLogin),
       async (accessErr) => {
         if (accessErr) {
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
           await fs.mkdir(
             path.join(__dirname, '../..', '/uploads', req.session.userLogin),
             (err) => {
@@ -100,7 +102,7 @@ exports.upload = asyncErrorHandler(async (req, res, next) => {
                   new Error(`Something went wrong while uploading... : ${err}`),
                 );
               } else {
-                startUpload(req, res, next);
+                startUpload(user, req, res, next);
               }
             },
           );
@@ -108,7 +110,7 @@ exports.upload = asyncErrorHandler(async (req, res, next) => {
           return;
         }
 
-        startUpload(req, res, next);
+        startUpload(user, req, res, next);
       },
     );
   } catch (e) {

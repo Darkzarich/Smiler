@@ -58,6 +58,7 @@ exports.deletePostTemplatePicture = asyncErrorHandler(
 
         fs.access(absolutePath, (accessErr) => {
           if (!accessErr) {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename
             fs.unlink(absolutePath, (err) => {
               if (err) {
                 generateError(err, 500, next);

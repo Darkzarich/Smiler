@@ -32,10 +32,12 @@ exports.getList = asyncErrorHandler(async (req, res, next) => {
       const result = await User.findOne({
         login: author,
       });
+
       if (!result) {
         generateError("User doesn't exist", 404, next);
         return;
       }
+
       query.author = result.id;
     }
 

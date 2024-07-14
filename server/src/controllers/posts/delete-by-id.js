@@ -55,6 +55,7 @@ exports.deleteById = asyncErrorHandler(async (req, res, next) => {
             return;
           }
 
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
           fs.unlink(absolutePath, (unlinkErr) => {
             if (unlinkErr) {
               generateError(err, 500, next);

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
+// Implementing multer's StorageEngine interface
 function DiskStorage(opts) {
   this.getFilename = opts.filename;
   this.getDestination = opts.destination;
@@ -18,6 +19,7 @@ DiskStorage.prototype._handleFile = function _handleFile(req, file, cb) {
         if (err3) return cb(err3);
 
         const finalPath = path.join(destination, filename);
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         const outStream = fs.createWriteStream(finalPath);
 
         file.stream.pipe(resizer).pipe(outStream);
@@ -34,6 +36,7 @@ DiskStorage.prototype._handleFile = function _handleFile(req, file, cb) {
               size: outStream.bytesWritten,
             });
           } else {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename
             fs.unlink(finalPath, (err) => {
               if (err) {
                 cb(new Error(err));
@@ -48,13 +51,13 @@ DiskStorage.prototype._handleFile = function _handleFile(req, file, cb) {
 
 DiskStorage.prototype._removeFile = function _removeFile(req, file, cb) {
   const filePath = file.path;
+
   if (filePath) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.unlink(filePath, cb);
   } else {
     cb();
   }
 };
 
-module.exports = function (opts) {
-  return new DiskStorage(opts);
-};
+module.exports = DiskStorage;
