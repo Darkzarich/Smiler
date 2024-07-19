@@ -1,4 +1,5 @@
 const express = require('express');
+const helmet = require('helmet');
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
@@ -13,6 +14,8 @@ const config = require('./src/config/config');
 const router = require('./src/routes');
 
 const app = express();
+
+app.use(helmet());
 
 const {
   PORT,
