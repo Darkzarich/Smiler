@@ -6,16 +6,20 @@ const {
   generateError,
 } = require('../../utils/utils');
 
-const validateUserAuth = (user, next) => {
-  if (user.password && user.email) {
-    if (user.password.length < 6) {
-      generateError('Password length must be not less than 6', 422, next);
-    } else {
-      return 0;
-    }
-  } else {
+const validate = (user, next) => {
+  if (!user.email || !user.password) {
     generateError('All fields must be filled.', 422, next);
+
+    return false;
   }
+
+  if (user.password.length < 6) {
+    generateError('Password length must be not less than 6', 422, next);
+
+    return false;
+  }
+
+  return true;
 };
 
 exports.signIn = asyncErrorHandler(async (req, res, next) => {
@@ -24,51 +28,47 @@ exports.signIn = asyncErrorHandler(async (req, res, next) => {
     password: req.body.password,
   };
 
-  const status = validateUserAuth(user, next);
+  const isValid = validate(user, next);
 
-  if (status !== 0) {
+  if (!isValid) {
     return;
   }
 
-  try {
-    const foundUser = await User.findOne({
-      email: user.email,
-    }).lean();
+  const foundUser = await User.findOne({
+    email: user.email,
+  }).lean();
 
-    if (!foundUser) {
-      generateError('Invalid email or password', 401, next);
-      return;
-    }
-
-    const hash = crypto
-      .pbkdf2Sync(user.password, foundUser.salt, 10000, 512, 'sha512')
-      .toString('hex');
-
-    const isEqual = crypto.timingSafeEqual(
-      Buffer.from(hash),
-      Buffer.from(foundUser.hash),
-    );
-
-    if (!isEqual) {
-      generateError('Invalid email or password', 401, next);
-    }
-
-    req.session.userId = foundUser._id;
-    req.session.userLogin = foundUser.login;
-
-    // TODO: Maybe move to getters of the model
-    const userAuth = {
-      login: foundUser.login,
-      isAuth: true,
-      rating: foundUser.rating || 0,
-      avatar: foundUser.avatar || '',
-      email: foundUser.email || '',
-      tagsFollowed: foundUser.tagsFollowed || [],
-      followersAmount: foundUser.followersAmount,
-    };
-
-    success(req, res, userAuth);
-  } catch (e) {
-    next(e);
+  if (!foundUser) {
+    generateError('Invalid email or password', 401, next);
+    return;
   }
+
+  const hash = crypto
+    .pbkdf2Sync(user.password, foundUser.salt, 10000, 512, 'sha512')
+    .toString('hex');
+
+  const isEqual = crypto.timingSafeEqual(
+    Buffer.from(hash),
+    Buffer.from(foundUser.hash),
+  );
+
+  if (!isEqual) {
+    generateError('Invalid email or password', 401, next);
+  }
+
+  req.session.userId = foundUser._id;
+  req.session.userLogin = foundUser.login;
+
+  // TODO: Maybe move to getters of the model
+  const userAuth = {
+    login: foundUser.login,
+    isAuth: true,
+    rating: foundUser.rating || 0,
+    avatar: foundUser.avatar || '',
+    email: foundUser.email || '',
+    tagsFollowed: foundUser.tagsFollowed || [],
+    followersAmount: foundUser.followersAmount,
+  };
+
+  success(req, res, userAuth);
 });

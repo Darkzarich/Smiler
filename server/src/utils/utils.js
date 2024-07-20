@@ -21,6 +21,8 @@ module.exports = {
       error: new Error(errorMessage),
     });
   },
+  isDuplicateKeyError: (error) =>
+    error.name === 'MongoError' && error.code === 11000,
   success: (req, res, payload = undefined) => {
     res.status(200);
 

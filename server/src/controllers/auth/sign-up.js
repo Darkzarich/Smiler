@@ -4,22 +4,41 @@ const {
   success,
   generateError,
   asyncErrorHandler,
+  isDuplicateKeyError,
 } = require('../../utils/utils');
 
-const validateUserRegistration = (user, next) => {
-  if (user.login && user.password && user.confirm && user.email) {
-    if (user.login.length < 3 || user.login.length > 10) {
-      generateError('Login length must be 3-10 symbols', 422, next);
-    } else if (user.password.length < 6) {
-      generateError('Password length must be not less than 6', 422, next);
-    } else if (user.password !== user.confirm) {
-      generateError('Password and password confirm must be equal', 422, next);
-    } else {
-      return 0;
-    }
-  } else {
+const validate = (user, next) => {
+  if (!user.login || !user.password || !user.confirm || !user.email) {
     generateError('All fields must be filled.', 422, next);
+
+    return false;
   }
+
+  if (user.login.length < 3 || user.login.length > 10) {
+    generateError('Login length must be 3-10 symbols', 422, next);
+
+    return false;
+  }
+
+  if (user.password.length < 6) {
+    generateError('Password length must be not less than 6', 422, next);
+
+    return false;
+  }
+
+  if (user.password !== user.confirm) {
+    generateError('Password and password confirm must be equal', 422, next);
+
+    return false;
+  }
+
+  if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(user.email)) {
+    generateError('Email is not valid', 422, next);
+
+    return false;
+  }
+
+  return true;
 };
 
 exports.signUp = asyncErrorHandler(async (req, res, next) => {
@@ -31,9 +50,9 @@ exports.signUp = asyncErrorHandler(async (req, res, next) => {
     confirm: req.body.confirm,
   };
 
-  const status = validateUserRegistration(user, next);
+  const isValid = validate(user, next);
 
-  if (status !== 0) {
+  if (!isValid) {
     return;
   }
 
@@ -62,7 +81,17 @@ exports.signUp = asyncErrorHandler(async (req, res, next) => {
     };
 
     success(req, res, userAuth);
-  } catch (e) {
-    next(e);
+  } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      generateError(
+        'This email or login is already associated with an account',
+        422,
+        next,
+      );
+
+      return;
+    }
+
+    throw error;
   }
 });
