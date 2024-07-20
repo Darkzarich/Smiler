@@ -106,8 +106,6 @@ export default {
 
       if (this.requestError && !(this.password || this.email)) {
         validation.email = this.requestError;
-        validation.password = this.requestError;
-        validation.confirm = this.requestError;
         validation.login = this.requestError;
       } else {
         // email
@@ -116,7 +114,7 @@ export default {
 
         if (this.email.length === 0) {
           validation.email = "Email can't be empty";
-        } else if (!/.+@.+\.[a-z]+/.test(this.email)) {
+        } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(this.email)) {
           validation.email = 'Email is not valid';
         }
 

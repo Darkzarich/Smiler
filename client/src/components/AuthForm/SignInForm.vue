@@ -79,7 +79,7 @@ export default {
 
         if (this.email.length === 0) {
           validation.email = "Email can't be empty";
-        } else if (!/.+@.+\.[a-z]+/.test(this.email)) {
+        } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(this.email)) {
           validation.email = 'Email is not valid';
         }
 
