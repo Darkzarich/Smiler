@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const logger = require('../../config/winston');
+const logger = require('../../config/logger');
 
 router.use('/users', require('./users'));
 router.use('/auth', require('./auth'));
@@ -7,11 +7,16 @@ router.use('/posts', require('./posts'));
 router.use('/comments', require('./comments'));
 router.use('/tags', require('./tags'));
 
-router.use((err, req, res) => {
+// eslint-disable-next-line no-unused-vars
+router.all('*', (req, res, next) => {
+  res.status(404).send('Not Found');
+});
+
+// specifying four parameters is a must for global error handling
+// eslint-disable-next-line no-unused-vars
+router.use((err, req, res, next) => {
   if (err.status) {
-    logger.warn(
-      `[req_id: ${req.id}][uid: ${req.session.userId}] [${err.status}] ${err.error.message}`,
-    );
+    res.response = err.error.message;
     res.status(err.status).json({
       error: {
         message: err.error.message,
@@ -20,10 +25,16 @@ router.use((err, req, res) => {
   } else {
     // TODO: validate mongo db error
 
-    logger.error(`[req_id: ${req.id}][uid: ${req.session.userId}] [500]`, err);
+    logger.error(err, {
+      requestId: req.id,
+    });
+
+    const message = 'Internal server error';
+
+    res.response = message;
     res.status(500).json({
       error: {
-        message: 'Internal Server Error',
+        message,
       },
     });
   }

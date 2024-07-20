@@ -1,4 +1,4 @@
-const logger = require('../config/winston');
+const logger = require('../config/logger');
 
 module.exports = {
   /**
@@ -7,38 +7,35 @@ module.exports = {
   asyncErrorHandler: (fn) => (req, res, next) => {
     fn(req, res, next).catch((e) => next(e));
   },
-  generateError: (error, status, next) => {
-    if (status) {
+  generateError: (errorMessage, status, next) => {
+    if (!status) {
       next({
-        status,
-        error: new Error(error),
+        error: new Error(errorMessage),
       });
-    } else {
-      next({
-        error: new Error(error),
-      });
-    }
-  },
-  success: (
-    req,
-    res,
-    payload = undefined,
-    additionalData = { userId: 'no-auth' },
-  ) => {
-    const userId = req.session ? req.session.userId : additionalData.userId;
 
-    if (payload) {
-      logger.info(
-        `[req_id: ${req.id}][uid: ${userId}] [200] "${req.originalUrl}" responded with ${JSON.stringify(payload)}`,
-      );
-      res.status(200).json(payload);
-    } else {
-      logger.info(
-        `[req_id: ${req.id}][uid: ${userId}] [200] "${req.originalUrl}" responded with ${JSON.stringify({ ok: true })}`,
-      );
-      res.status(200).json({
-        ok: true,
-      });
+      return;
     }
+
+    next({
+      status,
+      error: new Error(errorMessage),
+    });
+  },
+  success: (req, res, payload = undefined) => {
+    res.status(200);
+
+    if (!payload) {
+      const response = {
+        ok: true,
+      };
+
+      res.json(response);
+      res.response = response;
+
+      return;
+    }
+
+    res.json(payload);
+    res.response = payload;
   },
 };

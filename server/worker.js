@@ -1,13 +1,16 @@
+/// @ts-check
+
+const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
-const path = require('path');
+const addRequestId = require('express-request-id')();
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const morgan = require('morgan');
-const addRequestId = require('express-request-id')();
 const MongoStore = require('connect-mongo')(session);
 const cors = require('cors');
-const logger = require('./src/config/winston');
+
+const morganMiddleware = require('./src/config/morgan');
+const logger = require('./src/config/logger');
 const db = require('./db');
 const config = require('./src/config/config');
 
@@ -49,7 +52,7 @@ app.use(
   }),
 );
 
-// X-Request-Id header
+// Unique request id
 app.use(addRequestId);
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -76,61 +79,18 @@ app.use(
   }),
 );
 
-// logging
-morgan.token('request-body', (req) => {
-  const body = { ...req.body };
-  // is not safe to leave insecure user's passwords in logs
-  if ('password' in body) {
-    body.password = '***';
-  }
+app.use(morganMiddleware);
 
-  if ('confirm' in body) {
-    body.confirm = '***';
-  }
-
-  return JSON.stringify(body);
-});
-morgan.token('request-id', (req) => req.id);
-morgan.token('user', (req) => {
-  if (req.session && req.session.userId) {
-    return req.session.userId;
-  }
-
-  return 'no user';
-});
-
-const loggerFormat =
-  '[req_id: :request-id][uid: :user] [:status] :remote-addr :method :url :response-time ms - :res[content-length] \n body :request-body';
-
-app.use(
-  morgan(loggerFormat, {
-    skip(req, res) {
-      return res.statusCode < 400;
-    },
-    stream: logger.stream,
-  }),
-);
-app.use(
-  morgan(loggerFormat, {
-    skip(req, res) {
-      return res.statusCode >= 400;
-    },
-    stream: logger.stream,
-  }),
-);
-
-// routes
 app.use(router);
 
-// set files folder
-
 logger.info(
-  `Worker is running in ${IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode...`,
+  `[pid: ${process.pid}] Worker is running in ${IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode.`,
 );
 
 // TODO: make it conditional, make static only for dev
+// set files folder
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.listen(PORT, () => {
-  logger.info(`${process.pid} [pid]: Server is listening on the port ${PORT}`);
+  logger.info(`[pid: ${process.pid}] Server is listening on the port ${PORT}`);
 });
