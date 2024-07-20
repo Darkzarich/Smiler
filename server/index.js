@@ -1,7 +1,7 @@
 const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 const config = require('./src/config/config');
-const logger = require('./src/config/winston');
+const logger = require('./src/config/logger');
 
 const amountOfWorkers = config.IS_PRODUCTION ? numCPUs : 2;
 
@@ -13,14 +13,16 @@ if (cluster.isMaster) {
   }
 
   cluster.on('online', (worker) => {
-    logger.info(`Worker ${worker.process.pid} is online`);
+    logger.info(`[pid: ${worker.process.pid}] Worker is online`);
   });
 
   cluster.on('exit', (worker, code, signal) => {
     logger.error(
       `Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`,
     );
+
     logger.info('Starting a new worker');
+
     cluster.fork();
   });
 } else {
