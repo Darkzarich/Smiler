@@ -9,6 +9,11 @@ import Route from './route';
 export default {
   posts: {
     getPosts: new Route('/posts', 'GET'),
+    getAll: new Route('/posts/categories/all', 'GET'),
+    getToday: new Route('/posts/categories/today', 'GET'),
+    getBlowing: new Route('/posts/categories/blowing', 'GET'),
+    getRecent: new Route('/posts/categories/recent', 'GET'),
+    getTopThisWeek: new Route('/posts/categories/top-this-week', 'GET'),
     getFeed: new Route('/posts/feed', 'GET'),
     createPost: new Route('/posts', 'POST'),
     uploadAttachment: new Route('/posts/upload', 'POST'),

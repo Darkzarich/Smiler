@@ -11,7 +11,7 @@ test.beforeEach(async ({ Api }) => {
     body: generateAuth(),
   });
 
-  Api.routes.posts.getPosts.mock({
+  Api.routes.posts.getToday.mock({
     body: {
       pages: 0,
       posts: [],

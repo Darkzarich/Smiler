@@ -21,7 +21,7 @@ test.beforeEach(async ({ Api }) => {
     body: generateAuth(),
   });
 
-  Api.routes.posts.getPosts.mock({
+  Api.routes.posts.getToday.mock({
     body: {
       pages: 0,
       posts,
@@ -34,7 +34,7 @@ test('Fetches posts with expected filters', async ({
   Post,
   Api,
 }) => {
-  await Api.routes.posts.getPosts.waitForRequest({
+  await Api.routes.posts.getToday.waitForRequest({
     preRequestAction: PostsPage.goto.bind(PostsPage, PostsPage.urls.today),
   });
 
@@ -44,7 +44,7 @@ test('Fetches posts with expected filters', async ({
 });
 
 test('Empty posts lists', async ({ Api, Post, PostsPage }) => {
-  Api.routes.posts.getPosts.mock({
+  Api.routes.posts.getToday.mock({
     body: {
       pages: 0,
       posts: [],
@@ -65,7 +65,7 @@ test.describe('Post groups', () => {
 
   test.describe('Not requiring auth', () => {
     test.beforeEach(async ({ PostsPage, Api, Menu }) => {
-      await Api.routes.posts.getPosts.waitForRequest({
+      await Api.routes.posts.getToday.waitForRequest({
         preRequestAction: PostsPage.goto.bind(PostsPage, PostsPage.urls.today),
       });
       await Menu.openIfMobile();
@@ -77,20 +77,20 @@ test.describe('Post groups', () => {
       Post,
       Api,
     }) => {
-      const searchParams = new URLSearchParams({
-        limit: '20',
-        offset: '0',
-        sort: '-rating',
+      Api.routes.posts.getAll.mock({
+        body: {
+          pages: 0,
+          posts,
+        },
       });
 
-      const allPostsResponse = await Api.routes.posts.getPosts.waitForRequest({
+      await Api.routes.posts.getAll.waitForRequest({
         preRequestAction: PostsPage.selectPostGroup.bind(
           PostsPage,
           PostsPage.groups.all,
         ),
       });
 
-      expect(allPostsResponse.url()).toContain(searchParams.toString());
       await expect(currentPage).toHaveURL(PostsPage.urls.all);
       await expect(currentPage).toHaveTitle(PostsPage.titles.all);
       await expect(Post.postsList).toBeVisible();
@@ -105,26 +105,20 @@ test.describe('Post groups', () => {
       Post,
       Api,
     }) => {
-      const searchParams = new URLSearchParams({
-        limit: '20',
-        offset: '0',
-        sort: '-rating',
-        ratingFrom: '50',
-        // Two hours ago from the mocked date and rating is already at least 50
-        dateFrom: '2024-03-05T22:00:00.000Z',
+      Api.routes.posts.getBlowing.mock({
+        body: {
+          pages: 0,
+          posts,
+        },
       });
 
-      const blowingPostsResponse =
-        await Api.routes.posts.getPosts.waitForRequest({
-          preRequestAction: PostsPage.selectPostGroup.bind(
-            PostsPage,
-            PostsPage.groups.blowing,
-          ),
-        });
+      await Api.routes.posts.getBlowing.waitForRequest({
+        preRequestAction: PostsPage.selectPostGroup.bind(
+          PostsPage,
+          PostsPage.groups.blowing,
+        ),
+      });
 
-      expect(blowingPostsResponse.url()).toContain(
-        decodeURIComponent(searchParams.toString()),
-      );
       await expect(currentPage).toHaveURL(PostsPage.urls.blowing);
       await expect(currentPage).toHaveTitle(PostsPage.titles.blowing);
       await expect(Post.postsList).toBeVisible();
@@ -139,26 +133,20 @@ test.describe('Post groups', () => {
       Post,
       Api,
     }) => {
-      const searchParams = new URLSearchParams({
-        limit: '20',
-        offset: '0',
-        sort: '-createdAt',
-        // Posts with createdAt starting from the date of the start of this week
-        dateFrom: '2024-03-02T23:00:00.000Z',
-        dateTo: '2024-03-05T23:00:00.999Z',
+      Api.routes.posts.getTopThisWeek.mock({
+        body: {
+          pages: 0,
+          posts,
+        },
       });
 
-      const topThisWeekResponse =
-        await Api.routes.posts.getPosts.waitForRequest({
-          preRequestAction: PostsPage.selectPostGroup.bind(
-            PostsPage,
-            PostsPage.groups.topThisWeek,
-          ),
-        });
+      await Api.routes.posts.getTopThisWeek.waitForRequest({
+        preRequestAction: PostsPage.selectPostGroup.bind(
+          PostsPage,
+          PostsPage.groups.topThisWeek,
+        ),
+      });
 
-      expect(topThisWeekResponse.url()).toContain(
-        decodeURIComponent(searchParams.toString()),
-      );
       await expect(currentPage).toHaveURL(PostsPage.urls.topThisWeek);
       await expect(currentPage).toHaveTitle(PostsPage.titles.topThisWeek);
       await expect(Post.postsList).toBeVisible();
@@ -173,24 +161,20 @@ test.describe('Post groups', () => {
       Post,
       Api,
     }) => {
-      const searchParams = new URLSearchParams({
-        limit: '20',
-        offset: '0',
-        sort: '-createdAt',
-        // Within two hours from the mocked date
-        dateFrom: '2024-03-05T22:00:00.000Z',
+      Api.routes.posts.getRecent.mock({
+        body: {
+          pages: 0,
+          posts,
+        },
       });
 
-      const newPostsResponse = await Api.routes.posts.getPosts.waitForRequest({
+      await Api.routes.posts.getRecent.waitForRequest({
         preRequestAction: PostsPage.selectPostGroup.bind(
           PostsPage,
           PostsPage.groups.new,
         ),
       });
 
-      expect(newPostsResponse.url()).toContain(
-        decodeURIComponent(searchParams.toString()),
-      );
       await expect(currentPage).toHaveURL(PostsPage.urls.new);
       await expect(currentPage).toHaveTitle(PostsPage.titles.new);
       await expect(Post.postsList).toBeVisible();
@@ -205,27 +189,10 @@ test.describe('Post groups', () => {
       Post,
       Api,
     }) => {
-      const searchParams = new URLSearchParams({
-        limit: '20',
-        offset: '0',
-        sort: '-rating',
-        // Within two hours from the mocked date
-        dateFrom: '2024-03-05T23:00:00.000Z',
-        dateTo: '2024-03-06T22:59:59.999Z',
+      await Api.routes.posts.getToday.waitForRequest({
+        preRequestAction: PostsPage.goto.bind(PostsPage, PostsPage.urls.today),
       });
 
-      const todayPostsResponse = await Api.routes.posts.getPosts.waitForRequest(
-        {
-          preRequestAction: PostsPage.goto.bind(
-            PostsPage,
-            PostsPage.urls.today,
-          ),
-        },
-      );
-
-      expect(todayPostsResponse.url()).toContain(
-        decodeURIComponent(searchParams.toString()),
-      );
       await expect(currentPage).toHaveURL(PostsPage.urls.today);
       await expect(currentPage).toHaveTitle(PostsPage.titles.today);
       await expect(Post.postsList).toBeVisible();
@@ -275,7 +242,7 @@ test.describe('Post groups', () => {
         offset: '0',
       });
 
-      const feedResponse = await Api.routes.posts.getPosts.waitForRequest({
+      const feedResponse = await Api.routes.posts.getFeed.waitForRequest({
         preRequestAction: PostsPage.selectPostGroup.bind(
           PostsPage,
           PostsPage.groups.feed,
@@ -342,7 +309,7 @@ test.describe('Post votes', () => {
     PostsPage,
     Api,
   }) => {
-    Api.routes.posts.getPosts.mock({
+    Api.routes.posts.getToday.mock({
       body: {
         pages: 0,
         posts: [
@@ -375,7 +342,7 @@ test.describe('Post votes', () => {
     PostsPage,
     Api,
   }) => {
-    Api.routes.posts.getPosts.mock({
+    Api.routes.posts.getToday.mock({
       body: {
         pages: 0,
         posts: [
@@ -416,7 +383,7 @@ test.describe('Sections', () => {
       sections: [section],
     });
 
-    Api.routes.posts.getPosts.mock({
+    Api.routes.posts.getToday.mock({
       body: {
         pages: 0,
         posts: [post],
@@ -441,7 +408,7 @@ test.describe('Sections', () => {
       sections: [section],
     });
 
-    Api.routes.posts.getPosts.mock({
+    Api.routes.posts.getToday.mock({
       body: {
         pages: 0,
         posts: [post],
@@ -467,7 +434,7 @@ test.describe('Sections', () => {
       sections: [section],
     });
 
-    Api.routes.posts.getPosts.mock({
+    Api.routes.posts.getToday.mock({
       body: {
         pages: 0,
         posts: [post],
@@ -507,7 +474,7 @@ test.describe('Sections', () => {
       sections,
     });
 
-    Api.routes.posts.getPosts.mock({
+    Api.routes.posts.getToday.mock({
       body: {
         pages: 0,
         posts: [post],

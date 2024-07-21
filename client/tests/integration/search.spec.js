@@ -205,7 +205,7 @@ test('Searches posts by clicking on a tag name and then "Search tag" option in t
 }) => {
   const tags = ['test'];
 
-  Api.routes.posts.getPosts.mock({
+  Api.routes.posts.getAll.mock({
     body: {
       pages: 0,
       posts: [
@@ -216,8 +216,15 @@ test('Searches posts by clicking on a tag name and then "Search tag" option in t
     },
   });
 
-  await Api.routes.posts.getPosts.waitForRequest({
+  await Api.routes.posts.getAll.waitForRequest({
     preRequestAction: PostsPage.goto.bind(Post, PostsPage.urls.all),
+  });
+
+  Api.routes.posts.getPosts.mock({
+    body: {
+      pages: 0,
+      posts: [],
+    },
   });
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
