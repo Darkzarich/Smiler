@@ -3,9 +3,44 @@ import Query from './_query';
 const CONTROLLER_URL = 'posts';
 
 export default {
-  getPosts(params) {
+  search(params) {
     return Query({
       url: CONTROLLER_URL,
+      method: 'get',
+      params,
+    });
+  },
+  getAll(params) {
+    return Query({
+      url: `${CONTROLLER_URL}/categories/all`,
+      method: 'get',
+      params,
+    });
+  },
+  getToday(params) {
+    return Query({
+      url: `${CONTROLLER_URL}/categories/today`,
+      method: 'get',
+      params,
+    });
+  },
+  getBlowing(params) {
+    return Query({
+      url: `${CONTROLLER_URL}/categories/blowing`,
+      method: 'get',
+      params,
+    });
+  },
+  getRecent(params) {
+    return Query({
+      url: `${CONTROLLER_URL}/categories/recent`,
+      method: 'get',
+      params,
+    });
+  },
+  getTopThisWeek(params) {
+    return Query({
+      url: `${CONTROLLER_URL}/categories/top-this-week`,
       method: 'get',
       params,
     });

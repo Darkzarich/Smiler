@@ -28,23 +28,6 @@ const authGuard = async (to, from, next) => {
   next();
 };
 
-const getFilterDate = ({ h = 0, m = 0, s = 0, ms = 0, d = undefined } = {}) => {
-  // TODO: Change to date-fns
-
-  const date = new Date();
-
-  date.setHours(h);
-  date.setMinutes(m);
-  date.setSeconds(s);
-  date.setMilliseconds(ms);
-
-  if (d) {
-    date.setDate(d);
-  }
-
-  return date.toISOString();
-};
-
 const router = new Router({
   mode: 'history',
   base: '/',
@@ -60,17 +43,6 @@ const router = new Router({
       name: 'Home',
       component: PostsContainer,
       meta: {
-        // TODO: Filters have constant values, as the time goes it doesn't change
-        filters: {
-          sort: '-rating',
-          dateFrom: getFilterDate(),
-          dateTo: getFilterDate({
-            h: 23,
-            m: 59,
-            s: 59,
-            ms: 999,
-          }),
-        },
         title: 'Today',
       },
     },
@@ -90,15 +62,6 @@ const router = new Router({
       component: PostsContainer,
       name: 'Blowing',
       meta: {
-        filters: {
-          sort: '-rating',
-          ratingFrom: 50,
-          dateFrom: getFilterDate({
-            h: new Date().getHours() - 2,
-            ms: 0,
-          }),
-          dateTo: new Date().toISOString(),
-        },
         title: 'Blowing',
       },
     },
@@ -107,19 +70,6 @@ const router = new Router({
       component: PostsContainer,
       name: 'TopThisWeek',
       meta: {
-        filters: {
-          sort: '-createdAt',
-          dateFrom: getFilterDate({
-            h: 0,
-            m: 0,
-            s: 0,
-            ms: 0,
-            d: new Date().getDate() - new Date().getDay(),
-          }),
-          dateTo: getFilterDate({
-            ms: 999,
-          }),
-        },
         title: 'Top This Week',
       },
     },
@@ -128,14 +78,6 @@ const router = new Router({
       component: PostsContainer,
       name: 'New',
       meta: {
-        filters: {
-          sort: '-createdAt',
-          dateFrom: getFilterDate({
-            h: new Date().getHours() - 2,
-            m: new Date().getMinutes(),
-            ms: 0,
-          }),
-        },
         title: 'Recent',
       },
     },

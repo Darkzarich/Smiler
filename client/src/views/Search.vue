@@ -4,7 +4,7 @@
       <SearchForm v-model="filter" />
     </div>
 
-    <PostsContainer v-if="isAnyFilterActive" :search-filter="filter" />
+    <PostsContainer v-if="isAnyFilterActive" :search-filters="filter" />
   </div>
 </template>
 

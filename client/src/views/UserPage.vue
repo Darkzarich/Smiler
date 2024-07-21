@@ -82,7 +82,7 @@ export default {
     async uploadPosts(add) {
       this.loading = true;
 
-      const res = await api.posts.getPosts({
+      const res = await api.posts.search({
         author: this.user.login || this.$route.params.login,
         limit: consts.POSTS_INITIAL_COUNT,
         offset: 0 + this.curPage * consts.POSTS_INITIAL_COUNT,
