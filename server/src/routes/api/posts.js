@@ -346,8 +346,335 @@ const auth = require('../auth');
   }
 }
 */
-router.get('/', postsController.getList);
+router.get('/', (req, res, next) => {
+  if (req.query.author) {
+    return postsController.getByAuthor(req, res, next);
+  }
+
+  postsController.search(req, res, next);
+});
+
 router.post('/', auth.required, postsController.create);
+
+/**
+@swagger
+{
+  "/posts/categories/all": {
+    "get": {
+      "tags": [
+        "Posts"
+      ],
+      "description": "Get all posts sorted by rating",
+      "summary": "Get posts",
+      "parameters": [
+        {
+          "in": "query",
+          "name": "limit",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1
+          },
+          "description": "posts per page"
+        },
+        {
+          "in": "query",
+          "name": "offset",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "default": 0
+          },
+          "description": "offset from element"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "posts": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Post"
+                    }
+                  },
+                  "pages": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+      }
+    }
+  }
+}
+*/
+
+router.get('/categories/all', postsController.all);
+
+/**
+@swagger
+{
+  "/posts/categories/today": {
+    "get": {
+      "tags": [
+        "Posts"
+      ],
+      "description": "Get today's posts sorted by rating",
+      "summary": "Get today's posts",
+      "parameters": [
+        {
+          "in": "query",
+          "name": "limit",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1
+          },
+          "description": "posts per page"
+        },
+        {
+          "in": "query",
+          "name": "offset",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "default": 0
+          },
+          "description": "offset from element"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "posts": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Post"
+                    }
+                  },
+                  "pages": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+      }
+    }
+  }
+}
+*/
+
+router.get('/categories/today', postsController.today);
+
+/**
+@swagger
+{
+  "/posts/categories/blowing": {
+    "get": {
+      "tags": [
+        "Posts"
+      ],
+      "description": "Get posts posted in the last hour and with rating 50 or more, sorted by rating",
+      "summary": "Get blowing posts",
+      "parameters": [
+        {
+          "in": "query",
+          "name": "limit",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1
+          },
+          "description": "posts per page"
+        },
+        {
+          "in": "query",
+          "name": "offset",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "default": 0
+          },
+          "description": "offset from element"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "posts": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Post"
+                    }
+                  },
+                  "pages": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+      }
+    }
+  }
+}
+*/
+
+router.get('/categories/blowing', postsController.blowing);
+
+/**
+@swagger
+{
+  "/posts/categories/recent": {
+    "get": {
+      "tags": [
+        "Posts"
+      ],
+      "description": "Get posts posted in the last two hours, sorted by the date of creation",
+      "summary": "Get recent posts",
+      "parameters": [
+        {
+          "in": "query",
+          "name": "limit",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1
+          },
+          "description": "posts per page"
+        },
+        {
+          "in": "query",
+          "name": "offset",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "default": 0
+          },
+          "description": "offset from element"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "posts": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Post"
+                    }
+                  },
+                  "pages": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+      }
+    }
+  }
+}
+*/
+
+router.get('/categories/recent', postsController.recent);
+
+/**
+@swagger
+{
+  "/posts/categories/top-this-week": {
+    "get": {
+      "tags": [
+        "Posts"
+      ],
+      "description": "Get posts posted from the start of the week, sorted by the date of creation",
+      "summary": "Get top posts",
+      "parameters": [
+        {
+          "in": "query",
+          "name": "limit",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1
+          },
+          "description": "posts per page"
+        },
+        {
+          "in": "query",
+          "name": "offset",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "default": 0
+          },
+          "description": "offset from element"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "posts": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Post"
+                    }
+                  },
+                  "pages": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+      }
+    }
+  }
+}
+*/
+
+router.get('/categories/top-this-week', postsController.topThisWeek);
 
 /**
 @swagger
@@ -523,7 +850,9 @@ router.get('/feed', auth.required, postsController.getFeed);
           "$ref": "#/components/responses/MethodNotAllowed"
         }
       }
-    },
+    }
+  },
+  "/posts/{slug}": {
     "get": {
       "tags": [
         "Posts"
@@ -558,10 +887,10 @@ router.get('/feed', auth.required, postsController.getFeed);
     }
   }
 }
- */
+*/
+router.get('/:slug', postsController.getBySlug);
 router.put('/:id', auth.required, postsController.updateById);
 router.delete('/:id', auth.required, postsController.deleteById);
-router.get('/:slug', postsController.getBySlug);
 
 /**
 @swagger
