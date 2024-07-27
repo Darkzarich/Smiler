@@ -4,7 +4,6 @@ const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
 const addRequestId = require('express-request-id')();
-const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const cors = require('cors');
@@ -62,8 +61,8 @@ async function main() {
   // Unique request id
   app.use(addRequestId);
 
-  app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(bodyParser.json());
+  app.use(express.urlencoded({ extended: false }));
+  app.use(express.json({}));
 
   if (IS_PRODUCTION) {
     app.set('trust proxy', 1);
