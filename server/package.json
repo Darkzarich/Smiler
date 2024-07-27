@@ -7,7 +7,7 @@
     "node": ">=v10.15.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "gen-doc": "npx swagger-jsdoc -d src/swagger/swaggerDef.js -o \"src/swagger/swagger.json\"",
@@ -37,7 +37,10 @@
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-security": "^2.1.1",
-    "nodemon": "^3.1.2"
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.0.0",
+    "nodemon": "^3.1.2",
+    "supertest": "^7.0.0"
   },
   "dependencies": {
     "body-parser": "^1.20.1",

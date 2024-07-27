@@ -11,14 +11,10 @@ const cors = require('cors');
 
 const morganMiddleware = require('./src/config/morgan');
 const logger = require('./src/config/logger');
-const db = require('./db');
+const connectDB = require('./db');
 const config = require('./src/config/config');
 
 const router = require('./src/routes');
-
-const app = express();
-
-app.use(helmet());
 
 const {
   PORT,
@@ -34,63 +30,80 @@ const whitelist = [
   `http://localhost:${PORT}`,
 ];
 
-app.use(
-  cors({
-    credentials: true,
-    origin(origin, callback) {
-      if (
-        origin === undefined ||
-        whitelist.indexOf(origin) !== -1 ||
-        !IS_PRODUCTION
-      ) {
-        callback(null, true);
-      } else {
-        logger.warn(`"${origin}" is not allowed by CORS`);
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-  }),
-);
-
-// Unique request id
-app.use(addRequestId);
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-if (IS_PRODUCTION) {
-  app.set('trust proxy', 1);
-}
-
-app.use(
-  session({
-    secret: SESSION_SECRET,
-    resave: true,
-    cookie: {
-      secure: IS_PRODUCTION,
-      httpOnly: true,
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 1000,
-    },
-    saveUninitialized: false,
-    store: new MongoStore({
-      mongooseConnection: db,
-    }),
-  }),
-);
-
-app.use(morganMiddleware);
-
-app.use(router);
-
 logger.info(
   `[pid: ${process.pid}] Worker is running in ${IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode.`,
 );
 
-// TODO: make it conditional, make static only for dev
-// set files folder
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+async function main() {
+  const db = await connectDB();
 
-app.listen(PORT, () => {
-  logger.info(`[pid: ${process.pid}] Server is listening on the port ${PORT}`);
-});
+  const app = express();
+
+  app.use(helmet());
+
+  app.use(
+    cors({
+      credentials: true,
+      origin(origin, callback) {
+        if (
+          origin === undefined ||
+          whitelist.indexOf(origin) !== -1 ||
+          !IS_PRODUCTION
+        ) {
+          callback(null, true);
+        } else {
+          logger.warn(`"${origin}" is not allowed by CORS`);
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+    }),
+  );
+
+  // Unique request id
+  app.use(addRequestId);
+
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json());
+
+  if (IS_PRODUCTION) {
+    app.set('trust proxy', 1);
+  }
+
+  app.use(
+    session({
+      secret: SESSION_SECRET,
+      resave: true,
+      cookie: {
+        secure: IS_PRODUCTION,
+        httpOnly: true,
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24 * 1000,
+      },
+      saveUninitialized: false,
+      store: new MongoStore({
+        mongooseConnection: db,
+      }),
+    }),
+  );
+
+  app.use(morganMiddleware);
+
+  app.use(router);
+
+  // TODO: make it conditional, make static only for dev
+  // set files folder
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
+  const server =app.listen(PORT, () => {
+    logger.info(
+      `[pid: ${process.pid}] Server is listening on the port ${PORT}`,
+    );
+  });
+
+  return {
+    app,
+    server,
+  };
+}
+
+module.exports = main;

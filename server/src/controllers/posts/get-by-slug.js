@@ -11,10 +11,6 @@ exports.getBySlug = asyncErrorHandler(async (req, res, next) => {
 
   const { slug } = req.params;
 
-  if (!slug) {
-    return generateError('slug is required', 422, next);
-  }
-
   const [post, user] = await Promise.all([
     Post.findOne({
       slug,

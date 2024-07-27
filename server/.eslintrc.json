@@ -23,6 +23,15 @@
     "no-underscore-dangle": [
       "error",
       { "allow": ["_id", "_handleFile", "_removeFile"] }
-    ]
-  }
+    ],
+    "node/no-unpublished-require": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.spec.js"],
+      "env": {
+        "jest": true
+      }
+    }
+  ]
 }

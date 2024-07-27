@@ -1,7 +1,7 @@
 /// @ts-check
 
 const winston = require('winston');
-const { IS_PRODUCTION } = require('./config');
+const { IS_PRODUCTION, IS_JEST } = require('./config');
 
 const currentDir = process.cwd();
 
@@ -32,6 +32,7 @@ const consoleTransport = new winston.transports.Console({
 });
 
 const logger = winston.createLogger({
+  silent: IS_JEST,
   format: winston.format.combine(
     winston.format.errors({ stack: true }),
     winston.format.timestamp(),

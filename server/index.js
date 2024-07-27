@@ -27,5 +27,5 @@ if (cluster.isMaster) {
   });
 } else {
   // eslint-disable-next-line global-require
-  require('./worker');
+  require('./worker')();
 }
