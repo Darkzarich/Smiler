@@ -5,8 +5,14 @@ const { IS_PRODUCTION, IS_JEST } = require('./config');
 
 const currentDir = process.cwd();
 
+const { combine, timestamp, json, errors, cli } = winston.format;
+
+const fileLogsFormat = combine(errors({ stack: true }), timestamp(), json());
+
 const errorFileTransport = new winston.transports.File({
+  silent: IS_JEST,
   level: 'error', // max logging level a transport will log
+  format: fileLogsFormat,
   filename: `${currentDir}/logs/error.log`,
   handleExceptions: true,
   maxsize: 1024 * 1024 * 10, // 10MB
@@ -14,7 +20,9 @@ const errorFileTransport = new winston.transports.File({
 });
 
 const combinedFileTransport = new winston.transports.File({
+  silent: IS_JEST,
   level: 'info',
+  format: fileLogsFormat,
   filename: `${currentDir}/logs/combined.log`,
   handleExceptions: true,
   maxsize: 1024 * 1024 * 10, // 10MB
@@ -22,22 +30,13 @@ const combinedFileTransport = new winston.transports.File({
 });
 
 const consoleTransport = new winston.transports.Console({
-  level: 'debug',
-  handleExceptions: true,
   silent: IS_PRODUCTION,
-  format: winston.format.combine(
-    winston.format.errors({ stack: true }),
-    winston.format.cli(),
-  ),
+  level: IS_JEST ? 'error' : 'debug',
+  format: combine(errors({ stack: true }), cli()),
+  handleExceptions: true,
 });
 
 const logger = winston.createLogger({
-  silent: IS_JEST,
-  format: winston.format.combine(
-    winston.format.errors({ stack: true }),
-    winston.format.timestamp(),
-    winston.format.json(),
-  ),
   transports: [consoleTransport, errorFileTransport, combinedFileTransport],
   exitOnError: false, // Do not exit on handled exceptions
   defaultMeta: {
