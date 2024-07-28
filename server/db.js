@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const logger = require('./src/config/logger');
 const config = require('./src/config/config');
 
-module.exports = async () => {
+module.exports.connectDB = async () => {
   try {
     // Return the connection if it has already been established
     if ([1, 2].includes(mongoose.connection.readyState)) {

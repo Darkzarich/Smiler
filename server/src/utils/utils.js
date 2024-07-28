@@ -1,5 +1,3 @@
-const logger = require('../config/logger');
-
 module.exports = {
   /**
    * wrapper for global catch handling

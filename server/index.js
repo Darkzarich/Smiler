@@ -27,5 +27,13 @@ if (cluster.isMaster) {
   });
 } else {
   // eslint-disable-next-line global-require
-  require('./worker')();
+  require('./worker').run();
+
+  process.on('unhandledRejection', (error) => {
+    throw error;
+  });
+
+  process.on('uncaughtException', (error) => {
+    throw error;
+  });
 }

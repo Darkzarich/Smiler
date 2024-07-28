@@ -10,7 +10,7 @@ const cors = require('cors');
 
 const morganMiddleware = require('./src/config/morgan');
 const logger = require('./src/config/logger');
-const connectDB = require('./db');
+const { connectDB } = require('./db');
 const config = require('./src/config/config');
 
 const router = require('./src/routes');
@@ -21,6 +21,7 @@ const {
   FRONT_ORIGIN_REMOTE,
   SESSION_SECRET,
   IS_PRODUCTION,
+  IS_JEST,
 } = config;
 
 const whitelist = [
@@ -33,9 +34,7 @@ logger.info(
   `[pid: ${process.pid}] Worker is running in ${IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode.`,
 );
 
-async function main() {
-  const db = await connectDB();
-
+async function startApp({ db = null } = {}) {
   const app = express();
 
   app.use(helmet());
@@ -68,42 +67,51 @@ async function main() {
     app.set('trust proxy', 1);
   }
 
-  app.use(
-    session({
-      secret: SESSION_SECRET,
-      resave: true,
-      cookie: {
-        secure: IS_PRODUCTION,
-        httpOnly: true,
-        sameSite: 'strict',
-        maxAge: 60 * 60 * 24 * 1000,
-      },
-      saveUninitialized: false,
-      store: new MongoStore({
-        mongooseConnection: db,
+  if (db) {
+    app.use(
+      session({
+        secret: SESSION_SECRET,
+        resave: true,
+        cookie: {
+          secure: IS_PRODUCTION,
+          httpOnly: true,
+          sameSite: 'strict',
+          maxAge: 60 * 60 * 24 * 1000,
+        },
+        saveUninitialized: false,
+        store: new MongoStore({
+          mongooseConnection: db,
+        }),
       }),
-    }),
-  );
+    );
+  }
 
   app.use(morganMiddleware);
 
   app.use(router);
 
   // TODO: make it conditional, make static only for dev
-  // set files folder
+  // Set files folder
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-  const server = app.listen(PORT, () => {
-    logger.info(
-      `[pid: ${process.pid}] Server is listening on the port ${PORT}`,
-    );
-  });
+  if (!IS_JEST) {
+    app.listen(PORT, () => {
+      logger.info(
+        `[pid: ${process.pid}] Server is listening on the port ${PORT}`,
+      );
+    });
+  }
 
   return {
     app,
-    server,
     db,
   };
 }
 
-module.exports = main;
+async function run() {
+  const db = await connectDB();
+
+  startApp({ db });
+}
+
+module.exports = { run, startApp };

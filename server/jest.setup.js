@@ -7,9 +7,6 @@ module.exports = async () => {
     binary: {
       version: '5.0.10',
     },
-    instance: {
-      port: 27017,
-    },
   });
 
   process.env.DB_URL = mongod.getUri();
