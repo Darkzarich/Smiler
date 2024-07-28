@@ -1,7 +1,7 @@
 const { create } = require('./create');
 const { deleteById } = require('./delete-by-id');
 const { getBySlug } = require('./get-by-slug');
-const { getByAuthor } = require('./get-by-author');
+const { getListByAuthor } = require('./get-list-by-author');
 const { getFeed } = require('./get-feed');
 const { all } = require('./categories/all');
 const { blowing } = require('./categories/blowing');
@@ -18,7 +18,7 @@ module.exports = {
   create,
   deleteById,
   getBySlug,
-  getByAuthor,
+  getListByAuthor,
   getFeed,
   search,
   unvoteById,

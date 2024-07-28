@@ -6,7 +6,7 @@ const {
   generateError,
 } = require('../../utils/utils');
 
-exports.getByAuthor = asyncErrorHandler(async (req, res, next) => {
+exports.getListByAuthor = asyncErrorHandler(async (req, res, next) => {
   const { userId } = req.session;
 
   const limit = +req.query.limit || 100;
@@ -15,10 +15,6 @@ exports.getByAuthor = asyncErrorHandler(async (req, res, next) => {
 
   if (limit > 100) {
     return generateError("Limit can't be more than 100", 422, next);
-  }
-
-  if (!author) {
-    return generateError('Author is required', 422, next);
   }
 
   const foundAuthor = await User.findOne({

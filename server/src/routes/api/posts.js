@@ -348,7 +348,7 @@ const auth = require('../auth');
 */
 router.get('/', (req, res, next) => {
   if (req.query.author) {
-    return postsController.getByAuthor(req, res, next);
+    return postsController.getListByAuthor(req, res, next);
   }
 
   postsController.search(req, res, next);
