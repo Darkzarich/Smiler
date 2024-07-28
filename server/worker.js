@@ -93,7 +93,7 @@ async function main() {
   // set files folder
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-  const server =app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     logger.info(
       `[pid: ${process.pid}] Server is listening on the port ${PORT}`,
     );
@@ -102,6 +102,7 @@ async function main() {
   return {
     app,
     server,
+    db,
   };
 }
 

@@ -1,26 +1,28 @@
-const mongoose = require('mongoose');
 const request = require('supertest');
-
-const connectDB = require('../../../db');
 const main = require('../../../worker');
 
-const app = main();
+let app;
+let server;
+let db;
 
 beforeAll(async () => {
-  const db = await connectDB();
+  const resolvedMain = await main();
+
+  app = resolvedMain.app;
+  server = resolvedMain.server;
+  db = resolvedMain.db;
+
   await db.dropDatabase();
 });
 
 afterAll(async () => {
-  await mongoose.connection.close();
-  (await app).server.close();
+  await db.close();
+  server.close();
 });
 
 describe('GET /posts/:slug', () => {
   it('Should return status 404 and a message for non-existing slug', async () => {
-    const response = await request((await app).app).get(
-      '/api/posts/non-existing-slug',
-    );
+    const response = await request(app).get('/api/posts/non-existing-slug');
 
     expect(response.status).toEqual(404);
     expect(response.body.error).toMatchObject({

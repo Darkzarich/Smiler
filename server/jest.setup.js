@@ -12,9 +12,7 @@ module.exports = async () => {
     },
   });
 
-  const uri = mongod.getUri();
-
-  process.env.DB_URL = uri;
+  process.env.DB_URL = mongod.getUri();
 
   global.mongod = mongod;
 };

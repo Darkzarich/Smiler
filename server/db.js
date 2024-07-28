@@ -4,6 +4,7 @@ const config = require('./src/config/config');
 
 module.exports = async () => {
   try {
+    // Return the connection if it has already been established
     if ([1, 2].includes(mongoose.connection.readyState)) {
       return mongoose.connection;
     }
