@@ -1,5 +1,3 @@
-/// @ts-check
-
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
 module.exports = async () => {

@@ -1,7 +1,6 @@
-/// @ts-check
-
 const winston = require('winston');
-const { IS_PRODUCTION, IS_JEST } = require('./config');
+
+const { IS_PRODUCTION, IS_JEST } = require('../config/config');
 
 const currentDir = process.cwd();
 
@@ -36,12 +35,10 @@ const consoleTransport = new winston.transports.Console({
   handleExceptions: true,
 });
 
-const logger = winston.createLogger({
+module.exports.logger = winston.createLogger({
   transports: [consoleTransport, errorFileTransport, combinedFileTransport],
   exitOnError: false, // Do not exit on handled exceptions
   defaultMeta: {
     pid: process.pid,
   },
 });
-
-module.exports = logger;

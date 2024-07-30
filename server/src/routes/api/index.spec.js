@@ -1,5 +1,5 @@
 const request = require('supertest');
-const { startApp } = require('../../../worker');
+const { startApp } = require('../../app');
 
 let app;
 

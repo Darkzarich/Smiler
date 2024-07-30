@@ -1,6 +1,6 @@
 const request = require('supertest');
-const { startApp } = require('../../../worker');
-const { connectDB } = require('../../../db');
+const { startApp } = require('../../app');
+const { connectDB } = require('../../libs/db');
 
 let app;
 let db;

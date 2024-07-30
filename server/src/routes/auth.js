@@ -1,6 +1,6 @@
 module.exports = {
   required: (req, res, next) => {
-    if (req.session.userId) {
+    if (req.session && req.session.userId) {
       next();
     } else {
       const error = new Error(

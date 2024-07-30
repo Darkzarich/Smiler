@@ -1,5 +1,3 @@
-/// @ts-check
-
 const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
@@ -8,12 +6,11 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const cors = require('cors');
 
-const morganMiddleware = require('./src/config/morgan');
-const logger = require('./src/config/logger');
-const { connectDB } = require('./db');
-const config = require('./src/config/config');
-
-const router = require('./src/routes');
+const { connectDB } = require('./libs/db');
+const { logger } = require('./libs/logger');
+const config = require('./config/config');
+const morganMiddleware = require('./middlewares/morgan');
+const router = require('./routes');
 
 const {
   PORT,
