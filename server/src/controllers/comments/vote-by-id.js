@@ -2,13 +2,9 @@ const User = require('../../models/User');
 const Rate = require('../../models/Rate');
 const Comment = require('../../models/Comment');
 const consts = require('../../const/const');
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../utils/utils');
+const { success, generateError } = require('../../utils/utils');
 
-exports.voteById = asyncErrorHandler(async (req, res, next) => {
+exports.voteById = async (req, res, next) => {
   const { userId } = req.session;
   const { id } = req.params;
   const { negative } = req.body;
@@ -61,4 +57,4 @@ exports.voteById = asyncErrorHandler(async (req, res, next) => {
   } else {
     generateError("Comment doesn't exist", 404, next);
   }
-});
+};

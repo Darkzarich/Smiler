@@ -1,12 +1,8 @@
 const Comment = require('../../models/Comment');
 const consts = require('../../const/const');
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../utils/utils');
+const { success, generateError } = require('../../utils/utils');
 
-exports.deleteById = asyncErrorHandler(async (req, res, next) => {
+exports.deleteById = async (req, res, next) => {
   const { userId } = req.session;
   const { id } = req.params;
 
@@ -37,4 +33,4 @@ exports.deleteById = asyncErrorHandler(async (req, res, next) => {
   } else {
     generateError('Comment is not found', 404, next);
   }
-});
+};

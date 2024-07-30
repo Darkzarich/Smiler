@@ -1,4 +1,7 @@
 const router = require('express').Router();
+const {
+  asyncControllerErrorHandler,
+} = require('../../utils/async-controller-error-handler');
 const commentsController = require('../../controllers/comments');
 const auth = require('../auth');
 
@@ -236,9 +239,13 @@ const auth = require('../auth');
   }
 }
 */
-router.get('/', commentsController.getList);
+router.get('/', asyncControllerErrorHandler(commentsController.getList));
 
-router.post('/', auth.required, commentsController.create);
+router.post(
+  '/',
+  auth.required,
+  asyncControllerErrorHandler(commentsController.create),
+);
 
 /**
 @swagger
@@ -343,8 +350,16 @@ router.post('/', auth.required, commentsController.create);
 }
 */
 
-router.put('/:id', auth.required, commentsController.updateById);
-router.delete('/:id', auth.required, commentsController.deleteById);
+router.put(
+  '/:id',
+  auth.required,
+  asyncControllerErrorHandler(commentsController.updateById),
+);
+router.delete(
+  '/:id',
+  auth.required,
+  asyncControllerErrorHandler(commentsController.deleteById),
+);
 
 /**
 @swagger
@@ -440,7 +455,15 @@ router.delete('/:id', auth.required, commentsController.deleteById);
   }
 }
  */
-router.put('/:id/vote', auth.required, commentsController.voteById);
-router.delete('/:id/vote', auth.required, commentsController.unvoteById);
+router.put(
+  '/:id/vote',
+  auth.required,
+  asyncControllerErrorHandler(commentsController.voteById),
+);
+router.delete(
+  '/:id/vote',
+  auth.required,
+  asyncControllerErrorHandler(commentsController.unvoteById),
+);
 
 module.exports = router;

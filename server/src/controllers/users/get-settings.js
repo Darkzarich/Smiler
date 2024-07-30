@@ -1,12 +1,8 @@
 const User = require('../../models/User');
 
-const {
-  generateError,
-  success,
-  asyncErrorHandler,
-} = require('../../utils/utils');
+const { generateError, success } = require('../../utils/utils');
 
-exports.getSettings = asyncErrorHandler(async (req, res, next) => {
+exports.getSettings = async (req, res, next) => {
   const { userId } = req.session;
 
   const user = await User.findById(userId).populate(
@@ -26,4 +22,4 @@ exports.getSettings = asyncErrorHandler(async (req, res, next) => {
   } else {
     generateError('User is not found', 404, next);
   }
-});
+};

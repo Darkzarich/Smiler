@@ -2,13 +2,9 @@ const { startOfWeek } = require('date-fns');
 
 const User = require('../../../models/User');
 const Post = require('../../../models/Post');
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../../utils/utils');
+const { success, generateError } = require('../../../utils/utils');
 
-exports.topThisWeek = asyncErrorHandler(async (req, res, next) => {
+exports.topThisWeek = async (req, res, next) => {
   const limit = +req.query.limit || 100;
   const offset = +req.query.offset || 0;
 
@@ -40,4 +36,4 @@ exports.topThisWeek = asyncErrorHandler(async (req, res, next) => {
     pages: Math.ceil(count / limit),
     posts: postsWithRated,
   });
-});
+};

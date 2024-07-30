@@ -5,15 +5,11 @@ const sanitizeHtml = require('../../utils/sanitize-html');
 const User = require('../../models/User');
 const Post = require('../../models/Post');
 const consts = require('../../const/const');
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../utils/utils');
+const { success, generateError } = require('../../utils/utils');
 
 const allowedSectionTypes = Object.values(consts.POST_SECTION_TYPES);
 
-exports.create = asyncErrorHandler(async (req, res, next) => {
+exports.create = async (req, res, next) => {
   // TODO: rework this | move validation
 
   const { userId } = req.session;
@@ -91,4 +87,4 @@ exports.create = asyncErrorHandler(async (req, res, next) => {
   await user.save();
 
   success(req, res, post);
-});
+};

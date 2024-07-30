@@ -1,13 +1,9 @@
 const User = require('../../models/User');
 const Post = require('../../models/Post');
 const consts = require('../../const/const');
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../utils/utils');
+const { success, generateError } = require('../../utils/utils');
 
-exports.search = asyncErrorHandler(async (req, res, next) => {
+exports.search = async (req, res, next) => {
   const { userId } = req.session;
 
   const {
@@ -95,4 +91,4 @@ exports.search = asyncErrorHandler(async (req, res, next) => {
     pages: Math.ceil(count / +limit),
     posts: postsWithRated,
   });
-});
+};

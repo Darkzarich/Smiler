@@ -1,12 +1,8 @@
 const User = require('../../models/User');
 
-const {
-  generateError,
-  success,
-  asyncErrorHandler,
-} = require('../../utils/utils');
+const { generateError, success } = require('../../utils/utils');
 
-exports.updateMe = asyncErrorHandler(async (req, res, next) => {
+exports.updateMe = async (req, res, next) => {
   const { userId } = req.session;
   const update = req.body;
 
@@ -20,4 +16,4 @@ exports.updateMe = asyncErrorHandler(async (req, res, next) => {
   }
 
   success(req, res);
-});
+};

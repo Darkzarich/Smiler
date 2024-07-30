@@ -1,11 +1,7 @@
-const { success, asyncErrorHandler } = require('../../utils/utils');
+const { success } = require('../../utils/utils');
 
-exports.logout = asyncErrorHandler(async (req, res) => {
-  const { userId } = req.session;
-
+exports.logout = async (req, res) => {
   req.session.destroy();
 
-  success(req, res, null, {
-    userId,
-  });
-});
+  success(req, res);
+};

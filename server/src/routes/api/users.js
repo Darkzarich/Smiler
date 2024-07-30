@@ -1,4 +1,7 @@
 const router = require('express').Router();
+const {
+  asyncControllerErrorHandler,
+} = require('../../utils/async-controller-error-handler');
 const usersController = require('../../controllers/users');
 const auth = require('../auth');
 
@@ -186,8 +189,12 @@ const auth = require('../auth');
   }
 }
 */
-router.get('/:login', usersController.getByLogin);
-router.put('/me', auth.required, usersController.updateMe);
+router.get('/:login', asyncControllerErrorHandler(usersController.getByLogin));
+router.put(
+  '/me',
+  auth.required,
+  asyncControllerErrorHandler(usersController.updateMe),
+);
 
 /**
 @swagger
@@ -319,11 +326,15 @@ router.put('/me', auth.required, usersController.updateMe);
 }
 */
 
-router.get('/:login/template', auth.required, usersController.getPostTemplate);
+router.get(
+  '/:login/template',
+  auth.required,
+  asyncControllerErrorHandler(usersController.getPostTemplate),
+);
 router.put(
   '/:login/template',
   auth.required,
-  usersController.updatePostTemplate,
+  asyncControllerErrorHandler(usersController.updatePostTemplate),
 );
 
 /**
@@ -367,7 +378,11 @@ router.put(
 }
  */
 
-router.get('/me/settings', auth.required, usersController.getSettings);
+router.get(
+  '/me/settings',
+  auth.required,
+  asyncControllerErrorHandler(usersController.getSettings),
+);
 
 /**
 @swagger
@@ -449,8 +464,16 @@ router.get('/me/settings', auth.required, usersController.getSettings);
 }
  */
 
-router.put('/:id/follow', auth.required, usersController.followById);
-router.delete('/:id/follow', auth.required, usersController.unfollowById);
+router.put(
+  '/:id/follow',
+  auth.required,
+  asyncControllerErrorHandler(usersController.followById),
+);
+router.delete(
+  '/:id/follow',
+  auth.required,
+  asyncControllerErrorHandler(usersController.unfollowById),
+);
 
 /**
 @swagger
@@ -512,7 +535,7 @@ router.delete('/:id/follow', auth.required, usersController.unfollowById);
 router.delete(
   '/:login/template/:hash',
   auth.required,
-  usersController.deletePostTemplatePicture,
+  asyncControllerErrorHandler(usersController.deletePostTemplatePicture),
 );
 
 module.exports = router;

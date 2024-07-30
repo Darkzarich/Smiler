@@ -7,11 +7,7 @@ const DiskStorage = require('../../utils/DiskStorage');
 const User = require('../../models/User');
 const consts = require('../../const/const');
 
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../utils/utils');
+const { success, generateError } = require('../../utils/utils');
 
 const uploader = multer({
   storage: new DiskStorage({
@@ -76,7 +72,7 @@ function startUpload(user, req, res, next) {
   });
 }
 
-exports.upload = asyncErrorHandler(async (req, res, next) => {
+exports.upload = async (req, res, next) => {
   try {
     const user = await User.findById(req.session.userId).select('template');
 
@@ -116,4 +112,4 @@ exports.upload = asyncErrorHandler(async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-});
+};

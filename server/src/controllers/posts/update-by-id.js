@@ -4,13 +4,9 @@ const sanitizeHtml = require('../../utils/sanitize-html');
 
 const Post = require('../../models/Post');
 const consts = require('../../const/const');
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../utils/utils');
+const { success, generateError } = require('../../utils/utils');
 
-exports.updateById = asyncErrorHandler(async (req, res, next) => {
+exports.updateById = async (req, res, next) => {
   // TODO: validate sections on update by type and other stuff the same as when creating post
   // TODO: move all Post validation in one place
 
@@ -112,4 +108,4 @@ exports.updateById = asyncErrorHandler(async (req, res, next) => {
   await post.save();
 
   success(req, res);
-});
+};

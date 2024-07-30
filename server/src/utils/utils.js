@@ -1,10 +1,4 @@
 module.exports = {
-  /**
-   * wrapper for global catch handling
-   */
-  asyncErrorHandler: (fn) => (req, res, next) => {
-    fn(req, res, next).catch((e) => next(e));
-  },
   generateError: (errorMessage, status, next) => {
     if (!status) {
       next({

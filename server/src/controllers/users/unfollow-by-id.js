@@ -1,12 +1,8 @@
 const User = require('../../models/User');
 
-const {
-  generateError,
-  success,
-  asyncErrorHandler,
-} = require('../../utils/utils');
+const { generateError, success } = require('../../utils/utils');
 
-exports.unfollowById = asyncErrorHandler(async (req, res, next) => {
+exports.unfollowById = async (req, res, next) => {
   const { id } = req.params;
   const { userId } = req.session;
 
@@ -51,4 +47,4 @@ exports.unfollowById = asyncErrorHandler(async (req, res, next) => {
     .catch((e) => {
       next(e);
     });
-});
+};

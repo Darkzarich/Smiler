@@ -1,4 +1,7 @@
 const router = require('express').Router();
+const {
+  asyncControllerErrorHandler,
+} = require('../../utils/async-controller-error-handler');
 const authController = require('../../controllers/auth');
 const auth = require('../auth');
 
@@ -73,7 +76,7 @@ const auth = require('../auth');
   }
 }
 */
-router.get('/current', authController.current);
+router.get('/current', asyncControllerErrorHandler(authController.current));
 
 /**
 @swagger
@@ -140,7 +143,7 @@ router.get('/current', authController.current);
   }
 }
 */
-router.post('/signin', authController.signIn);
+router.post('/signin', asyncControllerErrorHandler(authController.signIn));
 
 /**
 @swagger
@@ -211,7 +214,7 @@ router.post('/signin', authController.signIn);
   }
 }
 */
-router.post('/signup', authController.signUp);
+router.post('/signup', asyncControllerErrorHandler(authController.signUp));
 
 /**
 @swagger
@@ -236,6 +239,10 @@ router.post('/signup', authController.signUp);
   }
 }
 */
-router.post('/logout', auth.required, authController.logout);
+router.post(
+  '/logout',
+  auth.required,
+  asyncControllerErrorHandler(authController.logout),
+);
 
 module.exports = router;

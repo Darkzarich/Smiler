@@ -3,7 +3,6 @@ const User = require('../../models/User');
 const {
   success,
   generateError,
-  asyncErrorHandler,
   isDuplicateKeyError,
 } = require('../../utils/utils');
 
@@ -41,7 +40,7 @@ const validate = (user, next) => {
   return true;
 };
 
-exports.signUp = asyncErrorHandler(async (req, res, next) => {
+exports.signUp = async (req, res, next) => {
   // TODO: Rework validation, rework unique email
   const user = {
     email: req.body.email,
@@ -95,4 +94,4 @@ exports.signUp = asyncErrorHandler(async (req, res, next) => {
 
     throw error;
   }
-});
+};

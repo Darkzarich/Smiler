@@ -1,12 +1,8 @@
 const User = require('../../models/User');
 const Post = require('../../models/Post');
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../utils/utils');
+const { success, generateError } = require('../../utils/utils');
 
-exports.getListByAuthor = asyncErrorHandler(async (req, res, next) => {
+exports.getListByAuthor = async (req, res, next) => {
   const { userId } = req.session;
 
   const limit = +req.query.limit || 100;
@@ -45,4 +41,4 @@ exports.getListByAuthor = asyncErrorHandler(async (req, res, next) => {
     pages: Math.ceil(count / limit),
     posts: postsWithRated,
   });
-});
+};

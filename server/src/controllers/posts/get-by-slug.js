@@ -1,12 +1,8 @@
 const User = require('../../models/User');
 const Post = require('../../models/Post');
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../utils/utils');
+const { success, generateError } = require('../../utils/utils');
 
-exports.getBySlug = asyncErrorHandler(async (req, res, next) => {
+exports.getBySlug = async (req, res, next) => {
   const { userId } = req.session;
 
   const { slug } = req.params;
@@ -23,4 +19,4 @@ exports.getBySlug = asyncErrorHandler(async (req, res, next) => {
   }
 
   success(req, res, post.toResponse(user));
-});
+};

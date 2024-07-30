@@ -1,13 +1,9 @@
 const sanitizeHtml = require('../../utils/sanitize-html');
 const Comment = require('../../models/Comment');
 const consts = require('../../const/const');
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../utils/utils');
+const { success, generateError } = require('../../utils/utils');
 
-exports.updateById = asyncErrorHandler(async (req, res, next) => {
+exports.updateById = async (req, res, next) => {
   const { userId } = req.session;
   const { id } = req.params;
   const { body } = req.body;
@@ -31,9 +27,8 @@ exports.updateById = asyncErrorHandler(async (req, res, next) => {
   }
 
   const commentCreatedAt = new Date(comment.createdAt.toString()).getTime();
-  const { now } = new Date();
 
-  if (now - commentCreatedAt > consts.COMMENT_TIME_TO_UPDATE) {
+  if (Date.now() - commentCreatedAt > consts.COMMENT_TIME_TO_UPDATE) {
     return generateError(
       `You can update comment only within first ${consts.COMMENT_TIME_TO_UPDATE / 1000 / 60} min`,
       405,
@@ -46,4 +41,4 @@ exports.updateById = asyncErrorHandler(async (req, res, next) => {
   await comment.save();
 
   success(req, res);
-});
+};

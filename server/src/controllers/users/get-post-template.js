@@ -1,12 +1,8 @@
 const User = require('../../models/User');
 
-const {
-  generateError,
-  success,
-  asyncErrorHandler,
-} = require('../../utils/utils');
+const { generateError, success } = require('../../utils/utils');
 
-exports.getPostTemplate = asyncErrorHandler(async (req, res, next) => {
+exports.getPostTemplate = async (req, res, next) => {
   if (req.session.userLogin !== req.params.login) {
     generateError('Can see only your own template', 403, next);
     return;
@@ -15,4 +11,4 @@ exports.getPostTemplate = asyncErrorHandler(async (req, res, next) => {
   const template = await User.findById(req.session.userId).select('template');
 
   success(req, res, template.template);
-});
+};

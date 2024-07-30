@@ -1,7 +1,7 @@
 const User = require('../../models/User');
-const { success, asyncErrorHandler } = require('../../utils/utils');
+const { success } = require('../../utils/utils');
 
-exports.current = asyncErrorHandler(async (req, res) => {
+exports.current = async (req, res) => {
   const { userId } = req.session;
   let authState = {};
 
@@ -22,4 +22,4 @@ exports.current = asyncErrorHandler(async (req, res) => {
   }
 
   success(req, res, authState);
-});
+};

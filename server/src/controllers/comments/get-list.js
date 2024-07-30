@@ -1,10 +1,6 @@
 const Comment = require('../../models/Comment');
 const User = require('../../models/User');
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../utils/utils');
+const { success, generateError } = require('../../utils/utils');
 
 function fillWithUserRecursive({ comments, user }) {
   if (!comments) {
@@ -25,7 +21,7 @@ function fillWithUserRecursive({ comments, user }) {
   });
 }
 
-exports.getList = asyncErrorHandler(async (req, res, next) => {
+exports.getList = async (req, res, next) => {
   const { userId } = req.session;
   const { post } = req.query;
   const { author } = req.query;
@@ -84,4 +80,4 @@ exports.getList = asyncErrorHandler(async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-});
+};

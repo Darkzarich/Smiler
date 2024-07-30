@@ -1,4 +1,7 @@
 const router = require('express').Router();
+const {
+  asyncControllerErrorHandler,
+} = require('../../utils/async-controller-error-handler');
 const tagsController = require('../../controllers/tags');
 const auth = require('../auth');
 
@@ -74,7 +77,15 @@ const auth = require('../auth');
 }
 */
 
-router.put('/:tag/follow', auth.required, tagsController.follow);
-router.delete('/:tag/follow', auth.required, tagsController.unfollow);
+router.put(
+  '/:tag/follow',
+  auth.required,
+  asyncControllerErrorHandler(tagsController.follow),
+);
+router.delete(
+  '/:tag/follow',
+  auth.required,
+  asyncControllerErrorHandler(tagsController.unfollow),
+);
 
 module.exports = router;

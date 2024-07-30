@@ -1,12 +1,8 @@
 const sanitizeHtml = require('../../utils/sanitize-html');
 const Comment = require('../../models/Comment');
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../utils/utils');
+const { success, generateError } = require('../../utils/utils');
 
-exports.create = asyncErrorHandler(async (req, res, next) => {
+exports.create = async (req, res, next) => {
   const { body } = req.body;
   const { parent } = req.body;
   const { post } = req.body;
@@ -23,7 +19,7 @@ exports.create = asyncErrorHandler(async (req, res, next) => {
 
   const sanitizedBody = sanitizeHtml(body);
 
-  // TODO: asyncErrorHandler catches everything anyone don't need try..catch here
+  // TODO: asyncControllerErrorHandler catches everything anyone don't need try..catch here
   try {
     if (!parent) {
       const comment = await Comment.create({
@@ -60,4 +56,4 @@ exports.create = asyncErrorHandler(async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-});
+};

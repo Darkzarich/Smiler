@@ -1,12 +1,8 @@
 const User = require('../../models/User');
 
-const {
-  generateError,
-  success,
-  asyncErrorHandler,
-} = require('../../utils/utils');
+const { generateError, success } = require('../../utils/utils');
 
-exports.getByLogin = asyncErrorHandler(async (req, res, next) => {
+exports.getByLogin = async (req, res, next) => {
   const { login } = req.params;
   const { userId } = req.session;
   const { userLogin } = req.session;
@@ -49,4 +45,4 @@ exports.getByLogin = asyncErrorHandler(async (req, res, next) => {
     .catch((e) => {
       next(e);
     });
-});
+};

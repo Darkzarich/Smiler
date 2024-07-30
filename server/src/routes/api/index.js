@@ -1,7 +1,9 @@
 const router = require('express').Router();
-const { asyncErrorHandler } = require('../../utils/utils');
+const {
+  asyncControllerErrorHandler,
+} = require('../../utils/async-controller-error-handler');
 const { IS_JEST } = require('../../config/config');
-const logger = require('../../config/logger');
+const { logger } = require('../../libs/logger');
 
 router.use('/users', require('./users'));
 router.use('/auth', require('./auth'));
@@ -13,7 +15,7 @@ router.use('/tags', require('./tags'));
 if (IS_JEST) {
   router.get(
     '/error-endpoint',
-    asyncErrorHandler(() => {
+    asyncControllerErrorHandler(() => {
       throw new Error('Some error');
     }),
   );

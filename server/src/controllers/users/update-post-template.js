@@ -1,13 +1,9 @@
 const User = require('../../models/User');
 
-const {
-  generateError,
-  success,
-  asyncErrorHandler,
-} = require('../../utils/utils');
+const { generateError, success } = require('../../utils/utils');
 const consts = require('../../const/const');
 
-exports.updatePostTemplate = asyncErrorHandler(async (req, res, next) => {
+exports.updatePostTemplate = async (req, res, next) => {
   // TODO: validate title, sections just like in posts
 
   const { sections } = req.body;
@@ -45,4 +41,4 @@ exports.updatePostTemplate = asyncErrorHandler(async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-});
+};

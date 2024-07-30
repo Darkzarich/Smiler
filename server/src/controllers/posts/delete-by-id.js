@@ -4,13 +4,9 @@ const path = require('path');
 const Post = require('../../models/Post');
 
 const consts = require('../../const/const');
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../utils/utils');
+const { success, generateError } = require('../../utils/utils');
 
-exports.deleteById = asyncErrorHandler(async (req, res, next) => {
+exports.deleteById = async (req, res, next) => {
   const { userId } = req.session;
   const { id } = req.params;
 
@@ -69,4 +65,4 @@ exports.deleteById = asyncErrorHandler(async (req, res, next) => {
   } else {
     generateError("Post doesn't exist", 404, next);
   }
-});
+};

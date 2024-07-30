@@ -1,10 +1,6 @@
 const crypto = require('crypto');
 const User = require('../../models/User');
-const {
-  success,
-  asyncErrorHandler,
-  generateError,
-} = require('../../utils/utils');
+const { success, generateError } = require('../../utils/utils');
 
 const validate = (user, next) => {
   if (!user.email || !user.password) {
@@ -22,7 +18,7 @@ const validate = (user, next) => {
   return true;
 };
 
-exports.signIn = asyncErrorHandler(async (req, res, next) => {
+exports.signIn = async (req, res, next) => {
   const user = {
     email: req.body.email,
     password: req.body.password,
@@ -71,4 +67,4 @@ exports.signIn = asyncErrorHandler(async (req, res, next) => {
   };
 
   success(req, res, userAuth);
-});
+};

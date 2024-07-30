@@ -1,4 +1,7 @@
 const router = require('express').Router();
+const {
+  asyncControllerErrorHandler,
+} = require('../../utils/async-controller-error-handler');
 const postsController = require('../../controllers/posts');
 const auth = require('../auth');
 
@@ -346,15 +349,22 @@ const auth = require('../auth');
   }
 }
 */
-router.get('/', (req, res, next) => {
-  if (req.query.author) {
-    return postsController.getListByAuthor(req, res, next);
-  }
+router.get(
+  '/',
+  asyncControllerErrorHandler((req, res, next) => {
+    if (req.query.author) {
+      return postsController.getListByAuthor(req, res, next);
+    }
 
-  postsController.search(req, res, next);
-});
+    postsController.search(req, res, next);
+  }),
+);
 
-router.post('/', auth.required, postsController.create);
+router.post(
+  '/',
+  auth.required,
+  asyncControllerErrorHandler(postsController.create),
+);
 
 /**
 @swagger
@@ -418,7 +428,7 @@ router.post('/', auth.required, postsController.create);
 }
 */
 
-router.get('/categories/all', postsController.all);
+router.get('/categories/all', asyncControllerErrorHandler(postsController.all));
 
 /**
 @swagger
@@ -482,7 +492,10 @@ router.get('/categories/all', postsController.all);
 }
 */
 
-router.get('/categories/today', postsController.today);
+router.get(
+  '/categories/today',
+  asyncControllerErrorHandler(postsController.today),
+);
 
 /**
 @swagger
@@ -546,7 +559,10 @@ router.get('/categories/today', postsController.today);
 }
 */
 
-router.get('/categories/blowing', postsController.blowing);
+router.get(
+  '/categories/blowing',
+  asyncControllerErrorHandler(postsController.blowing),
+);
 
 /**
 @swagger
@@ -610,7 +626,10 @@ router.get('/categories/blowing', postsController.blowing);
 }
 */
 
-router.get('/categories/recent', postsController.recent);
+router.get(
+  '/categories/recent',
+  asyncControllerErrorHandler(postsController.recent),
+);
 
 /**
 @swagger
@@ -674,7 +693,10 @@ router.get('/categories/recent', postsController.recent);
 }
 */
 
-router.get('/categories/top-this-week', postsController.topThisWeek);
+router.get(
+  '/categories/top-this-week',
+  asyncControllerErrorHandler(postsController.topThisWeek),
+);
 
 /**
 @swagger
@@ -741,7 +763,11 @@ router.get('/categories/top-this-week', postsController.topThisWeek);
 }
 */
 
-router.get('/feed', auth.required, postsController.getFeed);
+router.get(
+  '/feed',
+  auth.required,
+  asyncControllerErrorHandler(postsController.getFeed),
+);
 
 /**
 @swagger
@@ -888,9 +914,17 @@ router.get('/feed', auth.required, postsController.getFeed);
   }
 }
 */
-router.get('/:slug', postsController.getBySlug);
-router.put('/:id', auth.required, postsController.updateById);
-router.delete('/:id', auth.required, postsController.deleteById);
+router.get('/:slug', asyncControllerErrorHandler(postsController.getBySlug));
+router.put(
+  '/:id',
+  auth.required,
+  asyncControllerErrorHandler(postsController.updateById),
+);
+router.delete(
+  '/:id',
+  auth.required,
+  asyncControllerErrorHandler(postsController.deleteById),
+);
 
 /**
 @swagger
@@ -952,7 +986,11 @@ router.delete('/:id', auth.required, postsController.deleteById);
   }
 }
  */
-router.post('/upload', auth.required, postsController.upload);
+router.post(
+  '/upload',
+  auth.required,
+  asyncControllerErrorHandler(postsController.upload),
+);
 
 /**
 @swagger
@@ -1048,7 +1086,15 @@ router.post('/upload', auth.required, postsController.upload);
   }
 }
  */
-router.put('/:id/vote', auth.required, postsController.voteById);
-router.delete('/:id/vote', auth.required, postsController.unvoteById);
+router.put(
+  '/:id/vote',
+  auth.required,
+  asyncControllerErrorHandler(postsController.voteById),
+);
+router.delete(
+  '/:id/vote',
+  auth.required,
+  asyncControllerErrorHandler(postsController.unvoteById),
+);
 
 module.exports = router;

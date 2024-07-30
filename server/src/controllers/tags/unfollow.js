@@ -1,13 +1,9 @@
 const User = require('../../models/User');
 
 const consts = require('../../const/const');
-const {
-  generateError,
-  success,
-  asyncErrorHandler,
-} = require('../../utils/utils');
+const { generateError, success } = require('../../utils/utils');
 
-exports.unfollow = asyncErrorHandler(async (req, res, next) => {
+exports.unfollow = async (req, res, next) => {
   const { tag } = req.params;
   const { userId } = req.session;
 
@@ -29,4 +25,4 @@ exports.unfollow = asyncErrorHandler(async (req, res, next) => {
       generateError(e, 500, next);
     }
   }
-});
+};
