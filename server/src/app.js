@@ -1,31 +1,15 @@
 const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
-const addRequestId = require('express-request-id')();
-const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
-const cors = require('cors');
+const requestIdMiddleware = require('express-request-id')();
 
+const { PORT, IS_PRODUCTION, IS_JEST } = require('./config/config');
 const { connectDB } = require('./libs/db');
 const { logger } = require('./libs/logger');
-const config = require('./config/config');
 const morganMiddleware = require('./middlewares/morgan');
+const corsMiddleware = require('./middlewares/cors');
+const sessionMiddleware = require('./middlewares/session');
 const router = require('./routes');
-
-const {
-  PORT,
-  FRONT_ORIGIN_LOCAL,
-  FRONT_ORIGIN_REMOTE,
-  SESSION_SECRET,
-  IS_PRODUCTION,
-  IS_JEST,
-} = config;
-
-const whitelist = [
-  FRONT_ORIGIN_LOCAL,
-  FRONT_ORIGIN_REMOTE,
-  `http://localhost:${PORT}`,
-];
 
 logger.info(
   `[pid: ${process.pid}] Worker is running in ${IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode.`,
@@ -34,29 +18,15 @@ logger.info(
 async function startApp({ db = null } = {}) {
   const app = express();
 
+  // Add basic security headers
   app.use(helmet());
 
-  app.use(
-    cors({
-      credentials: true,
-      origin(origin, callback) {
-        if (
-          origin === undefined ||
-          whitelist.indexOf(origin) !== -1 ||
-          !IS_PRODUCTION
-        ) {
-          callback(null, true);
-        } else {
-          logger.warn(`"${origin}" is not allowed by CORS`);
-          callback(new Error('Not allowed by CORS'));
-        }
-      },
-    }),
-  );
+  app.use(corsMiddleware);
 
-  // Unique request id
-  app.use(addRequestId);
+  // Add unique request id
+  app.use(requestIdMiddleware);
 
+  // Parse JSON and URL-encoded data
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json({}));
 
@@ -65,24 +35,10 @@ async function startApp({ db = null } = {}) {
   }
 
   if (db) {
-    app.use(
-      session({
-        secret: SESSION_SECRET,
-        resave: true,
-        cookie: {
-          secure: IS_PRODUCTION,
-          httpOnly: true,
-          sameSite: 'strict',
-          maxAge: 60 * 60 * 24 * 1000,
-        },
-        saveUninitialized: false,
-        store: new MongoStore({
-          mongooseConnection: db,
-        }),
-      }),
-    );
+    app.use(sessionMiddleware(db));
   }
 
+  // Add logger for requests
   app.use(morganMiddleware);
 
   app.use(router);

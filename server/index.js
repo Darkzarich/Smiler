@@ -32,6 +32,8 @@ if (cluster.isMaster) {
   });
 } else {
   // eslint-disable-next-line global-require
+
+  // Runs the app in the worker process
   require('./src/app').run();
 
   process.on('unhandledRejection', (error) => {
