@@ -82,6 +82,7 @@ exports.signUp = asyncErrorHandler(async (req, res, next) => {
 
     success(req, res, userAuth);
   } catch (error) {
+    // Come up with a way to handle it globally
     if (isDuplicateKeyError(error)) {
       generateError(
         'This email or login is already associated with an account',

@@ -22,6 +22,8 @@ if (IS_JEST) {
 // eslint-disable-next-line no-unused-vars
 router.all('*', (req, res, next) => {
   res.status(404).send('Not Found');
+
+  // handle error with next()
 });
 
 // Specifying four parameters is a must for global error handling
