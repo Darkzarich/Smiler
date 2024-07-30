@@ -1,5 +1,3 @@
-// @ts-check
-
 import { test } from '@playwright/test';
 import Api from './api';
 import AuthForm from './components/AuthForm';
@@ -20,7 +18,6 @@ import SettingsPage from './pages/SettingsPage';
 import SinglePostPage from './pages/SinglePostPage';
 
 // Extend base test by providing common page objects
-// @ts-ignore
 export default test.extend({
   Api: async ({ page, context }, use) => {
     await use(new Api(page, context));

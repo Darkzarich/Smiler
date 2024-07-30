@@ -1,4 +1,3 @@
-// @ts-check
 import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
 

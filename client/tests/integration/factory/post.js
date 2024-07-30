@@ -1,5 +1,3 @@
-// @ts-check
-
 // TODO: Replace with lodash-es when moving to TypeScript
 import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';

@@ -1,5 +1,3 @@
-// @ts-check
-
 import routes from './routes';
 
 export default class Api {

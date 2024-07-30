@@ -1,4 +1,3 @@
-// @ts-check
 /* eslint-disable no-template-curly-in-string */
 
 import Route from './route';

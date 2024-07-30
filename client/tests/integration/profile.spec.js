@@ -1,6 +1,5 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-shadow */
-// @ts-check
 
 import { expect } from '@playwright/test';
 import generateAuth from './factory/auth';

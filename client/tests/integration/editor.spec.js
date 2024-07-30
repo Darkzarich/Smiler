@@ -1,8 +1,6 @@
 /* eslint-disable playwright/no-conditional-in-test */
 /* eslint-disable no-await-in-loop */
 
-// @ts-check
-
 import { expect } from '@playwright/test';
 import generateAuth from './factory/auth';
 import generatePost from './factory/post';

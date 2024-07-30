@@ -1,6 +1,5 @@
 /* eslint-disable no-shadow */
 /* eslint-disable playwright/no-conditional-in-test */
-// @ts-check
 
 import { expect } from '@playwright/test';
 import generateAuth from './factory/auth';

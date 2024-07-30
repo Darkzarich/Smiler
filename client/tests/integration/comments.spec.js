@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-// @ts-check
 
 import { expect } from '@playwright/test';
 import generateAuth from './factory/auth';
