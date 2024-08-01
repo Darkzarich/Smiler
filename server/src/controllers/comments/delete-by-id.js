@@ -18,7 +18,7 @@ exports.deleteById = async (req, res, next) => {
     ) {
       generateError(
         `You can delete comment only within the first ${COMMENT_TIME_TO_UPDATE} min`,
-        405,
+        403,
         next,
       );
     } else if (comFound.children.length > 0) {

@@ -43,7 +43,7 @@ exports.unvoteById = async (req, res, next) => {
           next(e);
         });
     } else {
-      generateError("You didn't rate this comment", 405, next);
+      generateError("You didn't rate this comment", 403, next);
     }
   } else {
     generateError("Comment doesn't exist", 404, next);

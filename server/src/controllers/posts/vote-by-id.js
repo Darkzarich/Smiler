@@ -13,7 +13,7 @@ exports.voteById = async (req, res, next) => {
 
   if (foundPost) {
     if (foundPost.author.toString() === userId) {
-      generateError("Can't rate your own post", 405, next);
+      generateError("Can't rate your own post", 403, next);
       return;
     }
     const user = await User.findById(userId).populate('rates');
@@ -47,7 +47,7 @@ exports.voteById = async (req, res, next) => {
           next(e);
         });
     } else {
-      generateError("Can't rate post you already rated", 405, next);
+      generateError("Can't rate post you already rated", 403, next);
     }
   } else {
     generateError("Post doesn't exist", 404, next);

@@ -13,7 +13,7 @@ exports.voteById = async (req, res, next) => {
 
   if (foundComment) {
     if (foundComment.author._id.toString() === userId) {
-      generateError("Can't rate your own comment", 405, next);
+      generateError("Can't rate your own comment", 403, next);
       return;
     }
 
@@ -52,7 +52,7 @@ exports.voteById = async (req, res, next) => {
           next(e);
         });
     } else {
-      generateError("Can't rate comment you already rated", 405, next);
+      generateError("Can't rate comment you already rated", 403, next);
     }
   } else {
     generateError("Comment doesn't exist", 404, next);

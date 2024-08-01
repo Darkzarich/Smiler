@@ -25,7 +25,7 @@ exports.deleteById = async (req, res, next) => {
     ) {
       generateError(
         `You can delete post only within first ${POST_TIME_TO_UPDATE} min`,
-        405,
+        403,
         next,
       );
     } else {

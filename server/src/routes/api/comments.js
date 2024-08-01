@@ -299,9 +299,6 @@ router.post(
         "404": {
           "$ref": "#/components/responses/NotFound"
         },
-        "405": {
-          "$ref": "#/components/responses/MethodNotAllowed"
-        },
         "422": {
           "$ref": "#/components/responses/UnprocessableEntity"
         }
@@ -340,9 +337,6 @@ router.post(
         },
         "404": {
           "$ref": "#/components/responses/NotFound"
-        },
-        "405": {
-          "$ref": "#/components/responses/MethodNotAllowed"
         }
       }
     }
@@ -410,9 +404,6 @@ router.delete(
         },
         "404": {
           "$ref": "#/components/responses/NotFound"
-        },
-        "405": {
-          "$ref": "#/components/responses/MethodNotAllowed"
         }
       }
     },
@@ -446,9 +437,6 @@ router.delete(
         },
         "404": {
           "$ref": "#/components/responses/NotFound"
-        },
-        "405": {
-          "$ref": "#/components/responses/MethodNotAllowed"
         }
       }
     }

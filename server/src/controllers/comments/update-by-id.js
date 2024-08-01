@@ -22,7 +22,7 @@ exports.updateById = async (req, res, next) => {
   if (comment.children.length > 0) {
     return generateError(
       "You can't edit a comment if someone already answered it",
-      405,
+      403,
       next,
     );
   }
@@ -33,7 +33,7 @@ exports.updateById = async (req, res, next) => {
   ) {
     return generateError(
       `You can update comment only within first ${COMMENT_TIME_TO_UPDATE} min`,
-      405,
+      403,
       next,
     );
   }

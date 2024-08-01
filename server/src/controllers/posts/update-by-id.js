@@ -37,7 +37,7 @@ exports.updateById = async (req, res, next) => {
   ) {
     return generateError(
       `You can edit post only within first ${POST_TIME_TO_UPDATE} min`,
-      405,
+      403,
       next,
     );
   }

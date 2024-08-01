@@ -832,9 +832,6 @@ router.get(
         },
         "404": {
           "$ref": "#/components/responses/NotFound"
-        },
-        "405": {
-          "$ref": "#/components/responses/MethodNotAllowed"
         }
       }
     },
@@ -871,9 +868,6 @@ router.get(
         },
         "404": {
           "$ref": "#/components/responses/NotFound"
-        },
-        "405": {
-          "$ref": "#/components/responses/MethodNotAllowed"
         }
       }
     }
@@ -1042,9 +1036,6 @@ router.post(
         },
         "404": {
           "$ref": "#/components/responses/NotFound"
-        },
-        "405": {
-          "$ref": "#/components/responses/MethodNotAllowed"
         }
       }
     },
@@ -1078,9 +1069,6 @@ router.post(
         },
         "404": {
           "$ref": "#/components/responses/NotFound"
-        },
-        "405": {
-          "$ref": "#/components/responses/MethodNotAllowed"
         }
       }
     }

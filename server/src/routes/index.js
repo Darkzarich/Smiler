@@ -127,16 +127,6 @@ module.exports = router;
             }
           }
         }
-      },
-      "MethodNotAllowed": {
-        "description": "Method is not available due to certain restrictions",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            }
-          }
-        }
       }
     }
   }

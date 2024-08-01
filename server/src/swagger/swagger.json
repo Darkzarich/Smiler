@@ -364,9 +364,6 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed"
-          },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
           }
@@ -405,9 +402,6 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       }
@@ -458,9 +452,6 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       },
@@ -494,9 +485,6 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       }
@@ -1095,9 +1083,6 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       },
@@ -1134,9 +1119,6 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       }
@@ -1277,9 +1259,6 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       },
@@ -1313,9 +1292,6 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed"
           }
         }
       }
@@ -2170,16 +2146,6 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/OK"
-            }
-          }
-        }
-      },
-      "MethodNotAllowed": {
-        "description": "Method is not available due to certain restrictions",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
             }
           }
         }
