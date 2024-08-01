@@ -3,7 +3,7 @@ const {
   asyncControllerErrorHandler,
 } = require('../../utils/async-controller-error-handler');
 const tagsController = require('../../controllers/tags');
-const auth = require('../auth');
+const authRequiredMiddleware = require('../../middlewares/auth-required');
 
 /**
 @swagger
@@ -79,12 +79,12 @@ const auth = require('../auth');
 
 router.put(
   '/:tag/follow',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(tagsController.follow),
 );
 router.delete(
   '/:tag/follow',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(tagsController.unfollow),
 );
 

@@ -3,7 +3,7 @@ const {
   asyncControllerErrorHandler,
 } = require('../../utils/async-controller-error-handler');
 const authController = require('../../controllers/auth');
-const auth = require('../auth');
+const authRequiredMiddleware = require('../../middlewares/auth-required');
 
 /**
 @swagger
@@ -241,7 +241,7 @@ router.post('/signup', asyncControllerErrorHandler(authController.signUp));
 */
 router.post(
   '/logout',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(authController.logout),
 );
 

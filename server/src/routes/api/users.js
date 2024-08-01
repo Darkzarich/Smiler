@@ -3,7 +3,7 @@ const {
   asyncControllerErrorHandler,
 } = require('../../utils/async-controller-error-handler');
 const usersController = require('../../controllers/users');
-const auth = require('../auth');
+const authRequiredMiddleware = require('../../middlewares/auth-required');
 
 /**
 @swagger
@@ -182,7 +182,7 @@ const auth = require('../auth');
 router.get('/:login', asyncControllerErrorHandler(usersController.getByLogin));
 router.put(
   '/me',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(usersController.updateMe),
 );
 
@@ -318,12 +318,12 @@ router.put(
 
 router.get(
   '/:login/template',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(usersController.getPostTemplate),
 );
 router.put(
   '/:login/template',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(usersController.updatePostTemplate),
 );
 
@@ -370,7 +370,7 @@ router.put(
 
 router.get(
   '/me/settings',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(usersController.getSettings),
 );
 
@@ -456,12 +456,12 @@ router.get(
 
 router.put(
   '/:id/follow',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(usersController.followById),
 );
 router.delete(
   '/:id/follow',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(usersController.unfollowById),
 );
 
@@ -524,7 +524,7 @@ router.delete(
 
 router.delete(
   '/:login/template/:hash',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(usersController.deletePostTemplatePicture),
 );
 

@@ -3,7 +3,7 @@ const {
   asyncControllerErrorHandler,
 } = require('../../utils/async-controller-error-handler');
 const commentsController = require('../../controllers/comments');
-const auth = require('../auth');
+const authRequiredMiddleware = require('../../middlewares/auth-required');
 
 /**
 @swagger
@@ -243,7 +243,7 @@ router.get('/', asyncControllerErrorHandler(commentsController.getList));
 
 router.post(
   '/',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(commentsController.create),
 );
 
@@ -346,12 +346,12 @@ router.post(
 
 router.put(
   '/:id',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(commentsController.updateById),
 );
 router.delete(
   '/:id',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(commentsController.deleteById),
 );
 
@@ -445,12 +445,12 @@ router.delete(
  */
 router.put(
   '/:id/vote',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(commentsController.voteById),
 );
 router.delete(
   '/:id/vote',
-  auth.required,
+  authRequiredMiddleware,
   asyncControllerErrorHandler(commentsController.unvoteById),
 );
 
