@@ -2,7 +2,7 @@ const multer = require('multer');
 const Sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
-const DiskStorage = require('../../utils/DiskStorage');
+const DiskStorage = require('../../libs/DiskStorage');
 
 const User = require('../../models/User');
 const consts = require('../../const/const');
