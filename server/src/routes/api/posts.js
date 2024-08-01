@@ -209,7 +209,7 @@ const auth = require('../auth');
               "type": "string"
             }
           },
-          "explode": "form"
+          "explode": true
         },
         {
           "in": "query",
@@ -958,6 +958,7 @@ router.delete(
       },
       "responses": {
         "200": {
+          "description": "OK",
           "content": {
             "application/json": {
               "schema": {

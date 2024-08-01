@@ -138,16 +138,6 @@ const auth = require('../auth');
           "cookieAuth": []
         }
       ],
-      "parameters": [
-        {
-          "in": "path",
-          "name": "login",
-          "schema": {
-            "type": "string"
-          },
-          "required": true
-        }
-      ],
       "requestBody": {
         "content": {
           "application/json": {

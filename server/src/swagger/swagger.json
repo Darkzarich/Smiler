@@ -558,7 +558,7 @@
                 "type": "string"
               }
             },
-            "explode": "form"
+            "explode": true
           },
           {
             "in": "query",
@@ -1204,6 +1204,7 @@
         },
         "responses": {
           "200": {
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1429,16 +1430,6 @@
         "security": [
           {
             "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "login",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
           }
         ],
         "requestBody": {
