@@ -1,7 +1,7 @@
 const { differenceInMilliseconds } = require('date-fns');
 const fs = require('fs');
 const path = require('path');
-const sanitizeHtml = require('../../utils/sanitize-html');
+const sanitizeHtml = require('../../libs/sanitize-html');
 
 const Post = require('../../models/Post');
 const {

@@ -1,4 +1,4 @@
-const sanitizeHtml = require('../../utils/sanitize-html');
+const sanitizeHtml = require('../../libs/sanitize-html');
 const Comment = require('../../models/Comment');
 const { success, generateError } = require('../../utils/utils');
 

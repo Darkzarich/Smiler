@@ -1,5 +1,5 @@
 const { differenceInMilliseconds } = require('date-fns');
-const sanitizeHtml = require('../../utils/sanitize-html');
+const sanitizeHtml = require('../../libs/sanitize-html');
 const Comment = require('../../models/Comment');
 const { COMMENT_TIME_TO_UPDATE } = require('../../const/const');
 const { success, generateError } = require('../../utils/utils');

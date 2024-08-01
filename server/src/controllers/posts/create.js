@@ -1,6 +1,6 @@
 const slugLib = require('slug');
 const crypto = require('crypto');
-const sanitizeHtml = require('../../utils/sanitize-html');
+const sanitizeHtml = require('../../libs/sanitize-html');
 
 const User = require('../../models/User');
 const Post = require('../../models/Post');
