@@ -1,9 +1,13 @@
+const { differenceInMilliseconds } = require('date-fns');
 const fs = require('fs');
 const path = require('path');
 
 const Post = require('../../models/Post');
 
-const consts = require('../../const/const');
+const {
+  POST_TIME_TO_UPDATE,
+  POST_SECTION_TYPES,
+} = require('../../const/const');
 const { success, generateError } = require('../../utils/utils');
 
 exports.deleteById = async (req, res, next) => {
@@ -18,12 +22,12 @@ exports.deleteById = async (req, res, next) => {
       return;
     }
 
-    const curDate = new Date().getTime();
-    const postDate = new Date(foundPost.createdAt.toString()).getTime();
-
-    if (curDate - postDate > consts.POST_TIME_TO_UPDATE) {
+    if (
+      differenceInMilliseconds(Date.now(), foundPost.createdAt) >
+      POST_TIME_TO_UPDATE
+    ) {
       generateError(
-        `You can delete post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`,
+        `You can delete post only within first ${POST_TIME_TO_UPDATE} min`,
         405,
         next,
       );
@@ -38,7 +42,7 @@ exports.deleteById = async (req, res, next) => {
       await foundPost.remove();
 
       const filePicSections = sections.filter(
-        (sec) => sec.type === consts.POST_SECTION_TYPES.PICTURE && sec.isFile,
+        (sec) => sec.type === POST_SECTION_TYPES.PICTURE && sec.isFile,
       );
 
       filePicSections.forEach((sec) => {

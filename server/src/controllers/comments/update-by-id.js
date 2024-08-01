@@ -1,6 +1,7 @@
+const { differenceInMilliseconds } = require('date-fns');
 const sanitizeHtml = require('../../utils/sanitize-html');
 const Comment = require('../../models/Comment');
-const consts = require('../../const/const');
+const { COMMENT_TIME_TO_UPDATE } = require('../../const/const');
 const { success, generateError } = require('../../utils/utils');
 
 exports.updateById = async (req, res, next) => {
@@ -26,11 +27,12 @@ exports.updateById = async (req, res, next) => {
     );
   }
 
-  const commentCreatedAt = new Date(comment.createdAt.toString()).getTime();
-
-  if (Date.now() - commentCreatedAt > consts.COMMENT_TIME_TO_UPDATE) {
+  if (
+    differenceInMilliseconds(Date.now(), comment.createdAt) >
+    COMMENT_TIME_TO_UPDATE
+  ) {
     return generateError(
-      `You can update comment only within first ${consts.COMMENT_TIME_TO_UPDATE / 1000 / 60} min`,
+      `You can update comment only within first ${COMMENT_TIME_TO_UPDATE} min`,
       405,
       next,
     );

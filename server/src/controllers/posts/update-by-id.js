@@ -1,9 +1,15 @@
+const { differenceInMilliseconds } = require('date-fns');
 const fs = require('fs');
 const path = require('path');
 const sanitizeHtml = require('../../utils/sanitize-html');
 
 const Post = require('../../models/Post');
-const consts = require('../../const/const');
+const {
+  POST_TIME_TO_UPDATE,
+  POST_MAX_TAGS,
+  POST_MAX_TAG_LEN,
+  POST_SECTION_TYPES,
+} = require('../../const/const');
 const { success, generateError } = require('../../utils/utils');
 
 exports.updateById = async (req, res, next) => {
@@ -26,27 +32,26 @@ exports.updateById = async (req, res, next) => {
     return generateError('You can edit only your own posts', 403, next);
   }
 
-  const postCreatedAt = new Date(post.createdAt.toString()).getTime();
-  const { now } = new Date();
-
-  if (now - postCreatedAt > consts.POST_TIME_TO_UPDATE) {
+  if (
+    differenceInMilliseconds(Date.now(), post.createdAt) > POST_TIME_TO_UPDATE
+  ) {
     return generateError(
-      `You can edit post only within first ${consts.POST_TIME_TO_UPDATE / 1000 / 60} min`,
+      `You can edit post only within first ${POST_TIME_TO_UPDATE} min`,
       405,
       next,
     );
   }
 
   if (tags) {
-    if (tags.length > consts.POST_MAX_TAGS) {
+    if (tags.length > POST_MAX_TAGS) {
       return generateError(
-        `Too many tags, max amount is ${consts.POST_MAX_TAGS}`,
+        `Too many tags, max amount is ${POST_MAX_TAGS}`,
         422,
         next,
       );
     }
 
-    if (tags.find((el) => el.length > consts.POST_MAX_TAG_LEN)) {
+    if (tags.find((el) => el.length > POST_MAX_TAG_LEN)) {
       return generateError('Exceeded max length of a tag', 422, next);
     }
 
@@ -57,7 +62,7 @@ exports.updateById = async (req, res, next) => {
 
   if (newSections) {
     newSections.forEach((section) => {
-      if (section.type === consts.POST_SECTION_TYPES.TEXT) {
+      if (section.type === POST_SECTION_TYPES.TEXT) {
         // eslint-disable-next-line no-param-reassign
         section.content = sanitizeHtml(section.content);
       }
@@ -65,10 +70,7 @@ exports.updateById = async (req, res, next) => {
 
     // Looking for pics that got removed from post
     post.sections.forEach((section) => {
-      if (
-        section.type !== consts.POST_SECTION_TYPES.PICTURE ||
-        !section.isFile
-      ) {
+      if (section.type !== POST_SECTION_TYPES.PICTURE || !section.isFile) {
         return;
       }
 

@@ -1,7 +1,9 @@
+const { minutesToMilliseconds } = require('date-fns');
+
 module.exports = {
   POST_ATTACHMENTS_LIMIT: 8,
-  POST_TIME_TO_UPDATE: 1000 * 60 * 10, // 10 min
-  COMMENT_TIME_TO_UPDATE: 1000 * 60 * 10, // 10 min
+  POST_TIME_TO_UPDATE: minutesToMilliseconds(10),
+  COMMENT_TIME_TO_UPDATE: minutesToMilliseconds(10),
   POST_RATE_VALUE: 1,
   POST_SECTION_TYPES: {
     TEXT: 'text',
