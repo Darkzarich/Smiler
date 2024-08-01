@@ -4,10 +4,17 @@ const sanitizeHtml = require('../../libs/sanitize-html');
 
 const User = require('../../models/User');
 const Post = require('../../models/Post');
-const consts = require('../../const/const');
+const {
+  POST_SECTION_TYPES,
+  POST_SECTIONS_MAX,
+  POST_SECTIONS_MAX_LENGTH,
+  POST_TITLE_MAX_LENGTH,
+  POST_MAX_TAGS,
+  POST_MAX_TAG_LEN,
+} = require('../../constants');
 const { success, generateError } = require('../../utils/utils');
 
-const allowedSectionTypes = Object.values(consts.POST_SECTION_TYPES);
+const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 
 exports.create = async (req, res, next) => {
   // TODO: rework this | move validation
@@ -25,20 +32,20 @@ exports.create = async (req, res, next) => {
     return generateError('At least one section is required', 422, next);
   }
 
-  if (sections.length > consts.POST_SECTIONS_MAX) {
+  if (sections.length > POST_SECTIONS_MAX) {
     return generateError('Exceeded max amount of sections', 422, next);
   }
 
-  if (title.length > consts.POST_TITLE_MAX_LENGTH) {
+  if (title.length > POST_TITLE_MAX_LENGTH) {
     return generateError('Exceeded max length of title', 422, next);
   }
 
   if (tags) {
-    if (tags.length > consts.POST_MAX_TAGS) {
+    if (tags.length > POST_MAX_TAGS) {
       return generateError('Too many tags', 422, next);
     }
 
-    if (tags.some((tag) => tag.length > consts.POST_MAX_TAG_LEN)) {
+    if (tags.some((tag) => tag.length > POST_MAX_TAG_LEN)) {
       return generateError('Exceeded max length of a tag', 422, next);
     }
   }
@@ -55,14 +62,14 @@ exports.create = async (req, res, next) => {
 
     let textContentSumLength = 0;
 
-    if (section.type === consts.POST_SECTION_TYPES.TEXT) {
+    if (section.type === POST_SECTION_TYPES.TEXT) {
       textContentSumLength += section.content.length;
       section.content = sanitizeHtml(section.content);
     }
 
-    if (textContentSumLength > consts.POST_SECTIONS_MAX_LENGTH) {
+    if (textContentSumLength > POST_SECTIONS_MAX_LENGTH) {
       return generateError(
-        `Text sections sum length exceeded max allowed length of ${consts.POST_SECTIONS_MAX_LENGTH} symbols`,
+        `Text sections sum length exceeded max allowed length of ${POST_SECTIONS_MAX_LENGTH} symbols`,
         422,
         next,
       );

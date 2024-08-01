@@ -1,6 +1,6 @@
 /* eslint-disable func-names */
 const mongoose = require('mongoose');
-const consts = require('../const/const');
+const { USER_MAX_AVATAR_LENGTH, USER_MAX_BIO_LENGTH } = require('../constants');
 
 const { Schema } = mongoose;
 
@@ -21,12 +21,12 @@ const schema = new Schema(
     avatar: {
       type: String,
       match: [/^https?:\/\//g, '{VALUE} is not an url'],
-      maxLength: consts.USER_MAX_AVATAR_LENGTH,
+      maxLength: USER_MAX_AVATAR_LENGTH,
       default: '',
     },
     bio: {
       type: String,
-      maxLength: consts.USER_MAX_BIO_LENGTH,
+      maxLength: USER_MAX_BIO_LENGTH,
       default: '',
     },
     salt: {

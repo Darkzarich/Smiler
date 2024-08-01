@@ -1,7 +1,7 @@
 const User = require('../../models/User');
 const Rate = require('../../models/Rate');
 const Comment = require('../../models/Comment');
-const consts = require('../../const/const');
+const { COMMENT_RATE_VALUE } = require('../../constants');
 const { success, generateError } = require('../../utils/utils');
 
 exports.voteById = async (req, res, next) => {
@@ -22,8 +22,8 @@ exports.voteById = async (req, res, next) => {
 
     if (!rated.result) {
       foundComment.rating += negative
-        ? -consts.COMMENT_RATE_VALUE
-        : consts.COMMENT_RATE_VALUE;
+        ? -COMMENT_RATE_VALUE
+        : COMMENT_RATE_VALUE;
 
       Promise.all([
         Rate.create({
@@ -40,8 +40,8 @@ exports.voteById = async (req, res, next) => {
 
           user.rates.push(newRate._id);
           commentAuthor.rating += negative
-            ? -consts.COMMENT_RATE_VALUE
-            : consts.COMMENT_RATE_VALUE;
+            ? -COMMENT_RATE_VALUE
+            : COMMENT_RATE_VALUE;
 
           user.save();
           commentAuthor.save();

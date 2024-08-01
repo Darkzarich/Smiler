@@ -1,7 +1,7 @@
 const User = require('../../models/User');
 
 const { generateError, success } = require('../../utils/utils');
-const consts = require('../../const/const');
+const { POST_MAX_TAGS, POST_MAX_TAG_LEN } = require('../../constants');
 
 exports.updatePostTemplate = async (req, res, next) => {
   // TODO: validate title, sections just like in posts
@@ -16,11 +16,11 @@ exports.updatePostTemplate = async (req, res, next) => {
   }
 
   if (tags) {
-    if (tags.length > consts.POST_MAX_TAGS) {
+    if (tags.length > POST_MAX_TAGS) {
       generateError('Too many tags', 422, next);
       return;
     }
-    if (tags.find((el) => el.length > consts.POST_MAX_TAG_LEN)) {
+    if (tags.find((el) => el.length > POST_MAX_TAG_LEN)) {
       generateError('Exceeded max length of a tag', 422, next);
       return;
     }

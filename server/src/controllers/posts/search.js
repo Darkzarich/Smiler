@@ -1,6 +1,6 @@
 const User = require('../../models/User');
 const Post = require('../../models/Post');
-const consts = require('../../const/const');
+const { POST_TITLE_MAX_LENGTH } = require('../../constants');
 const { success, generateError } = require('../../utils/utils');
 
 exports.search = async (req, res, next) => {
@@ -24,7 +24,7 @@ exports.search = async (req, res, next) => {
   const query = {};
 
   if (title) {
-    if (title.length > consts.POST_TITLE_MAX_LENGTH) {
+    if (title.length > POST_TITLE_MAX_LENGTH) {
       return generateError('Title is too long', 422, next);
     }
 

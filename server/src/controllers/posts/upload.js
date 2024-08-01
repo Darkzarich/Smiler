@@ -5,7 +5,7 @@ const fs = require('fs');
 const DiskStorage = require('../../libs/DiskStorage');
 
 const User = require('../../models/User');
-const consts = require('../../const/const');
+const { POST_SECTIONS_MAX } = require('../../constants');
 
 const { success, generateError } = require('../../utils/utils');
 
@@ -76,9 +76,9 @@ exports.upload = async (req, res, next) => {
   try {
     const user = await User.findById(req.session.userId).select('template');
 
-    if (user.template.sections.length >= consts.POST_SECTIONS_MAX) {
+    if (user.template.sections.length >= POST_SECTIONS_MAX) {
       generateError(
-        `Exceed limit of post sections: ${consts.POST_SECTIONS_MAX}`,
+        `Exceed limit of post sections: ${POST_SECTIONS_MAX}`,
         409,
         next,
       );

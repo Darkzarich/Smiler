@@ -4,10 +4,7 @@ const path = require('path');
 
 const Post = require('../../models/Post');
 
-const {
-  POST_TIME_TO_UPDATE,
-  POST_SECTION_TYPES,
-} = require('../../const/const');
+const { POST_TIME_TO_UPDATE, POST_SECTION_TYPES } = require('../../constants');
 const { success, generateError } = require('../../utils/utils');
 
 exports.deleteById = async (req, res, next) => {

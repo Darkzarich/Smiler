@@ -4,7 +4,7 @@ const path = require('path');
 const User = require('../../models/User');
 
 const { generateError, success } = require('../../utils/utils');
-const consts = require('../../const/const');
+const { POST_SECTION_TYPES } = require('../../constants');
 
 exports.deletePostTemplatePicture = async (req, res, next) => {
   const { login } = req.params;
@@ -31,7 +31,7 @@ exports.deletePostTemplatePicture = async (req, res, next) => {
 
   if (foundSection) {
     if (
-      foundSection.type === consts.POST_SECTION_TYPES.PICTURE &&
+      foundSection.type === POST_SECTION_TYPES.PICTURE &&
       foundSection.isFile === true
     ) {
       const { url } = foundSection;

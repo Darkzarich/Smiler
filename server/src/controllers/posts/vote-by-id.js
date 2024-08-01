@@ -1,7 +1,7 @@
 const User = require('../../models/User');
 const Post = require('../../models/Post');
 const Rate = require('../../models/Rate');
-const consts = require('../../const/const');
+const { POST_RATE_VALUE } = require('../../constants');
 const { success, generateError } = require('../../utils/utils');
 
 exports.voteById = async (req, res, next) => {
@@ -20,9 +20,7 @@ exports.voteById = async (req, res, next) => {
     const rated = user.isRated(foundPost.id);
 
     if (!rated.result) {
-      foundPost.rating += negative
-        ? -consts.POST_RATE_VALUE
-        : consts.POST_RATE_VALUE;
+      foundPost.rating += negative ? -POST_RATE_VALUE : POST_RATE_VALUE;
 
       Promise.all([
         Rate.create({
@@ -38,9 +36,7 @@ exports.voteById = async (req, res, next) => {
           const postAuthor = result[2];
 
           user.rates.push(newRate._id);
-          postAuthor.rating += negative
-            ? -consts.POST_RATE_VALUE
-            : consts.POST_RATE_VALUE;
+          postAuthor.rating += negative ? -POST_RATE_VALUE : POST_RATE_VALUE;
 
           user.save();
           postAuthor.save();

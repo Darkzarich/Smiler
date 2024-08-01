@@ -1,7 +1,7 @@
 const { differenceInMilliseconds } = require('date-fns');
 const sanitizeHtml = require('../../libs/sanitize-html');
 const Comment = require('../../models/Comment');
-const { COMMENT_TIME_TO_UPDATE } = require('../../const/const');
+const { COMMENT_TIME_TO_UPDATE } = require('../../constants');
 const { success, generateError } = require('../../utils/utils');
 
 exports.updateById = async (req, res, next) => {

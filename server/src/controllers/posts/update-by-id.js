@@ -9,7 +9,7 @@ const {
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
   POST_SECTION_TYPES,
-} = require('../../const/const');
+} = require('../../constants');
 const { success, generateError } = require('../../utils/utils');
 
 exports.updateById = async (req, res, next) => {
