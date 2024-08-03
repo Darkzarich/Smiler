@@ -13,8 +13,8 @@ describe('GET /not-existing-route', () => {
   it('Should return status 404 and an expected error message', async () => {
     const response = await request(app).get('/api/not-existing-route');
 
+    expect(response.body.error.message).toBe('Not Found');
     expect(response.status).toBe(404);
-    expect(response.text).toBe('Not Found');
   });
 });
 
@@ -24,7 +24,7 @@ describe('Internal Server Error handled globally', () => {
 
     expect(response.status).toBe(500);
     expect(response.body.error).toMatchObject({
-      message: 'Internal server error',
+      message: 'Something went wrong on the server. Please try again later.',
     });
   });
 });

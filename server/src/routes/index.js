@@ -29,7 +29,10 @@ module.exports = router;
             "properties": {
               "message": {
                 "type": "string"
-              }
+              },
+              "code": {
+                "type": "string"
+              },
             }
           }
         },
