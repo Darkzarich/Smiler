@@ -25,10 +25,8 @@ describe('GET /posts/:slug', () => {
   it('Should return status 404 and a message for non-existing slug', async () => {
     const response = await request(app).get('/api/posts/non-existing-slug');
 
+    expect(response.body.error.message).toBe("Post doesn't exist");
     expect(response.status).toBe(404);
-    expect(response.body.error).toMatchObject({
-      message: "Post doesn't exist",
-    });
   });
 
   // TODO: Temporary implementation
