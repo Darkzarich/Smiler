@@ -2,16 +2,17 @@ const { startOfWeek } = require('date-fns');
 
 const User = require('../../../models/User');
 const Post = require('../../../models/Post');
-const { success, generateError } = require('../../../utils/utils');
+const { ValidationError } = require('../../../errors');
+const { success } = require('../../../utils/utils');
 
-exports.topThisWeek = async (req, res, next) => {
+exports.topThisWeek = async (req, res) => {
   const limit = +req.query.limit || 100;
   const offset = +req.query.offset || 0;
 
   const { userId } = req.session;
 
   if (limit > 100) {
-    return generateError("Limit can't be more than 100", 422, next);
+    throw new ValidationError('Limit cannot be more than 100');
   }
 
   const query = {
