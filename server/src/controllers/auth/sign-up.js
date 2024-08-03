@@ -1,47 +1,32 @@
 const crypto = require('crypto');
 const User = require('../../models/User');
-const {
-  success,
-  generateError,
-  isDuplicateKeyError,
-} = require('../../utils/utils');
+const { ValidationError, ConflictError } = require('../../errors');
+const { success, isDuplicateKeyError } = require('../../utils/utils');
 
-const validate = (user, next) => {
+/** Validate user sign up, return error message or nothing */
+const validate = (user) => {
   if (!user.login || !user.password || !user.confirm || !user.email) {
-    generateError('All fields must be filled.', 422, next);
-
-    return false;
+    return 'All fields must be filled';
   }
 
   if (user.login.length < 3 || user.login.length > 10) {
-    generateError('Login length must be 3-10 symbols', 422, next);
-
-    return false;
+    return 'Login length must be 3-10 symbols';
   }
 
   if (user.password.length < 6) {
-    generateError('Password length must be not less than 6', 422, next);
-
-    return false;
+    return 'Password length must be not less than 6';
   }
 
   if (user.password !== user.confirm) {
-    generateError('Password and password confirm must be equal', 422, next);
-
-    return false;
+    return 'Password and password confirm must be equal';
   }
 
   if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(user.email)) {
-    generateError('Email is not valid', 422, next);
-
-    return false;
+    return 'Email is not valid';
   }
-
-  return true;
 };
 
-exports.signUp = async (req, res, next) => {
-  // TODO: Rework validation, rework unique email
+exports.signUp = async (req, res) => {
   const user = {
     email: req.body.email,
     login: req.body.login,
@@ -49,10 +34,10 @@ exports.signUp = async (req, res, next) => {
     confirm: req.body.confirm,
   };
 
-  const isValid = validate(user, next);
+  const error = validate(user);
 
-  if (!isValid) {
-    return;
+  if (error) {
+    throw new ValidationError(error);
   }
 
   const salt = crypto.randomBytes(16).toString('hex');
@@ -83,13 +68,9 @@ exports.signUp = async (req, res, next) => {
   } catch (error) {
     // Come up with a way to handle it globally
     if (isDuplicateKeyError(error)) {
-      generateError(
+      throw new ConflictError(
         'This email or login is already associated with an account',
-        422,
-        next,
       );
-
-      return;
     }
 
     throw error;

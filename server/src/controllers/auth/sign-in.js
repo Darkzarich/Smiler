@@ -1,33 +1,28 @@
 const crypto = require('crypto');
 const User = require('../../models/User');
-const { success, generateError } = require('../../utils/utils');
+const { ValidationError, UnauthorizedError } = require('../../errors');
+const { success } = require('../../utils/utils');
 
-const validate = (user, next) => {
+const validate = (user) => {
   if (!user.email || !user.password) {
-    generateError('All fields must be filled.', 422, next);
-
-    return false;
+    return 'All fields must be filled.';
   }
 
   if (user.password.length < 6) {
-    generateError('Password length must be not less than 6', 422, next);
-
-    return false;
+    return 'Password length must be not less than 6';
   }
-
-  return true;
 };
 
-exports.signIn = async (req, res, next) => {
+exports.signIn = async (req, res) => {
   const user = {
     email: req.body.email,
     password: req.body.password,
   };
 
-  const isValid = validate(user, next);
+  const error = validate(user);
 
-  if (!isValid) {
-    return;
+  if (!error) {
+    throw new ValidationError(error);
   }
 
   const foundUser = await User.findOne({
@@ -35,8 +30,7 @@ exports.signIn = async (req, res, next) => {
   }).lean();
 
   if (!foundUser) {
-    generateError('Invalid email or password', 401, next);
-    return;
+    throw new UnauthorizedError('Invalid email or password');
   }
 
   const hash = crypto
@@ -49,7 +43,7 @@ exports.signIn = async (req, res, next) => {
   );
 
   if (!isEqual) {
-    generateError('Invalid email or password', 401, next);
+    throw new UnauthorizedError('Invalid email or password');
   }
 
   req.session.userId = foundUser._id;
