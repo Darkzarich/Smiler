@@ -1,28 +1,28 @@
 const User = require('../../models/User');
 
-const { generateError, success } = require('../../utils/utils');
+const { ForbiddenError, ValidationError } = require('../../errors');
+const { success } = require('../../utils/utils');
 const { POST_MAX_TAGS, POST_MAX_TAG_LEN } = require('../../constants');
 
-exports.updatePostTemplate = async (req, res, next) => {
+exports.updatePostTemplate = async (req, res) => {
   // TODO: validate title, sections just like in posts
 
   const { sections } = req.body;
   const { tags } = req.body;
   const { title } = req.body;
 
+  // TODO: Replace with id of the user
   if (req.session.userLogin !== req.params.login) {
-    generateError('Can save template only for yourself', 403, next);
-    return;
+    throw new ForbiddenError('Can save template only for yourself');
   }
 
   if (tags) {
     if (tags.length > POST_MAX_TAGS) {
-      generateError('Too many tags', 422, next);
-      return;
+      throw new ValidationError('Too many tags');
     }
-    if (tags.find((el) => el.length > POST_MAX_TAG_LEN)) {
-      generateError('Exceeded max length of a tag', 422, next);
-      return;
+
+    if (tags.some((el) => el.length > POST_MAX_TAG_LEN)) {
+      throw new ValidationError('Exceeded max length of a tag');
     }
   }
 
@@ -34,11 +34,9 @@ exports.updatePostTemplate = async (req, res, next) => {
   userTemplate.template.tags = tags || userTemplate.template.tags;
   userTemplate.template.sections = sections || userTemplate.template.sections;
 
-  try {
-    userTemplate.markModified('template');
-    await userTemplate.save();
-    success(req, res);
-  } catch (e) {
-    next(e);
-  }
+  userTemplate.markModified('template');
+
+  await userTemplate.save();
+
+  success(req, res);
 };

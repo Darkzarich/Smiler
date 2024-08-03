@@ -504,6 +504,9 @@ router.delete(
         "200": {
           "$ref": "#/components/responses/OK"
         },
+        "400": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
         "401": {
           "$ref": "#/components/responses/Unauthorized"
         },

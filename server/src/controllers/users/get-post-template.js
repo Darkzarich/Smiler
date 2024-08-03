@@ -1,11 +1,12 @@
 const User = require('../../models/User');
 
-const { generateError, success } = require('../../utils/utils');
+const { ForbiddenError } = require('../../errors');
+const { success } = require('../../utils/utils');
 
-exports.getPostTemplate = async (req, res, next) => {
+exports.getPostTemplate = async (req, res) => {
+  // TODO: Replace with id of the user
   if (req.session.userLogin !== req.params.login) {
-    generateError('Can see only your own template', 403, next);
-    return;
+    throw new ForbiddenError('Can see only your own template');
   }
 
   const template = await User.findById(req.session.userId).select('template');

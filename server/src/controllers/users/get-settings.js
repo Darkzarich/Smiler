@@ -1,8 +1,9 @@
 const User = require('../../models/User');
 
-const { generateError, success } = require('../../utils/utils');
+const { NotFoundError } = require('../../errors');
+const { success } = require('../../utils/utils');
 
-exports.getSettings = async (req, res, next) => {
+exports.getSettings = async (req, res) => {
   const { userId } = req.session;
 
   const user = await User.findById(userId).populate(
@@ -10,16 +11,16 @@ exports.getSettings = async (req, res, next) => {
     'login avatar id',
   );
 
-  if (user) {
-    const following = {
-      authors: user.usersFollowed,
-      tags: user.tagsFollowed,
-      bio: user.bio,
-      avatar: user.avatar,
-    };
-
-    success(req, res, following);
-  } else {
-    generateError('User is not found', 404, next);
+  if (!user) {
+    throw new NotFoundError('User is not found');
   }
+
+  const following = {
+    authors: user.usersFollowed,
+    tags: user.tagsFollowed,
+    bio: user.bio,
+    avatar: user.avatar,
+  };
+
+  success(req, res, following);
 };
