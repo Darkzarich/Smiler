@@ -7,15 +7,20 @@ const { success } = require('../../utils/utils');
 
 exports.unvoteById = async (req, res) => {
   const { userId } = req.session;
-  const { id } = req.params;
+  const { id: commentId } = req.params;
 
-  const targetComment = await Comment.findById(id).select('author');
+  const targetComment = await Comment.findOne({
+    _id: commentId,
+    deleted: false,
+  }).select('author');
 
   if (!targetComment) {
     throw new NotFoundError('Comment does not exist');
   }
 
-  const currentUser = await User.findById(userId).populate('rates');
+  const currentUser = await User.findById(userId)
+    .select({ rates: 1 })
+    .populate('rates');
 
   const ratedForCurrentUser = currentUser.isRated(targetComment.id);
 
@@ -40,8 +45,7 @@ exports.unvoteById = async (req, res) => {
     Rate.deleteOne({ target: targetComment.id }),
     User.updateOne(
       { _id: targetComment.author },
-      // Passing Rate model populated object
-      { $pull: { rates: ratedForCurrentUser.rated.id } },
+      { $pull: { rates: ratedForCurrentUser.rated._id } },
     ),
   ]);
 

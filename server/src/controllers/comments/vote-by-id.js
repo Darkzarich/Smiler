@@ -7,10 +7,13 @@ const { success } = require('../../utils/utils');
 
 exports.voteById = async (req, res) => {
   const { userId } = req.session;
-  const { id } = req.params;
+  const { id: commentId } = req.params;
   const { negative } = req.body;
 
-  const targetComment = await Comment.findById(id);
+  const targetComment = await Comment.findOne({
+    _id: commentId,
+    deleted: false,
+  }).select('author');
 
   if (!targetComment) {
     throw new NotFoundError('Comment does not exist');
