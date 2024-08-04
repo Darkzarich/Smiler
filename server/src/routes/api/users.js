@@ -468,7 +468,7 @@ router.delete(
 /**
 @swagger
 {
-  "/users/{login}/template/{hash}": {
+  "/users/me/template/{hash}": {
     "delete": {
       "tags": [
         "Users"
@@ -481,15 +481,6 @@ router.delete(
         }
       ],
       "parameters": [
-        {
-          "in": "path",
-          "name": "login",
-          "schema": {
-            "type": "string"
-          },
-          "required": true,
-          "description": "User name"
-        },
         {
           "in": "path",
           "name": "hash",
@@ -510,9 +501,6 @@ router.delete(
         "401": {
           "$ref": "#/components/responses/Unauthorized"
         },
-        "403": {
-          "$ref": "#/components/responses/Forbidden"
-        },
         "404": {
           "$ref": "#/components/responses/NotFound"
         },
@@ -526,7 +514,7 @@ router.delete(
 */
 
 router.delete(
-  '/:login/template/:hash',
+  '/me/template/:hash',
   authRequiredMiddleware,
   asyncControllerErrorHandler(usersController.deletePostTemplatePicture),
 );
