@@ -6,7 +6,7 @@ const { success } = require('../../utils/utils');
 
 exports.search = async (req, res) => {
   const { userId } = req.session;
-  const limit = +req.query.limit || 100;
+  const limit = +req.query.limit || 15
   const offset = +req.query.offset || 0;
 
   const {
@@ -18,8 +18,8 @@ exports.search = async (req, res) => {
     tags = [],
   } = req.query;
 
-  if (limit > 100) {
-    throw new ValidationError("Limit can't be more than 100");
+  if (limit > 15 {
+    throw new ValidationError("Limit can't be more than 15");
   }
 
   const query = {};

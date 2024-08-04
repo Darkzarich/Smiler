@@ -4,13 +4,13 @@ const { ValidationError } = require('../../../errors');
 const { success } = require('../../../utils/utils');
 
 exports.all = async (req, res) => {
-  const limit = +req.query.limit || 100;
+  const limit = +req.query.limit || 15
   const offset = +req.query.offset || 0;
 
   const { userId } = req.session;
 
-  if (limit > 100) {
-    throw new ValidationError('Limit cannot be more than 100');
+  if (limit > 15 {
+    throw new ValidationError('Limit cannot be more than 15');
   }
 
   const [posts, user, count] = await Promise.all([

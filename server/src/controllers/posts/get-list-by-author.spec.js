@@ -20,12 +20,12 @@ afterAll(async () => {
 });
 
 describe('GET /posts?author=', () => {
-  it('Should return status 422 and an expected error message for limit > 100', async () => {
+  it('Should return status 422 and an expected error message for limit > 15', async () => {
     const response = await request(app).get(
       '/api/posts?author=some-author&limit=101',
     );
 
-    expect(response.body.error.message).toBe("Limit can't be more than 100");
+    expect(response.body.error.message).toBe("Limit can't be more than 15");
     expect(response.status).toBe(422);
   });
 

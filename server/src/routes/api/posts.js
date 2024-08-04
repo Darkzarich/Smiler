@@ -166,8 +166,8 @@ const authRequiredMiddleware = require('../../middlewares/auth-required');
           "required": true,
           "schema": {
             "type": "number",
-            "default": 100,
-            "maximum": 100,
+            "default": 15,
+            "maximum": 15,
             "minimum": 1
           },
           "description": "posts per page"
@@ -383,8 +383,8 @@ router.post(
           "required": true,
           "schema": {
             "type": "number",
-            "default": 20,
-            "maximum": 100,
+            "default": 15
+            "maximum": 15,
             "minimum": 1
           },
           "description": "posts per page"
@@ -447,8 +447,8 @@ router.get('/categories/all', asyncControllerErrorHandler(postsController.all));
           "required": true,
           "schema": {
             "type": "number",
-            "default": 20,
-            "maximum": 100,
+            "default": 15
+            "maximum": 15,
             "minimum": 1
           },
           "description": "posts per page"
@@ -514,8 +514,8 @@ router.get(
           "required": true,
           "schema": {
             "type": "number",
-            "default": 20,
-            "maximum": 100,
+            "default": 15
+            "maximum": 15,
             "minimum": 1
           },
           "description": "posts per page"
@@ -581,8 +581,8 @@ router.get(
           "required": true,
           "schema": {
             "type": "number",
-            "default": 20,
-            "maximum": 100,
+            "default": 15
+            "maximum": 15,
             "minimum": 1
           },
           "description": "posts per page"
@@ -648,8 +648,8 @@ router.get(
           "required": true,
           "schema": {
             "type": "number",
-            "default": 20,
-            "maximum": 100,
+            "default": 15
+            "maximum": 15,
             "minimum": 1
           },
           "description": "posts per page"
@@ -715,8 +715,8 @@ router.get(
           "required": true,
           "schema": {
             "type": "number",
-            "default": 20,
-            "maximum": 100,
+            "default": 15
+            "maximum": 15,
             "minimum": 1
           },
           "description": "posts per page"
