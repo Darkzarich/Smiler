@@ -19,7 +19,13 @@ async function startApp({ db = null } = {}) {
   const app = express();
 
   // Add basic security headers
-  app.use(helmet());
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: {
+        policy: 'same-site',
+      },
+    }),
+  );
 
   app.use(corsMiddleware);
 
