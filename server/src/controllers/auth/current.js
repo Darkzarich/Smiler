@@ -1,5 +1,6 @@
 const User = require('../../models/User');
 const { success } = require('../../utils/utils');
+const { NotFoundError } = require('../../errors');
 
 exports.current = async (req, res) => {
   const { userId } = req.session;
@@ -8,9 +9,15 @@ exports.current = async (req, res) => {
     success(req, res, {
       isAuth: false,
     });
+
+    return;
   }
 
   const user = await User.findById(userId).lean();
+
+  if (!user) {
+    throw new NotFoundError();
+  }
 
   return success(req, res, {
     login: user.login,
