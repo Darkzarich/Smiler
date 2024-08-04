@@ -31,7 +31,7 @@ export default {
   users: {
     getUserProfile: new Route('/users/*', 'GET'),
     updateUserProfile: new Route('/users/me', 'PUT'),
-    removeFilePicSection: new Route('/users/*/template/*', 'DELETE'),
+    removeFilePicSection: new Route('/users/me/template/*', 'DELETE'),
     getUserTemplate: new Route('/users/*/template', 'GET'),
     updateUserTemplate: new Route('/users/*/template', 'PUT'),
     followUser: new Route('/users/*/follow', 'PUT'),

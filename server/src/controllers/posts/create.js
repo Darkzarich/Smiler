@@ -4,6 +4,7 @@ const sanitizeHtml = require('../../libs/sanitize-html');
 
 const User = require('../../models/User');
 const Post = require('../../models/Post');
+
 const {
   POST_SECTION_TYPES,
   POST_SECTIONS_MAX,
@@ -12,11 +13,12 @@ const {
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
 } = require('../../constants');
-const { success, generateError } = require('../../utils/utils');
+const { ValidationError } = require('../../errors');
+const { success } = require('../../utils/utils');
 
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 
-exports.create = async (req, res, next) => {
+exports.create = async (req, res) => {
   // TODO: rework this | move validation
 
   const { userId } = req.session;
@@ -25,73 +27,72 @@ exports.create = async (req, res, next) => {
   const { sections } = req.body;
 
   if (!title) {
-    return generateError('Title is required', 422, next);
+    throw new ValidationError('Title is required');
   }
 
   if (!sections || sections.length < 1) {
-    return generateError('At least one section is required', 422, next);
+    throw new ValidationError('At least one section is required');
   }
 
   if (sections.length > POST_SECTIONS_MAX) {
-    return generateError('Exceeded max amount of sections', 422, next);
+    throw new ValidationError('Exceeded max amount of sections');
   }
 
   if (title.length > POST_TITLE_MAX_LENGTH) {
-    return generateError('Exceeded max length of title', 422, next);
+    throw new ValidationError('Exceeded max length of title');
   }
 
   if (tags) {
     if (tags.length > POST_MAX_TAGS) {
-      return generateError('Too many tags', 422, next);
+      throw new ValidationError('Too many tags');
     }
 
     if (tags.some((tag) => tag.length > POST_MAX_TAG_LEN)) {
-      return generateError('Exceeded max length of a tag', 422, next);
+      throw new ValidationError('Exceeded max length of a tag');
     }
   }
 
   // eslint-disable-next-line no-restricted-syntax
   for (const section of sections) {
     if (!allowedSectionTypes.includes(section.type)) {
-      return generateError(
-        `Unsupported section type: ${section.type}`,
-        422,
-        next,
-      );
+      throw new ValidationError(`Unsupported section type: ${section.type}`);
     }
 
     let textContentSumLength = 0;
 
+    // Sum length of text sections and check if it exceeds max total length
     if (section.type === POST_SECTION_TYPES.TEXT) {
       textContentSumLength += section.content.length;
       section.content = sanitizeHtml(section.content);
     }
 
     if (textContentSumLength > POST_SECTIONS_MAX_LENGTH) {
-      return generateError(
+      throw new ValidationError(
         `Text sections sum length exceeded max allowed length of ${POST_SECTIONS_MAX_LENGTH} symbols`,
-        422,
-        next,
       );
     }
   }
 
-  const post = await Post.create({
-    title,
-    sections,
-    tags,
-    slug: `${slugLib(title)}-${crypto.randomUUID()}`,
-    author: userId,
-  });
-
-  const user = await User.findById(userId).select('template');
-
-  user.template.title = '';
-  user.template.sections = [];
-  user.template.tags = [];
-  user.markModified('template');
-
-  await user.save();
+  const [post] = await Promise.all([
+    Post.create({
+      title,
+      sections,
+      tags,
+      slug: `${slugLib(title)}-${crypto.randomUUID()}`,
+      author: userId,
+    }),
+    // Clear user template
+    User.updateOne(
+      { _id: userId },
+      {
+        $set: {
+          'template.title': '',
+          'template.sections': [],
+          'template.tags': [],
+        },
+      },
+    ),
+  ]);
 
   success(req, res, post);
 };

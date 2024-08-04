@@ -25,10 +25,8 @@ describe('GET /posts?author=', () => {
       '/api/posts?author=some-author&limit=101',
     );
 
+    expect(response.body.error.message).toBe("Limit can't be more than 100");
     expect(response.status).toBe(422);
-    expect(response.body.error).toMatchObject({
-      message: "Limit can't be more than 100",
-    });
   });
 
   it("Should return status 404 and an expected error message if author doesn't exist", async () => {
@@ -36,9 +34,7 @@ describe('GET /posts?author=', () => {
       '/api/posts?author=not-existing-author',
     );
 
+    expect(response.body.error.message).toBe("Author doesn't exist");
     expect(response.status).toBe(404);
-    expect(response.body.error).toMatchObject({
-      message: "Author doesn't exist",
-    });
   });
 });

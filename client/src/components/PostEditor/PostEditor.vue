@@ -243,10 +243,7 @@ export default {
     },
     async deleteSection(section) {
       if (section.type === this.POST_SECTION_TYPES.PICTURE && section.isFile) {
-        const res = await api.users.removeFilePicSection(
-          this.getUserLogin,
-          section.hash,
-        );
+        const res = await api.users.removeFilePicSection(section.hash);
 
         if (!res.data.error) {
           this.sections.splice(this.sections.indexOf(section), 1);

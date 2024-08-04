@@ -16,9 +16,9 @@ export default {
       data,
     });
   },
-  removeFilePicSection(login, hash) {
+  removeFilePicSection(hash) {
     return Query({
-      url: `${CONTROLLER_URL}/${login}/template/${hash}`,
+      url: `${CONTROLLER_URL}/me/template/${hash}`,
       method: 'delete',
     });
   },

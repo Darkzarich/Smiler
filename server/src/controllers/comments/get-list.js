@@ -1,8 +1,10 @@
 const Comment = require('../../models/Comment');
 const User = require('../../models/User');
-const { success, generateError } = require('../../utils/utils');
 
-function fillWithUserRecursive({ comments, user }) {
+const { NotFoundError, ValidationError } = require('../../errors');
+const { success } = require('../../utils/utils');
+
+function fillWithRatedRecursive({ comments, user }) {
   if (!comments) {
     return [];
   }
@@ -11,7 +13,7 @@ function fillWithUserRecursive({ comments, user }) {
     const commentWithUser = comment.toResponse(user);
 
     if (commentWithUser.children && commentWithUser.children.length > 0) {
-      commentWithUser.children = fillWithUserRecursive({
+      commentWithUser.children = fillWithRatedRecursive({
         comments: comment.children,
         user,
       });
@@ -21,7 +23,7 @@ function fillWithUserRecursive({ comments, user }) {
   });
 }
 
-exports.getList = async (req, res, next) => {
+exports.getList = async (req, res) => {
   const { userId } = req.session;
   const { post } = req.query;
   const { author } = req.query;
@@ -32,52 +34,39 @@ exports.getList = async (req, res, next) => {
   const query = {};
 
   if (limit > 30) {
-    generateError("Limit can't be more than 30", 422, next);
-    return;
+    throw new ValidationError("Limit can't be more than 30");
   }
   if (!post) {
-    generateError("Can't get comments without set post", 422, next);
-    return;
+    throw new ValidationError('Post id for comments must be specified');
   }
 
+  query.post = post;
+
   if (author) {
+    // TODO: change to user id
     const foundAuthor = await User.findOne({
       login: author,
     });
+
     if (!foundAuthor) {
-      generateError('User is not found', 404, next);
-      return;
+      throw new NotFoundError('Author is not found');
     }
 
     query.author = foundAuthor.id;
   }
 
-  query.post = post;
+  const [comments, currentUser, count] = await Promise.all([
+    Comment.find(query)
+      .sort('-rating')
+      .skip(offset)
+      .limit(limit)
+      .exists('parent', false),
+    User.findById(userId).select('rates').populate('rates'),
+    Comment.countDocuments(query),
+  ]);
 
-  try {
-    Promise.all([
-      Comment.find(query)
-        .sort('-rating')
-        .skip(offset)
-        .limit(limit)
-        .exists('parent', false),
-      User.findById(userId).select('rates').populate('rates'),
-      Comment.countDocuments(query).exists('parent', false),
-    ])
-      .then((result) => {
-        const comments = result[0];
-        const user = result[1];
-        const pages = Math.ceil(result[2] / limit);
-
-        success(req, res, {
-          comments: fillWithUserRecursive({ comments, user }),
-          pages,
-        });
-      })
-      .catch((e) => {
-        next(e);
-      });
-  } catch (e) {
-    next(e);
-  }
+  success(req, res, {
+    comments: fillWithRatedRecursive({ comments, user: currentUser }),
+    pages: Math.ceil(count / limit),
+  });
 };

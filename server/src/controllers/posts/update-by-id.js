@@ -1,6 +1,4 @@
-const { differenceInMilliseconds } = require('date-fns');
-const fs = require('fs');
-const path = require('path');
+const { differenceInMilliseconds, millisecondsToMinutes } = require('date-fns');
 const sanitizeHtml = require('../../libs/sanitize-html');
 
 const Post = require('../../models/Post');
@@ -10,55 +8,57 @@ const {
   POST_MAX_TAG_LEN,
   POST_SECTION_TYPES,
 } = require('../../constants');
-const { success, generateError } = require('../../utils/utils');
+const {
+  NotFoundError,
+  ForbiddenError,
+  ValidationError,
+} = require('../../errors');
+const { success, removeFileByPath } = require('../../utils/utils');
 
-exports.updateById = async (req, res, next) => {
+exports.updateById = async (req, res) => {
   // TODO: validate sections on update by type and other stuff the same as when creating post
   // TODO: move all Post validation in one place
 
   const { userId } = req.session;
-  const { id } = req.params;
-  const { title } = req.body;
-  const { tags } = req.body;
-  const { sections: newSections } = req.body;
+  const { id: postId } = req.params;
+  const { title, tags, sections: newSections } = req.body;
 
-  const post = await Post.findById(id);
+  const targetPost = await Post.findById(postId);
 
-  if (!post) {
-    return generateError('Post is not found', 404, next);
+  if (!targetPost) {
+    throw new NotFoundError('Post is not found');
   }
 
-  if (post.author.toString() !== userId) {
-    return generateError('You can edit only your own posts', 403, next);
+  if (targetPost.author.toString() !== userId) {
+    throw new ForbiddenError('You can edit only your own posts');
   }
 
   if (
-    differenceInMilliseconds(Date.now(), post.createdAt) > POST_TIME_TO_UPDATE
+    differenceInMilliseconds(Date.now(), targetPost.createdAt) >
+    POST_TIME_TO_UPDATE
   ) {
-    return generateError(
-      `You can edit post only within first ${POST_TIME_TO_UPDATE} min`,
-      403,
-      next,
+    throw new ForbiddenError(
+      `You can edit post only within the first ${millisecondsToMinutes(POST_TIME_TO_UPDATE)} min`,
     );
   }
 
+  targetPost.title = title || targetPost.title;
+
   if (tags) {
     if (tags.length > POST_MAX_TAGS) {
-      return generateError(
+      throw new ValidationError(
         `Too many tags, max amount is ${POST_MAX_TAGS}`,
-        422,
-        next,
       );
     }
 
-    if (tags.find((el) => el.length > POST_MAX_TAG_LEN)) {
-      return generateError('Exceeded max length of a tag', 422, next);
+    if (tags.some((tag) => tag.length > POST_MAX_TAG_LEN)) {
+      throw new ValidationError(
+        `Exceeded max length of a tag ${POST_MAX_TAGS}`,
+      );
     }
-
-    post.tags = tags;
   }
 
-  const filesToDelete = [];
+  const filePathsToDelete = [];
 
   if (newSections) {
     newSections.forEach((section) => {
@@ -68,8 +68,9 @@ exports.updateById = async (req, res, next) => {
       }
     });
 
-    // Looking for pics that got removed from post
-    post.sections.forEach((section) => {
+    // Looking for sections with a type of "picture" that were uploaded as a file
+    // and that got removed from the post in the update
+    targetPost.sections.forEach((section) => {
       if (section.type !== POST_SECTION_TYPES.PICTURE || !section.isFile) {
         return;
       }
@@ -79,35 +80,23 @@ exports.updateById = async (req, res, next) => {
       );
 
       if (!item) {
-        filesToDelete.push(section.url);
+        filePathsToDelete.push(section.url);
       }
     });
-
-    post.sections = newSections;
   }
 
-  if (title) {
-    post.title = title;
-  }
+  targetPost.title = title || targetPost.title;
+  targetPost.tags = tags || targetPost.tags;
+  targetPost.sections = newSections || targetPost.sections;
 
-  if (filesToDelete.length > 0) {
-    filesToDelete.forEach((el) => {
-      const absolutePath = path.join(process.cwd(), el);
-
-      fs.access(absolutePath, (accessErr) => {
-        if (!accessErr) {
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          fs.unlink(absolutePath, (err) => {
-            if (err) {
-              generateError(err, 500, next);
-            }
-          });
-        }
-      });
-    });
-  }
-
-  await post.save();
+  await targetPost.save();
 
   success(req, res);
+
+  // Remove all deleted files
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const filePath of filePathsToDelete) {
+    removeFileByPath(filePath);
+  }
 };

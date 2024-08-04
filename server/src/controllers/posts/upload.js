@@ -1,23 +1,30 @@
 const multer = require('multer');
 const Sharp = require('sharp');
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs/promises');
 const DiskStorage = require('../../libs/DiskStorage');
 
 const User = require('../../models/User');
-const { POST_SECTIONS_MAX } = require('../../constants');
 
-const { success, generateError } = require('../../utils/utils');
+const {
+  POST_SECTIONS_MAX,
+  POST_MAX_UPLOAD_IMAGE_SIZE,
+} = require('../../constants');
+const { ContentTooLargeError, ValidationError } = require('../../errors');
+const { success } = require('../../utils/utils');
 
-const uploader = multer({
+const postMulter = multer({
   storage: new DiskStorage({
-    destination: async (req, file, cb) => {
-      cb(null, path.join(process.cwd(), 'uploads', req.session.userLogin));
+    destination: async (req, file, callback) => {
+      callback(
+        null,
+        path.join(process.cwd(), 'uploads', req.session.userLogin),
+      );
     },
-    filename: (req, file, cb) => {
-      cb(null, `${Date.now()}${path.extname(file.originalname)}`);
+    filename: (req, file, callback) => {
+      callback(null, `${Date.now()}${path.extname(file.originalname)}`);
     },
-    sharp: (req, file, cb) => {
+    sharp: (req, file, callback) => {
       const resizer = Sharp()
         .resize(640, 360, {
           fit: 'cover',
@@ -28,31 +35,65 @@ const uploader = multer({
           progressive: true,
         });
 
-      cb(null, resizer);
+      callback(null, resizer);
     },
   }),
   limits: {
-    fieldSize: 3 * 1024 * 1024, // 3MB
-    fileSize: 3 * 1024 * 1024,
+    fieldSize: POST_MAX_UPLOAD_IMAGE_SIZE,
+    fileSize: POST_MAX_UPLOAD_IMAGE_SIZE,
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req, file, callback) => {
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
-      cb(new Error('Invalid file extension'), false);
-    } else {
-      cb(null, true);
-    }
-  },
-}).single('picture'); // frontend form-data name for file
-
-function startUpload(user, req, res, next) {
-  uploader(req, res, async (err) => {
-    if (err) {
-      generateError(err.message, 413, next);
+      callback(
+        new ValidationError(
+          'Invalid file extension. Only jpg, jpeg, png, gif are allowed.',
+        ),
+      );
 
       return;
     }
 
-    // /uploads/username/file.jpg
+    // Accept the file
+    callback(null, true);
+  },
+}).single('picture'); // frontend form-data name for file
+
+exports.upload = async (req, res, next) => {
+  const { userId, userLogin } = req.session;
+
+  const user = await User.findById(userId).select('template');
+
+  if (user.template.sections.length >= POST_SECTIONS_MAX) {
+    throw new ContentTooLargeError(
+      `Exceed limit of post sections: ${POST_SECTIONS_MAX}`,
+    );
+  }
+
+  const rootFolder = process.cwd();
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  await fs.mkdir(path.join(rootFolder, 'uploads', userLogin), {
+    recursive: true,
+  });
+
+  // Initiate the upload with multer middleware but calling it as a function
+  postMulter(req, res, async (error) => {
+    if (error) {
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        next(
+          new ContentTooLargeError(
+            `Uploaded image is too large. Max allowed size is ${POST_MAX_UPLOAD_IMAGE_SIZE / 1024 / 1024}MB`,
+          ),
+        );
+
+        return;
+      }
+
+      // Some unknown error
+      next(error);
+    }
+
+    // Getting the path that looks like "/uploads/username/file.jpg"
     const fileRelativePath = req.file.path.replace(process.cwd(), '');
 
     const newSection = {
@@ -70,46 +111,4 @@ function startUpload(user, req, res, next) {
 
     success(req, res, newSection);
   });
-}
-
-exports.upload = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.session.userId).select('template');
-
-    if (user.template.sections.length >= POST_SECTIONS_MAX) {
-      generateError(
-        `Exceed limit of post sections: ${POST_SECTIONS_MAX}`,
-        409,
-        next,
-      );
-      return;
-    }
-
-    const rootFolder = process.cwd();
-
-    await !fs.access(
-      path.join(rootFolder, 'uploads', req.session.userLogin),
-      async (accessErr) => {
-        if (accessErr) {
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          await fs.mkdir(
-            path.join(rootFolder, 'uploads', req.session.userLogin),
-            (err) => {
-              if (err) {
-                next(new Error(`Something went wrong while uploading: ${err}`));
-              } else {
-                startUpload(user, req, res, next);
-              }
-            },
-          );
-
-          return;
-        }
-
-        startUpload(user, req, res, next);
-      },
-    );
-  } catch (e) {
-    next(e);
-  }
 };

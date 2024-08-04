@@ -18,15 +18,14 @@ module.exports.connectDB = async () => {
 
     const db = mongooseInstance.connection;
 
+    logger.info(
+      `[pid: ${process.pid}] Successfully connected to MongoDB database`,
+    );
+
     db.on('error', (error) => {
       logger.error(error);
     });
 
-    db.once('connected', () => {
-      logger.info(
-        `[pid: ${process.pid}]: Successfully connected to MongoDB database`,
-      );
-    });
 
     db.once('disconnected', () => {
       logger.warn(`[pid: ${process.pid}]: Disconnected from MongoDB database`);

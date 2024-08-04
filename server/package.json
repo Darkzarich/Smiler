@@ -4,7 +4,7 @@
   "description": "Backend module of Smiler project",
   "main": "index.js",
   "engines": {
-    "node": ">=v10.15.1"
+    "node": ">=v16.16.0"
   },
   "scripts": {
     "test": "jest",
@@ -25,6 +25,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.12",
+    "@types/multer": "^1.4.11",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.18.2",

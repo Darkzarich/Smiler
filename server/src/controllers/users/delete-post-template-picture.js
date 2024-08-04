@@ -1,78 +1,52 @@
-const fs = require('fs');
-const path = require('path');
-
 const User = require('../../models/User');
 
-const { generateError, success } = require('../../utils/utils');
+const {
+  ValidationError,
+  NotFoundError,
+  BadRequestError,
+} = require('../../errors');
+const { success, removeFileByPath } = require('../../utils/utils');
 const { POST_SECTION_TYPES } = require('../../constants');
 
-exports.deletePostTemplatePicture = async (req, res, next) => {
-  const { login } = req.params;
+exports.deletePostTemplatePicture = async (req, res) => {
   const { hash } = req.params;
+  const { userId } = req.session;
 
-  if (req.session.userLogin !== login) {
-    generateError('Can delete image only for yourself', 403, next);
-    return;
-  }
   if (!hash) {
-    generateError('Hash is required for this operation', 422, next);
-    return;
+    throw new ValidationError('Hash is required for this operation');
   }
 
-  const userTemplate = await User.findById(req.session.userId).select(
-    'template',
-  );
+  const userTemplate = await User.findById(userId).select('template');
 
-  const foundSection = userTemplate.template.sections.find(
-    (sec) => sec.hash === hash,
-  );
-
-  userTemplate.template.sections.indexOf(foundSection);
-
-  if (foundSection) {
-    if (
-      foundSection.type === POST_SECTION_TYPES.PICTURE &&
-      foundSection.isFile === true
-    ) {
-      const { url } = foundSection;
-
-      // async function removeSection() {
-      //   await User.findByIdAndUpdate(req.session.userId, {
-      //     $pull: {
-      //       'template.sections': foundSection,
-      //     },
-      //   });
-      // }
-
-      const delCb = (err) => {
-        if (err) generateError(err, 500, next);
-        else success(req, res);
-      };
-
-      const absolutePath = path.join(process.cwd(), url);
-
-      fs.access(absolutePath, (accessErr) => {
-        if (!accessErr) {
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          fs.unlink(absolutePath, (err) => {
-            if (err) {
-              generateError(err, 500, next);
-            } else {
-              userTemplate.deleteSection(foundSection, delCb);
-            }
-          });
-
-          return;
-        }
-
-        userTemplate.deleteSection(foundSection, delCb);
-      });
-    } else {
-      generateError(
-        'This operation cannot be done for not file picture sections or not pictures',
-      );
-    }
-  } else {
-    generateError('Section with given hash is not found', 404, next);
+  if (!userTemplate) {
+    throw new NotFoundError('User is not found');
   }
+
+  const targetSection = userTemplate.template.sections.find(
+    (section) => section.hash === hash,
+  );
+
+  if (!targetSection) {
+    throw new NotFoundError('Section with given hash is not found');
+  }
+
+  if (
+    !targetSection.isFile ||
+    targetSection.type !== POST_SECTION_TYPES.PICTURE
+  ) {
+    throw new BadRequestError(
+      'This operation cannot be done because this section is not type of picture or not file',
+    );
+  }
+
+  // Delete the file and update the user's template
+
+  await removeFileByPath(targetSection.url);
+
+  await User.updateOne(
+    { _id: userId },
+    { $pull: { 'template.sections': { hash } } },
+  );
+
+  success(req, res);
 };

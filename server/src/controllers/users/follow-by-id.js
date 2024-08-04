@@ -1,50 +1,37 @@
 const User = require('../../models/User');
 
-const { generateError, success } = require('../../utils/utils');
+const {
+  ForbiddenError,
+  NotFoundError,
+  BadRequestError,
+} = require('../../errors');
+const { success } = require('../../utils/utils');
 
-exports.followById = async (req, res, next) => {
+exports.followById = async (req, res) => {
   const { id } = req.params;
   const { userId } = req.session;
 
   if (id === userId) {
-    generateError('You cannot follow yourself', 422, next);
-    return;
+    throw new ForbiddenError('You cannot follow yourself');
   }
 
-  Promise.all([User.findById(userId), User.findById(id)])
-    .then((users) => {
-      const userFollowing = users[0];
-      const userFollowed = users[1];
+  const [userFollowing, userFollowed] = await Promise.all([
+    User.findById(userId),
+    User.findById(id),
+  ]);
 
-      if (userFollowed) {
-        if (userFollowing.usersFollowed.includes(id)) {
-          generateError('You cannot follow the same author twice', 422, next);
-          return;
-        }
+  if (!userFollowed) {
+    throw new NotFoundError('Followed user is not found');
+  }
 
-        Promise.all([
-          userFollowing.updateOne({
-            $push: {
-              usersFollowed: id,
-            },
-          }),
-          userFollowed.updateOne({
-            $inc: {
-              followersAmount: 1,
-            },
-          }),
-        ])
-          .then(() => {
-            success(req, res);
-          })
-          .catch((e) => {
-            next(e);
-          });
-      } else {
-        generateError('User is not found', 404, next);
-      }
-    })
-    .catch((e) => {
-      next(e);
-    });
+  if (userFollowing.usersFollowed.includes(id)) {
+    throw new BadRequestError('You cannot follow the same author twice');
+  }
+
+  await Promise.all([
+    userFollowing.updateOne({ $push: { usersFollowed: id } }),
+    userFollowed.updateOne({ $inc: { followersAmount: 1 } }),
+  ]);
+
+  success(req, res);
 };

@@ -1,69 +1,54 @@
-const { differenceInMilliseconds } = require('date-fns');
+const { differenceInMilliseconds, millisecondsToMinutes } = require('date-fns');
 const fs = require('fs');
 const path = require('path');
 
 const Post = require('../../models/Post');
 
 const { POST_TIME_TO_UPDATE, POST_SECTION_TYPES } = require('../../constants');
-const { success, generateError } = require('../../utils/utils');
+const { NotFoundError, ForbiddenError } = require('../../errors');
+const { success, removeFileByPath } = require('../../utils/utils');
 
-exports.deleteById = async (req, res, next) => {
+exports.deleteById = async (req, res) => {
   const { userId } = req.session;
   const { id } = req.params;
 
-  const foundPost = await Post.findById(id);
+  const targetPost = await Post.findById(id).select({
+    author: 1,
+    createdAt: 1,
+    commentCount: 1,
+  });
 
-  if (foundPost) {
-    if (foundPost.author.toString() !== userId) {
-      generateError('The post is not yours', 403, next);
-      return;
-    }
+  if (!targetPost) {
+    throw new NotFoundError('Post is not found');
+  }
 
-    if (
-      differenceInMilliseconds(Date.now(), foundPost.createdAt) >
-      POST_TIME_TO_UPDATE
-    ) {
-      generateError(
-        `You can delete post only within first ${POST_TIME_TO_UPDATE} min`,
-        403,
-        next,
-      );
-    } else {
-      const { sections } = foundPost;
+  if (targetPost.author.toString() !== userId) {
+    throw new ForbiddenError('You can delete only your own posts');
+  }
 
-      /**
-       * TODO: need to somehow check if post has comments or no and then don't allow to delete or
-       * delete related comments
-       */
+  if (
+    differenceInMilliseconds(Date.now(), targetPost.createdAt) >
+    POST_TIME_TO_UPDATE
+  ) {
+    throw new ForbiddenError(
+      `You can delete post only within the first ${millisecondsToMinutes(POST_TIME_TO_UPDATE)} min`,
+    );
+  }
 
-      await foundPost.remove();
+  if (targetPost.commentCount > 0) {
+    throw new ForbiddenError('You can not delete post with comments');
+  }
 
-      const filePicSections = sections.filter(
-        (sec) => sec.type === POST_SECTION_TYPES.PICTURE && sec.isFile,
-      );
+  await targetPost.remove();
 
-      filePicSections.forEach((sec) => {
-        const absolutePath = path.join(process.cwd(), sec.url);
+  success(req, res);
 
-        fs.access(absolutePath, (err) => {
-          if (err) {
-            generateError(err, 500, next);
+  const filePictureSections = targetPost.sections.filter(
+    (sec) => sec.type === POST_SECTION_TYPES.PICTURE && sec.isFile,
+  );
 
-            return;
-          }
-
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          fs.unlink(absolutePath, (unlinkErr) => {
-            if (unlinkErr) {
-              generateError(err, 500, next);
-            }
-          });
-        });
-      });
-
-      success(req, res);
-    }
-  } else {
-    generateError("Post doesn't exist", 404, next);
+  // eslint-disable-next-line no-restricted-syntax
+  for (const section of filePictureSections) {
+    removeFileByPath(section.url);
   }
 };

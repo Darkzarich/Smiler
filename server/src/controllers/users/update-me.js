@@ -1,8 +1,9 @@
 const User = require('../../models/User');
 
-const { generateError, success } = require('../../utils/utils');
+const { NotFoundError } = require('../../errors');
+const { success } = require('../../utils/utils');
 
-exports.updateMe = async (req, res, next) => {
+exports.updateMe = async (req, res) => {
   const { userId } = req.session;
   const update = req.body;
 
@@ -11,8 +12,7 @@ exports.updateMe = async (req, res, next) => {
   });
 
   if (!user) {
-    generateError('User is not found', 404, next);
-    return;
+    throw new NotFoundError('User is not found');
   }
 
   success(req, res);

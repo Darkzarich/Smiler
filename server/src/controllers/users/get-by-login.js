@@ -1,48 +1,34 @@
 const User = require('../../models/User');
+const { NotFoundError } = require('../../errors');
+const { success } = require('../../utils/utils');
 
-const { generateError, success } = require('../../utils/utils');
-
-exports.getByLogin = async (req, res, next) => {
+exports.getByLogin = async (req, res) => {
   const { login } = req.params;
-  const { userId } = req.session;
-  const { userLogin } = req.session;
+  const { userId, userLogin } = req.session;
 
-  let promises;
+  const promises = [
+    User.findOne({
+      login,
+    }).select('login rating bio avatar createdAt followersAmount'),
+  ];
 
+  // TODO: Replace with id of the user
   if (userId && login !== userLogin) {
-    promises = Promise.all([
-      User.findOne({
-        login,
-      }).select('login rating bio avatar createdAt followersAmount'),
-      User.findById(userId),
-    ]);
-  } else {
-    promises = Promise.all([
-      User.findOne({
-        login,
-      }).select('login rating bio avatar createdAt followersAmount'),
-    ]);
+    promises.push(User.findById(userId));
   }
 
-  promises
-    .then((users) => {
-      const requestedUser = users[0];
-      const requestingUser = users[1];
+  const [requestedUser, requestingUser] = await Promise.all(promises);
 
-      if (requestedUser) {
-        const response = {
-          ...requestedUser.toJSON(),
-          isFollowed: requestingUser
-            ? requestingUser.isFollowed(requestedUser._id)
-            : false,
-        };
+  if (!requestedUser) {
+    throw new NotFoundError('User is not found');
+  }
 
-        success(req, res, response);
-      } else {
-        generateError('User is not found', 404, next);
-      }
-    })
-    .catch((e) => {
-      next(e);
-    });
+  const response = {
+    ...requestedUser.toJSON(),
+    isFollowed: requestingUser
+      ? requestingUser.isFollowed(requestedUser._id)
+      : false,
+  };
+
+  success(req, res, response);
 };

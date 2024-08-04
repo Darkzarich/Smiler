@@ -1,63 +1,70 @@
 const fs = require('fs');
 const path = require('path');
 
-// Implementing multer's StorageEngine interface
-function DiskStorage(opts) {
-  this.getFilename = opts.filename;
-  this.getDestination = opts.destination;
-  this.getSharp = opts.sharp;
-}
+/**
+ * @typedef {import('multer').StorageEngine} StorageEngine
+ * @implements {StorageEngine}
+ */
+class DiskStorage {
+  constructor(opts) {
+    this.getFilename = opts.filename;
+    this.getDestination = opts.destination;
+    this.getSharp = opts.sharp;
+  }
 
-DiskStorage.prototype._handleFile = function _handleFile(req, file, cb) {
-  const that = this;
+  _handleFile(req, file, callback) {
+    const that = this;
 
-  that.getDestination(req, file, (err1, destination) => {
-    if (err1) return cb(err1);
-    that.getFilename(req, file, (err2, filename) => {
-      if (err2) return cb(err2);
-      that.getSharp(req, file, (err3, resizer) => {
-        if (err3) return cb(err3);
+    this.getDestination(req, file, (err1, destination) => {
+      if (err1) return callback(err1);
+      that.getFilename(req, file, (err2, filename) => {
+        if (err2) return callback(err2);
+        that.getSharp(req, file, (err3, resizer) => {
+          if (err3) return callback(err3);
 
-        const finalPath = path.join(destination, filename);
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        const outStream = fs.createWriteStream(finalPath);
+          const finalPath = path.join(destination, filename);
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          const outStream = fs.createWriteStream(finalPath);
 
-        file.stream.pipe(resizer).pipe(outStream);
+          file.stream.pipe(resizer).pipe(outStream);
 
-        resizer.on('error', cb);
+          resizer.on('error', callback);
 
-        outStream.on('error', cb);
-        outStream.on('finish', () => {
-          if (outStream.bytesWritten > 0) {
-            cb(null, {
-              destination,
-              filename,
-              path: finalPath,
-              size: outStream.bytesWritten,
-            });
-          } else {
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
-            fs.unlink(finalPath, (err) => {
-              if (err) {
-                cb(new Error(err));
-              }
-            });
-          }
+          outStream.on('error', callback);
+
+          outStream.on('finish', () => {
+            if (outStream.bytesWritten > 0) {
+              callback(null, {
+                destination,
+                filename,
+                path: finalPath,
+                size: outStream.bytesWritten,
+              });
+            } else {
+              // eslint-disable-next-line security/detect-non-literal-fs-filename
+              fs.unlink(finalPath, (err) => {
+                if (err) {
+                  callback(err);
+                }
+              });
+            }
+          });
         });
       });
     });
-  });
-};
-
-DiskStorage.prototype._removeFile = function _removeFile(req, file, cb) {
-  const filePath = file.path;
-
-  if (filePath) {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.unlink(filePath, cb);
-  } else {
-    cb();
   }
-};
+
+  // eslint-disable-next-line class-methods-use-this
+  _removeFile(req, file, cb) {
+    const filePath = file.path;
+
+    if (filePath) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs.unlink(filePath, cb);
+    } else {
+      cb();
+    }
+  }
+}
 
 module.exports = DiskStorage;
