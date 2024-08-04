@@ -21,7 +21,7 @@ exports.signIn = async (req, res) => {
 
   const error = validate(user);
 
-  if (!error) {
+  if (error) {
     throw new ValidationError(error);
   }
 
