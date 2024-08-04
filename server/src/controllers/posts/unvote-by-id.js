@@ -2,48 +2,42 @@ const User = require('../../models/User');
 const Post = require('../../models/Post');
 const Rate = require('../../models/Rate');
 const { POST_RATE_VALUE } = require('../../constants');
-const { success, generateError } = require('../../utils/utils');
+const { NotFoundError, ForbiddenError } = require('../../errors');
+const { success } = require('../../utils/utils');
 
-exports.unvoteById = async (req, res, next) => {
+exports.unvoteById = async (req, res) => {
   const { userId } = req.session;
-  const { id } = req.params;
+  const { id: postId } = req.params;
 
-  const foundPost = await Post.findById(id);
+  const targetPost = await Post.findById(postId).select({ author: 1 });
 
-  if (foundPost) {
-    const user = await User.findById(userId).populate('rates');
-    const rated = user.isRated(foundPost.id);
-
-    if (rated.result) {
-      foundPost.rating += rated.negative ? POST_RATE_VALUE : -POST_RATE_VALUE;
-
-      Promise.all([
-        Rate.deleteOne({
-          target: foundPost.id,
-        }),
-        foundPost.save(),
-        User.findById(foundPost.author),
-      ])
-        .then((result) => {
-          const postAuthor = result[2];
-
-          user.rates.remove(rated.rated);
-          postAuthor.rating += rated.negative
-            ? POST_RATE_VALUE
-            : -POST_RATE_VALUE;
-
-          user.save();
-          postAuthor.save();
-
-          success(req, res);
-        })
-        .catch((e) => {
-          next(e);
-        });
-    } else {
-      generateError("You didn't rate this post", 403, next);
-    }
-  } else {
-    generateError("Post doesn't exist", 404, next);
+  if (!targetPost) {
+    throw new NotFoundError('Post does not exist');
   }
+
+  const currentUser = await User.findById(userId)
+    .select({ rates: 1 })
+    .populate('rates');
+
+  const ratedForCurrentUser = currentUser.isRated(targetPost.id);
+
+  if (!ratedForCurrentUser.result) {
+    throw new ForbiddenError('Target post is not rated by the current user');
+  }
+
+  const rateValue = ratedForCurrentUser.negative
+    ? POST_RATE_VALUE
+    : -POST_RATE_VALUE;
+
+  await Promise.all([
+    User.updateOne({ _id: targetPost.author }, { $inc: { rating: rateValue } }),
+    Post.updateOne({ _id: targetPost.id }, { $inc: { rating: rateValue } }),
+    Rate.deleteOne({ target: targetPost.id }),
+    User.updateOne(
+      { _id: currentUser.id },
+      { $pull: { rates: ratedForCurrentUser.rated._id } },
+    ),
+  ]);
+
+  success(req, res);
 };

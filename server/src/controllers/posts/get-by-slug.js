@@ -1,8 +1,9 @@
 const User = require('../../models/User');
 const Post = require('../../models/Post');
-const { success, generateError } = require('../../utils/utils');
+const { NotFoundError } = require('../../errors');
+const { success } = require('../../utils/utils');
 
-exports.getBySlug = async (req, res, next) => {
+exports.getBySlug = async (req, res) => {
   const { userId } = req.session;
 
   const { slug } = req.params;
@@ -15,7 +16,7 @@ exports.getBySlug = async (req, res, next) => {
   ]);
 
   if (!post) {
-    return generateError("Post doesn't exist", 404, next);
+    throw new NotFoundError("Post doesn't exist");
   }
 
   success(req, res, post.toResponse(user));

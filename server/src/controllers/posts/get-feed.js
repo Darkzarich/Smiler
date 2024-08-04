@@ -1,23 +1,21 @@
 const User = require('../../models/User');
 const Post = require('../../models/Post');
-const { success, generateError } = require('../../utils/utils');
+const { ValidationError } = require('../../errors');
+const { success } = require('../../utils/utils');
 
-exports.getFeed = async (req, res, next) => {
+exports.getFeed = async (req, res) => {
   const limit = +req.query.limit || 100;
   const offset = +req.query.offset || 0;
   const { userId } = req.session;
 
   if (limit > 100) {
-    generateError("Limit can't be more than 100", 422, next);
-    return;
+    throw new ValidationError("Limit can't be more than 100");
   }
 
-  try {
-    const query = {};
+  const user = await User.findById(userId).populate('rates');
 
-    const user = await User.findById(userId).populate('rates');
-
-    query.$and = [
+  const query = {
+    $and: [
       {
         $or: [
           {
@@ -37,31 +35,22 @@ exports.getFeed = async (req, res, next) => {
           $ne: userId,
         },
       },
-    ];
+    ],
+  };
 
-    Promise.all([
-      Post.find(query)
-        .sort('-createdAt')
-        .populate('author', 'login avatar')
-        .limit(limit)
-        .skip(offset),
-      Post.countDocuments(query),
-    ])
-      .then((result) => {
-        const posts = result[0];
-        const pages = Math.ceil(result[1] / limit);
+  const [posts, count] = await Promise.all([
+    Post.find(query)
+      .sort('-createdAt')
+      .populate('author', 'login avatar')
+      .limit(limit)
+      .skip(offset),
+    Post.countDocuments(query),
+  ]);
 
-        const transPosts = posts.map((el) => el.toResponse(user));
+  const transPosts = posts.map((post) => post.toResponse(user));
 
-        success(req, res, {
-          pages,
-          posts: transPosts,
-        });
-      })
-      .catch((e) => {
-        next(e);
-      });
-  } catch (e) {
-    next(e);
-  }
+  success(req, res, {
+    pages: Math.ceil(count / limit),
+    posts: transPosts,
+  });
 };

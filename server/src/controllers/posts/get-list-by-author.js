@@ -1,8 +1,9 @@
 const User = require('../../models/User');
 const Post = require('../../models/Post');
-const { success, generateError } = require('../../utils/utils');
+const { ValidationError, NotFoundError } = require('../../errors');
+const { success } = require('../../utils/utils');
 
-exports.getListByAuthor = async (req, res, next) => {
+exports.getListByAuthor = async (req, res) => {
   const { userId } = req.session;
 
   const limit = +req.query.limit || 100;
@@ -10,7 +11,7 @@ exports.getListByAuthor = async (req, res, next) => {
   const author = req.query.author || '';
 
   if (limit > 100) {
-    return generateError("Limit can't be more than 100", 422, next);
+    throw new ValidationError("Limit can't be more than 100");
   }
 
   const foundAuthor = await User.findOne({
@@ -18,7 +19,7 @@ exports.getListByAuthor = async (req, res, next) => {
   });
 
   if (!foundAuthor) {
-    return generateError("Author doesn't exist", 404, next);
+    throw new NotFoundError("Author doesn't exist");
   }
 
   const query = {

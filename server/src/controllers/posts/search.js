@@ -1,14 +1,15 @@
 const User = require('../../models/User');
 const Post = require('../../models/Post');
 const { POST_TITLE_MAX_LENGTH } = require('../../constants');
-const { success, generateError } = require('../../utils/utils');
+const { ValidationError } = require('../../errors');
+const { success } = require('../../utils/utils');
 
-exports.search = async (req, res, next) => {
+exports.search = async (req, res) => {
   const { userId } = req.session;
+  const limit = +req.query.limit || 100;
+  const offset = +req.query.offset || 0;
 
   const {
-    limit = 100,
-    offset = 0,
     title = '',
     dateFrom = '',
     dateTo = '',
@@ -17,15 +18,15 @@ exports.search = async (req, res, next) => {
     tags = [],
   } = req.query;
 
-  if (+limit > 100) {
-    return generateError("Limit can't be more than 100", 422, next);
+  if (limit > 100) {
+    throw new ValidationError("Limit can't be more than 100");
   }
 
   const query = {};
 
   if (title) {
     if (title.length > POST_TITLE_MAX_LENGTH) {
-      return generateError('Title is too long', 422, next);
+      throw new ValidationError('Title is too long');
     }
 
     const sanitizedTitle = title.trim().replace(/[^0-9A-Za-z\s]/g, '');
@@ -41,7 +42,7 @@ exports.search = async (req, res, next) => {
       const dateFromCheck = new Date(dateFrom);
 
       if (dateFromCheck.toString() === 'Invalid Date') {
-        return generateError('Invalid date', 422, next);
+        throw new ValidationError('Invalid date');
       }
 
       query.createdAt.$gte = dateFromCheck;
@@ -51,7 +52,7 @@ exports.search = async (req, res, next) => {
       const dateToCheck = new Date(dateTo);
 
       if (dateToCheck.toString() === 'Invalid Date') {
-        return generateError('Invalid date', 422, next);
+        throw new ValidationError('Invalid date');
       }
 
       query.createdAt.$lte = dateToCheck;
@@ -79,8 +80,8 @@ exports.search = async (req, res, next) => {
     Post.find(query)
       .sort({ rating: -1 })
       .populate('author', 'login avatar')
-      .limit(+limit)
-      .skip(+offset),
+      .limit(limit)
+      .skip(offset),
     User.findById(userId).select('rates').populate('rates'),
     Post.countDocuments(query),
   ]);
@@ -88,7 +89,7 @@ exports.search = async (req, res, next) => {
   const postsWithRated = posts.map((post) => post.toResponse(user));
 
   success(req, res, {
-    pages: Math.ceil(count / +limit),
+    pages: Math.ceil(count / limit),
     posts: postsWithRated,
   });
 };
