@@ -1,4 +1,4 @@
-const { differenceInMilliseconds } = require('date-fns');
+const { differenceInMilliseconds, millisecondsToMinutes } = require('date-fns');
 const sanitizeHtml = require('../../libs/sanitize-html');
 const Comment = require('../../models/Comment');
 
@@ -36,7 +36,7 @@ exports.updateById = async (req, res) => {
     COMMENT_TIME_TO_UPDATE
   ) {
     throw new ForbiddenError(
-      `You can update comment only within first ${COMMENT_TIME_TO_UPDATE} min`,
+      `You can update comment only within first ${millisecondsToMinutes(COMMENT_TIME_TO_UPDATE)} min`,
     );
   }
 
