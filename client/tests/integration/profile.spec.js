@@ -87,7 +87,7 @@ test('Fetches user posts with expected filters', async ({
   });
 
   expect(postResponse.url()).toContain(
-    `author=${testUser.login}&limit=20&offset=0`,
+    `author=${testUser.login}&limit=15&offset=0`,
   );
 
   await expect(Post.getTitleById(post.id)).toContainText(post.title);
