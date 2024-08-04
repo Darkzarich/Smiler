@@ -5,6 +5,7 @@ const ValidationError = require('./ValidationError');
 const ForbiddenError = require('./ForbiddenError');
 const ConflictError = require('./ConflictError');
 const BadRequestError = require('./BadRequestError');
+const ContentTooLargeError = require('./ContentTooLargeError');
 
 module.exports = {
   AppError,
@@ -14,4 +15,5 @@ module.exports = {
   ForbiddenError,
   ConflictError,
   BadRequestError,
+  ContentTooLargeError,
 };

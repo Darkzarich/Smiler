@@ -1,6 +1,3 @@
-const fs = require('fs/promises');
-const path = require('path');
-
 const User = require('../../models/User');
 
 const {
@@ -8,7 +5,7 @@ const {
   NotFoundError,
   BadRequestError,
 } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { success, removeFileByPath } = require('../../utils/utils');
 const { POST_SECTION_TYPES } = require('../../constants');
 
 exports.deletePostTemplatePicture = async (req, res) => {
@@ -42,20 +39,9 @@ exports.deletePostTemplatePicture = async (req, res) => {
     );
   }
 
-  const { url } = targetSection;
-  const absolutePath = path.join(process.cwd(), url);
-
-  // Check if file exists
-  try {
-    await fs.access(absolutePath);
-  } catch (err) {
-    throw new NotFoundError('File does not exist');
-  }
-
   // Delete the file and update the user's template
 
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.unlink(absolutePath);
+  await removeFileByPath(targetSection.url);
 
   await User.updateOne(
     { _id: userId },

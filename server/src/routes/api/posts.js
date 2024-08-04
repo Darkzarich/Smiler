@@ -351,12 +351,12 @@ const authRequiredMiddleware = require('../../middlewares/auth-required');
 */
 router.get(
   '/',
-  asyncControllerErrorHandler((req, res, next) => {
+  asyncControllerErrorHandler((req, res) => {
     if (req.query.author) {
-      return postsController.getListByAuthor(req, res, next);
+      return postsController.getListByAuthor(req, res);
     }
 
-    postsController.search(req, res, next);
+    return postsController.search(req, res);
   }),
 );
 
@@ -1066,6 +1066,9 @@ router.post(
         },
         "401": {
           "$ref": "#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "#/components/responses/Forbidden"
         },
         "404": {
           "$ref": "#/components/responses/NotFound"

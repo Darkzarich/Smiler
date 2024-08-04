@@ -1290,6 +1290,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -1680,7 +1683,7 @@
         }
       }
     },
-    "/users/{login}/template/{hash}": {
+    "/users/me/template/{hash}": {
       "delete": {
         "tags": [
           "Users"
@@ -1695,15 +1698,6 @@
         "parameters": [
           {
             "in": "path",
-            "name": "login",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "User name"
-          },
-          {
-            "in": "path",
             "name": "hash",
             "schema": {
               "type": "string"
@@ -1716,11 +1710,11 @@
           "200": {
             "$ref": "#/components/responses/OK"
           },
-          "401": {
+          "400": {
             "$ref": "#/components/responses/Unauthorized"
           },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -2043,6 +2037,9 @@
             "type": "object",
             "properties": {
               "message": {
+                "type": "string"
+              },
+              "code": {
                 "type": "string"
               }
             }
