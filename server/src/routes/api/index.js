@@ -11,10 +11,10 @@ const {
 const { IS_JEST } = require('../../config/config');
 const { logger } = require('../../libs/logger');
 const {
+  isDuplicateKeyError,
   isCastError,
   isValidationError,
-  isDuplicateKeyError,
-} = require('../../utils/utils');
+} = require('../../utils/check-mongo-db-error');
 
 router.use('/users', require('./users'));
 router.use('/auth', require('./auth'));

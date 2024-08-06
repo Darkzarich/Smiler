@@ -1,7 +1,8 @@
 const crypto = require('crypto');
 const User = require('../../models/User');
 const { ValidationError, ConflictError } = require('../../errors');
-const { success, isDuplicateKeyError } = require('../../utils/utils');
+const { isDuplicateKeyError } = require('../../utils/check-mongo-db-error');
+const { success } = require('../../utils/utils');
 
 /** Validate user sign up, return error message or nothing */
 const validate = (user) => {
@@ -66,7 +67,6 @@ exports.signUp = async (req, res) => {
 
     success(req, res, userAuth);
   } catch (error) {
-    // Come up with a way to handle it globally
     if (isDuplicateKeyError(error)) {
       throw new ConflictError(
         'This email or login is already associated with an account',
