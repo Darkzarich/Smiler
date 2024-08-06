@@ -237,7 +237,7 @@ test.describe('Post groups', () => {
       Api,
     }) => {
       const searchParams = new URLSearchParams({
-        limit: '20',
+        limit: '15',
         offset: '0',
       });
 

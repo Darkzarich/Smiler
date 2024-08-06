@@ -102,7 +102,7 @@ export default class Post extends AbstractComponent {
   }
 
   async openPostById(id) {
-    await this.getByTestId(id).click();
+    await this.getTitleById(id).click();
   }
 
   /** On Desktop a post's page opens in a new browser tab.

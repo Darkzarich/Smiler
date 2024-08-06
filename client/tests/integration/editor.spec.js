@@ -17,6 +17,13 @@ const vidCode = 'dQw4w9WgXcQ';
 const createdPost = generatePost();
 
 test.beforeEach(async ({ Api }) => {
+  Api.routes.posts.getToday.mock({
+    body: {
+      pages: 0,
+      posts: [],
+    },
+  });
+
   Api.routes.posts.createPost.mock({
     body: createdPost,
   });
@@ -42,7 +49,7 @@ test('Goes to post create page from the user menu', async ({
 }) => {
   await PostsPage.goto(PostsPage.urls.today);
 
-  Menu.openIfMobile();
+  await Menu.openIfMobile();
 
   await Menu.goToCreatePostPage();
 
