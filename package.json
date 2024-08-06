@@ -4,13 +4,14 @@
   "version": "1.0.0",
   "description": "Smiler project monorepository.",
   "scripts": {
-    "dev": "concurrently --kill-others \"cd server && npm run dev\" \"cd client && npm run dev\"",
-    "front:build": "cd client && npm run build",
-    "front:dev": "cd client && npm run dev",
-    "back:dev": "cd server && npm run dev",
-    "back:serve": "cd server && npm start",
+    "dev": "concurrently --kill-others \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "front:build": "npm --prefix client run build",
+    "front:dev": "npm --prefix client run dev",
+    "back:dev": "npm --prefix server run dev",
+    "back:serve": "npm --prefix server start",
     "postinstall": "(cd client && npm i); (cd server && npm i);",
-    "lint:spell": "cspell --no-progress ."
+    "lint:spell": "cspell --no-progress .",
+    "test:all": "(cd server && npm run test); (cd client && npm run test:e2e);"
   },
   "license": "MIT",
   "bugs": {
