@@ -383,7 +383,7 @@ router.post(
           "required": true,
           "schema": {
             "type": "number",
-            "default": 15
+            "default": 15,
             "maximum": 15,
             "minimum": 1
           },
@@ -447,7 +447,7 @@ router.get('/categories/all', asyncControllerErrorHandler(postsController.all));
           "required": true,
           "schema": {
             "type": "number",
-            "default": 15
+            "default": 15,
             "maximum": 15,
             "minimum": 1
           },
@@ -514,7 +514,7 @@ router.get(
           "required": true,
           "schema": {
             "type": "number",
-            "default": 15
+            "default": 15,
             "maximum": 15,
             "minimum": 1
           },
@@ -581,7 +581,7 @@ router.get(
           "required": true,
           "schema": {
             "type": "number",
-            "default": 15
+            "default": 15,
             "maximum": 15,
             "minimum": 1
           },
@@ -648,7 +648,7 @@ router.get(
           "required": true,
           "schema": {
             "type": "number",
-            "default": 15
+            "default": 15,
             "maximum": 15,
             "minimum": 1
           },
@@ -715,7 +715,7 @@ router.get(
           "required": true,
           "schema": {
             "type": "number",
-            "default": 15
+            "default": 15,
             "maximum": 15,
             "minimum": 1
           },

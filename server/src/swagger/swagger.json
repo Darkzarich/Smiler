@@ -698,7 +698,7 @@
             "required": true,
             "schema": {
               "type": "number",
-              "default": 15
+              "default": 15,
               "maximum": 15,
               "minimum": 1
             },
@@ -754,7 +754,7 @@
             "required": true,
             "schema": {
               "type": "number",
-              "default": 15
+              "default": 15,
               "maximum": 15,
               "minimum": 1
             },
@@ -810,7 +810,7 @@
             "required": true,
             "schema": {
               "type": "number",
-              "default": 15
+              "default": 15,
               "maximum": 15,
               "minimum": 1
             },
@@ -866,7 +866,7 @@
             "required": true,
             "schema": {
               "type": "number",
-              "default": 15
+              "default": 15,
               "maximum": 15,
               "minimum": 1
             },
@@ -922,7 +922,7 @@
             "required": true,
             "schema": {
               "type": "number",
-              "default": 15
+              "default": 15,
               "maximum": 15,
               "minimum": 1
             },
@@ -978,7 +978,7 @@
             "required": true,
             "schema": {
               "type": "number",
-              "default": 15
+              "default": 15,
               "maximum": 15,
               "minimum": 1
             },
