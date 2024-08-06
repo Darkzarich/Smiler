@@ -1,6 +1,6 @@
 const User = require('../../models/User');
 const { NotFoundError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.getByLogin = async (req, res) => {
   const { login } = req.params;
@@ -30,5 +30,5 @@ exports.getByLogin = async (req, res) => {
       : false,
   };
 
-  success(req, res, response);
+  sendSuccess(res, response);
 };

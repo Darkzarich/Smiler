@@ -5,7 +5,8 @@ const {
   NotFoundError,
   BadRequestError,
 } = require('../../errors');
-const { success, removeFileByPath } = require('../../utils/utils');
+const { removeFileByPath } = require('../../utils/remove-file-by-path');
+const { sendSuccess } = require('../../utils/responseUtils');
 const { POST_SECTION_TYPES } = require('../../constants');
 
 exports.deletePostTemplatePicture = async (req, res) => {
@@ -48,5 +49,5 @@ exports.deletePostTemplatePicture = async (req, res) => {
     { $pull: { 'template.sections': { hash } } },
   );
 
-  success(req, res);
+  sendSuccess(res);
 };

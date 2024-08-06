@@ -1,12 +1,11 @@
 const { differenceInMilliseconds, millisecondsToMinutes } = require('date-fns');
-const fs = require('fs');
-const path = require('path');
 
 const Post = require('../../models/Post');
 
 const { POST_TIME_TO_UPDATE, POST_SECTION_TYPES } = require('../../constants');
 const { NotFoundError, ForbiddenError } = require('../../errors');
-const { success, removeFileByPath } = require('../../utils/utils');
+const { removeFileByPath } = require('../../utils/remove-file-by-path');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.deleteById = async (req, res) => {
   const { userId } = req.session;
@@ -41,7 +40,7 @@ exports.deleteById = async (req, res) => {
 
   await targetPost.remove();
 
-  success(req, res);
+  sendSuccess(res);
 
   const filePictureSections = targetPost.sections.filter(
     (sec) => sec.type === POST_SECTION_TYPES.PICTURE && sec.isFile,

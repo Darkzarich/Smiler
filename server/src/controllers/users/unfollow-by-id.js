@@ -5,7 +5,7 @@ const {
   NotFoundError,
   BadRequestError,
 } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.unfollowById = async (req, res) => {
   const { id } = req.params;
@@ -41,5 +41,5 @@ exports.unfollowById = async (req, res) => {
     }),
   ]);
 
-  success(req, res);
+  sendSuccess(res);
 };

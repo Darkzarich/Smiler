@@ -1,7 +1,7 @@
 const User = require('../../models/User');
 
 const { ForbiddenError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.getPostTemplate = async (req, res) => {
   // TODO: Replace with id of the user
@@ -11,5 +11,5 @@ exports.getPostTemplate = async (req, res) => {
 
   const template = await User.findById(req.session.userId).select('template');
 
-  success(req, res, template.template);
+  sendSuccess(res, template.template);
 };

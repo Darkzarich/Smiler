@@ -13,7 +13,8 @@ const {
   ForbiddenError,
   ValidationError,
 } = require('../../errors');
-const { success, removeFileByPath } = require('../../utils/utils');
+const { removeFileByPath } = require('../../utils/remove-file-by-path');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.updateById = async (req, res) => {
   // TODO: validate sections on update by type and other stuff the same as when creating post
@@ -91,7 +92,7 @@ exports.updateById = async (req, res) => {
 
   await targetPost.save();
 
-  success(req, res);
+  sendSuccess(res);
 
   // Remove all deleted files
 

@@ -3,7 +3,7 @@ const Post = require('../../models/Post');
 const Rate = require('../../models/Rate');
 const { POST_RATE_VALUE } = require('../../constants');
 const { NotFoundError, ForbiddenError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.voteById = async (req, res) => {
   const { userId } = req.session;
@@ -44,5 +44,5 @@ exports.voteById = async (req, res) => {
     Post.updateOne({ _id: targetPost.id }, { $inc: { rating: rateValue } }),
   ]);
 
-  success(req, res);
+  sendSuccess(res);
 };

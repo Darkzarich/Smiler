@@ -1,16 +1,16 @@
 const User = require('../../models/User');
 const Post = require('../../models/Post');
 const { ValidationError, NotFoundError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.getListByAuthor = async (req, res) => {
   const { userId } = req.session;
 
-  const limit = +req.query.limit || 15
+  const limit = +req.query.limit || 15;
   const offset = +req.query.offset || 0;
   const author = req.query.author || '';
 
-  if (limit > 15 {
+  if (limit > 15) {
     throw new ValidationError("Limit can't be more than 15");
   }
 
@@ -38,7 +38,7 @@ exports.getListByAuthor = async (req, res) => {
 
   const postsWithRated = posts.map((post) => post.toResponse(user));
 
-  success(req, res, {
+  sendSuccess(res, {
     pages: Math.ceil(count / limit),
     posts: postsWithRated,
   });

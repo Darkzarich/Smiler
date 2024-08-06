@@ -8,7 +8,7 @@ const {
   NotFoundError,
   BadRequestError,
 } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.updateById = async (req, res) => {
   const { userId } = req.session;
@@ -44,5 +44,5 @@ exports.updateById = async (req, res) => {
 
   await comment.save();
 
-  success(req, res);
+  sendSuccess(res);
 };

@@ -11,7 +11,7 @@ const {
   POST_MAX_UPLOAD_IMAGE_SIZE,
 } = require('../../constants');
 const { ContentTooLargeError, ValidationError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 const postMulter = multer({
   storage: new DiskStorage({
@@ -109,6 +109,6 @@ exports.upload = async (req, res, next) => {
 
     await user.save();
 
-    success(req, res, newSection);
+    sendSuccess(res, newSection);
   });
 };

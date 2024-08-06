@@ -1,7 +1,7 @@
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.logout = async (req, res) => {
   req.session.destroy();
 
-  success(req, res);
+  sendSuccess(res);
 };

@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const User = require('../../models/User');
 const { ValidationError, UnauthorizedError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 const validate = (user) => {
   if (!user.email || !user.password) {
@@ -60,5 +60,5 @@ exports.signIn = async (req, res) => {
     followersAmount: foundUser.followersAmount,
   };
 
-  success(req, res, userAuth);
+  sendSuccess(res, userAuth);
 };

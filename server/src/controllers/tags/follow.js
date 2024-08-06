@@ -1,7 +1,7 @@
 const User = require('../../models/User');
 const { ValidationError } = require('../../errors');
 const { TAGS_MAX_LENGTH } = require('../../constants');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.follow = async (req, res) => {
   const { tag } = req.params;
@@ -19,5 +19,5 @@ exports.follow = async (req, res) => {
     },
   });
 
-  success(req, res);
+  sendSuccess(res);
 };

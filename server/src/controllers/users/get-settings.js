@@ -1,7 +1,7 @@
 const User = require('../../models/User');
 
 const { NotFoundError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.getSettings = async (req, res) => {
   const { userId } = req.session;
@@ -22,5 +22,5 @@ exports.getSettings = async (req, res) => {
     avatar: user.avatar,
   };
 
-  success(req, res, following);
+  sendSuccess(res, following);
 };

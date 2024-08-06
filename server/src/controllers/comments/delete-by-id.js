@@ -2,7 +2,7 @@ const { differenceInMilliseconds } = require('date-fns');
 const Comment = require('../../models/Comment');
 const { COMMENT_TIME_TO_UPDATE } = require('../../constants');
 const { ForbiddenError, NotFoundError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.deleteById = async (req, res) => {
   const { userId } = req.session;
@@ -34,12 +34,12 @@ exports.deleteById = async (req, res) => {
 
     await comment.save();
 
-    success(req, res);
+    sendSuccess(res);
 
     return;
   }
 
   await comment.remove();
 
-  success(req, res);
+  sendSuccess(res);
 };

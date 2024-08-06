@@ -1,7 +1,7 @@
 const User = require('../../models/User');
 
 const { ForbiddenError, ValidationError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 const { POST_MAX_TAGS, POST_MAX_TAG_LEN } = require('../../constants');
 
 exports.updatePostTemplate = async (req, res) => {
@@ -38,5 +38,5 @@ exports.updatePostTemplate = async (req, res) => {
 
   await userTemplate.save();
 
-  success(req, res);
+  sendSuccess(res);
 };

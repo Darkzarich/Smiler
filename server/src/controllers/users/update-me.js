@@ -1,7 +1,7 @@
 const User = require('../../models/User');
 
 const { NotFoundError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.updateMe = async (req, res) => {
   const { userId } = req.session;
@@ -15,5 +15,5 @@ exports.updateMe = async (req, res) => {
     throw new NotFoundError('User is not found');
   }
 
-  success(req, res);
+  sendSuccess(res);
 };

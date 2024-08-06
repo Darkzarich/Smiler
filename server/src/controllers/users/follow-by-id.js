@@ -5,7 +5,7 @@ const {
   NotFoundError,
   BadRequestError,
 } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.followById = async (req, res) => {
   const { id } = req.params;
@@ -33,5 +33,5 @@ exports.followById = async (req, res) => {
     userFollowed.updateOne({ $inc: { followersAmount: 1 } }),
   ]);
 
-  success(req, res);
+  sendSuccess(res);
 };

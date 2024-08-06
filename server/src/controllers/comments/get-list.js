@@ -2,7 +2,7 @@ const Comment = require('../../models/Comment');
 const User = require('../../models/User');
 
 const { NotFoundError, ValidationError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 function fillWithRatedRecursive({ comments, user }) {
   if (!comments) {
@@ -65,7 +65,7 @@ exports.getList = async (req, res) => {
     Comment.countDocuments(query),
   ]);
 
-  success(req, res, {
+  sendSuccess(res, {
     comments: fillWithRatedRecursive({ comments, user: currentUser }),
     pages: Math.ceil(count / limit),
   });

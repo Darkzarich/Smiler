@@ -2,7 +2,7 @@ const sanitizeHtml = require('../../libs/sanitize-html');
 const Comment = require('../../models/Comment');
 
 const { ValidationError, NotFoundError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.create = async (req, res) => {
   const { body } = req.body;
@@ -27,7 +27,7 @@ exports.create = async (req, res) => {
       author: userId,
     });
 
-    success(req, res, comment);
+    sendSuccess(res, comment);
 
     return;
   }
@@ -56,5 +56,5 @@ exports.create = async (req, res) => {
 
   await parentCommentary.save();
 
-  success(req, res, comment);
+  sendSuccess(res, comment);
 };

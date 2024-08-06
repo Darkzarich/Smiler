@@ -3,7 +3,7 @@ const Rate = require('../../models/Rate');
 const Comment = require('../../models/Comment');
 const { COMMENT_RATE_VALUE } = require('../../constants');
 const { ForbiddenError, NotFoundError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 exports.voteById = async (req, res) => {
   const { userId } = req.session;
@@ -51,5 +51,5 @@ exports.voteById = async (req, res) => {
     ),
   ]);
 
-  success(req, res);
+  sendSuccess(res);
 };

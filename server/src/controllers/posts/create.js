@@ -14,7 +14,7 @@ const {
   POST_MAX_TAG_LEN,
 } = require('../../constants');
 const { ValidationError } = require('../../errors');
-const { success } = require('../../utils/utils');
+const { sendSuccess } = require('../../utils/responseUtils');
 
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 
@@ -94,5 +94,5 @@ exports.create = async (req, res) => {
     ),
   ]);
 
-  success(req, res, post);
+  sendSuccess(res, post);
 };
