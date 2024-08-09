@@ -9,7 +9,9 @@ exports.getPostTemplate = async (req, res) => {
     throw new ForbiddenError('Can see only your own template');
   }
 
-  const template = await User.findById(req.session.userId).select('template');
+  const template = await User.findById(req.session.userId)
+    .select('template')
+    .lean();
 
   sendSuccess(res, template.template);
 };

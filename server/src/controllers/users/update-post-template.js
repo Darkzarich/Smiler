@@ -30,13 +30,15 @@ exports.updatePostTemplate = async (req, res) => {
     'template',
   );
 
-  userTemplate.template.title = title || userTemplate.template.title;
-  userTemplate.template.tags = tags || userTemplate.template.tags;
-  userTemplate.template.sections = sections || userTemplate.template.sections;
+  userTemplate.template = {
+    title: title || userTemplate.template.title,
+    tags: tags || userTemplate.template.tags,
+    sections: sections || userTemplate.template.sections,
+  };
 
   userTemplate.markModified('template');
 
   await userTemplate.save();
 
-  sendSuccess(res);
+  sendSuccess(res, userTemplate);
 };
