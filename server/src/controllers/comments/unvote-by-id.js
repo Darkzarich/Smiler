@@ -33,13 +33,14 @@ exports.unvoteById = async (req, res) => {
     ? COMMENT_RATE_VALUE
     : -COMMENT_RATE_VALUE;
 
-  await Promise.all([
+  const [updatedComment] = await Promise.all([
+    Comment.findOneAndUpdate(
+      { _id: targetComment.id },
+      { $inc: { rating: rateValue } },
+      { new: true },
+    ),
     User.updateOne(
       { _id: targetComment.author },
-      { $inc: { rating: rateValue } },
-    ),
-    Comment.updateOne(
-      { _id: targetComment.id },
       { $inc: { rating: rateValue } },
     ),
     Rate.deleteOne({ target: targetComment.id }),
@@ -49,5 +50,5 @@ exports.unvoteById = async (req, res) => {
     ),
   ]);
 
-  sendSuccess(res);
+  sendSuccess(res, updatedComment);
 };
