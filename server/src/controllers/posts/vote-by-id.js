@@ -38,11 +38,15 @@ exports.voteById = async (req, res) => {
     negative,
   });
 
-  await Promise.all([
-    User.updateOne({ _id: currentUser.id }, { $push: { rates: newRate.id } }),
+  const [updatedPost] = await Promise.all([
+    Post.updateOne(
+      { _id: targetPost.id },
+      { $inc: { rating: rateValue } },
+      { new: true },
+    ),
     User.updateOne({ _id: targetPost.author }, { $inc: { rating: rateValue } }),
-    Post.updateOne({ _id: targetPost.id }, { $inc: { rating: rateValue } }),
+    User.updateOne({ _id: currentUser.id }, { $push: { rates: newRate.id } }),
   ]);
 
-  sendSuccess(res);
+  sendSuccess(res, updatedPost);
 };

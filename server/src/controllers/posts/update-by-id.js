@@ -92,7 +92,7 @@ exports.updateById = async (req, res) => {
 
   await targetPost.save();
 
-  sendSuccess(res);
+  sendSuccess(res, targetPost);
 
   // Remove all deleted files
 
