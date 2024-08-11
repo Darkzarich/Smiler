@@ -15,6 +15,30 @@ const authRequiredMiddleware = require('../../middlewares/auth-required');
     }
   ],
   "components": {
+    "parameters": {
+      "post-limit": {
+        "description": "posts per page",
+        "in": "query",
+        "name": "limit",
+        "required": true,
+        "schema": {
+          "type": "number",
+          "default": 15,
+          "maximum": 15,
+          "minimum": 1
+        }
+      },
+      "post-offset": {
+        "description": "offset from element",
+        "in": "query",
+        "name": "offset",
+        "required": true,
+        "schema": {
+          "type": "number",
+          "default": 0
+        }
+      }
+    },
     "schemas": {
       "Post": {
         "type": "object",
@@ -61,6 +85,20 @@ const authRequiredMiddleware = require('../../middlewares/auth-required');
           },
           "rated": {
             "$ref": "#/components/schemas/UserRate"
+          }
+        }
+      },
+      "PostList": {
+        "type": "object",
+        "properties": {
+          "posts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Post"
+            }
+          },
+          "pages": {
+            "type": "number"
           }
         }
       },
@@ -161,44 +199,10 @@ const authRequiredMiddleware = require('../../middlewares/auth-required');
       "summary": "Get all posts",
       "parameters": [
         {
-          "in": "query",
-          "name": "limit",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 15,
-            "maximum": 15,
-            "minimum": 1
-          },
-          "description": "posts per page"
+          "$ref": "#/components/parameters/post-limit"
         },
         {
-          "in": "query",
-          "name": "sort",
-          "schema": {
-            "type": "string"
-          },
-          "description": "Sorts posts by field `sort`, default descending. `-<sortField>` - ascending sort.",
-          "examples": {
-            "descending": {
-              "summary": "Example of descending sort by field `createdAt`",
-              "value": "-createdAt"
-            },
-            "ascending": {
-              "summary": "Example of ascending sort by field `rating`",
-              "value": "rating"
-            }
-          }
-        },
-        {
-          "in": "query",
-          "name": "offset",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 0
-          },
-          "description": "offset from element"
+          "$ref": "#/components/parameters/post-offset"
         },
         {
           "in": "query",
@@ -268,18 +272,7 @@ const authRequiredMiddleware = require('../../middlewares/auth-required');
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "posts": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Post"
-                    }
-                  },
-                  "pages": {
-                    "type": "number"
-                  }
-                }
+                "$ref": "#/components/schemas/PostList"
               }
             }
           }
@@ -378,27 +371,11 @@ router.post(
       "summary": "Get posts",
       "parameters": [
         {
-          "in": "query",
-          "name": "limit",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 15,
-            "maximum": 15,
-            "minimum": 1
-          },
-          "description": "posts per page"
+          "$ref": "#/components/parameters/post-limit"
         },
         {
-          "in": "query",
-          "name": "offset",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 0
-          },
-          "description": "offset from element"
-        }
+          "$ref": "#/components/parameters/post-offset"
+        },
       ],
       "responses": {
         "200": {
@@ -406,18 +383,7 @@ router.post(
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "posts": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Post"
-                    }
-                  },
-                  "pages": {
-                    "type": "number"
-                  }
-                }
+                "$ref": "#/components/schemas/PostList"
               }
             }
           }
@@ -442,27 +408,11 @@ router.get('/categories/all', asyncControllerErrorHandler(postsController.all));
       "summary": "Get today's posts",
       "parameters": [
         {
-          "in": "query",
-          "name": "limit",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 15,
-            "maximum": 15,
-            "minimum": 1
-          },
-          "description": "posts per page"
+          "$ref": "#/components/parameters/post-limit"
         },
         {
-          "in": "query",
-          "name": "offset",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 0
-          },
-          "description": "offset from element"
-        }
+          "$ref": "#/components/parameters/post-offset"
+        },
       ],
       "responses": {
         "200": {
@@ -470,18 +420,7 @@ router.get('/categories/all', asyncControllerErrorHandler(postsController.all));
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "posts": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Post"
-                    }
-                  },
-                  "pages": {
-                    "type": "number"
-                  }
-                }
+                "$ref": "#/components/schemas/PostList"
               }
             }
           }
@@ -509,27 +448,11 @@ router.get(
       "summary": "Get blowing posts",
       "parameters": [
         {
-          "in": "query",
-          "name": "limit",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 15,
-            "maximum": 15,
-            "minimum": 1
-          },
-          "description": "posts per page"
+          "$ref": "#/components/parameters/post-limit"
         },
         {
-          "in": "query",
-          "name": "offset",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 0
-          },
-          "description": "offset from element"
-        }
+          "$ref": "#/components/parameters/post-offset"
+        },
       ],
       "responses": {
         "200": {
@@ -537,18 +460,7 @@ router.get(
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "posts": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Post"
-                    }
-                  },
-                  "pages": {
-                    "type": "number"
-                  }
-                }
+                "$ref": "#/components/schemas/PostList"
               }
             }
           }
@@ -576,27 +488,11 @@ router.get(
       "summary": "Get recent posts",
       "parameters": [
         {
-          "in": "query",
-          "name": "limit",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 15,
-            "maximum": 15,
-            "minimum": 1
-          },
-          "description": "posts per page"
+          "$ref": "#/components/parameters/post-limit"
         },
         {
-          "in": "query",
-          "name": "offset",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 0
-          },
-          "description": "offset from element"
-        }
+          "$ref": "#/components/parameters/post-offset"
+        },
       ],
       "responses": {
         "200": {
@@ -604,18 +500,7 @@ router.get(
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "posts": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Post"
-                    }
-                  },
-                  "pages": {
-                    "type": "number"
-                  }
-                }
+                "$ref": "#/components/schemas/PostList"
               }
             }
           }
@@ -643,27 +528,11 @@ router.get(
       "summary": "Get top posts",
       "parameters": [
         {
-          "in": "query",
-          "name": "limit",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 15,
-            "maximum": 15,
-            "minimum": 1
-          },
-          "description": "posts per page"
+          "$ref": "#/components/parameters/post-limit"
         },
         {
-          "in": "query",
-          "name": "offset",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 0
-          },
-          "description": "offset from element"
-        }
+          "$ref": "#/components/parameters/post-offset"
+        },
       ],
       "responses": {
         "200": {
@@ -671,18 +540,7 @@ router.get(
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "posts": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Post"
-                    }
-                  },
-                  "pages": {
-                    "type": "number"
-                  }
-                }
+                "$ref": "#/components/schemas/PostList"
               }
             }
           }
@@ -710,27 +568,11 @@ router.get(
       "summary": "Get feed",
       "parameters": [
         {
-          "in": "query",
-          "name": "limit",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 15,
-            "maximum": 15,
-            "minimum": 1
-          },
-          "description": "posts per page"
+          "$ref": "#/components/parameters/post-limit"
         },
         {
-          "in": "query",
-          "name": "offset",
-          "required": true,
-          "schema": {
-            "type": "number",
-            "default": 0
-          },
-          "description": "offset from element"
-        }
+          "$ref": "#/components/parameters/post-offset"
+        },
       ],
       "responses": {
         "200": {
@@ -738,18 +580,7 @@ router.get(
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "posts": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Post"
-                    }
-                  },
-                  "pages": {
-                    "type": "number"
-                  }
-                }
+                "$ref": "#/components/schemas/PostList"
               }
             }
           }
@@ -822,7 +653,14 @@ router.get(
       },
       "responses": {
         "200": {
-          "$ref": "#/components/responses/OK"
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Post"
+              }
+            }
+          }
         },
         "401": {
           "$ref": "#/components/responses/Unauthorized"
@@ -992,8 +830,8 @@ router.post(
 {
   "/posts/{id}/vote": {
     "put": {
-      "summary": "Change vote on post",
-      "description": "Changes vote for post. `negative` decides direction. You can't rate post again before deleting previous rate",
+      "summary": "Vote for a post", 
+      "description": "Changes vote for post. `negative` decides direction. Cannot rate the post again before deleting previous rate",
       "tags": [
         "Posts"
       ],
@@ -1029,7 +867,14 @@ router.post(
       },
       "responses": {
         "200": {
-          "$ref": "#/components/responses/OK"
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Post"
+              }
+            }
+          }
         },
         "401": {
           "$ref": "#/components/responses/Unauthorized"
@@ -1062,7 +907,14 @@ router.post(
       ],
       "responses": {
         "200": {
-          "$ref": "#/components/responses/OK"
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Post"
+              }
+            }
+          }
         },
         "401": {
           "$ref": "#/components/responses/Unauthorized"

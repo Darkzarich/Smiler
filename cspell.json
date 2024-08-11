@@ -11,7 +11,14 @@
     "package-lock.json",
     "server/logs/**"
   ],
-  "dictionaries": ["node", "html", "bash", "css", "docker", "vue"],
+  "dictionaries": [
+    "node",
+    "html",
+    "bash",
+    "css",
+    "docker",
+    "vue"
+  ],
   "words": [
     "9gag",
     "autopopulate",
@@ -31,6 +38,7 @@
     "nginxinc",
     "NGNIX",
     "nodenext",
+    "openapi",
     "predownload",
     "resave",
     "resizer",

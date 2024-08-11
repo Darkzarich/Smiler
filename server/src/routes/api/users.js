@@ -83,7 +83,27 @@ const authRequiredMiddleware = require('../../middlewares/auth-required');
             "type": string
           }
         }
-      }
+      },
+      PostTemplate: {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostSection"
+            }
+          }
+        }
+      },
     }
   }
 }
@@ -160,7 +180,14 @@ const authRequiredMiddleware = require('../../middlewares/auth-required');
       },
       "responses": {
         "200": {
-          "$ref": "#/components/responses/OK"
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfile"
+              }
+            }
+          }
         },
         "401": {
           "$ref": "#/components/responses/Unauthorized"
@@ -218,25 +245,7 @@ router.put(
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "title": {
-                    "type": "string"
-                  },
-                  "tags": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "sections": {
-                    "description": "Post sections",
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/PostSection"
-                    }
-                  }
-                }
+                "$ref": "#/components/schemas/PostTemplate"
               }
             }
           }
@@ -299,7 +308,14 @@ router.put(
       },
       "responses": {
         "200": {
-          "$ref": "#/components/responses/OK"
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostTemplate"
+              }
+            }
+          }
         },
         "401": {
           "$ref": "#/components/responses/Unauthorized"

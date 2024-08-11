@@ -288,7 +288,14 @@ router.post(
       ],
       "responses": {
         "200": {
-          "$ref": "#/components/responses/OK"
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Comment"
+              }
+            }
+          }
         },
         "401": {
           "$ref": "#/components/responses/Unauthorized"
@@ -397,7 +404,14 @@ router.delete(
       },
       "responses": {
         "200": {
-          "$ref": "#/components/responses/OK"
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Comment"
+              }
+            }
+          }
         },
         "401": {
           "$ref": "#/components/responses/Unauthorized"
@@ -430,7 +444,14 @@ router.delete(
       ],
       "responses": {
         "200": {
-          "$ref": "#/components/responses/OK"
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Comment"
+              }
+            }
+          }
         },
         "401": {
           "$ref": "#/components/responses/Unauthorized"
