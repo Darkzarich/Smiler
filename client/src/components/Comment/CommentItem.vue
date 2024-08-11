@@ -8,7 +8,10 @@
     >
       <div class="comment-item__header">
         <template v-if="!commentData.deleted">
-          <div class="comment-item__rating">
+          <div
+            class="comment-item__rating"
+            :data-testid="`comment-${commentData.id}-rating`"
+          >
             {{ commentData.rating }}
           </div>
 

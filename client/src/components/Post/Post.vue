@@ -14,7 +14,7 @@
         <IconPlus />
       </div>
 
-      <div class="post__rating">
+      <div class="post__rating" :data-testid="`post-${postData.id}-rating`">
         {{ postData.rating }}
       </div>
 
@@ -231,7 +231,7 @@ export default {
   data() {
     return {
       postData: this.post,
-      loadingRate: false,
+      isRequesting: false,
       POST_SECTION_TYPES: consts.POST_SECTION_TYPES,
       contextMenuData: {
         show: false,
@@ -280,11 +280,11 @@ export default {
   },
   methods: {
     async upvote(id) {
-      if (this.loadingRate) {
+      if (this.isRequesting) {
         return;
       }
 
-      this.loadingRate = true;
+      this.isRequesting = true;
 
       if (!this.postData.rated.isRated) {
         // Optimistic update
@@ -296,7 +296,7 @@ export default {
           negative: false,
         });
 
-        this.loadingRate = false;
+        this.isRequesting = false;
 
         if (res.data.error) {
           this.postData.rated.isRated = false;
@@ -313,7 +313,7 @@ export default {
 
         const res = await api.posts.removeRateById(id);
 
-        this.loadingRate = false;
+        this.isRequesting = false;
 
         if (res.data.error) {
           this.postData.rated.isRated = true;
@@ -326,38 +326,50 @@ export default {
       }
     },
     async downvote(id) {
-      if (!this.loadingRate) {
-        this.loadingRate = true;
-
-        if (!this.postData.rated.isRated) {
-          this.postData.rated.isRated = true;
-          this.postData.rated.negative = true;
-          this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
-
-          const res = await api.posts.updateRateById(id, {
-            negative: true,
-          });
-
-          if (res.data.error) {
-            this.postData.rated.isRated = false;
-            this.postData.rating =
-              this.postData.rating + consts.POST_RATE_VALUE;
-          }
-        } else if (!this.postData.rated.negative) {
-          this.postData.rated.isRated = false;
-          this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
-
-          const res = await api.posts.removeRateById(id);
-
-          if (res.data.error) {
-            this.postData.rated.isRated = true;
-            this.postData.rating =
-              this.postData.rating + consts.POST_RATE_VALUE;
-          }
-        }
+      if (this.isRequesting) {
+        return;
       }
 
-      this.loadingRate = false;
+      this.isRequesting = true;
+
+      if (!this.postData.rated.isRated) {
+        // Optimistic update
+        this.postData.rated.isRated = true;
+        this.postData.rated.negative = true;
+        this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
+
+        const res = await api.posts.updateRateById(id, {
+          negative: true,
+        });
+
+        this.isRequesting = false;
+
+        if (res.data.error) {
+          this.postData.rated.isRated = false;
+          this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
+
+          return;
+        }
+
+        this.postData = res.data;
+      } else if (!this.postData.rated.negative) {
+        // Optimistic update
+        this.postData.rated.isRated = false;
+        this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
+
+        const res = await api.posts.removeRateById(id);
+
+        this.isRequesting = false;
+
+        if (res.data.error) {
+          this.postData.rated.isRated = true;
+          this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
+
+          return;
+        }
+
+        this.postData = res.data;
+      }
     },
     async deletePost(id) {
       const res = await api.posts.deletePostById(id);
