@@ -180,13 +180,17 @@ export default {
         bio: this.bioEditInput,
       });
 
+      this.bioEditRequesting = false;
+
       if (!res.data.error) {
         this.$store.dispatch('showInfoNotification', {
           message: 'Your bio has been successfully updated!',
         });
+
+        return;
       }
 
-      this.bioEditRequesting = false;
+      this.bioEditInput = res.data.bio;
     },
     async editAvatar() {
       this.avatarEditRequesting = true;
@@ -195,15 +199,19 @@ export default {
         avatar: this.avatarEditInput,
       });
 
+      this.avatarEditRequesting = false;
+
       if (!res.data.error) {
         this.$store.commit('setAvatar', this.avatarEditInput);
 
         this.$store.dispatch('showInfoNotification', {
           message: 'Your avatar has been successfully updated!',
         });
+
+        return;
       }
 
-      this.avatarEditRequesting = false;
+      this.avatarEditInput = res.data.avatar;
     },
     async unfollowTag(tag) {
       if (!this.requestingForUsers) {

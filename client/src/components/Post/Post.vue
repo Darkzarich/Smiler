@@ -280,37 +280,50 @@ export default {
   },
   methods: {
     async upvote(id) {
-      if (!this.loadingRate) {
-        this.loadingRate = true;
-
-        if (!this.postData.rated.isRated) {
-          this.postData.rated.isRated = true;
-          this.postData.rated.negative = false;
-          this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
-
-          const res = await api.posts.updateRateById(id, {
-            negative: false,
-          });
-
-          if (res.data.error) {
-            this.postData.rated.isRated = false;
-            this.postData.rating =
-              this.postData.rating - consts.POST_RATE_VALUE;
-          }
-        } else if (this.postData.rated.negative) {
-          this.postData.rated.isRated = false;
-          this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
-          const res = await api.posts.removeRateById(id);
-
-          if (res.data.error) {
-            this.postData.rated.isRated = true;
-            this.postData.rating =
-              this.postData.rating - consts.POST_RATE_VALUE;
-          }
-        }
+      if (this.loadingRate) {
+        return;
       }
 
-      this.loadingRate = false;
+      this.loadingRate = true;
+
+      if (!this.postData.rated.isRated) {
+        // Optimistic update
+        this.postData.rated.isRated = true;
+        this.postData.rated.negative = false;
+        this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
+
+        const res = await api.posts.updateRateById(id, {
+          negative: false,
+        });
+
+        this.loadingRate = false;
+
+        if (res.data.error) {
+          this.postData.rated.isRated = false;
+          this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
+
+          return;
+        }
+
+        this.postData = res.data;
+      } else if (this.postData.rated.negative) {
+        // Optimistic update
+        this.postData.rated.isRated = false;
+        this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
+
+        const res = await api.posts.removeRateById(id);
+
+        this.loadingRate = false;
+
+        if (res.data.error) {
+          this.postData.rated.isRated = true;
+          this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
+
+          return;
+        }
+
+        this.postData = res.data;
+      }
     },
     async downvote(id) {
       if (!this.loadingRate) {

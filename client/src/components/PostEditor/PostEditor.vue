@@ -226,20 +226,26 @@ export default {
     async saveDraft() {
       this.saving = true;
 
-      const data = await api.users.updateUserTemplate(this.getUserLogin, {
+      const res = await api.users.updateUserTemplate(this.getUserLogin, {
         title: this.title,
         sections: this.sections,
         tags: this.tags,
       });
 
-      if (!data.data.error) {
+      this.saving = false;
+      this.isDirty = false;
+
+      if (!res.data.error) {
         this.$store.dispatch('showInfoNotification', {
           message: 'Draft post has been saved successfully!',
         });
+
+        return;
       }
 
-      this.saving = false;
-      this.isDirty = false;
+      this.title = res.data.title;
+      this.sections = res.data.sections;
+      this.tags = res.data.tags;
     },
     async deleteSection(section) {
       if (section.type === this.POST_SECTION_TYPES.PICTURE && section.isFile) {
