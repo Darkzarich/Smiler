@@ -7,13 +7,14 @@ exports.updateMe = async (req, res) => {
   const { userId } = req.session;
   const update = req.body;
 
-  const user = await User.findByIdAndUpdate(userId, update, {
+  const updatedUser = await User.findByIdAndUpdate(userId, update, {
     runValidators: true,
+    new: true,
   });
 
-  if (!user) {
+  if (!updatedUser) {
     throw new NotFoundError('User is not found');
   }
 
-  sendSuccess(res);
+  sendSuccess(res, updatedUser);
 };

@@ -233,6 +233,19 @@ test.describe('Votes', () => {
   });
 
   test('Upvotes a comment', async ({ SinglePostPage, Comments, Api }) => {
+    Api.routes.comments.updateRate.mock({
+      status: 200,
+      body: {
+        ...comment,
+        // Increases more than the default rate to test using the response data
+        rating: comment.rating + 2,
+        rated: {
+          isRated: true,
+          negative: false,
+        },
+      },
+    });
+
     await SinglePostPage.goto(post.slug);
 
     const upvoteResponse = await Api.routes.comments.updateRate.waitForRequest({
@@ -243,9 +256,25 @@ test.describe('Votes', () => {
       negative: false,
     });
     await expect(await Comments.getIsCommentByIdUpvoted(comment.id)).toBe(true);
+    await expect(Comments.getCommentRatingById(comment.id)).toContainText(
+      String(comment.rating + 2),
+    );
   });
 
   test('Downvotes a comment', async ({ SinglePostPage, Comments, Api }) => {
+    Api.routes.comments.updateRate.mock({
+      status: 200,
+      body: {
+        ...comment,
+        // Decreases more than the default rate to test using the response data
+        rating: comment.rating - 2,
+        rated: {
+          isRated: true,
+          negative: true,
+        },
+      },
+    });
+
     await SinglePostPage.goto(post.slug);
 
     const downvoteResponse =
@@ -261,6 +290,9 @@ test.describe('Votes', () => {
     });
     await expect(await Comments.getIsCommentByIdDownvoted(comment.id)).toBe(
       true,
+    );
+    await expect(Comments.getCommentRatingById(comment.id)).toContainText(
+      String(comment.rating - 2),
     );
   });
 
@@ -283,6 +315,19 @@ test.describe('Votes', () => {
       },
     });
 
+    Api.routes.comments.removeRate.mock({
+      status: 200,
+      body: {
+        ...comment,
+        // Decreases more than the default rate to test using the response data
+        rating: comment.rating - 2,
+        rated: {
+          isRated: false,
+          negative: false,
+        },
+      },
+    });
+
     await SinglePostPage.goto(post.slug);
 
     await expect(await Comments.getIsCommentByIdUpvoted(comment.id)).toBe(true);
@@ -293,6 +338,9 @@ test.describe('Votes', () => {
 
     await expect(await Comments.getIsCommentByIdUpvoted(comment.id)).toBe(
       false,
+    );
+    await expect(Comments.getCommentRatingById(comment.id)).toContainText(
+      String(comment.rating - 2),
     );
   });
 
@@ -315,6 +363,19 @@ test.describe('Votes', () => {
       },
     });
 
+    Api.routes.comments.removeRate.mock({
+      status: 200,
+      body: {
+        ...comment,
+        // Increases more than the default rate to test using the response data
+        rating: comment.rating + 2,
+        rated: {
+          isRated: false,
+          negative: false,
+        },
+      },
+    });
+
     await SinglePostPage.goto(post.slug);
 
     await expect(await Comments.getIsCommentByIdDownvoted(comment.id)).toBe(
@@ -327,6 +388,9 @@ test.describe('Votes', () => {
 
     await expect(await Comments.getIsCommentByIdDownvoted(comment.id)).toBe(
       false,
+    );
+    await expect(Comments.getCommentRatingById(comment.id)).toContainText(
+      String(comment.rating + 2),
     );
   });
 });

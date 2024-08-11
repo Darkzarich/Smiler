@@ -29,15 +29,19 @@ exports.unvoteById = async (req, res) => {
     ? POST_RATE_VALUE
     : -POST_RATE_VALUE;
 
-  await Promise.all([
+  const [updatedPost] = await Promise.all([
+    Post.updateOne(
+      { _id: targetPost.id },
+      { $inc: { rating: rateValue } },
+      { new: true },
+    ),
     User.updateOne({ _id: targetPost.author }, { $inc: { rating: rateValue } }),
-    Post.updateOne({ _id: targetPost.id }, { $inc: { rating: rateValue } }),
-    Rate.deleteOne({ target: targetPost.id }),
     User.updateOne(
       { _id: currentUser.id },
       { $pull: { rates: ratedForCurrentUser.rated._id } },
     ),
+    Rate.deleteOne({ target: targetPost.id }),
   ]);
 
-  sendSuccess(res);
+  sendSuccess(res, updatedPost);
 };

@@ -6,10 +6,9 @@ const { sendSuccess } = require('../../utils/responseUtils');
 exports.getSettings = async (req, res) => {
   const { userId } = req.session;
 
-  const user = await User.findById(userId).populate(
-    'usersFollowed',
-    'login avatar id',
-  );
+  const user = await User.findById(userId)
+    .populate('usersFollowed', 'login avatar id')
+    .lean();
 
   if (!user) {
     throw new NotFoundError('User is not found');

@@ -21,6 +21,10 @@ export default class Post extends AbstractComponent {
     this.page = page;
   }
 
+  getRatingById(id = '') {
+    return this.page.getByTestId(`post-${id}-rating`);
+  }
+
   getTitleById(id) {
     return this.page.getByTestId(`post-${id}-title`);
   }

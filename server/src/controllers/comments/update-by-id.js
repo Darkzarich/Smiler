@@ -15,7 +15,10 @@ exports.updateById = async (req, res) => {
   const { id } = req.params;
   const { body } = req.body;
 
-  const comment = await Comment.findById(id);
+  const comment = await Comment.findOne({
+    _id: id,
+    deleted: false,
+  });
 
   if (!comment) {
     throw new NotFoundError('Comment is not found');
@@ -44,5 +47,5 @@ exports.updateById = async (req, res) => {
 
   await comment.save();
 
-  sendSuccess(res);
+  sendSuccess(res, comment);
 };

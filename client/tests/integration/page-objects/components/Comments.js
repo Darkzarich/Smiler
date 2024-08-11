@@ -14,6 +14,10 @@ export default class Comments extends AbstractComponent {
     );
   }
 
+  getCommentRatingById(commentId = '') {
+    return this.page.getByTestId(`comment-${commentId}-rating`);
+  }
+
   getCommentById(commentId = '') {
     return this.page.getByTestId(`comment-${commentId}-body`);
   }

@@ -8,7 +8,10 @@
     >
       <div class="comment-item__header">
         <template v-if="!commentData.deleted">
-          <div class="comment-item__rating">
+          <div
+            class="comment-item__rating"
+            :data-testid="`comment-${commentData.id}-rating`"
+          >
             {{ commentData.rating }}
           </div>
 
@@ -229,7 +232,7 @@ export default {
       });
 
       if (!res.data.error) {
-        this.commentData.body = this.editBody;
+        this.commentData = res.data;
         this.toggleEdit();
       }
 
@@ -272,6 +275,7 @@ export default {
       this.isRequesting = true;
 
       if (!this.commentData.rated.isRated) {
+        // Optimistic update
         this.commentData.rated.isRated = true;
         this.commentData.rated.negative = false;
         this.commentData.rating =
@@ -281,26 +285,37 @@ export default {
           negative: false,
         });
 
+        this.isRequesting = false;
+
         if (res.data.error) {
           this.commentData.rated.isRated = false;
           this.commentData.rating =
             this.commentData.rating - consts.COMMENT_RATE_VALUE;
+
+          return;
         }
+
+        this.commentData = res.data;
       } else if (this.commentData.rated.negative) {
+        // Optimistic update
         this.commentData.rated.isRated = false;
         this.commentData.rating =
           this.commentData.rating + consts.COMMENT_RATE_VALUE;
 
         const res = await api.comments.removeRate(this.commentData.id);
 
+        this.isRequesting = false;
+
         if (res.data.error) {
           this.commentData.rated.isRated = true;
           this.commentData.rating =
             this.commentData.rating - consts.COMMENT_RATE_VALUE;
-        }
-      }
 
-      this.isRequesting = false;
+          return;
+        }
+
+        this.commentData = res.data;
+      }
     },
     async downvote() {
       if (this.isRequesting) {
@@ -319,11 +334,17 @@ export default {
           negative: true,
         });
 
+        this.isRequesting = false;
+
         if (res.data.error) {
           this.commentData.rated.isRated = false;
           this.commentData.rating =
             this.commentData.rating + consts.COMMENT_RATE_VALUE;
+
+          return;
         }
+
+        this.commentData = res.data;
       } else if (!this.commentData.rated.negative) {
         this.commentData.rated.isRated = false;
         this.commentData.rating =
@@ -331,11 +352,17 @@ export default {
 
         const res = await api.comments.removeRate(this.commentData.id);
 
+        this.isRequesting = false;
+
         if (res.data.error) {
           this.commentData.rated.isRated = true;
           this.commentData.rating =
             this.commentData.rating + consts.COMMENT_RATE_VALUE;
+
+          return;
         }
+
+        this.commentData = res.data;
       }
 
       this.isRequesting = false;

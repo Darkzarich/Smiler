@@ -353,7 +353,14 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -445,7 +452,14 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -478,7 +492,14 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -498,44 +519,10 @@
         "summary": "Get all posts",
         "parameters": [
           {
-            "in": "query",
-            "name": "limit",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 15,
-              "maximum": 15,
-              "minimum": 1
-            },
-            "description": "posts per page"
+            "$ref": "#/components/parameters/post-limit"
           },
           {
-            "in": "query",
-            "name": "sort",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Sorts posts by field `sort`, default descending. `-<sortField>` - ascending sort.",
-            "examples": {
-              "descending": {
-                "summary": "Example of descending sort by field `createdAt`",
-                "value": "-createdAt"
-              },
-              "ascending": {
-                "summary": "Example of ascending sort by field `rating`",
-                "value": "rating"
-              }
-            }
-          },
-          {
-            "in": "query",
-            "name": "offset",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 0
-            },
-            "description": "offset from element"
+            "$ref": "#/components/parameters/post-offset"
           },
           {
             "in": "query",
@@ -605,18 +592,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "posts": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Post"
-                      }
-                    },
-                    "pages": {
-                      "type": "number"
-                    }
-                  }
+                  "$ref": "#/components/schemas/PostList"
                 }
               }
             }
@@ -693,26 +669,10 @@
         "summary": "Get posts",
         "parameters": [
           {
-            "in": "query",
-            "name": "limit",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 15,
-              "maximum": 15,
-              "minimum": 1
-            },
-            "description": "posts per page"
+            "$ref": "#/components/parameters/post-limit"
           },
           {
-            "in": "query",
-            "name": "offset",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 0
-            },
-            "description": "offset from element"
+            "$ref": "#/components/parameters/post-offset"
           }
         ],
         "responses": {
@@ -721,18 +681,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "posts": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Post"
-                      }
-                    },
-                    "pages": {
-                      "type": "number"
-                    }
-                  }
+                  "$ref": "#/components/schemas/PostList"
                 }
               }
             }
@@ -749,26 +698,10 @@
         "summary": "Get today's posts",
         "parameters": [
           {
-            "in": "query",
-            "name": "limit",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 15,
-              "maximum": 15,
-              "minimum": 1
-            },
-            "description": "posts per page"
+            "$ref": "#/components/parameters/post-limit"
           },
           {
-            "in": "query",
-            "name": "offset",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 0
-            },
-            "description": "offset from element"
+            "$ref": "#/components/parameters/post-offset"
           }
         ],
         "responses": {
@@ -777,18 +710,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "posts": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Post"
-                      }
-                    },
-                    "pages": {
-                      "type": "number"
-                    }
-                  }
+                  "$ref": "#/components/schemas/PostList"
                 }
               }
             }
@@ -805,26 +727,10 @@
         "summary": "Get blowing posts",
         "parameters": [
           {
-            "in": "query",
-            "name": "limit",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 15,
-              "maximum": 15,
-              "minimum": 1
-            },
-            "description": "posts per page"
+            "$ref": "#/components/parameters/post-limit"
           },
           {
-            "in": "query",
-            "name": "offset",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 0
-            },
-            "description": "offset from element"
+            "$ref": "#/components/parameters/post-offset"
           }
         ],
         "responses": {
@@ -833,18 +739,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "posts": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Post"
-                      }
-                    },
-                    "pages": {
-                      "type": "number"
-                    }
-                  }
+                  "$ref": "#/components/schemas/PostList"
                 }
               }
             }
@@ -861,26 +756,10 @@
         "summary": "Get recent posts",
         "parameters": [
           {
-            "in": "query",
-            "name": "limit",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 15,
-              "maximum": 15,
-              "minimum": 1
-            },
-            "description": "posts per page"
+            "$ref": "#/components/parameters/post-limit"
           },
           {
-            "in": "query",
-            "name": "offset",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 0
-            },
-            "description": "offset from element"
+            "$ref": "#/components/parameters/post-offset"
           }
         ],
         "responses": {
@@ -889,18 +768,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "posts": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Post"
-                      }
-                    },
-                    "pages": {
-                      "type": "number"
-                    }
-                  }
+                  "$ref": "#/components/schemas/PostList"
                 }
               }
             }
@@ -917,26 +785,10 @@
         "summary": "Get top posts",
         "parameters": [
           {
-            "in": "query",
-            "name": "limit",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 15,
-              "maximum": 15,
-              "minimum": 1
-            },
-            "description": "posts per page"
+            "$ref": "#/components/parameters/post-limit"
           },
           {
-            "in": "query",
-            "name": "offset",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 0
-            },
-            "description": "offset from element"
+            "$ref": "#/components/parameters/post-offset"
           }
         ],
         "responses": {
@@ -945,18 +797,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "posts": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Post"
-                      }
-                    },
-                    "pages": {
-                      "type": "number"
-                    }
-                  }
+                  "$ref": "#/components/schemas/PostList"
                 }
               }
             }
@@ -973,26 +814,10 @@
         "summary": "Get feed",
         "parameters": [
           {
-            "in": "query",
-            "name": "limit",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 15,
-              "maximum": 15,
-              "minimum": 1
-            },
-            "description": "posts per page"
+            "$ref": "#/components/parameters/post-limit"
           },
           {
-            "in": "query",
-            "name": "offset",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "default": 0
-            },
-            "description": "offset from element"
+            "$ref": "#/components/parameters/post-offset"
           }
         ],
         "responses": {
@@ -1001,18 +826,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "posts": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Post"
-                      }
-                    },
-                    "pages": {
-                      "type": "number"
-                    }
-                  }
+                  "$ref": "#/components/schemas/PostList"
                 }
               }
             }
@@ -1073,7 +887,14 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -1215,8 +1036,8 @@
     },
     "/posts/{id}/vote": {
       "put": {
-        "summary": "Change vote on post",
-        "description": "Changes vote for post. `negative` decides direction. You can't rate post again before deleting previous rate",
+        "summary": "Vote for a post",
+        "description": "Changes vote for post. `negative` decides direction. Cannot rate the post again before deleting previous rate",
         "tags": [
           "Posts"
         ],
@@ -1252,7 +1073,14 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -1285,7 +1113,14 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -1433,7 +1268,14 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -1479,25 +1321,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "title": {
-                      "type": "string"
-                    },
-                    "tags": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "sections": {
-                      "description": "Post sections",
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/PostSection"
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/PostTemplate"
                 }
               }
             }
@@ -1560,7 +1384,14 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostTemplate"
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -1882,6 +1713,20 @@
           }
         }
       },
+      "PostList": {
+        "type": "object",
+        "properties": {
+          "posts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Post"
+            }
+          },
+          "pages": {
+            "type": "number"
+          }
+        }
+      },
       "UserRate": {
         "type": "object",
         "properties": {
@@ -2030,6 +1875,26 @@
           }
         }
       },
+      "PostTemplate": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostSection"
+            }
+          }
+        }
+      },
       "Error": {
         "type": "object",
         "properties": {
@@ -2056,6 +1921,30 @@
             "type": "boolean",
             "example": true
           }
+        }
+      }
+    },
+    "parameters": {
+      "post-limit": {
+        "description": "posts per page",
+        "in": "query",
+        "name": "limit",
+        "required": true,
+        "schema": {
+          "type": "number",
+          "default": 15,
+          "maximum": 15,
+          "minimum": 1
+        }
+      },
+      "post-offset": {
+        "description": "offset from element",
+        "in": "query",
+        "name": "offset",
+        "required": true,
+        "schema": {
+          "type": "number",
+          "default": 0
         }
       }
     },
