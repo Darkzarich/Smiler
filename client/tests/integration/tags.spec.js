@@ -1,19 +1,19 @@
 /* eslint-disable no-await-in-loop */
 
 import { expect } from '@playwright/test';
-import generateAuth from './factory/auth';
-import generatePost from './factory/post';
+import createRandomAuth from './factory/auth';
+import createRandomPost from './factory/post';
 import test from './page-objects';
 
 const tags = ['tag1', 'tag2', 'tag3'];
-const post = generatePost({
+const post = createRandomPost({
   tags,
 });
 const tagToClick = tags[0];
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
-    body: generateAuth({
+    body: createRandomAuth({
       isAuth: true,
     }),
   });
@@ -70,7 +70,7 @@ test('Unfollows a tag', async ({
   NotificationList,
 }) => {
   Api.routes.auth.getAuth.mock({
-    body: generateAuth({
+    body: createRandomAuth({
       isAuth: true,
       tagsFollowed: [tagToClick],
     }),
@@ -97,7 +97,7 @@ test('Cannot follow or unfollow a tag if not logged in', async ({
   Api,
 }) => {
   Api.routes.auth.getAuth.mock({
-    body: generateAuth(),
+    body: createRandomAuth(),
   });
 
   await SinglePostPage.goto(post.slug);

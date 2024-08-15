@@ -1,18 +1,18 @@
 /* eslint-disable no-await-in-loop */
 
 import { expect } from '@playwright/test';
-import generateAuth from './factory/auth';
-import generateComment from './factory/comment';
-import generatePost from './factory/post';
-import generateProfile from './factory/profile';
+import createRandomAuth from './factory/auth';
+import createRandomComment from './factory/comment';
+import createRandomPost from './factory/post';
+import createRandomProfile from './factory/profile';
 import test from './page-objects';
 import mockDate from './utils/mock-date';
 
-const post = generatePost();
+const post = createRandomPost();
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
-    body: generateAuth(),
+    body: createRandomAuth(),
   });
 
   Api.routes.posts.getPostBySlug.mock({
@@ -29,7 +29,7 @@ test.beforeEach(async ({ Api }) => {
   Api.routes.comments.getComments.mock({
     body: {
       pages: 0,
-      comments: [generateComment()],
+      comments: [createRandomComment()],
     },
   });
 });
@@ -141,7 +141,7 @@ test('Opens user profile after clicking on the author of the post', async ({
   Api,
 }) => {
   Api.routes.users.getUserProfile.mock({
-    body: generateProfile(),
+    body: createRandomProfile(),
   });
 
   await SinglePostPage.goto(post.slug);
@@ -168,7 +168,7 @@ test.describe('Sections', () => {
       content: 'test',
     };
 
-    const postWithSections = generatePost({
+    const postWithSections = createRandomPost({
       sections: [section],
     });
 
@@ -190,7 +190,7 @@ test.describe('Sections', () => {
       url: 'test',
     };
 
-    const postWithSections = generatePost({
+    const postWithSections = createRandomPost({
       sections: [section],
     });
 
@@ -215,7 +215,7 @@ test.describe('Sections', () => {
       url: 'test',
     };
 
-    const postWithSections = generatePost({
+    const postWithSections = createRandomPost({
       sections: [section],
     });
 
@@ -256,7 +256,7 @@ test.describe('Sections', () => {
       },
     ];
 
-    const postWithSections = generatePost({
+    const postWithSections = createRandomPost({
       sections,
     });
 
@@ -289,7 +289,7 @@ test.describe('Sections', () => {
 test.describe('Post edit', () => {
   test.beforeEach(async ({ Api }) => {
     Api.routes.auth.getAuth.mock({
-      body: generateAuth({
+      body: createRandomAuth({
         isAuth: true,
       }),
     });
@@ -306,7 +306,7 @@ test.describe('Post edit', () => {
     await mockDate(context, dateToMock);
 
     Api.routes.posts.getPostBySlug.mock({
-      body: generatePost({
+      body: createRandomPost({
         createdAt: new Date(
           new Date(dateToMock).getTime() - 1000 * 60 * 11, // 11 mins
         ).toISOString(),
@@ -332,7 +332,7 @@ test.describe('Post edit', () => {
     await mockDate(context, dateToMock);
 
     Api.routes.posts.getPostBySlug.mock({
-      body: generatePost({
+      body: createRandomPost({
         createdAt: new Date(
           new Date(dateToMock).getTime() - 1000 * 60 * 11, // 11 mins
         ).toISOString(),
@@ -361,7 +361,7 @@ test.describe('Post edit', () => {
     await mockDate(context, dateToMock);
 
     Api.routes.posts.getPostBySlug.mock({
-      body: generatePost({
+      body: createRandomPost({
         createdAt: new Date(
           new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
         ).toISOString(),
@@ -395,7 +395,7 @@ test.describe('Post edit', () => {
     await mockDate(context, dateToMock);
 
     Api.routes.posts.getPostBySlug.mock({
-      body: generatePost({
+      body: createRandomPost({
         createdAt: new Date(
           new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
         ).toISOString(),
@@ -432,7 +432,7 @@ test.describe('Post edit', () => {
     await mockDate(context, dateToMock);
 
     Api.routes.posts.getPostBySlug.mock({
-      body: generatePost({
+      body: createRandomPost({
         createdAt: new Date(
           new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
         ).toISOString(),
@@ -483,7 +483,7 @@ test.describe('Post edit', () => {
     await mockDate(context, dateToMock);
 
     Api.routes.posts.getPostBySlug.mock({
-      body: generatePost({
+      body: createRandomPost({
         createdAt: new Date(
           new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
         ).toISOString(),

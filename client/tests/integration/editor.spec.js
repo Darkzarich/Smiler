@@ -2,11 +2,11 @@
 /* eslint-disable no-await-in-loop */
 
 import { expect } from '@playwright/test';
-import generateAuth from './factory/auth';
-import generatePost from './factory/post';
+import createRandomAuth from './factory/auth';
+import createRandomPost from './factory/post';
 import test from './page-objects';
 
-const authUser = generateAuth({
+const authUser = createRandomAuth({
   isAuth: true,
 });
 
@@ -14,7 +14,7 @@ const title = 'Test post';
 const picUrl = 'https://placehold.co/600x400';
 const vidCode = 'dQw4w9WgXcQ';
 
-const createdPost = generatePost();
+const createdPost = createRandomPost();
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.posts.getToday.mock({
@@ -368,7 +368,7 @@ test('Cannot open the editor if the user is not logged in', async ({
   NotificationList,
   PostCreatePage,
 }) => {
-  Api.routes.auth.getAuth.mock({ body: generateAuth() });
+  Api.routes.auth.getAuth.mock({ body: createRandomAuth() });
 
   await PostCreatePage.goto();
 

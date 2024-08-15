@@ -1,12 +1,12 @@
 /* eslint-disable no-await-in-loop */
 
 import { expect } from '@playwright/test';
-import generateAuth from './factory/auth';
+import createRandomAuth from './factory/auth';
 import test from './page-objects';
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
-    body: generateAuth(),
+    body: createRandomAuth(),
   });
 });
 

@@ -1,17 +1,17 @@
 import { expect } from '@playwright/test';
-import generateAuth from './factory/auth';
-import generateProfile from './factory/profile';
+import createRandomAuth from './factory/auth';
+import createRandomProfile from './factory/profile';
 import test from './page-objects';
 
-const testUser = generateAuth({
+const testUser = createRandomAuth({
   isAuth: true,
 });
 
-const author1 = generateProfile({
+const author1 = createRandomProfile({
   id: '1',
   login: 'author1',
 });
-const author2 = generateProfile({
+const author2 = createRandomProfile({
   id: '2',
   login: 'author2',
 });
@@ -48,7 +48,7 @@ test("Only authenticated user can see Settings page, redirect to the today's pos
   NotificationList,
 }) => {
   Api.routes.auth.getAuth.mock({
-    body: generateAuth({
+    body: createRandomAuth({
       isAuth: false,
     }),
   });

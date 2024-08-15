@@ -1,15 +1,15 @@
 /* eslint-disable no-await-in-loop */
 
 import { expect } from '@playwright/test';
-import generateAuth from './factory/auth';
-import generatePost from './factory/post';
+import createRandomAuth from './factory/auth';
+import createRandomPost from './factory/post';
 import test from './page-objects';
 import mockDate from './utils/mock-date';
 
-const post1 = generatePost({
+const post1 = createRandomPost({
   id: '1',
 });
-const post2 = generatePost({
+const post2 = createRandomPost({
   id: '2',
 });
 
@@ -17,7 +17,7 @@ const posts = [post1, post2];
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
-    body: generateAuth(),
+    body: createRandomAuth(),
   });
 
   Api.routes.posts.getToday.mock({
@@ -213,7 +213,7 @@ test.describe('Post groups', () => {
   test.describe('Requires auth', () => {
     test.beforeEach(async ({ PostsPage, Menu, Api }) => {
       Api.routes.auth.getAuth.mock({
-        body: generateAuth({
+        body: createRandomAuth({
           isAuth: true,
         }),
       });
@@ -442,7 +442,7 @@ test.describe('Sections', () => {
       content: 'test',
     };
 
-    const post = generatePost({
+    const post = createRandomPost({
       sections: [section],
     });
 
@@ -467,7 +467,7 @@ test.describe('Sections', () => {
       url: 'test',
     };
 
-    const post = generatePost({
+    const post = createRandomPost({
       sections: [section],
     });
 
@@ -493,7 +493,7 @@ test.describe('Sections', () => {
       url: 'test',
     };
 
-    const post = generatePost({
+    const post = createRandomPost({
       sections: [section],
     });
 
@@ -533,7 +533,7 @@ test.describe('Sections', () => {
       },
     ];
 
-    const post = generatePost({
+    const post = createRandomPost({
       sections,
     });
 

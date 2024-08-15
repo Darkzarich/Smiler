@@ -2,17 +2,17 @@
 /* eslint-disable no-shadow */
 
 import { expect } from '@playwright/test';
-import generateAuth from './factory/auth';
-import generatePost from './factory/post';
-import generateProfile from './factory/profile';
+import createRandomAuth from './factory/auth';
+import createRandomPost from './factory/post';
+import createRandomProfile from './factory/profile';
 import test from './page-objects';
 
-const post = generatePost({
+const post = createRandomPost({
   id: '1',
 });
 
-const testUser = generateProfile();
-const auth = generateAuth();
+const testUser = createRandomProfile();
+const auth = createRandomAuth();
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
@@ -96,7 +96,7 @@ test('Fetches user posts with expected filters', async ({
 test.describe('Follows and unfollow', () => {
   test.beforeEach(async ({ Api }) => {
     Api.routes.auth.getAuth.mock({
-      body: generateAuth({
+      body: createRandomAuth({
         isAuth: true,
         login: `_${testUser.login}`,
       }),
@@ -137,7 +137,7 @@ test.describe('Follows and unfollow', () => {
     Api,
   }) => {
     Api.routes.users.getUserProfile.mock({
-      body: generateProfile({
+      body: createRandomProfile({
         followersAmount: testUser.followersAmount + 1,
         isFollowed: true,
       }),
@@ -158,7 +158,7 @@ test.describe('Follows and unfollow', () => {
 
   test('Cannot follow or unfollow yourself', async ({ ProfilePage, Api }) => {
     Api.routes.auth.getAuth.mock({
-      body: generateAuth({
+      body: createRandomAuth({
         isAuth: true,
       }),
     });

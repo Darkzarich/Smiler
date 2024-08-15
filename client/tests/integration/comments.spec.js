@@ -1,18 +1,18 @@
 /* eslint-disable no-await-in-loop */
 
 import { expect } from '@playwright/test';
-import generateAuth from './factory/auth';
-import generateComment from './factory/comment';
-import generatePost from './factory/post';
+import createRandomAuth from './factory/auth';
+import createRandomComment from './factory/comment';
+import createRandomPost from './factory/post';
 import test from './page-objects';
 import mockDate from './utils/mock-date';
 
-const post = generatePost();
-const comment = generateComment();
+const post = createRandomPost();
+const comment = createRandomComment({}, true);
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
-    body: generateAuth({
+    body: createRandomAuth({
       isAuth: true,
     }),
   });
@@ -65,8 +65,7 @@ test('Shows a deleted comment with different text and no reply button', async ({
   Comments,
   Api,
 }) => {
-  const deletedComment = generateComment({
-    children: [],
+  const deletedComment = createRandomComment({
     deleted: true,
   });
 
@@ -90,15 +89,10 @@ test('Posts a new comment to a post', async ({
   Comments,
   Api,
 }) => {
-  const newCommentId = 'new-comment';
-  const newCommentText = 'new comment';
+  const newComment = createRandomComment();
 
   Api.routes.comments.createComment.mock({
-    body: {
-      body: newCommentText,
-      children: [],
-      id: newCommentId,
-    },
+    body: newComment,
   });
 
   await SinglePostPage.goto(post.slug);
@@ -112,11 +106,11 @@ test('Posts a new comment to a post', async ({
 
   expect(createCommentResponse.postDataJSON()).toEqual({
     post: post.id,
-    body: newCommentText,
+    body: 'new comment',
   });
 
-  await expect(Comments.getCommentById(newCommentId)).toContainText(
-    newCommentText,
+  await expect(Comments.getCommentById(newComment.id)).toContainText(
+    newComment.body,
   );
 });
 
@@ -126,7 +120,7 @@ test('Cannot post comments if not logged in', async ({
   Api,
 }) => {
   Api.routes.auth.getAuth.mock({
-    body: generateAuth(),
+    body: createRandomAuth(),
   });
 
   await SinglePostPage.goto(post.slug);
@@ -143,7 +137,7 @@ test.describe('Replies', () => {
 
   test.beforeEach(async ({ Api }) => {
     Api.routes.auth.getAuth.mock({
-      body: generateAuth({
+      body: createRandomAuth({
         isAuth: true,
       }),
     });
@@ -187,7 +181,7 @@ test.describe('Replies', () => {
     Api,
   }) => {
     Api.routes.auth.getAuth.mock({
-      body: generateAuth(),
+      body: createRandomAuth(),
     });
 
     await SinglePostPage.goto(post.slug);
@@ -305,7 +299,7 @@ test.describe('Votes', () => {
       body: {
         pages: 0,
         comments: [
-          generateComment({
+          createRandomComment({
             rated: {
               isRated: true,
               negative: false,
@@ -353,7 +347,7 @@ test.describe('Votes', () => {
       body: {
         pages: 0,
         comments: [
-          generateComment({
+          createRandomComment({
             rated: {
               isRated: true,
               negative: true,
@@ -404,7 +398,7 @@ test.describe('Editing or deleting a comment', () => {
   }) => {
     const dateToMock = '2024-03-06T00:00:00.000Z';
 
-    const oldComment = generateComment({
+    const oldComment = createRandomComment({
       createdAt: new Date(
         new Date(dateToMock).getTime() - 1000 * 60 * 11, // 11 mins
       ).toISOString(),
@@ -431,7 +425,7 @@ test.describe('Editing or deleting a comment', () => {
     context,
     Api,
   }) => {
-    const noChildrenComment = generateComment({
+    const noChildrenComment = createRandomComment({
       children: [],
     });
 
@@ -535,63 +529,54 @@ test('Formate different dates with relation to the current time correctly', asyn
   await mockDate(context, '2024-06-03T00:00:00Z');
 
   const comments = [
-    generateComment({
+    createRandomComment({
       id: '0',
-      children: [],
       // 7 seconds ago ~ a few seconds ago
       createdAt: '2024-06-02T23:59:53Z',
     }),
-    generateComment({
+    createRandomComment({
       id: '1',
-      children: [],
       // ~35 minutes ago
       createdAt: '2024-06-02T23:24:53Z',
     }),
-    generateComment({
+    createRandomComment({
       id: '2',
-      children: [],
       // ~ an hour ago
       createdAt: '2024-06-02T22:59:53Z',
     }),
-    generateComment({
+    createRandomComment({
       id: '3',
       children: [],
       // ~3 hours ago
       createdAt: '2024-06-02T20:59:53Z',
     }),
-    generateComment({
+    createRandomComment({
       id: '4',
-      children: [],
       // ~ a day ago
       createdAt: '2024-06-01T20:59:53Z',
     }),
-    generateComment({
+    createRandomComment({
       id: '5',
-      children: [],
       // ~ 14 days ago
       createdAt: '2024-05-19T20:59:53Z',
     }),
-    generateComment({
+    createRandomComment({
       id: '6',
-      children: [],
       // ~ a month ago
       createdAt: '2024-04-23T00:00:00Z',
     }),
-    generateComment({
+    createRandomComment({
       id: '7',
-      children: [],
       // ~ 5 months ago
       createdAt: '2023-12-20T00:00:00Z',
     }),
-    generateComment({
+    createRandomComment({
       id: '8',
-      children: [],
       // ~ a year ago
       createdAt: '2022-12-20T00:00:00Z',
     }),
-    generateComment({
+    createRandomComment({
       id: '9',
-      children: [],
       // ~ 2 years ago
       createdAt: '2021-12-20T00:00:00Z',
     }),

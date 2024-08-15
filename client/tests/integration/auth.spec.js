@@ -2,12 +2,12 @@
 /* eslint-disable playwright/no-conditional-in-test */
 
 import { expect } from '@playwright/test';
-import generateAuth from './factory/auth';
+import createRandomAuth from './factory/auth';
 import test from './page-objects';
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
-    body: generateAuth(),
+    body: createRandomAuth(),
   });
 
   Api.routes.posts.getToday.mock({
@@ -42,7 +42,7 @@ test.describe('Auth state', () => {
     CurrentUser,
     Menu,
   }) => {
-    const auth = generateAuth({
+    const auth = createRandomAuth({
       isAuth: true,
     });
 
@@ -70,7 +70,7 @@ test.describe('Auth state', () => {
     AuthForm,
   }) => {
     Api.routes.auth.getAuth.mock({
-      body: generateAuth({
+      body: createRandomAuth({
         isAuth: true,
       }),
     });

@@ -1,24 +1,31 @@
+import { faker } from '@faker-js/faker';
 import cloneDeep from 'lodash/cloneDeep';
 import defaultsDeep from 'lodash/defaultsDeep';
 
-const auth = {
-  isAuth: false,
-  tagsFollowed: ['test-tag', 'test-tag2'],
-  login: 'TestUser',
-  rating: 0,
-  avatar: '',
-  email: 'test@gmail.com',
-  followersAmount: 0,
-};
-
 /**
- * Generates an authentication fixture with optional overrides.
+ * Factory function to create an authentication fixture with optional overrides.
  *
  * @param {object} [overrides] - Object containing properties to override in the new profile object.
  * Defaults to `false`.
- * @returns {object} The newly generated authentication fixture.
+ * @returns {object} The newly created authentication fixture.
  */
-export default function generateAuth(overrides) {
+export default function createRandomAuth(overrides) {
+  const auth = {
+    isAuth: false,
+    tagsFollowed: faker.helpers.arrayElements([
+      'cat',
+      'dog',
+      'bird',
+      'fish',
+      'fox',
+    ]),
+    login: faker.internet.userName(),
+    rating: faker.number.int({ min: 0, max: 5 }),
+    avatar: faker.image.avatar(),
+    email: faker.internet.email(),
+    followersAmount: faker.number.int({ min: 0, max: 100 }),
+  };
+
   const clonedAuth = cloneDeep(auth);
 
   if (!overrides) {

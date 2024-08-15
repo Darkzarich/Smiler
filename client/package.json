@@ -27,6 +27,7 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
     "@playwright/test": "^1.40.1",
     "@types/node": "^20.10.5",
     "@vitejs/plugin-vue2": "^2.2.0",

@@ -1,16 +1,16 @@
 /* eslint-disable no-await-in-loop */
 import { expect } from '@playwright/test';
-import generateAuth from './factory/auth';
-import generatePost from './factory/post';
+import createRandomAuth from './factory/auth';
+import createRandomPost from './factory/post';
 import test from './page-objects';
 
-const post = generatePost({
+const post = createRandomPost({
   id: '1',
 });
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
-    body: generateAuth(),
+    body: createRandomAuth(),
   });
 
   Api.routes.posts.getPosts.mock({
@@ -208,7 +208,7 @@ test('Searches posts by clicking on a tag name and then "Search tag" option in t
     body: {
       pages: 0,
       posts: [
-        generatePost({
+        createRandomPost({
           tags,
         }),
       ],

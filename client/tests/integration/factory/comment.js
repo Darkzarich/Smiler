@@ -1,71 +1,52 @@
+import { faker } from '@faker-js/faker';
 import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
-
-const comment = {
-  body: 'test comment',
-  author: {
-    avatar: '',
-    login: 'TestUser',
-    id: '1',
-  },
-  id: '1',
-  rating: 0,
-  createdAt: '2023-01-01T00:00:00.000Z',
-  rated: {
-    isRated: false,
-    negative: false,
-  },
-  deleted: false,
-  children: [
-    {
-      id: '2',
-      parent: '1',
-      body: 'test comment 2',
-      author: {
-        avatar: '',
-        login: 'TestUser2',
-        id: '2',
-      },
-      rating: 0,
-      createdAt: '2023-01-01T01:00:00.000Z',
-      rated: {
-        isRated: false,
-        negative: false,
-      },
-      deleted: false,
-      children: [
-        {
-          id: '3',
-          parent: '2',
-          body: 'test comment 3',
-          author: {
-            avatar: '',
-            login: 'TestUser3',
-            id: '3',
-          },
-          rating: 0,
-          createdAt: '2023-01-01T02:00:00.000Z',
-          rated: {
-            isRated: false,
-            negative: false,
-          },
-
-          children: [],
-        },
-      ],
-    },
-  ],
-};
+import times from 'lodash/times';
 
 /**
- * Generates a new comment object by merging overrides with the default
- * comment object.
+ * Factory function to create a new comment object with optional overrides.
+ * By default, the comment object will have no children.
  *
  * @param {object} [overrides] - An object containing properties to override
- * in the new comment object.
- * @return {object} The new comment object.
+ * @param {boolean} [withChildren] - Whether to generate child comments for the
+ * in the new comment object. Creates 3 levels tree structure if true.
+ * @return {object} - The newly created comment object.
  */
-export default function generateComment(overrides) {
+export default function createRandomComment(overrides, withChildren = false) {
+  const id = faker.string.uuid();
+
+  const comment = {
+    body: faker.lorem.sentence(),
+    author: {
+      login: faker.internet.userName(),
+      id: faker.string.uuid(),
+      avatar: faker.image.avatar(),
+    },
+    id,
+    rating: faker.number.int({ min: 0, max: 5 }),
+    createdAt: faker.date.past().toISOString(),
+    rated: {
+      isRated: faker.datatype.boolean(),
+      negative: faker.datatype.boolean(),
+    },
+    deleted: faker.datatype.boolean(),
+    children: [],
+  };
+
+  // Generate children comments if needed
+  if (withChildren) {
+    comment.children = times(faker.number.int({ min: 1, max: 3 }), () => {
+      const childrenComment = createRandomComment({ parent: id });
+
+      // Add children to the children comment creating 3 levels tree structure
+      childrenComment.children = [
+        createRandomComment({ parent: childrenComment.id }),
+      ];
+
+      return childrenComment;
+    });
+  }
+
   const clonedComment = cloneDeep(comment);
 
   if (!overrides) {
