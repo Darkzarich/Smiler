@@ -15,7 +15,7 @@
     "prettier": "prettier \"src/**/*.{js,scss,css,html,json,vue}\" --write"
   },
   "dependencies": {
-    "axios": "^1.7.3",
+    "axios": "^1.7.4",
     "core-js": "^3.27.2",
     "date-fns": "^3.6.0",
     "lodash": "^4.17.21",
