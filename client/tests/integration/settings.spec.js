@@ -7,14 +7,8 @@ const testUser = createRandomAuth({
   isAuth: true,
 });
 
-const author1 = createRandomProfile({
-  id: '1',
-  login: 'author1',
-});
-const author2 = createRandomProfile({
-  id: '2',
-  login: 'author2',
-});
+const author1 = createRandomProfile();
+const author2 = createRandomProfile();
 
 const authors = [author1, author2];
 const tags = ['tag1', 'tag2', 'tag3'];
