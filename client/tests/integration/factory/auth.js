@@ -9,28 +9,28 @@ import defaultsDeep from 'lodash/defaultsDeep';
  * Defaults to `false`.
  * @returns {object} The newly created authentication fixture.
  */
-export default function createRandomAuth(overrides) {
-  const auth = {
-    isAuth: false,
-    tagsFollowed: faker.helpers.arrayElements([
-      'cat',
-      'dog',
-      'bird',
-      'fish',
-      'fox',
-    ]),
-    login: faker.internet.userName(),
-    rating: faker.number.int({ min: 0, max: 5 }),
-    avatar: faker.image.avatar(),
-    email: faker.internet.email(),
-    followersAmount: faker.number.int({ min: 0, max: 100 }),
-  };
+export default function createRandomAuth(overrides = {}) {
+  const auth = overrides.isAuth
+    ? {
+        isAuth: true,
+        tagsFollowed: faker.helpers.arrayElements([
+          'cat',
+          'dog',
+          'bird',
+          'fish',
+          'fox',
+        ]),
+        login: faker.internet.userName(),
+        rating: faker.number.int({ min: 0, max: 5 }),
+        avatar: faker.image.avatar(),
+        email: faker.internet.email(),
+        followersAmount: faker.number.int({ min: 0, max: 100 }),
+      }
+    : {
+        isAuth: false,
+      };
 
   const clonedAuth = cloneDeep(auth);
-
-  if (!overrides) {
-    return clonedAuth;
-  }
 
   return defaultsDeep(overrides, clonedAuth);
 }

@@ -7,11 +7,10 @@ import createRandomPost from './factory/post';
 import createRandomProfile from './factory/profile';
 import test from './page-objects';
 
-const post = createRandomPost({
-  id: '1',
-});
+const post = createRandomPost();
 
 const testUser = createRandomProfile();
+
 const auth = createRandomAuth();
 
 test.beforeEach(async ({ Api }) => {
@@ -115,20 +114,31 @@ test.describe('Follows and unfollow', () => {
     });
   });
 
-  test('Follows a different user, followers count increases', async ({
+  test('Follows another user, followers count increases', async ({
     ProfilePage,
+    Post,
     Api,
   }) => {
-    await ProfilePage.goto(testUser.login);
+    const notFollowedUser = createRandomProfile({
+      isFollowed: false,
+    });
+
+    Api.routes.users.getUserProfile.mock({
+      body: notFollowedUser,
+    });
+
+    await ProfilePage.goto(notFollowedUser.login);
+
+    await Post.getTitleById(post.id);
 
     const followResponse = await Api.routes.users.followUser.waitForRequest({
       preRequestAction: ProfilePage.follow.bind(ProfilePage),
     });
 
-    expect(followResponse.url()).toContain(testUser.id);
+    expect(followResponse.url()).toContain(notFollowedUser.id);
     await expect(ProfilePage.unfollowBtn).toBeVisible();
     await expect(ProfilePage.followersCount).toContainText(
-      (testUser.followersAmount + 1).toString(),
+      (notFollowedUser.followersAmount + 1).toString(),
     );
   });
 
@@ -136,14 +146,15 @@ test.describe('Follows and unfollow', () => {
     ProfilePage,
     Api,
   }) => {
-    Api.routes.users.getUserProfile.mock({
-      body: createRandomProfile({
-        followersAmount: testUser.followersAmount + 1,
-        isFollowed: true,
-      }),
+    const followedUser = createRandomProfile({
+      isFollowed: true,
     });
 
-    await ProfilePage.goto(testUser.login);
+    Api.routes.users.getUserProfile.mock({
+      body: followedUser,
+    });
+
+    await ProfilePage.goto(followedUser.login);
 
     const unfollowResponse = await Api.routes.users.unfollowUser.waitForRequest(
       {
@@ -151,15 +162,41 @@ test.describe('Follows and unfollow', () => {
       },
     );
 
-    expect(unfollowResponse.url()).toContain(testUser.id);
+    expect(unfollowResponse.url()).toContain(followedUser.id);
     await expect(ProfilePage.followBtn).toBeVisible();
-    await expect(ProfilePage.followersCount).toContainText('0');
+    await expect(ProfilePage.followersCount).toContainText(
+      (followedUser.followersAmount - 1).toString(),
+    );
   });
 
   test('Cannot follow or unfollow yourself', async ({ ProfilePage, Api }) => {
+    const auth = createRandomAuth({
+      isAuth: true,
+    });
+
+    Api.routes.users.getUserProfile.mock({
+      body: createRandomProfile({
+        login: auth.login,
+      }),
+    });
+
+    Api.routes.auth.getAuth.mock({
+      body: auth,
+    });
+
+    await ProfilePage.goto(testUser.login);
+
+    await expect(ProfilePage.followBtn).toBeHidden();
+    await expect(ProfilePage.unfollowBtn).toBeHidden();
+  });
+
+  test('Cannot follow or unfollow if not logged in', async ({
+    ProfilePage,
+    Api,
+  }) => {
     Api.routes.auth.getAuth.mock({
       body: createRandomAuth({
-        isAuth: true,
+        isAuth: false,
       }),
     });
 

@@ -150,6 +150,7 @@ export default {
     background-repeat: no-repeat;
     content: '';
     filter: grayscale(1);
+    pointer-events: none;
 
     @include for-size(phone-only) {
       display: none;
