@@ -20,7 +20,7 @@ function createPicSection() {
 
 function createVideoSection() {
   return {
-    type: 'video',
+    type: 'vid',
     hash: faker.string.uuid(),
     url: faker.image.url(),
   };
@@ -29,7 +29,7 @@ function createVideoSection() {
 const createSectionFns = {
   text: createTextSection,
   pic: createPicSection,
-  video: createVideoSection,
+  vid: createVideoSection,
 };
 
 /**
@@ -41,7 +41,7 @@ const createSectionFns = {
  */
 export default function createSection(overrides = {}) {
   const type =
-    overrides.type || faker.helpers.arrayElement(['text', 'pic', 'video']);
+    overrides.type || faker.helpers.arrayElement(['text', 'pic', 'vid']);
 
   const clonedSection = cloneDeep(createSectionFns[type]());
 

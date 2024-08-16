@@ -1,18 +1,23 @@
 /* eslint-disable no-await-in-loop */
 
 import { expect } from '@playwright/test';
+import { subMinutes } from 'date-fns';
 import createRandomAuth from './factory/auth';
 import createRandomComment from './factory/comment';
 import createRandomPost from './factory/post';
 import createRandomProfile from './factory/profile';
+import createRandomSection from './factory/section';
 import test from './page-objects';
 import mockDate from './utils/mock-date';
 
+const auth = createRandomAuth({
+  isAuth: true,
+});
 const post = createRandomPost();
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
-    body: createRandomAuth(),
+    body: auth,
   });
 
   Api.routes.posts.getPostBySlug.mock({
@@ -162,11 +167,7 @@ test('Opens user profile after clicking on the author of the post', async ({
 
 test.describe('Sections', () => {
   test('Shows text section', async ({ Api, SinglePostPage, Post }) => {
-    const section = {
-      hash: '1',
-      type: 'text',
-      content: 'test',
-    };
+    const section = createRandomSection({ type: 'text' });
 
     const postWithSections = createRandomPost({
       sections: [section],
@@ -184,11 +185,7 @@ test.describe('Sections', () => {
   });
 
   test('Shows pic section', async ({ Api, SinglePostPage, Post }) => {
-    const section = {
-      hash: '2',
-      type: 'pic',
-      url: 'test',
-    };
+    const section = createRandomSection({ type: 'pic' });
 
     const postWithSections = createRandomPost({
       sections: [section],
@@ -209,11 +206,7 @@ test.describe('Sections', () => {
   });
 
   test('Shows video section', async ({ Api, SinglePostPage, Post }) => {
-    const section = {
-      hash: '3',
-      type: 'vid',
-      url: 'test',
-    };
+    const section = createRandomSection({ type: 'vid' });
 
     const postWithSections = createRandomPost({
       sections: [section],
@@ -239,21 +232,9 @@ test.describe('Sections', () => {
     Post,
   }) => {
     const sections = [
-      {
-        hash: '1',
-        type: 'pic',
-        url: 'test',
-      },
-      {
-        hash: '2',
-        type: 'text',
-        content: 'test text',
-      },
-      {
-        hash: '3',
-        type: 'vid',
-        url: 'test',
-      },
+      createRandomSection({ type: 'pic' }),
+      createRandomSection({ type: 'text' }),
+      createRandomSection({ type: 'vid' }),
     ];
 
     const postWithSections = createRandomPost({
@@ -287,39 +268,49 @@ test.describe('Sections', () => {
 });
 
 test.describe('Post edit', () => {
+  const nowISOString = new Date().toISOString();
+
+  const currentUserNewerPost = createRandomPost({
+    createdAt: subMinutes(nowISOString, 9).toISOString(),
+    author: {
+      login: auth.login,
+    },
+  });
+  currentUserNewerPost.sections = currentUserNewerPost.sections.slice(0, 1);
+
   test.beforeEach(async ({ Api }) => {
-    Api.routes.auth.getAuth.mock({
-      body: createRandomAuth({
-        isAuth: true,
-      }),
+    Api.routes.posts.getPostBySlug.mock({
+      body: currentUserNewerPost,
     });
   });
 
-  test('Cannot edit or delete a post if the post is older than 10 mins', async ({
+  test('The current user cannot edit or delete their post if the post is older than 10 mins', async ({
     SinglePostPage,
     Post,
     context,
     Api,
   }) => {
-    const dateToMock = '2024-03-06T00:00:00.000Z';
+    await mockDate(context, nowISOString);
 
-    await mockDate(context, dateToMock);
-
-    Api.routes.posts.getPostBySlug.mock({
-      body: createRandomPost({
-        createdAt: new Date(
-          new Date(dateToMock).getTime() - 1000 * 60 * 11, // 11 mins
-        ).toISOString(),
-      }),
+    const oldPost = createRandomPost({
+      // Posted 11 minutes ago from now
+      createdAt: subMinutes(nowISOString, 11).toISOString(),
+      author: {
+        login: auth.login,
+      },
     });
 
-    await SinglePostPage.goto(post.slug);
+    Api.routes.posts.getPostBySlug.mock({
+      body: oldPost,
+    });
+
+    await SinglePostPage.goto(oldPost.slug);
 
     await expect(Post.editBtn).toBeHidden();
     await expect(Post.deleteBtn).toBeHidden();
   });
 
-  test('Cannot open edit page for a post if the post is older than 10 mins', async ({
+  test('The current user cannot open post edit page for their post if the post is older than 10 mins', async ({
     SinglePostPage,
     PostsPage,
     NotificationList,
@@ -327,19 +318,21 @@ test.describe('Post edit', () => {
     context,
     Api,
   }) => {
-    const dateToMock = '2024-03-06T00:00:00.000Z';
+    await mockDate(context, nowISOString);
 
-    await mockDate(context, dateToMock);
-
-    Api.routes.posts.getPostBySlug.mock({
-      body: createRandomPost({
-        createdAt: new Date(
-          new Date(dateToMock).getTime() - 1000 * 60 * 11, // 11 mins
-        ).toISOString(),
-      }),
+    const oldPost = createRandomPost({
+      // Posted 11 minutes ago from now
+      createdAt: subMinutes(nowISOString, 11).toISOString(),
+      author: {
+        login: auth.login,
+      },
     });
 
-    await SinglePostPage.gotoEditPage(post.slug);
+    Api.routes.posts.getPostBySlug.mock({
+      body: oldPost,
+    });
+
+    await SinglePostPage.gotoEditPage(oldPost.slug);
 
     await expect(currentPage).toHaveURL(PostsPage.urls.today);
     await expect(currentPage).toHaveTitle(PostsPage.titles.today);
@@ -348,7 +341,7 @@ test.describe('Post edit', () => {
     );
   });
 
-  test('Cannot open edit page for a post if the post author is not the logged in user', async ({
+  test('Cannot open edit page for a post if the post author is not the current user', async ({
     SinglePostPage,
     PostsPage,
     page: currentPage,
@@ -356,20 +349,17 @@ test.describe('Post edit', () => {
     context,
     Api,
   }) => {
-    const dateToMock = '2024-03-06T00:00:00.000Z';
+    await mockDate(context, nowISOString);
 
-    await mockDate(context, dateToMock);
+    const notCurrentUserPost = createRandomPost({
+      createdAt: subMinutes(nowISOString, 9).toISOString(),
+      author: {
+        login: 'not-the-current-user',
+      },
+    });
 
     Api.routes.posts.getPostBySlug.mock({
-      body: createRandomPost({
-        createdAt: new Date(
-          new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
-        ).toISOString(),
-        author: {
-          id: '2',
-          login: 'EditTester',
-        },
-      }),
+      body: notCurrentUserPost,
     });
 
     await SinglePostPage.gotoEditPage(post.slug);
@@ -388,32 +378,23 @@ test.describe('Post edit', () => {
     page: currentPage,
     PostEditor,
     context,
-    Api,
   }) => {
-    const dateToMock = '2024-03-06T00:00:00.000Z';
+    await mockDate(context, nowISOString);
 
-    await mockDate(context, dateToMock);
-
-    Api.routes.posts.getPostBySlug.mock({
-      body: createRandomPost({
-        createdAt: new Date(
-          new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
-        ).toISOString(),
-      }),
-    });
-
-    await SinglePostPage.goto(post.slug);
+    await SinglePostPage.goto(currentUserNewerPost.slug);
 
     await Post.startEditingPost();
 
-    await expect(currentPage).toHaveURL(PostEditPage.getUrlWithSlug(post.slug));
+    await expect(currentPage).toHaveURL(
+      PostEditPage.getUrlWithSlug(currentUserNewerPost.slug),
+    );
     await expect(currentPage).toHaveTitle(PostEditPage.title);
     await expect(PostEditor.textSectionInput).toHaveText(
-      post.sections[0].content,
+      currentUserNewerPost.sections[0].content,
     );
   });
 
-  test('Opens post edit page, edits the post and saves it', async ({
+  test('Opens post edit page, edits the post and saves it if the post is not older than 10 mins', async ({
     page: currentPage,
     SinglePostPage,
     PostEditor,
@@ -421,25 +402,15 @@ test.describe('Post edit', () => {
     context,
     Api,
   }) => {
+    await mockDate(context, nowISOString);
+
     Api.routes.posts.updatePostById.mock({
       body: {
         ok: true,
       },
     });
 
-    const dateToMock = '2024-03-06T00:00:00.000Z';
-
-    await mockDate(context, dateToMock);
-
-    Api.routes.posts.getPostBySlug.mock({
-      body: createRandomPost({
-        createdAt: new Date(
-          new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
-        ).toISOString(),
-      }),
-    });
-
-    await SinglePostPage.gotoEditPage(post.slug);
+    await SinglePostPage.gotoEditPage(currentUserNewerPost.slug);
 
     await PostEditor.typeInTextSection('edited');
 
@@ -448,12 +419,13 @@ test.describe('Post edit', () => {
         preRequestAction: PostEditor.submitEditedPost.bind(PostEditor),
       });
 
-    expect(editPostResponse.url()).toContain(post.id);
+    expect(editPostResponse.url()).toContain(currentUserNewerPost.id);
     expect(editPostResponse.postDataJSON()).toMatchObject({
       sections: [
         {
+          hash: currentUserNewerPost.sections[0].hash,
           type: 'text',
-          content: `edited${post.sections[0].content}`,
+          content: `edited${currentUserNewerPost.sections[0].content}`,
         },
       ],
     });
@@ -461,7 +433,7 @@ test.describe('Post edit', () => {
       'Post has been saved successfully',
     );
     await expect(currentPage).toHaveURL(
-      SinglePostPage.getUrlWithSlug(post.slug),
+      SinglePostPage.getUrlWithSlug(currentUserNewerPost.slug),
     );
   });
 
@@ -478,26 +450,16 @@ test.describe('Post edit', () => {
       status: 200,
     });
 
-    const dateToMock = '2024-03-06T00:00:00.000Z';
+    await mockDate(context, nowISOString);
 
-    await mockDate(context, dateToMock);
-
-    Api.routes.posts.getPostBySlug.mock({
-      body: createRandomPost({
-        createdAt: new Date(
-          new Date(dateToMock).getTime() - 1000 * 60 * 9, // 9 mins
-        ).toISOString(),
-      }),
-    });
-
-    await SinglePostPage.goto(post.slug);
+    await SinglePostPage.goto(currentUserNewerPost.slug);
 
     const deletePostByIdResponse =
       await Api.routes.posts.deletePostById.waitForRequest({
         preRequestAction: Post.deletePost.bind(Post),
       });
 
-    expect(deletePostByIdResponse.url()).toContain(post.id);
+    expect(deletePostByIdResponse.url()).toContain(currentUserNewerPost.id);
     await expect(currentPage).toHaveURL(PostsPage.urls.today);
     await expect(currentPage).toHaveTitle(PostsPage.titles.today);
     await expect(NotificationList.root).toHaveText(

@@ -7,10 +7,17 @@ import test from './page-objects';
 import mockDate from './utils/mock-date';
 
 const post1 = createRandomPost({
-  id: '1',
+  rated: {
+    isRated: false,
+    negative: false,
+  },
 });
+
 const post2 = createRandomPost({
-  id: '2',
+  rated: {
+    isRated: false,
+    negative: false,
+  },
 });
 
 const posts = [post1, post2];

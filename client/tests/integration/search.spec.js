@@ -4,9 +4,7 @@ import createRandomAuth from './factory/auth';
 import createRandomPost from './factory/post';
 import test from './page-objects';
 
-const post = createRandomPost({
-  id: '1',
-});
+const post = createRandomPost();
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
@@ -204,14 +202,14 @@ test('Searches posts by clicking on a tag name and then "Search tag" option in t
 }) => {
   const tags = ['test'];
 
+  const postWithSpecificTags = createRandomPost({
+    tags,
+  });
+
   Api.routes.posts.getAll.mock({
     body: {
       pages: 0,
-      posts: [
-        createRandomPost({
-          tags,
-        }),
-      ],
+      posts: [postWithSpecificTags],
     },
   });
 
@@ -227,7 +225,11 @@ test('Searches posts by clicking on a tag name and then "Search tag" option in t
   });
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
-    preRequestAction: Post.searchTag.bind(Post, post.id, tags[0]),
+    preRequestAction: Post.searchTag.bind(
+      Post,
+      postWithSpecificTags.id,
+      tags[0],
+    ),
   });
 
   expect(postsResponse.url()).toContain(`tags[]=${tags[0]}`);
