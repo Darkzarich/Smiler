@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import cloneDeep from 'lodash/cloneDeep';
-import defaults from 'lodash/defaults';
+import defaultsDeep from 'lodash/defaultsDeep';
 import times from 'lodash/times';
 
 /**
@@ -16,7 +16,7 @@ export default function createRandomComment(overrides, withChildren = false) {
   const id = faker.string.uuid();
 
   const comment = {
-    body: faker.lorem.sentence(),
+    body: faker.lorem.sentence(3),
     author: {
       login: faker.internet.userName(),
       id: faker.string.uuid(),
@@ -29,7 +29,7 @@ export default function createRandomComment(overrides, withChildren = false) {
       isRated: faker.datatype.boolean(),
       negative: faker.datatype.boolean(),
     },
-    deleted: faker.datatype.boolean(),
+    deleted: false,
     children: [],
   };
 
@@ -53,5 +53,5 @@ export default function createRandomComment(overrides, withChildren = false) {
     return clonedComment;
   }
 
-  return defaults(overrides, clonedComment);
+  return defaultsDeep(overrides, clonedComment);
 }

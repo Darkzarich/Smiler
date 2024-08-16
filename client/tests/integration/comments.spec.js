@@ -1,20 +1,22 @@
 /* eslint-disable no-await-in-loop */
 
 import { expect } from '@playwright/test';
+import { subMinutes } from 'date-fns';
 import createRandomAuth from './factory/auth';
 import createRandomComment from './factory/comment';
 import createRandomPost from './factory/post';
 import test from './page-objects';
 import mockDate from './utils/mock-date';
 
+const auth = createRandomAuth({
+  isAuth: true,
+});
 const post = createRandomPost();
 const comment = createRandomComment({}, true);
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
-    body: createRandomAuth({
-      isAuth: true,
-    }),
+    body: auth,
   });
 
   Api.routes.posts.getPostBySlug.mock({
@@ -217,12 +219,16 @@ test.describe('Replies', () => {
 });
 
 test.describe('Votes', () => {
+  const notRatedComment = createRandomComment({
+    rated: { isRated: false, negative: false },
+  });
+
   test.beforeEach(async ({ Api }) => {
-    Api.routes.comments.updateRate.mock({
-      status: 200,
-    });
-    Api.routes.comments.removeRate.mock({
-      status: 200,
+    Api.routes.comments.getComments.mock({
+      body: {
+        pages: 0,
+        comments: [notRatedComment],
+      },
     });
   });
 
@@ -230,9 +236,9 @@ test.describe('Votes', () => {
     Api.routes.comments.updateRate.mock({
       status: 200,
       body: {
-        ...comment,
+        ...notRatedComment,
         // Increases more than the default rate to test using the response data
-        rating: comment.rating + 2,
+        rating: notRatedComment.rating + 2,
         rated: {
           isRated: true,
           negative: false,
@@ -243,25 +249,32 @@ test.describe('Votes', () => {
     await SinglePostPage.goto(post.slug);
 
     const upvoteResponse = await Api.routes.comments.updateRate.waitForRequest({
-      preRequestAction: Comments.upvoteCommentById.bind(Comments, comment.id),
+      preRequestAction: Comments.upvoteCommentById.bind(
+        Comments,
+        notRatedComment.id,
+      ),
     });
 
     expect(upvoteResponse.postDataJSON()).toEqual({
       negative: false,
     });
-    await expect(await Comments.getIsCommentByIdUpvoted(comment.id)).toBe(true);
-    await expect(Comments.getCommentRatingById(comment.id)).toContainText(
-      String(comment.rating + 2),
-    );
+
+    await expect(
+      await Comments.getIsCommentByIdUpvoted(notRatedComment.id),
+    ).toBe(true);
+
+    await expect(
+      Comments.getCommentRatingById(notRatedComment.id),
+    ).toContainText(String(notRatedComment.rating + 2));
   });
 
   test('Downvotes a comment', async ({ SinglePostPage, Comments, Api }) => {
     Api.routes.comments.updateRate.mock({
       status: 200,
       body: {
-        ...comment,
+        ...notRatedComment,
         // Decreases more than the default rate to test using the response data
-        rating: comment.rating - 2,
+        rating: notRatedComment.rating - 2,
         rated: {
           isRated: true,
           negative: true,
@@ -275,19 +288,21 @@ test.describe('Votes', () => {
       await Api.routes.comments.updateRate.waitForRequest({
         preRequestAction: Comments.downvoteCommentById.bind(
           Comments,
-          comment.id,
+          notRatedComment.id,
         ),
       });
 
     expect(downvoteResponse.postDataJSON()).toEqual({
       negative: true,
     });
-    await expect(await Comments.getIsCommentByIdDownvoted(comment.id)).toBe(
-      true,
-    );
-    await expect(Comments.getCommentRatingById(comment.id)).toContainText(
-      String(comment.rating - 2),
-    );
+
+    await expect(
+      await Comments.getIsCommentByIdDownvoted(notRatedComment.id),
+    ).toBe(true);
+
+    await expect(
+      Comments.getCommentRatingById(notRatedComment.id),
+    ).toContainText(String(notRatedComment.rating - 2));
   });
 
   test('Removes a vote from a comment if it was upvoted before', async ({
@@ -295,26 +310,26 @@ test.describe('Votes', () => {
     Comments,
     Api,
   }) => {
+    const ratedComment = createRandomComment({
+      rated: {
+        isRated: true,
+        negative: false,
+      },
+    });
+
     Api.routes.comments.getComments.mock({
       body: {
         pages: 0,
-        comments: [
-          createRandomComment({
-            rated: {
-              isRated: true,
-              negative: false,
-            },
-          }),
-        ],
+        comments: [ratedComment],
       },
     });
 
     Api.routes.comments.removeRate.mock({
       status: 200,
       body: {
-        ...comment,
+        ...ratedComment,
         // Decreases more than the default rate to test using the response data
-        rating: comment.rating - 2,
+        rating: ratedComment.rating - 2,
         rated: {
           isRated: false,
           negative: false,
@@ -324,17 +339,23 @@ test.describe('Votes', () => {
 
     await SinglePostPage.goto(post.slug);
 
-    await expect(await Comments.getIsCommentByIdUpvoted(comment.id)).toBe(true);
+    await expect(await Comments.getIsCommentByIdUpvoted(ratedComment.id)).toBe(
+      true,
+    );
 
     await Api.routes.comments.removeRate.waitForRequest({
-      preRequestAction: Comments.downvoteCommentById.bind(Comments, comment.id),
+      preRequestAction: Comments.downvoteCommentById.bind(
+        Comments,
+        ratedComment.id,
+      ),
     });
 
-    await expect(await Comments.getIsCommentByIdUpvoted(comment.id)).toBe(
+    await expect(await Comments.getIsCommentByIdUpvoted(ratedComment.id)).toBe(
       false,
     );
-    await expect(Comments.getCommentRatingById(comment.id)).toContainText(
-      String(comment.rating - 2),
+
+    await expect(Comments.getCommentRatingById(ratedComment.id)).toContainText(
+      String(ratedComment.rating - 2),
     );
   });
 
@@ -343,26 +364,26 @@ test.describe('Votes', () => {
     Comments,
     Api,
   }) => {
+    const downvotedComment = createRandomComment({
+      rated: {
+        isRated: true,
+        negative: true,
+      },
+    });
+
     Api.routes.comments.getComments.mock({
       body: {
         pages: 0,
-        comments: [
-          createRandomComment({
-            rated: {
-              isRated: true,
-              negative: true,
-            },
-          }),
-        ],
+        comments: [downvotedComment],
       },
     });
 
     Api.routes.comments.removeRate.mock({
       status: 200,
       body: {
-        ...comment,
+        ...downvotedComment,
         // Increases more than the default rate to test using the response data
-        rating: comment.rating + 2,
+        rating: downvotedComment.rating + 2,
         rated: {
           isRated: false,
           negative: false,
@@ -372,39 +393,63 @@ test.describe('Votes', () => {
 
     await SinglePostPage.goto(post.slug);
 
-    await expect(await Comments.getIsCommentByIdDownvoted(comment.id)).toBe(
-      true,
-    );
+    await expect(
+      await Comments.getIsCommentByIdDownvoted(downvotedComment.id),
+    ).toBe(true);
 
     await Api.routes.comments.removeRate.waitForRequest({
-      preRequestAction: Comments.upvoteCommentById.bind(Comments, comment.id),
+      preRequestAction: Comments.upvoteCommentById.bind(
+        Comments,
+        downvotedComment.id,
+      ),
     });
 
-    await expect(await Comments.getIsCommentByIdDownvoted(comment.id)).toBe(
-      false,
-    );
-    await expect(Comments.getCommentRatingById(comment.id)).toContainText(
-      String(comment.rating + 2),
-    );
+    await expect(
+      await Comments.getIsCommentByIdDownvoted(downvotedComment.id),
+    ).toBe(false);
+
+    await expect(
+      Comments.getCommentRatingById(downvotedComment.id),
+    ).toContainText(String(downvotedComment.rating + 2));
   });
 });
 
 test.describe('Editing or deleting a comment', () => {
-  test('Cannot edit or delete a comment if the comment is older than 10 mins', async ({
+  const currentUserComment = createRandomComment(
+    {
+      author: {
+        login: auth.login,
+      },
+    },
+    false,
+  );
+
+  test.beforeEach(({ Api }) => {
+    Api.routes.comments.getComments.mock({
+      body: {
+        pages: 0,
+        comments: [currentUserComment],
+      },
+    });
+  });
+
+  test('The current user cannot edit or delete their comment if the comment is older than 10 mins', async ({
     SinglePostPage,
     Comments,
     context,
     Api,
   }) => {
-    const dateToMock = '2024-03-06T00:00:00.000Z';
+    const nowISOString = new Date().toISOString();
 
     const oldComment = createRandomComment({
-      createdAt: new Date(
-        new Date(dateToMock).getTime() - 1000 * 60 * 11, // 11 mins
-      ).toISOString(),
+      // Posted 11 minutes ago from now
+      createdAt: subMinutes(nowISOString, 11).toISOString(),
+      author: {
+        login: auth.login,
+      },
     });
 
-    mockDate(context, dateToMock);
+    mockDate(context, nowISOString);
 
     Api.routes.comments.getComments.mock({
       body: {
@@ -419,86 +464,121 @@ test.describe('Editing or deleting a comment', () => {
     await expect(Comments.getDeleteBtnById(oldComment.id)).toBeHidden();
   });
 
-  test('Deletes a comment that is not older than 10 mins, sends the delete request', async ({
+  test('The current user cannot edit or delete not their comment even if it is not older than 10 mins', async ({
     SinglePostPage,
     Comments,
     context,
     Api,
   }) => {
-    const noChildrenComment = createRandomComment({
-      children: [],
-    });
+    const notCurrentUserComment = createRandomComment(
+      {
+        author: {
+          login: 'not-current-user',
+        },
+      },
+      false,
+    );
 
     Api.routes.comments.getComments.mock({
       body: {
         pages: 0,
-        comments: [noChildrenComment],
+        comments: [notCurrentUserComment],
       },
     });
 
+    await mockDate(context, notCurrentUserComment.createdAt);
+
+    await SinglePostPage.goto(post.slug);
+
+    await expect(
+      Comments.getEditBtnById(notCurrentUserComment.id),
+    ).toBeHidden();
+    await expect(
+      Comments.getDeleteBtnById(notCurrentUserComment.id),
+    ).toBeHidden();
+  });
+
+  test('The current user deletes a comment that is not older than 10 mins, sends the delete request', async ({
+    SinglePostPage,
+    Comments,
+    context,
+    Api,
+  }) => {
     Api.routes.comments.deleteComment.mock({
       status: 200,
     });
 
-    const dateToMock = new Date(noChildrenComment.createdAt).toISOString();
-
-    await mockDate(context, dateToMock);
+    await mockDate(context, currentUserComment.createdAt);
 
     await SinglePostPage.goto(post.slug);
 
     await Api.routes.comments.deleteComment.waitForRequest({
       preRequestAction: Comments.deleteCommentById.bind(
         Comments,
-        noChildrenComment.id,
+        currentUserComment.id,
       ),
     });
 
-    await expect(Comments.getCommentById(noChildrenComment.id)).toBeHidden();
+    await expect(Comments.getCommentById(currentUserComment.id)).toBeHidden();
   });
 
-  test('Edits a comment that is not older than 10 mins, sends the edit request', async ({
+  test('The current user edits a comment that is not older than 10 mins, sends the edit request', async ({
     SinglePostPage,
     Comments,
     context,
     Api,
   }) => {
-    const editCommentText = 'edited comment';
-
     Api.routes.comments.updateComment.mock({
       status: 200,
     });
 
-    const dateToMock = new Date(comment.createdAt).toISOString();
+    const editCommentText = 'edited comment';
 
-    await mockDate(context, dateToMock);
+    await mockDate(context, currentUserComment.createdAt);
 
     await SinglePostPage.goto(post.slug);
 
-    await Comments.toggleCommentEditById(comment.id);
+    await Comments.toggleCommentEditById(currentUserComment.id);
     await Comments.getCommentEditInput().fill(editCommentText);
 
     const editCommentResponse =
       await Api.routes.comments.updateComment.waitForRequest({
         preRequestAction: Comments.submitEditedComment.bind(
           Comments,
-          comment.id,
+          currentUserComment.id,
         ),
       });
 
     expect(editCommentResponse.postDataJSON()).toEqual({
       body: editCommentText,
     });
-    await expect(Comments.getCommentById(comment.id)).toContainText(
+    await expect(Comments.getCommentById(currentUserComment.id)).toContainText(
       editCommentText,
     );
   });
 
-  test('Deletes a comment that has replies', async ({
+  test('The current user deletes a comment that has replies', async ({
     SinglePostPage,
     Comments,
     context,
     Api,
   }) => {
+    const currentUserCommentWithReplies = createRandomComment(
+      {
+        author: {
+          login: auth.login,
+        },
+      },
+      true,
+    );
+
+    Api.routes.comments.getComments.mock({
+      body: {
+        pages: 0,
+        comments: [currentUserCommentWithReplies],
+      },
+    });
+
     Api.routes.comments.deleteComment.mock({
       status: 200,
       body: {
@@ -506,17 +586,20 @@ test.describe('Editing or deleting a comment', () => {
       },
     });
 
-    const dateToMock = new Date(comment.createdAt).toISOString();
-
-    await mockDate(context, dateToMock);
+    await mockDate(context, currentUserCommentWithReplies.createdAt);
 
     await SinglePostPage.goto(post.slug);
 
-    await Comments.deleteCommentById(comment.id);
+    await Api.routes.comments.deleteComment.waitForRequest({
+      preRequestAction: Comments.deleteCommentById.bind(
+        Comments,
+        currentUserCommentWithReplies.id,
+      ),
+    });
 
-    await expect(Comments.getCommentById(comment.id)).toContainText(
-      'This comment has been deleted',
-    );
+    await expect(
+      Comments.getCommentById(currentUserCommentWithReplies.id),
+    ).toContainText('This comment has been deleted');
   });
 });
 
