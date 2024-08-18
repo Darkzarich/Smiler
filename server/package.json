@@ -7,7 +7,7 @@
     "node": ">=v16.16.0"
   },
   "scripts": {
-    "test": "jest",
+    "test": "jest --maxWorkers 4",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "gen-doc": "npx swagger-jsdoc -d src/swagger/swaggerDef.js -o \"src/swagger/swagger.json\"",

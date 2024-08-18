@@ -26,7 +26,6 @@ module.exports.connectDB = async () => {
       logger.error(error);
     });
 
-
     db.once('disconnected', () => {
       logger.warn(`[pid: ${process.pid}]: Disconnected from MongoDB database`);
     });
