@@ -162,13 +162,13 @@ export default {
     async getData() {
       this.loading = true;
 
-      const res = await api.users.getUserSettings();
+      const { data } = await api.users.getUserSettings();
 
-      if (!res.data.error) {
-        this.usersFollowed = res.data.authors;
-        this.tagsFollowed = res.data.tags;
-        this.bioEditInput = res.data.bio;
-        this.avatarEditInput = res.data.avatar;
+      if (!data.error) {
+        this.usersFollowed = data.authors;
+        this.tagsFollowed = data.tags;
+        this.bioEditInput = data.bio;
+        this.avatarEditInput = data.avatar;
       }
 
       this.loading = false;
