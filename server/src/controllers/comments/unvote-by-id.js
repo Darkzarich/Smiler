@@ -34,10 +34,10 @@ exports.unvoteById = async (req, res) => {
     : -COMMENT_RATE_VALUE;
 
   const [updatedComment] = await Promise.all([
-    Comment.findOneAndUpdate(
-      { _id: targetComment.id },
+    Comment.findByIdAndUpdate(
+      targetComment.id,
       { $inc: { rating: rateValue } },
-      { new: true },
+      { new: true, lean: true },
     ),
     User.updateOne(
       { _id: targetComment.author },

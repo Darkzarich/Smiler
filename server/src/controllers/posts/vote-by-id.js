@@ -39,10 +39,10 @@ exports.voteById = async (req, res) => {
   });
 
   const [updatedPost] = await Promise.all([
-    Post.updateOne(
-      { _id: targetPost.id },
+    Post.findByIdAndUpdate(
+      targetPost.id,
       { $inc: { rating: rateValue } },
-      { new: true },
+      { new: true, lean: true },
     ),
     User.updateOne({ _id: targetPost.author }, { $inc: { rating: rateValue } }),
     User.updateOne({ _id: currentUser.id }, { $push: { rates: newRate.id } }),
