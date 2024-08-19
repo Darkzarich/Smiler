@@ -13,7 +13,7 @@ This is my own pet MEVN (MongoDB, Express, Vue.js, Node.js) site-project similar
 Here is my [public roadmap](https://indecisive-shame-203.notion.site/73381a25f9154f56acf3eb43dcb6e36e?v=1d21a8001b464367963c77605c9ab92a&pvs=4) so you will know anything about what I'm currently working on related to this project and also any my future ideas and fixes I'm planning to release one day :sunglasses:
 
 ### Requirements:
-- Node.js
+- Node.js (>=20.16.0)
 - Docker and Docker Compose (optionally)
 
 ### How to run it:

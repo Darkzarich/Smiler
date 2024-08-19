@@ -36,8 +36,8 @@ services:
       <<: *common-variables
     restart: always
     volumes:
-      - /data/smiler/logs:/usr/src/app/logs
-      - /data/uploads/smiler:/usr/src/app/uploads
+      - /data/smiler/logs:/usr/src/app/logs:rw
+      - /data/uploads/smiler:/usr/src/app/uploads:rw
     networks:
       - app
       - db
@@ -49,7 +49,7 @@ services:
     restart: always
     container_name: smiler-db
     volumes:
-      - /data/smiler/db:/data/db
+      - /data/smiler/db:/data/db:rw
     networks:
       - db
     environment:

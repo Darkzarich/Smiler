@@ -4,7 +4,7 @@
   "description": "Backend module of Smiler project",
   "main": "index.js",
   "engines": {
-    "node": ">=v16.16.0"
+    "node": ">=v20.16.0"
   },
   "scripts": {
     "test": "jest --maxWorkers 4",
