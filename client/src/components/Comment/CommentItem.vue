@@ -295,7 +295,11 @@ export default {
           return;
         }
 
-        this.commentData = res.data;
+        this.commentData = {
+          ...this.commentData,
+          rating: res.data.rating,
+          deleted: res.data.deleted,
+        };
       } else if (this.commentData.rated.negative) {
         // Optimistic update
         this.commentData.rated.isRated = false;
@@ -314,7 +318,11 @@ export default {
           return;
         }
 
-        this.commentData = res.data;
+        this.commentData = {
+          ...this.commentData,
+          rating: res.data.rating,
+          deleted: res.data.deleted,
+        };
       }
     },
     async downvote() {
@@ -344,7 +352,11 @@ export default {
           return;
         }
 
-        this.commentData = res.data;
+        this.commentData = {
+          ...this.commentData,
+          rating: res.data.rating,
+          deleted: res.data.deleted,
+        };
       } else if (!this.commentData.rated.negative) {
         this.commentData.rated.isRated = false;
         this.commentData.rating =
@@ -362,7 +374,11 @@ export default {
           return;
         }
 
-        this.commentData = res.data;
+        this.commentData = {
+          ...this.commentData,
+          rating: res.data.rating,
+          deleted: res.data.deleted,
+        };
       }
 
       this.isRequesting = false;

@@ -305,7 +305,11 @@ export default {
           return;
         }
 
-        this.postData = res.data;
+        this.postData = {
+          ...this.postData,
+          rating: res.data.rating,
+          commentCount: res.data.commentCount,
+        };
       } else if (this.postData.rated.negative) {
         // Optimistic update
         this.postData.rated.isRated = false;
@@ -322,7 +326,11 @@ export default {
           return;
         }
 
-        this.postData = res.data;
+        this.postData = {
+          ...this.postData,
+          rating: res.data.rating,
+          commentCount: res.data.commentCount,
+        };
       }
     },
     async downvote(id) {
@@ -351,7 +359,11 @@ export default {
           return;
         }
 
-        this.postData = res.data;
+        this.postData = {
+          ...this.postData,
+          rating: res.data.rating,
+          commentCount: res.data.commentCount,
+        };
       } else if (!this.postData.rated.negative) {
         // Optimistic update
         this.postData.rated.isRated = false;
@@ -368,7 +380,11 @@ export default {
           return;
         }
 
-        this.postData = res.data;
+        this.postData = {
+          ...this.postData,
+          rating: res.data.rating,
+          commentCount: res.data.commentCount,
+        };
       }
     },
     async deletePost(id) {
