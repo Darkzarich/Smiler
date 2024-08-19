@@ -29,8 +29,7 @@ const combinedFileTransport = new winston.transports.File({
 });
 
 const consoleTransport = new winston.transports.Console({
-  silent: IS_PRODUCTION,
-  level: IS_JEST ? 'error' : 'debug',
+  level: IS_JEST || IS_PRODUCTION ? 'error' : 'debug',
   format: combine(errors({ stack: true }), cli()),
   handleExceptions: true,
 });
