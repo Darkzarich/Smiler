@@ -21,6 +21,12 @@ COPY --from=builder /usr/src/app/dist .
 COPY --from=builder /usr/src/app/change-api-url.sh .
 COPY --from=builder /usr/src/app/nginx.conf /etc/nginx/conf.d/default.conf
 
+USER root
+
+RUN chown -R nginx:nginx /usr/share/nginx/html
+
+USER nginx
+
 # Replace Frontend API URL before running NGNIX
 
 CMD . ./change-api-url.sh && nginx -g "daemon off;"
