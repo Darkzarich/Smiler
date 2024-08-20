@@ -614,8 +614,6 @@ export default {
   }
 
   &__footer {
-    margin-top: 1rem;
-
     @include for-size(phone-only) {
       margin-top: -1rem;
     }
@@ -637,8 +635,14 @@ export default {
     }
   }
 
+  &__date {
+    flex: 1;
+  }
+
   &__comments-count {
+    flex: 1;
     color: var(--color-gray-light);
+    text-align: center;
     text-decoration: none;
 
     /* stylelint-disable-next-line no-descending-specificity */
@@ -654,6 +658,8 @@ export default {
 
   &__author-container {
     display: flex;
+    flex: 1;
+    justify-content: flex-end;
     align-items: center;
     color: var(--color-main-text);
     text-decoration: none;
