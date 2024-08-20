@@ -104,6 +104,11 @@ export default {
 
         const res = await api.posts.uploadAttachment(formData);
 
+        // an error occurred
+        if (!res.data.url) {
+          return;
+        }
+
         this.$emit('input', res.data.url);
         this.$emit('set-section', res.data);
 
