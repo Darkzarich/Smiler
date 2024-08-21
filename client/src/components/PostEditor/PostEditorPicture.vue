@@ -106,6 +106,8 @@ export default {
 
         // an error occurred
         if (!res.data.url) {
+          this.reset();
+
           return;
         }
 
