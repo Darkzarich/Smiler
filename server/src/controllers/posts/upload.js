@@ -85,12 +85,12 @@ exports.upload = async (req, res, next) => {
             `Uploaded image is too large. Max allowed size is ${POST_MAX_UPLOAD_IMAGE_SIZE / 1024 / 1024}MB`,
           ),
         );
-
-        return;
       }
 
       // Some unknown error
       next(error);
+
+      return;
     }
 
     // Getting the path that looks like "/uploads/username/file.jpg"
