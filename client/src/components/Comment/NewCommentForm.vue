@@ -105,11 +105,6 @@ export default {
   padding: 1rem;
   padding-top: 0;
 
-  @include for-size(phone-only) {
-    width: 100%;
-    padding: 0;
-  }
-
   &--disabled {
     padding-top: 1rem;
     border: 1px solid var(--color-gray-light);
