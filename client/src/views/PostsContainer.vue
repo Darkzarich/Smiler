@@ -1,10 +1,6 @@
 <template>
   <div data-testid="posts-container" class="posts-container">
-    <div v-if="loading" class="posts-container__loading">
-      <CircularLoader />
-    </div>
-
-    <div v-else-if="posts.length > 0" v-scroll="handleScroll">
+    <div v-if="posts.length > 0" v-scroll="handleScroll">
       <Post
         v-for="post in posts"
         :key="post.id"
@@ -14,7 +10,11 @@
       />
     </div>
 
-    <div v-else class="posts-container__no-posts" data-testid="no-content">
+    <div
+      v-else-if="!loading"
+      class="posts-container__no-posts"
+      data-testid="no-content"
+    >
       No content found at the moment. <br />
       Please check back later for updates. <br />
       Thank you.
@@ -23,6 +23,10 @@
     <div v-if="isNoMorePosts" class="posts-container__no-more">
       Thank you for exploring all available content in this category. <br />
       Please check back later for more updates.
+    </div>
+
+    <div v-if="loading" class="posts-container__loading">
+      <CircularLoader />
     </div>
   </div>
 </template>

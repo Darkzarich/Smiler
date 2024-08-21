@@ -7,7 +7,7 @@
       v-scroll="handleScroll"
       class="post-container"
     >
-      <!-- TODO: Add instead PostsContainer -->
+      <!-- TODO: Add instead PostsContainer use slots -->
       <div v-for="post in posts" :key="post.id">
         <Post class="post-container__post" :post="post" />
       </div>
