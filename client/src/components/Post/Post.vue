@@ -493,7 +493,7 @@ export default {
   }
 
   &__title-link {
-    color: var(--color-gray-light);
+    color: var(--color-main-text);
     text-decoration: none;
   }
 
@@ -556,17 +556,15 @@ export default {
   }
 
   &__main {
+    @include widget;
+
     width: 90%;
-    padding: 1rem;
-    border: 1px solid var(--color-gray-light);
-    border-radius: 2px;
-    background: var(--color-widget-bg);
     color: var(--color-main-text);
 
     @include for-size(phone-only) {
       width: 100%;
       border: none;
-      border-bottom: 1px solid var(--color-gray-light);
+      border-radius: 0;
     }
   }
 
@@ -598,7 +596,6 @@ export default {
     flex-flow: row nowrap;
     margin-top: 1rem;
     margin-bottom: 1rem;
-    border: 1px solid var(--color-gray-light);
 
     @include for-size(phone-only) {
       width: 110%;
@@ -627,8 +624,9 @@ export default {
     margin: -1rem;
     margin-top: 1rem;
     padding: 0.5rem;
-    border-top: 1px solid var(--color-gray-light);
-    background: var(--color-bg);
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    background: var(--color-header);
 
     @include for-size(phone-only) {
       border-top: none;
@@ -677,7 +675,6 @@ export default {
     width: 1.5rem;
     height: 1.5rem;
     margin-left: 0.5rem;
-    border: 1px solid var(--color-gray-light);
     border-radius: 50%;
   }
 }
