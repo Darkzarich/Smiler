@@ -201,7 +201,7 @@ export default {
     border-bottom: 2px solid transparent;
 
     &:hover {
-      border-bottom: 2px solid var(--color-main-text);
+      color: var(--color-primary);
     }
 
     .nav-link--disabled {
@@ -232,7 +232,6 @@ export default {
     img {
       width: 2.5rem;
       height: 2.5rem;
-      border: 1px solid var(--color-gray-light);
       border-radius: 50%;
       cursor: pointer;
 

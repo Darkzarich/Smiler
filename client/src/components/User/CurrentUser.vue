@@ -72,8 +72,7 @@ export default {
     width: 100%;
     margin: 0 auto;
     padding: 1rem;
-    border-bottom: 1px solid var(--color-gray-light);
-    background: var(--color-bg);
+    background: var(--color-header);
     user-select: none;
 
     @include for-size(phone-only) {
@@ -87,7 +86,6 @@ export default {
 
   &__avatar {
     width: 8rem;
-    border: 1px solid var(--color-gray-light);
     border-radius: 50%;
   }
 
@@ -106,7 +104,6 @@ export default {
     flex-flow: row nowrap;
     justify-content: center;
     padding: 1rem;
-    border-bottom: 1px solid var(--color-gray-light);
   }
 }
 </style>
