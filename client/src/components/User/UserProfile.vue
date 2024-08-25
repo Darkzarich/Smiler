@@ -126,8 +126,7 @@ export default {
   margin-bottom: var(--variable-widget-margin);
   margin-left: 10%;
   padding: 1rem;
-  border: 1px solid var(--color-gray-light);
-  border-radius: 2px;
+  border-radius: 8px;
   background: var(--color-widget-bg);
   color: var(--color-main-text);
 
@@ -135,6 +134,7 @@ export default {
     width: 100%;
     margin-left: 0;
     border: none;
+    border-radius: 0;
   }
 
   &::after {
@@ -164,7 +164,6 @@ export default {
     img {
       width: 7rem;
       height: 7rem;
-      border: 1px solid var(--color-gray-light);
       border-radius: 50%;
     }
   }
