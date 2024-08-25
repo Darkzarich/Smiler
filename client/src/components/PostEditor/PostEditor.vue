@@ -175,6 +175,17 @@ export default {
       return validation;
     },
   },
+  watch: {
+    title() {
+      this.isDirty = true;
+    },
+    tags() {
+      this.isDirty = true;
+    },
+    sections() {
+      this.isDirty = true;
+    },
+  },
   async created() {
     if (this.isEdit) {
       this.sections = this.post.sections;
@@ -188,6 +199,10 @@ export default {
         this.tags = res.data.tags || [];
       }
     }
+
+    this.$nextTick(() => {
+      this.isDirty = false;
+    });
   },
   methods: {
     async createPost() {
@@ -239,19 +254,20 @@ export default {
       });
 
       this.saving = false;
-      this.isDirty = false;
 
       if (!res.data.error) {
+        this.title = res.data.title;
+        this.sections = res.data.sections;
+        this.tags = res.data.tags;
+
         this.$store.dispatch('showInfoNotification', {
           message: 'Draft post has been saved successfully!',
         });
 
-        return;
+        this.$nextTick(() => {
+          this.isDirty = false;
+        });
       }
-
-      this.title = res.data.title;
-      this.sections = res.data.sections;
-      this.tags = res.data.tags;
     },
     async deleteSection(section) {
       if (section.type === this.POST_SECTION_TYPES.PICTURE && section.isFile) {
@@ -263,23 +279,17 @@ export default {
       } else {
         this.sections.splice(this.sections.indexOf(section), 1);
       }
-
-      this.isDirty = true;
     },
     setSection(data) {
       const section = this.sections.find((el) => el.url === data.url);
 
       this.sections[this.sections.indexOf(section)] = data;
-
-      this.isDirty = true;
     },
     createSection(type) {
       this.sections.push({
         type,
         hash: (Math.random() * Math.random()).toString(36),
       });
-
-      this.isDirty = true;
     },
   },
 };
