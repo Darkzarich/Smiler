@@ -15,6 +15,7 @@ exports.deleteById = async (req, res) => {
     author: 1,
     createdAt: 1,
     commentCount: 1,
+    sections: 1,
   });
 
   if (!targetPost) {

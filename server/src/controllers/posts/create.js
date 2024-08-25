@@ -62,14 +62,31 @@ exports.create = async (req, res) => {
 
     // Sum length of text sections and check if it exceeds max total length
     if (section.type === POST_SECTION_TYPES.TEXT) {
+      if (!section.content || !section.content.length) {
+        throw new ValidationError('Text section content is required');
+      }
+
       textContentSumLength += section.content.length;
+
+      if (textContentSumLength > POST_SECTIONS_MAX_LENGTH) {
+        throw new ValidationError(
+          `Text sections sum length exceeded max allowed length of ${POST_SECTIONS_MAX_LENGTH} symbols`,
+        );
+      }
+
       section.content = sanitizeHtml(section.content);
     }
 
-    if (textContentSumLength > POST_SECTIONS_MAX_LENGTH) {
-      throw new ValidationError(
-        `Text sections sum length exceeded max allowed length of ${POST_SECTIONS_MAX_LENGTH} symbols`,
-      );
+    if (section.type === POST_SECTION_TYPES.PICTURE) {
+      if (!section.url) {
+        throw new ValidationError('Image section url is required');
+      }
+    }
+
+    if (section.type === POST_SECTION_TYPES.VIDEO) {
+      if (!section.url) {
+        throw new ValidationError('Video section url is required');
+      }
     }
   }
 
