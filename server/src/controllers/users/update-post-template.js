@@ -40,5 +40,5 @@ exports.updatePostTemplate = async (req, res) => {
 
   await userTemplate.save();
 
-  sendSuccess(res, userTemplate);
+  sendSuccess(res, userTemplate.template);
 };
