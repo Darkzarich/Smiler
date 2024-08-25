@@ -64,8 +64,10 @@ export default {
     border-radius: 8px;
     background: var(--color-bg);
     cursor: pointer;
+    transition: all 200ms ease-out;
 
     svg {
+      transition: all 200ms ease-out;
       fill: var(--color-gray-light);
     }
 

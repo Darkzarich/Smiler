@@ -60,6 +60,7 @@ export default {
   font-size: 13px;
   font-weight: bold;
   cursor: pointer;
+  transition: all 200ms ease-out;
 
   &:hover {
     background: var(--color-widget-bg);

@@ -222,6 +222,7 @@ export default {
 
   width: 100%;
   padding: 1rem;
+  transition: border 200ms ease-out;
 
   @include for-size(phone-only) {
     padding-right: 0;

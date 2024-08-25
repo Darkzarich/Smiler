@@ -199,6 +199,7 @@ export default {
   &__nav-link {
     padding-top: 5px;
     border-bottom: 2px solid transparent;
+    transition: all 200ms ease-out;
 
     &:hover {
       color: var(--color-primary);

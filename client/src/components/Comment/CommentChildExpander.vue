@@ -30,6 +30,7 @@ export default {
   font-family: monospace;
   font-weight: bold;
   cursor: pointer;
+  transition: color 200ms ease-out;
 
   &:hover {
     color: var(--color-primary);

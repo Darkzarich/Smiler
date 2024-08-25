@@ -501,10 +501,12 @@ export default {
   &__rating,
   &__downvote {
     color: var(--color-gray-light);
+    transition: all 200ms ease-out;
 
     svg {
       width: 5rem;
       fill: var(--color-gray-light);
+      transition: all 200ms ease-out;
 
       @include for-size(phone-only) {
         width: 3rem;

@@ -119,6 +119,7 @@ export default {
     border-radius: 8px;
     background: var(--color-bg);
     color: var(--color-main-text);
+    transition: all 200ms ease-out;
 
     &:focus {
       outline: none;

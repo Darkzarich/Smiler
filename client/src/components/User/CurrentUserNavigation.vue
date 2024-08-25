@@ -67,6 +67,7 @@ export default {
     width: 2rem;
     margin-right: 0.5rem;
     fill: var(--color-main-text);
+    transition: all 200ms ease-out;
   }
 
   &__item {
@@ -80,6 +81,7 @@ export default {
     cursor: pointer;
     font-weight: 500;
     line-height: 24px;
+    transition: all 200ms ease-out;
 
     &:last-child {
       border-bottom: none;

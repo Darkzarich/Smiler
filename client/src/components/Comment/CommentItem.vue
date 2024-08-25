@@ -544,6 +544,7 @@ export default {
     cursor: pointer;
     font-weight: bold;
     transition: color 0.2s ease;
+    transition: all 200ms ease-out;
 
     &:hover {
       filter: brightness(120%);
