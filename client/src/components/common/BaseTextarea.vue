@@ -97,7 +97,7 @@ export default {
   &__textarea {
     padding: 0.5rem;
     border: 1px solid var(--color-gray-light);
-    border-radius: 2px;
+    border-radius: 8px;
     background: var(--color-bg);
     color: var(--color-main-text);
 
