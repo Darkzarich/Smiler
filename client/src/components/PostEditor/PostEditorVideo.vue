@@ -96,6 +96,13 @@ export default {
   width: 100%;
   padding: 1rem;
   border: 1px solid var(--color-gray-light);
+  border-radius: 8px;
+
+  @include for-size(phone-only) {
+    border-right: none;
+    border-left: none;
+    border-radius: 0;
+  }
 
   &__upload-btn {
     margin-top: 20px;

@@ -8,7 +8,7 @@
       :error="validation.title"
     />
 
-    <PostEditorTags v-model="tags" />
+    <PostEditorTags v-model="tags" class="post-editor__tags" />
 
     <Draggable
       :list="sections"
@@ -166,6 +166,12 @@ export default {
         validation.title = `Title can't be longer than ${consts.POST_TITLE_MAX_LENGTH} symbols`;
       }
 
+      // sections
+
+      if (!this.sections.length) {
+        validation.sections = 'You should add at least one section';
+      }
+
       return validation;
     },
   },
@@ -288,20 +294,39 @@ export default {
     font-size: 20px;
   }
 
+  &__tags {
+    margin-bottom: 16px;
+  }
+
   &__section {
     @include flex-row;
 
     align-items: center;
     position: relative;
-    margin-top: 16px;
+    margin-bottom: 32px;
     cursor: move;
+
+    .base-text-editor {
+      border: 1px solid var(--color-gray-light);
+      border-radius: 8px;
+
+      @include for-size(phone-only) {
+        border-right: none;
+        border-left: none;
+        border-radius: 0;
+      }
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
 
     &--moving {
       opacity: 0.4;
     }
 
     &--chosen {
-      .text-editor-container,
+      .base-text-editor,
       .post-editor-picture,
       .post-editor-video {
         border: 1px solid var(--color-primary);

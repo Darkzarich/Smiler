@@ -105,7 +105,7 @@ export default {
         const res = await api.posts.uploadAttachment(formData);
 
         // an error occurred
-        if (!res.data.url) {
+        if (!res || !res.data.url) {
           this.reset();
 
           return;
@@ -144,6 +144,13 @@ export default {
   width: 100%;
   padding: 16px;
   border: 1px solid var(--color-gray-light);
+  border-radius: 8px;
+
+  @include for-size(phone-only) {
+    border-right: none;
+    border-left: none;
+    border-radius: 0;
+  }
 
   &--uploaded {
     padding: 0;
