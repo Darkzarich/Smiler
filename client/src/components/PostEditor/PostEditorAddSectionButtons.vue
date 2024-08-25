@@ -56,20 +56,25 @@ export default {
 .post-editor-add-section-buttons {
   display: flex;
   justify-content: center;
+  gap: 16px;
 
   &__button {
-    margin-left: 1rem;
-    padding: 1rem;
-    border: 1px solid var(--color-gray-light);
+    padding: 16px;
+    border: 2px solid var(--color-gray-light);
+    border-radius: 8px;
     background: var(--color-bg);
     cursor: pointer;
 
-    &:hover {
-      background: var(--color-widget-bg);
-    }
-
     svg {
       fill: var(--color-gray-light);
+    }
+
+    &:hover {
+      border: 2px solid var(--color-primary);
+
+      svg {
+        fill: var(--color-primary);
+      }
     }
   }
 }

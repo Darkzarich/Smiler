@@ -148,9 +148,9 @@ export default {
 .comments {
   margin-bottom: 2rem;
   padding: 1rem;
-  border: 1px solid var(--color-gray-light);
 
   @include for-size(phone-only) {
+    padding: 0;
     border: none;
   }
 

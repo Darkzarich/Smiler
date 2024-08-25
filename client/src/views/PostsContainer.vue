@@ -147,6 +147,7 @@ export default {
     @include for-size(phone-only) {
       margin-left: 0% !important;
       border: none !important;
+      border-radius: 0 !important;
     }
   }
 

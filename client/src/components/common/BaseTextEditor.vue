@@ -218,9 +218,10 @@ export default {
 @import '@/styles/mixins';
 
 .base-text-editor {
+  @include widget;
+
   width: 100%;
   padding: 1rem;
-  border: 1px solid var(--color-gray-light);
 
   @include for-size(phone-only) {
     padding-right: 0;
@@ -264,7 +265,7 @@ export default {
     padding: 16px;
     outline: var(--color-primary);
     border: 1px solid var(--color-gray-light);
-    border-radius: 3px;
+    border-radius: 8px;
     background: var(--color-bg);
     color: var(--color-main-text);
     cursor: text;

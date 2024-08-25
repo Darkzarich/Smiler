@@ -125,7 +125,7 @@ h6 {
   margin-left: auto;
 
   &__main {
-    width: 70%;
+    flex: 1;
     margin-right: var(--variable-widget-margin);
 
     @include for-size(phone-only) {
@@ -135,7 +135,7 @@ h6 {
   }
 
   &__sidebar {
-    width: 30%;
+    width: 26%;
 
     @include for-size(phone-only) {
       display: none;

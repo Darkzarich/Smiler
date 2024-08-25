@@ -63,12 +63,18 @@ export default {
   margin-block: 0 0;
   list-style: none;
 
+  &__item-icon {
+    width: 2rem;
+    margin-right: 0.5rem;
+    fill: var(--color-main-text);
+  }
+
   &__item {
     display: flex;
     flex-direction: row;
     align-items: center;
     padding: 1rem;
-    border-bottom: 1px solid var(--color-gray-light);
+    border-left: 2px solid transparent;
     color: var(--color-main-text);
     text-decoration: none;
     cursor: pointer;
@@ -80,14 +86,13 @@ export default {
     }
 
     &:hover {
-      background: var(--color-bg);
-    }
-  }
+      border-left: 2px solid var(--color-primary);
+      color: var(--color-primary);
 
-  &__item-icon {
-    width: 2rem;
-    margin-right: 0.5rem;
-    fill: var(--color-main-text);
+      .current-user-navigation__item-icon {
+        fill: var(--color-primary);
+      }
+    }
   }
 }
 </style>

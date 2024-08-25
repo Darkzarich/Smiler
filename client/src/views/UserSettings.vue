@@ -61,7 +61,7 @@
       </div>
 
       <div class="user-settings__block">
-        <h3 class="user-settings__block-title">Edit Bio</h3>
+        <h3 class="user-settings__block-title">About me</h3>
 
         <BaseTextarea
           v-model="bioEditInput"
@@ -82,7 +82,7 @@
       </div>
 
       <div class="user-settings__block">
-        <h3 class="user-settings__block-title">Edit Avatar</h3>
+        <h3 class="user-settings__block-title">Avatar</h3>
 
         <div class="user-settings__current-avatar">
           <img :src="$resolveAvatar(avatarEditInput)" alt="current avatar" />
@@ -262,6 +262,7 @@ export default {
   @include for-size(phone-only) {
     border-right: none;
     border-left: none;
+    border-radius: 0;
   }
 
   &__loading {
@@ -279,7 +280,6 @@ export default {
 
   &__block {
     padding: 16px 0;
-    border-bottom: 1px solid var(--color-gray-light);
 
     &:last-child {
       border-bottom: none;

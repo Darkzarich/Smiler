@@ -54,7 +54,7 @@ export default {
   padding: 8px;
   outline: none;
   border: 2px solid var(--color-primary);
-  border-radius: 2px;
+  border-radius: 8px;
   background: var(--color-bg);
   color: var(--color-primary);
   font-size: 13px;

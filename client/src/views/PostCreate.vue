@@ -91,6 +91,7 @@ export default {
     padding-right: 0;
     padding-left: 0;
     border: none;
+    border-radius: 0;
   }
 
   &__header {

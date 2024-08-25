@@ -433,6 +433,7 @@ export default {
   &__content {
     margin: 1rem;
     padding: 1rem;
+    border-radius: 8px;
     background: var(--color-widget-bg);
 
     @include for-size(phone-only) {
@@ -469,7 +470,6 @@ export default {
     width: 1rem;
     height: 1rem;
     margin-left: 0.5rem;
-    border: 1px solid var(--color-gray-light);
     border-radius: 50%;
   }
 
