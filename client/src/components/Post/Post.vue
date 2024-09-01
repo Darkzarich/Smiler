@@ -200,9 +200,8 @@
       :show="contextMenuData.show"
       :pos-x="contextMenuData.x"
       :pos-y="contextMenuData.y"
-      :list="contextMenuData.list"
+      :list="contextMenuOptions"
       :target="contextMenuData.target"
-      :filter="contextMenuData.filter"
     />
   </div>
 </template>
@@ -238,45 +237,40 @@ export default {
         x: 0,
         y: 0,
         target: null,
-        list: [
-          {
-            title: 'Search tag',
-            callback: this.searchTag,
-          },
-          {
-            title: 'Follow tag',
-            callback: this.followTag,
-          },
-          {
-            title: 'Unfollow tag',
-            callback: this.unfollowTag,
-          },
-        ],
-        /* filter callback for context menu, 
-        it decides what elements to show under conditions */
-        filter: (item) => {
-          if (item.title === 'Follow tag' || item.title === 'Unfollow tag') {
-            if (!this.isUserAuth) {
-              return false;
-            }
-            const foundTag =
-              this.$store.getters.isTagFollowed[this.contextMenuData.target];
-
-            if (foundTag && item.title === 'Unfollow tag') {
-              return true;
-            }
-            if (item.title === 'Follow tag' && !foundTag) {
-              return true;
-            }
-            return false;
-          }
-          return true;
-        },
       },
     };
   },
   computed: {
     ...mapGetters(['isUserAuth']),
+    contextMenuOptions() {
+      const options = [];
+
+      if (this.$route.name !== 'Search') {
+        options.push({
+          title: 'Search tag',
+          callback: this.searchTag,
+        });
+      }
+
+      if (this.isUserAuth) {
+        const isTargetTagFollowed =
+          this.$store.getters.isTagFollowed[this.contextMenuData.target];
+
+        if (isTargetTagFollowed) {
+          options.push({
+            title: 'Unfollow tag',
+            callback: this.unfollowTag,
+          });
+        } else {
+          options.push({
+            title: 'Follow tag',
+            callback: this.followTag,
+          });
+        }
+      }
+
+      return options;
+    },
   },
   methods: {
     async upvote(id) {
