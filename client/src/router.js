@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import NotFound from './views/NotFound.vue';
 import PostCreate from './views/PostCreate.vue';
-import PostsContainer from './views/PostsContainer.vue';
+import PostsCategory from './views/PostsCategory.vue';
 import Search from './views/Search.vue';
 import SinglePost from './views/SinglePost.vue';
 import UserPage from './views/UserPage.vue';
@@ -41,7 +41,7 @@ const router = new Router({
     {
       path: '/',
       name: 'Home',
-      component: PostsContainer,
+      component: PostsCategory,
       meta: {
         title: 'Today',
       },
@@ -49,7 +49,7 @@ const router = new Router({
     {
       path: '/posts/all',
       name: 'All',
-      component: PostsContainer,
+      component: PostsCategory,
       meta: {
         filters: {
           sort: '-rating',
@@ -59,7 +59,7 @@ const router = new Router({
     },
     {
       path: '/posts/blowing',
-      component: PostsContainer,
+      component: PostsCategory,
       name: 'Blowing',
       meta: {
         title: 'Blowing',
@@ -67,7 +67,7 @@ const router = new Router({
     },
     {
       path: '/posts/top-this-week',
-      component: PostsContainer,
+      component: PostsCategory,
       name: 'TopThisWeek',
       meta: {
         title: 'Top This Week',
@@ -75,7 +75,7 @@ const router = new Router({
     },
     {
       path: '/posts/new',
-      component: PostsContainer,
+      component: PostsCategory,
       name: 'New',
       meta: {
         title: 'Recent',
@@ -83,7 +83,7 @@ const router = new Router({
     },
     {
       path: '/posts/feed',
-      component: PostsContainer,
+      component: PostsCategory,
       name: 'Feed',
       beforeEnter(to, from, next) {
         authGuard(to, from, next);

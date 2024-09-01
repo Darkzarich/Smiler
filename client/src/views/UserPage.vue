@@ -2,43 +2,33 @@
   <div>
     <UserProfile :user="user" />
 
-    <div
-      v-if="!loading || posts.length > 0"
-      v-scroll="handleScroll"
-      class="post-container"
+    <PostsContainer
+      :posts="posts"
+      :is-loading="isLoading"
+      :is-no-more-posts="isNoMorePosts"
+      @load-more="handleNextPage"
     >
-      <!-- TODO: Add instead PostsContainer use slots -->
-      <div v-for="post in posts" :key="post.id">
-        <Post class="post-container__post" :post="post" />
-      </div>
-      <div v-if="posts.length == 0" class="post-container__no-post">
+      <template #no-content>
         This author has not posted anything yet.
-      </div>
-    </div>
+      </template>
 
-    <div v-if="loading" class="post-loading">
-      <CircularLoader />
-    </div>
-
-    <!-- Move to to a component -->
-    <div v-else-if="noMorePost" class="post-container__no-more">
-      You've read all the posts this author had posted!
-    </div>
+      <template #no-more-content>
+        You've read all the posts this author had posted!
+      </template>
+    </PostsContainer>
   </div>
 </template>
 
 <script>
 import api from '@/api';
+import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
 import consts from '@/const/const';
-import Post from '@components/Post/Post.vue';
 import UserProfile from '@components/User/UserProfile.vue';
-import CircularLoader from '@icons/animation/CircularLoader.vue';
 
 export default {
   components: {
-    Post,
     UserProfile,
-    CircularLoader,
+    PostsContainer,
   },
   async beforeRouteEnter(to, from, next) {
     const user = await api.users.getUserProfile(to.params.login);
@@ -60,27 +50,32 @@ export default {
       });
     } else {
       this.setUser(user.data);
-      this.uploadPosts();
+      this.fetchPosts();
     }
   },
   data() {
     return {
       posts: [],
       user: {},
-      loading: false,
+      isLoading: false,
       curPage: 0,
-      noMorePost: false,
+      isNoMorePosts: false,
     };
   },
   async created() {
-    this.uploadPosts();
+    this.fetchPosts();
   },
   methods: {
     setUser(user) {
       this.user = user;
     },
-    async uploadPosts(add) {
-      this.loading = true;
+    /**
+     *
+     * @param {Object} options
+     * @param {boolean=} options.isCombine - if true, posts are concatenated to the existing array
+     */
+    async fetchPosts({ isCombine } = {}) {
+      this.isLoading = true;
 
       const res = await api.posts.search({
         author: this.user.login || this.$route.params.login,
@@ -89,68 +84,26 @@ export default {
       });
 
       if (!res.data.error) {
-        if (add) {
+        if (isCombine) {
           if (res.data.posts.length === 0) {
-            this.noMorePost = true;
+            this.isNoMorePosts = true;
           } else {
             this.posts = this.posts.concat(res.data.posts);
           }
         } else {
           this.posts = res.data.posts;
           if (res.data.pages === 1) {
-            this.noMorePost = true;
+            this.isNoMorePosts = true;
           }
         }
       }
 
-      this.loading = false;
+      this.isLoading = false;
     },
-    handleScroll(evt, el) {
-      if (!this.loading && !this.noMorePost && this.posts.length > 0) {
-        const curContainerBounds = el.getBoundingClientRect();
-        if (
-          curContainerBounds.height - Math.abs(curContainerBounds.y) <
-          window.innerHeight
-        ) {
-          this.curPage = this.curPage + 1;
-          this.uploadPosts(true);
-        }
-      }
+    handleNextPage() {
+      this.curPage = this.curPage + 1;
+      this.fetchPosts({ isCombine: true });
     },
   },
 };
 </script>
-
-<style lang="scss">
-@import '@/styles/mixins';
-
-.post-loading {
-  @include widget;
-  @include flex-row;
-
-  justify-content: center;
-}
-
-.post-container {
-  &__post {
-    margin-bottom: var(--variable-widget-margin);
-  }
-
-  &__no-post,
-  &__no-more {
-    @include widget;
-
-    @include for-size(phone-only) {
-      margin-left: 0% !important;
-      border: none !important;
-    }
-
-    display: flex;
-    justify-content: none;
-    margin-left: 10%;
-    color: var(--color-main-text);
-    text-align: center;
-    font-size: 1.3rem;
-  }
-}
-</style>
