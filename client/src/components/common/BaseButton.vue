@@ -30,7 +30,7 @@ export default {
       default: 'button',
     },
     disabled: {
-      type: [Boolean, String],
+      type: Boolean,
       default: false,
     },
     loading: {

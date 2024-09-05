@@ -150,7 +150,7 @@ export default {
       getUserLogin: (state) => state.user.login,
     }),
     isSubmitDisabled() {
-      return !!(this.validation.title || this.validation.sections);
+      return Boolean(this.validation.title || this.validation.sections);
     },
     validation() {
       const validation = {
