@@ -72,6 +72,8 @@ export default {
 html {
   font-family: Roboto, 'Open Sans', Helvetica, Arial, sans-serif;
   box-sizing: border-box;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
 }
 
 *,
@@ -83,6 +85,7 @@ html {
 body {
   margin: 0;
   background: var(--color-bg);
+  overflow-y: hidden;
 
   &::-webkit-scrollbar {
     width: 4px;
