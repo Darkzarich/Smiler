@@ -38,7 +38,7 @@ exports.getFeed = async (req, res) => {
     ],
   };
 
-  const [posts, count] = await Promise.all([
+  const [posts, total] = await Promise.all([
     Post.find(query)
       .sort('-createdAt')
       .populate('author', 'login avatar')
@@ -50,7 +50,9 @@ exports.getFeed = async (req, res) => {
   const transPosts = posts.map((post) => post.toResponse(user));
 
   sendSuccess(res, {
-    pages: Math.ceil(count / limit),
     posts: transPosts,
+    total,
+    pages: Math.ceil(total / limit),
+    hasNextPage: offset + limit < total,
   });
 };

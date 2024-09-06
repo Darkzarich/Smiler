@@ -55,7 +55,7 @@ exports.getList = async (req, res) => {
     query.author = foundAuthor.id;
   }
 
-  const [comments, currentUser, count] = await Promise.all([
+  const [comments, currentUser, total] = await Promise.all([
     Comment.find(query)
       .sort('-rating')
       .skip(offset)
@@ -67,6 +67,8 @@ exports.getList = async (req, res) => {
 
   sendSuccess(res, {
     comments: fillWithRatedRecursive({ comments, user: currentUser }),
-    pages: Math.ceil(count / limit),
+    total,
+    pages: Math.ceil(total / limit),
+    hasNextPage: offset + limit < total,
   });
 };
