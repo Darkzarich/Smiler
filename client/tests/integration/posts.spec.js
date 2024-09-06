@@ -29,8 +29,10 @@ test.beforeEach(async ({ Api }) => {
 
   Api.routes.posts.getToday.mock({
     body: {
-      pages: 0,
+      pages: 1,
       posts,
+      hasNextPage: false,
+      total: posts.length,
     },
   });
 });
@@ -54,6 +56,8 @@ test('Empty posts lists', async ({ Api, Post, PostsPage }) => {
     body: {
       pages: 0,
       posts: [],
+      hasNextPage: false,
+      total: 0,
     },
   });
 
@@ -85,8 +89,10 @@ test.describe('Post groups', () => {
     }) => {
       Api.routes.posts.getAll.mock({
         body: {
-          pages: 0,
+          pages: 1,
           posts,
+          hasNextPage: false,
+          total: posts.length,
         },
       });
 
@@ -113,8 +119,10 @@ test.describe('Post groups', () => {
     }) => {
       Api.routes.posts.getBlowing.mock({
         body: {
-          pages: 0,
+          pages: 1,
           posts,
+          hasNextPage: false,
+          total: posts.length,
         },
       });
 
@@ -141,8 +149,10 @@ test.describe('Post groups', () => {
     }) => {
       Api.routes.posts.getTopThisWeek.mock({
         body: {
-          pages: 0,
+          pages: 2,
           posts,
+          hasNextPage: false,
+          total: posts.length,
         },
       });
 
@@ -169,8 +179,10 @@ test.describe('Post groups', () => {
     }) => {
       Api.routes.posts.getRecent.mock({
         body: {
-          pages: 0,
+          pages: 1,
           posts,
+          hasNextPage: false,
+          total: posts.length,
         },
       });
 
@@ -227,8 +239,10 @@ test.describe('Post groups', () => {
 
       Api.routes.posts.getFeed.mock({
         body: {
-          pages: 0,
+          pages: 1,
           posts,
+          hasNextPage: false,
+          total: posts.length,
         },
       });
 
@@ -349,7 +363,9 @@ test.describe('Post votes', () => {
   }) => {
     Api.routes.posts.getToday.mock({
       body: {
-        pages: 0,
+        pages: 1,
+        hasNextPage: false,
+        total: 1,
         posts: [
           {
             ...post1,
@@ -398,7 +414,9 @@ test.describe('Post votes', () => {
   }) => {
     Api.routes.posts.getToday.mock({
       body: {
-        pages: 0,
+        pages: 1,
+        hasNextPage: false,
+        total: 1,
         posts: [
           {
             ...post1,
@@ -455,8 +473,10 @@ test.describe('Sections', () => {
 
     Api.routes.posts.getToday.mock({
       body: {
-        pages: 0,
+        pages: 1,
         posts: [post],
+        hasNextPage: false,
+        total: 1,
       },
     });
 
@@ -480,8 +500,10 @@ test.describe('Sections', () => {
 
     Api.routes.posts.getToday.mock({
       body: {
-        pages: 0,
+        pages: 1,
         posts: [post],
+        hasNextPage: false,
+        total: 1,
       },
     });
 
@@ -506,8 +528,10 @@ test.describe('Sections', () => {
 
     Api.routes.posts.getToday.mock({
       body: {
-        pages: 0,
+        pages: 1,
         posts: [post],
+        hasNextPage: false,
+        total: 1,
       },
     });
 
@@ -546,8 +570,10 @@ test.describe('Sections', () => {
 
     Api.routes.posts.getToday.mock({
       body: {
-        pages: 0,
+        pages: 1,
         posts: [post],
+        hasNextPage: false,
+        total: 1,
       },
     });
 

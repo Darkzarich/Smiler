@@ -18,7 +18,7 @@
       <slot name="no-content" />
     </div>
 
-    <div v-if="isNoMorePosts" class="posts-container__no-more">
+    <div v-if="hasNextPage" class="posts-container__no-more">
       <slot name="no-more-content" />
     </div>
 
@@ -46,21 +46,23 @@ export default {
       type: Boolean,
       default: false,
     },
-    isNoMorePosts: {
+    hasNextPage: {
       type: Boolean,
       default: false,
     },
   },
   methods: {
     handleScroll(_, el) {
-      if (!this.isLoading && !this.isNoMorePosts && this.posts.length > 0) {
-        const curContainerBounds = el.getBoundingClientRect();
-        if (
-          curContainerBounds.height - Math.abs(curContainerBounds.y) <
-          window.innerHeight
-        ) {
-          this.$emit('load-more');
-        }
+      if (this.isLoading || !this.hasNextPage) {
+        return;
+      }
+
+      const curContainerBounds = el.getBoundingClientRect();
+      if (
+        curContainerBounds.height - Math.abs(curContainerBounds.y) <
+        window.innerHeight
+      ) {
+        this.$emit('fetch-more');
       }
     },
   },

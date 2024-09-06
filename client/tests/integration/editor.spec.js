@@ -21,6 +21,8 @@ test.beforeEach(async ({ Api }) => {
     body: {
       pages: 0,
       posts: [],
+      hasNextPage: false,
+      total: 0,
     },
   });
 

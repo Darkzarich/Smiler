@@ -241,6 +241,12 @@
                     "pages": {
                       "type": "number",
                       "default": 1
+                    },
+                    "hasNextPage": {
+                      "type": "boolean"
+                    },
+                    "total": {
+                      "type": "number"
                     }
                   }
                 }
@@ -1723,6 +1729,12 @@
             }
           },
           "pages": {
+            "type": "number"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          },
+          "total": {
             "type": "number"
           }
         }

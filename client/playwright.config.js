@@ -28,6 +28,6 @@ module.exports = defineConfig({
   webServer: {
     command: 'npm run build && npm run serve',
     url: BASE_URL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
   },
 });

@@ -20,8 +20,10 @@ test.beforeEach(async ({ Api }) => {
 
   Api.routes.posts.getPosts.mock({
     body: {
-      pages: 0,
+      pages: 1,
       posts: [post],
+      hasNextPage: false,
+      total: 1,
     },
   });
 

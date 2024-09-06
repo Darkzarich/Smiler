@@ -13,8 +13,10 @@ test.beforeEach(async ({ Api }) => {
 
   Api.routes.posts.getPosts.mock({
     body: {
-      pages: 0,
+      pages: 1,
       posts: [post],
+      hasNextPage: false,
+      total: 1,
     },
   });
 });
@@ -208,8 +210,10 @@ test('Searches posts by clicking on a tag name and then "Search tag" option in t
 
   Api.routes.posts.getAll.mock({
     body: {
-      pages: 0,
+      pages: 1,
       posts: [postWithSpecificTags],
+      hasNextPage: false,
+      total: 1,
     },
   });
 
@@ -221,6 +225,8 @@ test('Searches posts by clicking on a tag name and then "Search tag" option in t
     body: {
       pages: 0,
       posts: [],
+      hasNextPage: false,
+      total: 0,
     },
   });
 
@@ -247,6 +253,8 @@ test('Empty posts lists after search', async ({
     body: {
       pages: 0,
       posts: [],
+      hasNextPage: false,
+      total: 0,
     },
   });
 

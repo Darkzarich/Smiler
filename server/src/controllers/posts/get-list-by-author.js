@@ -26,7 +26,7 @@ exports.getListByAuthor = async (req, res) => {
     author: foundAuthor.id,
   };
 
-  const [posts, user, count] = await Promise.all([
+  const [posts, user, total] = await Promise.all([
     Post.find(query)
       .sort({ createdAt: -1 })
       .populate('author', 'login avatar')
@@ -39,7 +39,9 @@ exports.getListByAuthor = async (req, res) => {
   const postsWithRated = posts.map((post) => post.toResponse(user));
 
   sendSuccess(res, {
-    pages: Math.ceil(count / limit),
     posts: postsWithRated,
+    total,
+    pages: Math.ceil(total / limit),
+    hasNextPage: offset + limit < total,
   });
 };

@@ -99,6 +99,12 @@ const authRequiredMiddleware = require('../../middlewares/auth-required');
           },
           "pages": {
             "type": "number"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          },
+          "total": {
+            "type": "number"
           }
         }
       },
