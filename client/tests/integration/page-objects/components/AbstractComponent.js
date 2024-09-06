@@ -1,4 +1,3 @@
-// TODO: Make abstract after moving to TypeScript
 export default class AbstractComponent {
   /**
    * @param {import('@playwright/test').Page} page

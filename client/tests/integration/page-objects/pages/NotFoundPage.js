@@ -1,14 +1,9 @@
-export default class NotFoundPage {
-  title = 'Not Found | Smiler';
+import AbstractPage from './AbstractPage';
+
+export default class NotFoundPage extends AbstractPage {
+  title = AbstractPage.formatTitle('Not Found');
 
   url = '/error/404';
-
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
-  constructor(page) {
-    this.page = page;
-  }
 
   async waitForNotFoundPage() {
     await this.page.waitForURL(this.url);

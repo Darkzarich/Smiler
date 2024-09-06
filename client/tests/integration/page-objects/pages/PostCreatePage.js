@@ -1,15 +1,16 @@
 import { expect } from '@playwright/test';
+import AbstractPage from './AbstractPage';
 
-export default class PostCreatePage {
+export default class PostCreatePage extends AbstractPage {
   url = '/post/create';
 
-  title = 'Edit Post | Smiler';
+  title = AbstractPage.formatTitle('Edit Post');
 
   /**
    * @param {import('@playwright/test').Page} page
    */
   constructor(page) {
-    this.page = page;
+    super(page);
 
     this.header = page.getByTestId('post-create-header');
 

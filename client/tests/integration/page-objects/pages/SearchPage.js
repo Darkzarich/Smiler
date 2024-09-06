@@ -1,5 +1,7 @@
-export default class SearchPage {
-  title = 'Search | Smiler';
+import AbstractPage from './AbstractPage';
+
+export default class SearchPage extends AbstractPage {
+  title = AbstractPage.formatTitle('Search');
 
   url = '/posts/search';
 
@@ -7,7 +9,7 @@ export default class SearchPage {
    * @param {import('@playwright/test').Page} page
    */
   constructor(page) {
-    this.page = page;
+    super(page);
 
     this.searchInput = page.getByTestId('search-form-input');
     this.dateFrom = page.getByTestId('search-form-date-from');

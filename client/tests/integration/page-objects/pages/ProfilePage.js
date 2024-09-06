@@ -1,11 +1,11 @@
-export default class ProfilePage {
-  title = ' | Smiler';
+import AbstractPage from './AbstractPage';
 
+export default class ProfilePage extends AbstractPage {
   /**
    * @param {import('@playwright/test').Page} page
    */
   constructor(page) {
-    this.page = page;
+    super(page);
 
     this.login = page.getByTestId('user-profile-login');
     this.rating = page.getByTestId('user-profile-rating').first();
@@ -17,8 +17,9 @@ export default class ProfilePage {
     this.followBtn = page.getByTestId('user-profile-follow-btn');
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getTitle(login = '') {
-    return `${login}${this.title}`;
+    return AbstractPage.formatTitle(login);
   }
 
   // eslint-disable-next-line class-methods-use-this

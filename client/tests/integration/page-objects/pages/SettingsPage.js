@@ -1,7 +1,9 @@
-export default class SettingsPage {
+import AbstractPage from './AbstractPage';
+
+export default class SettingsPage extends AbstractPage {
   url = '/user/settings';
 
-  title = 'Settings | Smiler';
+  title = AbstractPage.formatTitle('Settings');
 
   avatarPlaceholderUrl = 'https://placehold.co/128x128';
 
@@ -9,7 +11,7 @@ export default class SettingsPage {
    * @param {import('@playwright/test').Page} page
    */
   constructor(page) {
-    this.page = page;
+    super(page);
 
     this.avatarInput = page.getByTestId('user-settings-avatar-input');
     this.avatarSubmitBtn = page.getByTestId('user-settings-avatar-submit');

@@ -1,12 +1,13 @@
-export default class PostsPage {
-  // TODO: Move "| Smiler" part in the base class
+import AbstractPage from './AbstractPage';
+
+export default class PostsPage extends AbstractPage {
   titles = {
-    today: 'Today | Smiler',
-    all: 'All Posts | Smiler',
-    blowing: 'Blowing | Smiler',
-    topThisWeek: 'Top This Week | Smiler',
-    new: 'Recent | Smiler',
-    feed: 'My Feed | Smiler',
+    today: AbstractPage.formatTitle('Today'),
+    all: AbstractPage.formatTitle('All Posts'),
+    blowing: AbstractPage.formatTitle('Blowing'),
+    topThisWeek: AbstractPage.formatTitle('Top This Week'),
+    new: AbstractPage.formatTitle('Recent'),
+    feed: AbstractPage.formatTitle('My Feed'),
   };
 
   urls = {
@@ -31,7 +32,7 @@ export default class PostsPage {
    * @param {import('@playwright/test').Page} page
    */
   constructor(page, isMobile) {
-    this.page = page;
+    super(page);
     this.isMobile = isMobile;
   }
 

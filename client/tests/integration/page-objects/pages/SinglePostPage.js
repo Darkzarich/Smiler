@@ -1,15 +1,9 @@
-export default class SinglePostPage {
-  title = ' | Smiler';
+import AbstractPage from './AbstractPage';
 
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
-  constructor(page) {
-    this.page = page;
-  }
-
+export default class SinglePostPage extends AbstractPage {
+  // eslint-disable-next-line class-methods-use-this
   getTitle(title = '') {
-    return `${title}${this.title}`;
+    return AbstractPage.formatTitle(title);
   }
 
   // eslint-disable-next-line class-methods-use-this

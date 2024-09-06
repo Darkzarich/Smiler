@@ -1,12 +1,7 @@
-export default class PostEditPage {
-  title = 'Edit Post | Smiler';
+import AbstractPage from './AbstractPage';
 
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
-  constructor(page) {
-    this.page = page;
-  }
+export default class PostEditPage extends AbstractPage {
+  title = AbstractPage.formatTitle('Edit Post');
 
   // eslint-disable-next-line class-methods-use-this
   getUrlWithSlug(slug = '') {
