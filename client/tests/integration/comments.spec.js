@@ -25,8 +25,10 @@ test.beforeEach(async ({ Api }) => {
 
   Api.routes.comments.getComments.mock({
     body: {
-      pages: 0,
+      pages: 1,
       comments: [comment],
+      hasNextPage: false,
+      total: 1,
     },
   });
 });
@@ -73,8 +75,10 @@ test('Shows a deleted comment with different text and no reply button', async ({
 
   Api.routes.comments.getComments.mock({
     body: {
-      pages: 0,
+      pages: 1,
       comments: [deletedComment],
+      hasNextPage: false,
+      total: 1,
     },
   });
 
@@ -226,8 +230,10 @@ test.describe('Votes', () => {
   test.beforeEach(async ({ Api }) => {
     Api.routes.comments.getComments.mock({
       body: {
-        pages: 0,
+        pages: 1,
         comments: [notRatedComment],
+        hasNextPage: false,
+        total: 1,
       },
     });
   });
@@ -319,8 +325,10 @@ test.describe('Votes', () => {
 
     Api.routes.comments.getComments.mock({
       body: {
-        pages: 0,
+        pages: 1,
         comments: [ratedComment],
+        hasNextPage: false,
+        total: 1,
       },
     });
 
@@ -373,8 +381,10 @@ test.describe('Votes', () => {
 
     Api.routes.comments.getComments.mock({
       body: {
-        pages: 0,
+        pages: 1,
         comments: [downvotedComment],
+        hasNextPage: false,
+        total: 1,
       },
     });
 
@@ -427,8 +437,10 @@ test.describe('Editing or deleting a comment', () => {
   test.beforeEach(({ Api }) => {
     Api.routes.comments.getComments.mock({
       body: {
-        pages: 0,
+        pages: 1,
         comments: [currentUserComment],
+        hasNextPage: false,
+        total: 1,
       },
     });
   });
@@ -453,8 +465,10 @@ test.describe('Editing or deleting a comment', () => {
 
     Api.routes.comments.getComments.mock({
       body: {
-        pages: 0,
+        pages: 1,
         comments: [oldComment],
+        hasNextPage: false,
+        total: 1,
       },
     });
 
@@ -481,8 +495,10 @@ test.describe('Editing or deleting a comment', () => {
 
     Api.routes.comments.getComments.mock({
       body: {
-        pages: 0,
+        pages: 1,
         comments: [notCurrentUserComment],
+        hasNextPage: false,
+        total: 1,
       },
     });
 
@@ -667,8 +683,10 @@ test('Formate different dates with relation to the current time correctly', asyn
 
   Api.routes.comments.getComments.mock({
     body: {
-      pages: 0,
+      pages: 1,
       comments,
+      hasNextPage: false,
+      total: comments.length,
     },
   });
 

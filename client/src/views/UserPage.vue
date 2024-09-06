@@ -5,8 +5,8 @@
     <PostsContainer
       :posts="posts"
       :is-loading="isLoading"
-      :is-no-more-posts="isNoMorePosts"
-      @load-more="handleNextPage"
+      :has-next-page="hasNextPage"
+      @fetch-more="handleNextPage"
     >
       <template #no-content>
         This author has not posted anything yet.
@@ -59,7 +59,7 @@ export default {
       user: {},
       isLoading: false,
       curPage: 0,
-      isNoMorePosts: false,
+      hasNextPage: false,
     };
   },
   async created() {
@@ -80,21 +80,16 @@ export default {
       const res = await api.posts.search({
         author: this.user.login || this.$route.params.login,
         limit: consts.POSTS_INITIAL_COUNT,
-        offset: 0 + this.curPage * consts.POSTS_INITIAL_COUNT,
+        offset: this.curPage * consts.POSTS_INITIAL_COUNT,
       });
 
-      if (!res.data.error) {
+      if (res && !res.data.error) {
+        this.hasNextPage = res.data.hasNextPage;
+
         if (isCombine) {
-          if (res.data.posts.length === 0) {
-            this.isNoMorePosts = true;
-          } else {
-            this.posts = this.posts.concat(res.data.posts);
-          }
+          this.posts = this.posts.concat(res.data.posts);
         } else {
           this.posts = res.data.posts;
-          if (res.data.pages === 1) {
-            this.isNoMorePosts = true;
-          }
         }
       }
 

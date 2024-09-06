@@ -1,18 +1,18 @@
 <template>
   <div>
     <div class="post-container">
-      <Post v-if="showPost" :post="post" :can-edit="$postCanEdit(post)" />
+      <Post v-if="post" :post="post" :can-edit="$postCanEdit(post)" />
     </div>
 
     <div id="comments" ref="comments" class="comments">
       <NewCommentForm
-        v-if="!commentsLoading"
+        v-if="!isFetchingComments"
         :post-id="post.id"
-        @new-comment="handleNewComment"
+        @new-comment="handleAddNewComment"
       />
 
       <CommentList
-        v-if="!commentsLoading && comments.length > 0"
+        v-if="!isFetchingComments && comments.length > 0"
         :data="comments"
         :indent-level="1"
         :post-id="post.id"
@@ -20,8 +20,8 @@
         :is-first="true"
       />
 
-      <div v-else-if="!commentsLoading" class="comments__no-comments">
-        There are no comments yet... Be the first!
+      <div v-else-if="!isFetchingComments" class="comments__no-comments">
+        "It’s quiet here — be the first to leave a comment!"
       </div>
 
       <div v-else class="comments__loading">
@@ -30,18 +30,18 @@
     </div>
 
     <div
-      v-if="comments.length > 0 && curPage !== maxPages"
-      class="comments__load-more"
-      @click="loadMoreComments()"
+      v-if="!isFetchingComments && hasCommentsNextPage"
+      class="comments__fetch-more"
+      @click="fetchMoreComments()"
     >
-      <template v-if="moreCommentsLoading">
+      <template v-if="isFetchingComments">
         <CircularLoader />
       </template>
       <template v-else> Click here to see more comments </template>
     </div>
 
     <div
-      v-if="comments.length > 0 && curPage === maxPages"
+      v-if="comments.length > 0 && !hasCommentsNextPage"
       class="comments__no-more"
     >
       You've read all the comments. Now it's your turn to share your thoughts!
@@ -73,18 +73,16 @@ export default {
         name: 'NotFound',
       });
     } else {
-      next((vm) => vm.setPost(post.data));
+      next((vm) => vm.handleSetPost(post.data));
     }
   },
   data() {
     return {
-      post: {},
-      showPost: false,
+      post: null,
       comments: [],
-      commentsLoading: true,
-      moreCommentsLoading: false,
-      curPage: 1,
-      maxPages: 1,
+      isFetchingComments: true,
+      commentsCurrentPage: 0,
+      hasCommentsNextPage: false,
     };
   },
   computed: {
@@ -93,44 +91,48 @@ export default {
     }),
   },
   methods: {
-    async setPost(post) {
+    async handleSetPost(post) {
       this.post = post;
-      // TODO: Remove this logic
-      this.showPost = true;
+
       window.document.title = `${this.post.title} | Smiler`;
 
       // comments
 
-      this.commentsLoading = true;
-
       // TODO: Come up with a way to track new comments user didn't see yet
       // e.g. save in store seen comments and then check if each comment is in there
-      const res = await api.comments.getComments({
-        limit: consts.COMMENTS_INITIAL_COUNT,
-        post: post.id,
-      });
-
-      this.comments = res.data.comments;
-      this.maxPages = res.data.pages;
-      this.commentsLoading = false;
+      this.fetchComments();
     },
-    async loadMoreComments() {
-      this.moreCommentsLoading = true;
+    /**
+     *
+     * @param {Object} options
+     * @param {boolean=} options.isCombine - if true, posts are concatenated to the existing array
+     */
+    async fetchComments({ isCombine } = {}) {
+      this.isFetchingComments = true;
 
       const res = await api.comments.getComments({
         limit: consts.COMMENTS_INITIAL_COUNT,
         post: this.post.id,
-        offset: 0 + this.curPage * consts.COMMENTS_INITIAL_COUNT,
+        offset: 0 + this.commentsCurrentPage * consts.COMMENTS_INITIAL_COUNT,
       });
 
-      if (!res.data.error) {
-        this.comments = this.comments.concat(res.data.comments);
-        this.curPage = this.curPage + 1;
+      if (res && !res.data.error) {
+        this.hasCommentsNextPage = res.data.hasNextPage;
+
+        if (isCombine) {
+          this.comments = this.comments.concat(res.data.comments);
+        } else {
+          this.comments = res.data.comments;
+        }
       }
 
-      this.moreCommentsLoading = false;
+      this.isFetchingComments = false;
     },
-    handleNewComment(newComment) {
+    async fetchMoreComments() {
+      this.commentsCurrentPage = this.commentsCurrentPage + 1;
+      this.fetchComments({ isCombine: true });
+    },
+    handleAddNewComment(newComment) {
       this.post.commentCount = this.post.commentCount + 1;
       this.comments.unshift(newComment);
     },
@@ -168,7 +170,7 @@ export default {
     font-size: 1.2rem;
   }
 
-  &__load-more,
+  &__fetch-more,
   &__no-more {
     margin-top: 0.5rem;
     color: var(--color-main-text);
@@ -178,7 +180,7 @@ export default {
     @include widget;
   }
 
-  &__load-more {
+  &__fetch-more {
     cursor: pointer;
   }
 }
