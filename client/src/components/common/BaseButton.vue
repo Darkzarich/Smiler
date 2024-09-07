@@ -4,6 +4,7 @@
     type="button"
     class="base-button"
     :class="{
+      [`base-button--${type}`]: Boolean(type),
       'base-button--stretched': stretched,
       'base-button--loading': loading,
     }"
@@ -29,6 +30,13 @@ export default {
       type: String,
       default: 'button',
     },
+    type: {
+      type: String,
+      default: 'primary',
+      validator(val) {
+        return ['primary', 'danger'].indexOf(val) !== -1;
+      },
+    },
     disabled: {
       type: Boolean,
       default: false,
@@ -53,10 +61,9 @@ export default {
   justify-content: center;
   padding: 8px;
   outline: none;
-  border: 2px solid var(--color-primary);
+  border: 2px solid transparent;
   border-radius: 8px;
   background: var(--color-bg);
-  color: var(--color-primary);
   font-size: 13px;
   font-weight: bold;
   cursor: pointer;
@@ -72,9 +79,26 @@ export default {
     pointer-events: none;
   }
 
+  &--primary {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+
+    &.base-button--loading {
+      border-color: rgb(var(--color-primary) 0.5);
+    }
+  }
+
+  &--danger {
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+
+    &.base-button--loading {
+      border-color: rgb(var(--color-danger) 0.5);
+    }
+  }
+
   &--loading {
     opacity: 0.5;
-    border: 2px solid rgb(var(--color-primary) 0.5);
     pointer-events: none;
     user-select: none;
   }

@@ -15,6 +15,7 @@
             isFollowed ? 'user-profile-unfollow-btn' : 'user-profile-follow-btn'
           "
           :loading="requesting"
+          :type="isFollowed ? 'danger' : 'primary'"
           @click.native="handleFollow"
         >
           {{ isFollowed ? 'Unfollow' : 'Follow' }}
@@ -175,8 +176,8 @@ export default {
     font-size: 1.5rem;
   }
 
-  // TODO Make red button for unfollow, make it as BaseButton type
   &__follow-btn {
+    z-index: 1;
     width: 100px;
     margin-left: 1rem;
     font-size: 13px;
