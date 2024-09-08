@@ -1,9 +1,8 @@
 <template>
-  <div class="signup-form">
+  <form class="signup-form" @submit="signUp">
     <div class="signup-form__header" data-testid="signup-form">Sign Up</div>
 
     <div class="signup-form__input">
-      <!-- TODO: Wrap everything in form and catch enter then enter-callback won't be needed -->
       <BaseInput
         v-model="email"
         data-testid="signup-form-email"
@@ -11,7 +10,6 @@
         name="email"
         placeholder="Enter email"
         :error="validation.email"
-        @keyup:enter="signUp"
       />
     </div>
 
@@ -23,7 +21,6 @@
         name="login"
         placeholder="Enter login"
         :error="validation.login"
-        @keyup:enter="signUp"
       />
     </div>
 
@@ -36,7 +33,6 @@
         name="password"
         :error="validation.password"
         placeholder="Enter password"
-        @keyup:enter="signUp"
       />
     </div>
 
@@ -49,21 +45,21 @@
         name="confirm"
         :error="validation.confirm"
         placeholder="Enter password again"
-        @keyup:enter="signUp"
       />
     </div>
 
     <BaseButton
+      attr-type="submit"
       class="signup-form__submit"
       stretched
       data-testid="signup-form-submit"
-      :loading="loading"
+      :loading="isLoading"
       :disabled="isSubmitDisabled"
       @click.native="signUp"
     >
       FINISH
     </BaseButton>
-  </div>
+  </form>
 </template>
 
 <script>
@@ -83,17 +79,17 @@ export default {
       login: '',
       password: '',
       confirm: '',
-      loading: false,
+      isLoading: false,
       requestError: '',
     };
   },
   computed: {
     isSubmitDisabled() {
-      return !!(
+      return Boolean(
         this.validation.email ||
-        this.validation.password ||
-        this.validation.confirm ||
-        this.validation.login
+          this.validation.password ||
+          this.validation.confirm ||
+          this.validation.login,
       );
     },
     validation() {
@@ -152,8 +148,14 @@ export default {
     },
   },
   methods: {
-    async signUp() {
-      this.loading = true;
+    async signUp(e) {
+      e.preventDefault();
+
+      if (this.isSubmitDisabled || this.isLoading) {
+        return;
+      }
+
+      this.isLoading = true;
 
       const res = await api.auth.signUp({
         email: this.email,
@@ -162,7 +164,7 @@ export default {
         confirm: this.confirm,
       });
 
-      this.loading = false;
+      this.isLoading = false;
 
       if (res.data.error) {
         this.email = '';

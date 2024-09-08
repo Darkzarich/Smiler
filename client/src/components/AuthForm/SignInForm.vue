@@ -1,5 +1,5 @@
 <template>
-  <div class="signin-form">
+  <form class="signin-form">
     <div class="signin-form__header" data-testid="signin-form">Sign In</div>
 
     <div class="signin-form__input">
@@ -10,7 +10,6 @@
         name="email"
         placeholder="Enter email"
         :error="validation.email"
-        @keyup:enter="signIn"
       />
     </div>
 
@@ -23,21 +22,21 @@
         name="password"
         :error="validation.password"
         placeholder="Enter password"
-        @keyup:enter="signIn"
       />
     </div>
 
     <BaseButton
+      attr-type="submit"
       class="signin-form__submit"
       stretched
       data-testid="signin-form-submit"
-      :loading="loading"
+      :loading="isLoading"
       :disabled="isSubmitDisabled"
       @click.native="signIn"
     >
       SIGN IN
     </BaseButton>
-  </div>
+  </form>
 </template>
 
 <script>
@@ -55,7 +54,7 @@ export default {
     return {
       email: '',
       password: '',
-      loading: false,
+      isLoading: false,
       requestError: '',
     };
   },
@@ -96,15 +95,21 @@ export default {
     },
   },
   methods: {
-    async signIn() {
-      this.loading = true;
+    async signIn(e) {
+      e.preventDefault();
+
+      if (this.isSubmitDisabled || this.isLoading) {
+        return;
+      }
+
+      this.isLoading = true;
 
       const res = await api.auth.signIn({
         email: this.email,
         password: this.password,
       });
 
-      this.loading = false;
+      this.isLoading = false;
 
       if (res.data.error) {
         this.email = '';

@@ -1,7 +1,7 @@
 <template>
   <button
+    :type="attrType"
     :data-testid="dataTestid"
-    type="button"
     class="base-button"
     :class="{
       [`base-button--${type}`]: Boolean(type),
@@ -29,6 +29,13 @@ export default {
     dataTestid: {
       type: String,
       default: 'button',
+    },
+    attrType: {
+      type: String,
+      default: 'button',
+      validator(val) {
+        return ['button', 'submit', 'reset'].indexOf(val) !== -1;
+      },
     },
     type: {
       type: String,
