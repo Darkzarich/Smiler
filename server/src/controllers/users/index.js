@@ -1,19 +1,8 @@
-const { deletePostTemplatePicture } = require('./delete-post-template-picture');
-const { followById } = require('./follow-by-id');
-const { getByLogin } = require('./get-by-login');
-const { getPostTemplate } = require('./get-post-template');
-const { getSettings } = require('./get-settings');
-const { unfollowById } = require('./unfollow-by-id');
-const { updateMe } = require('./update-me');
-const { updatePostTemplate } = require('./update-post-template');
-
-module.exports = {
-  deletePostTemplatePicture,
-  followById,
-  getByLogin,
-  getPostTemplate,
-  getSettings,
-  unfollowById,
-  updateMe,
-  updatePostTemplate,
-};
+export { deletePostTemplatePicture } from './delete-post-template-picture.js';
+export { followById } from './follow-by-id.js';
+export { getByLogin } from './get-by-login.js';
+export { getPostTemplate } from './get-post-template.js';
+export { getSettings } from './get-settings.js';
+export { unfollowById } from './unfollow-by-id.js';
+export { updateMe } from './update-me.js';
+export { updatePostTemplate } from './update-post-template.js';

@@ -1,8 +1,8 @@
-const crypto = require('crypto');
-const User = require('../../models/User');
-const { ValidationError, ConflictError } = require('../../errors');
-const { isDuplicateKeyError } = require('../../utils/check-mongo-db-error');
-const { sendSuccess } = require('../../utils/responseUtils');
+import crypto from 'crypto';
+import User from '../../models/User.js';
+import { ValidationError, ConflictError } from '../../errors/index.js';
+import { isDuplicateKeyError } from '../../utils/check-mongo-db-error.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
 /** Validate user sign up, return error message or nothing */
 const validate = (user) => {
@@ -27,7 +27,7 @@ const validate = (user) => {
   }
 };
 
-exports.signUp = async (req, res) => {
+export async function signUp (req, res) {
   const user = {
     email: req.body.email,
     login: req.body.login,

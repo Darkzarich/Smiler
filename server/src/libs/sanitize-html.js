@@ -1,6 +1,6 @@
-const sanitizeHtml = require('sanitize-html');
+import sanitizeHtml from 'sanitize-html';
 
-module.exports = (html = '') =>
+export default (html = '') =>
   sanitizeHtml(html, {
     allowedTags: ['b', 'i', 's', 'u', 'cite', 'br'],
     allowedAttributes: {},

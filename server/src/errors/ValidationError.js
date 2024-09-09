@@ -1,6 +1,6 @@
-const AbstractError = require('./AbstractError');
+import AbstractError from './AbstractError.js';
 
-class ValidationError extends AbstractError {
+export default class ValidationError extends AbstractError {
   constructor(message) {
     super({
       code: 'UnprocessableContent',
@@ -10,5 +10,3 @@ class ValidationError extends AbstractError {
     });
   }
 }
-
-module.exports = ValidationError;

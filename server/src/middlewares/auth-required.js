@@ -1,6 +1,6 @@
-const { UnauthorizedError } = require('../errors');
+import { UnauthorizedError } from '../errors/index.js';
 
-module.exports = (req, res, next) => {
+export default (req, res, next) => {
   if (req.session && req.session.userId) {
     next();
 

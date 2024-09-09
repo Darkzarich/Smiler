@@ -1,11 +1,11 @@
-const User = require('../../models/User');
-const Rate = require('../../models/Rate');
-const Comment = require('../../models/Comment');
-const { COMMENT_RATE_VALUE } = require('../../constants');
-const { ForbiddenError, NotFoundError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+import User from '../../models/User.js';
+import Rate from '../../models/Rate.js';
+import Comment from '../../models/Comment.js';
+import { COMMENT_RATE_VALUE } from '../../constants/index.js';
+import { ForbiddenError, NotFoundError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.unvoteById = async (req, res) => {
+export async function unvoteById(req, res) {
   const { userId } = req.session;
   const { id: commentId } = req.params;
 
@@ -51,4 +51,4 @@ exports.unvoteById = async (req, res) => {
   ]);
 
   sendSuccess(res, updatedComment);
-};
+}

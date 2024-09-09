@@ -5,6 +5,7 @@ const config = {
   testMatch: ['**/src/**/*.spec.js'],
   globalSetup: './jest.setup.js',
   globalTeardown: './jest.teardown.js',
+  watchPathIgnorePatterns: ['node_modules'],
 };
 
-module.exports = config;
+export default config;

@@ -1,10 +1,10 @@
-const sanitizeHtml = require('../../libs/sanitize-html');
-const Comment = require('../../models/Comment');
+import sanitizeHtml from '../../libs/sanitize-html.js';
+import Comment from '../../models/Comment.js';
 
-const { ValidationError, NotFoundError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+import { ValidationError, NotFoundError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.create = async (req, res) => {
+export async function create(req, res) {
   const { body } = req.body;
   const { parent } = req.body;
   const { post } = req.body;
@@ -21,7 +21,7 @@ exports.create = async (req, res) => {
   const sanitizedBody = sanitizeHtml(body);
 
   if (!parent) {
-    const comment = await Comment.create({
+    const comment = await create({
       post,
       body: sanitizedBody,
       author: userId,
@@ -41,7 +41,7 @@ exports.create = async (req, res) => {
     throw new NotFoundError('Parent commentary is not found');
   }
 
-  const comment = await Comment.create({
+  const comment = await create({
     post,
     body: sanitizedBody,
     parent,
@@ -57,4 +57,4 @@ exports.create = async (req, res) => {
   await parentCommentary.save();
 
   sendSuccess(res, comment);
-};
+}

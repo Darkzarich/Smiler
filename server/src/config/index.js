@@ -1,8 +1,8 @@
-const dotenv = require('dotenv');
-const path = require('path');
+import { config } from 'dotenv';
+import { resolve } from 'path';
 
 // Load environment variables from .env file, won't override any existing environment variables.
-dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
+config({ path: resolve(process.cwd(), '../.env') });
 
 const {
   BACKEND_PORT,
@@ -16,7 +16,7 @@ const {
   FRONT_ORIGIN_REMOTE,
 } = process.env;
 
-module.exports = {
+export default {
   PORT: BACKEND_PORT || 3000,
   DB_URL:
     DB_URL ||

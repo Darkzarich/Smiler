@@ -1,7 +1,7 @@
-const { sendSuccess } = require('../../utils/responseUtils');
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.logout = async (req, res) => {
+export async function logout(req, res) {
   req.session.destroy();
 
   sendSuccess(res);
-};
+}

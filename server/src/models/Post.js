@@ -1,5 +1,5 @@
 /* eslint-disable func-names */
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
 
@@ -102,4 +102,4 @@ schema.set('toJSON', {
   versionKey: false,
 });
 
-module.exports = mongoose.model('Post', schema);
+export default mongoose.model('Post', schema);

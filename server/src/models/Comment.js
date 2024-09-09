@@ -1,6 +1,7 @@
 /* eslint-disable func-names */
-const mongoose = require('mongoose');
-const Post = require('./Post');
+import mongoose from 'mongoose';
+import mongooseAutoPopulate from 'mongoose-autopopulate';
+import Post from './Post.js';
 
 const { Schema } = mongoose;
 
@@ -104,11 +105,11 @@ schema.methods.toResponse = function (user) {
   };
 };
 
-schema.plugin(require('mongoose-autopopulate'));
+schema.plugin(mongooseAutoPopulate);
 
 schema.set('toJSON', {
   virtuals: true,
   versionKey: false,
 });
 
-module.exports = mongoose.model('Comment', schema);
+export default mongoose.model('Comment', schema);

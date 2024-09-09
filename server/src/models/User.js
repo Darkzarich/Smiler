@@ -1,6 +1,6 @@
 /* eslint-disable func-names */
-const mongoose = require('mongoose');
-const { USER_MAX_AVATAR_LENGTH, USER_MAX_BIO_LENGTH } = require('../constants');
+import mongoose from 'mongoose';
+import { USER_MAX_AVATAR_LENGTH, USER_MAX_BIO_LENGTH } from '../constants/index.js';
 
 const { Schema } = mongoose;
 
@@ -103,4 +103,4 @@ schema.methods.isFollowed = function (id) {
   return !!followedUser;
 };
 
-module.exports = mongoose.model('User', schema);
+export default mongoose.model('User', schema);

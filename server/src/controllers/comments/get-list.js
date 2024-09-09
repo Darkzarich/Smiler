@@ -1,8 +1,7 @@
-const Comment = require('../../models/Comment');
-const User = require('../../models/User');
-
-const { NotFoundError, ValidationError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+import Comment from '../../models/Comment.js';
+import User from '../../models/User.js';
+import { NotFoundError, ValidationError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
 function fillWithRatedRecursive({ comments, user }) {
   if (!comments) {
@@ -23,7 +22,7 @@ function fillWithRatedRecursive({ comments, user }) {
   });
 }
 
-exports.getList = async (req, res) => {
+export async function getList(req, res) {
   const { userId } = req.session;
   const { post } = req.query;
   const { author } = req.query;
@@ -69,4 +68,4 @@ exports.getList = async (req, res) => {
     pages: Math.ceil(total / limit),
     hasNextPage: offset + limit < total,
   });
-};
+}

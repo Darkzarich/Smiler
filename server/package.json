@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "Backend module of Smiler project",
   "main": "index.js",
+  "type": "module",
   "engines": {
     "node": ">=v20.16.0"
   },
   "scripts": {
-    "test": "jest --maxWorkers 4",
+    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --maxWorkers 4",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "gen-doc": "npx swagger-jsdoc -d src/swagger/swaggerDef.js -o \"src/swagger/swagger.json\"",

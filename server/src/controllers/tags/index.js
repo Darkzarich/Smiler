@@ -1,7 +1,2 @@
-const { follow } = require('./follow');
-const { unfollow } = require('./unfollow');
-
-module.exports = {
-  follow,
-  unfollow,
-};
+export { follow } from './follow.js';
+export { unfollow } from './unfollow.js';

@@ -1,26 +1,28 @@
 // Start the app in cluster mode
 
-const cluster = require('cluster');
-const numCPUs = require('os').cpus().length;
-const config = require('./src/config/config');
-const { logger } = require('./src/libs/logger');
+import Cluster from 'node:cluster';
+import os from 'node:os';
+import Config from './src/config/index.js';
+import { logger } from './src/libs/logger.js';
+
+const numCPUs = os.cpus().length;
 
 // Setting up the amount of workers
-const amountOfWorkers = config.IS_PRODUCTION ? numCPUs : 2;
+const amountOfWorkers = Config.IS_PRODUCTION ? numCPUs : 2;
 
-if (cluster.isMaster) {
+if (Cluster.isPrimary) {
   logger.info(`Master cluster setting up ${amountOfWorkers} workers...`);
 
   for (let i = 0; i < amountOfWorkers; i += 1) {
     // Start a new worker
-    cluster.fork();
+    Cluster.fork();
   }
 
-  cluster.on('online', (worker) => {
+  Cluster.on('online', (worker) => {
     logger.info(`[pid: ${worker.process.pid}] Worker is online`);
   });
 
-  cluster.on('exit', (worker, code, signal) => {
+  Cluster.on('exit', (worker, code, signal) => {
     logger.error(
       `Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`,
     );
@@ -28,19 +30,19 @@ if (cluster.isMaster) {
     logger.info('Starting a new worker');
 
     // Start a new worker after the current one dies
-    cluster.fork();
+    Cluster.fork();
   });
 } else {
-  // eslint-disable-next-line global-require
-
-  // Runs the app in the worker process
-  require('./src/app').run();
-
   process.on('unhandledRejection', (error) => {
     throw error;
   });
 
   process.on('uncaughtException', (error) => {
     throw error;
+  });
+
+  // Runs the app in the worker process
+  import('./src/app.js').then((app) => {
+    app.default.run();
   });
 }

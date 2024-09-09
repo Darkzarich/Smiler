@@ -1,9 +1,9 @@
-const User = require('../../models/User');
-const { ValidationError } = require('../../errors');
-const { TAGS_MAX_LENGTH } = require('../../constants');
-const { sendSuccess } = require('../../utils/responseUtils');
+import User from '../../models/User.js';
+import { ValidationError } from '../../errors/index.js';
+import { TAGS_MAX_LENGTH } from '../../constants/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.follow = async (req, res) => {
+export async function follow (req, res) {
   const { tag } = req.params;
   const { userId } = req.session;
 

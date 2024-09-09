@@ -1,9 +1,9 @@
-const User = require('../../models/User');
-const Post = require('../../models/Post');
-const { ValidationError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+import User from '../../models/User.js';
+import Post from '../../models/Post.js';
+import { ValidationError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.getFeed = async (req, res) => {
+export async function getFeed(req, res) {
   const limit = +req.query.limit || 15;
   const offset = +req.query.offset || 0;
   const { userId } = req.session;
@@ -55,4 +55,4 @@ exports.getFeed = async (req, res) => {
     pages: Math.ceil(total / limit),
     hasNextPage: offset + limit < total,
   });
-};
+}

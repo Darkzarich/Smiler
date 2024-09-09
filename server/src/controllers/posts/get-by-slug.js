@@ -1,9 +1,9 @@
-const User = require('../../models/User');
-const Post = require('../../models/Post');
-const { NotFoundError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+import User from '../../models/User.js';
+import Post from '../../models/Post.js';
+import { NotFoundError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.getBySlug = async (req, res) => {
+export async function getBySlug(req, res) {
   const { userId } = req.session;
 
   const { slug } = req.params;
@@ -20,4 +20,4 @@ exports.getBySlug = async (req, res) => {
   }
 
   sendSuccess(res, post.toResponse(user));
-};
+}

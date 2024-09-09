@@ -1,9 +1,8 @@
-const User = require('../../models/User');
+import User from '../../models/User.js';
+import { NotFoundError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-const { NotFoundError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
-
-exports.updateMe = async (req, res) => {
+export async function updateMe(req, res) {
   const { userId } = req.session;
   const update = req.body;
 
@@ -17,4 +16,4 @@ exports.updateMe = async (req, res) => {
   }
 
   sendSuccess(res, updatedUser);
-};
+}

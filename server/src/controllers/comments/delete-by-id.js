@@ -1,10 +1,10 @@
-const { differenceInMilliseconds } = require('date-fns');
-const Comment = require('../../models/Comment');
-const { COMMENT_TIME_TO_UPDATE } = require('../../constants');
-const { ForbiddenError, NotFoundError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+import { differenceInMilliseconds } from 'date-fns';
+import Comment from '../../models/Comment.js';
+import { COMMENT_TIME_TO_UPDATE } from '../../constants/index.js';
+import { ForbiddenError, NotFoundError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.deleteById = async (req, res) => {
+export async function deleteById(req, res) {
   const { userId } = req.session;
   const { id } = req.params;
 
@@ -40,4 +40,4 @@ exports.deleteById = async (req, res) => {
   await comment.save();
 
   sendSuccess(res, comment);
-};
+}

@@ -2,7 +2,7 @@ module.exports = {
   root: false,
   env: {
     commonjs: true,
-    es6: true,
+    es2022: true,
     node: true,
   },
   extends: [
@@ -16,7 +16,7 @@ module.exports = {
     SharedArrayBuffer: 'readonly',
   },
   parserOptions: {
-    ecmaVersion: 2018,
+    ecmaVersion: 2022,
   },
   rules: {
     'consistent-return': 'off',
@@ -25,6 +25,8 @@ module.exports = {
       { allow: ['_id', '_handleFile', '_removeFile'] },
     ],
     'node/no-unpublished-require': 'off',
+    'import/prefer-default-export': 'off',
+    'import/extensions': 'off',
   },
   overrides: [
     {

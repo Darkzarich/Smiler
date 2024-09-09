@@ -1,15 +1,6 @@
-const { create } = require('./create');
-const { deleteById } = require('./delete-by-id');
-const { updateById } = require('./update-by-id');
-const { getList } = require('./get-list');
-const { unvoteById } = require('./unvote-by-id');
-const { voteById } = require('./vote-by-id');
-
-module.exports = {
-  create,
-  deleteById,
-  updateById,
-  getList,
-  unvoteById,
-  voteById,
-};
+export { create } from './create.js';
+export { deleteById } from './delete-by-id.js';
+export { updateById } from './update-by-id.js';
+export { getList } from './get-list.js';
+export { unvoteById } from './unvote-by-id.js';
+export { voteById } from './vote-by-id.js';

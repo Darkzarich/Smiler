@@ -1,14 +1,15 @@
-const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
+import session from 'express-session';
+import connectMongo from 'connect-mongo';
+import Config from '../config/index.js';
 
-const { SESSION_SECRET, IS_PRODUCTION } = require('../config/config');
+const MongoStore = connectMongo(session);
 
-module.exports = (db) =>
+export default (db) =>
   session({
-    secret: SESSION_SECRET,
+    secret: Config.SESSION_SECRET,
     resave: true,
     cookie: {
-      secure: IS_PRODUCTION,
+      secure: Config.IS_PRODUCTION,
       httpOnly: true,
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000, // a week

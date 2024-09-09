@@ -1,9 +1,9 @@
-const User = require('../../models/User');
-const Post = require('../../models/Post');
-const { ValidationError, NotFoundError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+import User from '../../models/User.js';
+import Post from '../../models/Post.js';
+import { ValidationError, NotFoundError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.getListByAuthor = async (req, res) => {
+export async function getListByAuthor(req, res) {
   const { userId } = req.session;
 
   const limit = +req.query.limit || 15;
@@ -44,4 +44,4 @@ exports.getListByAuthor = async (req, res) => {
     pages: Math.ceil(total / limit),
     hasNextPage: offset + limit < total,
   });
-};
+}

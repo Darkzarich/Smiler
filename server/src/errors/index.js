@@ -1,13 +1,13 @@
-const AppError = require('./AppError');
-const NotFoundError = require('./NotFoundError');
-const UnauthorizedError = require('./UnauthorizedError');
-const ValidationError = require('./ValidationError');
-const ForbiddenError = require('./ForbiddenError');
-const ConflictError = require('./ConflictError');
-const BadRequestError = require('./BadRequestError');
-const ContentTooLargeError = require('./ContentTooLargeError');
+import AppError from './AppError.js';
+import NotFoundError from './NotFoundError.js';
+import UnauthorizedError from './UnauthorizedError.js';
+import ValidationError from './ValidationError.js';
+import ForbiddenError from './ForbiddenError.js';
+import ConflictError from './ConflictError.js';
+import BadRequestError from './BadRequestError.js';
+import ContentTooLargeError from './ContentTooLargeError.js';
 
-module.exports = {
+export {
   AppError,
   NotFoundError,
   UnauthorizedError,

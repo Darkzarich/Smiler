@@ -1,10 +1,10 @@
-const User = require('../../models/User');
+import User from '../../models/User.js';
 
-const { ForbiddenError, ValidationError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
-const { POST_MAX_TAGS, POST_MAX_TAG_LEN } = require('../../constants');
+import { ForbiddenError, ValidationError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
+import { POST_MAX_TAGS, POST_MAX_TAG_LEN } from '../../constants/index.js';
 
-exports.updatePostTemplate = async (req, res) => {
+export async function updatePostTemplate(req, res) {
   // TODO: validate title, sections just like in posts
 
   const { sections } = req.body;
@@ -41,4 +41,4 @@ exports.updatePostTemplate = async (req, res) => {
   await userTemplate.save();
 
   sendSuccess(res, userTemplate.template);
-};
+}

@@ -1,15 +1,15 @@
-const mongoose = require('mongoose');
-const { logger } = require('./logger');
-const config = require('../config/config');
+import mongoose from 'mongoose';
+import { logger } from './logger.js';
+import Config from '../config/index.js';
 
-module.exports.connectDB = async () => {
+export async function connectDB() {
   try {
     // Return the connection if it has already been established
     if ([1, 2].includes(mongoose.connection.readyState)) {
       return mongoose.connection;
     }
 
-    const mongooseInstance = await mongoose.connect(config.DB_URL, {
+    const mongooseInstance = await mongoose.connect(Config.DB_URL, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
       useCreateIndex: true,
@@ -38,4 +38,4 @@ module.exports.connectDB = async () => {
   } catch (error) {
     logger.error(error);
   }
-};
+}

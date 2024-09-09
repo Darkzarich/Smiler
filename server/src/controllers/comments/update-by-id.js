@@ -1,16 +1,15 @@
-const { differenceInMilliseconds, millisecondsToMinutes } = require('date-fns');
-const sanitizeHtml = require('../../libs/sanitize-html');
-const Comment = require('../../models/Comment');
-
-const { COMMENT_TIME_TO_UPDATE } = require('../../constants');
-const {
+import { differenceInMilliseconds, millisecondsToMinutes } from 'date-fns';
+import sanitizeHtml from '../../libs/sanitize-html.js';
+import Comment from '../../models/Comment.js';
+import { COMMENT_TIME_TO_UPDATE } from '../../constants/index.js';
+import {
   ForbiddenError,
   NotFoundError,
   BadRequestError,
-} = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+} from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.updateById = async (req, res) => {
+export async function updateById(req, res) {
   const { userId } = req.session;
   const { id } = req.params;
   const { body } = req.body;
@@ -48,4 +47,4 @@ exports.updateById = async (req, res) => {
   await comment.save();
 
   sendSuccess(res, comment);
-};
+}

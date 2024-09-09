@@ -1,6 +1,5 @@
-const winston = require('winston');
-
-const { IS_PRODUCTION, IS_JEST } = require('../config/config');
+import winston from 'winston';
+import Config from '../config/index.js';
 
 const currentDir = process.cwd();
 
@@ -9,7 +8,7 @@ const { combine, timestamp, json, errors, cli } = winston.format;
 const fileLogsFormat = combine(errors({ stack: true }), timestamp(), json());
 
 const errorFileTransport = new winston.transports.File({
-  silent: IS_JEST,
+  silent: Config.IS_JEST,
   level: 'error', // max logging level a transport will log
   format: fileLogsFormat,
   filename: `${currentDir}/logs/error.log`,
@@ -19,7 +18,7 @@ const errorFileTransport = new winston.transports.File({
 });
 
 const combinedFileTransport = new winston.transports.File({
-  silent: IS_JEST,
+  silent: Config.IS_JEST,
   level: 'info',
   format: fileLogsFormat,
   filename: `${currentDir}/logs/combined.log`,
@@ -29,12 +28,12 @@ const combinedFileTransport = new winston.transports.File({
 });
 
 const consoleTransport = new winston.transports.Console({
-  level: IS_JEST || IS_PRODUCTION ? 'error' : 'debug',
+  level: Config.IS_JEST || Config.IS_PRODUCTION ? 'error' : 'debug',
   format: combine(errors({ stack: true }), cli()),
   handleExceptions: true,
 });
 
-module.exports.logger = winston.createLogger({
+export const logger = winston.createLogger({
   transports: [consoleTransport, errorFileTransport, combinedFileTransport],
   exitOnError: false, // Do not exit on handled exceptions
   defaultMeta: {

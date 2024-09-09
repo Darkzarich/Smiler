@@ -1,18 +1,17 @@
-const path = require('path');
-const express = require('express');
-const helmet = require('helmet');
-const requestIdMiddleware = require('express-request-id')();
-
-const { PORT, IS_PRODUCTION, IS_JEST } = require('./config/config');
-const { connectDB } = require('./libs/db');
-const { logger } = require('./libs/logger');
-const morganMiddleware = require('./middlewares/morgan');
-const corsMiddleware = require('./middlewares/cors');
-const sessionMiddleware = require('./middlewares/session');
-const router = require('./routes');
+import { join } from 'path';
+import express from 'express';
+import helmet from 'helmet';
+import requestIdMiddleware from 'express-request-id';
+import Config from './config/index.js';
+import { connectDB } from './libs/db.js';
+import { logger } from './libs/logger.js';
+import morganMiddleware from './middlewares/morgan.js';
+import corsMiddleware from './middlewares/cors.js';
+import sessionMiddleware from './middlewares/session.js';
+import router from './routes/index.js';
 
 logger.info(
-  `[pid: ${process.pid}] Worker is running in ${IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode.`,
+  `[pid: ${process.pid}] Worker is running in ${Config.IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode.`,
 );
 
 async function startApp({ db = null } = {}) {
@@ -30,13 +29,13 @@ async function startApp({ db = null } = {}) {
   app.use(corsMiddleware);
 
   // Add unique request id
-  app.use(requestIdMiddleware);
+  app.use(requestIdMiddleware());
 
   // Parse JSON and URL-encoded data
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json({}));
 
-  if (IS_PRODUCTION) {
+  if (Config.IS_PRODUCTION) {
     app.set('trust proxy', 1);
   }
 
@@ -51,12 +50,12 @@ async function startApp({ db = null } = {}) {
 
   // TODO: make it conditional, make static only for dev
   // Set files folder
-  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
 
-  if (!IS_JEST) {
-    app.listen(PORT, () => {
+  if (!Config.IS_JEST) {
+    app.listen(Config.PORT, () => {
       logger.info(
-        `[pid: ${process.pid}] Server is listening on the port ${PORT}`,
+        `[pid: ${process.pid}] Server is listening on the port ${Config.PORT}`,
       );
     });
   }
@@ -73,4 +72,4 @@ async function run() {
   startApp({ db });
 }
 
-module.exports = { run, startApp };
+export default { run, startApp };

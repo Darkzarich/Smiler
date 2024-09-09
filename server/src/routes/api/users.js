@@ -1,10 +1,9 @@
-const router = require('express').Router();
-const {
-  asyncControllerErrorHandler,
-} = require('../../utils/async-controller-error-handler');
-const usersController = require('../../controllers/users');
-const authRequiredMiddleware = require('../../middlewares/auth-required');
+import express from 'express';
+import { asyncControllerErrorHandler } from '../../utils/async-controller-error-handler.js';
+import { getByLogin, updateMe, getPostTemplate, updatePostTemplate, getSettings, followById, unfollowById, deletePostTemplatePicture } from '../../controllers/users/index.js';
+import authRequiredMiddleware from '../../middlewares/auth-required.js';
 
+const router = express.Router();
 /**
 @swagger
 {
@@ -206,11 +205,11 @@ const authRequiredMiddleware = require('../../middlewares/auth-required');
   }
 }
 */
-router.get('/:login', asyncControllerErrorHandler(usersController.getByLogin));
+router.get('/:login', asyncControllerErrorHandler(getByLogin));
 router.put(
   '/me',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(usersController.updateMe),
+  asyncControllerErrorHandler(updateMe),
 );
 
 /**
@@ -335,12 +334,12 @@ router.put(
 router.get(
   '/:login/template',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(usersController.getPostTemplate),
+  asyncControllerErrorHandler(getPostTemplate),
 );
 router.put(
   '/:login/template',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(usersController.updatePostTemplate),
+  asyncControllerErrorHandler(updatePostTemplate),
 );
 
 /**
@@ -387,7 +386,7 @@ router.put(
 router.get(
   '/me/settings',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(usersController.getSettings),
+  asyncControllerErrorHandler(getSettings),
 );
 
 /**
@@ -473,12 +472,12 @@ router.get(
 router.put(
   '/:id/follow',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(usersController.followById),
+  asyncControllerErrorHandler(followById),
 );
 router.delete(
   '/:id/follow',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(usersController.unfollowById),
+  asyncControllerErrorHandler(unfollowById),
 );
 
 /**
@@ -532,7 +531,7 @@ router.delete(
 router.delete(
   '/me/template/:hash',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(usersController.deletePostTemplatePicture),
+  asyncControllerErrorHandler(deletePostTemplatePicture),
 );
 
-module.exports = router;
+export default router;

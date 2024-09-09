@@ -1,9 +1,9 @@
-const router = require('express').Router();
-const {
-  asyncControllerErrorHandler,
-} = require('../../utils/async-controller-error-handler');
-const postsController = require('../../controllers/posts');
-const authRequiredMiddleware = require('../../middlewares/auth-required');
+import express from 'express';
+import { asyncControllerErrorHandler } from '../../utils/async-controller-error-handler.js';
+import { getListByAuthor, search, create, all, today, blowing, recent, topThisWeek, getFeed, getBySlug, updateById, deleteById, upload, voteById, unvoteById } from '../../controllers/posts/index.js';
+import authRequiredMiddleware from '../../middlewares/auth-required.js';
+
+const router = express.Router();
 
 /**
 @swagger
@@ -352,17 +352,17 @@ router.get(
   '/',
   asyncControllerErrorHandler((req, res) => {
     if (req.query.author) {
-      return postsController.getListByAuthor(req, res);
+      return getListByAuthor(req, res);
     }
 
-    return postsController.search(req, res);
+    return search(req, res);
   }),
 );
 
 router.post(
   '/',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(postsController.create),
+  asyncControllerErrorHandler(create),
 );
 
 /**
@@ -400,7 +400,7 @@ router.post(
 }
 */
 
-router.get('/categories/all', asyncControllerErrorHandler(postsController.all));
+router.get('/categories/all', asyncControllerErrorHandler(all));
 
 /**
 @swagger
@@ -439,7 +439,7 @@ router.get('/categories/all', asyncControllerErrorHandler(postsController.all));
 
 router.get(
   '/categories/today',
-  asyncControllerErrorHandler(postsController.today),
+  asyncControllerErrorHandler(today),
 );
 
 /**
@@ -479,7 +479,7 @@ router.get(
 
 router.get(
   '/categories/blowing',
-  asyncControllerErrorHandler(postsController.blowing),
+  asyncControllerErrorHandler(blowing),
 );
 
 /**
@@ -519,7 +519,7 @@ router.get(
 
 router.get(
   '/categories/recent',
-  asyncControllerErrorHandler(postsController.recent),
+  asyncControllerErrorHandler(recent),
 );
 
 /**
@@ -559,7 +559,7 @@ router.get(
 
 router.get(
   '/categories/top-this-week',
-  asyncControllerErrorHandler(postsController.topThisWeek),
+  asyncControllerErrorHandler(topThisWeek),
 );
 
 /**
@@ -603,7 +603,7 @@ router.get(
 router.get(
   '/feed',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(postsController.getFeed),
+  asyncControllerErrorHandler(getFeed),
 );
 
 /**
@@ -752,16 +752,16 @@ router.get(
   }
 }
 */
-router.get('/:slug', asyncControllerErrorHandler(postsController.getBySlug));
+router.get('/:slug', asyncControllerErrorHandler(getBySlug));
 router.put(
   '/:id',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(postsController.updateById),
+  asyncControllerErrorHandler(updateById),
 );
 router.delete(
   '/:id',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(postsController.deleteById),
+  asyncControllerErrorHandler(deleteById),
 );
 
 /**
@@ -828,7 +828,7 @@ router.delete(
 router.post(
   '/upload',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(postsController.upload),
+  asyncControllerErrorHandler(upload),
 );
 
 /**
@@ -939,12 +939,12 @@ router.post(
 router.put(
   '/:id/vote',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(postsController.voteById),
+  asyncControllerErrorHandler(voteById),
 );
 router.delete(
   '/:id/vote',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(postsController.unvoteById),
+  asyncControllerErrorHandler(unvoteById),
 );
 
-module.exports = router;
+export default router;

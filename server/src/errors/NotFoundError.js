@@ -1,6 +1,6 @@
-const AbstractError = require('./AbstractError');
+import AbstractError from './AbstractError.js';
 
-class NotFoundError extends AbstractError {
+export default class NotFoundError extends AbstractError {
   constructor(message, isOperational = true) {
     super({
       code: 'NotFound',
@@ -10,5 +10,3 @@ class NotFoundError extends AbstractError {
     });
   }
 }
-
-module.exports = NotFoundError;

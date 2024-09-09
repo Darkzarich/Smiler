@@ -1,6 +1,6 @@
-const AbstractError = require('./AbstractError');
+import AbstractError from './AbstractError.js';
 
-class BadRequestError extends AbstractError {
+export default class BadRequestError extends AbstractError {
   constructor(message) {
     super({
       code: 'BadRequest',
@@ -10,5 +10,3 @@ class BadRequestError extends AbstractError {
     });
   }
 }
-
-module.exports = BadRequestError;

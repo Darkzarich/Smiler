@@ -1,13 +1,14 @@
-const { differenceInMilliseconds, millisecondsToMinutes } = require('date-fns');
+import { differenceInMilliseconds, millisecondsToMinutes } from 'date-fns';
+import Post from '../../models/Post.js';
+import {
+  POST_SECTION_TYPES,
+  POST_TIME_TO_UPDATE,
+} from '../../constants/index.js';
+import { NotFoundError, ForbiddenError } from '../../errors/index.js';
+import { removeFileByPath } from '../../utils/remove-file-by-path.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-const Post = require('../../models/Post');
-
-const { POST_TIME_TO_UPDATE, POST_SECTION_TYPES } = require('../../constants');
-const { NotFoundError, ForbiddenError } = require('../../errors');
-const { removeFileByPath } = require('../../utils/remove-file-by-path');
-const { sendSuccess } = require('../../utils/responseUtils');
-
-exports.deleteById = async (req, res) => {
+export async function deleteById(req, res) {
   const { userId } = req.session;
   const { id } = req.params;
 
@@ -51,4 +52,4 @@ exports.deleteById = async (req, res) => {
   for (const section of filePictureSections) {
     removeFileByPath(section.url);
   }
-};
+}

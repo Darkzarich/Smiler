@@ -1,8 +1,8 @@
-const request = require('supertest');
-const { startApp } = require('../../app');
-const { connectDB } = require('../../libs/db');
-const Post = require('../../models/Post');
-const User = require('../../models/User');
+import request from 'supertest';
+import App from '../../app.js';
+import { connectDB } from '../../libs/db.js';
+import Post from '../../models/Post.js';
+import User from '../../models/User.js';
 
 let app;
 let db;
@@ -10,7 +10,7 @@ let db;
 beforeAll(async () => {
   db = await connectDB();
 
-  const resolvedApp = await startApp({ db });
+  const resolvedApp = await App.startApp({ db });
 
   app = resolvedApp.app;
 

@@ -1,10 +1,9 @@
-const router = require('express').Router();
-const {
-  asyncControllerErrorHandler,
-} = require('../../utils/async-controller-error-handler');
-const tagsController = require('../../controllers/tags');
-const authRequiredMiddleware = require('../../middlewares/auth-required');
+import express from 'express';
+import { asyncControllerErrorHandler } from '../../utils/async-controller-error-handler.js';
+import { follow, unfollow } from '../../controllers/tags/index.js';
+import authRequiredMiddleware from '../../middlewares/auth-required.js';
 
+const router = express.Router();
 /**
 @swagger
 {
@@ -80,12 +79,12 @@ const authRequiredMiddleware = require('../../middlewares/auth-required');
 router.put(
   '/:tag/follow',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(tagsController.follow),
+  asyncControllerErrorHandler(follow),
 );
 router.delete(
   '/:tag/follow',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(tagsController.unfollow),
+  asyncControllerErrorHandler(unfollow),
 );
 
-module.exports = router;
+export default router;

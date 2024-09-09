@@ -1,24 +1,22 @@
-const slugLib = require('slug');
-const crypto = require('crypto');
-const sanitizeHtml = require('../../libs/sanitize-html');
-
-const User = require('../../models/User');
-const Post = require('../../models/Post');
-
-const {
+import slugLib from 'slug';
+import crypto from 'crypto';
+import sanitizeHtml from '../../libs/sanitize-html.js';
+import User from '../../models/User.js';
+import Post from '../../models/Post.js';
+import {
   POST_SECTION_TYPES,
   POST_SECTIONS_MAX,
   POST_SECTIONS_MAX_LENGTH,
   POST_TITLE_MAX_LENGTH,
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
-} = require('../../constants');
-const { ValidationError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+} from '../../constants/index.js';
+import { ValidationError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 
-exports.create = async (req, res) => {
+export async function create(req, res) {
   // TODO: rework this | move validation
 
   const { userId } = req.session;
@@ -112,4 +110,4 @@ exports.create = async (req, res) => {
   ]);
 
   sendSuccess(res, post);
-};
+}

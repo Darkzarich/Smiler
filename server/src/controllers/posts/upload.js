@@ -1,28 +1,26 @@
-const multer = require('multer');
-const Sharp = require('sharp');
-const path = require('path');
-const fs = require('fs/promises');
-const DiskStorage = require('../../libs/DiskStorage');
-
-const User = require('../../models/User');
-
-const {
+import multer from 'multer';
+import Sharp from 'sharp';
+import { join, extname } from 'path';
+import { mkdir } from 'fs/promises';
+import DiskStorage from '../../libs/DiskStorage.js';
+import User from '../../models/User.js';
+import {
   POST_SECTIONS_MAX,
   POST_MAX_UPLOAD_IMAGE_SIZE,
-} = require('../../constants');
-const { ContentTooLargeError, ValidationError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+} from '../../constants/index.js';
+import { ContentTooLargeError, ValidationError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
 const postMulter = multer({
   storage: new DiskStorage({
     destination: async (req, file, callback) => {
       callback(
         null,
-        path.join(process.cwd(), 'uploads', req.session.userLogin),
+        join(process.cwd(), 'uploads', req.session.userLogin),
       );
     },
     filename: (req, file, callback) => {
-      callback(null, `${Date.now()}${path.extname(file.originalname)}`);
+      callback(null, `${Date.now()}${extname(file.originalname)}`);
     },
     sharp: (req, file, callback) => {
       const resizer = Sharp()
@@ -58,7 +56,7 @@ const postMulter = multer({
   },
 }).single('picture'); // frontend form-data name for file
 
-exports.upload = async (req, res, next) => {
+export async function upload(req, res, next) {
   const { userId, userLogin } = req.session;
 
   const user = await User.findById(userId).select('template');
@@ -72,7 +70,7 @@ exports.upload = async (req, res, next) => {
   const rootFolder = process.cwd();
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.mkdir(path.join(rootFolder, 'uploads', userLogin), {
+  await mkdir(join(rootFolder, 'uploads', userLogin), {
     recursive: true,
   });
 
@@ -113,4 +111,4 @@ exports.upload = async (req, res, next) => {
 
     sendSuccess(res, newSection);
   });
-};
+}

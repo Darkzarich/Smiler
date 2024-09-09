@@ -1,9 +1,8 @@
-const User = require('../../models/User');
+import User from '../../models/User.js';
+import { NotFoundError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-const { NotFoundError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
-
-exports.getSettings = async (req, res) => {
+export async function getSettings(req, res) {
   const { userId } = req.session;
 
   const user = await User.findById(userId)
@@ -22,4 +21,4 @@ exports.getSettings = async (req, res) => {
   };
 
   sendSuccess(res, following);
-};
+}

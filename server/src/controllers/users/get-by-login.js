@@ -1,8 +1,8 @@
-const User = require('../../models/User');
-const { NotFoundError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+import User from '../../models/User.js';
+import { NotFoundError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.getByLogin = async (req, res) => {
+export async function getByLogin(req, res) {
   const { login } = req.params;
   const { userId, userLogin } = req.session;
 
@@ -31,4 +31,4 @@ exports.getByLogin = async (req, res) => {
   };
 
   sendSuccess(res, response);
-};
+}

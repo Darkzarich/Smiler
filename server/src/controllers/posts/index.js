@@ -1,33 +1,15 @@
-const { create } = require('./create');
-const { deleteById } = require('./delete-by-id');
-const { getBySlug } = require('./get-by-slug');
-const { getListByAuthor } = require('./get-list-by-author');
-const { getFeed } = require('./get-feed');
-const { all } = require('./categories/all');
-const { blowing } = require('./categories/blowing');
-const { recent } = require('./categories/recent');
-const { today } = require('./categories/today');
-const { topThisWeek } = require('./categories/top-this-week');
-const { search } = require('./search');
-const { unvoteById } = require('./unvote-by-id');
-const { updateById } = require('./update-by-id');
-const { upload } = require('./upload');
-const { voteById } = require('./vote-by-id');
-
-module.exports = {
-  create,
-  deleteById,
-  getBySlug,
-  getListByAuthor,
-  getFeed,
-  search,
-  unvoteById,
-  updateById,
-  upload,
-  voteById,
-  all,
-  blowing,
-  recent,
-  topThisWeek,
-  today,
-};
+export { create } from './create.js';
+export { deleteById } from './delete-by-id.js';
+export { getBySlug } from './get-by-slug.js';
+export { getListByAuthor } from './get-list-by-author.js';
+export { getFeed } from './get-feed.js';
+export { all } from './categories/all.js';
+export { blowing } from './categories/blowing.js';
+export { recent } from './categories/recent.js';
+export { today } from './categories/today.js';
+export { topThisWeek } from './categories/top-this-week.js';
+export { search } from './search.js';
+export { unvoteById } from './unvote-by-id.js';
+export { updateById } from './update-by-id.js';
+export { upload } from './upload.js';
+export { voteById } from './vote-by-id.js';

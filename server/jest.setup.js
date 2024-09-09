@@ -1,6 +1,6 @@
-const { MongoMemoryServer } = require('mongodb-memory-server');
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
-module.exports = async () => {
+export default async () => {
   if (process.env.NODE_ENV !== 'test') {
     throw new Error('Running tests in a production environment!');
   }

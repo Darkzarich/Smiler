@@ -1,7 +1,7 @@
-const crypto = require('crypto');
-const User = require('../../models/User');
-const { ValidationError, UnauthorizedError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+import { pbkdf2Sync, timingSafeEqual } from 'crypto';
+import User from '../../models/User.js';
+import { ValidationError, UnauthorizedError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
 const validate = (user) => {
   if (!user.email || !user.password) {
@@ -13,7 +13,7 @@ const validate = (user) => {
   }
 };
 
-exports.signIn = async (req, res) => {
+export async function signIn(req, res) {
   const user = {
     email: req.body.email,
     password: req.body.password,
@@ -33,11 +33,10 @@ exports.signIn = async (req, res) => {
     throw new UnauthorizedError('Invalid email or password');
   }
 
-  const hash = crypto
-    .pbkdf2Sync(user.password, foundUser.salt, 10000, 512, 'sha512')
+  const hash = pbkdf2Sync(user.password, foundUser.salt, 10000, 512, 'sha512')
     .toString('hex');
 
-  const isEqual = crypto.timingSafeEqual(
+  const isEqual = timingSafeEqual(
     Buffer.from(hash),
     Buffer.from(foundUser.hash),
   );
@@ -61,4 +60,4 @@ exports.signIn = async (req, res) => {
   };
 
   sendSuccess(res, userAuth);
-};
+}

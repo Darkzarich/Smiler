@@ -1,29 +1,20 @@
-const router = require('express').Router();
-const {
-  AppError,
-  NotFoundError,
-  ValidationError,
-  ConflictError,
-} = require('../../errors');
-const {
-  asyncControllerErrorHandler,
-} = require('../../utils/async-controller-error-handler');
-const { IS_JEST } = require('../../config/config');
-const { logger } = require('../../libs/logger');
-const {
-  isDuplicateKeyError,
-  isCastError,
-  isValidationError,
-} = require('../../utils/check-mongo-db-error');
+import express from 'express';
+import { AppError, NotFoundError, ValidationError, ConflictError } from '../../errors/index.js';
+import { asyncControllerErrorHandler } from '../../utils/async-controller-error-handler.js';
+import Config from '../../config/index.js';
+import { logger } from '../../libs/logger.js';
+import { isDuplicateKeyError, isCastError, isValidationError } from '../../utils/check-mongo-db-error.js';
 
-router.use('/users', require('./users'));
-router.use('/auth', require('./auth'));
-router.use('/posts', require('./posts'));
-router.use('/comments', require('./comments'));
-router.use('/tags', require('./tags'));
+const router = express.Router();
+
+router.use('/users', (await import('./users.js')).default);
+router.use('/auth', (await import('./auth.js')).default);
+router.use('/posts', (await import('./posts.js')).default);
+router.use('/comments', (await import('./comments.js')).default);
+router.use('/tags', (await import('./tags.js')).default);
 
 // Special endpoint to test global error handling middleware in Jest environment
-if (IS_JEST) {
+if (Config.IS_JEST) {
   router.get(
     '/error-endpoint',
     asyncControllerErrorHandler(() => {
@@ -84,4 +75,4 @@ router.use((error, req, res, next) => {
   handleSendError(new AppError(), res);
 });
 
-module.exports = router;
+export default router;

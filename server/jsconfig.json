@@ -4,6 +4,9 @@
     "outDir": "./dist",
     "checkJs": true,
     "types": ["node", "jest"],
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
+    "resolveJsonModule": true,
     
   },
   "exclude": ["node_modules", "dist"]

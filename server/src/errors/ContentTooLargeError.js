@@ -1,6 +1,6 @@
-const AbstractError = require('./AbstractError');
+import AbstractError from './AbstractError.js';
 
-class ContentTooLargeError extends AbstractError {
+export default class ContentTooLargeError extends AbstractError {
   constructor(message) {
     super({
       code: 'ContentTooLarge',
@@ -10,5 +10,3 @@ class ContentTooLargeError extends AbstractError {
     });
   }
 }
-
-module.exports = ContentTooLargeError;

@@ -1,26 +1,20 @@
-const cors = require('cors');
-const { logger } = require('../libs/logger');
-
-const {
-  PORT,
-  FRONT_ORIGIN_LOCAL,
-  FRONT_ORIGIN_REMOTE,
-  IS_PRODUCTION,
-} = require('../config/config');
+import cors from 'cors';
+import { logger } from '../libs/logger.js';
+import Config from '../config/index.js';
 
 const whitelist = [
-  FRONT_ORIGIN_LOCAL,
-  FRONT_ORIGIN_REMOTE,
-  `http://localhost:${PORT}`,
+  Config.FRONT_ORIGIN_LOCAL,
+  Config.FRONT_ORIGIN_REMOTE,
+  `http://localhost:${Config.PORT}`,
 ];
 
-module.exports = cors({
+export default cors({
   credentials: true,
   origin(origin, callback) {
     if (
       origin === undefined ||
       whitelist.indexOf(origin) !== -1 ||
-      !IS_PRODUCTION
+      !Config.IS_PRODUCTION
     ) {
       callback(null, true);
     } else {

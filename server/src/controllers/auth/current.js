@@ -1,8 +1,8 @@
-const User = require('../../models/User');
-const { sendSuccess } = require('../../utils/responseUtils');
-const { NotFoundError } = require('../../errors');
+import User from '../../models/User.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
+import { NotFoundError } from '../../errors/index.js';
 
-exports.current = async (req, res) => {
+export async function current(req, res) {
   const { userId } = req.session;
 
   if (!userId) {
@@ -26,4 +26,4 @@ exports.current = async (req, res) => {
     tagsFollowed: user.tagsFollowed || [],
     followersAmount: user.followersAmount,
   });
-};
+}

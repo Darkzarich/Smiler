@@ -1,12 +1,21 @@
-const router = require('express').Router();
-const swaggerUi = require('swagger-ui-express');
+import express from 'express';
+import { serve, setup } from 'swagger-ui-express';
+import { createRequire } from 'node:module';
+import apiRoutes from './api/index.js';
+import Config from '../config/index.js';
 
-const swaggerDocument = require('../swagger/swagger.json');
+const router = express.Router();
 
-router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-router.use('/api', require('./api'));
+if (!Config.IS_JEST) {
+  const require = createRequire(import.meta.url);
+  const swaggerDocument = require('../swagger/swagger.json');
 
-module.exports = router;
+  router.use('/api-docs', serve, setup(swaggerDocument));
+}
+
+router.use('/api', apiRoutes);
+
+export default router;
 
 /**
 # Descriptions of common responses

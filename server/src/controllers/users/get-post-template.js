@@ -1,9 +1,8 @@
-const User = require('../../models/User');
+import User from '../../models/User.js';
+import { ForbiddenError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-const { ForbiddenError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
-
-exports.getPostTemplate = async (req, res) => {
+export async function getPostTemplate(req, res) {
   // TODO: Replace with id of the user
   if (req.session.userLogin !== req.params.login) {
     throw new ForbiddenError('Can see only your own template');
@@ -14,4 +13,4 @@ exports.getPostTemplate = async (req, res) => {
     .lean();
 
   sendSuccess(res, template.template);
-};
+}

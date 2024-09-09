@@ -1,4 +1,4 @@
-class AbstractError extends Error {
+export default class AbstractError extends Error {
   constructor({
     code = 'Error',
     status = 500,
@@ -12,4 +12,3 @@ class AbstractError extends Error {
   }
 }
 
-module.exports = AbstractError;

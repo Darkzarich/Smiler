@@ -1,10 +1,10 @@
-const request = require('supertest');
-const { startApp } = require('../../app');
+import request from 'supertest';
+import App from '../../app.js';
 
 let app;
 
 beforeAll(async () => {
-  const resolvedApp = await startApp();
+  const resolvedApp = await App.startApp();
 
   app = resolvedApp.app;
 });

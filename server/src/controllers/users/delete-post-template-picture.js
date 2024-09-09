@@ -1,15 +1,16 @@
-const User = require('../../models/User');
+import User from '../../models/User.js';
 
-const {
+import {
   ValidationError,
   NotFoundError,
   BadRequestError,
-} = require('../../errors');
-const { removeFileByPath } = require('../../utils/remove-file-by-path');
-const { sendSuccess } = require('../../utils/responseUtils');
-const { POST_SECTION_TYPES } = require('../../constants');
+} from '../../errors/index.js';
+import { removeFileByPath } from '../../utils/remove-file-by-path.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.deletePostTemplatePicture = async (req, res) => {
+import { POST_SECTION_TYPES } from '../../constants/index.js';
+
+export async function deletePostTemplatePicture(req, res) {
   const { hash } = req.params;
   const { userId } = req.session;
 
@@ -50,4 +51,4 @@ exports.deletePostTemplatePicture = async (req, res) => {
   );
 
   sendSuccess(res);
-};
+}

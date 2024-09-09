@@ -1,9 +1,9 @@
 // Morgan is a middleware for logging HTTP requests in a provided format
 
-const morgan = require('morgan');
-const { logger } = require('../libs/logger');
+import morgan, { token } from 'morgan';
+import { logger } from '../libs/logger.js';
 
-morgan.token('request-body', (req) => {
+token('request-body', (req) => {
   const body = { ...req.body };
 
   // Clean sensitive data
@@ -18,7 +18,7 @@ morgan.token('request-body', (req) => {
   return body;
 });
 
-module.exports = morgan(
+export default morgan(
   (tokens, req, res) =>
     JSON.stringify({
       requestId: req.id,

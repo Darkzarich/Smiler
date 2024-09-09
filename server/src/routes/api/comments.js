@@ -1,9 +1,9 @@
-const router = require('express').Router();
-const {
-  asyncControllerErrorHandler,
-} = require('../../utils/async-controller-error-handler');
-const commentsController = require('../../controllers/comments');
-const authRequiredMiddleware = require('../../middlewares/auth-required');
+import express from 'express';
+import { asyncControllerErrorHandler } from '../../utils/async-controller-error-handler.js';
+import { getList, create, updateById, deleteById, voteById, unvoteById } from '../../controllers/comments/index.js';
+import authRequiredMiddleware from '../../middlewares/auth-required.js';
+
+const router = express.Router();
 
 /**
 @swagger
@@ -245,12 +245,12 @@ const authRequiredMiddleware = require('../../middlewares/auth-required');
   }
 }
 */
-router.get('/', asyncControllerErrorHandler(commentsController.getList));
+router.get('/', asyncControllerErrorHandler(getList));
 
 router.post(
   '/',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(commentsController.create),
+  asyncControllerErrorHandler(create),
 );
 
 /**
@@ -360,12 +360,12 @@ router.post(
 router.put(
   '/:id',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(commentsController.updateById),
+  asyncControllerErrorHandler(updateById),
 );
 router.delete(
   '/:id',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(commentsController.deleteById),
+  asyncControllerErrorHandler(deleteById),
 );
 
 /**
@@ -473,12 +473,12 @@ router.delete(
 router.put(
   '/:id/vote',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(commentsController.voteById),
+  asyncControllerErrorHandler(voteById),
 );
 router.delete(
   '/:id/vote',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(commentsController.unvoteById),
+  asyncControllerErrorHandler(unvoteById),
 );
 
-module.exports = router;
+export default router;

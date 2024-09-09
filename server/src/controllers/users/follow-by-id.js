@@ -1,13 +1,12 @@
-const User = require('../../models/User');
-
-const {
+import User from '../../models/User.js';
+import {
   ForbiddenError,
   NotFoundError,
   BadRequestError,
-} = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+} from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.followById = async (req, res) => {
+export async function followById(req, res) {
   const { id } = req.params;
   const { userId } = req.session;
 
@@ -34,4 +33,4 @@ exports.followById = async (req, res) => {
   ]);
 
   sendSuccess(res);
-};
+}

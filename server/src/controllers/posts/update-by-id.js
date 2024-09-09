@@ -1,22 +1,21 @@
-const { differenceInMilliseconds, millisecondsToMinutes } = require('date-fns');
-const sanitizeHtml = require('../../libs/sanitize-html');
-
-const Post = require('../../models/Post');
-const {
-  POST_TIME_TO_UPDATE,
+import { differenceInMilliseconds, millisecondsToMinutes } from 'date-fns';
+import sanitizeHtml from '../../libs/sanitize-html.js';
+import Post from '../../models/Post.js';
+import {
+  POST_SECTION_TYPES,
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
-  POST_SECTION_TYPES,
-} = require('../../constants');
-const {
+  POST_TIME_TO_UPDATE,
+} from '../../constants/index.js';
+import {
+  ValidationError,
   NotFoundError,
   ForbiddenError,
-  ValidationError,
-} = require('../../errors');
-const { removeFileByPath } = require('../../utils/remove-file-by-path');
-const { sendSuccess } = require('../../utils/responseUtils');
+} from '../../errors/index.js';
+import { removeFileByPath } from '../../utils/remove-file-by-path.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.updateById = async (req, res) => {
+export async function updateById(req, res) {
   // TODO: validate sections on update by type and other stuff the same as when creating post
   // TODO: move all Post validation in one place
 
@@ -100,4 +99,4 @@ exports.updateById = async (req, res) => {
   for (const filePath of filePathsToDelete) {
     removeFileByPath(filePath);
   }
-};
+}

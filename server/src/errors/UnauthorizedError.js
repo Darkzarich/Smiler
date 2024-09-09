@@ -1,6 +1,6 @@
-const AbstractError = require('./AbstractError');
+import AbstractError from './AbstractError.js';
 
-class UnauthorizedError extends AbstractError {
+export default class UnauthorizedError extends AbstractError {
   constructor(message) {
     super({
       code: 'Unauthorized',
@@ -10,5 +10,3 @@ class UnauthorizedError extends AbstractError {
     });
   }
 }
-
-module.exports = UnauthorizedError;

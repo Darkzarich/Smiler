@@ -1,11 +1,11 @@
-const User = require('../../models/User');
-const Post = require('../../models/Post');
-const Rate = require('../../models/Rate');
-const { POST_RATE_VALUE } = require('../../constants');
-const { NotFoundError, ForbiddenError } = require('../../errors');
-const { sendSuccess } = require('../../utils/responseUtils');
+import User from '../../models/User.js';
+import Post from '../../models/Post.js';
+import Rate from '../../models/Rate.js';
+import { POST_RATE_VALUE } from '../../constants/index.js';
+import { NotFoundError, ForbiddenError } from '../../errors/index.js';
+import { sendSuccess } from '../../utils/responseUtils.js';
 
-exports.voteById = async (req, res) => {
+export async function voteById(req, res) {
   const { userId } = req.session;
   const { id: postId } = req.params;
   const { negative } = req.body;
@@ -49,4 +49,4 @@ exports.voteById = async (req, res) => {
   ]);
 
   sendSuccess(res, updatedPost);
-};
+}

@@ -1,6 +1,6 @@
-const AbstractError = require('./AbstractError');
+import AbstractError from './AbstractError.js';
 
-class ConflictError extends AbstractError {
+export default class ConflictError extends AbstractError {
   constructor(message) {
     super({
       code: 'Conflict',
@@ -10,5 +10,3 @@ class ConflictError extends AbstractError {
     });
   }
 }
-
-module.exports = ConflictError;

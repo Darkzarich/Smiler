@@ -1,9 +1,9 @@
-const router = require('express').Router();
-const {
-  asyncControllerErrorHandler,
-} = require('../../utils/async-controller-error-handler');
-const authController = require('../../controllers/auth');
-const authRequiredMiddleware = require('../../middlewares/auth-required');
+import express from 'express';
+import { asyncControllerErrorHandler } from '../../utils/async-controller-error-handler.js';
+import { current, signIn, signUp, logout } from '../../controllers/auth/index.js';
+import authRequiredMiddleware from '../../middlewares/auth-required.js';
+
+const router = express.Router();
 
 /**
 @swagger
@@ -76,7 +76,7 @@ const authRequiredMiddleware = require('../../middlewares/auth-required');
   }
 }
 */
-router.get('/current', asyncControllerErrorHandler(authController.current));
+router.get('/current', asyncControllerErrorHandler(current));
 
 /**
 @swagger
@@ -143,7 +143,7 @@ router.get('/current', asyncControllerErrorHandler(authController.current));
   }
 }
 */
-router.post('/signin', asyncControllerErrorHandler(authController.signIn));
+router.post('/signin', asyncControllerErrorHandler(signIn));
 
 /**
 @swagger
@@ -214,7 +214,7 @@ router.post('/signin', asyncControllerErrorHandler(authController.signIn));
   }
 }
 */
-router.post('/signup', asyncControllerErrorHandler(authController.signUp));
+router.post('/signup', asyncControllerErrorHandler(signUp));
 
 /**
 @swagger
@@ -242,7 +242,7 @@ router.post('/signup', asyncControllerErrorHandler(authController.signUp));
 router.post(
   '/logout',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(authController.logout),
+  asyncControllerErrorHandler(logout),
 );
 
-module.exports = router;
+export default router;
