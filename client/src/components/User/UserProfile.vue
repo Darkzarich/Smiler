@@ -69,8 +69,7 @@ export default {
       return this.user.isFollowed;
     },
     isSameUser() {
-      // TODO: Find all these check and change them to comparing user id not login
-      return this.$store.state.user.login === this.user.login;
+      return this.$store.state.user.id === this.user.id;
     },
   },
   methods: {

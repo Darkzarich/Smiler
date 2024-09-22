@@ -22,15 +22,15 @@ export default {
       method: 'delete',
     });
   },
-  getUserTemplate(login) {
+  getUserTemplate(id) {
     return Query({
-      url: `${CONTROLLER_URL}/${login}/template`,
+      url: `${CONTROLLER_URL}/${id}/template`,
       method: 'get',
     });
   },
-  updateUserTemplate(login, data) {
+  updateUserTemplate(id, data) {
     return Query({
-      url: `${CONTROLLER_URL}/${login}/template`,
+      url: `${CONTROLLER_URL}/${id}/template`,
       method: 'put',
       data,
     });

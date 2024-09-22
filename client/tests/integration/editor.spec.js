@@ -237,7 +237,7 @@ test('Fetch and show draft template', async ({ Api, page, PostCreatePage }) => {
       preRequestAction: PostCreatePage.goto.bind(PostCreatePage),
     });
 
-  expect(getUserTemplateResponse.url()).toContain(authUser.login);
+  expect(getUserTemplateResponse.url()).toContain(authUser.id);
 
   await expect(page.getByTestId('post-section').first()).toContainText(
     savedSections[0].content,
@@ -291,7 +291,7 @@ test('Saves draft template', async ({
   await expect(NotificationList.root).toHaveText(
     'Draft post has been saved successfully!',
   );
-  expect(updateUserTemplateResponse.url()).toContain(authUser.login);
+  expect(updateUserTemplateResponse.url()).toContain(authUser.id);
   expect(updateUserTemplateResponse.postDataJSON()).toMatchObject({
     title,
     tags: [tag],

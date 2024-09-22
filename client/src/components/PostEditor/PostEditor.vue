@@ -147,7 +147,7 @@ export default {
   },
   computed: {
     ...mapState({
-      getUserLogin: (state) => state.user.login,
+      userId: (state) => state.user.id,
     }),
     isSubmitDisabled() {
       return Boolean(this.validation.title || this.validation.sections);
@@ -192,7 +192,8 @@ export default {
       this.title = this.post.title;
       this.tags = this.post.tags;
     } else {
-      const res = await api.users.getUserTemplate(this.getUserLogin);
+      const res = await api.users.getUserTemplate(this.userId);
+
       if (!res.data.error) {
         this.title = res.data.title;
         this.sections = res.data.sections || [];
@@ -247,7 +248,7 @@ export default {
     async saveDraft() {
       this.saving = true;
 
-      const res = await api.users.updateUserTemplate(this.getUserLogin, {
+      const res = await api.users.updateUserTemplate(this.userId, {
         title: this.title,
         sections: this.sections,
         tags: this.tags,

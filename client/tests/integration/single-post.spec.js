@@ -275,7 +275,7 @@ test.describe('Post edit', () => {
   const currentUserNewerPost = createRandomPost({
     createdAt: subMinutes(nowISOString, 9).toISOString(),
     author: {
-      login: auth.login,
+      id: auth.id,
     },
   });
   currentUserNewerPost.sections = currentUserNewerPost.sections.slice(0, 1);
@@ -298,7 +298,7 @@ test.describe('Post edit', () => {
       // Posted 11 minutes ago from now
       createdAt: subMinutes(nowISOString, 11).toISOString(),
       author: {
-        login: auth.login,
+        id: auth.id,
       },
     });
 
@@ -326,7 +326,7 @@ test.describe('Post edit', () => {
       // Posted 11 minutes ago from now
       createdAt: subMinutes(nowISOString, 11).toISOString(),
       author: {
-        login: auth.login,
+        id: auth.id,
       },
     });
 
@@ -339,7 +339,7 @@ test.describe('Post edit', () => {
     await expect(currentPage).toHaveURL(PostsPage.urls.today);
     await expect(currentPage).toHaveTitle(PostsPage.titles.today);
     await expect(NotificationList.root).toContainText(
-      'You cannot edit this post anymore. Edit time has expired',
+      'You cannot edit this post anymore. The time allowed to edit has expired',
     );
   });
 

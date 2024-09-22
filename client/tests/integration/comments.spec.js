@@ -428,7 +428,7 @@ test.describe('Editing or deleting a comment', () => {
   const currentUserComment = createRandomComment(
     {
       author: {
-        login: auth.login,
+        id: auth.id,
       },
     },
     false,
@@ -457,7 +457,7 @@ test.describe('Editing or deleting a comment', () => {
       // Posted 11 minutes ago from now
       createdAt: subMinutes(nowISOString, 11).toISOString(),
       author: {
-        login: auth.login,
+        id: auth.id,
       },
     });
 
@@ -582,7 +582,7 @@ test.describe('Editing or deleting a comment', () => {
     const currentUserCommentWithReplies = createRandomComment(
       {
         author: {
-          login: auth.login,
+          id: auth.id,
         },
       },
       true,

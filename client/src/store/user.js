@@ -2,6 +2,7 @@ import api from '@/api';
 
 export default {
   state: {
+    id: -1,
     authState: false,
     login: '',
     avatar: '',
@@ -32,10 +33,12 @@ export default {
       state.avatar = user.avatar;
       state.email = user.email;
       state.login = user.login;
+      state.id = user.id;
       state.tagsFollowed = user.tagsFollowed;
       state.followersAmount = user.followersAmount || 0;
     },
     clearUser(state) {
+      state.id = -1;
       state.authState = false;
       state.login = '';
       state.avatar = '';

@@ -41,7 +41,7 @@ export default {
   },
   computed: {
     ...mapState({
-      login: (state) => state.user.login,
+      id: (state) => state.user.id,
     }),
   },
   methods: {
@@ -55,8 +55,7 @@ export default {
       this.show = false;
       this.key = 'edit';
 
-      // TODO: Check id instead
-      if (data.author.login !== this.login) {
+      if (data.author.id !== this.id) {
         this.$store.dispatch('showErrorNotification', {
           message: "Only post's author can edit this post",
         });
@@ -65,7 +64,8 @@ export default {
         });
       } else if (!this.$postCanEdit(data)) {
         this.$store.dispatch('showErrorNotification', {
-          message: 'You cannot edit this post anymore. Edit time has expired',
+          message:
+            'You cannot edit this post anymore. The time allowed to edit has expired',
         });
         this.$router.push({
           name: 'Home',

@@ -93,9 +93,9 @@ Vue.mixin({
       }
     },
     $postCanEdit(post) {
-      const currentLogin = store.state.user.login;
+      const currentId = store.state.user.id;
 
-      if (!currentLogin || !post.author || post.author.login !== currentLogin) {
+      if (!currentId || !post.author || post.author.id !== currentId) {
         return false;
       }
 
@@ -109,13 +109,9 @@ Vue.mixin({
       return true;
     },
     $commentCanEdit(comment) {
-      const currentLogin = store.state.user.login;
+      const currentId = store.state.user.id;
 
-      if (
-        !currentLogin ||
-        !comment.author ||
-        comment.author.login !== currentLogin
-      ) {
+      if (!currentId || !comment.author || comment.author.id !== currentId) {
         return false;
       }
 

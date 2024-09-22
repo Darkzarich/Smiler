@@ -99,7 +99,7 @@ test.describe('Follows and unfollow', () => {
     Api.routes.auth.getAuth.mock({
       body: createRandomAuth({
         isAuth: true,
-        login: `_${testUser.login}`,
+        id: `_${testUser.id}`,
       }),
     });
 
@@ -178,7 +178,7 @@ test.describe('Follows and unfollow', () => {
 
     Api.routes.users.getUserProfile.mock({
       body: createRandomProfile({
-        login: auth.login,
+        id: auth.id,
       }),
     });
 
