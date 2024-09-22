@@ -230,12 +230,12 @@ router.put(
       "parameters": [
         {
           "in": "path",
-          "name": "login",
+          "name": "id",
           "schema": {
             "type": "string"
           },
           "required": true,
-          "description": "User name"
+          "description": "User id"
         }
       ],
       "responses": {
@@ -271,12 +271,12 @@ router.put(
       "parameters": [
         {
           "in": "path",
-          "name": "login",
+          "name": "id",
           "schema": {
             "type": "string"
           },
           "required": true,
-          "description": "User name"
+          "description": "User id"
         }
       ],
       "requestBody": {
@@ -332,12 +332,12 @@ router.put(
 */
 
 router.get(
-  '/:login/template',
+  '/:id/template',
   authRequiredMiddleware,
   asyncControllerErrorHandler(getPostTemplate),
 );
 router.put(
-  '/:login/template',
+  '/:id/template',
   authRequiredMiddleware,
   asyncControllerErrorHandler(updatePostTemplate),
 );

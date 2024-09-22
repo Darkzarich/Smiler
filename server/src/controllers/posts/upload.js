@@ -14,10 +14,7 @@ import { sendSuccess } from '../../utils/responseUtils.js';
 const postMulter = multer({
   storage: new DiskStorage({
     destination: async (req, file, callback) => {
-      callback(
-        null,
-        join(process.cwd(), 'uploads', req.session.userLogin),
-      );
+      callback(null, join(process.cwd(), 'uploads', req.session.userId));
     },
     filename: (req, file, callback) => {
       callback(null, `${Date.now()}${extname(file.originalname)}`);
@@ -57,7 +54,7 @@ const postMulter = multer({
 }).single('picture'); // frontend form-data name for file
 
 export async function upload(req, res, next) {
-  const { userId, userLogin } = req.session;
+  const { userId } = req.session;
 
   const user = await User.findById(userId).select('template');
 
@@ -70,7 +67,7 @@ export async function upload(req, res, next) {
   const rootFolder = process.cwd();
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await mkdir(join(rootFolder, 'uploads', userLogin), {
+  await mkdir(join(rootFolder, 'uploads', userId), {
     recursive: true,
   });
 

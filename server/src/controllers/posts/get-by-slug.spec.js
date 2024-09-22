@@ -52,6 +52,7 @@ describe('GET /posts/:slug', () => {
       title: post.title,
       slug: post.slug,
       author: {
+        id: user._id.toString(),
         login: user.login,
         avatar: '',
       },

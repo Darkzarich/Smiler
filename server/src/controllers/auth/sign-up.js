@@ -27,7 +27,7 @@ const validate = (user) => {
   }
 };
 
-export async function signUp (req, res) {
+export async function signUp(req, res) {
   const user = {
     email: req.body.email,
     login: req.body.login,
@@ -35,10 +35,10 @@ export async function signUp (req, res) {
     confirm: req.body.confirm,
   };
 
-  const error = validate(user);
+  const errorText = validate(user);
 
-  if (error) {
-    throw new ValidationError(error);
+  if (errorText) {
+    throw new ValidationError(errorText);
   }
 
   const salt = crypto.randomBytes(16).toString('hex');
@@ -54,11 +54,11 @@ export async function signUp (req, res) {
       salt,
     });
 
-    req.session.userId = newUser.id;
-    req.session.userLogin = newUser.login;
+    req.session.userId = newUser._id;
 
     const userAuth = {
-      login: req.session.userLogin,
+      id: newUser._id,
+      login: newUser.login,
       isAuth: true,
       rating: newUser.rating,
       avatar: newUser.avatar,
@@ -75,4 +75,4 @@ export async function signUp (req, res) {
 
     throw error;
   }
-};
+}

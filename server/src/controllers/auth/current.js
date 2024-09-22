@@ -18,6 +18,7 @@ export async function current(req, res) {
   }
 
   return sendSuccess(res, {
+    id: user._id,
     login: user.login,
     isAuth: true,
     rating: user.rating || 0,

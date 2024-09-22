@@ -19,6 +19,9 @@ const router = express.Router();
       "AuthState": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string"
+          },
           "email": {
             "type": "string"
           },

@@ -4,29 +4,36 @@ import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function getByLogin(req, res) {
   const { login } = req.params;
-  const { userId, userLogin } = req.session;
+  const { userId: currentUserId } = req.session;
 
-  const promises = [
-    User.findOne({
-      login,
-    }).select('login rating bio avatar createdAt followersAmount'),
-  ];
-
-  // TODO: Replace with id of the user
-  if (userId && login !== userLogin) {
-    promises.push(User.findById(userId));
-  }
-
-  const [requestedUser, requestingUser] = await Promise.all(promises);
+  const requestedUser = await User.findOne({
+    login,
+  }).select({
+    login: 1,
+    rating: 1,
+    bio: 1,
+    avatar: 1,
+    createdAt: 1,
+    followersAmount: 1,
+  });
 
   if (!requestedUser) {
     throw new NotFoundError('User is not found');
   }
 
+  // The current user requested their own profile
+  if (currentUserId === requestedUser._id) {
+    sendSuccess(res, requestedUser.toJSON());
+
+    return;
+  }
+
+  const currentUser = await User.findById(currentUserId).select('');
+
   const response = {
     ...requestedUser.toJSON(),
-    isFollowed: requestingUser
-      ? requestingUser.isFollowed(requestedUser._id)
+    isFollowed: currentUser
+      ? currentUser.isFollowed(requestedUser._id)
       : false,
   };
 

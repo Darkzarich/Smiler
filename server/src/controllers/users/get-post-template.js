@@ -3,8 +3,7 @@ import { ForbiddenError } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function getPostTemplate(req, res) {
-  // TODO: Replace with id of the user
-  if (req.session.userLogin !== req.params.login) {
+  if (req.session.userId !== req.params.id) {
     throw new ForbiddenError('Can see only your own template');
   }
 

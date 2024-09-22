@@ -46,10 +46,10 @@ export async function signIn(req, res) {
   }
 
   req.session.userId = foundUser._id;
-  req.session.userLogin = foundUser.login;
 
   // TODO: Maybe move to getters of the model
   const userAuth = {
+    id: foundUser._id,
     login: foundUser.login,
     isAuth: true,
     rating: foundUser.rating || 0,

@@ -11,8 +11,7 @@ export async function updatePostTemplate(req, res) {
   const { tags } = req.body;
   const { title } = req.body;
 
-  // TODO: Replace with id of the user
-  if (req.session.userLogin !== req.params.login) {
+  if (req.session.userId !== req.params.id) {
     throw new ForbiddenError('Can save template only for yourself');
   }
 
