@@ -6,11 +6,15 @@
 
 ### [Demo](https://smiler.darkzarich.com/posts/all) | [Swagger documentation](https://smiler-api.darkzarich.com/api-docs/)
 
-Hello! :smile: 
+Welcome! :smile:
 
-This is my own pet MEVN (MongoDB, Express, Vue.js, Node.js) site-project similar to reddit.com, 9gag, etc with many different and awesome features, open Swagger API documentation (as the result of using Design First approach). Main reason of making this site is fun and learning new things while making it.
+This is my pet project build on the MEVN stack (MongoDB, Express, Vue.js, Node.js).  It’s a Single Page Application (SPA) inspired by platforms like Reddit and 9gag, packed with exciting features and innovative technical solutions listed below. Most components are covered with end-to-end (e2e) tests to ensure reliability.
 
-Here is my [public roadmap](https://indecisive-shame-203.notion.site/73381a25f9154f56acf3eb43dcb6e36e?v=1d21a8001b464367963c77605c9ab92a&pvs=4) so you will know anything about what I'm currently working on related to this project and also any my future ideas and fixes I'm planning to release one day :sunglasses:
+The primary motivation behind this project is to have fun while learning new technologies and implementing creative solutions. 
+
+I hope you find it as enjoyable as I do!
+
+Feel free to explore the code, report issues, or contribute!
 
 ### Requirements:
 - Node.js (>=20.16.0)
@@ -18,31 +22,30 @@ Here is my [public roadmap](https://indecisive-shame-203.notion.site/73381a25f91
 
 ### How to run it:
 
-0. Get your remote MongoDB ready. Do one of the options:
+1. Get your remote MongoDB ready. Do one of the options:
 	- Get a remote mongo db instance, for example [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). Take connection link and put it into `.env` file
 	- Run a local MongoDB instance with Docker
 		```bash
 		docker run -d -v /usr/src/smiler/db:/data/db -p 27017:27017 mongo:5.0.10
 		```
 
-1. `npm install`
-2. Inside root folder rename `.env.example` to `.env`
-3. Fill in your `.env` file following the comments inside the file
-4. `npm run dev`
+2. `npm install`
+3. Inside the root folder rename `.env.example` to `.env`
+4. Fill in your `.env` file following the comments inside the file
+5. Run `npm run dev`
 
-Alternatively you can run it with Docker Compose:
+Alternatively, you can run everything with Docker Compose using just a single command:
 ```bash
 # optionally add --build to build images instead of getting it from docker hub
 docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
 ```
 
 ### Common Features
-- It's containerized and docker-compose setup is very flexible! BUT it also can work without Docker
+- It's containerized and docker-compose setup is very flexible! And it also can work without Docker
 
-### Backend Features:
+### Backend Key Features:
 - General:
-	- **Clustering**. If something goes wrong on the server side and something throws an exception the app won't
-	die
+	- **Clustering**. If something goes wrong on the server side and something throws an exception the app won't stop working, instead another instance will be run.
 	- **CORS Protection**. The API has set allowed domains through env variables.
 	- **Logging**. Every single request is logged with [Winston](https://github.com/winstonjs/winston) and [morgan](https://github.com/expressjs/morgan). Also logs are saved to the file as well.
 - Posts:
@@ -75,7 +78,7 @@ docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
 	- **Comment rating**. Comments have their rating which forms user rating along with Posts rating
 - Full Swagger documentation to existing end-points (available with path `/api-docs/`)
 
-### Frontend Features
+### Frontend Key Features
 (might be missing out a lot, it's hard to describe all those...)
 
 - General:
@@ -105,6 +108,6 @@ docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
 	- **Login form**
 - Comments:
 	- **Tree comments**.
-	- **Creating comments**. With rich editor
+	- **Creating comments**. With rich text editor
 	- **Deleting comments**
 	- **Updating comments**
