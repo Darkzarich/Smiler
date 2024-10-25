@@ -21,7 +21,7 @@
     "lodash": "^4.17.21",
     "normalize.css": "^8.0.1",
     "v-click-outside": "^2.1.4",
-    "vue": "^2.7.14",
+    "vue": "^3.0.0",
     "vue-router": "^3.0.3",
     "vuedraggable": "^2.23.2",
     "vuex": "^3.0.1"
