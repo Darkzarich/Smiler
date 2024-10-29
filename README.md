@@ -1,5 +1,5 @@
 <div align="center">
-   <img src="https://i.imgur.com/D3AjmGt.png"/>
+   <img src="logo.png"/>
 </div>
 
 # Smiler
