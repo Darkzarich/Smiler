@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import cloneDeep from 'lodash/cloneDeep';
 import defaultsDeep from 'lodash/defaultsDeep';
 import times from 'lodash/times';
 
@@ -47,11 +46,9 @@ export default function createRandomComment(overrides, withChildren = false) {
     });
   }
 
-  const clonedComment = cloneDeep(comment);
-
   if (!overrides) {
-    return clonedComment;
+    return comment;
   }
 
-  return defaultsDeep(overrides, clonedComment);
+  return defaultsDeep(overrides, comment);
 }

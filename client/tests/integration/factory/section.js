@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
 
 function createTextSection() {
@@ -43,11 +42,11 @@ export default function createSection(overrides = {}) {
   const type =
     overrides.type || faker.helpers.arrayElement(['text', 'pic', 'vid']);
 
-  const clonedSection = cloneDeep(createSectionFns[type]());
+  const newSection = createSectionFns[type]();
 
   if (!overrides) {
-    return clonedSection;
+    return newSection;
   }
 
-  return defaults(overrides, clonedSection);
+  return defaults(overrides, newSection);
 }

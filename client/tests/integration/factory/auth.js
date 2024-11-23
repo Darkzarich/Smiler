@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import cloneDeep from 'lodash/cloneDeep';
 import defaultsDeep from 'lodash/defaultsDeep';
 
 /**
@@ -31,7 +30,5 @@ export default function createRandomAuth(overrides = {}) {
         isAuth: false,
       };
 
-  const clonedAuth = cloneDeep(auth);
-
-  return defaultsDeep(overrides, clonedAuth);
+  return defaultsDeep(overrides, auth);
 }

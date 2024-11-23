@@ -1,6 +1,5 @@
 // TODO: Replace with lodash-es when moving to TypeScript
 import { faker } from '@faker-js/faker';
-import cloneDeep from 'lodash/cloneDeep';
 import defaultsDeep from 'lodash/defaultsDeep';
 import createSection from './section';
 
@@ -36,7 +35,5 @@ export default function createRandomPost(overrides = {}) {
     },
   };
 
-  const clonedPost = cloneDeep(post);
-
-  return defaultsDeep(overrides, clonedPost);
+  return defaultsDeep(overrides, post);
 }

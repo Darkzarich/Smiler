@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import cloneDeep from 'lodash/cloneDeep';
 import defaultsDeep from 'lodash/defaultsDeep';
 
 /**
@@ -21,11 +20,9 @@ export default function createRandomProfile(overrides) {
     isFollowed: faker.datatype.boolean(),
   };
 
-  const clonedProfile = cloneDeep(profile);
-
   if (!overrides) {
-    return clonedProfile;
+    return profile;
   }
 
-  return defaultsDeep(overrides, clonedProfile);
+  return defaultsDeep(overrides, profile);
 }
