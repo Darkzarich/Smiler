@@ -10,8 +10,8 @@ export default (db) =>
     resave: true,
     cookie: {
       secure: Config.IS_PRODUCTION,
-      httpOnly: true,
-      sameSite: 'strict',
+      httpOnly: false,
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000, // a week
     },
     saveUninitialized: false,

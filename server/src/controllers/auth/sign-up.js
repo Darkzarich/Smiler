@@ -10,8 +10,8 @@ const validate = (user) => {
     return 'All fields must be filled';
   }
 
-  if (user.login.length < 3 || user.login.length > 10) {
-    return 'Login length must be 3-10 symbols';
+  if (user.login.length < 3 || user.login.length > 15) {
+    return 'Login length must be 3-15 symbols';
   }
 
   if (user.password.length < 6) {

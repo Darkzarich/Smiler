@@ -12,7 +12,7 @@ export async function getBySlug(req, res) {
     Post.findOne({
       slug,
     }).populate('author', 'login avatar'),
-    User.findById(userId).select('rates').populate('rates'),
+    userId ? User.findById(userId).select('rates').populate('rates') : null,
   ]);
 
   if (!post) {

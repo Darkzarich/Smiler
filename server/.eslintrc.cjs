@@ -27,6 +27,7 @@ module.exports = {
     'node/no-unpublished-require': 'off',
     'import/prefer-default-export': 'off',
     'import/extensions': 'off',
+    'node/no-unpublished-import': 'off',
   },
   overrides: [
     {

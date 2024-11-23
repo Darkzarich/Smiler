@@ -8,7 +8,7 @@
     "node": ">=v20.16.0"
   },
   "scripts": {
-    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --maxWorkers 4",
+    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "gen-doc": "npx swagger-jsdoc -d src/swagger/swaggerDef.js -o \"src/swagger/swagger.json\"",
@@ -49,6 +49,7 @@
     "express-request-id": "^1.4.1",
     "express-session": "^1.18.1",
     "helmet": "^7.1.0",
+    "lodash": "^4.17.21",
     "mongoose": "^5.7.5",
     "mongoose-autopopulate": "^0.9.1",
     "morgan": "^1.9.1",
