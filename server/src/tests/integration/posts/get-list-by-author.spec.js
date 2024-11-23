@@ -1,6 +1,6 @@
 import request from 'supertest';
-import App from '../../app.js';
-import { connectDB } from '../../libs/db.js';
+import App from '../../../app.js';
+import { connectDB } from '../../../libs/db.js';
 
 let app;
 let db;
@@ -11,12 +11,14 @@ beforeAll(async () => {
   const resolvedApp = await App.startApp({ db });
 
   app = resolvedApp.app;
-
-  await db.dropDatabase();
 });
 
 afterAll(async () => {
   await db.close();
+});
+
+beforeEach(async () => {
+  await db.dropDatabase();
 });
 
 describe('GET /posts?author=', () => {
