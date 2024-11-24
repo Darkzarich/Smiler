@@ -83,11 +83,13 @@ schema.methods.toResponse = function (user) {
     title: this.title,
     sections: this.sections,
     slug: this.slug,
-    author: {
-      id: this.author._id,
-      login: this.author.login,
-      avatar: this.author.avatar,
-    },
+    author: this.author
+      ? {
+          id: this.author._id,
+          login: this.author.login,
+          avatar: this.author.avatar,
+        }
+      : null,
     uploads: this.uploads,
     id: this._id,
     commentCount: this.commentCount,

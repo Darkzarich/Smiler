@@ -9,6 +9,7 @@ import {
   generateRandomUser,
   generateRate,
 } from '../../data-generators/index.js';
+import { signUpRequest } from '../../utils/request-auth.js';
 
 let app;
 let db;
@@ -37,7 +38,7 @@ describe('GET /posts/:slug', () => {
     expect(response.status).toBe(404);
   });
 
-  it('Should return status 200 and a post with its author if a post by provided slug exists', async () => {
+  it('Should return a post with its author if a post by provided slug exists with an expected structure', async () => {
     const user = await User.create(generateRandomUser());
 
     const post = (
@@ -51,7 +52,8 @@ describe('GET /posts/:slug', () => {
     const response = await request(app).get(`/api/posts/${post.slug}`);
 
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({
+    expect(response.body).toEqual({
+      id: post._id.toString(),
       title: post.title,
       slug: post.slug,
       author: {
@@ -70,14 +72,7 @@ describe('GET /posts/:slug', () => {
 
   it('Should return that a post is rated if the current user has rated it', async () => {
     // TODO: Move to test utils
-    const currentUser = await request(app).post('/api/auth/signup').send({
-      login: 'currentUser',
-      email: 'current-user@gmail.com',
-      password: '123456',
-      confirm: '123456',
-    });
-
-    const sessionCookie = currentUser.headers['set-cookie'][0];
+    const { currentUser, sessionCookie } = await signUpRequest(app);
 
     const otherUser = await User.create(generateRandomUser());
 
@@ -94,7 +89,7 @@ describe('GET /posts/:slug', () => {
       }),
     );
 
-    await User.findByIdAndUpdate(currentUser.body.id, {
+    await User.findByIdAndUpdate(currentUser.id, {
       $push: { rates: rate },
     });
 
@@ -103,8 +98,9 @@ describe('GET /posts/:slug', () => {
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({
-      rated: { isRated: true, negative: true },
+    expect(response.body.rated).toMatchObject({
+      isRated: true,
+      negative: true,
     });
   });
 });

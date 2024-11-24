@@ -1,6 +1,6 @@
 import User from '../../models/User.js';
 import Post from '../../models/Post.js';
-import { ValidationError } from '../../errors/index.js';
+import { UnauthorizedError, ValidationError } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function getFeed(req, res) {
@@ -13,6 +13,12 @@ export async function getFeed(req, res) {
   }
 
   const user = await User.findById(userId).populate('rates');
+
+  if (!user) {
+    throw new UnauthorizedError(
+      'Auth is required for this operation. Please sign in.',
+    );
+  }
 
   const query = {
     $and: [

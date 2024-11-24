@@ -31,9 +31,12 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['**/*.spec.js'],
+      files: ['**/*.spec.js', 'src/tests/**/*.js'],
       env: {
         jest: true,
+      },
+      rules: {
+        'import/no-extraneous-dependencies': 'off',
       },
     },
   ],
