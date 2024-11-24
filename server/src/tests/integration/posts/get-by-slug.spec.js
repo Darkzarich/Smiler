@@ -71,7 +71,6 @@ describe('GET /posts/:slug', () => {
   });
 
   it('Should return that a post is rated if the current user has rated it', async () => {
-    // TODO: Move to test utils
     const { currentUser, sessionCookie } = await signUpRequest(app);
 
     const otherUser = await User.create(generateRandomUser());
