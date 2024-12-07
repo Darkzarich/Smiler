@@ -7,6 +7,7 @@ export function generateRandomUser(overrides = {}) {
     avatar: 'https://picsum.photos/200/300',
     salt: 'test',
     hash: 'test',
+    rating: 0,
   };
 
   return defaultsDeep(overrides, user);

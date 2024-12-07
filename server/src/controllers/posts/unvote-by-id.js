@@ -1,20 +1,18 @@
 import User from '../../models/User.js';
 import Post from '../../models/Post.js';
 import Rate from '../../models/Rate.js';
-import {
-  POST_RATE_VALUE
-} from '../../constants/index.js';
+import { POST_RATE_VALUE } from '../../constants/index.js';
 import { NotFoundError, ForbiddenError } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
-export async function unvoteById (req, res) {
+export async function unvoteById(req, res) {
   const { userId } = req.session;
   const { id: postId } = req.params;
 
   const targetPost = await Post.findById(postId).select({ author: 1 });
 
   if (!targetPost) {
-    throw new NotFoundError('Post does not exist');
+    throw new NotFoundError("Post doesn't exist");
   }
 
   const currentUser = await User.findById(userId)
@@ -46,4 +44,4 @@ export async function unvoteById (req, res) {
   ]);
 
   sendSuccess(res, updatedPost);
-};
+}

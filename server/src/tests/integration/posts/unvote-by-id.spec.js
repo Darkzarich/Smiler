@@ -30,9 +30,9 @@ beforeEach(async () => {
   await db.dropDatabase();
 });
 
-describe('PUT /posts/:id/vote', () => {
+describe('DELETE /posts/:id/vote', () => {
   it('Should return status 401 and an expected message for not signed in user', async () => {
-    const response = await request(app).put('/api/posts/1234/vote');
+    const response = await request(app).delete('/api/posts/1234/vote');
 
     expect(response.body.error.message).toBe(
       'Auth is required for this operation. Please sign in.',
@@ -44,14 +44,14 @@ describe('PUT /posts/:id/vote', () => {
     const { sessionCookie } = await signUpRequest(app);
 
     const response = await request(app)
-      .put('/api/posts/5d5467b4c17806706f3df347/vote')
+      .delete('/api/posts/5d5467b4c17806706f3df347/vote')
       .set('Cookie', sessionCookie);
 
     expect(response.body.error.message).toBe("Post doesn't exist");
     expect(response.status).toBe(404);
   });
 
-  it('Should return status 403 and an expected message when user tries to vote for a post that they own', async () => {
+  it('Should return status 403 and an expected message when user tries to unvote a post that has not been rated', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(app);
 
     const post = await Post.create(
@@ -61,14 +61,16 @@ describe('PUT /posts/:id/vote', () => {
     );
 
     const response = await request(app)
-      .put(`/api/posts/${post._id}/vote`)
+      .delete(`/api/posts/${post._id}/vote`)
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(403);
-    expect(response.body.error.message).toBe("Can't rate your own post");
+    expect(response.body.error.message).toBe(
+      'Target post is not rated by the current user',
+    );
   });
 
-  it('Should return status 403 and an expected message when user tries to vote for a post that they have already rated', async () => {
+  it('Should delete a rate from the database', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(app);
 
     const otherUser = await User.create(generateRandomUser());
@@ -79,7 +81,7 @@ describe('PUT /posts/:id/vote', () => {
       }),
     );
 
-    const rate = await Rate.create(
+    const prevRate = await Rate.create(
       generateRate({
         target: post._id,
         negative: true,
@@ -88,80 +90,71 @@ describe('PUT /posts/:id/vote', () => {
     );
 
     await User.findByIdAndUpdate(currentUser.id, {
-      $push: { rates: rate._id },
+      $push: { rates: prevRate._id },
     });
 
-    const response = await request(app)
-      .put(`/api/posts/${post._id}/vote`)
-      .set('Cookie', sessionCookie);
-
-    expect(response.status).toBe(403);
-    expect(response.body.error.message).toBe(
-      "Can't rate a post you have already rated",
-    );
-  });
-
-  it('Should create a new rate in the database', async () => {
-    const { sessionCookie } = await signUpRequest(app);
-
-    const otherUser = await User.create(generateRandomUser());
-
-    const post = await Post.create(
-      generateRandomPost({
-        author: otherUser._id,
-      }),
-    );
-
-    const response = await request(app)
-      .put(`/api/posts/${post._id}/vote`)
-      .send({ negative: true })
+    await request(app)
+      .delete(`/api/posts/${post._id}/vote`)
       .set('Cookie', sessionCookie);
 
     const rate = await Rate.findOne({ target: post._id });
 
-    expect(response.status).toBe(200);
-    expect(rate).toBeDefined();
-    expect(rate.target.toString()).toBe(post._id.toString());
-    expect(rate.targetModel).toBe('Post');
-    expect(rate.negative).toBe(true);
+    expect(rate).toBe(null);
   });
 
   it.each([
-    ['increase', false],
-    ['decrease', true],
+    ['increase', true],
+    ['decrease', false],
   ])(
-    'Should %s the post rating after the post is rated',
+    'Should %s the post rating after the post is unrated after being voted for',
     async (_, isNegative) => {
-      const { sessionCookie } = await signUpRequest(app);
+      const { sessionCookie, currentUser } = await signUpRequest(app);
 
       const otherUser = await User.create(generateRandomUser());
 
       const post = await Post.create(
         generateRandomPost({
           author: otherUser._id,
+          rating: 1,
         }),
       );
 
+      const prevRate = await Rate.create(
+        generateRate({
+          target: post._id,
+          negative: isNegative,
+          targetModel: 'Post',
+        }),
+      );
+
+      await User.findByIdAndUpdate(currentUser.id, {
+        $push: { rates: prevRate._id },
+      });
+
       await request(app)
-        .put(`/api/posts/${post._id}/vote`)
-        .send({ negative: isNegative })
+        .delete(`/api/posts/${post._id}/vote`)
         .set('Cookie', sessionCookie);
 
       const { rating } = await Post.findById(post._id);
 
-      expect(rating).toBe(isNegative ? -1 : 1);
+      // the effect a vote had on the rating is reset
+      expect(rating).toBe(isNegative ? post.rating + 1 : post.rating - 1);
     },
   );
 
   it.each([
-    ['increase', false],
-    ['decrease', true],
+    ['increase', true],
+    ['decrease', false],
   ])(
-    "Should %s author's rating after after the post is rated",
+    "Should %s author's rating after after the post is unrated",
     async (_, isNegative) => {
-      const { sessionCookie } = await signUpRequest(app);
+      const { sessionCookie, currentUser } = await signUpRequest(app);
 
-      const otherUser = await User.create(generateRandomUser());
+      const otherUser = await User.create(
+        generateRandomUser({
+          rating: 1,
+        }),
+      );
 
       const post = await Post.create(
         generateRandomPost({
@@ -169,19 +162,32 @@ describe('PUT /posts/:id/vote', () => {
         }),
       );
 
+      const prevRate = await Rate.create(
+        generateRate({
+          target: post._id,
+          negative: isNegative,
+          targetModel: 'Post',
+        }),
+      );
+
+      await User.findByIdAndUpdate(currentUser.id, {
+        $push: { rates: prevRate._id },
+      });
+
       await request(app)
-        .put(`/api/posts/${post._id}/vote`)
-        .send({ negative: isNegative })
+        .delete(`/api/posts/${post._id}/vote`)
         .set('Cookie', sessionCookie);
 
       const { rating } = await User.findById(otherUser._id);
 
-      expect(rating).toBe(isNegative ? -1 : 1);
+      expect(rating).toBe(
+        isNegative ? otherUser.rating + 1 : otherUser.rating - 1,
+      );
     },
   );
 
   it('Should return the updated post with changed rating after vote', async () => {
-    const { sessionCookie } = await signUpRequest(app);
+    const { sessionCookie, currentUser } = await signUpRequest(app);
 
     const otherUser = await User.create(generateRandomUser());
 
@@ -191,9 +197,20 @@ describe('PUT /posts/:id/vote', () => {
       }),
     );
 
+    const prevRate = await Rate.create(
+      generateRate({
+        target: post._id,
+        negative: false,
+        targetModel: 'Post',
+      }),
+    );
+
+    await User.findByIdAndUpdate(currentUser.id, {
+      $push: { rates: prevRate._id },
+    });
+
     const response = await request(app)
-      .put(`/api/posts/${post._id}/vote`)
-      .send({ negative: true })
+      .delete(`/api/posts/${post._id}/vote`)
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(200);

@@ -115,7 +115,7 @@ test('Redirect to 404 if the post is not found', async ({
     status: 404,
     body: {
       error: {
-        message: 'Post does not exist',
+        message: "Post doesn't exist",
       },
     },
   });
@@ -124,7 +124,7 @@ test('Redirect to 404 if the post is not found', async ({
 
   await NotFoundPage.waitForNotFoundPage();
   await expect(currentPage).toHaveTitle(NotFoundPage.title);
-  await expect(NotificationList.root).toContainText('Post does not exist');
+  await expect(NotificationList.root).toContainText("Post doesn't exist");
 });
 
 test('Fetches post comments by post id', async ({ SinglePostPage, Api }) => {
