@@ -3,38 +3,47 @@ import User from '../../models/User.js';
 import { ValidationError, UnauthorizedError } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
-const validate = (user) => {
-  if (!user.email || !user.password) {
+const validate = (fields) => {
+  if (!fields.email || !fields.password) {
     return 'All fields must be filled.';
   }
 
-  if (user.password.length < 6) {
+  if (fields.password.length < 6) {
     return 'Password length must be not less than 6';
+  }
+
+  if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(fields.email)) {
+    return 'Email must be valid';
   }
 };
 
 export async function signIn(req, res) {
-  const user = {
+  const fields = {
     email: req.body.email,
     password: req.body.password,
   };
 
-  const error = validate(user);
+  const error = validate(fields);
 
   if (error) {
     throw new ValidationError(error);
   }
 
   const foundUser = await User.findOne({
-    email: user.email,
+    email: fields.email,
   }).lean();
 
   if (!foundUser) {
     throw new UnauthorizedError('Invalid email or password');
   }
 
-  const hash = pbkdf2Sync(user.password, foundUser.salt, 10000, 512, 'sha512')
-    .toString('hex');
+  const hash = pbkdf2Sync(
+    fields.password,
+    foundUser.salt,
+    10000,
+    512,
+    'sha512',
+  ).toString('hex');
 
   const isEqual = timingSafeEqual(
     Buffer.from(hash),
