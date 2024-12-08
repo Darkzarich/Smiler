@@ -63,6 +63,8 @@ export async function signUp(req, res) {
       rating: newUser.rating,
       avatar: newUser.avatar,
       email: newUser.email,
+      tagsFollowed: newUser.tagsFollowed,
+      followersAmount: newUser.followersAmount,
     };
 
     sendSuccess(res, userAuth);
