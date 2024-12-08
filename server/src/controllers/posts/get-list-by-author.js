@@ -1,6 +1,6 @@
 import User from '../../models/User.js';
 import Post from '../../models/Post.js';
-import { ValidationError, NotFoundError } from '../../errors/index.js';
+import { ValidationError, NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function getListByAuthor(req, res) {
@@ -11,7 +11,7 @@ export async function getListByAuthor(req, res) {
   const author = req.query.author || '';
 
   if (limit > 15) {
-    throw new ValidationError("Limit can't be more than 15");
+    throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
   }
 
   const foundAuthor = await User.findOne({
@@ -19,7 +19,7 @@ export async function getListByAuthor(req, res) {
   });
 
   if (!foundAuthor) {
-    throw new NotFoundError("Author doesn't exist");
+    throw new NotFoundError(ERRORS.AUTHOR_NOT_FOUND);
   }
 
   const query = {

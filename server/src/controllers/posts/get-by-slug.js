@@ -1,6 +1,6 @@
 import User from '../../models/User.js';
 import Post from '../../models/Post.js';
-import { NotFoundError } from '../../errors/index.js';
+import { NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function getBySlug(req, res) {
@@ -16,7 +16,7 @@ export async function getBySlug(req, res) {
   ]);
 
   if (!post) {
-    throw new NotFoundError("Post doesn't exist");
+    throw new NotFoundError(ERRORS.POST_NOT_FOUND);
   }
 
   sendSuccess(res, post.toResponse(user));

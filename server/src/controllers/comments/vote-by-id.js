@@ -2,7 +2,7 @@ import User from '../../models/User.js';
 import Rate from '../../models/Rate.js';
 import Comment from '../../models/Comment.js';
 import { COMMENT_RATE_VALUE } from '../../constants/index.js';
-import { ForbiddenError, NotFoundError } from '../../errors/index.js';
+import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function voteById(req, res) {
@@ -16,11 +16,11 @@ export async function voteById(req, res) {
   }).select('author');
 
   if (!targetComment) {
-    throw new NotFoundError('Comment does not exist');
+    throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
   }
 
   if (targetComment.author._id.toString() === userId) {
-    throw new ForbiddenError('Cannot rate your own comment');
+    throw new ForbiddenError(ERRORS.COMMENT_CANT_RATE_OWN);
   }
 
   const currentUser = await User.findById(userId).populate('rates');
@@ -28,7 +28,7 @@ export async function voteById(req, res) {
   const ratedForCurrentUser = currentUser.isRated(targetComment.id);
 
   if (ratedForCurrentUser.result) {
-    throw new ForbiddenError('Cannot rate a comment you have already rated');
+    throw new ForbiddenError(ERRORS.COMMENT_CANT_RATE_ALREADY_RATED);
   }
 
   const rateValue = negative ? -COMMENT_RATE_VALUE : COMMENT_RATE_VALUE;

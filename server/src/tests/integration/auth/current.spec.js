@@ -3,6 +3,7 @@ import User from '../../../models/User.js';
 import App from '../../../app.js';
 import { connectDB } from '../../../libs/db.js';
 import { signUpRequest } from '../../utils/request-auth.js';
+import { ERRORS } from '../../../errors/index.js';
 
 let app;
 let db;
@@ -44,7 +45,7 @@ describe('GET api/auth/current', () => {
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(404);
-    expect(response.body.error.message).toBe('Not Found');
+    expect(response.body.error.message).toBe(ERRORS.NOT_FOUND);
   });
 
   it('Returns status 200 and isAuth=true with the user data', async () => {

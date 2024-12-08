@@ -2,6 +2,7 @@ import request from 'supertest';
 import App from '../../../app.js';
 import { connectDB } from '../../../libs/db.js';
 import { signUpRequest } from '../../utils/request-auth.js';
+import { ERRORS } from '../../../errors/index.js';
 
 let app;
 let db;
@@ -29,7 +30,7 @@ describe('POST api/auth/signin', () => {
     });
 
     expect(response.status).toBe(422);
-    expect(response.body.error.message).toBe('All fields must be filled.');
+    expect(response.body.error.message).toBe(ERRORS.AUTH_FIELDS_REQUIRED);
   });
 
   it('Returns status 422 and an expected message for not filled all fields (only password)', async () => {
@@ -38,7 +39,7 @@ describe('POST api/auth/signin', () => {
     });
 
     expect(response.status).toBe(422);
-    expect(response.body.error.message).toBe('All fields must be filled.');
+    expect(response.body.error.message).toBe(ERRORS.AUTH_FIELDS_REQUIRED);
   });
 
   it('Returns status 422 and an expected message for password length less than 6', async () => {
@@ -48,9 +49,7 @@ describe('POST api/auth/signin', () => {
     });
 
     expect(response.status).toBe(422);
-    expect(response.body.error.message).toBe(
-      'Password length must be not less than 6',
-    );
+    expect(response.body.error.message).toBe(ERRORS.AUTH_PASSWORD_TOO_SHORT);
   });
 
   it('Returns status 422 and an expected message for email not valid', async () => {
@@ -60,7 +59,7 @@ describe('POST api/auth/signin', () => {
     });
 
     expect(response.status).toBe(422);
-    expect(response.body.error.message).toBe('Email must be valid');
+    expect(response.body.error.message).toBe(ERRORS.AUTH_INVALID_EMAIL);
   });
 
   it('Returns status 401 and an expected message if email or password is wrong (wrong email)', async () => {
@@ -74,7 +73,7 @@ describe('POST api/auth/signin', () => {
       });
 
     expect(response.status).toBe(401);
-    expect(response.body.error.message).toBe('Invalid email or password');
+    expect(response.body.error.message).toBe(ERRORS.AUTH_INVALID_CREDENTIALS);
   });
 
   it('Returns status 401 and an expected message if email or password is wrong (wrong password)', async () => {
@@ -86,7 +85,7 @@ describe('POST api/auth/signin', () => {
     });
 
     expect(response.status).toBe(401);
-    expect(response.body.error.message).toBe('Invalid email or password');
+    expect(response.body.error.message).toBe(ERRORS.AUTH_INVALID_CREDENTIALS);
   });
 
   it('Returns status 200 and isAuth=true with the user data if credentials are correct', async () => {

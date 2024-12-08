@@ -1,7 +1,7 @@
 import User from '../../models/User.js';
 import Post from '../../models/Post.js';
 import { POST_TITLE_MAX_LENGTH } from '../../constants/index.js';
-import { ValidationError } from '../../errors/index.js';
+import { ValidationError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function search(req, res) {
@@ -19,14 +19,14 @@ export async function search(req, res) {
   } = req.query;
 
   if (limit > 15) {
-    throw new ValidationError("Limit can't be more than 15");
+    throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
   }
 
   const query = {};
 
   if (title) {
     if (title.length > POST_TITLE_MAX_LENGTH) {
-      throw new ValidationError('Title is too long');
+      throw new ValidationError(ERRORS.POST_TITLE_MAX_LENGTH_EXCEEDED);
     }
 
     const sanitizedTitle = title.trim().replace(/[^0-9A-Za-z\s]/g, '');
@@ -42,7 +42,7 @@ export async function search(req, res) {
       const dateFromCheck = new Date(dateFrom);
 
       if (dateFromCheck.toString() === 'Invalid Date') {
-        throw new ValidationError('Invalid date');
+        throw new ValidationError(ERRORS.POST_SEARCH_INVALID_DATE);
       }
 
       query.createdAt.$gte = dateFromCheck;
@@ -52,7 +52,7 @@ export async function search(req, res) {
       const dateToCheck = new Date(dateTo);
 
       if (dateToCheck.toString() === 'Invalid Date') {
-        throw new ValidationError('Invalid date');
+        throw new ValidationError(ERRORS.POST_SEARCH_INVALID_DATE);
       }
 
       query.createdAt.$lte = dateToCheck;

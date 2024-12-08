@@ -2,7 +2,7 @@ import User from '../../models/User.js';
 import Post from '../../models/Post.js';
 import Rate from '../../models/Rate.js';
 import { POST_RATE_VALUE } from '../../constants/index.js';
-import { NotFoundError, ForbiddenError } from '../../errors/index.js';
+import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function unvoteById(req, res) {
@@ -12,7 +12,7 @@ export async function unvoteById(req, res) {
   const targetPost = await Post.findById(postId).select({ author: 1 });
 
   if (!targetPost) {
-    throw new NotFoundError("Post doesn't exist");
+    throw new NotFoundError(ERRORS.POST_NOT_FOUND);
   }
 
   const currentUser = await User.findById(userId)
@@ -22,7 +22,7 @@ export async function unvoteById(req, res) {
   const ratedForCurrentUser = currentUser.isRated(targetPost.id);
 
   if (!ratedForCurrentUser.result) {
-    throw new ForbiddenError('Target post is not rated by the current user');
+    throw new ForbiddenError(ERRORS.TARGET_IS_NOT_RATED);
   }
 
   const rateValue = ratedForCurrentUser.negative

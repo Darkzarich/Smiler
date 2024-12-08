@@ -4,6 +4,7 @@ import {
   ValidationError,
   NotFoundError,
   BadRequestError,
+  ERRORS,
 } from '../../errors/index.js';
 import { removeFileByPath } from '../../utils/remove-file-by-path.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
@@ -15,13 +16,13 @@ export async function deletePostTemplatePicture(req, res) {
   const { userId } = req.session;
 
   if (!hash) {
-    throw new ValidationError('Hash is required for this operation');
+    throw new ValidationError(ERRORS.HASH_REQUIRED);
   }
 
   const userTemplate = await User.findById(userId).select('template');
 
   if (!userTemplate) {
-    throw new NotFoundError('User is not found');
+    throw new NotFoundError(ERRORS.USER_NOT_FOUND);
   }
 
   const targetSection = userTemplate.template.sections.find(
@@ -29,16 +30,14 @@ export async function deletePostTemplatePicture(req, res) {
   );
 
   if (!targetSection) {
-    throw new NotFoundError('Section with given hash is not found');
+    throw new NotFoundError(ERRORS.SECTION_NOT_FOUND);
   }
 
   if (
     !targetSection.isFile ||
     targetSection.type !== POST_SECTION_TYPES.PICTURE
   ) {
-    throw new BadRequestError(
-      'This operation cannot be done because this section is not type of picture or not file',
-    );
+    throw new BadRequestError(ERRORS.SECTION_NOT_FILE);
   }
 
   // Delete the file and update the user's template

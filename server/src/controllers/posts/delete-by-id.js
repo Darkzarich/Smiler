@@ -1,10 +1,10 @@
-import { differenceInMilliseconds, millisecondsToMinutes } from 'date-fns';
+import { differenceInMilliseconds } from 'date-fns';
 import Post from '../../models/Post.js';
 import {
   POST_SECTION_TYPES,
   POST_TIME_TO_UPDATE,
 } from '../../constants/index.js';
-import { NotFoundError, ForbiddenError } from '../../errors/index.js';
+import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index.js';
 import { removeFileByPath } from '../../utils/remove-file-by-path.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
@@ -20,24 +20,22 @@ export async function deleteById(req, res) {
   });
 
   if (!targetPost) {
-    throw new NotFoundError('Post is not found');
+    throw new NotFoundError(ERRORS.POST_NOT_FOUND);
   }
 
   if (targetPost.author.toString() !== userId) {
-    throw new ForbiddenError('You can delete only your own posts');
+    throw new ForbiddenError(ERRORS.POST_CANT_DELETE_NOT_OWN_POST);
   }
 
   if (
     differenceInMilliseconds(Date.now(), targetPost.createdAt) >
     POST_TIME_TO_UPDATE
   ) {
-    throw new ForbiddenError(
-      `You can delete post only within the first ${millisecondsToMinutes(POST_TIME_TO_UPDATE)} min`,
-    );
+    throw new ForbiddenError(ERRORS.POST_CAN_DELETE_WITHIN_TIME);
   }
 
   if (targetPost.commentCount > 0) {
-    throw new ForbiddenError('You can not delete post with comments');
+    throw new ForbiddenError(ERRORS.POST_CANT_DELETE_WITH_COMMENTS);
   }
 
   await targetPost.remove();

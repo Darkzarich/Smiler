@@ -1,7 +1,7 @@
 import sanitizeHtml from '../../libs/sanitize-html.js';
 import Comment from '../../models/Comment.js';
 
-import { ValidationError, NotFoundError } from '../../errors/index.js';
+import { ValidationError, NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function create(req, res) {
@@ -11,11 +11,11 @@ export async function create(req, res) {
   const { userId } = req.session;
 
   if (!body) {
-    throw new ValidationError('Commentary should not be empty');
+    throw new ValidationError(ERRORS.COMMENT_SHOULD_NOT_BE_EMPTY);
   }
 
   if (!post) {
-    throw new ValidationError('Post id for commentary must be specified');
+    throw new ValidationError(ERRORS.POST_ID_REQUIRED);
   }
 
   const sanitizedBody = sanitizeHtml(body);
@@ -38,7 +38,7 @@ export async function create(req, res) {
   });
 
   if (!parentCommentary) {
-    throw new NotFoundError('Parent commentary is not found');
+    throw new NotFoundError(ERRORS.COMMENT_PARENT_COMMENT_NOT_FOUND);
   }
 
   const comment = await create({

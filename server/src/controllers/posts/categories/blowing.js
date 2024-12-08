@@ -1,7 +1,7 @@
 import { subHours } from 'date-fns';
 import User from '../../../models/User.js';
 import Post from '../../../models/Post.js';
-import { ValidationError } from '../../../errors/index.js';
+import { ValidationError, ERRORS } from '../../../errors/index.js';
 import { sendSuccess } from '../../../utils/responseUtils.js';
 
 export async function blowing(req, res) {
@@ -11,7 +11,7 @@ export async function blowing(req, res) {
   const { userId } = req.session;
 
   if (limit > 15) {
-    throw new ValidationError('Limit cannot be more than 15');
+    throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
   }
 
   const query = {

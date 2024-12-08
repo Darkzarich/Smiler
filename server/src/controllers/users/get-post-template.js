@@ -1,10 +1,10 @@
 import User from '../../models/User.js';
-import { ForbiddenError } from '../../errors/index.js';
+import { ForbiddenError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function getPostTemplate(req, res) {
   if (req.session.userId !== req.params.id) {
-    throw new ForbiddenError('Can see only your own template');
+    throw new ForbiddenError(ERRORS.TEMPLATE_CANT_SEE_NOT_OWN);
   }
 
   const template = await User.findById(req.session.userId)

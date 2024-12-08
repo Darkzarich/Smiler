@@ -3,6 +3,7 @@ import {
   ForbiddenError,
   NotFoundError,
   BadRequestError,
+  ERRORS,
 } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
@@ -11,7 +12,7 @@ export async function unfollowById(req, res) {
   const { userId } = req.session;
 
   if (id === userId) {
-    throw new ForbiddenError('You cannot unfollow yourself');
+    throw new ForbiddenError(ERRORS.USER_CANT_UNFOLLOW_OWN);
   }
 
   const [userUnfollowing, userUnfollowed] = await Promise.all([
@@ -20,11 +21,11 @@ export async function unfollowById(req, res) {
   ]);
 
   if (!userUnfollowed) {
-    throw new NotFoundError('Followed user is not found');
+    throw new NotFoundError(ERRORS.USER_NOT_FOUND);
   }
 
   if (!userUnfollowing.usersFollowed.includes(id)) {
-    throw new BadRequestError("You're not following this author");
+    throw new BadRequestError(ERRORS.USER_CANT_UNFOLLOW_NOT_FOLLOWED);
   }
 
   await Promise.all([

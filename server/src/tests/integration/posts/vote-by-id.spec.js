@@ -10,6 +10,7 @@ import {
   generateRate,
 } from '../../data-generators/index.js';
 import { signUpRequest } from '../../utils/request-auth.js';
+import { ERRORS } from '../../../errors/index.js';
 
 let app;
 let db;
@@ -34,9 +35,7 @@ describe('PUT /posts/:id/vote', () => {
   it('Should return status 401 and an expected message for not signed in user', async () => {
     const response = await request(app).put('/api/posts/1234/vote');
 
-    expect(response.body.error.message).toBe(
-      'Auth is required for this operation. Please sign in.',
-    );
+    expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);
     expect(response.status).toBe(401);
   });
 
@@ -47,7 +46,7 @@ describe('PUT /posts/:id/vote', () => {
       .put('/api/posts/5d5467b4c17806706f3df347/vote')
       .set('Cookie', sessionCookie);
 
-    expect(response.body.error.message).toBe("Post doesn't exist");
+    expect(response.body.error.message).toBe(ERRORS.POST_NOT_FOUND);
     expect(response.status).toBe(404);
   });
 
@@ -66,7 +65,7 @@ describe('PUT /posts/:id/vote', () => {
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(403);
-    expect(response.body.error.message).toBe("Can't rate your own post");
+    expect(response.body.error.message).toBe(ERRORS.POST_CANT_RATE_OWN);
   });
 
   it('Should return status 403 and an expected message when user tries to vote for a post that they have already rated', async () => {
@@ -98,7 +97,7 @@ describe('PUT /posts/:id/vote', () => {
 
     expect(response.status).toBe(403);
     expect(response.body.error.message).toBe(
-      "Can't rate a post you have already rated",
+      ERRORS.POST_CANT_RATE_ALREADY_RATED,
     );
   });
 

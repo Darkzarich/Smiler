@@ -2,7 +2,7 @@ import User from '../../models/User.js';
 import Post from '../../models/Post.js';
 import Rate from '../../models/Rate.js';
 import { POST_RATE_VALUE } from '../../constants/index.js';
-import { NotFoundError, ForbiddenError } from '../../errors/index.js';
+import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function voteById(req, res) {
@@ -13,11 +13,11 @@ export async function voteById(req, res) {
   const targetPost = await Post.findById(postId).select({ author: 1 });
 
   if (!targetPost) {
-    throw new NotFoundError("Post doesn't exist");
+    throw new NotFoundError(ERRORS.POST_NOT_FOUND);
   }
 
   if (targetPost.author.toString() === userId) {
-    throw new ForbiddenError("Can't rate your own post");
+    throw new ForbiddenError(ERRORS.POST_CANT_RATE_OWN);
   }
 
   const currentUser = await User.findById(userId)
@@ -27,7 +27,7 @@ export async function voteById(req, res) {
   const ratedForCurrentUser = currentUser.isRated(targetPost.id);
 
   if (ratedForCurrentUser.result) {
-    throw new ForbiddenError("Can't rate a post you have already rated");
+    throw new ForbiddenError(ERRORS.POST_CANT_RATE_ALREADY_RATED);
   }
 
   const rateValue = negative ? -POST_RATE_VALUE : POST_RATE_VALUE;

@@ -10,6 +10,7 @@ import {
   generateRate,
 } from '../../data-generators/index.js';
 import { signUpRequest } from '../../utils/request-auth.js';
+import { ERRORS } from '../../../errors/index.js';
 
 let app;
 let db;
@@ -34,7 +35,7 @@ describe('GET /posts/:slug', () => {
   it('Should return status 404 and a message for non-existing slug', async () => {
     const response = await request(app).get('/api/posts/non-existing-slug');
 
-    expect(response.body.error.message).toBe("Post doesn't exist");
+    expect(response.body.error.message).toBe(ERRORS.POST_NOT_FOUND);
     expect(response.status).toBe(404);
   });
 

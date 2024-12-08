@@ -1,6 +1,6 @@
 import Comment from '../../models/Comment.js';
 import User from '../../models/User.js';
-import { NotFoundError, ValidationError } from '../../errors/index.js';
+import { NotFoundError, ValidationError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 function fillWithRatedRecursive({ comments, user }) {
@@ -35,10 +35,10 @@ export async function getList(req, res) {
   };
 
   if (limit > 30) {
-    throw new ValidationError("Limit can't be more than 30");
+    throw new ValidationError(ERRORS.COMMENT_LIMIT_PARAM_EXCEEDED);
   }
   if (!post) {
-    throw new ValidationError('Post id for comments must be specified');
+    throw new ValidationError(ERRORS.POST_ID_REQUIRED);
   }
 
   query.post = post;
@@ -50,7 +50,7 @@ export async function getList(req, res) {
     });
 
     if (!foundAuthor) {
-      throw new NotFoundError('Author is not found');
+      throw new NotFoundError(ERRORS.AUTHOR_NOT_FOUND);
     }
 
     query.author = foundAuthor.id;

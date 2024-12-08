@@ -1,5 +1,5 @@
 import User from '../../models/User.js';
-import { NotFoundError } from '../../errors/index.js';
+import { NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function getSettings(req, res) {
@@ -10,7 +10,7 @@ export async function getSettings(req, res) {
     .lean();
 
   if (!user) {
-    throw new NotFoundError('User is not found');
+    throw new NotFoundError(ERRORS.USER_NOT_FOUND);
   }
 
   const following = {

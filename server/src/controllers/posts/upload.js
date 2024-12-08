@@ -8,7 +8,11 @@ import {
   POST_SECTIONS_MAX,
   POST_MAX_UPLOAD_IMAGE_SIZE,
 } from '../../constants/index.js';
-import { ContentTooLargeError, ValidationError } from '../../errors/index.js';
+import {
+  ContentTooLargeError,
+  ValidationError,
+  ERRORS,
+} from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 const postMulter = multer({
@@ -39,11 +43,7 @@ const postMulter = multer({
   },
   fileFilter: (req, file, callback) => {
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
-      callback(
-        new ValidationError(
-          'Invalid file extension. Only jpg, jpeg, png, gif are allowed.',
-        ),
-      );
+      callback(new ValidationError(ERRORS.POST_INVALID_ATTACHMENT_EXTENSION));
 
       return;
     }
@@ -59,9 +59,7 @@ export async function upload(req, res, next) {
   const user = await User.findById(userId).select('template');
 
   if (user.template.sections.length >= POST_SECTIONS_MAX) {
-    throw new ContentTooLargeError(
-      `Exceed limit of post sections: ${POST_SECTIONS_MAX}`,
-    );
+    throw new ContentTooLargeError(ERRORS.POST_SECTIONS_MAX_EXCEEDED);
   }
 
   const rootFolder = process.cwd();
@@ -76,9 +74,7 @@ export async function upload(req, res, next) {
     if (error) {
       if (error.code === 'LIMIT_FILE_SIZE') {
         next(
-          new ContentTooLargeError(
-            `Uploaded image is too large. Max allowed size is ${POST_MAX_UPLOAD_IMAGE_SIZE / 1024 / 1024}MB`,
-          ),
+          new ContentTooLargeError(ERRORS.POST_MAX_UPLOAD_IMAGE_SIZE_EXCEEDED),
         );
 
         return;

@@ -1,5 +1,5 @@
 import User from '../../models/User.js';
-import { NotFoundError } from '../../errors/index.js';
+import { NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function getByLogin(req, res) {
@@ -18,7 +18,7 @@ export async function getByLogin(req, res) {
   });
 
   if (!requestedUser) {
-    throw new NotFoundError('User is not found');
+    throw new NotFoundError(ERRORS.USER_NOT_FOUND);
   }
 
   // The current user requested their own profile
@@ -32,9 +32,7 @@ export async function getByLogin(req, res) {
 
   const response = {
     ...requestedUser.toJSON(),
-    isFollowed: currentUser
-      ? currentUser.isFollowed(requestedUser._id)
-      : false,
+    isFollowed: currentUser ? currentUser.isFollowed(requestedUser._id) : false,
   };
 
   sendSuccess(res, response);

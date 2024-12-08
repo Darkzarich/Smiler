@@ -7,6 +7,7 @@ import {
   generateRandomPost,
   generateRandomUser,
 } from '../../data-generators/index.js';
+import { ERRORS } from '../../../errors/index.js';
 
 let app;
 let db;
@@ -33,7 +34,7 @@ describe('GET /posts?author=', () => {
       '/api/posts?author=some-author&limit=101',
     );
 
-    expect(response.body.error.message).toBe("Limit can't be more than 15");
+    expect(response.body.error.message).toBe(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
     expect(response.status).toBe(422);
   });
 
@@ -42,7 +43,7 @@ describe('GET /posts?author=', () => {
       '/api/posts?author=not-existing-author',
     );
 
-    expect(response.body.error.message).toBe("Author doesn't exist");
+    expect(response.body.error.message).toBe(ERRORS.AUTHOR_NOT_FOUND);
     expect(response.status).toBe(404);
   });
 

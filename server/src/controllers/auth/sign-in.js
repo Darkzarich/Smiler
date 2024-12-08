@@ -1,19 +1,23 @@
 import { pbkdf2Sync, timingSafeEqual } from 'crypto';
 import User from '../../models/User.js';
-import { ValidationError, UnauthorizedError } from '../../errors/index.js';
+import {
+  ValidationError,
+  UnauthorizedError,
+  ERRORS,
+} from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 const validate = (fields) => {
   if (!fields.email || !fields.password) {
-    return 'All fields must be filled.';
+    return ERRORS.AUTH_FIELDS_REQUIRED;
   }
 
   if (fields.password.length < 6) {
-    return 'Password length must be not less than 6';
+    return ERRORS.AUTH_PASSWORD_TOO_SHORT;
   }
 
   if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(fields.email)) {
-    return 'Email must be valid';
+    return ERRORS.AUTH_INVALID_EMAIL;
   }
 };
 
@@ -23,10 +27,10 @@ export async function signIn(req, res) {
     password: req.body.password,
   };
 
-  const error = validate(fields);
+  const errorMessage = validate(fields);
 
-  if (error) {
-    throw new ValidationError(error);
+  if (errorMessage) {
+    throw new ValidationError(errorMessage);
   }
 
   const foundUser = await User.findOne({
@@ -34,7 +38,7 @@ export async function signIn(req, res) {
   }).lean();
 
   if (!foundUser) {
-    throw new UnauthorizedError('Invalid email or password');
+    throw new UnauthorizedError(ERRORS.AUTH_INVALID_CREDENTIALS);
   }
 
   const hash = pbkdf2Sync(
@@ -51,7 +55,7 @@ export async function signIn(req, res) {
   );
 
   if (!isEqual) {
-    throw new UnauthorizedError('Invalid email or password');
+    throw new UnauthorizedError(ERRORS.AUTH_INVALID_CREDENTIALS);
   }
 
   req.session.userId = foundUser._id;

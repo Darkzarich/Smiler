@@ -8,6 +8,7 @@ import {
   generateRandomPost,
   generateRandomUser,
 } from '../../data-generators/index.js';
+import { ERRORS } from '../../../errors/index.js';
 
 let app;
 let db;
@@ -32,9 +33,7 @@ describe('GET /posts/feed', () => {
   it('Should return status 401 and an expected message for not signed in user', async () => {
     const response = await request(app).get('/api/posts/feed');
 
-    expect(response.body.error.message).toBe(
-      'Auth is required for this operation. Please sign in.',
-    );
+    expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);
     expect(response.status).toBe(401);
   });
 
@@ -45,7 +44,7 @@ describe('GET /posts/feed', () => {
       .get('/api/posts/feed?limit=16')
       .set('Cookie', sessionCookie);
 
-    expect(response.body.error.message).toBe("Limit can't be more than 15");
+    expect(response.body.error.message).toBe(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
     expect(response.status).toBe(422);
   });
 
@@ -58,9 +57,7 @@ describe('GET /posts/feed', () => {
       .get('/api/posts/feed')
       .set('Cookie', sessionCookie);
 
-    expect(response.body.error.message).toBe(
-      'Auth is required for this operation. Please sign in.',
-    );
+    expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);
     expect(response.status).toBe(401);
   });
 

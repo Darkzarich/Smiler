@@ -1,6 +1,6 @@
 import User from '../../models/User.js';
 
-import { ForbiddenError, ValidationError } from '../../errors/index.js';
+import { ForbiddenError, ValidationError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 import { POST_MAX_TAGS, POST_MAX_TAG_LEN } from '../../constants/index.js';
 
@@ -12,16 +12,16 @@ export async function updatePostTemplate(req, res) {
   const { title } = req.body;
 
   if (req.session.userId !== req.params.id) {
-    throw new ForbiddenError('Can save template only for yourself');
+    throw new ForbiddenError(ERRORS.TEMPLATE_CANT_SAVE_NOT_OWN);
   }
 
   if (tags) {
     if (tags.length > POST_MAX_TAGS) {
-      throw new ValidationError('Too many tags');
+      throw new ValidationError(ERRORS.POST_MAX_TAGS_EXCEEDED);
     }
 
     if (tags.some((el) => el.length > POST_MAX_TAG_LEN)) {
-      throw new ValidationError('Exceeded max length of a tag');
+      throw new ValidationError(ERRORS.POST_TAG_MAX_LEN_EXCEEDED);
     }
   }
 

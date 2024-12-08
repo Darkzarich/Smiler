@@ -10,6 +10,7 @@ import {
   generateRate,
 } from '../../data-generators/index.js';
 import { signUpRequest } from '../../utils/request-auth.js';
+import { ERRORS } from '../../../errors/index.js';
 
 let app;
 let db;
@@ -34,9 +35,7 @@ describe('DELETE /posts/:id/vote', () => {
   it('Should return status 401 and an expected message for not signed in user', async () => {
     const response = await request(app).delete('/api/posts/1234/vote');
 
-    expect(response.body.error.message).toBe(
-      'Auth is required for this operation. Please sign in.',
-    );
+    expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);
     expect(response.status).toBe(401);
   });
 
@@ -47,7 +46,7 @@ describe('DELETE /posts/:id/vote', () => {
       .delete('/api/posts/5d5467b4c17806706f3df347/vote')
       .set('Cookie', sessionCookie);
 
-    expect(response.body.error.message).toBe("Post doesn't exist");
+    expect(response.body.error.message).toBe(ERRORS.POST_NOT_FOUND);
     expect(response.status).toBe(404);
   });
 
@@ -65,9 +64,7 @@ describe('DELETE /posts/:id/vote', () => {
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(403);
-    expect(response.body.error.message).toBe(
-      'Target post is not rated by the current user',
-    );
+    expect(response.body.error.message).toBe(ERRORS.TARGET_IS_NOT_RATED);
   });
 
   it('Should delete a rate from the database', async () => {

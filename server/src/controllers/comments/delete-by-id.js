@@ -1,7 +1,7 @@
 import { differenceInMilliseconds } from 'date-fns';
 import Comment from '../../models/Comment.js';
 import { COMMENT_TIME_TO_UPDATE } from '../../constants/index.js';
-import { ForbiddenError, NotFoundError } from '../../errors/index.js';
+import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function deleteById(req, res) {
@@ -11,20 +11,18 @@ export async function deleteById(req, res) {
   const comment = await Comment.findById(id);
 
   if (!comment) {
-    throw new NotFoundError('Comment is not found');
+    throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
   }
 
   if (comment.author.id.toString() !== userId) {
-    throw new ForbiddenError('You can delete only your own comments');
+    throw new ForbiddenError(ERRORS.COMMENT_CANT_DELETE_NOT_OWN);
   }
 
   if (
     differenceInMilliseconds(Date.now(), comment.createdAt) >
     COMMENT_TIME_TO_UPDATE
   ) {
-    throw new ForbiddenError(
-      `You can delete comment only within the first ${COMMENT_TIME_TO_UPDATE} min`,
-    );
+    throw new ForbiddenError(ERRORS.COMMENT_CAN_DELETE_WITHIN_TIME);
   }
 
   // If comment has replies we cannot delete it completely

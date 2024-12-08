@@ -1,16 +1,14 @@
 import User from '../../models/User.js';
-import { ValidationError } from '../../errors/index.js';
-import { TAGS_MAX_LENGTH } from '../../constants/index.js';
+import { ValidationError, ERRORS } from '../../errors/index.js';
+import { POST_MAX_TAG_LEN } from '../../constants/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
-export async function unfollow (req, res) {
+export async function unfollow(req, res) {
   const { tag } = req.params;
   const { userId } = req.session;
 
-  if (tag.length > TAGS_MAX_LENGTH) {
-    throw new ValidationError(
-      `The tag can't be longer than ${TAGS_MAX_LENGTH}`,
-    );
+  if (tag.length > POST_MAX_TAG_LEN) {
+    throw new ValidationError(ERRORS.POST_TAG_MAX_LEN_EXCEEDED);
   }
 
   await User.findByIdAndUpdate(userId, {
@@ -20,4 +18,4 @@ export async function unfollow (req, res) {
   });
 
   sendSuccess(res);
-};
+}

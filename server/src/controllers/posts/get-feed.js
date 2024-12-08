@@ -1,6 +1,10 @@
 import User from '../../models/User.js';
 import Post from '../../models/Post.js';
-import { UnauthorizedError, ValidationError } from '../../errors/index.js';
+import {
+  UnauthorizedError,
+  ValidationError,
+  ERRORS,
+} from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function getFeed(req, res) {
@@ -9,15 +13,13 @@ export async function getFeed(req, res) {
   const { userId } = req.session;
 
   if (limit > 15) {
-    throw new ValidationError("Limit can't be more than 15");
+    throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
   }
 
   const user = await User.findById(userId).populate('rates');
 
   if (!user) {
-    throw new UnauthorizedError(
-      'Auth is required for this operation. Please sign in.',
-    );
+    throw new UnauthorizedError(ERRORS.UNAUTHORIZED);
   }
 
   const query = {

@@ -2,6 +2,7 @@ import request from 'supertest';
 import App from '../../../app.js';
 import { connectDB } from '../../../libs/db.js';
 import { signUpRequest } from '../../utils/request-auth.js';
+import { ERRORS } from '../../../errors/index.js';
 
 let app;
 let db;
@@ -36,8 +37,6 @@ describe('POST api/auth/logout', () => {
 
     expect(response.status).toBe(200);
     expect(anotherResponse.status).toBe(401);
-    expect(anotherResponse.body.error.message).toBe(
-      'Auth is required for this operation. Please sign in.',
-    );
+    expect(anotherResponse.body.error.message).toBe(ERRORS.UNAUTHORIZED);
   });
 });

@@ -6,6 +6,7 @@ import {
   ForbiddenError,
   NotFoundError,
   BadRequestError,
+  ERRORS,
 } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
@@ -20,26 +21,22 @@ export async function updateById(req, res) {
   });
 
   if (!comment) {
-    throw new NotFoundError('Comment is not found');
+    throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
   }
 
   if (comment.author.id.toString() !== userId) {
-    throw new ForbiddenError('You can edit only your own comments');
+    throw new ForbiddenError(ERRORS.COMMENT_CANT_EDIT_NOT_OWN);
   }
 
   if (comment.children.length > 0) {
-    return new BadRequestError(
-      'You cannot edit a comment if someone already replied to it',
-    );
+    throw new BadRequestError(ERRORS.COMMENT_CANT_EDIT_WITH_REPLIES);
   }
 
   if (
     differenceInMilliseconds(Date.now(), comment.createdAt) >
     COMMENT_TIME_TO_UPDATE
   ) {
-    throw new ForbiddenError(
-      `You can update comment only within first ${millisecondsToMinutes(COMMENT_TIME_TO_UPDATE)} min`,
-    );
+    throw new ForbiddenError(ERRORS.COMMENT_CAN_EDIT_WITHIN_TIME);
   }
 
   comment.body = sanitizeHtml(body);

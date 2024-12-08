@@ -3,6 +3,7 @@ import {
   ForbiddenError,
   NotFoundError,
   BadRequestError,
+  ERRORS,
 } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
@@ -11,7 +12,7 @@ export async function followById(req, res) {
   const { userId } = req.session;
 
   if (id === userId) {
-    throw new ForbiddenError('You cannot follow yourself');
+    throw new ForbiddenError(ERRORS.USER_CANT_FOLLOW_OWN);
   }
 
   const [userFollowing, userFollowed] = await Promise.all([
@@ -20,11 +21,11 @@ export async function followById(req, res) {
   ]);
 
   if (!userFollowed) {
-    throw new NotFoundError('Followed user is not found');
+    throw new NotFoundError(ERRORS.USER_NOT_FOUND);
   }
 
   if (userFollowing.usersFollowed.includes(id)) {
-    throw new BadRequestError('You cannot follow the same author twice');
+    throw new BadRequestError(ERRORS.USER_CANT_FOLLOW_ALREADY_FOLLOWED);
   }
 
   await Promise.all([

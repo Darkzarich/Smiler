@@ -2,7 +2,7 @@ import User from '../../models/User.js';
 import Rate from '../../models/Rate.js';
 import Comment from '../../models/Comment.js';
 import { COMMENT_RATE_VALUE } from '../../constants/index.js';
-import { ForbiddenError, NotFoundError } from '../../errors/index.js';
+import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function unvoteById(req, res) {
@@ -15,7 +15,7 @@ export async function unvoteById(req, res) {
   }).select('author');
 
   if (!targetComment) {
-    throw new NotFoundError('Comment does not exist');
+    throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
   }
 
   const currentUser = await User.findById(userId)
@@ -25,7 +25,7 @@ export async function unvoteById(req, res) {
   const ratedForCurrentUser = currentUser.isRated(targetComment.id);
 
   if (!ratedForCurrentUser.result) {
-    throw new ForbiddenError('Target comment is not rated by the current user');
+    throw new ForbiddenError(ERRORS.TARGET_IS_NOT_RATED);
   }
 
   // If the rate was negative increase the rating after removing the rate

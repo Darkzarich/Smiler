@@ -1,4 +1,4 @@
-import { differenceInMilliseconds, millisecondsToMinutes } from 'date-fns';
+import { differenceInMilliseconds } from 'date-fns';
 import sanitizeHtml from '../../libs/sanitize-html.js';
 import Post from '../../models/Post.js';
 import {
@@ -11,6 +11,7 @@ import {
   ValidationError,
   NotFoundError,
   ForbiddenError,
+  ERRORS,
 } from '../../errors/index.js';
 import { removeFileByPath } from '../../utils/remove-file-by-path.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
@@ -26,35 +27,29 @@ export async function updateById(req, res) {
   const targetPost = await Post.findById(postId);
 
   if (!targetPost) {
-    throw new NotFoundError('Post is not found');
+    throw new NotFoundError(ERRORS.POST_NOT_FOUND);
   }
 
   if (targetPost.author.toString() !== userId) {
-    throw new ForbiddenError('You can edit only your own posts');
+    throw new ForbiddenError(ERRORS.POST_CANT_EDIT_NOT_OWN);
   }
 
   if (
     differenceInMilliseconds(Date.now(), targetPost.createdAt) >
     POST_TIME_TO_UPDATE
   ) {
-    throw new ForbiddenError(
-      `You can edit post only within the first ${millisecondsToMinutes(POST_TIME_TO_UPDATE)} min`,
-    );
+    throw new ForbiddenError(ERRORS.POST_CAN_EDIT_WITHIN_TIME);
   }
 
   targetPost.title = title || targetPost.title;
 
   if (tags) {
     if (tags.length > POST_MAX_TAGS) {
-      throw new ValidationError(
-        `Too many tags, max amount is ${POST_MAX_TAGS}`,
-      );
+      throw new ValidationError(ERRORS.POST_MAX_TAGS_EXCEEDED);
     }
 
     if (tags.some((tag) => tag.length > POST_MAX_TAG_LEN)) {
-      throw new ValidationError(
-        `Exceeded max length of a tag ${POST_MAX_TAGS}`,
-      );
+      throw new ValidationError(ERRORS.POST_TAG_MAX_LEN_EXCEEDED);
     }
   }
 

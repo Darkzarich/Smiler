@@ -1,5 +1,5 @@
 import User from '../../models/User.js';
-import { NotFoundError } from '../../errors/index.js';
+import { NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function updateMe(req, res) {
@@ -12,7 +12,7 @@ export async function updateMe(req, res) {
   });
 
   if (!updatedUser) {
-    throw new NotFoundError('User is not found');
+    throw new NotFoundError(ERRORS.USER_NOT_FOUND);
   }
 
   sendSuccess(res, updatedUser);
