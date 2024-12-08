@@ -51,7 +51,7 @@ describe('PUT /posts/:id/vote', () => {
     expect(response.status).toBe(404);
   });
 
-  it('Should return status 403 and an expected message when user tries to vote for a post that they own', async () => {
+  it('Should return status 403 and an expected message when user tries to vote for their own post', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(app);
 
     const post = await Post.create(
@@ -62,6 +62,7 @@ describe('PUT /posts/:id/vote', () => {
 
     const response = await request(app)
       .put(`/api/posts/${post._id}/vote`)
+      .send({ negative: false })
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(403);
