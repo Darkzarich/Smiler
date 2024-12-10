@@ -11,7 +11,7 @@ const validate = (user) => {
   }
 
   if (user.login.length < 3 || user.login.length > 15) {
-    return ERRORS.AUTH_LOGIN_TOO_SHORT;
+    return ERRORS.AUTH_LOGIN_WRONG_LENGTH;
   }
 
   if (user.password.length < 6) {
@@ -19,7 +19,7 @@ const validate = (user) => {
   }
 
   if (user.password !== user.confirm) {
-    return ERRORS.AUTH_PASSWORDS_NOT_MATCH;
+    return ERRORS.AUTH_PASSWORDS_NOT_EQUAL;
   }
 
   if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(user.email)) {

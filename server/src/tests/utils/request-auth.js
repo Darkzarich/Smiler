@@ -6,7 +6,7 @@ import request from 'supertest';
 export async function signUpRequest(app) {
   const response = await request(app).post('/api/auth/signup').send({
     login: 'currentUser',
-    email: 'current-user@gmail.com',
+    email: 'test-user@test.com',
     password: '123456',
     confirm: '123456',
   });

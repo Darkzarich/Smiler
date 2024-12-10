@@ -26,7 +26,7 @@ beforeEach(async () => {
 describe('POST api/auth/signin', () => {
   it('Returns status 422 and an expected message for not filled all fields (only email)', async () => {
     const response = await request(app).post('/api/auth/signin').send({
-      email: 'current-user@gmail.com',
+      email: 'test-user@test.com',
     });
 
     expect(response.status).toBe(422);
@@ -44,7 +44,7 @@ describe('POST api/auth/signin', () => {
 
   it('Returns status 422 and an expected message for password length less than 6', async () => {
     const response = await request(app).post('/api/auth/signin').send({
-      email: 'current-user@gmail.com',
+      email: 'test-user@test.com',
       password: '12345',
     });
 
@@ -107,5 +107,16 @@ describe('POST api/auth/signin', () => {
       followersAmount: currentUser.followersAmount,
       rating: currentUser.rating,
     });
+  });
+
+  it('Sets session cookies', async () => {
+    const { currentUser } = await signUpRequest(app);
+
+    const response = await request(app).post('/api/auth/signin').send({
+      email: currentUser.email,
+      password: '123456',
+    });
+
+    expect(response.headers['set-cookie']).toBeDefined();
   });
 });

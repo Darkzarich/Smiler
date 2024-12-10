@@ -12,9 +12,9 @@ export const ERRORS = {
   AUTH_INVALID_CREDENTIALS: 'Invalid email or password',
   AUTH_FIELDS_REQUIRED: 'All fields must be filled.',
   AUTH_PASSWORD_TOO_SHORT: 'Password length must be not less than 6',
-  AUTH_LOGIN_TOO_SHORT: 'Login length must be 3-15 symbols',
+  AUTH_LOGIN_WRONG_LENGTH: 'Login length must be 3-15 symbols',
   AUTH_INVALID_EMAIL: 'Email must be valid',
-  AUTH_PASSWORDS_NOT_MATCH: 'Password and password confirm must be equal',
+  AUTH_PASSWORDS_NOT_EQUAL: 'Password and password confirm must be equal',
   AUTH_CONFLICT: 'This email or login is already associated with an account',
 
   USER_NOT_FOUND: 'User is not found',
