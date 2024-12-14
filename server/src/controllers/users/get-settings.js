@@ -6,7 +6,7 @@ export async function getSettings(req, res) {
   const { userId } = req.session;
 
   const user = await User.findById(userId)
-    .populate('usersFollowed', 'login avatar id')
+    .populate('usersFollowed', 'login avatar')
     .lean();
 
   if (!user) {
