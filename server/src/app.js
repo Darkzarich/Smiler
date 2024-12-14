@@ -14,7 +14,9 @@ logger.info(
   `[pid: ${process.pid}] Worker is running in ${Config.IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode.`,
 );
 
-async function startApp({ db = null } = {}) {
+async function startApp() {
+  const db = await connectDB();
+
   const app = express();
 
   // Add basic security headers
@@ -66,10 +68,4 @@ async function startApp({ db = null } = {}) {
   };
 }
 
-async function run() {
-  const db = await connectDB();
-
-  startApp({ db });
-}
-
-export default { run, startApp };
+export default { startApp };

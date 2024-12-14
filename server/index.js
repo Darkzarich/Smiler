@@ -43,6 +43,6 @@ if (Cluster.isPrimary) {
 
   // Runs the app in the worker process
   import('./src/app.js').then((app) => {
-    app.default.run();
+    app.default.startApp();
   });
 }
