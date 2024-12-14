@@ -9,6 +9,8 @@ export async function connectDB() {
       return mongoose.connection;
     }
 
+    logger.info(`[pid: ${process.pid}] Connecting to MongoDB database...`);
+
     const mongooseInstance = await mongoose.connect(Config.DB_URL, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
@@ -37,5 +39,7 @@ export async function connectDB() {
     return db;
   } catch (error) {
     logger.error(error);
+
+    throw error;
   }
 }
