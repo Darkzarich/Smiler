@@ -1,6 +1,4 @@
 import request from 'supertest';
-import App from '../../../app.js';
-import { connectDB } from '../../../libs/db.js';
 import Post from '../../../models/Post.js';
 import User from '../../../models/User.js';
 import {
@@ -9,28 +7,9 @@ import {
 } from '../../data-generators/index.js';
 import { ERRORS } from '../../../errors/index.js';
 
-let app;
-let db;
-
-beforeAll(async () => {
-  db = await connectDB();
-
-  const resolvedApp = await App.startApp({ db });
-
-  app = resolvedApp.app;
-});
-
-afterAll(async () => {
-  await db.close();
-});
-
-beforeEach(async () => {
-  await db.dropDatabase();
-});
-
 describe('GET /posts?author=', () => {
   it('Should return status 422 and an expected error message for limit > 15', async () => {
-    const response = await request(app).get(
+    const response = await request(global.app).get(
       '/api/posts?author=some-author&limit=101',
     );
 
@@ -39,7 +18,7 @@ describe('GET /posts?author=', () => {
   });
 
   it("Should return status 404 and an expected error message if author doesn't exist", async () => {
-    const response = await request(app).get(
+    const response = await request(global.app).get(
       '/api/posts?author=not-existing-author',
     );
 
@@ -50,7 +29,7 @@ describe('GET /posts?author=', () => {
   it("Should return empty list of posts if author doesn't have any posts", async () => {
     const otherUser = await User.create(generateRandomUser());
 
-    const response = await request(app).get(
+    const response = await request(global.app).get(
       `/api/posts?author=${otherUser.login}`,
     );
 
@@ -74,7 +53,7 @@ describe('GET /posts?author=', () => {
       )
     ).toJSON();
 
-    const response = await request(app).get(
+    const response = await request(global.app).get(
       `/api/posts?author=${otherUser.login}`,
     );
 

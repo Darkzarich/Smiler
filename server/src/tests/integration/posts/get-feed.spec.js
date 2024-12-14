@@ -1,6 +1,4 @@
 import request from 'supertest';
-import App from '../../../app.js';
-import { connectDB } from '../../../libs/db.js';
 import { signUpRequest } from '../../utils/request-auth.js';
 import Post from '../../../models/Post.js';
 import User from '../../../models/User.js';
@@ -10,37 +8,18 @@ import {
 } from '../../data-generators/index.js';
 import { ERRORS } from '../../../errors/index.js';
 
-let app;
-let db;
-
-beforeAll(async () => {
-  db = await connectDB();
-
-  const resolvedApp = await App.startApp({ db });
-
-  app = resolvedApp.app;
-});
-
-afterAll(async () => {
-  await db.close();
-});
-
-beforeEach(async () => {
-  await db.dropDatabase();
-});
-
 describe('GET /posts/feed', () => {
   it('Should return status 401 and an expected message for not signed in user', async () => {
-    const response = await request(app).get('/api/posts/feed');
+    const response = await request(global.app).get('/api/posts/feed');
 
     expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);
     expect(response.status).toBe(401);
   });
 
   it('Should return status 422 and an expected message for limit greater than 15', async () => {
-    const { sessionCookie } = await signUpRequest(app);
+    const { sessionCookie } = await signUpRequest(global.app);
 
-    const response = await request(app)
+    const response = await request(global.app)
       .get('/api/posts/feed?limit=16')
       .set('Cookie', sessionCookie);
 
@@ -49,11 +28,11 @@ describe('GET /posts/feed', () => {
   });
 
   it('Should return status 401 and an expected message if session was provided but user for some reason is not found', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(app);
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
     await User.deleteOne({ _id: currentUser.id });
 
-    const response = await request(app)
+    const response = await request(global.app)
       .get('/api/posts/feed')
       .set('Cookie', sessionCookie);
 
@@ -62,13 +41,13 @@ describe('GET /posts/feed', () => {
   });
 
   it('Should an empty list of posts (no subscriptions)', async () => {
-    const { sessionCookie } = await signUpRequest(app);
+    const { sessionCookie } = await signUpRequest(global.app);
 
     /* Creating a post just to make sure response.posts
     is empty not because there are no posts at all */
     await Post.create(generateRandomPost());
 
-    const response = await request(app)
+    const response = await request(global.app)
       .get('/api/posts/feed')
       .set('Cookie', sessionCookie);
 
@@ -82,7 +61,7 @@ describe('GET /posts/feed', () => {
   });
 
   it('Should a list of posts if user is subscribed to any of the post tags', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(app);
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
     const post = await Post.create(generateRandomPost());
 
@@ -90,7 +69,7 @@ describe('GET /posts/feed', () => {
       $push: { tagsFollowed: post.tags[0] },
     });
 
-    const response = await request(app)
+    const response = await request(global.app)
       .get('/api/posts/feed')
       .set('Cookie', sessionCookie);
 
@@ -104,7 +83,7 @@ describe('GET /posts/feed', () => {
   });
 
   it('Should return a list of posts if user is subscribed to the post author', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(app);
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
     const otherUser = await User.create(generateRandomUser());
 
@@ -118,7 +97,7 @@ describe('GET /posts/feed', () => {
       $push: { usersFollowed: post.author },
     });
 
-    const response = await request(app)
+    const response = await request(global.app)
       .get('/api/posts/feed')
       .set('Cookie', sessionCookie);
 
@@ -132,7 +111,7 @@ describe('GET /posts/feed', () => {
   });
 
   it('Should not return a post if user is subscribed to any of the post tags but also is the author of the post (users should not see their own posts in their feed)', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(app);
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
     const post = await Post.create(
       generateRandomPost({
@@ -144,7 +123,7 @@ describe('GET /posts/feed', () => {
       $push: { tagsFollowed: post.tags[0] },
     });
 
-    const response = await request(app)
+    const response = await request(global.app)
       .get('/api/posts/feed')
       .set('Cookie', sessionCookie);
 
@@ -158,7 +137,7 @@ describe('GET /posts/feed', () => {
   });
 
   it('Should return a post in the response with an expected structure', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(app);
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
     const otherUser = await User.create(generateRandomUser());
 
@@ -174,7 +153,7 @@ describe('GET /posts/feed', () => {
       $push: { tagsFollowed: post.tags[0] },
     });
 
-    const response = await request(app)
+    const response = await request(global.app)
       .get('/api/posts/feed')
       .set('Cookie', sessionCookie);
 
@@ -198,7 +177,7 @@ describe('GET /posts/feed', () => {
   });
 
   it('Should return more than one page in pagination if there are more than limit posts existing', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(app);
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
     const otherUser = await User.create(generateRandomUser());
 
@@ -217,11 +196,11 @@ describe('GET /posts/feed', () => {
       $push: { tagsFollowed: posts[0].tags[0] },
     });
 
-    const response = await request(app)
+    const response = await request(global.app)
       .get('/api/posts/feed?limit=10')
       .set('Cookie', sessionCookie);
 
-    const responseWithOffset = await request(app)
+    const responseWithOffset = await request(global.app)
       .get('/api/posts/feed?limit=10&offset=10')
       .set('Cookie', sessionCookie);
 

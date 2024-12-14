@@ -1,7 +1,6 @@
 import request from 'supertest';
 import Rate from '../../../models/Rate.js';
-import App from '../../../app.js';
-import { connectDB } from '../../../libs/db.js';
+
 import Post from '../../../models/Post.js';
 import User from '../../../models/User.js';
 import {
@@ -12,37 +11,18 @@ import {
 import { signUpRequest } from '../../utils/request-auth.js';
 import { ERRORS } from '../../../errors/index.js';
 
-let app;
-let db;
-
-beforeAll(async () => {
-  db = await connectDB();
-
-  const resolvedApp = await App.startApp({ db });
-
-  app = resolvedApp.app;
-});
-
-afterAll(async () => {
-  await db.close();
-});
-
-beforeEach(async () => {
-  await db.dropDatabase();
-});
-
 describe('PUT /posts/:id/vote', () => {
   it('Should return status 401 and an expected message for not signed in user', async () => {
-    const response = await request(app).put('/api/posts/1234/vote');
+    const response = await request(global.app).put('/api/posts/1234/vote');
 
     expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);
     expect(response.status).toBe(401);
   });
 
   it('Should return status 404 and a message for non-existing slug', async () => {
-    const { sessionCookie } = await signUpRequest(app);
+    const { sessionCookie } = await signUpRequest(global.app);
 
-    const response = await request(app)
+    const response = await request(global.app)
       .put('/api/posts/5d5467b4c17806706f3df347/vote')
       .set('Cookie', sessionCookie);
 
@@ -51,7 +31,7 @@ describe('PUT /posts/:id/vote', () => {
   });
 
   it('Should return status 403 and an expected message when user tries to vote for their own post', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(app);
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
     const post = await Post.create(
       generateRandomPost({
@@ -59,7 +39,7 @@ describe('PUT /posts/:id/vote', () => {
       }),
     );
 
-    const response = await request(app)
+    const response = await request(global.app)
       .put(`/api/posts/${post._id}/vote`)
       .send({ negative: false })
       .set('Cookie', sessionCookie);
@@ -69,7 +49,7 @@ describe('PUT /posts/:id/vote', () => {
   });
 
   it('Should return status 403 and an expected message when user tries to vote for a post that they have already rated', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(app);
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
     const otherUser = await User.create(generateRandomUser());
 
@@ -91,7 +71,7 @@ describe('PUT /posts/:id/vote', () => {
       $push: { rates: rate._id },
     });
 
-    const response = await request(app)
+    const response = await request(global.app)
       .put(`/api/posts/${post._id}/vote`)
       .set('Cookie', sessionCookie);
 
@@ -102,7 +82,7 @@ describe('PUT /posts/:id/vote', () => {
   });
 
   it('Should create a new rate in the database', async () => {
-    const { sessionCookie } = await signUpRequest(app);
+    const { sessionCookie } = await signUpRequest(global.app);
 
     const otherUser = await User.create(generateRandomUser());
 
@@ -112,7 +92,7 @@ describe('PUT /posts/:id/vote', () => {
       }),
     );
 
-    const response = await request(app)
+    const response = await request(global.app)
       .put(`/api/posts/${post._id}/vote`)
       .send({ negative: true })
       .set('Cookie', sessionCookie);
@@ -132,7 +112,7 @@ describe('PUT /posts/:id/vote', () => {
   ])(
     'Should %s the post rating after the post is rated',
     async (_, isNegative) => {
-      const { sessionCookie } = await signUpRequest(app);
+      const { sessionCookie } = await signUpRequest(global.app);
 
       const otherUser = await User.create(generateRandomUser());
 
@@ -142,7 +122,7 @@ describe('PUT /posts/:id/vote', () => {
         }),
       );
 
-      await request(app)
+      await request(global.app)
         .put(`/api/posts/${post._id}/vote`)
         .send({ negative: isNegative })
         .set('Cookie', sessionCookie);
@@ -159,7 +139,7 @@ describe('PUT /posts/:id/vote', () => {
   ])(
     "Should %s author's rating after after the post is rated",
     async (_, isNegative) => {
-      const { sessionCookie } = await signUpRequest(app);
+      const { sessionCookie } = await signUpRequest(global.app);
 
       const otherUser = await User.create(generateRandomUser());
 
@@ -169,7 +149,7 @@ describe('PUT /posts/:id/vote', () => {
         }),
       );
 
-      await request(app)
+      await request(global.app)
         .put(`/api/posts/${post._id}/vote`)
         .send({ negative: isNegative })
         .set('Cookie', sessionCookie);
@@ -181,7 +161,7 @@ describe('PUT /posts/:id/vote', () => {
   );
 
   it('Should return the updated post with changed rating after vote', async () => {
-    const { sessionCookie } = await signUpRequest(app);
+    const { sessionCookie } = await signUpRequest(global.app);
 
     const otherUser = await User.create(generateRandomUser());
 
@@ -191,7 +171,7 @@ describe('PUT /posts/:id/vote', () => {
       }),
     );
 
-    const response = await request(app)
+    const response = await request(global.app)
       .put(`/api/posts/${post._id}/vote`)
       .send({ negative: true })
       .set('Cookie', sessionCookie);

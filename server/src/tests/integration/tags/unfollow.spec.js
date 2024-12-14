@@ -1,44 +1,26 @@
 import request from 'supertest';
 import { POST_MAX_TAG_LEN } from '../../../constants/index.js';
 import User from '../../../models/User.js';
-import App from '../../../app.js';
-import { connectDB } from '../../../libs/db.js';
+
 import { signUpRequest } from '../../utils/request-auth.js';
 import { ERRORS } from '../../../errors/index.js';
-
-let app;
-let db;
-
-beforeAll(async () => {
-  db = await connectDB();
-
-  const resolvedApp = await App.startApp({ db });
-
-  app = resolvedApp.app;
-});
-
-afterAll(async () => {
-  await db.close();
-});
-
-beforeEach(async () => {
-  await db.dropDatabase();
-});
 
 describe('DELETE /tags/:tag/follow', () => {
   const tag = 'test-tag';
 
   it('Should return status 401 and an expected message for not signed in user', async () => {
-    const response = await request(app).delete(`/api/tags/${tag}/follow`);
+    const response = await request(global.app).delete(
+      `/api/tags/${tag}/follow`,
+    );
 
     expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);
     expect(response.status).toBe(401);
   });
 
   it('Should return status 422 and an expected message for a too long tag', async () => {
-    const { sessionCookie } = await signUpRequest(app);
+    const { sessionCookie } = await signUpRequest(global.app);
 
-    const response = await request(app)
+    const response = await request(global.app)
       .delete(`/api/tags/${'a'.repeat(POST_MAX_TAG_LEN + 1)}/follow`)
       .set('Cookie', sessionCookie);
 
@@ -47,9 +29,9 @@ describe('DELETE /tags/:tag/follow', () => {
   });
 
   it('Should return status 200 and an expected message for a valid tag', async () => {
-    const { sessionCookie } = await signUpRequest(app);
+    const { sessionCookie } = await signUpRequest(global.app);
 
-    const response = await request(app)
+    const response = await request(global.app)
       .delete(`/api/tags/${tag}/follow`)
       .set('Cookie', sessionCookie);
 
@@ -58,14 +40,14 @@ describe('DELETE /tags/:tag/follow', () => {
   });
 
   it('Should add the tag to the user tags', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(app);
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
     // Making sure a tag is added before unfollowing
     await User.findByIdAndUpdate(currentUser.id, {
       $push: { tagsFollowed: tag },
     });
 
-    await request(app)
+    await request(global.app)
       .delete(`/api/tags/${tag}/follow`)
       .set('Cookie', sessionCookie);
 

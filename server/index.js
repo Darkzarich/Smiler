@@ -11,7 +11,7 @@ const numCPUs = os.cpus().length;
 const amountOfWorkers = Config.IS_PRODUCTION ? numCPUs : 2;
 
 if (Cluster.isPrimary) {
-  logger.info(`Master cluster setting up ${amountOfWorkers} workers...`);
+  logger.info(`Master cluster is setting up ${amountOfWorkers} workers...`);
 
   for (let i = 0; i < amountOfWorkers; i += 1) {
     // Start a new worker
@@ -24,7 +24,7 @@ if (Cluster.isPrimary) {
 
   Cluster.on('exit', (worker, code, signal) => {
     logger.error(
-      `Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`,
+      `Worker ${worker.process.pid} died with code [${code}] and signal [${signal}]`,
     );
 
     logger.info('Starting a new worker');

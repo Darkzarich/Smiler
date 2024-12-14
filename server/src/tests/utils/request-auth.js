@@ -1,6 +1,4 @@
-import request from 'supertest';
-
-/** Signs up a test user and returns a session cookie and the user object
+import request from 'supertest'; /** Signs up a test user and returns a session cookie and the user object
  * it's important for test cases that require a logged in user
  */
 export async function signUpRequest(app) {

@@ -1,17 +1,8 @@
 import request from 'supertest';
-import App from '../../../app.js';
-
-let app;
-
-beforeAll(async () => {
-  const resolvedApp = await App.startApp();
-
-  app = resolvedApp.app;
-});
 
 describe('GET /not-existing-route', () => {
   it('Should return status 404 and an expected error message', async () => {
-    const response = await request(app).get('/api/not-existing-route');
+    const response = await request(global.app).get('/api/not-existing-route');
 
     expect(response.body.error.message).toBe('Not Found');
     expect(response.status).toBe(404);
@@ -20,7 +11,7 @@ describe('GET /not-existing-route', () => {
 
 describe('Internal Server Error handled globally', () => {
   it('Should return status 500 and an expected error message', async () => {
-    const response = await request(app).get('/api/error-endpoint');
+    const response = await request(global.app).get('/api/error-endpoint');
 
     expect(response.status).toBe(500);
     expect(response.body.error).toMatchObject({

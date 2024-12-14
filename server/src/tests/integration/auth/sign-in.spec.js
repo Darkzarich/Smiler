@@ -1,31 +1,10 @@
 import request from 'supertest';
-import App from '../../../app.js';
-import { connectDB } from '../../../libs/db.js';
 import { signUpRequest } from '../../utils/request-auth.js';
 import { ERRORS } from '../../../errors/index.js';
 
-let app;
-let db;
-
-beforeAll(async () => {
-  db = await connectDB();
-
-  const resolvedApp = await App.startApp({ db });
-
-  app = resolvedApp.app;
-});
-
-afterAll(async () => {
-  await db.close();
-});
-
-beforeEach(async () => {
-  await db.dropDatabase();
-});
-
 describe('POST api/auth/signin', () => {
   it('Returns status 422 and an expected message for not filled all fields (only email)', async () => {
-    const response = await request(app).post('/api/auth/signin').send({
+    const response = await request(global.app).post('/api/auth/signin').send({
       email: 'test-user@test.com',
     });
 
@@ -34,7 +13,7 @@ describe('POST api/auth/signin', () => {
   });
 
   it('Returns status 422 and an expected message for not filled all fields (only password)', async () => {
-    const response = await request(app).post('/api/auth/signin').send({
+    const response = await request(global.app).post('/api/auth/signin').send({
       password: '123456',
     });
 
@@ -43,7 +22,7 @@ describe('POST api/auth/signin', () => {
   });
 
   it('Returns status 422 and an expected message for password length less than 6', async () => {
-    const response = await request(app).post('/api/auth/signin').send({
+    const response = await request(global.app).post('/api/auth/signin').send({
       email: 'test-user@test.com',
       password: '12345',
     });
@@ -53,7 +32,7 @@ describe('POST api/auth/signin', () => {
   });
 
   it('Returns status 422 and an expected message for email not valid', async () => {
-    const response = await request(app).post('/api/auth/signin').send({
+    const response = await request(global.app).post('/api/auth/signin').send({
       email: 'current-user@gmail',
       password: '123456',
     });
@@ -63,9 +42,9 @@ describe('POST api/auth/signin', () => {
   });
 
   it('Returns status 401 and an expected message if email or password is wrong (wrong email)', async () => {
-    const { currentUser } = await signUpRequest(app);
+    const { currentUser } = await signUpRequest(global.app);
 
-    const response = await request(app)
+    const response = await request(global.app)
       .post('/api/auth/signin')
       .send({
         email: `${currentUser.email}-wrong`,
@@ -77,9 +56,9 @@ describe('POST api/auth/signin', () => {
   });
 
   it('Returns status 401 and an expected message if email or password is wrong (wrong password)', async () => {
-    const { currentUser } = await signUpRequest(app);
+    const { currentUser } = await signUpRequest(global.app);
 
-    const response = await request(app).post('/api/auth/signin').send({
+    const response = await request(global.app).post('/api/auth/signin').send({
       email: currentUser.email,
       password: '123456-wrong', // signUpRequest uses 123456
     });
@@ -89,9 +68,9 @@ describe('POST api/auth/signin', () => {
   });
 
   it('Returns status 200 and isAuth=true with the user data if credentials are correct', async () => {
-    const { currentUser } = await signUpRequest(app);
+    const { currentUser } = await signUpRequest(global.app);
 
-    const response = await request(app).post('/api/auth/signin').send({
+    const response = await request(global.app).post('/api/auth/signin').send({
       email: currentUser.email,
       password: '123456',
     });
@@ -110,9 +89,9 @@ describe('POST api/auth/signin', () => {
   });
 
   it('Sets session cookies', async () => {
-    const { currentUser } = await signUpRequest(app);
+    const { currentUser } = await signUpRequest(global.app);
 
-    const response = await request(app).post('/api/auth/signin').send({
+    const response = await request(global.app).post('/api/auth/signin').send({
       email: currentUser.email,
       password: '123456',
     });

@@ -4,42 +4,22 @@ import {
   USER_MAX_BIO_LENGTH,
 } from '../../../constants/index.js';
 import User from '../../../models/User.js';
-import App from '../../../app.js';
-import { connectDB } from '../../../libs/db.js';
+
 import { signUpRequest } from '../../utils/request-auth.js';
 import { ERRORS } from '../../../errors/index.js';
 
-let app;
-let db;
-
-beforeAll(async () => {
-  db = await connectDB();
-
-  const resolvedApp = await App.startApp({ db });
-
-  app = resolvedApp.app;
-});
-
-afterAll(async () => {
-  await db.close();
-});
-
-beforeEach(async () => {
-  await db.dropDatabase();
-});
-
 describe('PUT /users/me', () => {
   it('Should return status 401 and an expected message for not signed in user', async () => {
-    const response = await request(app).put(`/api/users/me`);
+    const response = await request(global.app).put(`/api/users/me`);
 
     expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);
     expect(response.status).toBe(401);
   });
 
   it('Should return status 422 and an expected db validation message for a too long bio', async () => {
-    const { sessionCookie } = await signUpRequest(app);
+    const { sessionCookie } = await signUpRequest(global.app);
 
-    const response = await request(app)
+    const response = await request(global.app)
       .put('/api/users/me')
       .send({
         bio: 'a'.repeat(USER_MAX_BIO_LENGTH + 1),
@@ -53,9 +33,9 @@ describe('PUT /users/me', () => {
   });
 
   it('Should return status 422 and an expected db validation message if avatar is not an url', async () => {
-    const { sessionCookie } = await signUpRequest(app);
+    const { sessionCookie } = await signUpRequest(global.app);
 
-    const response = await request(app)
+    const response = await request(global.app)
       .put('/api/users/me')
       .send({
         avatar: 'a',
@@ -67,9 +47,9 @@ describe('PUT /users/me', () => {
   });
 
   it('Should return status 422 and an expected db validation message for too long avatar', async () => {
-    const { sessionCookie } = await signUpRequest(app);
+    const { sessionCookie } = await signUpRequest(global.app);
 
-    const response = await request(app)
+    const response = await request(global.app)
       .put('/api/users/me')
       .send({
         avatar: `https://${'a'.repeat(USER_MAX_AVATAR_LENGTH)}.jpg`,
@@ -83,11 +63,11 @@ describe('PUT /users/me', () => {
   });
 
   it('Should return status 404 and en expected message for not found user', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(app);
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
     await User.deleteOne({ _id: currentUser.id });
 
-    const response = await request(app)
+    const response = await request(global.app)
       .put('/api/users/me')
       .send({ bio: 'a' })
       .set('Cookie', sessionCookie);
@@ -100,9 +80,9 @@ describe('PUT /users/me', () => {
     const bio = 'a';
     const avatar = 'https://example.com/avatar.jpg';
 
-    const { sessionCookie } = await signUpRequest(app);
+    const { sessionCookie } = await signUpRequest(global.app);
 
-    const response = await request(app)
+    const response = await request(global.app)
       .put('/api/users/me')
       .send({ bio, avatar })
       .set('Cookie', sessionCookie);

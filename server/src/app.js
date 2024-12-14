@@ -15,6 +15,8 @@ logger.info(
 );
 
 async function startApp() {
+  logger.info(`[pid: ${process.pid}] App is starting...`);
+
   const db = await connectDB();
 
   const app = express();
@@ -62,10 +64,11 @@ async function startApp() {
     });
   }
 
-  return {
-    app,
-    db,
-  };
+  logger.info(
+    `[pid: ${process.pid}] App has successfully started in ${Config.IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode`,
+  );
+
+  return app;
 }
 
 export default { startApp };

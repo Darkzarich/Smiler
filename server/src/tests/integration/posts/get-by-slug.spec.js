@@ -1,7 +1,6 @@
 import request from 'supertest';
 import Rate from '../../../models/Rate.js';
-import App from '../../../app.js';
-import { connectDB } from '../../../libs/db.js';
+
 import Post from '../../../models/Post.js';
 import User from '../../../models/User.js';
 import {
@@ -12,28 +11,11 @@ import {
 import { signUpRequest } from '../../utils/request-auth.js';
 import { ERRORS } from '../../../errors/index.js';
 
-let app;
-let db;
-
-beforeAll(async () => {
-  db = await connectDB();
-
-  const resolvedApp = await App.startApp({ db });
-
-  app = resolvedApp.app;
-});
-
-afterAll(async () => {
-  await db.close();
-});
-
-beforeEach(async () => {
-  await db.dropDatabase();
-});
-
 describe('GET /posts/:slug', () => {
   it('Should return status 404 and a message for non-existing slug', async () => {
-    const response = await request(app).get('/api/posts/non-existing-slug');
+    const response = await request(global.app).get(
+      '/api/posts/non-existing-slug',
+    );
 
     expect(response.body.error.message).toBe(ERRORS.POST_NOT_FOUND);
     expect(response.status).toBe(404);
@@ -50,7 +32,7 @@ describe('GET /posts/:slug', () => {
       )
     ).toJSON();
 
-    const response = await request(app).get(`/api/posts/${post.slug}`);
+    const response = await request(global.app).get(`/api/posts/${post.slug}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -72,7 +54,7 @@ describe('GET /posts/:slug', () => {
   });
 
   it('Should return that a post is rated if the current user has rated it', async () => {
-    const { currentUser, sessionCookie } = await signUpRequest(app);
+    const { currentUser, sessionCookie } = await signUpRequest(global.app);
 
     const otherUser = await User.create(generateRandomUser());
 
@@ -93,7 +75,7 @@ describe('GET /posts/:slug', () => {
       $push: { rates: rate },
     });
 
-    const response = await request(app)
+    const response = await request(global.app)
       .get(`/api/posts/${post.slug}`)
       .set('Cookie', sessionCookie);
 
