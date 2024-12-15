@@ -94,6 +94,7 @@ module.exports = {
       },
     ],
     'consistent-return': 'off',
+    'no-underscore-dangle': 'off',
   },
   parser: 'vue-eslint-parser',
   settings: {

@@ -9,8 +9,11 @@ import defaultsDeep from 'lodash/defaultsDeep';
  * @return {object} The newly created profile object.
  */
 export default function createRandomProfile(overrides) {
+  const id = faker.string.uuid();
+
   const profile = {
-    id: faker.string.uuid(),
+    _id: id,
+    id,
     avatar: faker.image.avatar(),
     bio: faker.lorem.sentence(),
     rating: faker.number.int({ min: 0, max: 5 }),

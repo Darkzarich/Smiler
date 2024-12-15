@@ -10,15 +10,20 @@
             <div class="user-settings__following-type">Authors:</div>
             <div
               v-for="author in usersFollowed"
-              :key="author.id"
-              :data-testid="`user-settings-author-${author.id}`"
+              :key="author._id"
+              :data-testid="`user-settings-author-${author._id}`"
               class="user-settings__following-item"
             >
+              <img
+                class="user-settings__following-avatar"
+                :src="$resolveAvatar(author.avatar)"
+                alt="avatar"
+              />
               {{ author.login }}
               <span
                 class="user-settings__unfollow"
-                :data-testid="`user-settings-author-${author.id}-unfollow`"
-                @click="unfollowUser(author.id)"
+                :data-testid="`user-settings-author-${author._id}-unfollow`"
+                @click="unfollowUser(author._id)"
               >
                 x
               </span>
@@ -35,7 +40,7 @@
               v-for="tag in tagsFollowed"
               :key="tag"
               :data-testid="`user-settings-tags-${tag}`"
-              class="user-settings__following-item"
+              class="user-settings__following-item user-settings__tag"
             >
               {{ tag }}
               <span
@@ -231,23 +236,29 @@ export default {
       }
     },
     async unfollowUser(id) {
-      if (!this.requestingForTags) {
-        this.requestingForTags = true;
-        const res = await api.users.unfollowUser(id);
-
-        if (!res.data.error) {
-          const foundUser = this.usersFollowed.find((el) => el.id === id);
-
-          if (foundUser) {
-            this.usersFollowed.splice(this.usersFollowed.indexOf(foundUser), 1);
-          }
-
-          this.$store.dispatch('showInfoNotification', {
-            message: 'This author was successfully unfollowed!',
-          });
-        }
-        this.requestingForTags = false;
+      if (this.requestingForTags) {
+        return;
       }
+
+      this.requestingForTags = true;
+      const res = await api.users.unfollowUser(id);
+
+      if (res.data.error) {
+        this.requestingForTags = false;
+        return;
+      }
+
+      const foundUser = this.usersFollowed.find((el) => el._id === id);
+
+      if (foundUser) {
+        this.usersFollowed.splice(this.usersFollowed.indexOf(foundUser), 1);
+      }
+
+      this.$store.dispatch('showInfoNotification', {
+        message: 'This author was successfully unfollowed!',
+      });
+
+      this.requestingForTags = false;
     },
   },
 };
@@ -342,8 +353,9 @@ export default {
   &__following {
     display: flex;
     flex-wrap: wrap;
-    margin-top: 0.5rem;
-    padding-left: 1rem;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-left: 16px;
 
     @include for-size(phone-only) {
       padding-left: 0;
@@ -351,7 +363,6 @@ export default {
   }
 
   &__following-type {
-    margin-top: 0.5rem;
     color: var(--color-gray-light);
     font-weight: bold;
   }
@@ -363,9 +374,29 @@ export default {
   }
 
   &__following-item {
-    margin-top: 0.5rem;
-    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
     color: var(--color-main-text);
+  }
+
+  &__following-avatar {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--color-gray-light);
+    border-radius: 50%;
+  }
+
+  &__tag {
+    padding: 0.1rem;
+    border: 1px solid var(--color-primary);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--color-primary);
+    font-family: monospace;
+    font-size: 0.8rem;
+    font-weight: bold;
+    user-select: none;
   }
 }
 </style>
