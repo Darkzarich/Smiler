@@ -1,0 +1,26 @@
+{
+  "workspaces": {
+    "client": {
+      "entry": "src/main.js",
+      "project": "**/*.js",
+      "paths": {
+        "@/*": [
+          "./src/*"
+        ],
+        "@icons/*": [
+          "./src/components/common/icons/*"
+        ],
+        "@common/*": [
+          "./src/components/common/*"
+        ],
+        "@components/*": [
+          "./src/components/*"
+        ]
+      }
+    },
+    "server": {
+      "entry": "index.js",
+      "project": "**/*.js"
+    }
+  }
+}

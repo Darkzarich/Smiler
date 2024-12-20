@@ -1,6 +1,5 @@
 import { minutesToMilliseconds } from 'date-fns';
 
-export const POST_ATTACHMENTS_LIMIT = 8;
 export const POST_TIME_TO_UPDATE = minutesToMilliseconds(10);
 export const COMMENT_TIME_TO_UPDATE = minutesToMilliseconds(10);
 export const POST_RATE_VALUE = 1;

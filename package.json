@@ -11,7 +11,8 @@
     "back:serve": "npm --prefix server start",
     "postinstall": "(cd client && npm i); (cd server && npm i);",
     "lint:spell": "cspell --no-progress .",
-    "test:all": "(cd server && npm run test); (cd client && npm run test:e2e);"
+    "test:all": "(cd server && npm run test); (cd client && npm run test:e2e);",
+    "knip": "knip"
   },
   "license": "MIT",
   "bugs": {
@@ -19,7 +20,10 @@
   },
   "homepage": "https://github.com/Darkzarich/Smiler#readme",
   "devDependencies": {
+    "@types/node": "^22.10.2",
     "concurrently": "^7.6.0",
-    "cspell": "^8.8.1"
+    "cspell": "^8.8.1",
+    "knip": "^5.41.1",
+    "typescript": "^5.7.2"
   }
 }
