@@ -1,3 +1,4 @@
+import omit from 'lodash/omit';
 import User from '../../models/User.js';
 import { NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
@@ -21,17 +22,18 @@ export async function getByLogin(req, res) {
     throw new NotFoundError(ERRORS.USER_NOT_FOUND);
   }
 
-  // The current user requested their own profile
-  if (currentUserId === requestedUser._id) {
-    sendSuccess(res, requestedUser.toJSON());
+  if (currentUserId === requestedUser._id.toString()) {
+    sendSuccess(res, omit(requestedUser.toJSON(), '_id'));
 
     return;
   }
 
-  const currentUser = await User.findById(currentUserId).select('');
+  const currentUser = await User.findById(currentUserId).select({
+    usersFollowed: 1,
+  });
 
   const response = {
-    ...requestedUser.toJSON(),
+    ...omit(requestedUser.toJSON(), '_id'),
     isFollowed: currentUser ? currentUser.isFollowed(requestedUser._id) : false,
   };
 

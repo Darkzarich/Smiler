@@ -20,7 +20,7 @@ describe('DELETE /users/:id/follow', () => {
     await User.deleteOne({ _id: otherUser._id });
 
     const response = await request(global.app)
-      .delete(`/api/users/6766ab495b84f675bbbbfdcd/follow`)
+      .delete(`/api/users/${otherUser.id}/follow`)
       .set('Cookie', sessionCookie);
 
     expect(response.body.error.message).toBe(ERRORS.USER_NOT_FOUND);
