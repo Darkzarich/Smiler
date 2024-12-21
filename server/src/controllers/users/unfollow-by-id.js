@@ -1,10 +1,5 @@
 import User from '../../models/User.js';
-import {
-  ForbiddenError,
-  NotFoundError,
-  BadRequestError,
-  ERRORS,
-} from '../../errors/index.js';
+import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function unfollowById(req, res) {
@@ -25,7 +20,7 @@ export async function unfollowById(req, res) {
   }
 
   if (!userUnfollowing.usersFollowed.includes(id)) {
-    throw new BadRequestError(ERRORS.USER_CANT_UNFOLLOW_NOT_FOLLOWED);
+    throw new ForbiddenError(ERRORS.USER_CANT_UNFOLLOW_NOT_FOLLOWED);
   }
 
   await Promise.all([
