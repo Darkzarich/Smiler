@@ -2,7 +2,6 @@ import User from '../../models/User.js';
 import {
   ForbiddenError,
   NotFoundError,
-  BadRequestError,
   ERRORS,
 } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
@@ -25,7 +24,7 @@ export async function followById(req, res) {
   }
 
   if (userFollowing.usersFollowed.includes(id)) {
-    throw new BadRequestError(ERRORS.USER_CANT_FOLLOW_ALREADY_FOLLOWED);
+    throw new ForbiddenError(ERRORS.USER_CANT_FOLLOW_ALREADY_FOLLOWED);
   }
 
   await Promise.all([
