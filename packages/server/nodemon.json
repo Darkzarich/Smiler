@@ -4,6 +4,6 @@
     "src/**/*.spec.js"
   ],
   "events": {
-    "start": "npm run gen-doc"
+    "start": "pnpm gen-doc"
   }
 }

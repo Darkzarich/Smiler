@@ -1,4 +1,4 @@
-import defaultsDeep from 'lodash/defaultsDeep';
+import { defaultsDeep } from 'lodash-es';
 
 export function generateRandomUser(overrides = {}) {
   const user = {

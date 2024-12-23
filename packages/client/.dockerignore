@@ -1,0 +1,12 @@
+node_modules
+dist
+npm-debug.log
+.DS_Store
+.env
+.git
+.gitignore
+stylelint.config.js
+playwright.config.js
+tests
+test-results
+playwright-report
