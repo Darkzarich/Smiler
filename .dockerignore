@@ -10,3 +10,4 @@ playwright.config.js
 tests
 test-results
 playwright-report
+**/uploads/*
