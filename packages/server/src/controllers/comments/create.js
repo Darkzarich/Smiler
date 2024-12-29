@@ -5,10 +5,8 @@ import { ValidationError, NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function create(req, res) {
-  const { body } = req.body;
-  const { parent } = req.body;
-  const { post } = req.body;
   const { userId } = req.session;
+  const { body, parent, post } = req.body;
 
   if (!body) {
     throw new ValidationError(ERRORS.COMMENT_SHOULD_NOT_BE_EMPTY);
@@ -21,7 +19,7 @@ export async function create(req, res) {
   const sanitizedBody = sanitizeHtml(body);
 
   if (!parent) {
-    const comment = await create({
+    const comment = await Comment.create({
       post,
       body: sanitizedBody,
       author: userId,
@@ -41,7 +39,7 @@ export async function create(req, res) {
     throw new NotFoundError(ERRORS.COMMENT_PARENT_COMMENT_NOT_FOUND);
   }
 
-  const comment = await create({
+  const comment = await Comment.create({
     post,
     body: sanitizedBody,
     parent,

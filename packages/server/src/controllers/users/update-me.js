@@ -9,6 +9,7 @@ export async function updateMe(req, res) {
   const updatedUser = await User.findByIdAndUpdate(userId, update, {
     runValidators: true,
     new: true,
+    lean: true,
   });
 
   if (!updatedUser) {
