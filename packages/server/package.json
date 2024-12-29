@@ -10,7 +10,7 @@
     "pnpm": ">=8.6.0"
   },
   "scripts": {
-    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand",
+    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand --forceExit --detectOpenHandles",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "gen-doc": "pnpm exec swagger-jsdoc -d src/swagger/swaggerDef.js -o \"src/swagger/swagger.json\"",

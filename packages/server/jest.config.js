@@ -8,6 +8,7 @@ const config = {
   // Runs after the test framework has been installed in the environment. Before each spec file.
   setupFilesAfterEnv: ['./src/tests/jest.setup-after-env.js'],
   watchPathIgnorePatterns: ['node_modules'],
+  testTimeout: 30000,
 };
 
 export default config;

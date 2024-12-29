@@ -5,14 +5,10 @@ beforeAll(async () => {
   global.app = await App.startApp();
 });
 
-afterAll(async () => {
-  if (mongoose.connection.readyState === 1) {
-    await mongoose.connection.close();
-  }
+beforeEach(async () => {
+  await mongoose.connections[0].dropDatabase();
 });
 
-beforeEach(async () => {
-  if (mongoose.connection.readyState === 1) {
-    await mongoose.connection.dropDatabase();
-  }
+afterAll(async () => {
+  await mongoose.connections[0].close();
 });

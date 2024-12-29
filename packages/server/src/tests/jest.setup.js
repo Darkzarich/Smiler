@@ -6,6 +6,9 @@ export default async () => {
   }
 
   const mongod = await MongoMemoryServer.create({
+    instance: {
+      port: 27018,
+    },
     binary: {
       version: '5.0.10',
     },
