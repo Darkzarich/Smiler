@@ -28,14 +28,14 @@ export async function deleteById(req, res) {
   // If comment has replies we cannot delete it completely
   // instead we mark it as deleted with a flag
   if (comment.children.length > 0) {
-    await comment.remove();
+    comment.deleted = true;
 
-    return sendSuccess(res);
+    await comment.save();
+
+    return sendSuccess(res, comment);
   }
 
-  comment.deleted = true;
+  await comment.remove();
 
-  await comment.save();
-
-  sendSuccess(res, comment);
+  return sendSuccess(res);
 }
