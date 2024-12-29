@@ -1,16 +1,16 @@
 import express from 'express';
+import { readFile } from 'node:fs/promises';
 import { serve, setup } from 'swagger-ui-express';
-import { createRequire } from 'node:module';
 import apiRoutes from './api/index.js';
 import Config from '../config/index.js';
 
 const router = express.Router();
 
 if (!Config.IS_JEST) {
-  const require = createRequire(import.meta.url);
-  const swaggerDocument = import('../swagger/swagger.json', {
-    with: { type: 'json' },
-  });
+  const buffer = await readFile(
+    new URL('../swagger/swagger.json', import.meta.url),
+  );
+  const swaggerDocument = JSON.parse(buffer.toString());
 
   router.use('/api-docs', serve, setup(swaggerDocument));
 }

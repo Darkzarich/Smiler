@@ -1,6 +1,9 @@
 /* eslint-disable func-names */
 import mongoose from 'mongoose';
-import { USER_MAX_AVATAR_LENGTH, USER_MAX_BIO_LENGTH } from '../constants/index.js';
+import {
+  USER_MAX_AVATAR_LENGTH,
+  USER_MAX_BIO_LENGTH,
+} from '../constants/index.js';
 
 const { Schema } = mongoose;
 
@@ -20,13 +23,13 @@ const schema = new Schema(
     },
     avatar: {
       type: String,
-      match: [/^https?:\/\//g, '{VALUE} is not an url'],
-      maxLength: USER_MAX_AVATAR_LENGTH,
+      match: [/^https?:\/\//, '{VALUE} is not an url'],
+      maxlength: USER_MAX_AVATAR_LENGTH,
       default: '',
     },
     bio: {
       type: String,
-      maxLength: USER_MAX_BIO_LENGTH,
+      maxlength: USER_MAX_BIO_LENGTH,
       default: '',
     },
     salt: {
