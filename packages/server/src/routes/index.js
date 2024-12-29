@@ -8,7 +8,9 @@ const router = express.Router();
 
 if (!Config.IS_JEST) {
   const require = createRequire(import.meta.url);
-  const swaggerDocument = require('../swagger/swagger.json');
+  const swaggerDocument = import('../swagger/swagger.json', {
+    with: { type: 'json' },
+  });
 
   router.use('/api-docs', serve, setup(swaggerDocument));
 }

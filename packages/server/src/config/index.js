@@ -2,7 +2,7 @@ import { config } from 'dotenv';
 import { resolve } from 'path';
 
 // Load environment variables from .env file, won't override any existing environment variables.
-config({ path: resolve(process.cwd(), '../.env') });
+config({ path: resolve(process.cwd(), '../../.env') });
 
 const {
   BACKEND_PORT,

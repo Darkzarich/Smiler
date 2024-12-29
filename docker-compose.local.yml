@@ -1,7 +1,7 @@
 version: '3.9'
 
 services:
-  smiler-frontend: 
+  smiler-frontend:
     ports:
       - ${FRONTEND_PORT}:80
     environment:
@@ -10,5 +10,6 @@ services:
     ports:
       - ${BACKEND_HOST_PORT}:${BACKEND_PORT}
     environment:
+      NODE_ENV: development
       BACKEND_PORT: ${BACKEND_PORT}
       BACKEND_HOST_PORT: ${BACKEND_HOST_PORT}

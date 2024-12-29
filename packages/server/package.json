@@ -1,18 +1,20 @@
 {
-  "name": "smiler-backend",
+  "name": "@smiler/backend",
   "version": "1.0.0",
   "description": "Backend module of Smiler project",
   "main": "index.js",
   "type": "module",
+  "packageManager": "pnpm@8.6.0",
   "engines": {
-    "node": ">=v20.16.0"
+    "node": ">=v20.16.0",
+    "pnpm": ">=8.6.0"
   },
   "scripts": {
     "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "gen-doc": "npx swagger-jsdoc -d src/swagger/swaggerDef.js -o \"src/swagger/swagger.json\"",
-    "postinstall": "npm run gen-doc",
+    "gen-doc": "pnpm exec swagger-jsdoc -d src/swagger/swaggerDef.js -o \"src/swagger/swagger.json\"",
+    "postinstall": "pnpm gen-doc",
     "lint": "eslint --ext .js --ignore-path .gitignore .",
     "prettier": "prettier . --write"
   },
@@ -49,7 +51,7 @@
     "express-request-id": "^1.4.1",
     "express-session": "^1.18.1",
     "helmet": "^7.1.0",
-    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "mongoose": "^5.7.5",
     "mongoose-autopopulate": "^0.9.1",
     "morgan": "^1.9.1",
@@ -58,7 +60,7 @@
     "sanitize-html": "^2.13.0",
     "sharp": "^0.33.4",
     "slug": "^1.1.0",
-    "swagger-jsdoc": "^3.4.0",
+    "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.0.7",
     "winston": "^3.2.1"
   }

@@ -9,12 +9,9 @@ export default async () => {
     binary: {
       version: '5.0.10',
     },
-    instance: {
-      dbName: 'smiler-test',
-    },
   });
 
-  process.env.DB_URL = mongod.getUri();
+  process.env.DB_URL = `${mongod.getUri()}smiler-test`;
 
   global.mongod = mongod;
 };

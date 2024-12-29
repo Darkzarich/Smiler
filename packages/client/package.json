@@ -1,15 +1,25 @@
 {
-  "name": "smiler-frontend",
+  "name": "@smiler/frontend",
   "description": "Frontend module of Smiler project",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@8.6.0",
+  "engines": {
+    "node": ">=v20.16.0",
+    "pnpm": ">=8.6.0"
+  },
+  "files": [
+    "dist",
+    "change-api-url.sh",
+    "nginx.conf"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "test:e2e": "npx playwright test",
-    "test:e2e:ui": "npx playwright test --ui",
-    "lint:css": "npx stylelint '**/*.{css,scss,vue}'",
+    "test:e2e": "pnpm exec playwright test",
+    "test:e2e:ui": "pnpm exec playwright test --ui",
+    "lint:css": "pnpm exec stylelint '**/*.{css,scss,vue}'",
     "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "lint:js:fix": "eslint --ext .js,.vue --ignore-path .gitignore --fix .",
     "prettier": "prettier \"src/**/*.{js,scss,css,html,json,vue}\" --write"
