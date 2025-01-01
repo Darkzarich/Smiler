@@ -1313,12 +1313,12 @@
         "parameters": [
           {
             "in": "path",
-            "name": "login",
+            "name": "id",
             "schema": {
               "type": "string"
             },
             "required": true,
-            "description": "User name"
+            "description": "User id"
           }
         ],
         "responses": {
@@ -1354,12 +1354,12 @@
         "parameters": [
           {
             "in": "path",
-            "name": "login",
+            "name": "id",
             "schema": {
               "type": "string"
             },
             "required": true,
-            "description": "User name"
+            "description": "User id"
           }
         ],
         "requestBody": {
@@ -1564,10 +1564,48 @@
     }
   },
   "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "connect.sid"
+      }
+    },
     "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "OK": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
       "AuthState": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string"
+          },
           "email": {
             "type": "string"
           },
@@ -1906,65 +1944,6 @@
             }
           }
         }
-      },
-      "Error": {
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "object",
-            "properties": {
-              "message": {
-                "type": "string"
-              },
-              "code": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "required": [
-          "message"
-        ]
-      },
-      "OK": {
-        "type": "object",
-        "properties": {
-          "ok": {
-            "type": "boolean",
-            "example": true
-          }
-        }
-      }
-    },
-    "parameters": {
-      "post-limit": {
-        "description": "posts per page",
-        "in": "query",
-        "name": "limit",
-        "required": true,
-        "schema": {
-          "type": "number",
-          "default": 15,
-          "maximum": 15,
-          "minimum": 1
-        }
-      },
-      "post-offset": {
-        "description": "offset from element",
-        "in": "query",
-        "name": "offset",
-        "required": true,
-        "schema": {
-          "type": "number",
-          "default": 0
-        }
-      }
-    },
-    "securitySchemes": {
-      "cookieAuth": {
-        "type": "apiKey",
-        "in": "cookie",
-        "name": "connect.sid"
       }
     },
     "responses": {
@@ -2046,6 +2025,30 @@
               "$ref": "#/components/schemas/OK"
             }
           }
+        }
+      }
+    },
+    "parameters": {
+      "post-limit": {
+        "description": "posts per page",
+        "in": "query",
+        "name": "limit",
+        "required": true,
+        "schema": {
+          "type": "number",
+          "default": 15,
+          "maximum": 15,
+          "minimum": 1
+        }
+      },
+      "post-offset": {
+        "description": "offset from element",
+        "in": "query",
+        "name": "offset",
+        "required": true,
+        "schema": {
+          "type": "number",
+          "default": 0
         }
       }
     }

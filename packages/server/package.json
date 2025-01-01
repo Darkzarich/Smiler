@@ -13,7 +13,7 @@
     "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand --forceExit --detectOpenHandles",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "gen-doc": "pnpm exec swagger-jsdoc -d src/swagger/swaggerDef.js -o \"src/swagger/swagger.json\"",
+    "gen-doc": "pnpm exec swagger-jsdoc -d src/swagger/swaggerDef.cjs ./src/routes/*.js ./src/routes/api/*.js -o \"src/swagger/swagger.json\"",
     "postinstall": "pnpm gen-doc",
     "lint": "eslint --ext .js --ignore-path .gitignore .",
     "prettier": "prettier . --write"

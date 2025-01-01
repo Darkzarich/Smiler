@@ -10,6 +10,7 @@ if (!Config.IS_JEST) {
   const buffer = await readFile(
     new URL('../swagger/swagger.json', import.meta.url),
   );
+
   const swaggerDocument = JSON.parse(buffer.toString());
 
   router.use('/api-docs', serve, setup(swaggerDocument));
@@ -22,7 +23,8 @@ export default router;
 /**
 # Descriptions of common responses
 @swagger
-"components": {
+{
+  "components": {
     "securitySchemes": {
       "cookieAuth": {
         
@@ -144,4 +146,5 @@ export default router;
       }
     }
   }
+}
 */
