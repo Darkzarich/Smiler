@@ -6,9 +6,9 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await mongoose.connections[0].dropDatabase();
+  await mongoose.connection.dropDatabase();
 });
 
 afterAll(async () => {
-  await mongoose.connections[0].close();
+  await mongoose.connection.close();
 });

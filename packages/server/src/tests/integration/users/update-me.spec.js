@@ -62,7 +62,7 @@ describe('PUT /users/me', () => {
     expect(response.status).toBe(422);
   });
 
-  it('Should return status 404 and en expected message for not found user', async () => {
+  it("Should return status 404 and an expected message if didn't find the user", async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
     await User.deleteOne({ _id: currentUser.id });
