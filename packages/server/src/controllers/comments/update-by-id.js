@@ -1,4 +1,4 @@
-import { differenceInMilliseconds, millisecondsToMinutes } from 'date-fns';
+import { differenceInMilliseconds } from 'date-fns';
 import sanitizeHtml from '../../libs/sanitize-html.js';
 import Comment from '../../models/Comment.js';
 import { COMMENT_TIME_TO_UPDATE } from '../../constants/index.js';
@@ -18,6 +18,9 @@ export async function updateById(req, res) {
   const comment = await Comment.findOne({
     _id: id,
     deleted: false,
+  }).populate('author', {
+    login: 1,
+    avatar: 1,
   });
 
   if (!comment) {

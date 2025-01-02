@@ -1,7 +1,6 @@
 /* eslint-disable func-names */
 import mongoose from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
-import Post from './Post.js';
 
 const { Schema } = mongoose;
 
@@ -36,7 +35,6 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    autopopulate: { select: 'login avatar' },
   },
   createdAt: {
     type: Date,
@@ -49,25 +47,6 @@ const schema = new Schema({
 });
 
 schema.index({ post: 1 });
-
-schema.pre('remove', async function (next) {
-  Promise.all([
-    this.updateOne(this.parent, {
-      $pull: {
-        children: this.id,
-      },
-    }),
-
-    // TODO: Remove this
-    Post.commentCountDec(this.post),
-  ])
-    .then(() => {
-      next();
-    })
-    .catch((e) => {
-      next(e);
-    });
-});
 
 schema.methods.toResponse = function (user) {
   if (this.deleted) {

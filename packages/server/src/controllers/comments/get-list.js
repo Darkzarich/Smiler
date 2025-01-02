@@ -57,7 +57,14 @@ export async function getList(req, res) {
   }
 
   const [comments, currentUser, total] = await Promise.all([
-    Comment.find(query).sort({ rating: -1 }).skip(offset).limit(limit),
+    Comment.find(query)
+      .sort({ rating: -1 })
+      .skip(offset)
+      .limit(limit)
+      .populate('author', {
+        login: 1,
+        avatar: 1,
+      }),
     User.findById(userId).select('rates').populate('rates'),
     Comment.countDocuments(query),
   ]);
