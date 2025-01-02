@@ -10,7 +10,7 @@ import { ERRORS } from '../../../errors/index.js';
 
 describe('POST /comments', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
-    const response = await request(global.app).get('/api/posts/feed');
+    const response = await request(global.app).post('/api/comments');
 
     expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);
     expect(response.status).toBe(401);
