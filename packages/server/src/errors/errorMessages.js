@@ -26,7 +26,7 @@ export const ERRORS = {
   TARGET_IS_NOT_RATED: "It's not yet rated by the current user",
   AUTHOR_NOT_FOUND: 'Author is not found',
 
-  COMMENT_SHOULD_NOT_BE_EMPTY: 'Commentary should not be empty',
+  COMMENT_SHOULD_NOT_BE_EMPTY: 'Comment should not be empty',
   COMMENT_PARENT_COMMENT_NOT_FOUND: 'Parent commentary is not found',
   COMMENT_NOT_FOUND: 'Comment is not found',
   COMMENT_CANT_RATE_OWN: 'Cannot rate your own comment',

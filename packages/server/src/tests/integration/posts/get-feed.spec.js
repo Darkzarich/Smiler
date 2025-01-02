@@ -9,7 +9,7 @@ import {
 import { ERRORS } from '../../../errors/index.js';
 
 describe('GET /posts/feed', () => {
-  it('Should return status 401 and an expected message for not signed in user', async () => {
+  it('Should return status 401 and an expected message if user is not signed in', async () => {
     const response = await request(global.app).get('/api/posts/feed');
 
     expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);

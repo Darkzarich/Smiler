@@ -12,7 +12,7 @@ import { signUpRequest } from '../../utils/request-auth.js';
 import { ERRORS } from '../../../errors/index.js';
 
 describe('DELETE /posts/:id/vote', () => {
-  it('Should return status 401 and an expected message for not signed in user', async () => {
+  it('Should return status 401 and an expected message if user is not signed in', async () => {
     const response = await request(global.app).delete('/api/posts/1234/vote');
 
     expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);

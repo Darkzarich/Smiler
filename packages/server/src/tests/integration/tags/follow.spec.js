@@ -8,7 +8,7 @@ import { ERRORS } from '../../../errors/index.js';
 describe('PUT /tags/:tag/follow', () => {
   const tag = 'test-tag';
 
-  it('Should return status 401 and an expected message for not signed in user', async () => {
+  it('Should return status 401 and an expected message if user is not signed in', async () => {
     const response = await request(global.app).put(`/api/tags/${tag}/follow`);
 
     expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);
