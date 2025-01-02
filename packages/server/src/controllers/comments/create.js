@@ -1,29 +1,39 @@
 import sanitizeHtml from '../../libs/sanitize-html.js';
 import Comment from '../../models/Comment.js';
+import Post from '../../models/Post.js';
 
 import { ValidationError, NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function create(req, res) {
   const { userId } = req.session;
-  const { body, parent, post } = req.body;
+  const { body, parent, post: postId } = req.body;
 
   if (!body) {
     throw new ValidationError(ERRORS.COMMENT_SHOULD_NOT_BE_EMPTY);
   }
 
-  if (!post) {
+  if (!postId) {
     throw new ValidationError(ERRORS.POST_ID_REQUIRED);
+  }
+
+  const post = await Post.findById(postId);
+
+  if (!post) {
+    throw new NotFoundError(ERRORS.POST_NOT_FOUND);
   }
 
   const sanitizedBody = sanitizeHtml(body);
 
   if (!parent) {
-    const comment = await Comment.create({
-      post,
-      body: sanitizedBody,
-      author: userId,
-    });
+    const [comment] = await Promise.all([
+      Comment.create({
+        post: postId,
+        body: sanitizedBody,
+        author: userId,
+      }),
+      Post.commentCountInc(postId),
+    ]);
 
     sendSuccess(res, comment);
 
@@ -32,7 +42,7 @@ export async function create(req, res) {
 
   const parentCommentary = await Comment.findOne({
     _id: parent,
-    post,
+    post: postId,
   });
 
   if (!parentCommentary) {
@@ -40,19 +50,19 @@ export async function create(req, res) {
   }
 
   const comment = await Comment.create({
-    post,
+    post: postId,
     body: sanitizedBody,
     parent,
     author: userId,
   });
 
-  const { children } = parentCommentary;
-
-  children.push(comment.id);
-
-  parentCommentary.children = children;
-
-  await parentCommentary.save();
+  await Promise.all([
+    Comment.updateOne(
+      { _id: parent },
+      { $push: { children: comment.id.toString() } },
+    ),
+    Post.commentCountInc(postId),
+  ]);
 
   sendSuccess(res, comment);
 }

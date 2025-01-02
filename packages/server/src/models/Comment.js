@@ -50,13 +50,6 @@ const schema = new Schema({
 
 schema.index({ post: 1 });
 
-schema.pre('save', async function (next) {
-  if (this.isNew) {
-    await Post.commentCountInc(this.post);
-  }
-  next();
-});
-
 schema.pre('remove', async function (next) {
   Promise.all([
     this.updateOne(this.parent, {
@@ -65,6 +58,7 @@ schema.pre('remove', async function (next) {
       },
     }),
 
+    // TODO: Remove this
     Post.commentCountDec(this.post),
   ])
     .then(() => {

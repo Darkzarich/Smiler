@@ -35,6 +35,7 @@ export async function deleteById(req, res) {
     return sendSuccess(res, comment);
   }
 
+  // TODO: commentCountDec called on remove hook of Comment model - remove that
   await comment.remove();
 
   return sendSuccess(res);
