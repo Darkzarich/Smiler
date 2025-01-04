@@ -10,6 +10,7 @@ import {
 } from '../../data-generators/index.js';
 import { signUpRequest } from '../../utils/request-auth.js';
 import { ERRORS } from '../../../errors/index.js';
+import { POST_RATE_VALUE } from '../../../constants/index.js';
 
 describe('PUT /posts/:id/vote', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -53,7 +54,7 @@ describe('PUT /posts/:id/vote', () => {
 
     const otherUser = await User.create(generateRandomUser());
 
-    const post = await Post.create(
+    const otherUserPost = await Post.create(
       generateRandomPost({
         author: otherUser._id,
       }),
@@ -61,7 +62,7 @@ describe('PUT /posts/:id/vote', () => {
 
     const rate = await Rate.create(
       generateRate({
-        target: post._id,
+        target: otherUserPost._id,
         negative: true,
         targetModel: 'Post',
       }),
@@ -72,7 +73,8 @@ describe('PUT /posts/:id/vote', () => {
     });
 
     const response = await request(global.app)
-      .put(`/api/posts/${post._id}/vote`)
+      .put(`/api/posts/${otherUserPost._id}/vote`)
+      .send({ negative: false })
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(403);
@@ -81,7 +83,7 @@ describe('PUT /posts/:id/vote', () => {
     );
   });
 
-  it('Should create a new rate in the database', async () => {
+  it('Should create a new post rate in the database', async () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
     const otherUser = await User.create(generateRandomUser());
@@ -129,7 +131,7 @@ describe('PUT /posts/:id/vote', () => {
 
       const { rating } = await Post.findById(post._id);
 
-      expect(rating).toBe(isNegative ? -1 : 1);
+      expect(rating).toBe(isNegative ? -POST_RATE_VALUE : POST_RATE_VALUE);
     },
   );
 
@@ -156,7 +158,7 @@ describe('PUT /posts/:id/vote', () => {
 
       const { rating } = await User.findById(otherUser._id);
 
-      expect(rating).toBe(isNegative ? -1 : 1);
+      expect(rating).toBe(isNegative ? -POST_RATE_VALUE : POST_RATE_VALUE);
     },
   );
 
@@ -177,6 +179,6 @@ describe('PUT /posts/:id/vote', () => {
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(200);
-    expect(response.body.rating).toBe(-1);
+    expect(response.body.rating).toBe(-POST_RATE_VALUE);
   });
 });

@@ -10,6 +10,7 @@ import {
 } from '../../data-generators/index.js';
 import { signUpRequest } from '../../utils/request-auth.js';
 import { ERRORS } from '../../../errors/index.js';
+import { POST_RATE_VALUE } from '../../../constants/index.js';
 
 describe('DELETE /posts/:id/vote', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -115,7 +116,11 @@ describe('DELETE /posts/:id/vote', () => {
       const { rating } = await Post.findById(post._id);
 
       // the effect a vote had on the rating is reset
-      expect(rating).toBe(isNegative ? post.rating + 1 : post.rating - 1);
+      expect(rating).toBe(
+        isNegative
+          ? post.rating + POST_RATE_VALUE
+          : post.rating - POST_RATE_VALUE,
+      );
     },
   );
 
@@ -158,7 +163,9 @@ describe('DELETE /posts/:id/vote', () => {
       const { rating } = await User.findById(otherUser._id);
 
       expect(rating).toBe(
-        isNegative ? otherUser.rating + 1 : otherUser.rating - 1,
+        isNegative
+          ? otherUser.rating + POST_RATE_VALUE
+          : otherUser.rating - POST_RATE_VALUE,
       );
     },
   );
@@ -191,6 +198,6 @@ describe('DELETE /posts/:id/vote', () => {
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(200);
-    expect(response.body.rating).toBe(-1);
+    expect(response.body.rating).toBe(-POST_RATE_VALUE);
   });
 });
