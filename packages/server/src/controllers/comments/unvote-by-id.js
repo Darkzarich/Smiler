@@ -12,7 +12,9 @@ export async function unvoteById(req, res) {
   const targetComment = await Comment.findOne({
     _id: commentId,
     deleted: false,
-  }).select('author');
+  })
+    .select('author')
+    .lean();
 
   if (!targetComment) {
     throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
@@ -22,7 +24,7 @@ export async function unvoteById(req, res) {
     .select({ rates: 1 })
     .populate('rates');
 
-  const ratedForCurrentUser = currentUser.isRated(targetComment.id);
+  const ratedForCurrentUser = currentUser.isRated(targetComment._id.toString());
 
   if (!ratedForCurrentUser.result) {
     throw new ForbiddenError(ERRORS.TARGET_IS_NOT_RATED);
@@ -35,7 +37,7 @@ export async function unvoteById(req, res) {
 
   const [updatedComment] = await Promise.all([
     Comment.findByIdAndUpdate(
-      targetComment.id,
+      targetComment._id,
       { $inc: { rating: rateValue } },
       { new: true, lean: true },
     ),
@@ -43,7 +45,7 @@ export async function unvoteById(req, res) {
       { _id: targetComment.author },
       { $inc: { rating: rateValue } },
     ),
-    Rate.deleteOne({ target: targetComment.id }),
+    Rate.deleteOne({ target: targetComment._id }),
     User.updateOne(
       { _id: targetComment.author },
       { $pull: { rates: ratedForCurrentUser.rated._id } },
