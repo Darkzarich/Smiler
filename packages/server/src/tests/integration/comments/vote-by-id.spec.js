@@ -20,7 +20,7 @@ describe('PUT /comments/:id/vote', () => {
     expect(response.status).toBe(401);
   });
 
-  it('Should return status 404 and a message for non-existing slug', async () => {
+  it('Should return status 404 and a message for a non-existing comment', async () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
     const response = await request(global.app)
@@ -140,7 +140,7 @@ describe('PUT /comments/:id/vote', () => {
     ['increase', false],
     ['decrease', true],
   ])(
-    "Should %s author's rating after after the post is rated",
+    "Should %s author's rating after after the comment is rated",
     async (_, isNegative) => {
       const { sessionCookie } = await signUpRequest(global.app);
 
