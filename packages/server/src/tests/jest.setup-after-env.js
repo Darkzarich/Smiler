@@ -1,8 +1,14 @@
 import mongoose from 'mongoose';
-import App from '../app.js';
+
+// TODO: Remove after moving to TypeScript
+import.meta.jest.unstable_mockModule('../utils/remove-file-by-path.js', () => ({
+  removeFileByPath: import.meta.jest.fn(),
+}));
+
+const appModule = await import('../app.js');
 
 beforeAll(async () => {
-  global.app = await App.startApp();
+  global.app = await appModule.default.startApp();
 });
 
 beforeEach(async () => {
