@@ -1,6 +1,15 @@
 import express from 'express';
 import { asyncControllerErrorHandler } from '../../utils/async-controller-error-handler.js';
-import { getByLogin, updateMe, getPostTemplate, updatePostTemplate, getSettings, followById, unfollowById, deletePostTemplatePicture } from '../../controllers/users/index.js';
+import {
+  getByLogin,
+  updateMe,
+  getPostTemplate,
+  updatePostTemplate,
+  getSettings,
+  followById,
+  unfollowById,
+  deletePostTemplatePicture,
+} from '../../controllers/users/index.js';
 import authRequiredMiddleware from '../../middlewares/auth-required.js';
 
 const router = express.Router();
@@ -215,7 +224,7 @@ router.put(
 /**
 @swagger
 {
-  "/users/{login}/template": {
+  "/users/{id}/template": {
     "get": {
       "summary": "Get user saved template",
       "tags": [
@@ -331,6 +340,7 @@ router.put(
 }
 */
 
+// TODO: me/template
 router.get(
   '/:id/template',
   authRequiredMiddleware,
