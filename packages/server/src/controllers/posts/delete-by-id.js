@@ -12,12 +12,14 @@ export async function deleteById(req, res) {
   const { userId } = req.session;
   const { id } = req.params;
 
-  const targetPost = await Post.findById(id).select({
-    author: 1,
-    createdAt: 1,
-    commentCount: 1,
-    sections: 1,
-  });
+  const targetPost = await Post.findById(id)
+    .select({
+      author: 1,
+      createdAt: 1,
+      commentCount: 1,
+      sections: 1,
+    })
+    .lean();
 
   if (!targetPost) {
     throw new NotFoundError(ERRORS.POST_NOT_FOUND);
@@ -38,7 +40,8 @@ export async function deleteById(req, res) {
     throw new ForbiddenError(ERRORS.POST_CANT_DELETE_WITH_COMMENTS);
   }
 
-  await targetPost.remove();
+  // TODO: Remove rates for the post as well
+  await Post.deleteOne({ _id: id });
 
   sendSuccess(res);
 
