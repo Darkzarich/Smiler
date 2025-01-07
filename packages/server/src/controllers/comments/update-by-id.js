@@ -18,16 +18,13 @@ export async function updateById(req, res) {
   const comment = await Comment.findOne({
     _id: id,
     deleted: false,
-  }).populate('author', {
-    login: 1,
-    avatar: 1,
-  });
+  }).lean();
 
   if (!comment) {
     throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
   }
 
-  if (comment.author.id.toString() !== userId) {
+  if (comment.author.toString() !== userId) {
     throw new ForbiddenError(ERRORS.COMMENT_CANT_EDIT_NOT_OWN);
   }
 
@@ -42,9 +39,19 @@ export async function updateById(req, res) {
     throw new ForbiddenError(ERRORS.COMMENT_CAN_EDIT_WITHIN_TIME);
   }
 
-  comment.body = sanitizeHtml(body);
+  const updatedComment = await Comment.findByIdAndUpdate(
+    comment._id,
+    {
+      $set: {
+        body: sanitizeHtml(body),
+      },
+    },
+    {
+      // lean: true,
+      populate: { path: 'author', select: { login: 1, avatar: 1 } },
+      new: true,
+    },
+  );
 
-  await comment.save();
-
-  sendSuccess(res, comment);
+  sendSuccess(res, updatedComment);
 }
