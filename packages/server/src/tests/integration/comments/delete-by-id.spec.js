@@ -1,5 +1,4 @@
 import request from 'supertest';
-import {} from 'date-fns';
 import { COMMENT_TIME_TO_UPDATE } from '../../../constants/index.js';
 import { signUpRequest } from '../../utils/request-auth.js';
 import Post from '../../../models/Post.js';
