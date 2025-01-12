@@ -52,7 +52,7 @@ export const ERRORS = {
   POST_ID_REQUIRED: 'Post id must be specified',
   POST_TITLE_REQUIRED: 'Title is required',
   POST_TITLE_MAX_LENGTH_EXCEEDED: 'Exceeded max length of title',
-  POST_SECTION_REQUIRED: 'At least one section is required',
+  POST_SECTIONS_REQUIRED: 'At least one section is required',
   POST_TAGS_REQUIRED: 'At least one tag is required',
   POST_MAX_TAGS_EXCEEDED: 'Exceeded max amount of tags',
   POST_TAG_MAX_LEN_EXCEEDED: 'Exceeded max length of a tag',

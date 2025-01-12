@@ -19,6 +19,8 @@ const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 export async function create(req, res) {
   // TODO: rework this | move validation
 
+  // TODO: frontend sends hash should think about avoiding that anyhow
+
   const { userId } = req.session;
   const { title } = req.body;
   const { tags } = req.body;
@@ -50,13 +52,13 @@ export async function create(req, res) {
     }
   }
 
+  let textContentSumLength = 0;
+
   // eslint-disable-next-line no-restricted-syntax
   for (const section of sections) {
     if (!allowedSectionTypes.includes(section.type)) {
       throw new ValidationError(ERRORS.POST_UNSUPPORTED_SECTION_TYPE);
     }
-
-    let textContentSumLength = 0;
 
     // Sum length of text sections and check if it exceeds max total length
     if (section.type === POST_SECTION_TYPES.TEXT) {
@@ -74,13 +76,13 @@ export async function create(req, res) {
     }
 
     if (section.type === POST_SECTION_TYPES.PICTURE) {
-      if (!section.url) {
+      if (!section.url || !section.url.match(/^https?:\/\//)) {
         throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_REQUIRED);
       }
     }
 
     if (section.type === POST_SECTION_TYPES.VIDEO) {
-      if (!section.url) {
+      if (!section.url || !section.url.match(/^https?:\/\//)) {
         throw new ValidationError(ERRORS.POST_VIDEO_SECTION_URL_REQUIRED);
       }
     }
@@ -107,5 +109,9 @@ export async function create(req, res) {
     ),
   ]);
 
-  sendSuccess(res, post);
+  const populatedPost = await post
+    .populate('author', 'login avatar')
+    .execPopulate();
+
+  sendSuccess(res, populatedPost.toResponse());
 }
