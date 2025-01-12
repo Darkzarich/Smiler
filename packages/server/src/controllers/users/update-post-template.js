@@ -1,18 +1,25 @@
+import { identity, pickBy } from 'lodash-es';
 import User from '../../models/User.js';
 
-import { ForbiddenError, ValidationError, ERRORS } from '../../errors/index.js';
+import { ValidationError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
-import { POST_MAX_TAGS, POST_MAX_TAG_LEN } from '../../constants/index.js';
+import {
+  POST_MAX_TAGS,
+  POST_MAX_TAG_LEN,
+  POST_TITLE_MAX_LENGTH,
+  POST_SECTIONS_MAX,
+} from '../../constants/index.js';
 
 export async function updatePostTemplate(req, res) {
   // TODO: validate title, sections just like in posts
 
+  const { userId } = req.session;
   const { sections } = req.body;
   const { tags } = req.body;
   const { title } = req.body;
 
-  if (req.session.userId !== req.params.id) {
-    throw new ForbiddenError(ERRORS.TEMPLATE_CANT_SAVE_NOT_OWN);
+  if (title && title.length > POST_TITLE_MAX_LENGTH) {
+    throw new ValidationError(ERRORS.POST_TITLE_MAX_LENGTH_EXCEEDED);
   }
 
   if (tags) {
@@ -25,19 +32,24 @@ export async function updatePostTemplate(req, res) {
     }
   }
 
-  const userTemplate = await User.findById(req.session.userId).select(
-    'template',
+  if (sections && sections.length > POST_SECTIONS_MAX) {
+    throw new ValidationError(ERRORS.POST_SECTIONS_MAX_EXCEEDED);
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      $set: pickBy(
+        {
+          'template.title': title,
+          'template.tags': tags,
+          'template.sections': sections,
+        },
+        identity,
+      ),
+    },
+    { new: true, lean: true },
   );
 
-  userTemplate.template = {
-    title: title || userTemplate.template.title,
-    tags: tags || userTemplate.template.tags,
-    sections: sections || userTemplate.template.sections,
-  };
-
-  userTemplate.markModified('template');
-
-  await userTemplate.save();
-
-  sendSuccess(res, userTemplate.template);
+  sendSuccess(res, updatedUser.template);
 }

@@ -80,6 +80,8 @@ export async function updateById(req, res) {
     });
   }
 
+  // TODO: Rewrite to _.pickBy and _.identity maybe, like in update-post-template
+
   targetPost.title = title || targetPost.title;
   targetPost.tags = tags || targetPost.tags;
   targetPost.sections = newSections || targetPost.sections;
