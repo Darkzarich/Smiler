@@ -9,15 +9,15 @@ export function generateRandomPost(overrides = {}) {
     sections: [
       {
         type: 'text',
-        text: 'My text section',
+        content: 'My text section',
       },
       {
         type: 'pic',
-        pic: 'https://picsum.photos/200/300',
+        url: 'https://picsum.photos/200/300',
       },
       {
         type: 'vid',
-        vid: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       },
     ],
     commentCount: 0,
