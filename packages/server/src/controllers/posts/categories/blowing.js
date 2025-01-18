@@ -1,6 +1,7 @@
 import { subHours } from 'date-fns';
 import User from '../../../models/User.js';
 import Post from '../../../models/Post.js';
+import { POST_BLOWING_RATING_THRESHOLD } from '../../../constants/index.js';
 import { ValidationError, ERRORS } from '../../../errors/index.js';
 import { sendSuccess } from '../../../utils/responseUtils.js';
 
@@ -16,7 +17,7 @@ export async function blowing(req, res) {
 
   const query = {
     rating: {
-      $gte: 50,
+      $gte: POST_BLOWING_RATING_THRESHOLD,
     },
     createdAt: {
       $gte: subHours(Date.now(), 1),

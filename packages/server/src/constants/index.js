@@ -14,6 +14,7 @@ export const POST_SECTIONS_MAX = 8;
 export const POST_SECTIONS_MAX_LENGTH = 10000;
 export const POST_MAX_UPLOAD_IMAGE_SIZE = 3 * 1024 * 1024;
 export const POST_TITLE_MAX_LENGTH = 40;
+export const POST_BLOWING_RATING_THRESHOLD = 50;
 export const COMMENT_RATE_VALUE = 0.5;
 export const USER_MAX_BIO_LENGTH = 300;
 export const USER_MAX_AVATAR_LENGTH = 150;
