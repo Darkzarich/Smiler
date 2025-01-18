@@ -3,7 +3,7 @@ import { defaultsDeep } from 'lodash-es';
 export function generateRandomPost(overrides = {}) {
   const post = {
     title: 'My post title',
-    slug: 'my-post-title-d2k5g8',
+    slug: `my-post-title-d2k5g8${Math.random().toString(36)}`,
     author: '5d5467b4c17806706f3df347',
     tags: ['cat', 'dog', 'bird', 'fish', 'fox'],
     sections: [
