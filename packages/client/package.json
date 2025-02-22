@@ -61,6 +61,6 @@
     "stylelint-order": "^6.0.4",
     "stylelint-prettier": "^5.0.0",
     "stylelint-scss": "^6.2.1",
-    "vite": "^4.5.5"
+    "vite": "^4.5.6"
   }
 }
