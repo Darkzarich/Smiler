@@ -17,22 +17,18 @@ import {
 
 describe('GET /posts', () => {
   it(`Should return status 422 and an expected message for limit greater than ${POST_MAX_LIMIT}`, async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
-
-    const response = await request(global.app)
-      .get(`/api/posts?limit=${POST_MAX_LIMIT + 1}`)
-      .set('Cookie', sessionCookie);
+    const response = await request(global.app).get(
+      `/api/posts?limit=${POST_MAX_LIMIT + 1}`,
+    );
 
     expect(response.body.error.message).toBe(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
     expect(response.status).toBe(422);
   });
 
   it('Should return status 422 and an expected message if title length exceeds limit', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
-
-    const response = await request(global.app)
-      .get(`/api/posts?title=${'a'.repeat(POST_TITLE_MAX_LENGTH + 1)}`)
-      .set('Cookie', sessionCookie);
+    const response = await request(global.app).get(
+      `/api/posts?title=${'a'.repeat(POST_TITLE_MAX_LENGTH + 1)}`,
+    );
 
     expect(response.body.error.message).toBe(
       ERRORS.POST_TITLE_MAX_LENGTH_EXCEEDED,
@@ -41,22 +37,16 @@ describe('GET /posts', () => {
   });
 
   it('Should return status 422 and an expected message if date.to is invalid', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
-
-    const response = await request(global.app)
-      .get(`/api/posts?dateTo=invalid`)
-      .set('Cookie', sessionCookie);
+    const response = await request(global.app).get(`/api/posts?dateTo=invalid`);
 
     expect(response.body.error.message).toBe(ERRORS.POST_SEARCH_INVALID_DATE);
     expect(response.status).toBe(422);
   });
 
   it('Should return status 422 and an expected message if date.from is invalid', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
-
-    const response = await request(global.app)
-      .get(`/api/posts?dateFrom=invalid`)
-      .set('Cookie', sessionCookie);
+    const response = await request(global.app).get(
+      `/api/posts?dateFrom=invalid`,
+    );
 
     expect(response.body.error.message).toBe(ERRORS.POST_SEARCH_INVALID_DATE);
     expect(response.status).toBe(422);
