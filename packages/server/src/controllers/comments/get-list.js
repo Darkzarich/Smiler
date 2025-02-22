@@ -2,6 +2,7 @@ import Comment from '../../models/Comment.js';
 import User from '../../models/User.js';
 import { NotFoundError, ValidationError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
+import { COMMENT_MAX_LIMIT } from '../../constants/index.js';
 
 function fillWithRatedRecursive({ comments, user }) {
   if (!comments) {
@@ -34,7 +35,7 @@ export async function getList(req, res) {
     parent: { $exists: false },
   };
 
-  if (limit > 30) {
+  if (limit > COMMENT_MAX_LIMIT) {
     throw new ValidationError(ERRORS.COMMENT_LIMIT_PARAM_EXCEEDED);
   }
   if (!post) {
@@ -44,27 +45,17 @@ export async function getList(req, res) {
   query.post = post;
 
   if (author) {
-    // TODO: change to user id
-    const foundAuthor = await User.findOne({
-      login: author,
-    });
+    const foundAuthor = await User.findById(author).lean();
 
     if (!foundAuthor) {
       throw new NotFoundError(ERRORS.AUTHOR_NOT_FOUND);
     }
 
-    query.author = foundAuthor.id;
+    query.author = foundAuthor._id;
   }
 
   const [comments, currentUser, total] = await Promise.all([
-    Comment.find(query)
-      .sort({ rating: -1 })
-      .skip(offset)
-      .limit(limit)
-      .populate('author', {
-        login: 1,
-        avatar: 1,
-      }),
+    Comment.find(query).sort({ rating: -1 }).skip(offset).limit(limit),
     User.findById(userId).select('rates').populate('rates'),
     Comment.countDocuments(query),
   ]);

@@ -35,6 +35,10 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
+    autopopulate: {
+      maxDepth: 20,
+      select: 'login avatar',
+    },
   },
   createdAt: {
     type: Date,

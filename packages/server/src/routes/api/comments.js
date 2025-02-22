@@ -134,7 +134,7 @@ const router = express.Router();
           "schema": {
             "type": "string"
           },
-          "description": "user which comments you want to see"
+          "description": "user id of the user which comments you want to see"
         },
         {
           "in": "query",
