@@ -2,15 +2,16 @@ import User from '../../models/User.js';
 import Post from '../../models/Post.js';
 import { ValidationError, NotFoundError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
+import { POST_MAX_LIMIT } from '../../constants/index.js';
 
 export async function getListByAuthor(req, res) {
   const { userId } = req.session;
 
-  const limit = +req.query.limit || 15;
+  const limit = +req.query.limit || POST_MAX_LIMIT;
   const offset = +req.query.offset || 0;
   const author = req.query.author || '';
 
-  if (limit > 15) {
+  if (limit > POST_MAX_LIMIT) {
     throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
   }
 

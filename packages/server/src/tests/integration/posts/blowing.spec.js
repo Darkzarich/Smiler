@@ -10,14 +10,17 @@ import {
   generateRate,
 } from '../../data-generators/index.js';
 import { ERRORS } from '../../../errors/index.js';
-import { POST_BLOWING_RATING_THRESHOLD } from '../../../constants/index.js';
+import {
+  POST_BLOWING_RATING_THRESHOLD,
+  POST_MAX_LIMIT,
+} from '../../../constants/index.js';
 
 describe('GET /posts/categories/blowing', () => {
-  it('Should return status 422 and an expected message for limit greater than 15', async () => {
+  it(`Should return status 422 and an expected message for limit greater than ${POST_MAX_LIMIT}`, async () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
     const response = await request(global.app)
-      .get('/api/posts/categories/blowing?limit=16')
+      .get(`/api/posts/categories/blowing?limit=${POST_MAX_LIMIT + 1}`)
       .set('Cookie', sessionCookie);
 
     expect(response.body.error.message).toBe(ERRORS.POST_LIMIT_PARAM_EXCEEDED);

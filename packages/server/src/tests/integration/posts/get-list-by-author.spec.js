@@ -6,11 +6,12 @@ import {
   generateRandomUser,
 } from '../../data-generators/index.js';
 import { ERRORS } from '../../../errors/index.js';
+import { POST_MAX_LIMIT } from '../../../constants/index.js';
 
 describe('GET /posts?author=', () => {
-  it('Should return status 422 and an expected error message for limit > 15', async () => {
+  it(`Should return status 422 and an expected error message for limit > ${POST_MAX_LIMIT}`, async () => {
     const response = await request(global.app).get(
-      '/api/posts?author=some-author&limit=101',
+      `/api/posts?author=some-author&limit=${POST_MAX_LIMIT + 1}`,
     );
 
     expect(response.body.error.message).toBe(ERRORS.POST_LIMIT_PARAM_EXCEEDED);

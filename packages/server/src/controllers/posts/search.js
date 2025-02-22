@@ -1,12 +1,15 @@
 import User from '../../models/User.js';
 import Post from '../../models/Post.js';
-import { POST_TITLE_MAX_LENGTH } from '../../constants/index.js';
+import {
+  POST_TITLE_MAX_LENGTH,
+  POST_MAX_LIMIT,
+} from '../../constants/index.js';
 import { ValidationError, ERRORS } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
 export async function search(req, res) {
   const { userId } = req.session;
-  const limit = +req.query.limit || 15;
+  const limit = +req.query.limit || POST_MAX_LIMIT;
   const offset = +req.query.offset || 0;
 
   const {
@@ -18,7 +21,7 @@ export async function search(req, res) {
     tags = [],
   } = req.query;
 
-  if (limit > 15) {
+  if (limit > POST_MAX_LIMIT) {
     throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
   }
 

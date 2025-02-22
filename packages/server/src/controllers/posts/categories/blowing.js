@@ -1,17 +1,20 @@
 import { subHours } from 'date-fns';
 import User from '../../../models/User.js';
 import Post from '../../../models/Post.js';
-import { POST_BLOWING_RATING_THRESHOLD } from '../../../constants/index.js';
+import {
+  POST_BLOWING_RATING_THRESHOLD,
+  POST_MAX_LIMIT,
+} from '../../../constants/index.js';
 import { ValidationError, ERRORS } from '../../../errors/index.js';
 import { sendSuccess } from '../../../utils/responseUtils.js';
 
 export async function blowing(req, res) {
-  const limit = +req.query.limit || 15;
+  const limit = +req.query.limit || POST_MAX_LIMIT;
   const offset = +req.query.offset || 0;
 
   const { userId } = req.session;
 
-  if (limit > 15) {
+  if (limit > POST_MAX_LIMIT) {
     throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
   }
 
