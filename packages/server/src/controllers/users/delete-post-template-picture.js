@@ -1,11 +1,6 @@
 import User from '../../models/User.js';
 
-import {
-  ValidationError,
-  NotFoundError,
-  BadRequestError,
-  ERRORS,
-} from '../../errors/index.js';
+import { NotFoundError, BadRequestError, ERRORS } from '../../errors/index.js';
 import { removeFileByPath } from '../../utils/remove-file-by-path.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
 
@@ -14,10 +9,6 @@ import { POST_SECTION_TYPES } from '../../constants/index.js';
 export async function deletePostTemplatePicture(req, res) {
   const { hash } = req.params;
   const { userId } = req.session;
-
-  if (!hash) {
-    throw new ValidationError(ERRORS.HASH_REQUIRED);
-  }
 
   const userTemplate = await User.findById(userId).select('template');
 

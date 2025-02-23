@@ -70,7 +70,6 @@ export const ERRORS = {
   POST_INVALID_ATTACHMENT_EXTENSION:
     'Invalid file extension. Only jpg, jpeg, png, gif are allowed.',
 
-  HASH_REQUIRED: 'Hash is required for this operation',
   SECTION_NOT_FOUND: 'Section with given hash is not found',
   SECTION_NOT_FILE:
     'This operation cannot be done because this section is not type of picture or not a file',
