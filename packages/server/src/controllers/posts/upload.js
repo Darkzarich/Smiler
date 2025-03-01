@@ -7,10 +7,14 @@ import User from '../../models/User.js';
 import {
   POST_SECTIONS_MAX,
   POST_MAX_UPLOAD_IMAGE_SIZE,
+  POST_MAX_IMAGE_HEIGHT,
+  POST_MAX_IMAGE_WIDTH,
+  BASE_UPLOAD_FOLDER,
 } from '../../constants/index.js';
 import {
   ContentTooLargeError,
   ValidationError,
+  NotFoundError,
   ERRORS,
 } from '../../errors/index.js';
 import { sendSuccess } from '../../utils/responseUtils.js';
@@ -18,14 +22,17 @@ import { sendSuccess } from '../../utils/responseUtils.js';
 const postMulter = multer({
   storage: new DiskStorage({
     destination: async (req, file, callback) => {
-      callback(null, join(process.cwd(), 'uploads', req.session.userId));
+      callback(
+        null,
+        join(process.cwd(), BASE_UPLOAD_FOLDER, req.session.userId),
+      );
     },
     filename: (req, file, callback) => {
       callback(null, `${Date.now()}${extname(file.originalname)}`);
     },
     sharp: (req, file, callback) => {
       const resizer = Sharp()
-        .resize(640, 360, {
+        .resize(POST_MAX_IMAGE_WIDTH, POST_MAX_IMAGE_HEIGHT, {
           fit: 'cover',
           withoutEnlargement: true,
         })
@@ -58,6 +65,10 @@ export async function upload(req, res, next) {
 
   const user = await User.findById(userId).select('template');
 
+  if (!user) {
+    throw new NotFoundError(ERRORS.USER_NOT_FOUND);
+  }
+
   if (user.template.sections.length >= POST_SECTIONS_MAX) {
     throw new ContentTooLargeError(ERRORS.POST_SECTIONS_MAX_EXCEEDED);
   }
@@ -65,7 +76,7 @@ export async function upload(req, res, next) {
   const rootFolder = process.cwd();
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await mkdir(join(rootFolder, 'uploads', userId), {
+  await mkdir(join(rootFolder, BASE_UPLOAD_FOLDER, userId), {
     recursive: true,
   });
 
