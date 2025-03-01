@@ -37,7 +37,7 @@ This project is built on the MEVN stack (MongoDB, Express, Vue.js, Node.js) and 
   - **Clustering**: If an exception occurs on the server, the app won't crash. Instead, another instance will be spawned to keep the application running.
   - **CORS Protection**: The API restricts access to allowed domains via environment variables.
   - **Logging**: Every request is logged using [Winston](https://github.com/winstonjs/winston) and [morgan](https://github.com/expressjs/morgan). Logs are also saved to a file for debugging and monitoring.
-  - **Integration Testing**: The backend is rigorously tested with **integration tests** to ensure real-world functionality. These tests verify that ORM functions interact correctly with the database, API endpoints return the expected data, and dependencies (e.g., ORM, middleware) work as intended, even after updates. -
+  - **Integration Testing**: The backend is rigorously tested with **integration tests** to ensure real-world functionality. These tests verify that ORM functions interact correctly with the database, API endpoints return the expected data, a file is actually written to disk or deleted, and dependencies (e.g., ORM, middleware) work as intended, even after updates and so on.
 
 - **Posts**:
 
@@ -114,6 +114,7 @@ I hope you find this project as enjoyable as I do! Feel free to explore the code
 This project can be run in multiple ways, depending on your preferences and setup. Below are the steps for each scenario:
 
 ### Prerequisites
+
 - **Node.js** (>=20.16.0)
 - **[pnpm](https://pnpm.io/)** (>=8.6.0)
 - **Docker** and **Docker Compose** (optional, for containerized setups)
@@ -122,22 +123,26 @@ This project can be run in multiple ways, depending on your preferences and setu
 ---
 
 ### Option 1: Running Without Docker
+
 If you prefer not to use Docker, follow these steps:
 
 1. **Set Up MongoDB**:
+
    - **Option A: Local MongoDB**  
-     Install MongoDB locally on your machine and ensure it’s running.  
-     - [MongoDB Installation Guide](https://www.mongodb.com/docs/manual/installation/)  
+     Install MongoDB locally on your machine and ensure it’s running.
+     - [MongoDB Installation Guide](https://www.mongodb.com/docs/manual/installation/)
    - **Option B: Remote MongoDB (e.g., MongoDB Atlas)**  
      Use a remote MongoDB instance like [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). Copy the connection string provided by the service.
 
 2. **Configure Environment Variables**:
+
    - Rename `.env.example` to `.env` in the root folder.
    - Open the `.env` file and fill in the required values:
      - For **Local MongoDB**: Set `DB_URL` to `mongodb://localhost:27017/smiler`.
      - For **Remote MongoDB**: Set `DB_URL` to the connection string provided by your remote MongoDB service.
 
 3. **Install Dependencies**:
+
    ```bash
    pnpm install
    ```
@@ -150,20 +155,25 @@ If you prefer not to use Docker, follow these steps:
 ---
 
 ### Option 2: Running With Docker
+
 If you prefer to use Docker, follow these steps:
 
 1. **Set Up MongoDB**:
+
    - **Option A: Use Docker to Run MongoDB**  
      Run a MongoDB container using Docker:
+
      ```bash
      docker run -d -v /usr/src/smiler/db:/data/db -p 27017:27017 --name smiler-mongo mongo:5.0.10
      ```
+
      Update the `DB_URL` in `.env` to `mongodb://smiler-mongo:27017/smiler`.
 
    - **Option B: Use Remote MongoDB (e.g., MongoDB Atlas)**  
      Use a remote MongoDB instance like [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). Copy the connection string and update the `DB_URL` in `.env`.
 
 2. **Configure Environment Variables**:
+
    - Rename `.env.example` to `.env` in the root folder.
    - Open the `.env` file and fill in the required values.
 
@@ -183,9 +193,11 @@ If you prefer to use Docker, follow these steps:
 ---
 
 ### Option 3: Running With Docker Compose (All-in-One)
+
 If you want to run both the application and MongoDB using Docker Compose, follow these steps:
 
 1. **Configure Environment Variables**:
+
    - Rename `.env.example` to `.env` in the root folder.
    - Open the `.env` file and fill in the required values. For MongoDB, set `DB_URL` to `mongodb://mongo:27017/smiler`.
 
