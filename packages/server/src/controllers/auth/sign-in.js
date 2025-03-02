@@ -5,7 +5,7 @@ import {
   UnauthorizedError,
   ERRORS,
 } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 const validate = (fields) => {
   if (!fields.email || !fields.password) {

@@ -2,7 +2,7 @@ import User from '../../models/User.js';
 
 import { NotFoundError, BadRequestError, ERRORS } from '../../errors/index.js';
 import { removeFileByPath } from '../../utils/remove-file-by-path.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 import { POST_SECTION_TYPES } from '../../constants/index.js';
 

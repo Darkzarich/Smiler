@@ -8,7 +8,7 @@ import {
   BadRequestError,
   ERRORS,
 } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 export async function updateById(req, res) {
   const { userId } = req.session;

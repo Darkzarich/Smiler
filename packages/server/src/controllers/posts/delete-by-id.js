@@ -6,7 +6,7 @@ import {
 } from '../../constants/index.js';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index.js';
 import { removeFileByPath } from '../../utils/remove-file-by-path.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 export async function deleteById(req, res) {
   const { userId } = req.session;

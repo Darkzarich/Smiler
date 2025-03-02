@@ -1,7 +1,7 @@
 import { omit } from 'lodash-es';
 import User from '../../models/User.js';
 import { NotFoundError, ERRORS } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 export async function getByLogin(req, res) {
   const { login } = req.params;

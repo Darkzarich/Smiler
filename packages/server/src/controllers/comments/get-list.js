@@ -1,7 +1,7 @@
 import Comment from '../../models/Comment.js';
 import User from '../../models/User.js';
 import { NotFoundError, ValidationError, ERRORS } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 import { COMMENT_MAX_LIMIT } from '../../constants/index.js';
 
 function fillWithRatedRecursive({ comments, user }) {

@@ -3,7 +3,7 @@ import Rate from '../../models/Rate.js';
 import Comment from '../../models/Comment.js';
 import { COMMENT_RATE_VALUE } from '../../constants/index.js';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 export async function voteById(req, res) {
   const { userId } = req.session;

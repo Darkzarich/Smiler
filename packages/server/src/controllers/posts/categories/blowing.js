@@ -6,7 +6,7 @@ import {
   POST_MAX_LIMIT,
 } from '../../../constants/index.js';
 import { ValidationError, ERRORS } from '../../../errors/index.js';
-import { sendSuccess } from '../../../utils/responseUtils.js';
+import { sendSuccess } from '../../../utils/response-utils.js';
 
 export async function blowing(req, res) {
   const limit = +req.query.limit || POST_MAX_LIMIT;

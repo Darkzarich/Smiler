@@ -14,7 +14,7 @@ import {
   ERRORS,
 } from '../../errors/index.js';
 import { removeFileByPath } from '../../utils/remove-file-by-path.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 export async function updateById(req, res) {
   // TODO: validate sections on update by type and other stuff the same as when creating post

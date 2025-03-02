@@ -2,7 +2,7 @@ import { subHours } from 'date-fns';
 import User from '../../../models/User.js';
 import Post from '../../../models/Post.js';
 import { ValidationError, ERRORS } from '../../../errors/index.js';
-import { sendSuccess } from '../../../utils/responseUtils.js';
+import { sendSuccess } from '../../../utils/response-utils.js';
 import { POST_MAX_LIMIT } from '../../../constants/index.js';
 
 export async function recent(req, res) {

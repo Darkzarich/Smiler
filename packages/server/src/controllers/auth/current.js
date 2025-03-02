@@ -1,5 +1,5 @@
 import User from '../../models/User.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 import { NotFoundError } from '../../errors/index.js';
 
 export async function current(req, res) {

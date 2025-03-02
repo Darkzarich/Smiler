@@ -1,6 +1,6 @@
 import User from '../../models/User.js';
 import { ForbiddenError, ERRORS } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 export async function getPostTemplate(req, res) {
   if (req.session.userId !== req.params.id) {

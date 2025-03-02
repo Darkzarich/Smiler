@@ -1,6 +1,6 @@
 import User from '../../models/User.js';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 export async function unfollowById(req, res) {
   const { id } = req.params;

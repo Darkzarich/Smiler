@@ -1,7 +1,7 @@
 import User from '../../models/User.js';
 import Post from '../../models/Post.js';
 import { NotFoundError, ERRORS } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 export async function getBySlug(req, res) {
   const { userId } = req.session;

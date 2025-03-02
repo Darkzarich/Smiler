@@ -3,7 +3,7 @@ import Comment from '../../models/Comment.js';
 import Post from '../../models/Post.js';
 import { COMMENT_TIME_TO_UPDATE } from '../../constants/index.js';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 export async function deleteById(req, res) {
   const { userId } = req.session;

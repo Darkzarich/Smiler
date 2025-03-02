@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import User from '../../models/User.js';
 import { ValidationError, ConflictError, ERRORS } from '../../errors/index.js';
 import { isDuplicateKeyError } from '../../utils/check-mongo-db-error.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 /** Validate user sign up, return error message or nothing */
 const validate = (user) => {

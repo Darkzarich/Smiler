@@ -3,7 +3,7 @@ import Post from '../../models/Post.js';
 import Rate from '../../models/Rate.js';
 import { POST_RATE_VALUE } from '../../constants/index.js';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 export async function unvoteById(req, res) {
   const { userId } = req.session;

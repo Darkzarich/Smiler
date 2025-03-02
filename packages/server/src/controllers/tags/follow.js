@@ -1,7 +1,7 @@
 import User from '../../models/User.js';
 import { ValidationError, ERRORS } from '../../errors/index.js';
 import { POST_MAX_TAG_LEN } from '../../constants/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 export async function follow(req, res) {
   const { tag } = req.params;

@@ -12,7 +12,7 @@ import {
   POST_MAX_TAG_LEN,
 } from '../../constants/index.js';
 import { ValidationError, ERRORS } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 

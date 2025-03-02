@@ -1,4 +1,4 @@
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 export async function logout(req, res) {
   req.session.destroy();

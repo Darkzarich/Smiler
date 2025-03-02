@@ -3,7 +3,7 @@ import Comment from '../../models/Comment.js';
 import Post from '../../models/Post.js';
 
 import { ValidationError, NotFoundError, ERRORS } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 export async function create(req, res) {
   const { userId } = req.session;

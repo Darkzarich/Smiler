@@ -17,7 +17,7 @@ import {
   NotFoundError,
   ERRORS,
 } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 
 const postMulter = multer({
   storage: new DiskStorage({

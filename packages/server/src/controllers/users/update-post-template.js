@@ -2,7 +2,7 @@ import { identity, pickBy } from 'lodash-es';
 import User from '../../models/User.js';
 
 import { ValidationError, ERRORS } from '../../errors/index.js';
-import { sendSuccess } from '../../utils/responseUtils.js';
+import { sendSuccess } from '../../utils/response-utils.js';
 import {
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
