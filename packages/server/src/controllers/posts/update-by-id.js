@@ -1,20 +1,13 @@
 import { differenceInMilliseconds } from 'date-fns';
-import sanitizeHtml from '../../libs/sanitize-html.js';
 import Post from '../../models/Post.js';
 import {
   POST_SECTION_TYPES,
-  POST_MAX_TAGS,
-  POST_MAX_TAG_LEN,
   POST_TIME_TO_UPDATE,
 } from '../../constants/index.js';
-import {
-  ValidationError,
-  NotFoundError,
-  ForbiddenError,
-  ERRORS,
-} from '../../errors/index.js';
+import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index.js';
 import { removeFileByPath } from '../../utils/remove-file-by-path.js';
 import { sendSuccess } from '../../utils/response-utils.js';
+import { PostValidator } from '../../validators/PostValidator.js';
 
 export async function updateById(req, res) {
   // TODO: validate sections on update by type and other stuff the same as when creating post
@@ -22,7 +15,6 @@ export async function updateById(req, res) {
 
   const { userId } = req.session;
   const { id: postId } = req.params;
-  const { title, tags, sections: newSections } = req.body;
 
   const targetPost = await Post.findById(postId);
 
@@ -41,28 +33,19 @@ export async function updateById(req, res) {
     throw new ForbiddenError(ERRORS.POST_CAN_EDIT_WITHIN_TIME);
   }
 
-  targetPost.title = title || targetPost.title;
-
-  if (tags) {
-    if (tags.length > POST_MAX_TAGS) {
-      throw new ValidationError(ERRORS.POST_MAX_TAGS_EXCEEDED);
-    }
-
-    if (tags.some((tag) => tag.length > POST_MAX_TAG_LEN)) {
-      throw new ValidationError(ERRORS.POST_TAG_MAX_LEN_EXCEEDED);
-    }
-  }
+  const {
+    title,
+    sections: newSections,
+    tags,
+  } = PostValidator.validateAndPrepare({
+    title: req.body.title || targetPost.title,
+    sections: req.body.sections || targetPost.sections,
+    tags: req.body.tags || targetPost.tags,
+  });
 
   const filePathsToDelete = [];
 
   if (newSections) {
-    newSections.forEach((section) => {
-      if (section.type === POST_SECTION_TYPES.TEXT) {
-        // eslint-disable-next-line no-param-reassign
-        section.content = sanitizeHtml(section.content);
-      }
-    });
-
     // Looking for sections with a type of "picture" that were uploaded as a file
     // and that got removed from the post in the update
     targetPost.sections.forEach((section) => {
@@ -80,15 +63,13 @@ export async function updateById(req, res) {
     });
   }
 
-  // TODO: Rewrite to _.pickBy and _.identity maybe, like in update-post-template
-
-  targetPost.title = title || targetPost.title;
-  targetPost.tags = tags || targetPost.tags;
-  targetPost.sections = newSections || targetPost.sections;
+  targetPost.title = title;
+  targetPost.tags = tags;
+  targetPost.sections = newSections;
 
   await targetPost.save();
 
-  sendSuccess(res, targetPost);
+  sendSuccess(res, targetPost.toResponse());
 
   // Remove all deleted files
 
