@@ -1,6 +1,6 @@
 {
   "ignore": [
-    "src/swagger/swagger.json",
+    "src/docs/swagger/swagger.json",
     "src/**/*.spec.js"
   ],
   "events": {

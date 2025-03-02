@@ -8,7 +8,7 @@ const router = express.Router();
 
 if (!Config.IS_JEST) {
   const buffer = await readFile(
-    new URL('../swagger/swagger.json', import.meta.url),
+    new URL('../docs/swagger/swagger.json', import.meta.url),
   );
 
   const swaggerDocument = JSON.parse(buffer.toString());
