@@ -16,13 +16,15 @@ export async function updateById(req, res) {
   const { userId } = req.session;
   const { id: postId } = req.params;
 
-  const targetPost = await Post.findById(postId);
+  const targetPost = await Post.findById(postId, null, {
+    populate: { path: 'author', select: { login: 1, avatar: 1 } },
+  });
 
   if (!targetPost) {
     throw new NotFoundError(ERRORS.POST_NOT_FOUND);
   }
 
-  if (targetPost.author.toString() !== userId) {
+  if (targetPost.author._id.toString() !== userId) {
     throw new ForbiddenError(ERRORS.POST_CANT_EDIT_NOT_OWN);
   }
 
