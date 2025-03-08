@@ -1,6 +1,7 @@
 FROM node:20.18.3-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+RUN npm install -g corepack@latest
 RUN corepack enable
 
 FROM base AS build
