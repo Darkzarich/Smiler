@@ -16,6 +16,11 @@ export function generateRandomPost(overrides = {}) {
         url: 'https://picsum.photos/200/300',
       },
       {
+        type: 'pic',
+        isFile: true,
+        url: '/uploads/1234/1234.jpg',
+      },
+      {
         type: 'vid',
         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       },

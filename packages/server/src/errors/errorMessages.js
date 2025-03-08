@@ -64,6 +64,7 @@ export const ERRORS = {
   POST_TEXT_SECTIONS_CONTENT_MAX_LENGTH_EXCEEDED:
     'Exceeded max length of text sections content',
   POST_PIC_SECTION_URL_REQUIRED: 'Image section url is required',
+  POST_PIC_SECTION_URL_INVALID: 'Invalid image section url',
   POST_VIDEO_SECTION_URL_REQUIRED: 'Video section url is required',
   POST_MAX_UPLOAD_IMAGE_SIZE_EXCEEDED: `Uploaded image is too large. Max allowed size is ${POST_MAX_UPLOAD_IMAGE_SIZE / 1024 / 1024}MB`,
   POST_SEARCH_INVALID_DATE: 'Invalid date',

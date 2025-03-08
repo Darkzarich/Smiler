@@ -69,8 +69,16 @@ export class PostValidator {
       }
 
       if (section.type === POST_SECTION_TYPES.PICTURE) {
-        if (!section.url || !section.url.match(/^https?:\/\//)) {
+        if (!section.url) {
           throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_REQUIRED);
+        }
+
+        if (!section.isFile && !section.url.match(/^https?:\/\//)) {
+          throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_INVALID);
+        }
+
+        if (section.isFile && !section.url.startsWith('/uploads')) {
+          throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_INVALID);
         }
       }
 

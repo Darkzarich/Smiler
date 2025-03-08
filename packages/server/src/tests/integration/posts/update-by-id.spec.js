@@ -285,7 +285,36 @@ describe('PUT /posts/:id', () => {
       });
 
     expect(response.body.error.message).toBe(
-      ERRORS.POST_PIC_SECTION_URL_REQUIRED,
+      ERRORS.POST_PIC_SECTION_URL_INVALID,
+    );
+    expect(response.status).toBe(422);
+  });
+
+  it('Should return status 422 and an expected message if pic section file url is not a valid URL', async () => {
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+
+    const post = await Post.create(
+      generateRandomPost({
+        author: currentUser.id,
+      }),
+    );
+
+    const response = await request(global.app)
+      .put(`/api/posts/${post._id}`)
+      .set('Cookie', sessionCookie)
+      .send({
+        ...requiredPostFields,
+        sections: [
+          {
+            type: POST_SECTION_TYPES.PICTURE,
+            isFile: true,
+            url: 'test',
+          },
+        ],
+      });
+
+    expect(response.body.error.message).toBe(
+      ERRORS.POST_PIC_SECTION_URL_INVALID,
     );
     expect(response.status).toBe(422);
   });

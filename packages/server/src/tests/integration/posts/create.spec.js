@@ -224,7 +224,30 @@ describe('POST /posts', () => {
       });
 
     expect(response.body.error.message).toBe(
-      ERRORS.POST_PIC_SECTION_URL_REQUIRED,
+      ERRORS.POST_PIC_SECTION_URL_INVALID,
+    );
+    expect(response.status).toBe(422);
+  });
+
+  it('Should return status 422 and an expected message if pic section file url is not a valid URL', async () => {
+    const { sessionCookie } = await signUpRequest(global.app);
+
+    const response = await request(global.app)
+      .post('/api/posts')
+      .set('Cookie', sessionCookie)
+      .send({
+        ...requiredPostFields,
+        sections: [
+          {
+            type: POST_SECTION_TYPES.PICTURE,
+            isFile: true,
+            url: 'test',
+          },
+        ],
+      });
+
+    expect(response.body.error.message).toBe(
+      ERRORS.POST_PIC_SECTION_URL_INVALID,
     );
     expect(response.status).toBe(422);
   });
@@ -279,12 +302,18 @@ describe('POST /posts', () => {
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
-      .send(requiredPostFields);
+      .send({
+        ...requiredPostFields,
+        tags: post.tags,
+        sections: post.sections,
+      });
 
     const postFromDb = await Post.findById(response.body.id).lean();
 
     expect(postFromDb).toMatchObject({
       title: requiredPostFields.title,
+      sections: post.sections,
+      tags: post.tags,
     });
   });
 
