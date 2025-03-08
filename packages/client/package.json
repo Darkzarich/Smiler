@@ -17,6 +17,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
+    "test:e2e:ci": "pnpm exec playwright test --reporter=line",
     "test:e2e": "pnpm exec playwright test",
     "test:e2e:ui": "pnpm exec playwright test --ui",
     "lint:css": "pnpm exec stylelint '**/*.{css,scss,vue}'",

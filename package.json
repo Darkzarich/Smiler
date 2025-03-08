@@ -11,7 +11,7 @@
     "back:dev": "pnpm --filter \"@smiler/backend\" dev",
     "back:serve": "pnpm --filter \"@smiler/backend\" start",
     "lint:spell": "cspell --no-progress .",
-    "test:all": "pnpm --filter \"@smiler/backend\" test && pnpm --filter \"@smiler/frontend\" test:e2e",
+    "test:all": "pnpm --filter \"@smiler/backend\" test; pnpm --filter \"@smiler/frontend\" test:e2e:ci",
     "knip": "knip"
   },
   "license": "MIT",
