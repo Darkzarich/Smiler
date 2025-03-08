@@ -1,4 +1,4 @@
-import { defaultsDeep } from 'lodash-es';
+import { defaults } from 'lodash-es';
 
 export function generateRandomPost(overrides = {}) {
   const post = {
@@ -29,5 +29,5 @@ export function generateRandomPost(overrides = {}) {
     rating: 0,
   };
 
-  return defaultsDeep(overrides, post);
+  return defaults(overrides, post);
 }

@@ -12,6 +12,10 @@ import { ERRORS } from '../../../errors/index.js';
 const mockRemoveFileByPath = import.meta.jest.mocked(removeFileByPath);
 
 describe('DELETE /posts/:id', () => {
+  beforeEach(() => {
+    mockRemoveFileByPath.mockClear();
+  });
+
   it('Should return status 401 and an expected message if user is not signed in', async () => {
     const response = await request(global.app).delete('/api/posts/1234');
 

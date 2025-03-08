@@ -20,6 +20,10 @@ const requiredPostFields = pick(generateRandomPost(), ['title', 'sections']);
 const mockRemoveFileByPath = import.meta.jest.mocked(removeFileByPath);
 
 describe('PUT /posts/:id', () => {
+  beforeEach(() => {
+    mockRemoveFileByPath.mockClear();
+  });
+
   it('Should return status 401 and an expected message if user is not signed in', async () => {
     const response = await request(global.app).put('/api/posts/:id');
 
