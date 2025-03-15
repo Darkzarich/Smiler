@@ -2,3 +2,4 @@ node_modules
 uploads/*
 logs/*
 !uploads/.keep
+dist

@@ -1,3 +1,4 @@
+/* eslint-disable node/no-unsupported-features/es-syntax */
 import mongoose from 'mongoose';
 
 // TODO: Remove after moving to TypeScript

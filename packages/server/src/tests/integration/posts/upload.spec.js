@@ -4,7 +4,6 @@ import Sharp from 'sharp';
 import path from 'path';
 import fs from 'fs/promises';
 import User from '../../../models/User.js';
-import { generateRandomUser } from '../../data-generators/index.js';
 import { signUpRequest } from '../../utils/request-auth.js';
 import { ERRORS } from '../../../errors/index.js';
 import {
