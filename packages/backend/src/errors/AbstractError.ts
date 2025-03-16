@@ -1,4 +1,8 @@
 export default class AbstractError extends Error {
+  code: string | number;
+  status: number;
+  isOperational: boolean;
+
   constructor({
     code = 'Error',
     status = 500,

@@ -14,8 +14,6 @@
     "start": "node dist/index.js",
     "dev": "ts-node index.ts",
     "dev:watch": "nodemon --exec ts-node index.ts",
-    "gen-doc": "pnpm exec swagger-jsdoc -d src/swagger/swaggerDef.cjs ./src/routes/*.js ./src/routes/api/*.js -o \"src/swagger/swagger.json\"",
-    "postinstall": "pnpm gen-doc",
     "lint:code": "eslint --ext .js --ext .ts --ignore-path .gitignore .",
     "lint:types": "tsc --noEmit",
     "prettier": "prettier . --write"
@@ -29,11 +27,16 @@
   "author": "Darkzarich",
   "license": "MIT",
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/express-session": "^1.18.1",
     "@types/jest": "^29.5.12",
+    "@types/morgan": "^1.9.9",
     "@types/multer": "^1.4.11",
     "@types/node": "^20.10.5",
     "@types/supertest": "^6.0.2",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "@typescript-eslint/eslint-plugin": "^8.26.1",
     "@typescript-eslint/parser": "^8.26.1",
     "eslint": "^8.57.0",
@@ -51,7 +54,7 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "connect-mongo": "^3.0.0",
+    "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "date-fns": "^3.6.0",

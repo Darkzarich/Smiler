@@ -1,7 +1,7 @@
 import AbstractError from './AbstractError';
 
 export default class ForbiddenError extends AbstractError {
-  constructor(message) {
+  constructor(message: string) {
     super({
       code: 'Forbidden',
       status: 403,

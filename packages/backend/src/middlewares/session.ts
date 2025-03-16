@@ -1,10 +1,9 @@
 import session from 'express-session';
-import connectMongo from 'connect-mongo';
+import MongoStore from 'connect-mongo';
+import type { Connection } from 'mongoose';
 import Config from '../config/index';
 
-const MongoStore = connectMongo(session);
-
-export default (db) =>
+export default (db: Connection) =>
   session({
     secret: Config.SESSION_SECRET,
     resave: true,
@@ -15,7 +14,8 @@ export default (db) =>
       maxAge: 7 * 24 * 60 * 60 * 1000, // a week
     },
     saveUninitialized: false,
-    store: new MongoStore({
-      mongooseConnection: db,
+    store: MongoStore.create({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      client: db.getClient() as any,
     }),
   });

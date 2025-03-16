@@ -1,4 +1,5 @@
 import express from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import {
   AppError,
   NotFoundError,
@@ -13,14 +14,20 @@ import {
   isCastError,
   isValidationError,
 } from '../../utils/check-mongo-db-error';
+import usersRouter from './users';
+import authRouter from './auth';
+import postsRouter from './posts';
+import commentsRouter from './comments';
+import tagsRouter from './tags';
+import AbstractError from '../../errors/AbstractError';
 
 const router = express.Router();
 
-router.use('/users', (await import('./users')).default);
-router.use('/auth', (await import('./auth')).default);
-router.use('/posts', (await import('./posts')).default);
-router.use('/comments', (await import('./comments')).default);
-router.use('/tags', (await import('./tags')).default);
+router.use('/users', usersRouter);
+router.use('/auth', authRouter);
+router.use('/posts', postsRouter);
+router.use('/comments', commentsRouter);
+router.use('/tags', tagsRouter);
 
 // Special endpoint to test global error handling middleware in Jest environment
 if (Config.IS_JEST) {
@@ -37,12 +44,13 @@ router.all('*', (req, res, next) => {
   next(new NotFoundError());
 });
 
-function handleSendError(error, res) {
+function handleSendError(error: AbstractError, res: Response) {
   const { code, status, message } = error;
 
   const response = {
     error: {
       code,
+      message,
     },
   };
 
@@ -51,36 +59,38 @@ function handleSendError(error, res) {
   res.status(status).json(response);
 }
 
-// Specifying four parameters is a must for global error handling
-// eslint-disable-next-line no-unused-vars
-router.use((error, req, res, next) => {
-  // Handle errors from user's input such as ValidationError etc
-  // these are operational errors and should be handled by the client
-  if (error.status && error.isOperational) {
-    handleSendError(error, res);
+// ! Specifying four parameters is a must for global error handling
+router.use(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  (error: AbstractError, req: Request, res: Response, next: NextFunction) => {
+    // Handle errors from user's input such as ValidationError etc
+    // these are "operational" errors and should be handled by the client
+    if (error.status && error.isOperational) {
+      handleSendError(error, res);
 
-    return;
-  }
+      return;
+    }
 
-  logger.error(error, {
-    requestId: req.id,
-  });
+    logger.error(error.message, {
+      requestId: req.id,
+    });
 
-  // Handle MongoDB errors
-  if (isCastError(error) || isValidationError(error)) {
-    handleSendError(new ValidationError(error.message), res);
+    // Handle MongoDB errors
+    if (isCastError(error) || isValidationError(error)) {
+      handleSendError(new ValidationError(error.message), res);
 
-    return;
-  }
+      return;
+    }
 
-  // Handle MongoDB duplicate document error, when unique index is violated
-  if (isDuplicateKeyError(error)) {
-    handleSendError(new ConflictError(error.message), res);
+    // Handle MongoDB duplicate document error, when unique index is violated
+    if (isDuplicateKeyError(error)) {
+      handleSendError(new ConflictError(error.message), res);
 
-    return;
-  }
+      return;
+    }
 
-  handleSendError(new AppError(), res);
-});
+    handleSendError(new AppError(), res);
+  },
+);
 
 export default router;

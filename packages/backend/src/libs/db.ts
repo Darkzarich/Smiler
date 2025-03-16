@@ -9,7 +9,7 @@ async function getDatabase() {
       mongoose.connection.readyState,
     )
   ) {
-    return mongoose.connection;
+    return mongoose;
   }
 
   return mongoose.connect(Config.DB_URL, {
@@ -46,7 +46,7 @@ export async function connectDB() {
 
     return connection;
   } catch (error) {
-    logger.error(error);
+    logger.error(error as Error);
 
     throw error;
   }

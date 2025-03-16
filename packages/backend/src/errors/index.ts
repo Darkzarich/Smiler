@@ -1,4 +1,4 @@
-import AppError from './AppError';
+import AppError from './ServerError';
 import NotFoundError from './NotFoundError';
 import UnauthorizedError from './UnauthorizedError';
 import ValidationError from './ValidationError';
