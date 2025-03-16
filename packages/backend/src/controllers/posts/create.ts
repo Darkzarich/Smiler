@@ -1,3 +1,4 @@
+import type { Request, Response } from 'express';
 import slugLib from 'slug';
 import crypto from 'crypto';
 import User from '../../models/User';
@@ -5,7 +6,7 @@ import Post from '../../models/Post';
 import { sendSuccess } from '../../utils/response-utils';
 import { PostValidator } from '../../validators/PostValidator';
 
-export async function create(req, res) {
+export async function create(req: Request, res: Response) {
   // TODO: frontend sends hash should think about avoiding that anyhow
 
   const { userId } = req.session;

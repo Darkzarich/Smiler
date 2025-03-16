@@ -1,10 +1,11 @@
+import type { Request, Response } from 'express';
 import { POST_MAX_LIMIT } from '../../../constants/index';
 import User from '../../../models/User';
 import Post from '../../../models/Post';
 import { ValidationError, ERRORS } from '../../../errors/index';
 import { sendSuccess } from '../../../utils/response-utils';
 
-export async function all(req, res) {
+export async function all(req: Request, res: Response) {
   const limit = +req.query.limit || POST_MAX_LIMIT;
   const offset = +req.query.offset || 0;
 

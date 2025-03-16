@@ -1,3 +1,4 @@
+import type { Request } from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -12,7 +13,7 @@ class DiskStorage {
     this.getSharp = opts.sharp;
   }
 
-  _handleFile(req, file, callback) {
+  _handleFile(req: Request, file, callback) {
     const that = this;
 
     this.getDestination(req, file, (err1, destination) => {
@@ -55,7 +56,7 @@ class DiskStorage {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  _removeFile(req, file, cb) {
+  _removeFile(req: Request, file, cb) {
     const filePath = file.path;
 
     if (filePath) {

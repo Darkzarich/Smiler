@@ -1,9 +1,10 @@
+import type { Request, Response } from 'express';
 import User from '../../models/User';
 import { NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function updateMe(req, res) {
-  const { userId } = req.session;
+export async function updateMe(req: Request, res: Response) {
+  const { userId } = req.session!;
   const update = req.body;
 
   const updatedUser = await User.findByIdAndUpdate(userId, update, {

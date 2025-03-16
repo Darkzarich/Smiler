@@ -1,10 +1,11 @@
+import type { Request, Response } from 'express';
 import User from '../../models/User';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function followById(req, res) {
+export async function followById(req: Request, res: Response) {
   const { id } = req.params;
-  const { userId } = req.session;
+  const { userId } = req.session!;
 
   if (id === userId) {
     throw new ForbiddenError(ERRORS.USER_CANT_FOLLOW_OWN);

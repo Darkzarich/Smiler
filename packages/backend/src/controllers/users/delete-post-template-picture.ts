@@ -1,14 +1,14 @@
+import type { Request, Response } from 'express';
 import User from '../../models/User';
-
 import { NotFoundError, BadRequestError, ERRORS } from '../../errors/index';
 import { removeFileByPath } from '../../utils/remove-file-by-path';
 import { sendSuccess } from '../../utils/response-utils';
 
 import { POST_SECTION_TYPES } from '../../constants/index';
 
-export async function deletePostTemplatePicture(req, res) {
+export async function deletePostTemplatePicture(req: Request, res: Response) {
   const { hash } = req.params;
-  const { userId } = req.session;
+  const { userId } = req.session!;
 
   const userTemplate = await User.findById(userId).select('template');
 

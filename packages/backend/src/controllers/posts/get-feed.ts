@@ -1,10 +1,11 @@
+import type { Request, Response } from 'express';
 import User from '../../models/User';
 import Post from '../../models/Post';
 import { UnauthorizedError, ValidationError, ERRORS } from '../../errors/index';
 import { POST_MAX_LIMIT } from '../../constants/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function getFeed(req, res) {
+export async function getFeed(req: Request, res: Response) {
   const limit = +req.query.limit || POST_MAX_LIMIT;
   const offset = +req.query.offset || 0;
   const { userId } = req.session;

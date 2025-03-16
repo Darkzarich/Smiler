@@ -1,8 +1,9 @@
+import type { Request, Response } from 'express';
 import User from '../../models/User';
 import { sendSuccess } from '../../utils/response-utils';
 import { NotFoundError } from '../../errors/index';
 
-export async function current(req, res) {
+export async function current(req: Request, res: Response) {
   const { userId } = req.session;
 
   if (!userId) {

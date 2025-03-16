@@ -1,3 +1,4 @@
+import type { Request, Response } from 'express';
 import sanitizeHtml from '../../libs/sanitize-html';
 import Comment from '../../models/Comment';
 import Post from '../../models/Post';
@@ -5,7 +6,7 @@ import Post from '../../models/Post';
 import { ValidationError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function create(req, res) {
+export async function create(req: Request, res: Response) {
   const { userId } = req.session;
   const { body, parent, post: postId } = req.body;
 

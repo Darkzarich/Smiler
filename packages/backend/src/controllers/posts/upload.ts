@@ -1,3 +1,4 @@
+import type { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import Sharp from 'sharp';
 import { join, extname } from 'path';
@@ -21,16 +22,16 @@ import { sendSuccess } from '../../utils/response-utils';
 
 const postMulter = multer({
   storage: new DiskStorage({
-    destination: async (req, file, callback) => {
+    destination: async (req: Request, file, callback) => {
       callback(
         null,
-        join(process.cwd(), BASE_UPLOAD_FOLDER, req.session.userId),
+        join(process.cwd(), BASE_UPLOAD_FOLDER, req.session.userId!),
       );
     },
-    filename: (req, file, callback) => {
+    filename: (req: Request, file, callback) => {
       callback(null, `${Date.now()}${extname(file.originalname)}`);
     },
-    sharp: (req, file, callback) => {
+    sharp: (req: Request, file, callback) => {
       const resizer = Sharp()
         .resize(POST_MAX_IMAGE_WIDTH, POST_MAX_IMAGE_HEIGHT, {
           fit: 'cover',
@@ -48,7 +49,7 @@ const postMulter = multer({
     fieldSize: POST_MAX_UPLOAD_IMAGE_SIZE,
     fileSize: POST_MAX_UPLOAD_IMAGE_SIZE,
   },
-  fileFilter: (req, file, callback) => {
+  fileFilter: (req: Request, file, callback) => {
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
       callback(new ValidationError(ERRORS.POST_INVALID_ATTACHMENT_EXTENSION));
 
@@ -60,7 +61,7 @@ const postMulter = multer({
   },
 }).single('picture'); // frontend form-data name for file
 
-export async function upload(req, res, next) {
+export async function upload(req: Request, res: Response, next: NextFunction) {
   const { userId } = req.session;
 
   const user = await User.findById(userId).select('template');
@@ -76,7 +77,7 @@ export async function upload(req, res, next) {
   const rootFolder = process.cwd();
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await mkdir(join(rootFolder, BASE_UPLOAD_FOLDER, userId), {
+  await mkdir(join(rootFolder, BASE_UPLOAD_FOLDER, userId!), {
     recursive: true,
   });
 

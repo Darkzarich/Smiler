@@ -1,10 +1,11 @@
+import type { Request, Response } from 'express';
 import User from '../../models/User';
 import Post from '../../models/Post';
 import { ValidationError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 import { POST_MAX_LIMIT } from '../../constants/index';
 
-export async function getListByAuthor(req, res) {
+export async function getListByAuthor(req: Request, res: Response) {
   const { userId } = req.session;
 
   const limit = +req.query.limit || POST_MAX_LIMIT;

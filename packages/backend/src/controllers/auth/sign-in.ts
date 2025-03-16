@@ -1,3 +1,4 @@
+import type { Request, Response } from 'express';
 import { pbkdf2Sync, timingSafeEqual } from 'crypto';
 import User from '../../models/User';
 import { ValidationError, UnauthorizedError, ERRORS } from '../../errors/index';
@@ -17,7 +18,7 @@ const validate = (fields) => {
   }
 };
 
-export async function signIn(req, res) {
+export async function signIn(req: Request, res: Response) {
   const fields = {
     email: req.body.email,
     password: req.body.password,

@@ -1,3 +1,4 @@
+import type { Request, Response } from 'express';
 import crypto from 'crypto';
 import User from '../../models/User';
 import { ValidationError, ConflictError, ERRORS } from '../../errors/index';
@@ -27,7 +28,7 @@ const validate = (user) => {
   }
 };
 
-export async function signUp(req, res) {
+export async function signUp(req: Request, res: Response) {
   const user = {
     email: req.body.email,
     login: req.body.login,

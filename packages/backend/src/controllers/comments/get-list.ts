@@ -1,3 +1,4 @@
+import type { Request, Response } from 'express';
 import Comment from '../../models/Comment';
 import User from '../../models/User';
 import { NotFoundError, ValidationError, ERRORS } from '../../errors/index';
@@ -23,7 +24,7 @@ function fillWithRatedRecursive({ comments, user }) {
   });
 }
 
-export async function getList(req, res) {
+export async function getList(req: Request, res: Response) {
   const { userId } = req.session;
   const { post } = req.query;
   const { author } = req.query;

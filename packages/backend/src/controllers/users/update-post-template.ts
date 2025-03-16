@@ -1,3 +1,4 @@
+import type { Request, Response } from 'express';
 import { identity, pickBy } from 'lodash-es';
 import User from '../../models/User';
 
@@ -10,7 +11,7 @@ import {
   POST_SECTIONS_MAX,
 } from '../../constants/index';
 
-export async function updatePostTemplate(req, res) {
+export async function updatePostTemplate(req: Request, res: Response) {
   // TODO: validate title, sections just like in posts
 
   const { userId } = req.session;

@@ -1,10 +1,11 @@
+import type { Request, Response } from 'express';
 import User from '../../models/User';
 import Post from '../../models/Post';
 import { POST_TITLE_MAX_LENGTH, POST_MAX_LIMIT } from '../../constants/index';
 import { ValidationError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function search(req, res) {
+export async function search(req: Request, res: Response) {
   const { userId } = req.session;
   const limit = +req.query.limit || POST_MAX_LIMIT;
   const offset = +req.query.offset || 0;

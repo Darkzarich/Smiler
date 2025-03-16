@@ -1,9 +1,10 @@
+import type { Request, Response } from 'express';
 import User from '../../models/User';
 import { ValidationError, ERRORS } from '../../errors/index';
 import { POST_MAX_TAG_LEN } from '../../constants/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function unfollow(req, res) {
+export async function unfollow(req: Request, res: Response) {
   const { tag } = req.params;
   const { userId } = req.session;
 

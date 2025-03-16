@@ -1,3 +1,4 @@
+import type { Request, Response } from 'express';
 import User from '../../models/User';
 import Post from '../../models/Post';
 import Rate from '../../models/Rate';
@@ -5,7 +6,7 @@ import { POST_RATE_VALUE } from '../../constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function unvoteById(req, res) {
+export async function unvoteById(req: Request, res: Response) {
   const { userId } = req.session;
   const { id: postId } = req.params;
 

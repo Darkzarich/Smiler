@@ -1,3 +1,4 @@
+import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
 import sanitizeHtml from '../../libs/sanitize-html';
 import Comment from '../../models/Comment';
@@ -10,7 +11,7 @@ import {
 } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function updateById(req, res) {
+export async function updateById(req: Request, res: Response) {
   const { userId } = req.session;
   const { id } = req.params;
   const { body } = req.body;

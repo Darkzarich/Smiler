@@ -1,9 +1,10 @@
+import type { Request, Response } from 'express';
 import { omit } from 'lodash-es';
 import User from '../../models/User';
 import { NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function getByLogin(req, res) {
+export async function getByLogin(req: Request, res: Response) {
   const { login } = req.params;
   const { userId: currentUserId } = req.session;
 

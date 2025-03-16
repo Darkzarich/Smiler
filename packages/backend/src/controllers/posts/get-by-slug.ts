@@ -1,9 +1,10 @@
+import type { Request, Response } from 'express';
 import User from '../../models/User';
 import Post from '../../models/Post';
 import { NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function getBySlug(req, res) {
+export async function getBySlug(req: Request, res: Response) {
   const { userId } = req.session;
 
   const { slug } = req.params;
