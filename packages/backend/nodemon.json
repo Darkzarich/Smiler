@@ -1,9 +1,5 @@
 {
   "ignore": [
-    "src/docs/swagger/swagger.json",
     "src/**/*.spec.ts"
-  ],
-  "events": {
-    "start": "pnpm gen-doc"
-  }
+  ]
 }
