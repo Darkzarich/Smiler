@@ -1,0 +1,15 @@
+import User from '../../models/User';
+import { ForbiddenError, ERRORS } from '../../errors/index';
+import { sendSuccess } from '../../utils/response-utils';
+
+export async function getPostTemplate(req, res) {
+  if (req.session.userId !== req.params.id) {
+    throw new ForbiddenError(ERRORS.TEMPLATE_CANT_SEE_NOT_OWN);
+  }
+
+  const template = await User.findById(req.session.userId)
+    .select('template')
+    .lean();
+
+  sendSuccess(res, template.template);
+}
