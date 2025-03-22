@@ -13,6 +13,7 @@
     "resolveJsonModule": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "experimentalDecorators": true,
     "typeRoots": [
       "./node_modules/@types",
       "node_modules/express-request-id/types.d.ts",

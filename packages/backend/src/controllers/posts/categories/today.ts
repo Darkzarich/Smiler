@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { startOfToday } from 'date-fns';
-import User from '../../../models/User';
-import Post from '../../../models/Post';
+import { UserModel } from '../../../models/User';
+import { PostModel } from '../../../models/Post';
 import { ValidationError, ERRORS } from '../../../errors/index';
 import { sendSuccess } from '../../../utils/response-utils';
 import { POST_MAX_LIMIT } from '../../../constants/index';
@@ -23,13 +23,13 @@ export async function today(req: Request, res: Response) {
   };
 
   const [posts, user, total] = await Promise.all([
-    Post.find(query)
+    PostModel.find(query)
       .sort({ rating: -1 })
       .populate('author', 'login avatar')
       .limit(limit)
       .skip(offset),
-    User.findById(userId).select('rates').populate('rates'),
-    Post.countDocuments(query),
+    UserModel.findById(userId, { rates: 1 }).populate('rates'),
+    PostModel.countDocuments(query),
   ]);
 
   const postsWithRated = posts.map((post) => post.toResponse(user));

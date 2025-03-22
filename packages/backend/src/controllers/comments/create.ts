@@ -33,7 +33,7 @@ export async function create(req: Request, res: Response) {
         body: sanitizedBody,
         author: userId,
       }),
-      Post.commentCountInc(postId),
+      Post.increaseCommentCount(postId),
     ]);
 
     sendSuccess(res, comment);
@@ -62,7 +62,7 @@ export async function create(req: Request, res: Response) {
       { _id: parent },
       { $push: { children: comment.id.toString() } },
     ),
-    Post.commentCountInc(postId),
+    Post.increaseCommentCount(postId),
   ]);
 
   sendSuccess(res, comment);

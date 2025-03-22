@@ -1,92 +1,89 @@
-/* eslint-disable func-names */
-import mongoose from 'mongoose';
+import {
+  prop,
+  getModelForClass,
+  Ref,
+  index,
+  modelOptions,
+  plugin,
+  DocumentType,
+} from '@typegoose/typegoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
+import { Post } from './Post';
+import { User } from './User';
 
-const { Schema } = mongoose;
-
-const schema = new Schema({
-  deleted: {
-    type: Boolean,
-    default: false,
-  },
-  body: {
-    type: String,
-    required: true,
-  },
-  post: {
-    type: Schema.Types.ObjectId,
-    ref: 'Post',
-    required: true,
-  },
-  children: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Comment',
-      autopopulate: {
-        maxDepth: 20,
-      },
-    },
-  ],
-  parent: {
-    type: Schema.Types.ObjectId,
-    ref: 'Comment',
-  },
-  author: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-    autopopulate: {
-      maxDepth: 20,
-      select: 'login avatar',
+@index({ post: 1 })
+@modelOptions({
+  schemaOptions: {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      versionKey: false,
     },
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  rating: {
-    type: Number,
-    default: 0,
-  },
-});
+})
+@plugin(mongooseAutoPopulate)
+export class Comment {
+  @prop({ default: false })
+  public deleted!: boolean;
 
-schema.index({ post: 1 });
+  @prop({ required: true })
+  public body!: string;
 
-schema.methods.toResponse = function (user) {
-  if (this.deleted) {
+  @prop({ required: true })
+  public post!: Ref<Post>;
+
+  @prop({ ref: () => Comment, default: [] })
+  public children!: Ref<Comment>[];
+
+  @prop({ ref: () => Comment })
+  public parent!: Ref<Comment>;
+
+  @prop({ ref: () => User, required: true })
+  public author!: Ref<User>;
+
+  @prop({ default: 0 })
+  public rating!: number;
+
+  public createdAt!: string;
+  public updatedAt!: string;
+
+  public toResponse(
+    this: DocumentType<Comment>,
+    user?: DocumentType<User> | null,
+  ) {
+    if (this.deleted) {
+      return {
+        author: this.author,
+        children: this.children,
+        id: this._id,
+        deleted: true,
+        parent: this.parent,
+        createdAt: this.createdAt,
+      };
+    }
+
+    const rated = user ? user.isRated(this._id.toString()) : null;
+
     return {
+      body: this.body,
       author: this.author,
       children: this.children,
       id: this._id,
-      deleted: true,
       parent: this.parent,
+      rating: this.rating,
       createdAt: this.createdAt,
+      rated: rated
+        ? {
+            isRated: rated.result,
+            negative: rated.negative,
+          }
+        : {
+            isRated: false,
+            negative: false,
+          },
+      deleted: false,
     };
   }
+}
 
-  const rated = user ? user.isRated(this.id) : {};
-
-  return {
-    body: this.body,
-    author: this.author,
-    children: this.children,
-    id: this._id,
-    parent: this.parent,
-    rating: this.rating,
-    createdAt: this.createdAt,
-    rated: {
-      isRated: rated.result || false,
-      negative: rated.negative || false,
-    },
-    deleted: false,
-  };
-};
-
-schema.plugin(mongooseAutoPopulate);
-
-schema.set('toJSON', {
-  virtuals: true,
-  versionKey: false,
-});
-
-export default mongoose.model('Comment', schema);
+export const CommentModel = getModelForClass(Comment);

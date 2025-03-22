@@ -1,22 +1,32 @@
-import mongoose from 'mongoose';
+import {
+  prop,
+  getModelForClass,
+  Ref,
+  index,
+  modelOptions,
+} from '@typegoose/typegoose';
+import { Comment } from './Comment';
+import { Post } from './Post';
 
-const { Schema } = mongoose;
+@index({ post: 1 })
+@modelOptions({
+  schemaOptions: {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      versionKey: false,
+    },
+  },
+})
+export class Rate {
+  @prop({ default: false })
+  public negative!: boolean;
 
-const schema = new Schema({
-  negative: {
-    type: Boolean,
-    required: true,
-  },
-  target: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    refPath: 'targetModel',
-  },
-  targetModel: {
-    type: String,
-    required: true,
-    enum: ['Comment', 'Post'],
-  },
-});
+  @prop({ required: true, refPath: 'targetModel' })
+  public target!: Ref<Post | Comment>;
 
-export default mongoose.model('Rate', schema);
+  @prop({ required: true })
+  public targetModel!: 'Comment' | 'Post';
+}
+
+export const RateModel = getModelForClass(Rate);

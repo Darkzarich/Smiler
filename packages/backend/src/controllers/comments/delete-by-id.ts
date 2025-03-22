@@ -46,7 +46,7 @@ export async function deleteById(req: Request, res: Response) {
         },
       },
     ),
-    Post.commentCountDec(comment.post),
+    Post.decreaseCommentCount(comment.post),
     // TODO: Remove rates for the comment as well
     Comment.deleteOne({
       _id: comment._id,
