@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import User from '../../models/User';
-import Post from '../../models/Post';
+import { UserModel } from '../../models/User';
+import { PostModel } from '../../models/Post';
 import { ValidationError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 import { POST_MAX_LIMIT } from '../../constants/index';
@@ -16,7 +16,7 @@ export async function getListByAuthor(req: Request, res: Response) {
     throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
   }
 
-  const foundAuthor = await User.findOne({
+  const foundAuthor = await UserModel.findOne({
     login: author,
   });
 
@@ -29,13 +29,13 @@ export async function getListByAuthor(req: Request, res: Response) {
   };
 
   const [posts, user, total] = await Promise.all([
-    Post.find(query)
+    PostModel.find(query)
       .sort({ createdAt: -1 })
       .populate('author', 'login avatar')
       .limit(limit)
       .skip(offset),
-    User.findById(userId).select('rates').populate('rates'),
-    Post.countDocuments(query),
+    UserModel.findById(userId).select('rates').populate('rates'),
+    PostModel.countDocuments(query),
   ]);
 
   const postsWithRated = posts.map((post) => post.toResponse(user));

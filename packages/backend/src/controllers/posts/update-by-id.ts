@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
-import Post from '../../models/Post';
+import { PostModel } from '../../models/Post';
 import { POST_SECTION_TYPES, POST_TIME_TO_UPDATE } from '../../constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index';
 import { removeFileByPath } from '../../utils/remove-file-by-path';
@@ -14,7 +14,7 @@ export async function updateById(req: Request, res: Response) {
   const { userId } = req.session;
   const { id: postId } = req.params;
 
-  const targetPost = await Post.findById(postId, null, {
+  const targetPost = await PostModel.findById(postId, null, {
     populate: { path: 'author', select: { login: 1, avatar: 1 } },
   });
 

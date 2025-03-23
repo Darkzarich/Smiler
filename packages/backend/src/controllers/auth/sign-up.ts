@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import crypto from 'crypto';
-import User from '../../models/User';
+import { UserModel } from '../../models/User';
 import { ValidationError, ConflictError, ERRORS } from '../../errors/index';
 import { isDuplicateKeyError } from '../../utils/check-mongo-db-error';
 import { sendSuccess } from '../../utils/response-utils';
@@ -48,7 +48,7 @@ export async function signUp(req: Request, res: Response) {
     .toString('hex');
 
   try {
-    const newUser = await User.create({
+    const newUser = await UserModel.create({
       login: user.login,
       email: user.email,
       hash,

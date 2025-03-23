@@ -1,12 +1,16 @@
 import type { Request, Response } from 'express';
 import { subHours } from 'date-fns';
-import User from '../../../models/User';
-import Post from '../../../models/Post';
+import { UserModel } from '../../../models/User';
+import { PostModel } from '../../../models/Post';
 import { ValidationError, ERRORS } from '../../../errors/index';
 import { sendSuccess } from '../../../utils/response-utils';
 import { POST_MAX_LIMIT } from '../../../constants/index';
+import { Pagination } from '../../../types/pagination';
 
-export async function recent(req: Request, res: Response) {
+export async function recent(
+  req: Request<unknown, unknown, unknown, Pagination>,
+  res: Response,
+) {
   const limit = +req.query.limit || POST_MAX_LIMIT;
   const offset = +req.query.offset || 0;
 
@@ -23,13 +27,13 @@ export async function recent(req: Request, res: Response) {
   };
 
   const [posts, user, total] = await Promise.all([
-    Post.find(query)
+    PostModel.find(query)
       .sort({ createdAt: -1 })
       .populate('author', 'login avatar')
       .limit(limit)
       .skip(offset),
-    User.findById(userId).select('rates').populate('rates'),
-    Post.countDocuments(query),
+    UserModel.findById(userId).select('rates').populate('rates'),
+    PostModel.countDocuments(query),
   ]);
 
   const postsWithRated = posts.map((post) => post.toResponse(user));

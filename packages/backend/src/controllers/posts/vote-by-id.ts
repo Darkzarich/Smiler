@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
-import User from '../../models/User';
-import Post from '../../models/Post';
-import Rate from '../../models/Rate';
+import { UserModel } from '../../models/User';
+import { PostModel } from '../../models/Post';
+import { RateModel } from '../../models/Rate';
 import { POST_RATE_VALUE } from '../../constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
@@ -11,7 +11,7 @@ export async function voteById(req: Request, res: Response) {
   const { id: postId } = req.params;
   const { negative } = req.body;
 
-  const targetPost = await Post.findById(postId).select({ author: 1 });
+  const targetPost = await PostModel.findById(postId).select({ author: 1 });
 
   if (!targetPost) {
     throw new NotFoundError(ERRORS.POST_NOT_FOUND);
@@ -21,7 +21,7 @@ export async function voteById(req: Request, res: Response) {
     throw new ForbiddenError(ERRORS.POST_CANT_RATE_OWN);
   }
 
-  const currentUser = await User.findById(userId)
+  const currentUser = await UserModel.findById(userId)
     .select({ rates: 1 })
     .populate('rates');
 
@@ -33,20 +33,26 @@ export async function voteById(req: Request, res: Response) {
 
   const rateValue = negative ? -POST_RATE_VALUE : POST_RATE_VALUE;
 
-  const newRate = await Rate.create({
+  const newRate = await RateModel.create({
     target: targetPost.id,
     targetModel: 'Post',
     negative,
   });
 
   const [updatedPost] = await Promise.all([
-    Post.findByIdAndUpdate(
+    PostModel.findByIdAndUpdate(
       targetPost.id,
       { $inc: { rating: rateValue } },
       { new: true, lean: true },
     ),
-    User.updateOne({ _id: targetPost.author }, { $inc: { rating: rateValue } }),
-    User.updateOne({ _id: currentUser.id }, { $push: { rates: newRate.id } }),
+    UserModel.updateOne(
+      { _id: targetPost.author },
+      { $inc: { rating: rateValue } },
+    ),
+    UserModel.updateOne(
+      { _id: currentUser.id },
+      { $push: { rates: newRate.id } },
+    ),
   ]);
 
   sendSuccess(res, updatedPost);

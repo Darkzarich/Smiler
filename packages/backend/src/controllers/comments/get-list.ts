@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import Comment from '../../models/Comment';
-import User from '../../models/User';
+import { CommentModel } from '../../models/Comment';
+import { UserModel } from '../../models/User';
 import { NotFoundError, ValidationError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 import { COMMENT_MAX_LIMIT } from '../../constants/index';
@@ -46,7 +46,7 @@ export async function getList(req: Request, res: Response) {
   query.post = post;
 
   if (author) {
-    const foundAuthor = await User.findById(author).lean();
+    const foundAuthor = await UserModel.findById(author).lean();
 
     if (!foundAuthor) {
       throw new NotFoundError(ERRORS.AUTHOR_NOT_FOUND);
@@ -56,9 +56,9 @@ export async function getList(req: Request, res: Response) {
   }
 
   const [comments, currentUser, total] = await Promise.all([
-    Comment.find(query).sort({ rating: -1 }).skip(offset).limit(limit),
-    User.findById(userId).select('rates').populate('rates'),
-    Comment.countDocuments(query),
+    CommentModel.find(query).sort({ rating: -1 }).skip(offset).limit(limit),
+    UserModel.findById(userId).select('rates').populate('rates'),
+    CommentModel.countDocuments(query),
   ]);
 
   sendSuccess(res, {

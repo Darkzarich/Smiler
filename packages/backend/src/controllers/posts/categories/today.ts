@@ -5,8 +5,12 @@ import { PostModel } from '../../../models/Post';
 import { ValidationError, ERRORS } from '../../../errors/index';
 import { sendSuccess } from '../../../utils/response-utils';
 import { POST_MAX_LIMIT } from '../../../constants/index';
+import { Pagination } from '../../../types/pagination';
 
-export async function today(req: Request, res: Response) {
+export async function today(
+  req: Request<unknown, unknown, unknown, Pagination>,
+  res: Response,
+) {
   const limit = +req.query.limit || POST_MAX_LIMIT;
   const offset = +req.query.offset || 0;
 

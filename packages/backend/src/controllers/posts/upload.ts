@@ -4,7 +4,7 @@ import Sharp from 'sharp';
 import { join, extname } from 'path';
 import { mkdir } from 'fs/promises';
 import DiskStorage from '../../libs/DiskStorage';
-import User from '../../models/User';
+import { UserModel } from '../../models/User';
 import {
   POST_SECTIONS_MAX,
   POST_MAX_UPLOAD_IMAGE_SIZE,
@@ -64,7 +64,7 @@ const postMulter = multer({
 export async function upload(req: Request, res: Response, next: NextFunction) {
   const { userId } = req.session;
 
-  const user = await User.findById(userId).select('template');
+  const user = await UserModel.findById(userId).select('template');
 
   if (!user) {
     throw new NotFoundError(ERRORS.USER_NOT_FOUND);

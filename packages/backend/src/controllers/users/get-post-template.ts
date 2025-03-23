@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import User from '../../models/User';
+import { UserModel } from '../../models/User';
 import { ForbiddenError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
@@ -8,7 +8,7 @@ export async function getPostTemplate(req: Request, res: Response) {
     throw new ForbiddenError(ERRORS.TEMPLATE_CANT_SEE_NOT_OWN);
   }
 
-  const template = await User.findById(req.session.userId)
+  const template = await UserModel.findById(req.session.userId)
     .select('template')
     .lean();
 

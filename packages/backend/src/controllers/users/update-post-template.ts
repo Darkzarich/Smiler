@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { identity, pickBy } from 'lodash-es';
-import User from '../../models/User';
+import { UserModel } from '../../models/User';
 
 import { ValidationError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
@@ -37,7 +37,7 @@ export async function updatePostTemplate(req: Request, res: Response) {
     throw new ValidationError(ERRORS.POST_SECTIONS_MAX_EXCEEDED);
   }
 
-  const updatedUser = await User.findByIdAndUpdate(
+  const updatedUser = await UserModel.findByIdAndUpdate(
     userId,
     {
       $set: pickBy(

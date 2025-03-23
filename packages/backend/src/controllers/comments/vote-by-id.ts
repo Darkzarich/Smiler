@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
-import User from '../../models/User';
-import Rate from '../../models/Rate';
-import Comment from '../../models/Comment';
+import { UserModel } from '../../models/User';
+import { RateModel } from '../../models/Rate';
+import { CommentModel } from '../../models/Comment';
 import { COMMENT_RATE_VALUE } from '../../constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
@@ -11,7 +11,7 @@ export async function voteById(req: Request, res: Response) {
   const { id: commentId } = req.params;
   const { negative } = req.body;
 
-  const targetComment = await Comment.findOne({
+  const targetComment = await CommentModel.findOne({
     _id: commentId,
     deleted: false,
   })
@@ -26,7 +26,7 @@ export async function voteById(req: Request, res: Response) {
     throw new ForbiddenError(ERRORS.COMMENT_CANT_RATE_OWN);
   }
 
-  const currentUser = await User.findById(userId).populate('rates');
+  const currentUser = await UserModel.findById(userId).populate('rates');
 
   const ratedForCurrentUser = currentUser.isRated(targetComment._id.toString());
 
@@ -36,20 +36,23 @@ export async function voteById(req: Request, res: Response) {
 
   const rateValue = negative ? -COMMENT_RATE_VALUE : COMMENT_RATE_VALUE;
 
-  const newRate = await Rate.create({
+  const newRate = await RateModel.create({
     target: targetComment._id,
     targetModel: 'Comment',
     negative,
   });
 
   const [updatedComment] = await Promise.all([
-    Comment.findByIdAndUpdate(
+    CommentModel.findByIdAndUpdate(
       targetComment._id,
       { $inc: { rating: rateValue } },
       { new: true, lean: true },
     ),
-    User.updateOne({ _id: currentUser.id }, { $push: { rates: newRate.id } }),
-    User.updateOne(
+    UserModel.updateOne(
+      { _id: currentUser.id },
+      { $push: { rates: newRate.id } },
+    ),
+    UserModel.updateOne(
       { _id: targetComment.author },
       { $inc: { rating: rateValue } },
     ),

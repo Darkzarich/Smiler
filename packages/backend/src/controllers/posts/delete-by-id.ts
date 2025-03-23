@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
-import Post from '../../models/Post';
+import { PostModel } from '../../models/Post';
 import { POST_SECTION_TYPES, POST_TIME_TO_UPDATE } from '../../constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index';
 import { removeFileByPath } from '../../utils/remove-file-by-path';
@@ -10,7 +10,7 @@ export async function deleteById(req: Request, res: Response) {
   const { userId } = req.session;
   const { id } = req.params;
 
-  const targetPost = await Post.findById(id)
+  const targetPost = await PostModel.findById(id)
     .select({
       author: 1,
       createdAt: 1,
@@ -39,7 +39,7 @@ export async function deleteById(req: Request, res: Response) {
   }
 
   // TODO: Remove rates for the post as well
-  await Post.deleteOne({ _id: id });
+  await PostModel.deleteOne({ _id: id });
 
   sendSuccess(res);
 

@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import User from '../../models/User';
-import Post from '../../models/Post';
+import { UserModel } from '../../models/User';
+import { PostModel } from '../../models/Post';
 import { NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
@@ -10,10 +10,12 @@ export async function getBySlug(req: Request, res: Response) {
   const { slug } = req.params;
 
   const [post, user] = await Promise.all([
-    Post.findOne({
+    PostModel.findOne({
       slug,
     }).populate('author', 'login avatar'),
-    userId ? User.findById(userId).select('rates').populate('rates') : null,
+    userId
+      ? UserModel.findById(userId).select('rates').populate('rates')
+      : null,
   ]);
 
   if (!post) {

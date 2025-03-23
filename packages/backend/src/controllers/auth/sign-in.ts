@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { pbkdf2Sync, timingSafeEqual } from 'crypto';
-import User from '../../models/User';
+import { UserModel } from '../../models/User';
 import { ValidationError, UnauthorizedError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
@@ -30,7 +30,7 @@ export async function signIn(req: Request, res: Response) {
     throw new ValidationError(errorMessage);
   }
 
-  const foundUser = await User.findOne({
+  const foundUser = await UserModel.findOne({
     email: fields.email,
   }).lean();
 
@@ -55,7 +55,7 @@ export async function signIn(req: Request, res: Response) {
     throw new UnauthorizedError(ERRORS.AUTH_INVALID_CREDENTIALS);
   }
 
-  req.session.userId = foundUser._id;
+  req.session.userId = foundUser._id.toString();
 
   // TODO: Maybe move to getters of the model
   const userAuth = {

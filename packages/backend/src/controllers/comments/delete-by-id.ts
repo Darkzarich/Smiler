@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
-import Comment from '../../models/Comment';
-import Post from '../../models/Post';
+import { CommentModel } from '../../models/Comment';
+import { PostModel } from '../../models/Post';
 import { COMMENT_TIME_TO_UPDATE } from '../../constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
@@ -10,7 +10,7 @@ export async function deleteById(req: Request, res: Response) {
   const { userId } = req.session;
   const { id } = req.params;
 
-  const comment = await Comment.findById(id).lean();
+  const comment = await CommentModel.findById(id).lean();
 
   if (!comment) {
     throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
@@ -30,7 +30,7 @@ export async function deleteById(req: Request, res: Response) {
   // If comment has replies we cannot delete it completely
   // instead we mark it as deleted with a flag
   if (comment.children.length > 0) {
-    const updateComment = await Comment.findByIdAndUpdate(comment._id, {
+    const updateComment = await CommentModel.findByIdAndUpdate(comment._id, {
       deleted: true,
     });
 
@@ -38,7 +38,7 @@ export async function deleteById(req: Request, res: Response) {
   }
 
   await Promise.all([
-    Comment.updateOne(
+    CommentModel.updateOne(
       { _id: comment.parent },
       {
         $pull: {
@@ -46,9 +46,9 @@ export async function deleteById(req: Request, res: Response) {
         },
       },
     ),
-    Post.decreaseCommentCount(comment.post),
+    PostModel.decreaseCommentCount(comment.post),
     // TODO: Remove rates for the comment as well
-    Comment.deleteOne({
+    CommentModel.deleteOne({
       _id: comment._id,
     }),
   ]);

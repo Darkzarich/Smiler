@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import User from '../../models/User';
+import { UserModel } from '../../models/User';
 import { ValidationError, ERRORS } from '../../errors/index';
 import { POST_MAX_TAG_LEN } from '../../constants/index';
 import { sendSuccess } from '../../utils/response-utils';
@@ -12,7 +12,7 @@ export async function unfollow(req: Request, res: Response) {
     throw new ValidationError(ERRORS.POST_TAG_MAX_LEN_EXCEEDED);
   }
 
-  await User.findByIdAndUpdate(userId, {
+  await UserModel.findByIdAndUpdate(userId, {
     $pull: {
       tagsFollowed: tag,
     },

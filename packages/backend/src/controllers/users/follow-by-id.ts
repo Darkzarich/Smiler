@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import User from '../../models/User';
+import { UserModel } from '../../models/User';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
@@ -12,8 +12,8 @@ export async function followById(req: Request, res: Response) {
   }
 
   const [userFollowing, userFollowed] = await Promise.all([
-    User.findById(userId),
-    User.findById(id),
+    UserModel.findById(userId),
+    UserModel.findById(id),
   ]);
 
   if (!userFollowed) {

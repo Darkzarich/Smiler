@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
-import User from '../../models/User';
-import Rate from '../../models/Rate';
-import Comment from '../../models/Comment';
+import { UserModel } from '../../models/User';
+import { RateModel } from '../../models/Rate';
+import { CommentModel } from '../../models/Comment';
 import { COMMENT_RATE_VALUE } from '../../constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
@@ -10,7 +10,7 @@ export async function unvoteById(req: Request, res: Response) {
   const { userId } = req.session;
   const { id: commentId } = req.params;
 
-  const targetComment = await Comment.findOne({
+  const targetComment = await CommentModel.findOne({
     _id: commentId,
     deleted: false,
   })
@@ -21,7 +21,7 @@ export async function unvoteById(req: Request, res: Response) {
     throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
   }
 
-  const currentUser = await User.findById(userId)
+  const currentUser = await UserModel.findById(userId)
     .select({ rates: 1 })
     .populate('rates');
 
@@ -37,17 +37,17 @@ export async function unvoteById(req: Request, res: Response) {
     : -COMMENT_RATE_VALUE;
 
   const [updatedComment] = await Promise.all([
-    Comment.findByIdAndUpdate(
+    CommentModel.findByIdAndUpdate(
       targetComment._id,
       { $inc: { rating: rateValue } },
       { new: true, lean: true },
     ),
-    User.updateOne(
+    UserModel.updateOne(
       { _id: targetComment.author },
       { $inc: { rating: rateValue } },
     ),
-    Rate.deleteOne({ target: targetComment._id }),
-    User.updateOne(
+    RateModel.deleteOne({ target: targetComment._id }),
+    UserModel.updateOne(
       { _id: targetComment.author },
       { $pull: { rates: ratedForCurrentUser.rated._id } },
     ),

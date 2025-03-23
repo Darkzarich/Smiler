@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import User from '../../models/User';
-import Post from '../../models/Post';
+import { UserModel } from '../../models/User';
+import { PostModel } from '../../models/Post';
 import { UnauthorizedError, ValidationError, ERRORS } from '../../errors/index';
 import { POST_MAX_LIMIT } from '../../constants/index';
 import { sendSuccess } from '../../utils/response-utils';
@@ -14,7 +14,7 @@ export async function getFeed(req: Request, res: Response) {
     throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
   }
 
-  const user = await User.findById(userId).populate('rates');
+  const user = await UserModel.findById(userId).populate('rates');
 
   if (!user) {
     throw new UnauthorizedError(ERRORS.UNAUTHORIZED);
@@ -45,12 +45,12 @@ export async function getFeed(req: Request, res: Response) {
   };
 
   const [posts, total] = await Promise.all([
-    Post.find(query)
+    PostModel.find(query)
       .sort('-createdAt')
       .populate('author', 'login avatar')
       .limit(limit)
       .skip(offset),
-    Post.countDocuments(query),
+    PostModel.countDocuments(query),
   ]);
 
   const transPosts = posts.map((post) => post.toResponse(user));

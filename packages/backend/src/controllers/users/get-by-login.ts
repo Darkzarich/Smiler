@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { omit } from 'lodash-es';
-import User from '../../models/User';
+import { UserModel } from '../../models/User';
 import { NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
@@ -8,7 +8,7 @@ export async function getByLogin(req: Request, res: Response) {
   const { login } = req.params;
   const { userId: currentUserId } = req.session;
 
-  const requestedUser = await User.findOne({
+  const requestedUser = await UserModel.findOne({
     login,
   }).select({
     login: 1,
@@ -29,7 +29,7 @@ export async function getByLogin(req: Request, res: Response) {
     return;
   }
 
-  const currentUser = await User.findById(currentUserId).select({
+  const currentUser = await UserModel.findById(currentUserId).select({
     usersFollowed: 1,
   });
 

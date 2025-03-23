@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
 import slugLib from 'slug';
 import crypto from 'crypto';
-import User from '../../models/User';
-import Post from '../../models/Post';
+import { UserModel } from '../../models/User';
+import { PostModel } from '../../models/Post';
 import { sendSuccess } from '../../utils/response-utils';
 import { PostValidator } from '../../validators/PostValidator';
 
@@ -18,7 +18,7 @@ export async function create(req: Request, res: Response) {
   });
 
   const [post] = await Promise.all([
-    Post.create({
+    PostModel.create({
       title,
       sections,
       tags,
@@ -26,7 +26,7 @@ export async function create(req: Request, res: Response) {
       author: userId,
     }),
     // Clear user template
-    User.updateOne(
+    UserModel.updateOne(
       { _id: userId },
       {
         $set: {

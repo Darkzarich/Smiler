@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import sanitizeHtml from '../../libs/sanitize-html';
-import Comment from '../../models/Comment';
-import Post from '../../models/Post';
+import { CommentModel } from '../../models/Comment';
+import { PostModel } from '../../models/Post';
 
 import { ValidationError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
@@ -18,7 +18,7 @@ export async function create(req: Request, res: Response) {
     throw new ValidationError(ERRORS.POST_ID_REQUIRED);
   }
 
-  const post = await Post.findById(postId);
+  const post = await PostModel.findById(postId);
 
   if (!post) {
     throw new NotFoundError(ERRORS.POST_NOT_FOUND);
@@ -28,12 +28,12 @@ export async function create(req: Request, res: Response) {
 
   if (!parent) {
     const [comment] = await Promise.all([
-      Comment.create({
+      CommentModel.create({
         post: postId,
         body: sanitizedBody,
         author: userId,
       }),
-      Post.increaseCommentCount(postId),
+      PostModel.increaseCommentCount(postId),
     ]);
 
     sendSuccess(res, comment);
@@ -41,7 +41,7 @@ export async function create(req: Request, res: Response) {
     return;
   }
 
-  const parentCommentary = await Comment.findOne({
+  const parentCommentary = await CommentModel.findOne({
     _id: parent,
     post: postId,
   });
@@ -50,7 +50,7 @@ export async function create(req: Request, res: Response) {
     throw new NotFoundError(ERRORS.COMMENT_PARENT_COMMENT_NOT_FOUND);
   }
 
-  const comment = await Comment.create({
+  const comment = await CommentModel.create({
     post: postId,
     body: sanitizedBody,
     parent,
@@ -58,11 +58,11 @@ export async function create(req: Request, res: Response) {
   });
 
   await Promise.all([
-    Comment.updateOne(
+    CommentModel.updateOne(
       { _id: parent },
       { $push: { children: comment.id.toString() } },
     ),
-    Post.increaseCommentCount(postId),
+    PostModel.increaseCommentCount(postId),
   ]);
 
   sendSuccess(res, comment);

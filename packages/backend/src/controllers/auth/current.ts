@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import User from '../../models/User';
+import { UserModel } from '../../models/User';
 import { sendSuccess } from '../../utils/response-utils';
 import { NotFoundError } from '../../errors/index';
 
@@ -12,7 +12,7 @@ export async function current(req: Request, res: Response) {
     });
   }
 
-  const user = await User.findById(userId).lean();
+  const user = await UserModel.findById(userId).lean();
 
   if (!user) {
     throw new NotFoundError();

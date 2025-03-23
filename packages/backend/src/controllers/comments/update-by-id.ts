@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
 import sanitizeHtml from '../../libs/sanitize-html';
-import Comment from '../../models/Comment';
+import { CommentModel } from '../../models/Comment';
 import { COMMENT_TIME_TO_UPDATE } from '../../constants/index';
 import {
   ForbiddenError,
@@ -16,7 +16,7 @@ export async function updateById(req: Request, res: Response) {
   const { id } = req.params;
   const { body } = req.body;
 
-  const comment = await Comment.findOne({
+  const comment = await CommentModel.findOne({
     _id: id,
     deleted: false,
   }).lean();
@@ -40,7 +40,7 @@ export async function updateById(req: Request, res: Response) {
     throw new ForbiddenError(ERRORS.COMMENT_CAN_EDIT_WITHIN_TIME);
   }
 
-  const updatedComment = await Comment.findByIdAndUpdate(
+  const updatedComment = await CommentModel.findByIdAndUpdate(
     comment._id,
     {
       $set: {
