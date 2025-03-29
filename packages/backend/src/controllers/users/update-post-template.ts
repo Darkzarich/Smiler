@@ -10,8 +10,18 @@ import {
   POST_TITLE_MAX_LENGTH,
   POST_SECTIONS_MAX,
 } from '../../constants/index';
+import { PostSection } from '../../models/Post';
 
-export async function updatePostTemplate(req: Request, res: Response) {
+interface Body {
+  title?: string;
+  tags?: string[];
+  sections?: PostSection[];
+}
+
+export async function updatePostTemplate(
+  req: Request<never, never, Body>,
+  res: Response,
+) {
   // TODO: validate title, sections just like in posts
 
   const { userId } = req.session;
@@ -51,6 +61,10 @@ export async function updatePostTemplate(req: Request, res: Response) {
     },
     { new: true, lean: true },
   );
+
+  if (!updatedUser) {
+    throw new ValidationError(ERRORS.USER_NOT_FOUND);
+  }
 
   sendSuccess(res, updatedUser.template);
 }

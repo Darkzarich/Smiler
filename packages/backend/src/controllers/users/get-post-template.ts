@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '../../models/User';
-import { ForbiddenError, ERRORS } from '../../errors/index';
+import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
 export async function getPostTemplate(req: Request, res: Response) {
@@ -11,6 +11,10 @@ export async function getPostTemplate(req: Request, res: Response) {
   const template = await UserModel.findById(req.session.userId)
     .select('template')
     .lean();
+
+  if (!template) {
+    throw new NotFoundError(ERRORS.USER_NOT_FOUND);
+  }
 
   sendSuccess(res, template.template);
 }

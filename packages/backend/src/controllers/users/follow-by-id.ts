@@ -1,9 +1,19 @@
 import type { Request, Response } from 'express';
+import { isRefTypeArray, mongoose } from '@typegoose/typegoose';
 import { UserModel } from '../../models/User';
-import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
+import {
+  ForbiddenError,
+  NotFoundError,
+  AppError,
+  ERRORS,
+} from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function followById(req: Request, res: Response) {
+interface Params {
+  id: string;
+}
+
+export async function followById(req: Request<Params>, res: Response) {
   const { id } = req.params;
   const { userId } = req.session!;
 
@@ -16,11 +26,15 @@ export async function followById(req: Request, res: Response) {
     UserModel.findById(id),
   ]);
 
-  if (!userFollowed) {
+  if (!userFollowed || !userFollowing) {
     throw new NotFoundError(ERRORS.USER_NOT_FOUND);
   }
 
-  if (userFollowing.usersFollowed.includes(id)) {
+  if (!isRefTypeArray(userFollowing.usersFollowed, mongoose.Types.ObjectId)) {
+    throw new AppError();
+  }
+
+  if (userFollowing.usersFollowed.some((el) => el.toString() === id)) {
     throw new ForbiddenError(ERRORS.USER_CANT_FOLLOW_ALREADY_FOLLOWED);
   }
 

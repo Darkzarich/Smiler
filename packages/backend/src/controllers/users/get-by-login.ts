@@ -4,7 +4,11 @@ import { UserModel } from '../../models/User';
 import { NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function getByLogin(req: Request, res: Response) {
+interface Params {
+  login: string;
+}
+
+export async function getByLogin(req: Request<Params>, res: Response) {
   const { login } = req.params;
   const { userId: currentUserId } = req.session;
 
@@ -35,7 +39,9 @@ export async function getByLogin(req: Request, res: Response) {
 
   const response = {
     ...omit(requestedUser.toJSON(), '_id'),
-    isFollowed: currentUser ? currentUser.isFollowed(requestedUser._id) : false,
+    isFollowed: currentUser
+      ? currentUser.isFollowed(requestedUser._id.toString())
+      : false,
   };
 
   sendSuccess(res, response);
