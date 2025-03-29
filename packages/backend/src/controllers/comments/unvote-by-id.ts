@@ -6,7 +6,11 @@ import { COMMENT_RATE_VALUE } from '../../constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function unvoteById(req: Request, res: Response) {
+interface Params {
+  id: string;
+}
+
+export async function unvoteById(req: Request<Params>, res: Response) {
   const { userId } = req.session;
   const { id: commentId } = req.params;
 
@@ -25,6 +29,10 @@ export async function unvoteById(req: Request, res: Response) {
     .select({ rates: 1 })
     .populate('rates');
 
+  if (!currentUser) {
+    throw new ForbiddenError(ERRORS.USER_NOT_FOUND);
+  }
+
   const ratedForCurrentUser = currentUser.isRated(targetComment._id.toString());
 
   if (!ratedForCurrentUser.result) {
@@ -36,6 +44,7 @@ export async function unvoteById(req: Request, res: Response) {
     ? COMMENT_RATE_VALUE
     : -COMMENT_RATE_VALUE;
 
+  // TODO: Use transaction here
   const [updatedComment] = await Promise.all([
     CommentModel.findByIdAndUpdate(
       targetComment._id,
@@ -49,9 +58,9 @@ export async function unvoteById(req: Request, res: Response) {
     RateModel.deleteOne({ target: targetComment._id }),
     UserModel.updateOne(
       { _id: targetComment.author },
-      { $pull: { rates: ratedForCurrentUser.rated._id } },
+      { $pull: { rates: ratedForCurrentUser.rated!._id } },
     ),
   ]);
 
-  sendSuccess(res, updatedComment);
+  sendSuccess(res, updatedComment!);
 }

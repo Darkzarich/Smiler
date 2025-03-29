@@ -21,6 +21,8 @@ export interface UserTemplate {
   title: string;
 }
 
+export type UserDocument = DocumentType<User>;
+
 @index({ login: 1 }, { unique: true, background: true })
 @index({ email: 1 }, { unique: true, background: true })
 @modelOptions({
@@ -82,7 +84,7 @@ export class User {
   @prop()
   public createdAt!: string;
 
-  public isRated(this: DocumentType<User>, id: string | ObjectId) {
+  public isRated(this: UserDocument, id: string | ObjectId) {
     if (!isDocumentArray(this.rates)) {
       return {
         result: false,

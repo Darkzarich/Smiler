@@ -11,7 +11,18 @@ import {
 } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function updateById(req: Request, res: Response) {
+interface Params {
+  id: string;
+}
+
+interface Body {
+  body: string;
+}
+
+export async function updateById(
+  req: Request<Params, never, Body>,
+  res: Response,
+) {
   const { userId } = req.session;
   const { id } = req.params;
   const { body } = req.body;
@@ -54,5 +65,9 @@ export async function updateById(req: Request, res: Response) {
     },
   );
 
-  sendSuccess(res, updatedComment);
+  if (!updatedComment) {
+    throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
+  }
+
+  sendSuccess(res, updatedComment.toJSON());
 }

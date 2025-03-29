@@ -4,7 +4,12 @@ import { UserModel } from '../../models/User';
 import { ValidationError, UnauthorizedError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-const validate = (fields) => {
+interface SignInFields {
+  email?: string;
+  password?: string;
+}
+
+const validate = (fields: SignInFields) => {
   if (!fields.email || !fields.password) {
     return ERRORS.AUTH_FIELDS_REQUIRED;
   }
@@ -18,7 +23,10 @@ const validate = (fields) => {
   }
 };
 
-export async function signIn(req: Request, res: Response) {
+export async function signIn(
+  req: Request<never, never, SignInFields>,
+  res: Response,
+) {
   const fields = {
     email: req.body.email,
     password: req.body.password,
@@ -31,7 +39,7 @@ export async function signIn(req: Request, res: Response) {
   }
 
   const foundUser = await UserModel.findOne({
-    email: fields.email,
+    email: fields.email!,
   }).lean();
 
   if (!foundUser) {
@@ -39,7 +47,7 @@ export async function signIn(req: Request, res: Response) {
   }
 
   const hash = pbkdf2Sync(
-    fields.password,
+    fields.password!,
     foundUser.salt,
     10000,
     512,

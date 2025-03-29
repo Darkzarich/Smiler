@@ -1,6 +1,9 @@
 import type { Response } from 'express';
 
-export function sendSuccess(res: Response, data?: Record<string, unknown>) {
+export function sendSuccess(
+  res: Response,
+  data?: Record<string | number | symbol, unknown>,
+) {
   const response = data || {
     ok: true,
   };

@@ -6,7 +6,11 @@ import { COMMENT_TIME_TO_UPDATE } from '../../constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function deleteById(req: Request, res: Response) {
+interface Params {
+  id: string;
+}
+
+export async function deleteById(req: Request<never, Params>, res: Response) {
   const { userId } = req.session;
   const { id } = req.params;
 
@@ -34,7 +38,7 @@ export async function deleteById(req: Request, res: Response) {
       deleted: true,
     });
 
-    return sendSuccess(res, updateComment);
+    return sendSuccess(res, updateComment?.toJSON());
   }
 
   await Promise.all([
@@ -46,7 +50,7 @@ export async function deleteById(req: Request, res: Response) {
         },
       },
     ),
-    PostModel.decreaseCommentCount(comment.post),
+    PostModel.decreaseCommentCount(comment.post.toString()),
     // TODO: Remove rates for the comment as well
     CommentModel.deleteOne({
       _id: comment._id,

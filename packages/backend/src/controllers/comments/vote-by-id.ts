@@ -6,7 +6,18 @@ import { COMMENT_RATE_VALUE } from '../../constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function voteById(req: Request, res: Response) {
+interface Params {
+  id: string;
+}
+
+interface Body {
+  negative: boolean;
+}
+
+export async function voteById(
+  req: Request<Params, never, Body>,
+  res: Response,
+) {
   const { userId } = req.session;
   const { id: commentId } = req.params;
   const { negative } = req.body;
@@ -28,6 +39,10 @@ export async function voteById(req: Request, res: Response) {
 
   const currentUser = await UserModel.findById(userId).populate('rates');
 
+  if (!currentUser) {
+    throw new ForbiddenError(ERRORS.USER_NOT_FOUND);
+  }
+
   const ratedForCurrentUser = currentUser.isRated(targetComment._id.toString());
 
   if (ratedForCurrentUser.result) {
@@ -42,6 +57,7 @@ export async function voteById(req: Request, res: Response) {
     negative,
   });
 
+  // TODO: Use transaction here
   const [updatedComment] = await Promise.all([
     CommentModel.findByIdAndUpdate(
       targetComment._id,
@@ -58,5 +74,5 @@ export async function voteById(req: Request, res: Response) {
     ),
   ]);
 
-  sendSuccess(res, updatedComment);
+  sendSuccess(res, updatedComment!);
 }

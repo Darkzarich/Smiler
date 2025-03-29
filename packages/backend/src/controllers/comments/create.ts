@@ -6,7 +6,13 @@ import { PostModel } from '../../models/Post';
 import { ValidationError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function create(req: Request, res: Response) {
+interface Body {
+  body: string;
+  parent?: string;
+  post: string;
+}
+
+export async function create(req: Request<never, never, Body>, res: Response) {
   const { userId } = req.session;
   const { body, parent, post: postId } = req.body;
 
@@ -36,7 +42,7 @@ export async function create(req: Request, res: Response) {
       PostModel.increaseCommentCount(postId),
     ]);
 
-    sendSuccess(res, comment);
+    sendSuccess(res, comment.toJSON());
 
     return;
   }
@@ -65,5 +71,5 @@ export async function create(req: Request, res: Response) {
     PostModel.increaseCommentCount(postId),
   ]);
 
-  sendSuccess(res, comment);
+  sendSuccess(res, comment.toJSON());
 }

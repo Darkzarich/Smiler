@@ -11,6 +11,8 @@ import mongooseAutoPopulate from 'mongoose-autopopulate';
 import { Post } from './Post';
 import { User } from './User';
 
+export type CommentDocument = DocumentType<Comment>;
+
 @index({ post: 1 })
 @modelOptions({
   schemaOptions: {
@@ -47,10 +49,7 @@ export class Comment {
   public createdAt!: string;
   public updatedAt!: string;
 
-  public toResponse(
-    this: DocumentType<Comment>,
-    user?: DocumentType<User> | null,
-  ) {
+  public toResponse(this: CommentDocument, user?: DocumentType<User> | null) {
     if (this.deleted) {
       return {
         author: this.author,

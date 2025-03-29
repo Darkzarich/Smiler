@@ -1,11 +1,25 @@
 import type { Request, Response } from 'express';
-import { CommentModel } from '../../models/Comment';
-import { UserModel } from '../../models/User';
+import { CommentModel, CommentDocument } from '../../models/Comment';
+import { UserModel, UserDocument } from '../../models/User';
 import { NotFoundError, ValidationError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 import { COMMENT_MAX_LIMIT } from '../../constants/index';
 
-function fillWithRatedRecursive({ comments, user }) {
+interface Query {
+  post: string;
+  author?: string;
+  limit?: number;
+  offset?: number;
+}
+
+// TODO: Rewrite from recursion to iteration
+function fillWithRatedRecursive({
+  comments,
+  user,
+}: {
+  comments: CommentDocument[];
+  user?: UserDocument;
+}) {
   if (!comments) {
     return [];
   }
@@ -15,26 +29,25 @@ function fillWithRatedRecursive({ comments, user }) {
 
     if (commentWithUser.children && commentWithUser.children.length > 0) {
       commentWithUser.children = fillWithRatedRecursive({
-        comments: comment.children,
+        comments: comment.children as CommentDocument[],
         user,
-      });
+      }) as unknown as CommentDocument[];
     }
 
     return commentWithUser;
   });
 }
 
-export async function getList(req: Request, res: Response) {
+export async function getList(
+  req: Request<never, never, never, Query>,
+  res: Response,
+) {
   const { userId } = req.session;
   const { post } = req.query;
   const { author } = req.query;
 
-  const limit = +req.query.limit || 10;
-  const offset = +req.query.offset || 0;
-
-  const query = {
-    parent: { $exists: false },
-  };
+  const limit = Number(req.query.limit) || 10;
+  const offset = Number(req.query.offset) || 0;
 
   if (limit > COMMENT_MAX_LIMIT) {
     throw new ValidationError(ERRORS.COMMENT_LIMIT_PARAM_EXCEEDED);
@@ -43,7 +56,14 @@ export async function getList(req: Request, res: Response) {
     throw new ValidationError(ERRORS.POST_ID_REQUIRED);
   }
 
-  query.post = post;
+  const query: {
+    parent: { $exists: false };
+    post: string;
+    author?: string;
+  } = {
+    parent: { $exists: false },
+    post,
+  };
 
   if (author) {
     const foundAuthor = await UserModel.findById(author).lean();
@@ -52,7 +72,7 @@ export async function getList(req: Request, res: Response) {
       throw new NotFoundError(ERRORS.AUTHOR_NOT_FOUND);
     }
 
-    query.author = foundAuthor._id;
+    query.author = foundAuthor._id.toString();
   }
 
   const [comments, currentUser, total] = await Promise.all([
@@ -62,7 +82,7 @@ export async function getList(req: Request, res: Response) {
   ]);
 
   sendSuccess(res, {
-    comments: fillWithRatedRecursive({ comments, user: currentUser }),
+    comments: fillWithRatedRecursive({ comments, user: currentUser! }),
     total,
     pages: Math.ceil(total / limit),
     hasNextPage: offset + limit < total,
