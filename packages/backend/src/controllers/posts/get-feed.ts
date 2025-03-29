@@ -4,10 +4,14 @@ import { PostModel } from '../../models/Post';
 import { UnauthorizedError, ValidationError, ERRORS } from '../../errors/index';
 import { POST_MAX_LIMIT } from '../../constants/index';
 import { sendSuccess } from '../../utils/response-utils';
+import { Pagination as PaginationQuery } from '../../types/pagination';
 
-export async function getFeed(req: Request, res: Response) {
-  const limit = +req.query.limit || POST_MAX_LIMIT;
-  const offset = +req.query.offset || 0;
+export async function getFeed(
+  req: Request<unknown, unknown, unknown, PaginationQuery>,
+  res: Response,
+) {
+  const limit = Number(req.query.limit) || POST_MAX_LIMIT;
+  const offset = Number(req.query.offset) || 0;
   const { userId } = req.session;
 
   if (limit > POST_MAX_LIMIT) {

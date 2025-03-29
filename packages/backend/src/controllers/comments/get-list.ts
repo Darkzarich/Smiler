@@ -4,12 +4,11 @@ import { UserModel, UserDocument } from '../../models/User';
 import { NotFoundError, ValidationError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 import { COMMENT_MAX_LIMIT } from '../../constants/index';
+import { Pagination } from '../../types/pagination';
 
-interface Query {
+interface Query extends Pagination {
   post: string;
   author?: string;
-  limit?: number;
-  offset?: number;
 }
 
 // TODO: Rewrite from recursion to iteration
@@ -39,7 +38,7 @@ function fillWithRatedRecursive({
 }
 
 export async function getList(
-  req: Request<never, never, never, Query>,
+  req: Request<unknown, unknown, unknown, Query>,
   res: Response,
 ) {
   const { userId } = req.session;

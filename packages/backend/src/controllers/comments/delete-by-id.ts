@@ -10,7 +10,7 @@ interface Params {
   id: string;
 }
 
-export async function deleteById(req: Request<never, Params>, res: Response) {
+export async function deleteById(req: Request<Params>, res: Response) {
   const { userId } = req.session;
   const { id } = req.params;
 

@@ -1,13 +1,17 @@
 import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
-import { PostModel } from '../../models/Post';
-import { POST_SECTION_TYPES, POST_TIME_TO_UPDATE } from '../../constants/index';
+import { PostModel, POST_SECTION_TYPES } from '../../models/Post';
+import { POST_TIME_TO_UPDATE } from '../../constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index';
 import { removeFileByPath } from '../../utils/remove-file-by-path';
 import { sendSuccess } from '../../utils/response-utils';
 import { PostValidator } from '../../validators/PostValidator';
 
-export async function updateById(req: Request, res: Response) {
+interface Params {
+  id: string;
+}
+
+export async function updateById(req: Request<Params>, res: Response) {
   // TODO: validate sections on update by type and other stuff the same as when creating post
   // TODO: move all Post validation in one place
 
@@ -43,21 +47,23 @@ export async function updateById(req: Request, res: Response) {
     tags: req.body.tags || targetPost.tags,
   });
 
-  const filePathsToDelete = [];
+  const filePathsToDelete: string[] = [];
 
   if (newSections) {
-    // Looking for sections with a type of "picture" that were uploaded as a file
+    // Looking for sections with "picture" type that were uploaded as a file
     // and that got removed from the post in the update
     targetPost.sections.forEach((section) => {
       if (section.type !== POST_SECTION_TYPES.PICTURE || !section.isFile) {
         return;
       }
 
-      const item = newSections.find(
-        (newSection) => newSection.url === section.url,
+      const isSectionGone = !newSections.some(
+        (newSection) =>
+          newSection.type === POST_SECTION_TYPES.PICTURE &&
+          newSection.url === section.url,
       );
 
-      if (!item) {
+      if (isSectionGone) {
         filePathsToDelete.push(section.url);
       }
     });

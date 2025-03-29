@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express';
-import { identity, pickBy } from 'lodash-es';
+import { identity, pickBy } from 'lodash';
 import { UserModel } from '../../models/User';
-
 import { ValidationError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 import {
@@ -19,7 +18,7 @@ interface Body {
 }
 
 export async function updatePostTemplate(
-  req: Request<never, never, Body>,
+  req: Request<unknown, unknown, Body>,
   res: Response,
 ) {
   // TODO: validate title, sections just like in posts

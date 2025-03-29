@@ -6,7 +6,11 @@ import { POST_RATE_VALUE } from '../../constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function unvoteById(req: Request, res: Response) {
+interface Params {
+  id: string;
+}
+
+export async function unvoteById(req: Request<Params>, res: Response) {
   const { userId } = req.session;
   const { id: postId } = req.params;
 
@@ -34,6 +38,7 @@ export async function unvoteById(req: Request, res: Response) {
     ? POST_RATE_VALUE
     : -POST_RATE_VALUE;
 
+  // TODO: Use transaction here
   const [updatedPost] = await Promise.all([
     PostModel.findByIdAndUpdate(
       targetPost.id,
@@ -51,9 +56,5 @@ export async function unvoteById(req: Request, res: Response) {
     RateModel.deleteOne({ target: targetPost.id }),
   ]);
 
-  if (!updatedPost) {
-    throw new NotFoundError(ERRORS.POST_NOT_FOUND);
-  }
-
-  sendSuccess(res, updatedPost);
+  sendSuccess(res, updatedPost!);
 }

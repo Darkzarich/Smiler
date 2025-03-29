@@ -4,11 +4,6 @@ export const BASE_UPLOAD_FOLDER = '/uploads';
 
 export const POST_TIME_TO_UPDATE = minutesToMilliseconds(10);
 export const POST_RATE_VALUE = 1;
-export const POST_SECTION_TYPES = {
-  TEXT: 'text',
-  PICTURE: 'pic',
-  VIDEO: 'vid',
-};
 export const POST_MAX_TAGS = 8;
 export const POST_MAX_TAG_LEN = 20;
 export const POST_SECTIONS_MAX = 8;

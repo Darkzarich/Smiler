@@ -4,12 +4,20 @@ import { PostModel } from '../../models/Post';
 import { ValidationError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 import { POST_MAX_LIMIT } from '../../constants/index';
+import { Pagination } from '../../types/pagination';
 
-export async function getListByAuthor(req: Request, res: Response) {
+interface Query extends Pagination {
+  author: string;
+}
+
+export async function getListByAuthor(
+  req: Request<unknown, unknown, unknown, Query>,
+  res: Response,
+) {
   const { userId } = req.session;
 
-  const limit = +req.query.limit || POST_MAX_LIMIT;
-  const offset = +req.query.offset || 0;
+  const limit = Number(req.query.limit) || POST_MAX_LIMIT;
+  const offset = Number(req.query.offset) || 0;
   const author = req.query.author || '';
 
   if (limit > POST_MAX_LIMIT) {

@@ -20,7 +20,7 @@ interface Body {
 }
 
 export async function updateById(
-  req: Request<Params, never, Body>,
+  req: Request<Params, unknown, Body>,
   res: Response,
 ) {
   const { userId } = req.session;

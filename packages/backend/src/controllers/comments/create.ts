@@ -12,7 +12,10 @@ interface Body {
   post: string;
 }
 
-export async function create(req: Request<never, never, Body>, res: Response) {
+export async function create(
+  req: Request<unknown, unknown, Body>,
+  res: Response,
+) {
   const { userId } = req.session;
   const { body, parent, post: postId } = req.body;
 

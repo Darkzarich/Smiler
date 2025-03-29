@@ -37,7 +37,7 @@ const validate = (fields: SignUpFields) => {
 };
 
 export async function signUp(
-  req: Request<never, never, SignUpFields>,
+  req: Request<unknown, unknown, SignUpFields>,
   res: Response,
 ) {
   const user = {

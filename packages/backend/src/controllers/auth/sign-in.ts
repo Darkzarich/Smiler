@@ -24,7 +24,7 @@ const validate = (fields: SignInFields) => {
 };
 
 export async function signIn(
-  req: Request<never, never, SignInFields>,
+  req: Request<unknown, unknown, SignInFields>,
   res: Response,
 ) {
   const fields = {

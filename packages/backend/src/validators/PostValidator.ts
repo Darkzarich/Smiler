@@ -1,5 +1,4 @@
 import {
-  POST_SECTION_TYPES,
   POST_SECTIONS_MAX,
   POST_SECTIONS_MAX_LENGTH,
   POST_TITLE_MAX_LENGTH,
@@ -8,6 +7,7 @@ import {
 } from '../constants/index';
 import { ValidationError, ERRORS } from '../errors/index';
 import sanitizeHtml from '../libs/sanitize-html';
+import { Post, POST_SECTION_TYPES } from '../models/Post';
 
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 
@@ -16,7 +16,7 @@ export class PostValidator {
   /** Validate a post and return it wih sanitized sections
    * throw ValidationError if validation fails
    */
-  static validateAndPrepare(post) {
+  static validateAndPrepare(post: Pick<Post, 'title' | 'sections' | 'tags'>) {
     const { title, sections, tags } = post;
 
     if (!title) {

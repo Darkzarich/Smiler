@@ -30,7 +30,6 @@ module.exports = {
     '@typescript-eslint/no-throw-literal': 'off',
     '@typescript-eslint/only-throw-error': 'error',
     'node/no-missing-import': 'off',
-
     'node/no-unsupported-features/es-syntax': [
       'error',
       { ignores: ['modules'] },

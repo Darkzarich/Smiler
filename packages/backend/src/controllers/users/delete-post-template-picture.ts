@@ -3,8 +3,7 @@ import { UserModel } from '../../models/User';
 import { NotFoundError, BadRequestError, ERRORS } from '../../errors/index';
 import { removeFileByPath } from '../../utils/remove-file-by-path';
 import { sendSuccess } from '../../utils/response-utils';
-import { POST_SECTION_TYPES } from '../../constants/index';
-import { PostPictureSection } from '../../models/Post';
+import { PostPictureSection, POST_SECTION_TYPES } from '../../models/Post';
 
 export async function deletePostTemplatePicture(req: Request, res: Response) {
   const { hash } = req.params;

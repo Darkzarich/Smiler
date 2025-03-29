@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { omit } from 'lodash-es';
+import { omit } from 'lodash';
 import { UserModel } from '../../models/User';
 import { NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';

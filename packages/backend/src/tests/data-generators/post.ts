@@ -1,4 +1,4 @@
-import { defaults } from 'lodash-es';
+import { defaults } from 'lodash';
 
 export function generateRandomPost(overrides = {}) {
   const post = {

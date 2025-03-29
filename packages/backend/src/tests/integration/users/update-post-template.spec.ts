@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { pick } from 'lodash-es';
+import { pick } from 'lodash';
 import {
   POST_SECTIONS_MAX,
   POST_TITLE_MAX_LENGTH,

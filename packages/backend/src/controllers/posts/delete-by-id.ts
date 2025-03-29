@@ -1,12 +1,20 @@
 import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
-import { PostModel } from '../../models/Post';
-import { POST_SECTION_TYPES, POST_TIME_TO_UPDATE } from '../../constants/index';
+import {
+  PostModel,
+  POST_SECTION_TYPES,
+  PostPictureSection,
+} from '../../models/Post';
+import { POST_TIME_TO_UPDATE } from '../../constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index';
 import { removeFileByPath } from '../../utils/remove-file-by-path';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function deleteById(req: Request, res: Response) {
+interface Params {
+  id: string;
+}
+
+export async function deleteById(req: Request<Params>, res: Response) {
   const { userId } = req.session;
   const { id } = req.params;
 
@@ -45,7 +53,7 @@ export async function deleteById(req: Request, res: Response) {
 
   const filePictureSections = targetPost.sections.filter(
     (sec) => sec.type === POST_SECTION_TYPES.PICTURE && sec.isFile,
-  );
+  ) as PostPictureSection[];
 
   // eslint-disable-next-line no-restricted-syntax
   for (const section of filePictureSections) {

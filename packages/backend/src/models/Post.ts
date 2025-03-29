@@ -10,21 +10,28 @@ import {
 } from '@typegoose/typegoose';
 import { User } from './User';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export enum POST_SECTION_TYPES {
+  PICTURE = 'pic',
+  VIDEO = 'vid',
+  TEXT = 'text',
+}
+
 export interface PostPictureSection {
-  type: 'pic';
+  type: POST_SECTION_TYPES.PICTURE;
   hash: string;
   url: string;
   isFile?: boolean;
 }
 
 export interface PostVideoSection {
-  type: 'vid';
+  type: POST_SECTION_TYPES.VIDEO;
   hash: string;
   url: string;
 }
 
 export interface PostTextSection {
-  type: 'text';
+  type: POST_SECTION_TYPES.TEXT;
   content: string;
   hash: string;
 }
@@ -61,9 +68,9 @@ export class Post {
   public sections!: PostSection[];
 
   @prop({ default: 0 })
-  public rating!: number;
+  public rating?: number;
 
-  @prop({ type: String })
+  @prop({ type: String, default: [] })
   public tags!: string[];
 
   @prop({ default: 0 })

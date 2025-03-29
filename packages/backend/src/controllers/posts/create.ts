@@ -2,11 +2,20 @@ import type { Request, Response } from 'express';
 import slugLib from 'slug';
 import crypto from 'crypto';
 import { UserModel } from '../../models/User';
-import { PostModel } from '../../models/Post';
+import { PostModel, PostSection } from '../../models/Post';
 import { sendSuccess } from '../../utils/response-utils';
 import { PostValidator } from '../../validators/PostValidator';
 
-export async function create(req: Request, res: Response) {
+interface Body {
+  title: string;
+  sections: PostSection[];
+  tags?: string[];
+}
+
+export async function create(
+  req: Request<unknown, unknown, Body>,
+  res: Response,
+) {
   // TODO: frontend sends hash should think about avoiding that anyhow
 
   const { userId } = req.session;
@@ -14,7 +23,7 @@ export async function create(req: Request, res: Response) {
   const { title, sections, tags } = PostValidator.validateAndPrepare({
     title: req.body.title,
     sections: req.body.sections,
-    tags: req.body.tags,
+    tags: req.body.tags || [],
   });
 
   const [post] = await Promise.all([
@@ -38,9 +47,7 @@ export async function create(req: Request, res: Response) {
     ),
   ]);
 
-  const populatedPost = await post
-    .populate('author', 'login avatar')
-    .execPopulate();
+  const populatedPost = await post.populate('author', 'login avatar');
 
   sendSuccess(res, populatedPost.toResponse());
 }

@@ -6,7 +6,18 @@ import { POST_RATE_VALUE } from '../../constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function voteById(req: Request, res: Response) {
+interface Params {
+  id: string;
+}
+
+interface Body {
+  negative: boolean;
+}
+
+export async function voteById(
+  req: Request<Params, unknown, Body>,
+  res: Response,
+) {
   const { userId } = req.session;
   const { id: postId } = req.params;
   const { negative } = req.body;
@@ -25,6 +36,10 @@ export async function voteById(req: Request, res: Response) {
     .select({ rates: 1 })
     .populate('rates');
 
+  if (!currentUser) {
+    throw new ForbiddenError(ERRORS.USER_NOT_FOUND);
+  }
+
   const ratedForCurrentUser = currentUser.isRated(targetPost.id);
 
   if (ratedForCurrentUser.result) {
@@ -39,6 +54,7 @@ export async function voteById(req: Request, res: Response) {
     negative,
   });
 
+  // TODO: Use transaction here
   const [updatedPost] = await Promise.all([
     PostModel.findByIdAndUpdate(
       targetPost.id,
@@ -55,5 +71,5 @@ export async function voteById(req: Request, res: Response) {
     ),
   ]);
 
-  sendSuccess(res, updatedPost);
+  sendSuccess(res, updatedPost!);
 }
