@@ -12,12 +12,7 @@ async function getDatabase() {
     return mongoose;
   }
 
-  return mongoose.connect(Config.DB_URL, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  });
+  return mongoose.connect(Config.DB_URL);
 }
 
 export async function connectDB() {
