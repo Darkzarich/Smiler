@@ -1,14 +1,15 @@
+const { createDefaultPreset } = require('ts-jest');
+
 /** @type {import('jest').Config} */
-const config = {
+module.exports = {
+  ...createDefaultPreset(),
   testEnvironment: 'node',
   verbose: true,
-  testMatch: ['**/src/**/*.spec.js'],
-  globalSetup: './src/tests/jest.setup.js',
-  globalTeardown: './src/tests/jest.teardown.js',
+  testMatch: ['**/tests/**/*.spec.ts'],
+  globalSetup: './tests/jest.setup.ts',
+  globalTeardown: './tests/jest.teardown.ts',
   // Runs after the test framework has been installed in the environment. Before each spec file.
-  setupFilesAfterEnv: ['./src/tests/jest.setup-after-env.js'],
+  setupFilesAfterEnv: ['./tests/jest.setup-after-env.ts'],
   watchPathIgnorePatterns: ['node_modules'],
   testTimeout: 30000,
 };
-
-export default config;

@@ -14,13 +14,14 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "isolatedModules": true,
     "typeRoots": [
       "./node_modules/@types",
-      "node_modules/express-request-id/types.d.ts",
-      "./types"
+      "node_modules/express-request-id/types.d.ts"
     ]
   },
-  "exclude": ["node_modules", "dist", "src/tests/**/*.ts"],
-  "include": ["src/**/*.ts", "src/**/*.js", "index.ts"],
+  "exclude": ["node_modules", "dist"],
+  "include": ["src/**/*.ts", "src/**/*.js", "tests/**/*"],
   "files": ["./global.d.ts"]
 }

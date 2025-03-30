@@ -1,11 +1,11 @@
 import {
   prop,
   getModelForClass,
-  Ref,
+  type Ref,
   index,
   modelOptions,
-  ReturnModelType,
-  DocumentType,
+  type ReturnModelType,
+  type DocumentType,
   isDocument,
 } from '@typegoose/typegoose';
 import { User } from './User';

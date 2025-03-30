@@ -65,8 +65,8 @@ module.exports = {
       files: [
         '**/*.spec.js',
         '**/*.spec.ts',
-        'src/tests/**/*.js',
-        'src/tests/**/*.ts',
+        'tests/**/*.js',
+        'tests/**/*.ts',
       ],
       env: {
         jest: true,

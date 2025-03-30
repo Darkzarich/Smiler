@@ -1,11 +1,11 @@
 import {
   prop,
   getModelForClass,
-  Ref,
+  type Ref,
   index,
   modelOptions,
   plugin,
-  DocumentType,
+  type DocumentType,
 } from '@typegoose/typegoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
 import { Post } from './Post';

@@ -2,9 +2,9 @@
 
 import Cluster from 'node:cluster';
 import os from 'node:os';
-import Config from './src/config/index';
-import { logger } from './src/libs/logger';
-import { startApp } from './src/app';
+import Config from './config/index';
+import { logger } from './libs/logger';
+import { startApp } from './app';
 
 const numCPUs = os.cpus().length;
 

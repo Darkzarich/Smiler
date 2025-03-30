@@ -1,10 +1,10 @@
 import {
   prop,
   getModelForClass,
-  Ref,
+  type Ref,
   index,
   modelOptions,
-  DocumentType,
+  type DocumentType,
   isDocumentArray,
 } from '@typegoose/typegoose';
 import { ObjectId } from 'mongoose';

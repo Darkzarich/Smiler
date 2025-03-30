@@ -1,7 +1,7 @@
 import {
   prop,
   getModelForClass,
-  Ref,
+  type Ref,
   index,
   modelOptions,
 } from '@typegoose/typegoose';
@@ -19,7 +19,7 @@ import { Post } from './Post';
   },
 })
 export class Rate {
-  @prop({ default: false })
+  @prop({ default: false, type: Boolean })
   public negative!: boolean;
 
   @prop({ required: true, refPath: 'targetModel' })
