@@ -5,6 +5,7 @@ declare namespace Express {
       userId?: string;
       destroy?(): void;
     };
+    file:? Express.Multer.File;
   }
 
   export interface Response {

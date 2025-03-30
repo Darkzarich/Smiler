@@ -1,70 +1,101 @@
 import type { Request } from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
+import type { StorageEngine } from 'multer';
+import { Sharp } from 'sharp';
 
-/**
- * @typedef {import('multer').StorageEngine} StorageEngine
- * @implements {StorageEngine}
- */
-class DiskStorage {
-  constructor(opts) {
+type Result<T> = {
+  error?: Error | null;
+  value?: T;
+};
+
+interface Opts {
+  filename: (req: Request, file: Express.Multer.File) => Result<string>;
+  destination: (req: Request, file: Express.Multer.File) => Result<string>;
+  sharp: (req: Request, file: Express.Multer.File) => Result<Sharp>;
+}
+
+class DiskStorage implements StorageEngine {
+  private getFilename: Opts['filename'];
+  private getDestination: Opts['destination'];
+  private getSharp: Opts['sharp'];
+
+  constructor(opts: Opts) {
     this.getFilename = opts.filename;
     this.getDestination = opts.destination;
     this.getSharp = opts.sharp;
   }
 
-  _handleFile(req: Request, file, callback) {
-    const that = this;
+  _handleFile(
+    req: Request,
+    file: Express.Multer.File,
+    callback: (
+      error?: Error | null,
+      info?: Partial<Express.Multer.File>,
+    ) => void,
+  ) {
+    const destination = this.getDestination(req, file);
 
-    this.getDestination(req, file, (err1, destination) => {
-      if (err1) return callback(err1);
-      that.getFilename(req, file, (err2, filename) => {
-        if (err2) return callback(err2);
-        that.getSharp(req, file, (err3, resizer) => {
-          if (err3) return callback(err3);
+    if (destination.error || !destination.value) {
+      return callback(destination.error);
+    }
 
-          const finalPath = path.join(destination, filename);
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          const outStream = fs.createWriteStream(finalPath);
+    const filename = this.getFilename(req, file);
 
-          file.stream.pipe(resizer).pipe(outStream);
+    if (filename.error || !filename.value) {
+      return callback(filename.error);
+    }
 
-          resizer.on('error', callback);
+    // Picture transformer
+    const sharp = this.getSharp(req, file);
 
-          outStream.on('error', callback);
+    if (sharp.error || !sharp.value) {
+      return callback(sharp.error);
+    }
 
-          outStream.on('finish', () => {
-            if (outStream.bytesWritten > 0) {
-              callback(null, {
-                destination,
-                filename,
-                path: finalPath,
-                size: outStream.bytesWritten,
-              });
-            } else {
-              // eslint-disable-next-line security/detect-non-literal-fs-filename
-              fs.unlink(finalPath, (err) => {
-                if (err) {
-                  callback(err);
-                }
-              });
-            }
+    const finalPath = path.join(destination.value, filename.value);
+
+    sharp.value.on('error', callback);
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const outStream = fs
+      .createWriteStream(finalPath)
+      .on('error', callback)
+      .on('finish', () => {
+        if (outStream.bytesWritten > 0) {
+          return callback(null, {
+            destination: destination.value,
+            filename: filename.value,
+            path: finalPath,
+            size: outStream.bytesWritten,
           });
+        }
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.unlink(finalPath, (err) => {
+          if (err) {
+            callback(err);
+          }
         });
       });
-    });
+
+    file.stream.pipe(sharp.value).pipe(outStream);
   }
 
   // eslint-disable-next-line class-methods-use-this
-  _removeFile(req: Request, file, cb) {
+  _removeFile(
+    req: Request,
+    file: Express.Multer.File,
+    callback: (error: Error | null) => void,
+  ) {
     const filePath = file.path;
 
-    if (filePath) {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      fs.unlink(filePath, cb);
-    } else {
-      cb();
+    if (!filePath) {
+      callback(new Error('File path was not provided'));
     }
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    return fs.unlink(filePath, callback);
   }
 }
 

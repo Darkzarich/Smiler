@@ -5,6 +5,7 @@ import { join, extname } from 'path';
 import { mkdir } from 'fs/promises';
 import DiskStorage from '../../libs/DiskStorage';
 import { UserModel } from '../../models/User';
+import { POST_SECTION_TYPES } from '../../models/Post';
 import {
   POST_SECTIONS_MAX,
   POST_MAX_UPLOAD_IMAGE_SIZE,
@@ -15,6 +16,7 @@ import {
 import {
   ContentTooLargeError,
   ValidationError,
+  AppError,
   NotFoundError,
   ERRORS,
 } from '../../errors/index';
@@ -22,16 +24,19 @@ import { sendSuccess } from '../../utils/response-utils';
 
 const postMulter = multer({
   storage: new DiskStorage({
-    destination: async (req: Request, file, callback) => {
-      callback(
-        null,
-        join(process.cwd(), BASE_UPLOAD_FOLDER, req.session.userId!),
-      );
+    destination(req) {
+      return {
+        error: null,
+        value: join(process.cwd(), BASE_UPLOAD_FOLDER, req.session.userId!),
+      };
     },
-    filename: (req: Request, file, callback) => {
-      callback(null, `${Date.now()}${extname(file.originalname)}`);
+    filename(req, file) {
+      return {
+        error: null,
+        value: `${Date.now()}${extname(file.originalname)}`,
+      };
     },
-    sharp: (req: Request, file, callback) => {
+    sharp() {
       const resizer = Sharp()
         .resize(POST_MAX_IMAGE_WIDTH, POST_MAX_IMAGE_HEIGHT, {
           fit: 'cover',
@@ -42,14 +47,17 @@ const postMulter = multer({
           progressive: true,
         });
 
-      callback(null, resizer);
+      return {
+        error: null,
+        value: resizer,
+      };
     },
   }),
   limits: {
     fieldSize: POST_MAX_UPLOAD_IMAGE_SIZE,
     fileSize: POST_MAX_UPLOAD_IMAGE_SIZE,
   },
-  fileFilter: (req: Request, file, callback) => {
+  fileFilter: (_, file, callback) => {
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
       callback(new ValidationError(ERRORS.POST_INVALID_ATTACHMENT_EXTENSION));
 
@@ -98,11 +106,17 @@ export async function upload(req: Request, res: Response, next: NextFunction) {
       return;
     }
 
+    if (!req.file) {
+      next(new AppError());
+
+      return;
+    }
+
     // Getting the path that looks like "/uploads/username/file.jpg"
     const fileRelativePath = req.file.path.replace(process.cwd(), '');
 
     const newSection = {
-      type: 'pic',
+      type: POST_SECTION_TYPES.PICTURE as const,
       url: fileRelativePath,
       hash: (Math.random() * Math.random()).toString(36),
       isFile: true,
