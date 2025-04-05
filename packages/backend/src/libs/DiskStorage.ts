@@ -91,7 +91,7 @@ class DiskStorage implements StorageEngine {
     const filePath = file.path;
 
     if (!filePath) {
-      callback(new Error('File path was not provided'));
+      return callback(new Error('File path was not provided'));
     }
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename

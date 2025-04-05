@@ -13,7 +13,7 @@ interface SearchQuery extends Pagination {
   dateTo?: string;
   ratingFrom?: string;
   ratingTo?: string;
-  tags?: string[];
+  'tags[]'?: string[];
 }
 
 export async function search(
@@ -30,8 +30,10 @@ export async function search(
     dateTo = '',
     ratingFrom = '',
     ratingTo = '',
-    tags = [],
   } = req.query;
+
+  // TODO: Fix how frontend sends tags, maybe with QS library
+  const tags = req.query['tags[]'] || [];
 
   if (limit > POST_MAX_LIMIT) {
     throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);

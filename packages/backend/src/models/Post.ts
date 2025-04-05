@@ -89,12 +89,7 @@ export class Post {
     this: DocumentType<Post>,
     user?: DocumentType<User> | null,
   ) {
-    const rated = user
-      ? user.isRated(this.id)
-      : {
-          isRated: false,
-          negative: false,
-        };
+    const rated = user ? user.isRated(this._id.toString()) : null;
 
     return {
       title: this.title,
@@ -112,7 +107,15 @@ export class Post {
       rating: this.rating,
       createdAt: this.createdAt,
       tags: this.tags,
-      rated,
+      rated: rated
+        ? {
+            isRated: rated.result,
+            negative: rated.negative,
+          }
+        : {
+            isRated: false,
+            negative: false,
+          },
     };
   }
 

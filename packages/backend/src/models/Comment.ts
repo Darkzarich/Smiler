@@ -34,13 +34,18 @@ export class Comment {
   @prop({ ref: () => Post, required: true })
   public post!: Ref<Post>;
 
-  @prop({ ref: () => Comment, default: [] })
+  // TODO: Come up with a better solution for this autopopulate
+  @prop({ ref: () => Comment, default: [], autopopulate: { maxDepth: 20 } })
   public children!: Ref<Comment>[];
 
   @prop({ ref: () => Comment })
   public parent!: Ref<Comment>;
 
-  @prop({ ref: () => User, required: true })
+  @prop({
+    ref: () => User,
+    required: true,
+    autopopulate: { maxDepth: 20, select: 'login avatar' },
+  })
   public author!: Ref<User>;
 
   @prop({ default: 0 })

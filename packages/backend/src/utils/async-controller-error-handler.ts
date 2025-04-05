@@ -17,6 +17,12 @@ export function asyncControllerErrorHandler(
     res: Response,
     next: NextFunction,
   ) => {
+    // TODO: After updating to Express 5, body-parser was also updated and now by default
+    // gives undefined body if it was not passed in the request - this is a workaround
+    if (!req.body) {
+      req.body = {};
+    }
+
     fn(req, res, next).catch((e: Error) => next(e));
   };
 }

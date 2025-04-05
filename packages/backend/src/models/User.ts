@@ -24,8 +24,7 @@ export interface UserTemplate {
 
 export type UserDocument = DocumentType<User>;
 
-@index({ login: 1 }, { unique: true, background: true })
-@index({ email: 1 }, { unique: true, background: true })
+@index({ login: 1, email: 1 }, { unique: true, background: true })
 @modelOptions({
   schemaOptions: {
     timestamps: true,
@@ -94,7 +93,9 @@ export class User {
       };
     }
 
-    const rated = this.rates.find((el) => el._id.toString() === id.toString());
+    const rated = this.rates.find(
+      (el) => el.target.toString() === id.toString(),
+    );
 
     if (!rated) {
       return {

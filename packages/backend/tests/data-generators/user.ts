@@ -2,7 +2,7 @@ import { defaultsDeep } from 'lodash';
 
 export function generateRandomUser(overrides = {}) {
   const user = {
-    login: 'test',
+    login: `test${Math.random()}`,
     email: 'test@gmail.com',
     avatar: 'https://picsum.photos/200/300',
     salt: 'test',

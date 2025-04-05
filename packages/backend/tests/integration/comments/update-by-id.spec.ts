@@ -119,6 +119,7 @@ describe('PUT /comments/:id', () => {
       rating: comment.rating,
       post: comment.post.toString(),
       createdAt: comment.createdAt.toJSON(),
+      updatedAt: expect.any(String),
       deleted: false,
     });
     expect(response.status).toBe(200);

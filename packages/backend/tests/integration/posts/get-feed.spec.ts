@@ -172,7 +172,7 @@ describe('GET /posts/feed', () => {
       commentCount: 0,
       rating: 0,
       tags: post.tags,
-      rated: { isRated: false, negative: false },
+      rated: { isRated: false },
       createdAt: post.createdAt.toISOString(),
     });
   });
