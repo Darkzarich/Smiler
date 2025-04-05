@@ -1,7 +1,7 @@
 import AbstractError from '../errors/AbstractError';
 
 export function isDuplicateKeyError(error: AbstractError) {
-  return error.name === 'MongoError' && error.code === 11000;
+  return error.name === 'MongoServerError' && error.code === 11000;
 }
 
 export function isCastError(error: AbstractError) {

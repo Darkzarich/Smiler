@@ -39,8 +39,7 @@ if (Config.IS_JEST) {
   );
 }
 
-// eslint-disable-next-line no-unused-vars
-router.all('*', (req, res, next) => {
+router.all(/(.*)/, (_, __, next) => {
   next(new NotFoundError());
 });
 
@@ -81,6 +80,8 @@ router.use(
 
       return;
     }
+
+    console.log('error', error);
 
     // Handle MongoDB duplicate document error, when unique index is violated
     if (isDuplicateKeyError(error)) {

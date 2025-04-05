@@ -6,8 +6,9 @@ import {
   modelOptions,
   type DocumentType,
   isDocumentArray,
+  Severity,
 } from '@typegoose/typegoose';
-import { ObjectId } from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
 import {
   USER_MAX_AVATAR_LENGTH,
   USER_MAX_BIO_LENGTH,
@@ -45,13 +46,13 @@ export class User {
   public hash!: string;
 
   @prop({
-    required: true,
     match: [/^https?:\/\//, '{VALUE} is not an url'],
     maxlength: USER_MAX_AVATAR_LENGTH,
+    default: '',
   })
   public avatar!: string;
 
-  @prop({ required: true, maxlength: USER_MAX_BIO_LENGTH })
+  @prop({ maxlength: USER_MAX_BIO_LENGTH, default: '' })
   public bio!: string;
 
   @prop({ required: true })
@@ -78,6 +79,8 @@ export class User {
       tags: [],
       sections: [],
     },
+    allowMixed: Severity.ALLOW,
+    type: () => mongoose.Schema.Types.Mixed,
   })
   public template!: UserTemplate;
 

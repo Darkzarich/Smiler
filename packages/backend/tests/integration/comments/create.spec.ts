@@ -65,6 +65,7 @@ describe('POST /comments', () => {
       children: [],
       deleted: false,
       createdAt: expect.any(String),
+      updatedAt: expect.any(String),
       rating: 0,
     });
   });
@@ -153,6 +154,7 @@ describe('POST /comments', () => {
       children: [],
       deleted: false,
       createdAt: expect.any(String),
+      updatedAt: expect.any(String),
       rating: 0,
     });
   });

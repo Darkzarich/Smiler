@@ -7,6 +7,8 @@ import {
   type ReturnModelType,
   type DocumentType,
   isDocument,
+  mongoose,
+  Severity,
 } from '@typegoose/typegoose';
 import { User } from './User';
 
@@ -64,7 +66,11 @@ export class Post {
   @prop({ required: true, ref: () => User })
   public author!: Ref<User>;
 
-  @prop({ default: [] })
+  @prop({
+    type: () => mongoose.Schema.Types.Mixed,
+    default: [],
+    allowMixed: Severity.ALLOW,
+  })
   public sections!: PostSection[];
 
   @prop({ default: 0 })

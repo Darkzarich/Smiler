@@ -31,7 +31,7 @@ export class Comment {
   @prop({ required: true })
   public body!: string;
 
-  @prop({ required: true })
+  @prop({ ref: () => Post, required: true })
   public post!: Ref<Post>;
 
   @prop({ ref: () => Comment, default: [] })

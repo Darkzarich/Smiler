@@ -14,8 +14,6 @@ import { generateRandomPost } from '../../data-generators/index';
 import { ERRORS } from '../../../src/errors';
 import { removeFileByPath } from '../../../src/utils/remove-file-by-path';
 
-jest.mock('../../../src/utils/remove-file-by-path');
-
 const requiredPostFields = pick(generateRandomPost(), ['title', 'sections']);
 
 describe('PUT /posts/:id', () => {

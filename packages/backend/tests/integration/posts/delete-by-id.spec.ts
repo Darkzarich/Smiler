@@ -6,8 +6,6 @@ import { PostModel, POST_SECTION_TYPES } from '../../../src/models/Post';
 import { generateRandomPost } from '../../data-generators/index';
 import { ERRORS } from '../../../src/errors';
 
-jest.mock('../../../src/utils/remove-file-by-path');
-
 describe('DELETE /posts/:id', () => {
   const mockRemoveFileByPath = jest.mocked(removeFileByPath);
 

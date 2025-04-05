@@ -4,8 +4,6 @@ import { signUpRequest } from '../../utils/request-auth';
 import { ERRORS } from '../../../src/errors';
 import { removeFileByPath } from '../../../src/utils/remove-file-by-path';
 
-jest.mock('../../../src/utils/remove-file-by-path');
-
 describe('DELETE /users/me/template/:hash', () => {
   const mockRemoveFileByPath = jest.mocked(removeFileByPath);
 
