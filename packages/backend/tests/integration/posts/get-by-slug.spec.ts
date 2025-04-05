@@ -1,15 +1,14 @@
 import request from 'supertest';
-import Rate from '../../../models/Rate';
-
-import Post from '../../../models/Post';
-import User from '../../../models/User';
+import { RateModel } from '../../../src/models/Rate';
+import { PostModel } from '../../../src/models/Post';
+import { UserModel } from '../../../src/models/User';
 import {
   generateRandomPost,
   generateRandomUser,
   generateRate,
 } from '../../data-generators/index';
 import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 
 describe('GET /posts/:slug', () => {
   it('Should return status 404 and a message for non-existing slug', async () => {
@@ -22,10 +21,10 @@ describe('GET /posts/:slug', () => {
   });
 
   it('Should return a post with its author if a post by provided slug exists with an expected structure', async () => {
-    const user = await User.create(generateRandomUser());
+    const user = await UserModel.create(generateRandomUser());
 
     const post = (
-      await Post.create(
+      await PostModel.create(
         generateRandomPost({
           author: user._id,
         }),
@@ -56,22 +55,22 @@ describe('GET /posts/:slug', () => {
   it('Should return that a post is rated if the current user has rated it', async () => {
     const { currentUser, sessionCookie } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: otherUser._id,
       }),
     );
 
-    const rate = await Rate.create(
+    const rate = await RateModel.create(
       generateRate({
         target: post._id,
         negative: true,
       }),
     );
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { rates: rate },
     });
 

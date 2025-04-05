@@ -6,13 +6,12 @@ import {
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
   POST_SECTIONS_MAX_LENGTH,
-  POST_SECTION_TYPES,
-} from '../../../constants/index';
+} from '../../../src/constants';
 import { signUpRequest } from '../../utils/request-auth';
-import Post from '../../../models/Post';
-import User from '../../../models/User';
+import { PostModel, POST_SECTION_TYPES } from '../../../src/models/Post';
+import { UserModel } from '../../../src/models/User';
 import { generateRandomPost } from '../../data-generators/index';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 
 const post = generateRandomPost();
 
@@ -308,7 +307,7 @@ describe('POST /posts', () => {
         sections: post.sections,
       });
 
-    const postFromDb = await Post.findById(response.body.id).lean();
+    const postFromDb = await PostModel.findById(response.body.id).lean();
 
     expect(postFromDb).toMatchObject({
       title: requiredPostFields.title,
@@ -353,7 +352,7 @@ describe('POST /posts', () => {
   it('Should clear user template after successful creation', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    await User.updateOne(
+    await UserModel.updateOne(
       { _id: currentUser.id },
       {
         $set: {
@@ -369,9 +368,9 @@ describe('POST /posts', () => {
       .set('Cookie', sessionCookie)
       .send(requiredPostFields);
 
-    const userFromDb = await User.findById(currentUser.id).lean();
+    const userFromDb = await UserModel.findById(currentUser.id).lean();
 
-    expect(userFromDb.template).toEqual({
+    expect(userFromDb!.template).toEqual({
       title: '',
       sections: [],
       tags: [],

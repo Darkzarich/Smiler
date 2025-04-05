@@ -1,7 +1,7 @@
 import request from 'supertest';
-import User from '../../../models/User';
+import { UserModel } from '../../../src/models/User';
 import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 
 describe('GET /users/:id/template', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -36,7 +36,7 @@ describe('GET /users/:id/template', () => {
       ],
     };
 
-    await User.updateOne({ _id: currentUser.id }, { $set: { template } });
+    await UserModel.updateOne({ _id: currentUser.id }, { $set: { template } });
 
     const response = await request(global.app)
       .get(`/api/users/${currentUser.id}/template`)

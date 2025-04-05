@@ -1,9 +1,9 @@
 import request from 'supertest';
-import { POST_MAX_TAG_LEN } from '../../../constants/index';
-import User from '../../../models/User';
+import { POST_MAX_TAG_LEN } from '../../../src/constants';
+import { UserModel } from '../../../src/models/User';
 
 import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 
 describe('PUT /tags/:tag/follow', () => {
   const tag = 'test-tag';
@@ -44,8 +44,8 @@ describe('PUT /tags/:tag/follow', () => {
       .put(`/api/tags/${tag}/follow`)
       .set('Cookie', sessionCookie);
 
-    const user = await User.findById(currentUser.id);
+    const user = await UserModel.findById(currentUser.id);
 
-    expect(user.tagsFollowed).toContain(tag);
+    expect(user!.tagsFollowed).toContain(tag);
   });
 });

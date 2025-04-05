@@ -2,11 +2,11 @@ import request from 'supertest';
 import {
   USER_MAX_AVATAR_LENGTH,
   USER_MAX_BIO_LENGTH,
-} from '../../../constants/index';
-import User from '../../../models/User';
+} from '../../../src/constants';
+import { UserModel } from '../../../src/models/User';
 
 import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 
 describe('PUT /users/me', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -65,7 +65,7 @@ describe('PUT /users/me', () => {
   it("Should return status 404 and an expected message if didn't find the user", async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    await User.deleteOne({ _id: currentUser.id });
+    await UserModel.deleteOne({ _id: currentUser.id });
 
     const response = await request(global.app)
       .put('/api/users/me')

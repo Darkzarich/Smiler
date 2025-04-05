@@ -1,16 +1,16 @@
 import request from 'supertest';
-import Rate from '../../../models/Rate';
+import { RateModel } from '../../../src/models/Rate';
 
-import Post from '../../../models/Post';
-import User from '../../../models/User';
+import { PostModel } from '../../../src/models/Post';
+import { UserModel } from '../../../src/models/User';
 import {
   generateRandomPost,
   generateRandomUser,
   generateRate,
 } from '../../data-generators/index';
 import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../errors/index';
-import { POST_RATE_VALUE } from '../../../constants/index';
+import { ERRORS } from '../../../src/errors';
+import { POST_RATE_VALUE } from '../../../src/constants';
 
 describe('DELETE /posts/:id/vote', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -34,7 +34,7 @@ describe('DELETE /posts/:id/vote', () => {
   it('Should return status 403 and an expected message when user tries to unvote a post that has not been rated', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -51,15 +51,15 @@ describe('DELETE /posts/:id/vote', () => {
   it('Should delete a rate from the database', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: otherUser._id,
       }),
     );
 
-    const prevRate = await Rate.create(
+    const prevRate = await RateModel.create(
       generateRate({
         target: post._id,
         negative: true,
@@ -67,7 +67,7 @@ describe('DELETE /posts/:id/vote', () => {
       }),
     );
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { rates: prevRate._id },
     });
 
@@ -75,7 +75,7 @@ describe('DELETE /posts/:id/vote', () => {
       .delete(`/api/posts/${post._id}/vote`)
       .set('Cookie', sessionCookie);
 
-    const rate = await Rate.findOne({ target: post._id });
+    const rate = await RateModel.findOne({ target: post._id });
 
     expect(rate).toBe(null);
   });
@@ -88,16 +88,16 @@ describe('DELETE /posts/:id/vote', () => {
     async (_, isNegative) => {
       const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-      const otherUser = await User.create(generateRandomUser());
+      const otherUser = await UserModel.create(generateRandomUser());
 
-      const post = await Post.create(
+      const post = await PostModel.create(
         generateRandomPost({
           author: otherUser._id,
           rating: 1,
         }),
       );
 
-      const prevRate = await Rate.create(
+      const prevRate = await RateModel.create(
         generateRate({
           target: post._id,
           negative: isNegative,
@@ -105,7 +105,7 @@ describe('DELETE /posts/:id/vote', () => {
         }),
       );
 
-      await User.findByIdAndUpdate(currentUser.id, {
+      await UserModel.findByIdAndUpdate(currentUser.id, {
         $push: { rates: prevRate._id },
       });
 
@@ -113,13 +113,13 @@ describe('DELETE /posts/:id/vote', () => {
         .delete(`/api/posts/${post._id}/vote`)
         .set('Cookie', sessionCookie);
 
-      const { rating } = await Post.findById(post._id);
+      const unvotedPost = await PostModel.findById(post._id);
 
       // the effect a vote had on the rating is reset
-      expect(rating).toBe(
+      expect(unvotedPost!.rating).toBe(
         isNegative
-          ? post.rating + POST_RATE_VALUE
-          : post.rating - POST_RATE_VALUE,
+          ? post!.rating! + POST_RATE_VALUE
+          : post!.rating! - POST_RATE_VALUE,
       );
     },
   );
@@ -132,19 +132,19 @@ describe('DELETE /posts/:id/vote', () => {
     async (_, isNegative) => {
       const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-      const otherUser = await User.create(
+      const otherUser = await UserModel.create(
         generateRandomUser({
           rating: 1,
         }),
       );
 
-      const post = await Post.create(
+      const post = await PostModel.create(
         generateRandomPost({
           author: otherUser._id,
         }),
       );
 
-      const prevRate = await Rate.create(
+      const prevRate = await RateModel.create(
         generateRate({
           target: post._id,
           negative: isNegative,
@@ -152,7 +152,7 @@ describe('DELETE /posts/:id/vote', () => {
         }),
       );
 
-      await User.findByIdAndUpdate(currentUser.id, {
+      await UserModel.findByIdAndUpdate(currentUser.id, {
         $push: { rates: prevRate._id },
       });
 
@@ -160,9 +160,9 @@ describe('DELETE /posts/:id/vote', () => {
         .delete(`/api/posts/${post._id}/vote`)
         .set('Cookie', sessionCookie);
 
-      const { rating } = await User.findById(otherUser._id);
+      const unvotedPost = await UserModel.findById(otherUser._id);
 
-      expect(rating).toBe(
+      expect(unvotedPost!.rating).toBe(
         isNegative
           ? otherUser.rating + POST_RATE_VALUE
           : otherUser.rating - POST_RATE_VALUE,
@@ -173,15 +173,15 @@ describe('DELETE /posts/:id/vote', () => {
   it('Should return the updated post with changed rating after vote', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: otherUser._id,
       }),
     );
 
-    const prevRate = await Rate.create(
+    const prevRate = await RateModel.create(
       generateRate({
         target: post._id,
         negative: false,
@@ -189,7 +189,7 @@ describe('DELETE /posts/:id/vote', () => {
       }),
     );
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { rates: prevRate._id },
     });
 

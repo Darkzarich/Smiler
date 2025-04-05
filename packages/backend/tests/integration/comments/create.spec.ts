@@ -1,12 +1,12 @@
 import request from 'supertest';
 import { signUpRequest } from '../../utils/request-auth';
-import Post from '../../../models/Post';
-import Comment from '../../../models/Comment';
+import { PostModel } from '../../../src/models/Post';
+import { CommentModel } from '../../../src/models/Comment';
 import {
   generateRandomPost,
   generateRandomComment,
 } from '../../data-generators/index';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 
 describe('POST /comments', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -45,7 +45,7 @@ describe('POST /comments', () => {
   it('Should return status 200, create a comment and return it (without a parent)', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
     const response = await request(global.app)
       .post('/api/comments')
@@ -72,7 +72,7 @@ describe('POST /comments', () => {
   it('Should sanitize html from the body', async () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
     const response = await request(global.app)
       .post('/api/comments')
@@ -89,7 +89,7 @@ describe('POST /comments', () => {
   it('Should return status 404 and an expected message if parent comment was provided but not found', async () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
     const response = await request(global.app)
       .post('/api/comments')
@@ -124,9 +124,9 @@ describe('POST /comments', () => {
   it('Should return status 200, create a comment and return it (with a parent)', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
-    const parentComment = await Comment.create(
+    const parentComment = await CommentModel.create(
       generateRandomComment({
         author: currentUser.id,
         post: post.id,
@@ -160,9 +160,9 @@ describe('POST /comments', () => {
   it("Should add children comment to parent's children array", async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
-    const parentComment = await Comment.create(
+    const parentComment = await CommentModel.create(
       generateRandomComment({
         author: currentUser.id,
         post: post.id,
@@ -178,19 +178,19 @@ describe('POST /comments', () => {
       })
       .set('Cookie', sessionCookie);
 
-    const updatedParentComment = await Comment.findById(
+    const updatedParentComment = await CommentModel.findById(
       parentComment.id,
     ).lean();
 
     expect(
-      updatedParentComment.children.map((comment) => comment.toString()),
+      updatedParentComment!.children.map((comment) => comment.toString()),
     ).toEqual([newComment.body.id]);
   });
 
   it('Should increase post comment count (after a comment without a parent)', async () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
     await request(global.app)
       .post('/api/comments')
@@ -200,17 +200,17 @@ describe('POST /comments', () => {
       })
       .set('Cookie', sessionCookie);
 
-    const updatedPost = await Post.findById(post.id).lean();
+    const updatedPost = await PostModel.findById(post.id).lean();
 
-    expect(updatedPost.commentCount).toBe(post.commentCount + 1);
+    expect(updatedPost!.commentCount).toBe(post.commentCount + 1);
   });
 
   it('Should increase post comment count (after a comment with a parent)', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
-    const parentComment = await Comment.create(
+    const parentComment = await CommentModel.create(
       generateRandomComment({
         author: currentUser.id,
         post: post.id,
@@ -226,8 +226,8 @@ describe('POST /comments', () => {
       })
       .set('Cookie', sessionCookie);
 
-    const updatedPost = await Post.findById(post.id).lean();
+    const updatedPost = await PostModel.findById(post.id).lean();
 
-    expect(updatedPost.commentCount).toBe(post.commentCount + 1);
+    expect(updatedPost!.commentCount).toBe(post.commentCount + 1);
   });
 });

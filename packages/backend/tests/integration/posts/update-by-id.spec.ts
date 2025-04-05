@@ -6,20 +6,21 @@ import {
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
   POST_SECTIONS_MAX_LENGTH,
-  POST_SECTION_TYPES,
   POST_TIME_TO_UPDATE,
-} from '../../../constants/index';
+} from '../../../src/constants';
 import { signUpRequest } from '../../utils/request-auth';
-import Post from '../../../models/Post';
+import { PostModel, POST_SECTION_TYPES } from '../../../src/models/Post';
 import { generateRandomPost } from '../../data-generators/index';
-import { ERRORS } from '../../../errors/index';
-import { removeFileByPath } from '../../../utils/remove-file-by-path';
+import { ERRORS } from '../../../src/errors';
+import { removeFileByPath } from '../../../src/utils/remove-file-by-path';
+
+jest.mock('../../../src/utils/remove-file-by-path');
 
 const requiredPostFields = pick(generateRandomPost(), ['title', 'sections']);
 
-const mockRemoveFileByPath = import.meta.jest.mocked(removeFileByPath);
-
 describe('PUT /posts/:id', () => {
+  const mockRemoveFileByPath = jest.mocked(removeFileByPath);
+
   beforeEach(() => {
     mockRemoveFileByPath.mockClear();
   });
@@ -46,7 +47,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 403 and an expected message if comment is older than 10 min', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
         createdAt: Date.now() - POST_TIME_TO_UPDATE - 1,
@@ -64,7 +65,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 422 and an expected message if too many sections', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -87,7 +88,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 422 and an expected message if title is too long', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -110,7 +111,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 422 and an expected message if too many tags', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -131,7 +132,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 422 and an expected message if too long tag', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -152,7 +153,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 422 and an expected message if at least one section is unknown type', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -180,7 +181,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 422 and an expected message if text section is empty', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -208,7 +209,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 422 and an expected message if text section content is too long', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -241,7 +242,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 422 and an expected message if pic section url is empty', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -269,7 +270,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 422 and an expected message if pic section url is not an URL', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -297,7 +298,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 422 and an expected message if pic section file url is not a valid URL', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -326,7 +327,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 422 and an expected message if video section url is empty', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -354,7 +355,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 422 and an expected message if video section url is not an URL', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -382,7 +383,7 @@ describe('PUT /posts/:id', () => {
   it('Should edit the post in the database', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -406,7 +407,7 @@ describe('PUT /posts/:id', () => {
         tags,
       });
 
-    const postFromDb = await Post.findById(response.body.id).lean();
+    const postFromDb = await PostModel.findById(response.body.id).lean();
 
     expect(postFromDb).toMatchObject({
       title,
@@ -418,7 +419,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 200 and the updated post', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -467,7 +468,7 @@ describe('PUT /posts/:id', () => {
   it('Should return status 200 and fields that were not passed retaining their previous value', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -493,7 +494,7 @@ describe('PUT /posts/:id', () => {
   it('Should delete picture files corresponding to the deleted post picture sections that have isFile=true', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
         sections: [

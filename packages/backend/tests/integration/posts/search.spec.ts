@@ -1,19 +1,16 @@
 import request from 'supertest';
 import { addMilliseconds, subMilliseconds } from 'date-fns';
 import { signUpRequest } from '../../utils/request-auth';
-import Post from '../../../models/Post';
-import User from '../../../models/User';
-import Rate from '../../../models/Rate';
+import { PostModel } from '../../../src/models/Post';
+import { UserModel } from '../../../src/models/User';
+import { RateModel } from '../../../src/models/Rate';
 import {
   generateRandomPost,
   generateRandomUser,
   generateRate,
 } from '../../data-generators/index';
-import { ERRORS } from '../../../errors/index';
-import {
-  POST_TITLE_MAX_LENGTH,
-  POST_MAX_LIMIT,
-} from '../../../constants/index';
+import { ERRORS } from '../../../src/errors';
+import { POST_TITLE_MAX_LENGTH, POST_MAX_LIMIT } from '../../../src/constants';
 
 describe('GET /posts', () => {
   it(`Should return status 422 and an expected message for limit greater than ${POST_MAX_LIMIT}`, async () => {
@@ -69,9 +66,9 @@ describe('GET /posts', () => {
   });
 
   it('Should return list of posts with the expected structure if there are posts', async () => {
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: otherUser._id,
       }),
@@ -91,10 +88,10 @@ describe('GET /posts', () => {
             login: otherUser.login,
             avatar: otherUser.avatar,
           },
-          sections: post.sections.toObject(),
+          sections: post.sections,
           commentCount: 0,
           rating: 0,
-          tags: post.tags.toObject(),
+          tags: post.tags,
           rated: { isRated: false, negative: false },
           createdAt: post.createdAt.toISOString(),
         },
@@ -114,7 +111,7 @@ describe('GET /posts', () => {
         }),
       );
 
-    await Post.insertMany(posts);
+    await PostModel.insertMany(posts);
 
     const response = await request(global.app).get('/api/posts?limit=10');
 
@@ -136,7 +133,7 @@ describe('GET /posts', () => {
         }),
       );
 
-    await Post.insertMany(posts);
+    await PostModel.insertMany(posts);
 
     const response = await request(global.app).get(
       '/api/posts?limit=10&offset=10',
@@ -154,21 +151,21 @@ describe('GET /posts', () => {
   it('Should return posts as rated if user rated them', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    const post1 = await Post.create(
+    const post1 = await PostModel.create(
       generateRandomPost({
         author: otherUser._id,
       }),
     );
 
-    const post2 = await Post.create(
+    const post2 = await PostModel.create(
       generateRandomPost({
         author: otherUser._id,
       }),
     );
 
-    const rate1 = await Rate.create(
+    const rate1 = await RateModel.create(
       generateRate({
         target: post1._id,
         negative: true,
@@ -176,7 +173,7 @@ describe('GET /posts', () => {
       }),
     );
 
-    const rate2 = await Rate.create(
+    const rate2 = await RateModel.create(
       generateRate({
         target: post2._id,
         negative: false,
@@ -184,7 +181,7 @@ describe('GET /posts', () => {
       }),
     );
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { rates: { $each: [rate1._id, rate2._id] } },
     });
 
@@ -209,17 +206,17 @@ describe('GET /posts', () => {
 
   it('Should sort posts by rating descending', async () => {
     await Promise.all([
-      Post.create(
+      PostModel.create(
         generateRandomPost({
           rating: 15,
         }),
       ),
-      Post.create(
+      PostModel.create(
         generateRandomPost({
           rating: 5,
         }),
       ),
-      Post.create(
+      PostModel.create(
         generateRandomPost({
           rating: 10,
         }),
@@ -235,7 +232,7 @@ describe('GET /posts', () => {
   });
 
   it('Should filter posts by title (found)', async () => {
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         title: 'title1',
       }),
@@ -249,7 +246,7 @@ describe('GET /posts', () => {
   });
 
   it('Should filter posts by title (not found)', async () => {
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         title: 'title1',
       }),
@@ -265,7 +262,7 @@ describe('GET /posts', () => {
     const dateFrom = new Date();
     const futureDate = addMilliseconds(dateFrom, 1);
 
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         createdAt: futureDate,
       }),
@@ -283,7 +280,7 @@ describe('GET /posts', () => {
   it('Should filter posts by dateFrom (not found)', async () => {
     const dateFrom = new Date();
 
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         createdAt: subMilliseconds(dateFrom, 1),
       }),
@@ -301,7 +298,7 @@ describe('GET /posts', () => {
     const dateTo = new Date();
     const pastDate = subMilliseconds(dateTo, 1);
 
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         createdAt: pastDate,
       }),
@@ -319,7 +316,7 @@ describe('GET /posts', () => {
   it('Should filter posts by dateTo (not found)', async () => {
     const dateTo = new Date();
 
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         createdAt: addMilliseconds(dateTo, 1).toISOString(),
       }),
@@ -334,7 +331,7 @@ describe('GET /posts', () => {
   });
 
   it('Should filter posts by ratingFrom (found)', async () => {
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         rating: 10,
       }),
@@ -350,7 +347,7 @@ describe('GET /posts', () => {
   });
 
   it('Should filter posts by ratingFrom (not found)', async () => {
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         rating: 10,
       }),
@@ -365,7 +362,7 @@ describe('GET /posts', () => {
   });
 
   it('Should filter posts by ratingTo (found)', async () => {
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         rating: 10,
       }),
@@ -379,7 +376,7 @@ describe('GET /posts', () => {
   });
 
   it('Should filter posts by ratingTo (not found)', async () => {
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         rating: 10,
       }),
@@ -392,7 +389,7 @@ describe('GET /posts', () => {
   });
 
   it('Should filter posts by tags (found)', async () => {
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         tags: ['tag1', 'tag2'],
       }),
@@ -406,7 +403,7 @@ describe('GET /posts', () => {
   });
 
   it('Should filter posts by tags (not found)', async () => {
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         tags: ['tag1', 'tag2'],
       }),
@@ -419,7 +416,7 @@ describe('GET /posts', () => {
   });
 
   it('Should filter posts by multiple criteria (found)', async () => {
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         title: 'title1',
         rating: 10,
@@ -439,7 +436,7 @@ describe('GET /posts', () => {
   });
 
   it('Should filter posts by multiple criteria (not found)', async () => {
-    await Post.create(
+    await PostModel.create(
       generateRandomPost({
         title: 'title1',
         rating: 10,

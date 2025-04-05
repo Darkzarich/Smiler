@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import request from 'supertest';
-import { ERRORS } from '../../../errors/index';
-import User from '../../../models/User';
+import { ERRORS } from '../../../src/errors';
+import { UserModel } from '../../../src/models/User';
 
 describe('POST api/auth/signup', () => {
   function generateSignUpCredentials() {
@@ -116,10 +116,10 @@ describe('POST api/auth/signup', () => {
       .post('/api/auth/signup')
       .send(credentials);
 
-    const user = await User.findOne({ _id: response.body.id }).lean();
+    const user = await UserModel.findOne({ _id: response.body.id }).lean();
 
     const hash = crypto
-      .pbkdf2Sync(credentials.password, user.salt, 10000, 512, 'sha512')
+      .pbkdf2Sync(credentials.password, user!.salt, 10000, 512, 'sha512')
       .toString('hex');
 
     expect(user).toMatchObject({
@@ -128,11 +128,12 @@ describe('POST api/auth/signup', () => {
       hash,
       salt: expect.any(String),
     });
-    expect(user.password).not.toBeDefined();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((user as any).password).not.toBeDefined();
   });
 
   it('Returns status 409 and an expected message if user already exists', async () => {
-    await User.syncIndexes();
+    await UserModel.syncIndexes();
 
     const credentials = generateSignUpCredentials();
 

@@ -82,7 +82,7 @@ export class User {
   public template!: UserTemplate;
 
   @prop()
-  public createdAt!: string;
+  public createdAt!: Date;
 
   public isRated(this: UserDocument, id: string | ObjectId) {
     if (!isDocumentArray(this.rates)) {

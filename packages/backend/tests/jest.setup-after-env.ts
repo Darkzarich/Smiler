@@ -1,4 +1,3 @@
-/* eslint-disable node/no-unsupported-features/es-syntax */
 import mongoose from 'mongoose';
 import { startApp } from '../src/app';
 
@@ -8,10 +7,6 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await mongoose.connection.dropDatabase();
-
-  jest.mock('../utils/remove-file-by-path', () => ({
-    removeFileByPath: jest.fn(),
-  }));
 });
 
 afterAll(async () => {

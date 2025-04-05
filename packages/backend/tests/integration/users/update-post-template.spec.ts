@@ -5,11 +5,11 @@ import {
   POST_TITLE_MAX_LENGTH,
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
-} from '../../../constants/index';
+} from '../../../src/constants';
 import { signUpRequest } from '../../utils/request-auth';
-import User from '../../../models/User';
+import { UserModel } from '../../../src/models/User';
 import { generateRandomPost } from '../../data-generators/index';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 
 const post = generateRandomPost();
 
@@ -118,9 +118,9 @@ describe('PUT /users/:id/template', () => {
       .set('Cookie', sessionCookie)
       .send(template);
 
-    const userFromDb = await User.findById(currentUser.id).lean();
+    const userFromDb = await UserModel.findById(currentUser.id).lean();
 
-    expect(userFromDb.template.title).toBe(template.title);
+    expect(userFromDb!.template.title).toBe(template.title);
   });
 
   it('Should update tags in user.template in the database', async () => {
@@ -135,9 +135,9 @@ describe('PUT /users/:id/template', () => {
       .set('Cookie', sessionCookie)
       .send(template);
 
-    const userFromDb = await User.findById(currentUser.id).lean();
+    const userFromDb = await UserModel.findById(currentUser.id).lean();
 
-    expect(userFromDb.template.tags).toEqual(template.tags);
+    expect(userFromDb!.template.tags).toEqual(template.tags);
   });
 
   it('Should update sections in user.template in the database', async () => {
@@ -157,9 +157,9 @@ describe('PUT /users/:id/template', () => {
       .set('Cookie', sessionCookie)
       .send(template);
 
-    const userFromDb = await User.findById(currentUser.id).lean();
+    const userFromDb = await UserModel.findById(currentUser.id).lean();
 
-    expect(userFromDb.template.sections).toEqual(template.sections);
+    expect(userFromDb!.template.sections).toEqual(template.sections);
   });
 
   it('Should update all: title, tags and sections in user.template in the database', async () => {
@@ -181,8 +181,8 @@ describe('PUT /users/:id/template', () => {
       .set('Cookie', sessionCookie)
       .send(template);
 
-    const userFromDb = await User.findById(currentUser.id).lean();
+    const userFromDb = await UserModel.findById(currentUser.id).lean();
 
-    expect(userFromDb.template).toEqual(template);
+    expect(userFromDb!.template).toEqual(template);
   });
 });

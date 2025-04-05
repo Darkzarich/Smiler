@@ -1,16 +1,15 @@
 import request from 'supertest';
-import Rate from '../../../models/Rate';
-
-import Comment from '../../../models/Comment';
-import User from '../../../models/User';
+import { RateModel } from '../../../src/models/Rate';
+import { CommentModel } from '../../../src/models/Comment';
+import { UserModel } from '../../../src/models/User';
 import {
   generateRandomComment,
   generateRandomUser,
   generateRate,
 } from '../../data-generators/index';
 import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../errors/index';
-import { COMMENT_RATE_VALUE } from '../../../constants/index';
+import { ERRORS } from '../../../src/errors';
+import { COMMENT_RATE_VALUE } from '../../../src/constants';
 
 describe('DELETE /comments/:id/vote', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -36,7 +35,7 @@ describe('DELETE /comments/:id/vote', () => {
   it('Should return status 403 and an expected message when user tries to unvote a comment that has not been rated', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const comment = await Comment.create(
+    const comment = await CommentModel.create(
       generateRandomComment({
         author: currentUser.id,
       }),
@@ -53,15 +52,15 @@ describe('DELETE /comments/:id/vote', () => {
   it('Should delete a comment rate from the database', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    const comment = await Comment.create(
+    const comment = await CommentModel.create(
       generateRandomComment({
         author: otherUser.id,
       }),
     );
 
-    const prevRate = await Rate.create(
+    const prevRate = await RateModel.create(
       generateRate({
         target: comment._id,
         negative: true,
@@ -69,7 +68,7 @@ describe('DELETE /comments/:id/vote', () => {
       }),
     );
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { rates: prevRate._id },
     });
 
@@ -77,7 +76,7 @@ describe('DELETE /comments/:id/vote', () => {
       .delete(`/api/comments/${comment._id}/vote`)
       .set('Cookie', sessionCookie);
 
-    const rate = await Rate.findOne({ target: comment._id });
+    const rate = await RateModel.findOne({ target: comment._id });
 
     expect(rate).toBe(null);
   });
@@ -90,16 +89,16 @@ describe('DELETE /comments/:id/vote', () => {
     async (_, isNegative) => {
       const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-      const otherUser = await User.create(generateRandomUser());
+      const otherUser = await UserModel.create(generateRandomUser());
 
-      const comment = await Comment.create(
+      const comment = await CommentModel.create(
         generateRandomComment({
           author: otherUser._id,
           rating: 1,
         }),
       );
 
-      const prevRate = await Rate.create(
+      const prevRate = await RateModel.create(
         generateRate({
           target: comment._id,
           negative: isNegative,
@@ -107,7 +106,7 @@ describe('DELETE /comments/:id/vote', () => {
         }),
       );
 
-      await User.findByIdAndUpdate(currentUser.id, {
+      await UserModel.findByIdAndUpdate(currentUser.id, {
         $push: { rates: prevRate._id },
       });
 
@@ -115,10 +114,10 @@ describe('DELETE /comments/:id/vote', () => {
         .delete(`/api/comments/${comment._id}/vote`)
         .set('Cookie', sessionCookie);
 
-      const { rating } = await Comment.findById(comment._id);
+      const commentVotedFor = await CommentModel.findById(comment._id);
 
       // the effect a vote had on the rating is reset
-      expect(rating).toBe(
+      expect(commentVotedFor!.rating).toBe(
         isNegative
           ? comment.rating + COMMENT_RATE_VALUE
           : comment.rating - COMMENT_RATE_VALUE,
@@ -134,19 +133,19 @@ describe('DELETE /comments/:id/vote', () => {
     async (_, isNegative) => {
       const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-      const otherUser = await User.create(
+      const otherUser = await UserModel.create(
         generateRandomUser({
           rating: 1,
         }),
       );
 
-      const comment = await Comment.create(
+      const comment = await CommentModel.create(
         generateRandomComment({
           author: otherUser._id,
         }),
       );
 
-      const prevRate = await Rate.create(
+      const prevRate = await RateModel.create(
         generateRate({
           target: comment._id,
           negative: isNegative,
@@ -154,7 +153,7 @@ describe('DELETE /comments/:id/vote', () => {
         }),
       );
 
-      await User.findByIdAndUpdate(currentUser.id, {
+      await UserModel.findByIdAndUpdate(currentUser.id, {
         $push: { rates: prevRate._id },
       });
 
@@ -162,9 +161,9 @@ describe('DELETE /comments/:id/vote', () => {
         .delete(`/api/comments/${comment._id}/vote`)
         .set('Cookie', sessionCookie);
 
-      const { rating } = await User.findById(otherUser._id);
+      const commentVotedFor = await UserModel.findById(otherUser._id);
 
-      expect(rating).toBe(
+      expect(commentVotedFor!.rating).toBe(
         isNegative
           ? otherUser.rating + COMMENT_RATE_VALUE
           : otherUser.rating - COMMENT_RATE_VALUE,
@@ -175,15 +174,15 @@ describe('DELETE /comments/:id/vote', () => {
   it('Should return the updated comment with changed rating after vote', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    const comment = await Comment.create(
+    const comment = await CommentModel.create(
       generateRandomComment({
         author: otherUser._id,
       }),
     );
 
-    const prevRate = await Rate.create(
+    const prevRate = await RateModel.create(
       generateRate({
         target: comment._id,
         negative: false,
@@ -191,7 +190,7 @@ describe('DELETE /comments/:id/vote', () => {
       }),
     );
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { rates: prevRate._id },
     });
 

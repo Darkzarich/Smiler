@@ -46,8 +46,8 @@ export class Comment {
   @prop({ default: 0 })
   public rating!: number;
 
-  public createdAt!: string;
-  public updatedAt!: string;
+  public createdAt!: Date;
+  public updatedAt!: Date;
 
   public toResponse(this: CommentDocument, user?: DocumentType<User> | null) {
     if (this.deleted) {

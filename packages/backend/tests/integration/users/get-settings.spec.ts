@@ -1,7 +1,7 @@
 import request from 'supertest';
-import User from '../../../models/User';
+import { UserModel } from '../../../src/models/User';
 import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 
 describe('GET /users/me/settings', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -14,7 +14,7 @@ describe('GET /users/me/settings', () => {
   it('Should return status 404 and en expected message for not found user', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    await User.deleteOne({ _id: currentUser.id });
+    await UserModel.deleteOne({ _id: currentUser.id });
 
     const response = await request(global.app)
       .get('/api/users/me/settings')
@@ -27,7 +27,7 @@ describe('GET /users/me/settings', () => {
   it('Returns status 200 and current user settings', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { tagsFollowed: 'test-tag', usersFollowed: currentUser.id },
       $set: { bio: 'test-bio', avatar: 'test-avatar' },
     });

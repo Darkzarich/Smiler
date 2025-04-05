@@ -1,13 +1,13 @@
 import request from 'supertest';
-import { COMMENT_TIME_TO_UPDATE } from '../../../constants/index';
+import { COMMENT_TIME_TO_UPDATE } from '../../../src/constants';
 import { signUpRequest } from '../../utils/request-auth';
-import Comment from '../../../models/Comment';
-import User from '../../../models/User';
+import { CommentModel } from '../../../src/models/Comment';
+import { UserModel } from '../../../src/models/User';
 import {
   generateRandomComment,
   generateRandomUser,
 } from '../../data-generators/index';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 
 describe('PUT /comments/:id', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -31,9 +31,9 @@ describe('PUT /comments/:id', () => {
   it('Should return status 403 and an expected message if comment does not belong to the user', async () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    const comment = await Comment.create(
+    const comment = await CommentModel.create(
       generateRandomComment({
         author: otherUser.id,
       }),
@@ -50,7 +50,7 @@ describe('PUT /comments/:id', () => {
   it('Should return status 403 and an expected message if comment is older than 10 min', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const comment = await Comment.create(
+    const comment = await CommentModel.create(
       generateRandomComment({
         author: currentUser.id,
         createdAt: Date.now() - COMMENT_TIME_TO_UPDATE - 1,
@@ -72,7 +72,7 @@ describe('PUT /comments/:id', () => {
 
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const comment = await Comment.create(
+    const comment = await CommentModel.create(
       generateRandomComment({
         author: currentUser.id,
       }),
@@ -83,9 +83,9 @@ describe('PUT /comments/:id', () => {
       .send({ body })
       .set('Cookie', sessionCookie);
 
-    const updatedComment = await Comment.findById(comment.id).lean();
+    const updatedComment = await CommentModel.findById(comment.id).lean();
 
-    expect(updatedComment.body).toBe(body);
+    expect(updatedComment!.body).toBe(body);
     expect(response.status).toBe(200);
   });
 
@@ -94,7 +94,7 @@ describe('PUT /comments/:id', () => {
 
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const comment = await Comment.create(
+    const comment = await CommentModel.create(
       generateRandomComment({
         author: currentUser.id,
       }),

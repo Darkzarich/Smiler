@@ -1,12 +1,12 @@
 import request from 'supertest';
-import Post from '../../../models/Post';
-import User from '../../../models/User';
+import { PostModel } from '../../../src/models/Post';
+import { UserModel } from '../../../src/models/User';
 import {
   generateRandomPost,
   generateRandomUser,
 } from '../../data-generators/index';
-import { ERRORS } from '../../../errors/index';
-import { POST_MAX_LIMIT } from '../../../constants/index';
+import { ERRORS } from '../../../src/errors';
+import { POST_MAX_LIMIT } from '../../../src/constants';
 
 describe('GET /posts?author=', () => {
   it(`Should return status 422 and an expected error message for limit > ${POST_MAX_LIMIT}`, async () => {
@@ -28,7 +28,7 @@ describe('GET /posts?author=', () => {
   });
 
   it("Should return empty list of posts if author doesn't have any posts", async () => {
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
     const response = await request(global.app).get(
       `/api/posts?author=${otherUser.login}`,
@@ -44,10 +44,10 @@ describe('GET /posts?author=', () => {
   });
 
   it("Should a list of the author's posts with an expected structure", async () => {
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
     const post = (
-      await Post.create(
+      await PostModel.create(
         generateRandomPost({
           author: otherUser._id,
         }),

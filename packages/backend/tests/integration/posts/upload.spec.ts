@@ -3,16 +3,16 @@ import request from 'supertest';
 import Sharp from 'sharp';
 import path from 'path';
 import fs from 'fs/promises';
-import User from '../../../models/User';
+import { UserModel } from '../../../src/models/User';
 import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 import {
   POST_SECTIONS_MAX,
   POST_MAX_UPLOAD_IMAGE_SIZE,
   POST_MAX_IMAGE_HEIGHT,
   POST_MAX_IMAGE_WIDTH,
   BASE_UPLOAD_FOLDER,
-} from '../../../constants/index';
+} from '../../../src/constants';
 
 const createTestImage = async (extension = Sharp.format.png) =>
   Sharp({
@@ -46,7 +46,7 @@ describe('POST /posts/upload', () => {
   it("Should return status 404 and an expected message if didn't find the user", async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    await User.deleteOne({ _id: currentUser.id });
+    await UserModel.deleteOne({ _id: currentUser.id });
 
     const response = await request(global.app)
       .post('/api/posts/upload')
@@ -59,7 +59,7 @@ describe('POST /posts/upload', () => {
   it('Should return status 413 and an expected message if the post has too many sections', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    await User.updateOne(
+    await UserModel.updateOne(
       { _id: currentUser.id },
       {
         $set: {
@@ -203,7 +203,7 @@ describe('POST /posts/upload', () => {
 
     const files = await fs.readdir(uploadPath);
 
-    const user = await User.findById(currentUser.id)
+    const user = await UserModel.findById(currentUser.id)
       .select({ template: 1 })
       .lean();
 
@@ -216,7 +216,7 @@ describe('POST /posts/upload', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(section);
-    expect(user.template.sections).toEqual([section]);
+    expect(user!.template.sections).toEqual([section]);
 
     await cleanTestUploadDir(currentUser.id);
   });

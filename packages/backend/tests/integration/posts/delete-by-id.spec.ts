@@ -1,17 +1,16 @@
 import request from 'supertest';
-import { removeFileByPath } from '../../../utils/remove-file-by-path';
-import {
-  COMMENT_TIME_TO_UPDATE,
-  POST_SECTION_TYPES,
-} from '../../../constants/index';
+import { removeFileByPath } from '../../../src/utils/remove-file-by-path';
+import { COMMENT_TIME_TO_UPDATE } from '../../../src/constants';
 import { signUpRequest } from '../../utils/request-auth';
-import Post from '../../../models/Post';
+import { PostModel, POST_SECTION_TYPES } from '../../../src/models/Post';
 import { generateRandomPost } from '../../data-generators/index';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 
-const mockRemoveFileByPath = import.meta.jest.mocked(removeFileByPath);
+jest.mock('../../../src/utils/remove-file-by-path');
 
 describe('DELETE /posts/:id', () => {
+  const mockRemoveFileByPath = jest.mocked(removeFileByPath);
+
   beforeEach(() => {
     mockRemoveFileByPath.mockClear();
   });
@@ -37,7 +36,7 @@ describe('DELETE /posts/:id', () => {
   it('Should return status 403 and an expected message if post does not belong to the user', async () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: '5d5467b4c17806706f3df347',
       }),
@@ -56,7 +55,7 @@ describe('DELETE /posts/:id', () => {
   it('Should return status 403 and an expected message if post is older than 10 min', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
         createdAt: Date.now() - COMMENT_TIME_TO_UPDATE - 1,
@@ -76,7 +75,7 @@ describe('DELETE /posts/:id', () => {
   it('Should return status 403 and an expected message if post has comments', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
         commentCount: 1,
@@ -96,7 +95,7 @@ describe('DELETE /posts/:id', () => {
   it('Should remove the post from the database', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -106,7 +105,7 @@ describe('DELETE /posts/:id', () => {
       .delete(`/api/posts/${post.id}`)
       .set('Cookie', sessionCookie);
 
-    const updatedPost = await Post.findById(post.id).lean();
+    const updatedPost = await PostModel.findById(post.id).lean();
 
     expect(updatedPost).toBe(null);
     expect(response.status).toBe(200);
@@ -115,7 +114,7 @@ describe('DELETE /posts/:id', () => {
   it('Should delete picture files corresponding to the deleted post picture sections with isFile=true', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
         sections: [

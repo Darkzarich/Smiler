@@ -1,16 +1,16 @@
 import request from 'supertest';
-import Rate from '../../../models/Rate';
+import { RateModel } from '../../../src/models/Rate';
 
-import Post from '../../../models/Post';
-import User from '../../../models/User';
+import { PostModel } from '../../../src/models/Post';
+import { UserModel } from '../../../src/models/User';
 import {
   generateRandomPost,
   generateRandomUser,
   generateRate,
 } from '../../data-generators/index';
 import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../errors/index';
-import { POST_RATE_VALUE } from '../../../constants/index';
+import { ERRORS } from '../../../src/errors';
+import { POST_RATE_VALUE } from '../../../src/constants';
 
 describe('PUT /posts/:id/vote', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -34,7 +34,7 @@ describe('PUT /posts/:id/vote', () => {
   it('Should return status 403 and an expected message when user tries to vote for their own post', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
@@ -52,15 +52,15 @@ describe('PUT /posts/:id/vote', () => {
   it('Should return status 403 and an expected message when user tries to vote for a post that they have already rated', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    const otherUserPost = await Post.create(
+    const otherUserPost = await PostModel.create(
       generateRandomPost({
         author: otherUser._id,
       }),
     );
 
-    const rate = await Rate.create(
+    const rate = await RateModel.create(
       generateRate({
         target: otherUserPost._id,
         negative: true,
@@ -68,7 +68,7 @@ describe('PUT /posts/:id/vote', () => {
       }),
     );
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { rates: rate._id },
     });
 
@@ -86,9 +86,9 @@ describe('PUT /posts/:id/vote', () => {
   it('Should create a new post rate in the database', async () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: otherUser._id,
       }),
@@ -99,13 +99,13 @@ describe('PUT /posts/:id/vote', () => {
       .send({ negative: true })
       .set('Cookie', sessionCookie);
 
-    const rate = await Rate.findOne({ target: post._id });
+    const rate = await RateModel.findOne({ target: post._id });
 
     expect(response.status).toBe(200);
     expect(rate).toBeDefined();
-    expect(rate.target.toString()).toBe(post._id.toString());
-    expect(rate.targetModel).toBe('Post');
-    expect(rate.negative).toBe(true);
+    expect(rate!.target.toString()).toBe(post._id.toString());
+    expect(rate!.targetModel).toBe('Post');
+    expect(rate!.negative).toBe(true);
   });
 
   it.each([
@@ -116,9 +116,9 @@ describe('PUT /posts/:id/vote', () => {
     async (_, isNegative) => {
       const { sessionCookie } = await signUpRequest(global.app);
 
-      const otherUser = await User.create(generateRandomUser());
+      const otherUser = await UserModel.create(generateRandomUser());
 
-      const post = await Post.create(
+      const post = await PostModel.create(
         generateRandomPost({
           author: otherUser._id,
         }),
@@ -129,9 +129,11 @@ describe('PUT /posts/:id/vote', () => {
         .send({ negative: isNegative })
         .set('Cookie', sessionCookie);
 
-      const { rating } = await Post.findById(post._id);
+      const votedPost = await PostModel.findById(post._id);
 
-      expect(rating).toBe(isNegative ? -POST_RATE_VALUE : POST_RATE_VALUE);
+      expect(votedPost!.rating).toBe(
+        isNegative ? -POST_RATE_VALUE : POST_RATE_VALUE,
+      );
     },
   );
 
@@ -143,9 +145,9 @@ describe('PUT /posts/:id/vote', () => {
     async (_, isNegative) => {
       const { sessionCookie } = await signUpRequest(global.app);
 
-      const otherUser = await User.create(generateRandomUser());
+      const otherUser = await UserModel.create(generateRandomUser());
 
-      const post = await Post.create(
+      const post = await PostModel.create(
         generateRandomPost({
           author: otherUser._id,
         }),
@@ -156,18 +158,20 @@ describe('PUT /posts/:id/vote', () => {
         .send({ negative: isNegative })
         .set('Cookie', sessionCookie);
 
-      const { rating } = await User.findById(otherUser._id);
+      const votedPost = await UserModel.findById(otherUser._id);
 
-      expect(rating).toBe(isNegative ? -POST_RATE_VALUE : POST_RATE_VALUE);
+      expect(votedPost!.rating).toBe(
+        isNegative ? -POST_RATE_VALUE : POST_RATE_VALUE,
+      );
     },
   );
 
   it('Should return the updated post with changed rating after vote', async () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: otherUser._id,
       }),

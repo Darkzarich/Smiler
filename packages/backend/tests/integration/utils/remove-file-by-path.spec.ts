@@ -1,9 +1,6 @@
-import { unlink } from 'fs/promises';
 import path from 'path';
 import fs from 'fs';
-import { removeFileByPath } from '../../../utils/remove-file-by-path';
-
-const mockRemoveFileByPath = import.meta.jest.mocked(removeFileByPath);
+import { removeFileByPath } from '../../../src/utils/remove-file-by-path';
 
 const testFilePath = path.join(process.cwd(), 'test-file-to-delete.txt');
 
@@ -14,15 +11,10 @@ afterEach(() => {
   }
 });
 
-/** Mock reset in this test does not work probably due to usage of unstable_mockModule */
 describe('removeFileByPath', () => {
+  // This test purpose is to test a file is actually deleted,
+  // even when I update Node it will still test this behavior
   it('Should remove file by path', async () => {
-    import.meta.jest.resetModules();
-
-    // This test purpose is to test a file is actually deleted,
-    // even when I update Node it will still test this behavior
-    mockRemoveFileByPath.mockImplementation(unlink);
-
     fs.writeFileSync(testFilePath, 'This is a test file.');
 
     await removeFileByPath(testFilePath);

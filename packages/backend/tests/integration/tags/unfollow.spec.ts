@@ -1,9 +1,9 @@
 import request from 'supertest';
-import { POST_MAX_TAG_LEN } from '../../../constants/index';
-import User from '../../../models/User';
+import { POST_MAX_TAG_LEN } from '../../../src/constants';
+import { UserModel } from '../../../src/models/User';
 
 import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 
 describe('DELETE /tags/:tag/follow', () => {
   const tag = 'test-tag';
@@ -43,7 +43,7 @@ describe('DELETE /tags/:tag/follow', () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
     // Making sure a tag is added before unfollowing
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { tagsFollowed: tag },
     });
 
@@ -51,8 +51,8 @@ describe('DELETE /tags/:tag/follow', () => {
       .delete(`/api/tags/${tag}/follow`)
       .set('Cookie', sessionCookie);
 
-    const user = await User.findById(currentUser.id);
+    const user = await UserModel.findById(currentUser.id);
 
-    expect(user.tagsFollowed).not.toContain(tag);
+    expect(user!.tagsFollowed).not.toContain(tag);
   });
 });

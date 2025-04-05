@@ -1,13 +1,13 @@
 import request from 'supertest';
 import { signUpRequest } from '../../utils/request-auth';
-import Post from '../../../models/Post';
-import User from '../../../models/User';
+import { PostModel } from '../../../src/models/Post';
+import { UserModel } from '../../../src/models/User';
 import {
   generateRandomPost,
   generateRandomUser,
 } from '../../data-generators/index';
-import { ERRORS } from '../../../errors/index';
-import { POST_MAX_LIMIT } from '../../../constants/index';
+import { ERRORS } from '../../../src/errors';
+import { POST_MAX_LIMIT } from '../../../src/constants';
 
 describe('GET /posts/feed', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -31,7 +31,7 @@ describe('GET /posts/feed', () => {
   it('Should return status 401 and an expected message if session was provided but user for some reason is not found', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    await User.deleteOne({ _id: currentUser.id });
+    await UserModel.deleteOne({ _id: currentUser.id });
 
     const response = await request(global.app)
       .get('/api/posts/feed')
@@ -46,7 +46,7 @@ describe('GET /posts/feed', () => {
 
     /* Creating a post just to make sure response.posts
     is empty not because there are no posts at all */
-    await Post.create(generateRandomPost());
+    await PostModel.create(generateRandomPost());
 
     const response = await request(global.app)
       .get('/api/posts/feed')
@@ -64,9 +64,9 @@ describe('GET /posts/feed', () => {
   it('Should a list of posts if user is subscribed to any of the post tags', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { tagsFollowed: post.tags[0] },
     });
 
@@ -86,15 +86,15 @@ describe('GET /posts/feed', () => {
   it('Should return a list of posts if user is subscribed to the post author', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: otherUser._id,
       }),
     );
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { usersFollowed: post.author },
     });
 
@@ -114,13 +114,13 @@ describe('GET /posts/feed', () => {
   it('Should not return a post if user is subscribed to any of the post tags but also is the author of the post (users should not see their own posts in their feed)', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(
+    const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
       }),
     );
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { tagsFollowed: post.tags[0] },
     });
 
@@ -140,17 +140,17 @@ describe('GET /posts/feed', () => {
   it('Should return a post in the response with an expected structure', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
     const post = (
-      await Post.create(
+      await PostModel.create(
         generateRandomPost({
           author: otherUser._id,
         }),
       )
     ).toJSON();
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { tagsFollowed: post.tags[0] },
     });
 
@@ -180,7 +180,7 @@ describe('GET /posts/feed', () => {
   it('Should return more than one page in pagination if there are more than limit posts existing', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
     const posts = Array(11)
       .fill({})
@@ -191,9 +191,9 @@ describe('GET /posts/feed', () => {
         }),
       );
 
-    await Post.insertMany(posts);
+    await PostModel.insertMany(posts);
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { tagsFollowed: posts[0].tags[0] },
     });
 

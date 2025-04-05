@@ -1,8 +1,8 @@
 import request from 'supertest';
-import User from '../../../models/User';
+import { UserModel } from '../../../src/models/User';
 
 import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 
 describe('GET api/auth/current', () => {
   it('Returns status 200 and isAuth=false', async () => {
@@ -18,7 +18,7 @@ describe('GET api/auth/current', () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
     // Imitating the deletion of the user for whatever reason
-    await User.deleteOne({ _id: currentUser.id });
+    await UserModel.deleteOne({ _id: currentUser.id });
 
     const response = await request(global.app)
       .get('/api/auth/current')

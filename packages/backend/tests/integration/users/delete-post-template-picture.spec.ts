@@ -1,12 +1,18 @@
 import request from 'supertest';
-import User from '../../../models/User';
+import { UserModel } from '../../../src/models/User';
 import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../errors/index';
-import { removeFileByPath } from '../../../utils/remove-file-by-path';
+import { ERRORS } from '../../../src/errors';
+import { removeFileByPath } from '../../../src/utils/remove-file-by-path';
 
-const mockRemoveFileByPath = import.meta.jest.mocked(removeFileByPath);
+jest.mock('../../../src/utils/remove-file-by-path');
 
 describe('DELETE /users/me/template/:hash', () => {
+  const mockRemoveFileByPath = jest.mocked(removeFileByPath);
+
+  beforeEach(() => {
+    mockRemoveFileByPath.mockClear();
+  });
+
   it('Should return status 401 and an expected message if user is not signed in', async () => {
     const response = await request(global.app).delete(
       '/api/users/me/template/1234',
@@ -19,7 +25,7 @@ describe('DELETE /users/me/template/:hash', () => {
   it('Should return status 404 and an expected message when user is not found, been deleted for unknown reason', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    await User.deleteOne({ _id: currentUser.id });
+    await UserModel.deleteOne({ _id: currentUser.id });
 
     const response = await request(global.app)
       .delete(`/api/users/me/template/1234`)
@@ -44,7 +50,7 @@ describe('DELETE /users/me/template/:hash', () => {
     const hash = '1234';
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    await User.updateOne(
+    await UserModel.updateOne(
       { _id: currentUser.id },
       {
         $set: {
@@ -69,7 +75,7 @@ describe('DELETE /users/me/template/:hash', () => {
     const hash = '1234';
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    await User.updateOne(
+    await UserModel.updateOne(
       { _id: currentUser.id },
       {
         $set: {
@@ -94,7 +100,7 @@ describe('DELETE /users/me/template/:hash', () => {
     const hash = '1234';
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    await User.updateOne(
+    await UserModel.updateOne(
       { _id: currentUser.id },
       {
         $set: {
@@ -118,7 +124,7 @@ describe('DELETE /users/me/template/:hash', () => {
     const path = '/uploads/currentUser/1234.jpg';
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    await User.updateOne(
+    await UserModel.updateOne(
       { _id: currentUser.id },
       {
         $set: {

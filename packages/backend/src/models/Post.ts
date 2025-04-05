@@ -68,7 +68,7 @@ export class Post {
   public sections!: PostSection[];
 
   @prop({ default: 0 })
-  public rating?: number;
+  public rating!: number;
 
   @prop({ type: String, default: [] })
   public tags!: string[];
@@ -76,8 +76,8 @@ export class Post {
   @prop({ default: 0 })
   public commentCount!: number;
 
-  public createdAt!: string;
-  public updatedAt!: string;
+  public createdAt!: Date;
+  public updatedAt!: Date;
 
   public toResponse(
     this: DocumentType<Post>,

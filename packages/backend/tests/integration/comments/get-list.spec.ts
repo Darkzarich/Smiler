@@ -1,17 +1,17 @@
 import request from 'supertest';
 import { signUpRequest } from '../../utils/request-auth';
-import Post from '../../../models/Post';
-import Comment from '../../../models/Comment';
+import { PostModel } from '../../../src/models/Post';
+import { CommentModel } from '../../../src/models/Comment';
 import {
   generateRandomPost,
   generateRandomComment,
   generateRandomUser,
   generateRate,
 } from '../../data-generators/index';
-import { ERRORS } from '../../../errors/index';
-import { COMMENT_MAX_LIMIT } from '../../../constants/index';
-import Rate from '../../../models/Rate';
-import User from '../../../models/User';
+import { ERRORS } from '../../../src/errors';
+import { COMMENT_MAX_LIMIT } from '../../../src/constants';
+import { RateModel } from '../../../src/models/Rate';
+import { UserModel } from '../../../src/models/User';
 
 describe('GET /comments', () => {
   it(`Should return status 422 and an expected message for limit greater than ${COMMENT_MAX_LIMIT}`, async () => {
@@ -44,7 +44,7 @@ describe('GET /comments', () => {
   it('Should return empty list of comments if there are no comments', async () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
     const response = await request(global.app)
       .get(`/api/comments?post=${post.id}`)
@@ -60,7 +60,7 @@ describe('GET /comments', () => {
   });
 
   it('Should return more than one page in pagination if there are more than limit posts existing', async () => {
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
     const comments = Array(11)
       .fill({})
@@ -70,7 +70,7 @@ describe('GET /comments', () => {
         }),
       );
 
-    await Comment.insertMany(comments);
+    await CommentModel.insertMany(comments);
 
     const response = await request(global.app).get(
       `/api/comments?post=${post.id}&limit=10`,
@@ -86,7 +86,7 @@ describe('GET /comments', () => {
   });
 
   it('Should correctly offset pagination', async () => {
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
     const comments = Array(11)
       .fill({})
@@ -96,7 +96,7 @@ describe('GET /comments', () => {
         }),
       );
 
-    await Comment.insertMany(comments);
+    await CommentModel.insertMany(comments);
 
     const response = await request(global.app).get(
       `/api/comments?post=${post.id}&limit=10&offset=10`,
@@ -112,21 +112,21 @@ describe('GET /comments', () => {
   });
 
   it('Should filter comments by provided author if it was provided', async () => {
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
     const [otherUser1, otherUser2] = await Promise.all([
-      User.create(generateRandomUser()),
-      User.create(generateRandomUser({ email: 'test2@gmail.com' })),
+      UserModel.create(generateRandomUser()),
+      UserModel.create(generateRandomUser({ email: 'test2@gmail.com' })),
     ]);
 
     await Promise.all([
-      Comment.create(
+      CommentModel.create(
         generateRandomComment({
           post: post.id,
           author: otherUser1.id,
         }),
       ),
-      Comment.create(
+      CommentModel.create(
         generateRandomComment({
           post: post.id,
           author: otherUser2.id,
@@ -148,9 +148,9 @@ describe('GET /comments', () => {
   it('Should return a comment with an expected structure', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
-    const comment = await Comment.create(
+    const comment = await CommentModel.create(
       generateRandomComment({
         author: currentUser.id,
         post: post.id,
@@ -189,16 +189,16 @@ describe('GET /comments', () => {
   it('Should return a comment with expected structure with its children (comment tree)', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
-    const comment = await Comment.create(
+    const comment = await CommentModel.create(
       generateRandomComment({
         author: currentUser.id,
         post: post.id,
       }),
     );
 
-    const childComment = await Comment.create(
+    const childComment = await CommentModel.create(
       generateRandomComment({
         author: currentUser.id,
         post: post.id,
@@ -206,7 +206,7 @@ describe('GET /comments', () => {
       }),
     );
 
-    const childOfChildComment = await Comment.create(
+    const childOfChildComment = await CommentModel.create(
       generateRandomComment({
         author: currentUser.id,
         post: post.id,
@@ -215,11 +215,11 @@ describe('GET /comments', () => {
     );
 
     await Promise.all([
-      Comment.updateOne(
+      CommentModel.updateOne(
         { _id: comment._id },
         { $push: { children: childComment._id } },
       ),
-      Comment.updateOne(
+      CommentModel.updateOne(
         { _id: childComment._id },
         { $push: { children: childOfChildComment._id } },
       ),
@@ -289,16 +289,16 @@ describe('GET /comments', () => {
   });
 
   it('Should sort comments by rating descending', async () => {
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
     await Promise.all([
-      Comment.create(
+      CommentModel.create(
         generateRandomComment({
           post: post.id,
           rating: 5,
         }),
       ),
-      Comment.create(
+      CommentModel.create(
         generateRandomComment({
           post: post.id,
           rating: 10,
@@ -306,7 +306,7 @@ describe('GET /comments', () => {
       ),
     ]);
 
-    await Comment.create(
+    await CommentModel.create(
       generateRandomComment({
         post: post.id,
         rating: 15,
@@ -326,18 +326,18 @@ describe('GET /comments', () => {
   it('Should return rated comment if the current user rated it', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const post = await Post.create(generateRandomPost());
+    const post = await PostModel.create(generateRandomPost());
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    const otherUserComment = await Comment.create(
+    const otherUserComment = await CommentModel.create(
       generateRandomComment({
         author: otherUser.id,
         post: post.id,
       }),
     );
 
-    const rate = await Rate.create(
+    const rate = await RateModel.create(
       generateRate({
         target: otherUserComment._id,
         negative: true,
@@ -345,7 +345,7 @@ describe('GET /comments', () => {
       }),
     );
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { rates: rate._id },
     });
 

@@ -1,14 +1,14 @@
 import request from 'supertest';
-import User from '../../../models/User';
+import { UserModel } from '../../../src/models/User';
 import { generateRandomUser } from '../../data-generators/index';
 import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../errors/index';
+import { ERRORS } from '../../../src/errors';
 
 describe('GET /users/:id', () => {
   it('Should return status 404 for not existing user', async () => {
-    const user = await User.create(generateRandomUser());
+    const user = await UserModel.create(generateRandomUser());
 
-    await User.deleteOne({ _id: user._id });
+    await UserModel.deleteOne({ _id: user._id });
 
     const response = await request(global.app).get(`/api/users/${user.login}`);
 
@@ -17,7 +17,7 @@ describe('GET /users/:id', () => {
   });
 
   it("Should return status 200 and a other user's profile with all expected fields", async () => {
-    const user = await User.create(
+    const user = await UserModel.create(
       generateRandomUser({
         bio: 'test',
       }),
@@ -60,9 +60,9 @@ describe('GET /users/:id', () => {
   it('Should return isFollowed=true if requested other user is followed by the current user', async () => {
     const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const otherUser = await User.create(generateRandomUser());
+    const otherUser = await UserModel.create(generateRandomUser());
 
-    await User.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { usersFollowed: otherUser.id },
     });
 
