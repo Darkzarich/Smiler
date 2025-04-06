@@ -3,7 +3,7 @@ import { startOfWeek, subMilliseconds, subSeconds } from 'date-fns';
 import { signUpRequest } from '../../utils/request-auth';
 import { PostModel } from '../../../src/models/Post';
 import { UserModel } from '../../../src/models/User';
-import { RateModel } from '../../../src/models/Rate';
+import { RateModel, RateTargetModel } from '../../../src/models/Rate';
 import {
   generateRandomPost,
   generateRandomUser,
@@ -168,7 +168,7 @@ describe('GET /posts/categories/top-this-week', () => {
       generateRate({
         target: post1._id,
         negative: true,
-        targetModel: 'Post',
+        targetModel: RateTargetModel.POST,
       }),
     );
 
@@ -176,7 +176,7 @@ describe('GET /posts/categories/top-this-week', () => {
       generateRate({
         target: post2._id,
         negative: false,
-        targetModel: 'Post',
+        targetModel: RateTargetModel.POST,
       }),
     );
 

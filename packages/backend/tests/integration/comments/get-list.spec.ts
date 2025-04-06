@@ -10,7 +10,7 @@ import {
 } from '../../data-generators/index';
 import { ERRORS } from '../../../src/errors';
 import { COMMENT_MAX_LIMIT } from '../../../src/constants';
-import { RateModel } from '../../../src/models/Rate';
+import { RateModel, RateTargetModel } from '../../../src/models/Rate';
 import { UserModel } from '../../../src/models/User';
 
 describe('GET /comments', () => {
@@ -341,7 +341,7 @@ describe('GET /comments', () => {
       generateRate({
         target: otherUserComment._id,
         negative: true,
-        targetModel: 'Comment',
+        targetModel: RateTargetModel.COMMENT,
       }),
     );
 

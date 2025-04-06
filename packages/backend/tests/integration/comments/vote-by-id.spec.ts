@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { RateModel } from '../../../src/models/Rate';
+import { RateModel, RateTargetModel } from '../../../src/models/Rate';
 import { CommentModel } from '../../../src/models/Comment';
 import { UserModel } from '../../../src/models/User';
 import {
@@ -63,7 +63,7 @@ describe('PUT /comments/:id/vote', () => {
       generateRate({
         target: otherUserComment._id,
         negative: true,
-        targetModel: 'Comment',
+        targetModel: RateTargetModel.COMMENT,
       }),
     );
 
@@ -102,7 +102,7 @@ describe('PUT /comments/:id/vote', () => {
 
     expect(response.status).toBe(200);
     expect(rate!.target.toString()).toBe(otherUserComment._id.toString());
-    expect(rate!.targetModel).toBe('Comment');
+    expect(rate!.targetModel).toBe(RateTargetModel.COMMENT);
     expect(rate!.negative).toBe(true);
   });
 

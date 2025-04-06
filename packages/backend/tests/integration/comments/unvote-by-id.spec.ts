@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { RateModel } from '../../../src/models/Rate';
+import { RateModel, RateTargetModel } from '../../../src/models/Rate';
 import { CommentModel } from '../../../src/models/Comment';
 import { UserModel } from '../../../src/models/User';
 import {
@@ -64,7 +64,7 @@ describe('DELETE /comments/:id/vote', () => {
       generateRate({
         target: comment._id,
         negative: true,
-        targetModel: 'Comment',
+        targetModel: RateTargetModel.COMMENT,
       }),
     );
 
@@ -102,7 +102,7 @@ describe('DELETE /comments/:id/vote', () => {
         generateRate({
           target: comment._id,
           negative: isNegative,
-          targetModel: 'Comment',
+          targetModel: RateTargetModel.COMMENT,
         }),
       );
 
@@ -149,7 +149,7 @@ describe('DELETE /comments/:id/vote', () => {
         generateRate({
           target: comment._id,
           negative: isNegative,
-          targetModel: 'Comment',
+          targetModel: RateTargetModel.COMMENT,
         }),
       );
 
@@ -186,7 +186,7 @@ describe('DELETE /comments/:id/vote', () => {
       generateRate({
         target: comment._id,
         negative: false,
-        targetModel: 'Comment',
+        targetModel: RateTargetModel.COMMENT,
       }),
     );
 

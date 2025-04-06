@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '../../models/User';
 import { PostModel } from '../../models/Post';
-import { RateModel } from '../../models/Rate';
+import { RateModel, RateTargetModel } from '../../models/Rate';
 import { POST_RATE_VALUE } from '../../constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
@@ -50,7 +50,7 @@ export async function voteById(
 
   const newRate = await RateModel.create({
     target: targetPost.id,
-    targetModel: 'Post',
+    targetModel: RateTargetModel.POST,
     negative,
   });
 

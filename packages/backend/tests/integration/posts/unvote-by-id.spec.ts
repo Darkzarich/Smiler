@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { RateModel } from '../../../src/models/Rate';
+import { RateModel, RateTargetModel } from '../../../src/models/Rate';
 
 import { PostModel } from '../../../src/models/Post';
 import { UserModel } from '../../../src/models/User';
@@ -63,7 +63,7 @@ describe('DELETE /posts/:id/vote', () => {
       generateRate({
         target: post._id,
         negative: true,
-        targetModel: 'Post',
+        targetModel: RateTargetModel.POST,
       }),
     );
 
@@ -101,7 +101,7 @@ describe('DELETE /posts/:id/vote', () => {
         generateRate({
           target: post._id,
           negative: isNegative,
-          targetModel: 'Post',
+          targetModel: RateTargetModel.POST,
         }),
       );
 
@@ -148,7 +148,7 @@ describe('DELETE /posts/:id/vote', () => {
         generateRate({
           target: post._id,
           negative: isNegative,
-          targetModel: 'Post',
+          targetModel: RateTargetModel.POST,
         }),
       );
 
@@ -185,7 +185,7 @@ describe('DELETE /posts/:id/vote', () => {
       generateRate({
         target: post._id,
         negative: false,
-        targetModel: 'Post',
+        targetModel: RateTargetModel.POST,
       }),
     );
 

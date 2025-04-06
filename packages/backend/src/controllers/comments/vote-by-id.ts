@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '../../models/User';
-import { RateModel } from '../../models/Rate';
+import { RateModel, RateTargetModel } from '../../models/Rate';
 import { CommentModel } from '../../models/Comment';
 import { COMMENT_RATE_VALUE } from '../../constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
@@ -53,7 +53,7 @@ export async function voteById(
 
   const newRate = await RateModel.create({
     target: targetComment._id,
-    targetModel: 'Comment',
+    targetModel: RateTargetModel.COMMENT,
     negative,
   });
 
