@@ -13,6 +13,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
+    "dev:debug": "ts-node --swc src/index.ts",
     "dev:watch": "nodemon --exec ts-node src/index.ts",
     "lint:code": "eslint --ext .js --ext .ts --ignore-path .gitignore .",
     "lint:types": "tsc --noEmit",
@@ -23,11 +24,17 @@
     "typescript",
     "blog",
     "api",
-    "rest"
+    "rest",
+    "ts-node",
+    "node",
+    "nodemon",
+    "swc"
   ],
   "author": "Darkzarich",
   "license": "MIT",
   "devDependencies": {
+    "@swc/core": "^1.11.16",
+    "@swc/helpers": "^0.5.15",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/express-session": "^1.18.1",
