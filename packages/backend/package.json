@@ -12,8 +12,8 @@
     "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand --forceExit --detectOpenHandles",
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "ts-node index.ts",
-    "dev:watch": "nodemon --exec ts-node index.ts",
+    "dev": "ts-node src/index.ts",
+    "dev:watch": "nodemon --exec ts-node src/index.ts",
     "lint:code": "eslint --ext .js --ext .ts --ignore-path .gitignore .",
     "lint:types": "tsc --noEmit",
     "prettier": "prettier . --write"

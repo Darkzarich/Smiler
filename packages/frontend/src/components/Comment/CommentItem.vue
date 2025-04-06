@@ -232,7 +232,10 @@ export default {
       });
 
       if (!res.data.error) {
-        this.commentData = res.data;
+        this.commentData = {
+          ...this.commentData,
+          ...res.data,
+        };
         this.toggleEdit();
       }
 
