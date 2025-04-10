@@ -1,8 +1,8 @@
 import type { Response } from 'express';
 
-export function sendSuccess(
-  res: Response,
-  data?: Record<string | number | symbol, unknown>,
+export function sendSuccess<Res extends Response>(
+  res: Res,
+  data?: Res extends Response<infer ResBody> ? ResBody | null : never,
 ) {
   const response = data || {
     ok: true,

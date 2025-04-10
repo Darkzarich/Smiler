@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '../../models/User';
 import { RateModel, RateTargetModel } from '../../models/Rate';
-import { CommentModel } from '../../models/Comment';
+import { CommentModel, Comment } from '../../models/Comment';
 import { COMMENT_RATE_VALUE } from '../../constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
@@ -14,9 +14,11 @@ interface Body {
   negative: boolean;
 }
 
+type VoteByIdResponse = Comment;
+
 export async function voteById(
   req: Request<Params, unknown, Body>,
-  res: Response,
+  res: Response<VoteByIdResponse>,
 ) {
   const { userId } = req.session;
   const { id: commentId } = req.params;
@@ -74,5 +76,5 @@ export async function voteById(
     ),
   ]);
 
-  sendSuccess(res, updatedComment!);
+  sendSuccess(res, updatedComment);
 }
