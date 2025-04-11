@@ -4,9 +4,9 @@ import { PostModel } from '../../models/Post';
 import { ValidationError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 import { POST_MAX_LIMIT } from '../../constants/index';
-import { Pagination } from '../../types/pagination';
+import { PaginationRequest } from '../../types/pagination';
 
-interface Query extends Pagination {
+interface Query extends PaginationRequest {
   author: string;
 }
 

@@ -8,10 +8,10 @@ import {
 } from '../../../constants/index';
 import { ValidationError, ERRORS } from '../../../errors/index';
 import { sendSuccess } from '../../../utils/response-utils';
-import { Pagination } from '../../../types/pagination';
+import { PaginationRequest } from '../../../types/pagination';
 
 export async function blowing(
-  req: Request<unknown, unknown, unknown, Pagination>,
+  req: Request<unknown, unknown, unknown, PaginationRequest>,
   res: Response,
 ) {
   const limit = +req.query.limit || POST_MAX_LIMIT;

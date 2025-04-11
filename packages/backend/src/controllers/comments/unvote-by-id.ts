@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '../../models/User';
 import { RateModel } from '../../models/Rate';
-import { CommentModel } from '../../models/Comment';
+import { Comment, CommentModel } from '../../models/Comment';
 import { COMMENT_RATE_VALUE } from '../../constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
@@ -10,7 +10,12 @@ interface Params {
   id: string;
 }
 
-export async function unvoteById(req: Request<Params>, res: Response) {
+type UnvoteByIdResponse = Comment;
+
+export async function unvoteById(
+  req: Request<Params>,
+  res: Response<UnvoteByIdResponse>,
+) {
   const { userId } = req.session;
   const { id: commentId } = req.params;
 

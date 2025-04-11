@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import sanitizeHtml from '../../libs/sanitize-html';
-import { CommentModel } from '../../models/Comment';
+import { Comment, CommentModel } from '../../models/Comment';
 import { PostModel } from '../../models/Post';
 
 import { ValidationError, NotFoundError, ERRORS } from '../../errors/index';
@@ -12,9 +12,11 @@ interface Body {
   post: string;
 }
 
+type CreateResponse = Comment;
+
 export async function create(
   req: Request<unknown, unknown, Body>,
-  res: Response,
+  res: Response<CreateResponse>,
 ) {
   const { userId } = req.session;
   const { body, parent, post: postId } = req.body;

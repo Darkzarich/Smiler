@@ -1,14 +1,19 @@
 import type { Request, Response } from 'express';
-import { CommentModel, CommentDocument } from '../../models/Comment';
+import { CommentModel, CommentDocument, Comment } from '../../models/Comment';
 import { UserModel, UserDocument } from '../../models/User';
 import { NotFoundError, ValidationError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 import { COMMENT_MAX_LIMIT } from '../../constants/index';
-import { Pagination } from '../../types/pagination';
+import { PaginationRequest, PaginationResponse } from '../../types/pagination';
 
-interface Query extends Pagination {
+interface Query extends PaginationRequest {
   post: string;
   author?: string;
+}
+
+interface GetListResponse extends PaginationResponse {
+  // TODO: think of something better
+  comments: ReturnType<Comment['toResponse']>[];
 }
 
 // TODO: Rewrite from recursion to iteration
@@ -39,7 +44,7 @@ function fillWithRatedRecursive({
 
 export async function getList(
   req: Request<unknown, unknown, unknown, Query>,
-  res: Response,
+  res: Response<GetListResponse>,
 ) {
   const { userId } = req.session;
   const { post } = req.query;

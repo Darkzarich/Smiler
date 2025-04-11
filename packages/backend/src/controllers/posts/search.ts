@@ -5,9 +5,9 @@ import { Post, PostModel } from '../../models/Post';
 import { POST_TITLE_MAX_LENGTH, POST_MAX_LIMIT } from '../../constants/index';
 import { ValidationError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
-import { Pagination } from '../../types/pagination';
+import { PaginationRequest } from '../../types/pagination';
 
-interface SearchQuery extends Pagination {
+interface SearchQuery extends PaginationRequest {
   title?: string;
   dateFrom?: string;
   dateTo?: string;

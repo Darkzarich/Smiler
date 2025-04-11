@@ -4,7 +4,7 @@ import { PostModel } from '../../models/Post';
 import { UnauthorizedError, ValidationError, ERRORS } from '../../errors/index';
 import { POST_MAX_LIMIT } from '../../constants/index';
 import { sendSuccess } from '../../utils/response-utils';
-import { Pagination as PaginationQuery } from '../../types/pagination';
+import { PaginationRequest as PaginationQuery } from '../../types/pagination';
 
 export async function getFeed(
   req: Request<unknown, unknown, unknown, PaginationQuery>,

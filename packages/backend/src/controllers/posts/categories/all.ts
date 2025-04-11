@@ -4,10 +4,10 @@ import { UserModel } from '../../../models/User';
 import { PostModel } from '../../../models/Post';
 import { ValidationError, ERRORS } from '../../../errors/index';
 import { sendSuccess } from '../../../utils/response-utils';
-import { Pagination } from '../../../types/pagination';
+import { PaginationRequest } from '../../../types/pagination';
 
 export async function all(
-  req: Request<unknown, unknown, unknown, Pagination>,
+  req: Request<unknown, unknown, unknown, PaginationRequest>,
   res: Response,
 ) {
   const limit = +req.query.limit || POST_MAX_LIMIT;

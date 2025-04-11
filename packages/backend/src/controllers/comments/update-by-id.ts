@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
 import sanitizeHtml from '../../libs/sanitize-html';
-import { CommentModel } from '../../models/Comment';
+import { Comment, CommentModel } from '../../models/Comment';
 import { COMMENT_TIME_TO_UPDATE } from '../../constants/index';
 import {
   ForbiddenError,
@@ -19,9 +19,11 @@ interface Body {
   body: string;
 }
 
+type UpdateByIdResponse = Comment;
+
 export async function updateById(
   req: Request<Params, unknown, Body>,
-  res: Response,
+  res: Response<UpdateByIdResponse>,
 ) {
   const { userId } = req.session;
   const { id } = req.params;
