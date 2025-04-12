@@ -1,9 +1,16 @@
 import type { Request, Response } from 'express';
-import { UserModel } from '../../models/User';
+import { User, UserModel } from '../../models/User';
 import { NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function updateMe(req: Request, res: Response) {
+type UpdateMeBody = Partial<Omit<User, 'isFollowed' | '_id' | 'hash'>>;
+
+type UpdateMeResponse = Omit<User, 'isFollowed' | '_id' | 'hash'>;
+
+export async function updateMe(
+  req: Request<unknown, unknown, UpdateMeBody>,
+  res: Response<UpdateMeResponse>,
+) {
   const { userId } = req.session!;
   const update = req.body;
 

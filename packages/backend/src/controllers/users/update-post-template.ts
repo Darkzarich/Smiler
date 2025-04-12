@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { identity, pickBy } from 'lodash';
-import { UserModel } from '../../models/User';
+import { UserModel, UserTemplate } from '../../models/User';
 import { ValidationError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 import {
@@ -9,17 +9,14 @@ import {
   POST_TITLE_MAX_LENGTH,
   POST_SECTIONS_MAX,
 } from '../../constants/index';
-import { PostSection } from '../../models/Post';
 
-interface Body {
-  title?: string;
-  tags?: string[];
-  sections?: PostSection[];
-}
+type UpdatePostTemplateBody = Partial<UserTemplate>;
+
+type UpdatePostTemplateResponse = UserTemplate;
 
 export async function updatePostTemplate(
-  req: Request<unknown, unknown, Body>,
-  res: Response,
+  req: Request<unknown, unknown, UpdatePostTemplateBody>,
+  res: Response<UpdatePostTemplateResponse>,
 ) {
   // TODO: validate title, sections just like in posts
 

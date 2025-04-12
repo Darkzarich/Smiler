@@ -1,9 +1,19 @@
 import type { Request, Response } from 'express';
-import { UserModel } from '../../models/User';
+import { User, UserModel } from '../../models/User';
 import { NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function getSettings(req: Request, res: Response) {
+interface GetSettingsResponse {
+  authors: User[];
+  tags: string[];
+  bio: string;
+  avatar: string;
+}
+
+export async function getSettings(
+  req: Request,
+  res: Response<GetSettingsResponse>,
+) {
   const { userId } = req.session;
 
   const user = await UserModel.findById(userId)
@@ -14,12 +24,10 @@ export async function getSettings(req: Request, res: Response) {
     throw new NotFoundError(ERRORS.USER_NOT_FOUND);
   }
 
-  const following = {
-    authors: user.usersFollowed,
+  sendSuccess(res, {
+    authors: user.usersFollowed as User[],
     tags: user.tagsFollowed,
     bio: user.bio,
     avatar: user.avatar,
-  };
-
-  sendSuccess(res, following);
+  });
 }

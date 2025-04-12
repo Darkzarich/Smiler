@@ -9,11 +9,14 @@ import {
 } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-interface Params {
+interface FollowByIdParams {
   id: string;
 }
 
-export async function followById(req: Request<Params>, res: Response) {
+export async function followById(
+  req: Request<FollowByIdParams>,
+  res: Response,
+) {
   const { id } = req.params;
   const { userId } = req.session!;
 

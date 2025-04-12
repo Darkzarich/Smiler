@@ -1,14 +1,21 @@
 import type { Request, Response } from 'express';
 import { omit } from 'lodash';
-import { UserModel } from '../../models/User';
+import { UserModel, User } from '../../models/User';
 import { NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-interface Params {
+interface GetByLoginParams {
   login: string;
 }
 
-export async function getByLogin(req: Request<Params>, res: Response) {
+interface GetByLoginResponse extends Omit<User, 'isFollowed' | '_id'> {
+  isFollowed?: boolean;
+}
+
+export async function getByLogin(
+  req: Request<GetByLoginParams>,
+  res: Response<GetByLoginResponse>,
+) {
   const { login } = req.params;
   const { userId: currentUserId } = req.session;
 
@@ -28,7 +35,7 @@ export async function getByLogin(req: Request<Params>, res: Response) {
   }
 
   if (currentUserId === requestedUser._id.toString()) {
-    sendSuccess(res, omit(requestedUser.toJSON(), '_id'));
+    sendSuccess(res, omit(requestedUser.toJSON(), ['_id', 'isFollowed']));
 
     return;
   }

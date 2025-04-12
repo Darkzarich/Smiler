@@ -4,7 +4,7 @@ import { generateRandomUser } from '../../data-generators/index';
 import { signUpRequest } from '../../utils/request-auth';
 import { ERRORS } from '../../../src/errors';
 
-describe('GET /users/:id', () => {
+describe('GET /users/:login', () => {
   it('Should return status 404 for not existing user', async () => {
     const user = await UserModel.create(generateRandomUser());
 
