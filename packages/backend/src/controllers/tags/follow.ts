@@ -4,7 +4,11 @@ import { ValidationError, ERRORS } from '../../errors/index';
 import { POST_MAX_TAG_LEN } from '../../constants/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function follow(req: Request, res: Response) {
+interface FollowParams {
+  tag: string;
+}
+
+export async function follow(req: Request<FollowParams>, res: Response) {
   const { tag } = req.params;
   const { userId } = req.session;
 
