@@ -1,17 +1,25 @@
 import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
-import { PostModel, POST_SECTION_TYPES } from '../../models/Post';
+import { PostModel, POST_SECTION_TYPES, Post } from '../../models/Post';
 import { POST_TIME_TO_UPDATE } from '../../constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index';
 import { removeFileByPath } from '../../utils/remove-file-by-path';
 import { sendSuccess } from '../../utils/response-utils';
 import { PostValidator } from '../../validators/PostValidator';
 
-interface Params {
+interface UpdateByIdParams {
   id: string;
 }
 
-export async function updateById(req: Request<Params>, res: Response) {
+type UpdateByIdBody = Partial<Pick<Post, 'title' | 'sections' | 'tags'>>;
+
+// TODO: think of something better
+type UpdateByIdResponse = ReturnType<Post['toResponse']>;
+
+export async function updateById(
+  req: Request<UpdateByIdParams, unknown, UpdateByIdBody>,
+  res: Response<UpdateByIdResponse>,
+) {
   // TODO: validate sections on update by type and other stuff the same as when creating post
   // TODO: move all Post validation in one place
 
@@ -70,7 +78,7 @@ export async function updateById(req: Request<Params>, res: Response) {
   }
 
   targetPost.title = title;
-  targetPost.tags = tags;
+  targetPost.tags = tags || [];
   targetPost.sections = newSections;
 
   await targetPost.save();

@@ -16,7 +16,9 @@ export class PostValidator {
   /** Validate a post and return it wih sanitized sections
    * throw ValidationError if validation fails
    */
-  static validateAndPrepare(post: Pick<Post, 'title' | 'sections' | 'tags'>) {
+  static validateAndPrepare(
+    post: Partial<Pick<Post, 'title' | 'sections' | 'tags'>>,
+  ) {
     const { title, sections, tags } = post;
 
     if (!title) {

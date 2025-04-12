@@ -1,18 +1,23 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '../../models/User';
-import { PostModel } from '../../models/Post';
+import { Post, PostModel } from '../../models/Post';
 import { ValidationError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 import { POST_MAX_LIMIT } from '../../constants/index';
-import { PaginationRequest } from '../../types/pagination';
+import { PaginationRequest, PaginationResponse } from '../../types/pagination';
 
-interface Query extends PaginationRequest {
+interface GetListByAuthorQuery extends PaginationRequest {
   author: string;
 }
 
+interface GetListByAuthorResponse extends PaginationResponse {
+  // TODO: think of something better
+  posts: ReturnType<Post['toResponse']>[];
+}
+
 export async function getListByAuthor(
-  req: Request<unknown, unknown, unknown, Query>,
-  res: Response,
+  req: Request<unknown, unknown, unknown, GetListByAuthorQuery>,
+  res: Response<GetListByAuthorResponse>,
 ) {
   const { userId } = req.session;
 

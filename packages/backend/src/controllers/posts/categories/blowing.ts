@@ -1,18 +1,26 @@
 import type { Request, Response } from 'express';
 import { subHours } from 'date-fns';
 import { UserModel } from '../../../models/User';
-import { PostModel } from '../../../models/Post';
+import { Post, PostModel } from '../../../models/Post';
 import {
   POST_BLOWING_RATING_THRESHOLD,
   POST_MAX_LIMIT,
 } from '../../../constants/index';
 import { ValidationError, ERRORS } from '../../../errors/index';
 import { sendSuccess } from '../../../utils/response-utils';
-import { PaginationRequest } from '../../../types/pagination';
+import {
+  PaginationRequest,
+  PaginationResponse,
+} from '../../../types/pagination';
+
+interface GetBlowingResponse extends PaginationResponse {
+  // TODO: think of something better
+  posts: ReturnType<Post['toResponse']>[];
+}
 
 export async function blowing(
   req: Request<unknown, unknown, unknown, PaginationRequest>,
-  res: Response,
+  res: Response<GetBlowingResponse>,
 ) {
   const limit = +req.query.limit || POST_MAX_LIMIT;
   const offset = +req.query.offset || 0;

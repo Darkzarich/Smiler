@@ -1,14 +1,22 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '../../models/User';
-import { PostModel } from '../../models/Post';
+import { Post, PostModel } from '../../models/Post';
 import { UnauthorizedError, ValidationError, ERRORS } from '../../errors/index';
 import { POST_MAX_LIMIT } from '../../constants/index';
 import { sendSuccess } from '../../utils/response-utils';
-import { PaginationRequest as PaginationQuery } from '../../types/pagination';
+import {
+  PaginationRequest as PaginationQuery,
+  PaginationResponse,
+} from '../../types/pagination';
+
+interface GetFeedResponse extends PaginationResponse {
+  // TODO: think of something better
+  posts: ReturnType<Post['toResponse']>[];
+}
 
 export async function getFeed(
   req: Request<unknown, unknown, unknown, PaginationQuery>,
-  res: Response,
+  res: Response<GetFeedResponse>,
 ) {
   const limit = Number(req.query.limit) || POST_MAX_LIMIT;
   const offset = Number(req.query.offset) || 0;

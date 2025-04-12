@@ -5,7 +5,7 @@ import { Post, PostModel } from '../../models/Post';
 import { POST_TITLE_MAX_LENGTH, POST_MAX_LIMIT } from '../../constants/index';
 import { ValidationError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
-import { PaginationRequest } from '../../types/pagination';
+import { PaginationRequest, PaginationResponse } from '../../types/pagination';
 
 interface SearchQuery extends PaginationRequest {
   title?: string;
@@ -16,9 +16,14 @@ interface SearchQuery extends PaginationRequest {
   'tags[]'?: string[];
 }
 
+interface SearchResponse extends PaginationResponse {
+  // TODO: think of something better
+  posts: ReturnType<Post['toResponse']>[];
+}
+
 export async function search(
   req: Request<unknown, unknown, unknown, SearchQuery>,
-  res: Response,
+  res: Response<SearchResponse>,
 ) {
   const { userId } = req.session;
   const limit = +req.query.limit || POST_MAX_LIMIT;

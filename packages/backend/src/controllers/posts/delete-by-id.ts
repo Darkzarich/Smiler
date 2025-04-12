@@ -10,11 +10,11 @@ import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index';
 import { removeFileByPath } from '../../utils/remove-file-by-path';
 import { sendSuccess } from '../../utils/response-utils';
 
-interface Params {
+interface DeleteByIdParams {
   id: string;
 }
 
-export async function deleteById(req: Request<Params>, res: Response) {
+export async function deleteById(req: Request<DeleteByIdParams>, res: Response) {
   const { userId } = req.session;
   const { id } = req.params;
 

@@ -5,7 +5,7 @@ import { join, extname } from 'path';
 import { mkdir } from 'fs/promises';
 import DiskStorage from '../../libs/DiskStorage';
 import { UserModel } from '../../models/User';
-import { POST_SECTION_TYPES } from '../../models/Post';
+import { POST_SECTION_TYPES, PostPictureSection } from '../../models/Post';
 import {
   POST_SECTIONS_MAX,
   POST_MAX_UPLOAD_IMAGE_SIZE,
@@ -21,6 +21,8 @@ import {
   ERRORS,
 } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
+
+type UploadResponse = PostPictureSection;
 
 const postMulter = multer({
   storage: new DiskStorage({
@@ -69,7 +71,11 @@ const postMulter = multer({
   },
 }).single('picture'); // frontend form-data name for file
 
-export async function upload(req: Request, res: Response, next: NextFunction) {
+export async function upload(
+  req: Request,
+  res: Response<UploadResponse>,
+  next: NextFunction,
+) {
   const { userId } = req.session;
 
   const user = await UserModel.findById(userId).select('template');

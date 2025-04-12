@@ -1,10 +1,20 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '../../models/User';
-import { PostModel } from '../../models/Post';
+import { Post, PostModel } from '../../models/Post';
 import { NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-export async function getBySlug(req: Request, res: Response) {
+interface GetBySlugParams {
+  slug: string;
+}
+
+// TODO: think of something better
+type GetBySlugResponse = ReturnType<Post['toResponse']>;
+
+export async function getBySlug(
+  req: Request<GetBySlugParams>,
+  res: Response<GetBySlugResponse>,
+) {
   const { userId } = req.session;
 
   const { slug } = req.params;

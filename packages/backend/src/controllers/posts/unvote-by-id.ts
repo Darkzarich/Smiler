@@ -1,16 +1,21 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '../../models/User';
-import { PostModel } from '../../models/Post';
+import { PostModel, Post } from '../../models/Post';
 import { RateModel } from '../../models/Rate';
 import { POST_RATE_VALUE } from '../../constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-interface Params {
+interface UnvoteByIdParams {
   id: string;
 }
 
-export async function unvoteById(req: Request<Params>, res: Response) {
+type UnvoteByIdResponse = Post;
+
+export async function unvoteById(
+  req: Request<UnvoteByIdParams>,
+  res: Response<UnvoteByIdResponse>,
+) {
   const { userId } = req.session;
   const { id: postId } = req.params;
 

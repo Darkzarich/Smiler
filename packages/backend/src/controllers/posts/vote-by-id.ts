@@ -1,22 +1,24 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '../../models/User';
-import { PostModel } from '../../models/Post';
+import { Post, PostModel } from '../../models/Post';
 import { RateModel, RateTargetModel } from '../../models/Rate';
 import { POST_RATE_VALUE } from '../../constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-interface Params {
+interface VoteByIdParams {
   id: string;
 }
 
-interface Body {
+interface VoteByIdBody {
   negative: boolean;
 }
 
+type VoteByIdResponse = Post;
+
 export async function voteById(
-  req: Request<Params, unknown, Body>,
-  res: Response,
+  req: Request<VoteByIdParams, unknown, VoteByIdBody>,
+  res: Response<VoteByIdResponse>,
 ) {
   const { userId } = req.session;
   const { id: postId } = req.params;

@@ -2,19 +2,21 @@ import type { Request, Response } from 'express';
 import slugLib from 'slug';
 import crypto from 'crypto';
 import { UserModel } from '../../models/User';
-import { PostModel, PostSection } from '../../models/Post';
+import { Post, PostModel, PostSection } from '../../models/Post';
 import { sendSuccess } from '../../utils/response-utils';
 import { PostValidator } from '../../validators/PostValidator';
 
-interface Body {
+interface CreateBody {
   title: string;
   sections: PostSection[];
   tags?: string[];
 }
 
+type CreateResponse = ReturnType<Post['toResponse']>;
+
 export async function create(
-  req: Request<unknown, unknown, Body>,
-  res: Response,
+  req: Request<unknown, unknown, CreateBody>,
+  res: Response<CreateResponse>,
 ) {
   // TODO: frontend sends hash should think about avoiding that anyhow
 
