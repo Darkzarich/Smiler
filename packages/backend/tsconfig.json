@@ -19,7 +19,18 @@
     "typeRoots": [
       "./node_modules/@types",
       "node_modules/express-request-id/types.d.ts"
-    ]
+    ],
+    "paths": {
+      "@config/": ["./src/config"],
+      "@controllers/*": ["./src/controllers/*"],
+      "@libs/*": ["./src/libs/*"],
+      "@models/*": ["./src/models/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@validators/*": ["./src/validators/*"],
+      "@constants/*": ["./src/constants/*"],
+      "@types/*": ["./src/types/*"],
+      "@errors/*": ["./src/errors/*"]
+    }
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src/**/*.ts", "src/**/*.js", "tests/**/*"],
