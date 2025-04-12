@@ -1,9 +1,27 @@
 import type { Request, Response } from 'express';
-import { UserModel } from '../../models/User';
+import { UserModel, User } from '../../models/User';
 import { sendSuccess } from '../../utils/response-utils';
 import { NotFoundError } from '../../errors/index';
 
-export async function current(req: Request, res: Response) {
+interface CurrentUser
+  extends Pick<
+    User,
+    'login' | 'rating' | 'followersAmount' | 'tagsFollowed' | 'avatar' | 'email'
+  > {
+  id: string;
+  isAuth: boolean;
+}
+
+interface NotLoggedInUser {
+  isAuth: false;
+}
+
+export type CurrentUserResponse = CurrentUser | NotLoggedInUser;
+
+export async function current(
+  req: Request,
+  res: Response<CurrentUserResponse>,
+) {
   const { userId } = req.session;
 
   if (!userId) {
@@ -19,7 +37,7 @@ export async function current(req: Request, res: Response) {
   }
 
   return sendSuccess(res, {
-    id: user._id,
+    id: user._id.toString(),
     login: user.login,
     isAuth: true,
     rating: user.rating || 0,

@@ -3,6 +3,7 @@ import { pbkdf2Sync, timingSafeEqual } from 'crypto';
 import { UserModel } from '../../models/User';
 import { ValidationError, UnauthorizedError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
+import { CurrentUserResponse } from './current';
 
 interface SignInFields {
   email?: string;
@@ -25,7 +26,7 @@ const validate = (fields: SignInFields) => {
 
 export async function signIn(
   req: Request<unknown, unknown, SignInFields>,
-  res: Response,
+  res: Response<CurrentUserResponse>,
 ) {
   const fields = {
     email: req.body.email,
@@ -67,7 +68,7 @@ export async function signIn(
 
   // TODO: Maybe move to getters of the model
   const userAuth = {
-    id: foundUser._id,
+    id: foundUser._id.toString(),
     login: foundUser.login,
     isAuth: true,
     rating: foundUser.rating || 0,

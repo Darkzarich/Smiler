@@ -5,6 +5,7 @@ import { ValidationError, ConflictError, ERRORS } from '../../errors/index';
 import { isDuplicateKeyError } from '../../utils/check-mongo-db-error';
 import { sendSuccess } from '../../utils/response-utils';
 import AbstractError from '../../errors/AbstractError';
+import { CurrentUserResponse } from './current';
 
 interface SignUpFields {
   email?: string;
@@ -38,7 +39,7 @@ const validate = (fields: SignUpFields) => {
 
 export async function signUp(
   req: Request<unknown, unknown, SignUpFields>,
-  res: Response,
+  res: Response<CurrentUserResponse>,
 ) {
   const user = {
     email: req.body.email,
@@ -69,7 +70,7 @@ export async function signUp(
     req.session.userId = newUser._id.toString();
 
     const userAuth = {
-      id: newUser._id,
+      id: newUser._id.toString(),
       login: newUser.login,
       isAuth: true,
       rating: newUser.rating,
