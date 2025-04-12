@@ -11,18 +11,18 @@ import {
 } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-interface Params {
+interface UpdateByIdParams {
   id: string;
 }
 
-interface Body {
+interface UpdateByIdBody {
   body: string;
 }
 
 type UpdateByIdResponse = Comment;
 
 export async function updateById(
-  req: Request<Params, unknown, Body>,
+  req: Request<UpdateByIdParams, unknown, UpdateByIdBody>,
   res: Response<UpdateByIdResponse>,
 ) {
   const { userId } = req.session;

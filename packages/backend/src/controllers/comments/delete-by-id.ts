@@ -6,11 +6,11 @@ import { COMMENT_TIME_TO_UPDATE } from '../../constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-interface Params {
+interface DeleteByIdParams {
   id: string;
 }
 
-export async function deleteById(req: Request<Params>, res: Response) {
+export async function deleteById(req: Request<DeleteByIdParams>, res: Response) {
   const { userId } = req.session;
   const { id } = req.params;
 

@@ -7,7 +7,7 @@ import { sendSuccess } from '../../utils/response-utils';
 import AbstractError from '../../errors/AbstractError';
 import { CurrentUserResponse } from './current';
 
-interface SignUpFields {
+interface SignUpBody {
   email?: string;
   login?: string;
   password?: string;
@@ -15,7 +15,7 @@ interface SignUpFields {
 }
 
 /** Validate user sign up, return error message or nothing */
-const validate = (fields: SignUpFields) => {
+const validate = (fields: SignUpBody) => {
   if (!fields.login || !fields.password || !fields.confirm || !fields.email) {
     return ERRORS.AUTH_FIELDS_REQUIRED;
   }
@@ -38,7 +38,7 @@ const validate = (fields: SignUpFields) => {
 };
 
 export async function signUp(
-  req: Request<unknown, unknown, SignUpFields>,
+  req: Request<unknown, unknown, SignUpBody>,
   res: Response<CurrentUserResponse>,
 ) {
   const user = {

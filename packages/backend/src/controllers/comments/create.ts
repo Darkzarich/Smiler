@@ -6,7 +6,7 @@ import { PostModel } from '../../models/Post';
 import { ValidationError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-interface Body {
+interface CreateBody {
   body: string;
   parent?: string;
   post: string;
@@ -15,7 +15,7 @@ interface Body {
 type CreateResponse = Comment;
 
 export async function create(
-  req: Request<unknown, unknown, Body>,
+  req: Request<unknown, unknown, CreateBody>,
   res: Response<CreateResponse>,
 ) {
   const { userId } = req.session;

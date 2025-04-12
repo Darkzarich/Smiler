@@ -6,18 +6,18 @@ import { COMMENT_RATE_VALUE } from '../../constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 
-interface Params {
+interface VoteByIdParams {
   id: string;
 }
 
-interface Body {
+interface VoteByIdBody {
   negative: boolean;
 }
 
 type VoteByIdResponse = Comment;
 
 export async function voteById(
-  req: Request<Params, unknown, Body>,
+  req: Request<VoteByIdParams, unknown, VoteByIdBody>,
   res: Response<VoteByIdResponse>,
 ) {
   const { userId } = req.session;

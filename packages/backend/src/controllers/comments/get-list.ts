@@ -6,7 +6,7 @@ import { sendSuccess } from '../../utils/response-utils';
 import { COMMENT_MAX_LIMIT } from '../../constants/index';
 import { PaginationRequest, PaginationResponse } from '../../types/pagination';
 
-interface Query extends PaginationRequest {
+interface GetListQuery extends PaginationRequest {
   post: string;
   author?: string;
 }
@@ -43,7 +43,7 @@ function fillWithRatedRecursive({
 }
 
 export async function getList(
-  req: Request<unknown, unknown, unknown, Query>,
+  req: Request<unknown, unknown, unknown, GetListQuery>,
   res: Response<GetListResponse>,
 ) {
   const { userId } = req.session;

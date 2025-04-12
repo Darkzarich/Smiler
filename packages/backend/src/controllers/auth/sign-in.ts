@@ -5,12 +5,12 @@ import { ValidationError, UnauthorizedError, ERRORS } from '../../errors/index';
 import { sendSuccess } from '../../utils/response-utils';
 import { CurrentUserResponse } from './current';
 
-interface SignInFields {
+interface SignInBody {
   email?: string;
   password?: string;
 }
 
-const validate = (fields: SignInFields) => {
+const validate = (fields: SignInBody) => {
   if (!fields.email || !fields.password) {
     return ERRORS.AUTH_FIELDS_REQUIRED;
   }
@@ -25,7 +25,7 @@ const validate = (fields: SignInFields) => {
 };
 
 export async function signIn(
-  req: Request<unknown, unknown, SignInFields>,
+  req: Request<unknown, unknown, SignInBody>,
   res: Response<CurrentUserResponse>,
 ) {
   const fields = {
