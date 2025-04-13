@@ -1,5 +1,5 @@
 import winston from 'winston';
-import Config from '../config/index';
+import Config from '@config/index';
 
 const currentDir = process.cwd();
 

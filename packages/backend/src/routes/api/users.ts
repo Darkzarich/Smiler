@@ -1,5 +1,5 @@
 import express from 'express';
-import { asyncControllerErrorHandler } from '../../utils/async-controller-error-handler';
+import { asyncControllerErrorHandler } from '@utils/async-controller-error-handler';
 import {
   getByLogin,
   updateMe,
@@ -9,8 +9,8 @@ import {
   followById,
   unfollowById,
   deletePostTemplatePicture,
-} from '../../controllers/users/index';
-import authRequiredMiddleware from '../../middlewares/auth-required';
+} from '@controllers/users';
+import authRequiredMiddleware from '@middlewares/auth-required';
 
 const router = express.Router();
 /**

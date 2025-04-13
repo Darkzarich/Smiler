@@ -5,21 +5,21 @@ import {
   NotFoundError,
   ValidationError,
   ConflictError,
-} from '../../errors/index';
-import { asyncControllerErrorHandler } from '../../utils/async-controller-error-handler';
-import Config from '../../config/index';
-import { logger } from '../../libs/logger';
+} from '@errors/index';
+import { asyncControllerErrorHandler } from '@utils/async-controller-error-handler';
+import Config from '@config/index';
+import { logger } from '@libs/logger';
 import {
   isDuplicateKeyError,
   isCastError,
   isValidationError,
-} from '../../utils/check-mongo-db-error';
-import usersRouter from './users';
-import authRouter from './auth';
-import postsRouter from './posts';
-import commentsRouter from './comments';
-import tagsRouter from './tags';
-import AbstractError from '../../errors/AbstractError';
+} from '@utils/check-mongo-db-error';
+import AbstractError from '@errors/AbstractError';
+import usersRouter from '@routes/api/users';
+import authRouter from '@routes/api/auth';
+import postsRouter from '@routes/api/posts';
+import commentsRouter from '@routes/api/comments';
+import tagsRouter from '@routes/api/tags';
 
 const router = express.Router();
 

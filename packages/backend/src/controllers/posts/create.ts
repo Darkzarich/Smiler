@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
 import slugLib from 'slug';
 import crypto from 'crypto';
-import { UserModel } from '../../models/User';
-import { Post, PostModel, PostSection } from '../../models/Post';
-import { sendSuccess } from '../../utils/response-utils';
-import { PostValidator } from '../../validators/PostValidator';
+import { UserModel } from '@models/User';
+import { Post, PostModel, PostSection } from '@models/Post';
+import { sendSuccess } from '@utils/response-utils';
+import { PostValidator } from '@validators/PostValidator';
 
 interface CreateBody {
   title: string;

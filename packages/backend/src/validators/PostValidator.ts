@@ -1,13 +1,13 @@
+import { Post, POST_SECTION_TYPES } from '@models/Post';
 import {
   POST_SECTIONS_MAX,
   POST_SECTIONS_MAX_LENGTH,
   POST_TITLE_MAX_LENGTH,
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
-} from '../constants/index';
-import { ValidationError, ERRORS } from '../errors/index';
-import sanitizeHtml from '../libs/sanitize-html';
-import { Post, POST_SECTION_TYPES } from '../models/Post';
+} from '@constants/index';
+import { ValidationError, ERRORS } from '@errors/index';
+import sanitizeHtml from '@libs/sanitize-html';
 
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 

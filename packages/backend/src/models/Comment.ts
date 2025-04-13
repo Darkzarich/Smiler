@@ -8,8 +8,8 @@ import {
   type DocumentType,
 } from '@typegoose/typegoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
-import { Post } from './Post';
-import { User } from './User';
+import { Post } from '@models/Post';
+import { User } from '@models/User';
 
 export type CommentDocument = DocumentType<Comment>;
 

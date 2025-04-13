@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { unlink } from 'fs/promises';
-import { logger } from '../libs/logger';
+import { logger } from '@libs/logger';
 
 export async function removeFileByPath(filePath: string) {
   const absolutePath = join(process.cwd(), filePath);

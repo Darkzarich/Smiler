@@ -1,6 +1,6 @@
 import cors from 'cors';
-import { logger } from '../libs/logger';
-import Config from '../config/index';
+import { logger } from '@libs/logger';
+import Config from '@config/index';
 
 const whitelist = [
   Config.FRONT_ORIGIN_LOCAL,

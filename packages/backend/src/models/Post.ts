@@ -10,7 +10,7 @@ import {
   mongoose,
   Severity,
 } from '@typegoose/typegoose';
-import { User } from './User';
+import { User } from '@models/User';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export enum POST_SECTION_TYPES {

@@ -1,15 +1,15 @@
 import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
-import sanitizeHtml from '../../libs/sanitize-html';
-import { Comment, CommentModel } from '../../models/Comment';
-import { COMMENT_TIME_TO_UPDATE } from '../../constants/index';
+import sanitizeHtml from '@libs/sanitize-html';
+import { Comment, CommentModel } from '@models/Comment';
+import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
 import {
   ForbiddenError,
   NotFoundError,
   BadRequestError,
   ERRORS,
-} from '../../errors/index';
-import { sendSuccess } from '../../utils/response-utils';
+} from '@errors/index';
+import { sendSuccess } from '@utils/response-utils';
 
 interface UpdateByIdParams {
   id: string;

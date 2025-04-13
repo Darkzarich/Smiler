@@ -21,14 +21,16 @@
       "node_modules/express-request-id/types.d.ts"
     ],
     "paths": {
-      "@config/": ["./src/config"],
+      "@config/*": ["./src/config/*"],
+      "@routes/*": ["./src/routes/*"],
       "@controllers/*": ["./src/controllers/*"],
+      "@middlewares/*": ["./src/middlewares/*"],
       "@libs/*": ["./src/libs/*"],
       "@models/*": ["./src/models/*"],
       "@utils/*": ["./src/utils/*"],
       "@validators/*": ["./src/validators/*"],
       "@constants/*": ["./src/constants/*"],
-      "@types/*": ["./src/types/*"],
+      "@type/*": ["./src/types/*"],
       "@errors/*": ["./src/errors/*"]
     }
   },

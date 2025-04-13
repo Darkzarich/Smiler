@@ -1,13 +1,13 @@
 import type { Request, Response } from 'express';
-import { UserModel } from '../../models/User';
-import { Post, PostModel } from '../../models/Post';
-import { UnauthorizedError, ValidationError, ERRORS } from '../../errors/index';
-import { POST_MAX_LIMIT } from '../../constants/index';
-import { sendSuccess } from '../../utils/response-utils';
+import { UserModel } from '@models/User';
+import { Post, PostModel } from '@models/Post';
+import { UnauthorizedError, ValidationError, ERRORS } from '@errors/index';
+import { POST_MAX_LIMIT } from '@constants/index';
+import { sendSuccess } from '@utils/response-utils';
 import {
   PaginationRequest as PaginationQuery,
   PaginationResponse,
-} from '../../types/pagination';
+} from '@type/pagination';
 
 interface GetFeedResponse extends PaginationResponse {
   // TODO: think of something better

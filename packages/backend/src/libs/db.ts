@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { logger } from './logger';
-import Config from '../config/index';
+import Config from '@config/index';
+import { logger } from '@libs/logger';
 
 // Return the connection if it has already been established
 async function getDatabase() {

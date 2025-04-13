@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
-import { POST_MAX_LIMIT } from '../../../constants/index';
-import { UserModel } from '../../../models/User';
-import { PostModel, Post } from '../../../models/Post';
-import { ValidationError, ERRORS } from '../../../errors/index';
-import { sendSuccess } from '../../../utils/response-utils';
-import { PaginationRequest, PaginationResponse } from '../../../types/pagination';
+import { POST_MAX_LIMIT } from '@constants/index';
+import { UserModel } from '@models/User';
+import { PostModel, Post } from '@models/Post';
+import { ValidationError, ERRORS } from '@errors/index';
+import { sendSuccess } from '@utils/response-utils';
+import { PaginationRequest, PaginationResponse } from '@type/pagination';
 
 interface GetAllResponse extends PaginationResponse {
   // TODO: think of something better

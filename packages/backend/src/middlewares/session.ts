@@ -1,7 +1,7 @@
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import type { Connection } from 'mongoose';
-import Config from '../config/index';
+import Config from '@config/index';
 
 export default (db: Connection) =>
   session({

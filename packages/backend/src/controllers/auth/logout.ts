@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { sendSuccess } from '../../utils/response-utils';
+import { sendSuccess } from '@utils/response-utils';
 
 export async function logout(req: Request, res: Response) {
   if (req.session) {

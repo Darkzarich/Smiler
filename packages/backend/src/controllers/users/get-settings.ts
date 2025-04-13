@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
-import { User, UserModel } from '../../models/User';
-import { NotFoundError, ERRORS } from '../../errors/index';
-import { sendSuccess } from '../../utils/response-utils';
+import { User, UserModel } from '@models/User';
+import { NotFoundError, ERRORS } from '@errors/index';
+import { sendSuccess } from '@utils/response-utils';
 
 interface GetSettingsResponse {
   authors: User[];

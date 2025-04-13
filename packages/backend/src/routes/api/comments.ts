@@ -1,5 +1,5 @@
 import express from 'express';
-import { asyncControllerErrorHandler } from '../../utils/async-controller-error-handler';
+import { asyncControllerErrorHandler } from '@utils/async-controller-error-handler';
 import {
   getList,
   create,
@@ -7,8 +7,8 @@ import {
   deleteById,
   voteById,
   unvoteById,
-} from '../../controllers/comments/index';
-import authRequiredMiddleware from '../../middlewares/auth-required';
+} from '@controllers/comments';
+import authRequiredMiddleware from '@middlewares/auth-required';
 
 const router = express.Router();
 

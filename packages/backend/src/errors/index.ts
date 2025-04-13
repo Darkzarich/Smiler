@@ -1,3 +1,4 @@
+import AbstractError from './AbstractError';
 import AppError from './ServerError';
 import NotFoundError from './NotFoundError';
 import UnauthorizedError from './UnauthorizedError';
@@ -9,6 +10,7 @@ import ContentTooLargeError from './ContentTooLargeError';
 import { ERRORS } from './errorMessages';
 
 export {
+  AbstractError,
   AppError,
   NotFoundError,
   UnauthorizedError,

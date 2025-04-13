@@ -1,14 +1,14 @@
 import type { Request, Response } from 'express';
 import { identity, pickBy } from 'lodash';
-import { UserModel, UserTemplate } from '../../models/User';
-import { ValidationError, ERRORS } from '../../errors/index';
-import { sendSuccess } from '../../utils/response-utils';
+import { UserModel, UserTemplate } from '@models/User';
+import { ValidationError, ERRORS } from '@errors/index';
+import { sendSuccess } from '@utils/response-utils';
 import {
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
   POST_TITLE_MAX_LENGTH,
   POST_SECTIONS_MAX,
-} from '../../constants/index';
+} from '@constants/index';
 
 type UpdatePostTemplateBody = Partial<UserTemplate>;
 

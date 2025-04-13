@@ -1,14 +1,14 @@
 import { join } from 'path';
 import express from 'express';
 import helmet from 'helmet';
-import { requestIdMiddleware } from './middlewares/request-id';
-import Config from './config/index';
-import { connectDB } from './libs/db';
-import { logger } from './libs/logger';
-import morganMiddleware from './middlewares/morgan';
-import corsMiddleware from './middlewares/cors';
-import sessionMiddleware from './middlewares/session';
-import router from './routes/index';
+import Config from '@config/index';
+import { connectDB } from '@libs/db';
+import { logger } from '@libs/logger';
+import morganMiddleware from '@middlewares/morgan';
+import corsMiddleware from '@middlewares/cors';
+import sessionMiddleware from '@middlewares/session';
+import router from '@routes/index';
+import { requestIdMiddleware } from '@middlewares/request-id';
 
 logger.info(
   `[pid: ${process.pid}] Worker is running in ${Config.IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode.`,

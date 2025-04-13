@@ -2,7 +2,7 @@
 
 import morgan, { token } from 'morgan';
 import type { Request, Response } from 'express';
-import { logger } from '../libs/logger';
+import { logger } from '@libs/logger';
 
 token('request-body', (req: Request) => {
   const body = { ...req.body };

@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
-import { UserModel, UserTemplate } from '../../models/User';
-import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
-import { sendSuccess } from '../../utils/response-utils';
+import { UserModel, UserTemplate } from '@models/User';
+import { ForbiddenError, NotFoundError, ERRORS } from '@errors/index';
+import { sendSuccess } from '@utils/response-utils';
 
 type GetPostTemplateResponse = UserTemplate;
 

@@ -3,24 +3,24 @@ import multer from 'multer';
 import Sharp from 'sharp';
 import { join, extname } from 'path';
 import { mkdir } from 'fs/promises';
-import DiskStorage from '../../libs/DiskStorage';
-import { UserModel } from '../../models/User';
-import { POST_SECTION_TYPES, PostPictureSection } from '../../models/Post';
+import DiskStorage from '@libs/DiskStorage';
+import { UserModel } from '@models/User';
+import { POST_SECTION_TYPES, PostPictureSection } from '@models/Post';
 import {
   POST_SECTIONS_MAX,
   POST_MAX_UPLOAD_IMAGE_SIZE,
   POST_MAX_IMAGE_HEIGHT,
   POST_MAX_IMAGE_WIDTH,
   BASE_UPLOAD_FOLDER,
-} from '../../constants/index';
+} from '@constants/index';
 import {
   ContentTooLargeError,
   ValidationError,
   AppError,
   NotFoundError,
   ERRORS,
-} from '../../errors/index';
-import { sendSuccess } from '../../utils/response-utils';
+} from '@errors/index';
+import { sendSuccess } from '@utils/response-utils';
 
 type UploadResponse = PostPictureSection;
 

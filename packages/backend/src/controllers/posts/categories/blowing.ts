@@ -1,17 +1,17 @@
 import type { Request, Response } from 'express';
 import { subHours } from 'date-fns';
-import { UserModel } from '../../../models/User';
-import { Post, PostModel } from '../../../models/Post';
+import { UserModel } from '@models/User';
+import { Post, PostModel } from '@models/Post';
 import {
   POST_BLOWING_RATING_THRESHOLD,
   POST_MAX_LIMIT,
-} from '../../../constants/index';
-import { ValidationError, ERRORS } from '../../../errors/index';
-import { sendSuccess } from '../../../utils/response-utils';
+} from '@constants/index';
+import { ValidationError, ERRORS } from '@errors/index';
+import { sendSuccess } from '@utils/response-utils';
 import {
   PaginationRequest,
   PaginationResponse,
-} from '../../../types/pagination';
+} from '@type/pagination';
 
 interface GetBlowingResponse extends PaginationResponse {
   // TODO: think of something better

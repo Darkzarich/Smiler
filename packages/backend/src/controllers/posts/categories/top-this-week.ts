@@ -1,14 +1,11 @@
 import type { Request, Response } from 'express';
 import { startOfWeek } from 'date-fns';
-import { UserModel } from '../../../models/User';
-import { Post, PostModel } from '../../../models/Post';
-import { ValidationError, ERRORS } from '../../../errors/index';
-import { sendSuccess } from '../../../utils/response-utils';
-import { POST_MAX_LIMIT } from '../../../constants/index';
-import {
-  PaginationRequest,
-  PaginationResponse,
-} from '../../../types/pagination';
+import { UserModel } from '@models/User';
+import { Post, PostModel } from '@models/Post';
+import { ValidationError, ERRORS } from '@errors/index';
+import { sendSuccess } from '@utils/response-utils';
+import { POST_MAX_LIMIT } from '@constants/index';
+import { PaginationRequest, PaginationResponse } from '@type/pagination';
 
 interface GetTopThisWeekResponse extends PaginationResponse {
   // TODO: think of something better

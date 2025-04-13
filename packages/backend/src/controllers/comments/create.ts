@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
-import sanitizeHtml from '../../libs/sanitize-html';
-import { Comment, CommentModel } from '../../models/Comment';
-import { PostModel } from '../../models/Post';
+import sanitizeHtml from '@libs/sanitize-html';
+import { Comment, CommentModel } from '@models/Comment';
+import { PostModel } from '@models/Post';
 
-import { ValidationError, NotFoundError, ERRORS } from '../../errors/index';
-import { sendSuccess } from '../../utils/response-utils';
+import { ValidationError, NotFoundError, ERRORS } from '@errors/index';
+import { sendSuccess } from '@utils/response-utils';
 
 interface CreateBody {
   body: string;

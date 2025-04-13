@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
-import { UserModel } from '../../models/User';
-import { Post, PostModel } from '../../models/Post';
-import { ValidationError, NotFoundError, ERRORS } from '../../errors/index';
-import { sendSuccess } from '../../utils/response-utils';
-import { POST_MAX_LIMIT } from '../../constants/index';
-import { PaginationRequest, PaginationResponse } from '../../types/pagination';
+import { UserModel } from '@models/User';
+import { Post, PostModel } from '@models/Post';
+import { ValidationError, NotFoundError, ERRORS } from '@errors/index';
+import { sendSuccess } from '@utils/response-utils';
+import { POST_MAX_LIMIT } from '@constants/index';
+import { PaginationRequest, PaginationResponse } from '@type/pagination';
 
 interface GetListByAuthorQuery extends PaginationRequest {
   author: string;

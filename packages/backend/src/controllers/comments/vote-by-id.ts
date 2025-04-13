@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
-import { UserModel } from '../../models/User';
-import { RateModel, RateTargetModel } from '../../models/Rate';
-import { CommentModel, Comment } from '../../models/Comment';
-import { COMMENT_RATE_VALUE } from '../../constants/index';
-import { ForbiddenError, NotFoundError, ERRORS } from '../../errors/index';
-import { sendSuccess } from '../../utils/response-utils';
+import { UserModel } from '@models/User';
+import { RateModel, RateTargetModel } from '@models/Rate';
+import { CommentModel, Comment } from '@models/Comment';
+import { COMMENT_RATE_VALUE } from '@constants/index';
+import { ForbiddenError, NotFoundError, ERRORS } from '@errors/index';
+import { sendSuccess } from '@utils/response-utils';
 
 interface VoteByIdParams {
   id: string;

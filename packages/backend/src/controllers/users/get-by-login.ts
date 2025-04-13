@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
 import { omit } from 'lodash';
-import { UserModel, User } from '../../models/User';
-import { NotFoundError, ERRORS } from '../../errors/index';
-import { sendSuccess } from '../../utils/response-utils';
+import { UserModel, User } from '@models/User';
+import { NotFoundError, ERRORS } from '@errors/index';
+import { sendSuccess } from '@utils/response-utils';
 
 interface GetByLoginParams {
   login: string;

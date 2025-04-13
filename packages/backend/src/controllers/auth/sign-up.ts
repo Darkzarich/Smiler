@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
 import crypto from 'crypto';
-import { UserModel } from '../../models/User';
-import { ValidationError, ConflictError, ERRORS } from '../../errors/index';
-import { isDuplicateKeyError } from '../../utils/check-mongo-db-error';
-import { sendSuccess } from '../../utils/response-utils';
-import AbstractError from '../../errors/AbstractError';
+import { UserModel } from '@models/User';
+import { ValidationError, ConflictError, ERRORS } from '@errors/index';
+import { isDuplicateKeyError } from '@utils/check-mongo-db-error';
+import { sendSuccess } from '@utils/response-utils';
+import AbstractError from '@errors/AbstractError';
 import { CurrentUserResponse } from './current';
 
 interface SignUpBody {
