@@ -1,4 +1,5 @@
-const { createDefaultPreset } = require('ts-jest');
+import { createDefaultPreset, pathsToModuleNameMapper } from 'ts-jest';
+import { compilerOptions } from './tsconfig.json';
 
 /** @type {import('jest').Config} */
 module.exports = {
@@ -12,4 +13,7 @@ module.exports = {
   setupFilesAfterEnv: ['./tests/jest.setup-after-env.ts'],
   watchPathIgnorePatterns: ['node_modules'],
   testTimeout: 30000,
+  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
+    prefix: '<rootDir>/',
+  }),
 };
