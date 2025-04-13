@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { isRefTypeArray, mongoose } from '@typegoose/typegoose';
 import { UserModel } from '@models/User';
-import { ForbiddenError, NotFoundError, AppError, ERRORS } from '@errors/index';
+import { ForbiddenError, NotFoundError, AppError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
 interface Params {

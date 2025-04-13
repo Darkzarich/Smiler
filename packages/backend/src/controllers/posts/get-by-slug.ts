@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
 import { Post, PostModel } from '@models/Post';
-import { NotFoundError, ERRORS } from '@errors/index';
+import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
 interface GetBySlugParams {

@@ -6,7 +6,7 @@ import {
   PostPictureSection,
 } from '@models/Post';
 import { POST_TIME_TO_UPDATE } from '@constants/index';
-import { NotFoundError, ForbiddenError, ERRORS } from '@errors/index';
+import { NotFoundError, ForbiddenError, ERRORS } from '@errors';
 import { removeFileByPath } from '@utils/remove-file-by-path';
 import { sendSuccess } from '@utils/response-utils';
 

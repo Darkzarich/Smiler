@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { unlink } from 'fs/promises';
-import { removeFileByPath } from '../../../src/utils/remove-file-by-path';
+import { removeFileByPath } from '@utils/remove-file-by-path';
 
 const fileName = 'test-file-to-delete.txt';
 

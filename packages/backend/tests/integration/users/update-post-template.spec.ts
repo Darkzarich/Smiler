@@ -1,15 +1,15 @@
 import request from 'supertest';
 import { pick } from 'lodash';
+import { signUpRequest } from '@test-utils/request-auth';
+import { UserModel } from '@models/User';
+import { generateRandomPost } from '@test-data-generators';
+import { ERRORS } from '@errors';
 import {
   POST_SECTIONS_MAX,
   POST_TITLE_MAX_LENGTH,
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
-} from '../../../src/constants';
-import { signUpRequest } from '../../utils/request-auth';
-import { UserModel } from '../../../src/models/User';
-import { generateRandomPost } from '../../data-generators/index';
-import { ERRORS } from '../../../src/errors';
+} from '@constants/index';
 
 const post = generateRandomPost();
 

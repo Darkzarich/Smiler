@@ -8,7 +8,7 @@ import {
   NotFoundError,
   BadRequestError,
   ERRORS,
-} from '@errors/index';
+} from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
 interface UpdateByIdParams {

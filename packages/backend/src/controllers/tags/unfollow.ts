@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
-import { ValidationError, ERRORS } from '@errors/index';
+import { ValidationError, ERRORS } from '@errors';
 import { POST_MAX_TAG_LEN } from '@constants/index';
 import { sendSuccess } from '@utils/response-utils';
 

@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
 import { Post, PostModel } from '@models/Post';
-import { UnauthorizedError, ValidationError, ERRORS } from '@errors/index';
+import { UnauthorizedError, ValidationError, ERRORS } from '@errors';
 import { POST_MAX_LIMIT } from '@constants/index';
 import { sendSuccess } from '@utils/response-utils';
 import {

@@ -1,8 +1,8 @@
 import request from 'supertest';
-import { UserModel } from '../../../src/models/User';
-import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../src/errors';
-import { removeFileByPath } from '../../../src/utils/remove-file-by-path';
+import { UserModel } from '@models/User';
+import { ERRORS } from '@errors';
+import { removeFileByPath } from '@utils/remove-file-by-path';
+import { signUpRequest } from '@test-utils/request-auth';
 
 describe('DELETE /users/me/template/:hash', () => {
   const mockRemoveFileByPath = jest.mocked(removeFileByPath);

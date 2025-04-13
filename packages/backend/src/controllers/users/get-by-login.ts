@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { omit } from 'lodash';
 import { UserModel, User } from '@models/User';
-import { NotFoundError, ERRORS } from '@errors/index';
+import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
 interface GetByLoginParams {

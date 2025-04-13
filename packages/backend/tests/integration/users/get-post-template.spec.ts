@@ -1,7 +1,7 @@
 import request from 'supertest';
-import { UserModel } from '../../../src/models/User';
-import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../src/errors';
+import { UserModel } from '@models/User';
+import { signUpRequest } from '@test-utils/request-auth';
+import { ERRORS } from '@errors';
 
 describe('GET /users/:id/template', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {

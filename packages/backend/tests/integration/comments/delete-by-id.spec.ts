@@ -1,13 +1,13 @@
 import request from 'supertest';
-import { COMMENT_TIME_TO_UPDATE } from '../../../src/constants';
-import { signUpRequest } from '../../utils/request-auth';
-import { PostModel } from '../../../src/models/Post';
-import { CommentModel } from '../../../src/models/Comment';
+import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
+import { signUpRequest } from '@test-utils/request-auth';
+import { PostModel } from '@models/Post';
+import { CommentModel } from '@models/Comment';
 import {
   generateRandomPost,
   generateRandomComment,
-} from '../../data-generators/index';
-import { ERRORS } from '../../../src/errors';
+} from '@test-data-generators';
+import { ERRORS } from '@errors';
 
 describe('DELETE /comments/:id', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {

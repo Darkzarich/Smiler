@@ -1,14 +1,14 @@
 import request from 'supertest';
-import { RateModel } from '../../../src/models/Rate';
-import { PostModel } from '../../../src/models/Post';
-import { UserModel } from '../../../src/models/User';
+import { RateModel } from '@models/Rate';
+import { PostModel } from '@models/Post';
+import { UserModel } from '@models/User';
 import {
   generateRandomPost,
   generateRandomUser,
   generateRate,
-} from '../../data-generators/index';
-import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../src/errors';
+} from '@test-data-generators';
+import { signUpRequest } from '@test-utils/request-auth';
+import { ERRORS } from '@errors';
 
 describe('GET /posts/:slug', () => {
   it('Should return status 404 and a message for non-existing slug', async () => {

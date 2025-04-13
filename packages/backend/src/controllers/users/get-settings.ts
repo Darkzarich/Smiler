@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { User, UserModel } from '@models/User';
-import { NotFoundError, ERRORS } from '@errors/index';
+import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
 interface GetSettingsResponse {

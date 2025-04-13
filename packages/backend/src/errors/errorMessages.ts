@@ -3,7 +3,7 @@ import {
   COMMENT_TIME_TO_UPDATE,
   POST_MAX_UPLOAD_IMAGE_SIZE,
   POST_TIME_TO_UPDATE,
-} from '../constants/index';
+} from '@constants/index';
 
 export const ERRORS = {
   NOT_FOUND: 'Not Found',

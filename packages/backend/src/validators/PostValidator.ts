@@ -6,7 +6,7 @@ import {
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
 } from '@constants/index';
-import { ValidationError, ERRORS } from '@errors/index';
+import { ValidationError, ERRORS } from '@errors';
 import sanitizeHtml from '@libs/sanitize-html';
 
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);

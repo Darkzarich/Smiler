@@ -6,12 +6,12 @@ import {
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
   POST_SECTIONS_MAX_LENGTH,
-} from '../../../src/constants';
-import { signUpRequest } from '../../utils/request-auth';
-import { PostModel, POST_SECTION_TYPES } from '../../../src/models/Post';
-import { UserModel } from '../../../src/models/User';
-import { generateRandomPost } from '../../data-generators/index';
-import { ERRORS } from '../../../src/errors';
+} from '@constants/index';
+import { signUpRequest } from '@test-utils/request-auth';
+import { PostModel, POST_SECTION_TYPES } from '@models/Post';
+import { UserModel } from '@models/User';
+import { generateRandomPost } from '@test-data-generators';
+import { ERRORS } from '@errors';
 
 const post = generateRandomPost();
 

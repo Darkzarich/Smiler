@@ -1,13 +1,10 @@
 import request from 'supertest';
-import { signUpRequest } from '../../utils/request-auth';
-import { PostModel } from '../../../src/models/Post';
-import { UserModel } from '../../../src/models/User';
-import {
-  generateRandomPost,
-  generateRandomUser,
-} from '../../data-generators/index';
-import { ERRORS } from '../../../src/errors';
-import { POST_MAX_LIMIT } from '../../../src/constants';
+import { signUpRequest } from '@test-utils/request-auth';
+import { PostModel } from '@models/Post';
+import { UserModel } from '@models/User';
+import { generateRandomPost, generateRandomUser } from '@test-data-generators';
+import { ERRORS } from '@errors';
+import { POST_MAX_LIMIT } from '@constants/index';
 
 describe('GET /posts/feed', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {

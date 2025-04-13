@@ -1,17 +1,17 @@
 import request from 'supertest';
-import { signUpRequest } from '../../utils/request-auth';
-import { PostModel } from '../../../src/models/Post';
-import { CommentModel } from '../../../src/models/Comment';
+import { signUpRequest } from '@test-utils/request-auth';
+import { PostModel } from '@models/Post';
+import { CommentModel } from '@models/Comment';
 import {
   generateRandomPost,
   generateRandomComment,
   generateRandomUser,
   generateRate,
-} from '../../data-generators/index';
-import { ERRORS } from '../../../src/errors';
-import { COMMENT_MAX_LIMIT } from '../../../src/constants';
-import { RateModel, RateTargetModel } from '../../../src/models/Rate';
-import { UserModel } from '../../../src/models/User';
+} from '@test-data-generators';
+import { ERRORS } from '@errors';
+import { COMMENT_MAX_LIMIT } from '@constants/index';
+import { RateModel, RateTargetModel } from '@models/Rate';
+import { UserModel } from '@models/User';
 
 describe('GET /comments', () => {
   it(`Should return status 422 and an expected message for limit greater than ${COMMENT_MAX_LIMIT}`, async () => {

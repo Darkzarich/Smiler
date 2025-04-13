@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { identity, pickBy } from 'lodash';
 import { UserModel, UserTemplate } from '@models/User';
-import { ValidationError, ERRORS } from '@errors/index';
+import { ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import {
   POST_MAX_TAGS,

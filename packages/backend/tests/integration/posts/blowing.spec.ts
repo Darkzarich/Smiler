@@ -1,19 +1,19 @@
 import request from 'supertest';
 import { subHours } from 'date-fns';
-import { signUpRequest } from '../../utils/request-auth';
-import { PostModel } from '../../../src/models/Post';
-import { UserModel } from '../../../src/models/User';
-import { RateModel, RateTargetModel } from '../../../src/models/Rate';
+import { signUpRequest } from '@test-utils/request-auth';
+import { PostModel } from '@models/Post';
+import { UserModel } from '@models/User';
+import { RateModel, RateTargetModel } from '@models/Rate';
 import {
   generateRandomPost,
   generateRandomUser,
   generateRate,
-} from '../../data-generators/index';
-import { ERRORS } from '../../../src/errors';
+} from '@test-data-generators';
+import { ERRORS } from '@errors';
 import {
   POST_BLOWING_RATING_THRESHOLD,
   POST_MAX_LIMIT,
-} from '../../../src/constants';
+} from '@constants/index';
 
 describe('GET /posts/categories/blowing', () => {
   it(`Should return status 422 and an expected message for limit greater than ${POST_MAX_LIMIT}`, async () => {

@@ -3,16 +3,16 @@ import request from 'supertest';
 import Sharp from 'sharp';
 import path from 'path';
 import fs from 'fs/promises';
-import { UserModel } from '../../../src/models/User';
-import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../src/errors';
+import { UserModel } from '@models/User';
+import { signUpRequest } from '@test-utils/request-auth';
+import { ERRORS } from '@errors';
 import {
   POST_SECTIONS_MAX,
   POST_MAX_UPLOAD_IMAGE_SIZE,
   POST_MAX_IMAGE_HEIGHT,
   POST_MAX_IMAGE_WIDTH,
   BASE_UPLOAD_FOLDER,
-} from '../../../src/constants';
+} from '@constants/index';
 
 const createTestImage = async (extension = Sharp.format.png) =>
   Sharp({

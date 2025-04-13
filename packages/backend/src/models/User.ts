@@ -11,10 +11,7 @@ import {
 import mongoose, { ObjectId } from 'mongoose';
 import { Rate } from '@models/Rate';
 import { PostSection } from '@models/Post';
-import {
-  USER_MAX_AVATAR_LENGTH,
-  USER_MAX_BIO_LENGTH,
-} from '../constants/index';
+import { USER_MAX_AVATAR_LENGTH, USER_MAX_BIO_LENGTH } from '@constants/index';
 
 export interface UserTemplate {
   sections: PostSection[];

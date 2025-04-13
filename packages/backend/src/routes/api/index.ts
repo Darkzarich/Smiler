@@ -5,7 +5,8 @@ import {
   NotFoundError,
   ValidationError,
   ConflictError,
-} from '@errors/index';
+  AbstractError,
+} from '@errors';
 import { asyncControllerErrorHandler } from '@utils/async-controller-error-handler';
 import Config from '@config/index';
 import { logger } from '@libs/logger';
@@ -14,7 +15,6 @@ import {
   isCastError,
   isValidationError,
 } from '@utils/check-mongo-db-error';
-import AbstractError from '@errors/AbstractError';
 import usersRouter from '@routes/api/users';
 import authRouter from '@routes/api/auth';
 import postsRouter from '@routes/api/posts';

@@ -1,8 +1,8 @@
 import request from 'supertest';
-import { UserModel } from '../../../src/models/User';
+import { UserModel } from '@models/User';
 
-import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../src/errors';
+import { signUpRequest } from '@test-utils/request-auth';
+import { ERRORS } from '@errors';
 
 describe('GET api/auth/current', () => {
   it('Returns status 200 and isAuth=false', async () => {

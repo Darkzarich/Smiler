@@ -3,7 +3,7 @@ import { RootFilterQuery } from 'mongoose';
 import { UserModel } from '@models/User';
 import { Post, PostModel } from '@models/Post';
 import { POST_TITLE_MAX_LENGTH, POST_MAX_LIMIT } from '@constants/index';
-import { ValidationError, ERRORS } from '@errors/index';
+import { ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { PaginationRequest, PaginationResponse } from '@type/pagination';
 

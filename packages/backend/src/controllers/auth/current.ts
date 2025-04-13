@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { UserModel, User } from '@models/User';
 import { sendSuccess } from '@utils/response-utils';
-import { NotFoundError } from '@errors/index';
+import { NotFoundError } from '@errors';
 
 interface CurrentUser
   extends Pick<

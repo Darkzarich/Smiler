@@ -3,7 +3,7 @@ import { UserModel } from '@models/User';
 import { RateModel } from '@models/Rate';
 import { Comment, CommentModel } from '@models/Comment';
 import { COMMENT_RATE_VALUE } from '@constants/index';
-import { ForbiddenError, NotFoundError, ERRORS } from '@errors/index';
+import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
 interface UnvoteByIdParams {

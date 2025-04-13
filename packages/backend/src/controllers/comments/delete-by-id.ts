@@ -3,7 +3,7 @@ import { differenceInMilliseconds } from 'date-fns';
 import { CommentModel } from '@models/Comment';
 import { PostModel } from '@models/Post';
 import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
-import { ForbiddenError, NotFoundError, ERRORS } from '@errors/index';
+import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
 interface DeleteByIdParams {

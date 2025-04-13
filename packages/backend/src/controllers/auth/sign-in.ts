@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { pbkdf2Sync, timingSafeEqual } from 'crypto';
 import { UserModel } from '@models/User';
-import { ValidationError, UnauthorizedError, ERRORS } from '@errors/index';
+import { ValidationError, UnauthorizedError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { CurrentUserResponse } from './current';
 

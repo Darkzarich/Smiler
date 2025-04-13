@@ -1,15 +1,15 @@
 import request from 'supertest';
-import { RateModel, RateTargetModel } from '../../../src/models/Rate';
-import { CommentModel } from '../../../src/models/Comment';
-import { UserModel } from '../../../src/models/User';
+import { RateModel, RateTargetModel } from '@models/Rate';
+import { CommentModel } from '@models/Comment';
+import { UserModel } from '@models/User';
 import {
   generateRandomComment,
   generateRandomUser,
   generateRate,
-} from '../../data-generators/index';
-import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../src/errors';
-import { COMMENT_RATE_VALUE } from '../../../src/constants';
+} from '@test-data-generators';
+import { signUpRequest } from '@test-utils/request-auth';
+import { ERRORS } from '@errors';
+import { COMMENT_RATE_VALUE } from '@constants/index';
 
 describe('DELETE /comments/:id/vote', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {

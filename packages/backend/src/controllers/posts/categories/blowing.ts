@@ -6,12 +6,9 @@ import {
   POST_BLOWING_RATING_THRESHOLD,
   POST_MAX_LIMIT,
 } from '@constants/index';
-import { ValidationError, ERRORS } from '@errors/index';
+import { ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-import {
-  PaginationRequest,
-  PaginationResponse,
-} from '@type/pagination';
+import { PaginationRequest, PaginationResponse } from '@type/pagination';
 
 interface GetBlowingResponse extends PaginationResponse {
   // TODO: think of something better

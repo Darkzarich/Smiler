@@ -19,7 +19,7 @@ import {
   AppError,
   NotFoundError,
   ERRORS,
-} from '@errors/index';
+} from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
 type UploadResponse = PostPictureSection;

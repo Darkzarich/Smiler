@@ -3,7 +3,7 @@ import sanitizeHtml from '@libs/sanitize-html';
 import { Comment, CommentModel } from '@models/Comment';
 import { PostModel } from '@models/Post';
 
-import { ValidationError, NotFoundError, ERRORS } from '@errors/index';
+import { ValidationError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
 interface CreateBody {

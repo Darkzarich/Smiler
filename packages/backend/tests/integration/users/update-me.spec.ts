@@ -1,12 +1,9 @@
 import request from 'supertest';
-import {
-  USER_MAX_AVATAR_LENGTH,
-  USER_MAX_BIO_LENGTH,
-} from '../../../src/constants';
-import { UserModel } from '../../../src/models/User';
+import { USER_MAX_AVATAR_LENGTH, USER_MAX_BIO_LENGTH } from '@constants/index';
+import { UserModel } from '@models/User';
 
-import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../src/errors';
+import { signUpRequest } from '@test-utils/request-auth';
+import { ERRORS } from '@errors';
 
 describe('PUT /users/me', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {

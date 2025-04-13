@@ -1,6 +1,6 @@
 import request from 'supertest';
-import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../src/errors';
+import { signUpRequest } from '@test-utils/request-auth';
+import { ERRORS } from '@errors';
 
 describe('POST api/auth/signin', () => {
   it('Returns status 422 and an expected message for not filled all fields (only email)', async () => {

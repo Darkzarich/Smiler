@@ -1,9 +1,8 @@
 import request from 'supertest';
-import { POST_MAX_TAG_LEN } from '../../../src/constants';
-import { UserModel } from '../../../src/models/User';
-
-import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../src/errors';
+import { POST_MAX_TAG_LEN } from '@constants/index';
+import { UserModel } from '@models/User';
+import { signUpRequest } from '@test-utils/request-auth';
+import { ERRORS } from '@errors';
 
 describe('PUT /tags/:tag/follow', () => {
   const tag = 'test-tag';

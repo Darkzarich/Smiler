@@ -1,8 +1,8 @@
 import request from 'supertest';
-import { UserModel } from '../../../src/models/User';
-import { generateRandomUser } from '../../data-generators/index';
-import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../src/errors';
+import { UserModel } from '@models/User';
+import { ERRORS } from '@errors';
+import { signUpRequest } from '@test-utils/request-auth';
+import { generateRandomUser } from '@test-data-generators';
 
 describe('PUT /users/:id/follow', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {

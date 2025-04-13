@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
-import { NotFoundError, BadRequestError, ERRORS } from '@errors/index';
+import { NotFoundError, BadRequestError, ERRORS } from '@errors';
 import { removeFileByPath } from '@utils/remove-file-by-path';
 import { sendSuccess } from '@utils/response-utils';
 import { PostPictureSection, POST_SECTION_TYPES } from '@models/Post';

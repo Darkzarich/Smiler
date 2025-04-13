@@ -1,4 +1,4 @@
-import { AbstractError } from '@errors/index';
+import { AbstractError } from '@errors';
 
 export function isDuplicateKeyError(error: AbstractError) {
   return error.name === 'MongoServerError' && error.code === 11000;

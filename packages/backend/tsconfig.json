@@ -21,6 +21,7 @@
       "node_modules/express-request-id/types.d.ts"
     ],
     "paths": {
+      "@app": ["./src/app"],
       "@config/*": ["./src/config/*"],
       "@routes/*": ["./src/routes/*"],
       "@controllers/*": ["./src/controllers/*"],
@@ -31,7 +32,9 @@
       "@validators/*": ["./src/validators/*"],
       "@constants/*": ["./src/constants/*"],
       "@type/*": ["./src/types/*"],
-      "@errors/*": ["./src/errors/*"]
+      "@errors": ["./src/errors/index"],
+      "@test-utils/*": ["./tests/utils/*"],
+      "@test-data-generators": ["./tests/data-generators/index"]
     }
   },
   "exclude": ["node_modules", "dist"],

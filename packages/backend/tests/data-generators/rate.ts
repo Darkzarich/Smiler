@@ -1,5 +1,5 @@
 import { defaultsDeep } from 'lodash';
-import { RateTargetModel } from '../../src/models/Rate';
+import { RateTargetModel } from '@models/Rate';
 
 export function generateRate(overrides = {}) {
   const rate = {

@@ -7,12 +7,12 @@ import {
   POST_MAX_TAG_LEN,
   POST_SECTIONS_MAX_LENGTH,
   POST_TIME_TO_UPDATE,
-} from '../../../src/constants';
-import { signUpRequest } from '../../utils/request-auth';
-import { PostModel, POST_SECTION_TYPES } from '../../../src/models/Post';
-import { generateRandomPost } from '../../data-generators/index';
-import { ERRORS } from '../../../src/errors';
-import { removeFileByPath } from '../../../src/utils/remove-file-by-path';
+} from '@constants/index';
+import { signUpRequest } from '@test-utils/request-auth';
+import { PostModel, POST_SECTION_TYPES } from '@models/Post';
+import { generateRandomPost } from '@test-data-generators';
+import { ERRORS } from '@errors';
+import { removeFileByPath } from '@utils/remove-file-by-path';
 
 const requiredPostFields = pick(generateRandomPost(), ['title', 'sections']);
 

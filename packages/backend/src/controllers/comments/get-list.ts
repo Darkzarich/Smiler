@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { CommentModel, CommentDocument, Comment } from '@models/Comment';
 import { UserModel, UserDocument } from '@models/User';
-import { NotFoundError, ValidationError, ERRORS } from '@errors/index';
+import { NotFoundError, ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { COMMENT_MAX_LIMIT } from '@constants/index';
 import { PaginationRequest, PaginationResponse } from '@type/pagination';

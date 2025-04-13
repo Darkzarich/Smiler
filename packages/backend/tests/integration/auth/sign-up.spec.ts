@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import request from 'supertest';
-import { ERRORS } from '../../../src/errors';
-import { UserModel } from '../../../src/models/User';
+import { ERRORS } from '@errors';
+import { UserModel } from '@models/User';
 
 describe('POST api/auth/signup', () => {
   function generateSignUpCredentials() {

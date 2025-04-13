@@ -1,8 +1,8 @@
 import request from 'supertest';
-import { UserModel } from '../../../src/models/User';
-import { generateRandomUser } from '../../data-generators/index';
-import { signUpRequest } from '../../utils/request-auth';
-import { ERRORS } from '../../../src/errors';
+import { generateRandomUser } from '@test-data-generators';
+import { signUpRequest } from '@test-utils/request-auth';
+import { UserModel } from '@models/User';
+import { ERRORS } from '@errors';
 
 describe('GET /users/:login', () => {
   it('Should return status 404 for not existing user', async () => {

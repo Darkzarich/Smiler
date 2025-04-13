@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { POST_MAX_LIMIT } from '@constants/index';
 import { UserModel } from '@models/User';
 import { PostModel, Post } from '@models/Post';
-import { ValidationError, ERRORS } from '@errors/index';
+import { ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { PaginationRequest, PaginationResponse } from '@type/pagination';
 

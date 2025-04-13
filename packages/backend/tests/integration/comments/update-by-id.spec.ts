@@ -1,13 +1,13 @@
 import request from 'supertest';
-import { COMMENT_TIME_TO_UPDATE } from '../../../src/constants';
-import { signUpRequest } from '../../utils/request-auth';
-import { CommentModel } from '../../../src/models/Comment';
-import { UserModel } from '../../../src/models/User';
+import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
+import { signUpRequest } from '@test-utils/request-auth';
+import { CommentModel } from '@models/Comment';
+import { UserModel } from '@models/User';
 import {
   generateRandomComment,
   generateRandomUser,
-} from '../../data-generators/index';
-import { ERRORS } from '../../../src/errors';
+} from '@test-data-generators';
+import { ERRORS } from '@errors';
 
 describe('PUT /comments/:id', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {

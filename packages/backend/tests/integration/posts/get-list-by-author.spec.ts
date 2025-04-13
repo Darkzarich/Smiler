@@ -1,12 +1,9 @@
 import request from 'supertest';
-import { PostModel } from '../../../src/models/Post';
-import { UserModel } from '../../../src/models/User';
-import {
-  generateRandomPost,
-  generateRandomUser,
-} from '../../data-generators/index';
-import { ERRORS } from '../../../src/errors';
-import { POST_MAX_LIMIT } from '../../../src/constants';
+import { PostModel } from '@models/Post';
+import { UserModel } from '@models/User';
+import { generateRandomPost, generateRandomUser } from '@test-data-generators';
+import { ERRORS } from '@errors';
+import { POST_MAX_LIMIT } from '@constants/index';
 
 describe('GET /posts?author=', () => {
   it(`Should return status 422 and an expected error message for limit > ${POST_MAX_LIMIT}`, async () => {

@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { startOfToday } from 'date-fns';
 import { UserModel } from '@models/User';
 import { Post, PostModel } from '@models/Post';
-import { ValidationError, ERRORS } from '@errors/index';
+import { ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { POST_MAX_LIMIT } from '@constants/index';
 import { PaginationRequest, PaginationResponse } from '@type/pagination';
