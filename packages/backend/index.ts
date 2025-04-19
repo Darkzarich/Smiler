@@ -4,7 +4,7 @@ import Cluster from 'node:cluster';
 import os from 'node:os';
 import Config from '@config/index';
 import { logger } from '@libs/logger';
-import { startApp } from './app';
+import { startApp } from './src/app';
 
 const numCPUs = os.cpus().length;
 

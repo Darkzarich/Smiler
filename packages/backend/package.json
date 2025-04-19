@@ -8,13 +8,18 @@
     "node": ">=v20.16.0",
     "pnpm": ">=8.6.0"
   },
+  "files": [
+    "dist/src",
+    "dist/index.js",
+    "tsconfig.json"
+  ],
   "scripts": {
     "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand --forceExit --detectOpenHandles",
-    "build": "tsc",
+    "build": "tsc && tsc-alias -p tsconfig.json",
     "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "dev:debug": "ts-node --swc src/index.ts",
-    "dev:watch": "nodemon --exec ts-node src/index.ts",
+    "dev": "ts-node index.ts",
+    "dev:watch": "nodemon --exec ts-node index.ts",
+    "dev:debug": "ts-node --swc index.ts",
     "lint:code": "eslint --ext .js --ext .ts --ignore-path .gitignore .",
     "lint:types": "tsc --noEmit",
     "prettier": "prettier . --write"
@@ -63,11 +68,11 @@
     "supertest": "^7.0.0",
     "ts-jest": "^29.3.0",
     "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.2"
   },
   "dependencies": {
     "@typegoose/typegoose": "^12.13.0",
+    "tsc-alias": "^1.8.15",
     "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
