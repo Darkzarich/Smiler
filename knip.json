@@ -1,6 +1,6 @@
 {
   "workspaces": {
-    "client": {
+    "frontend": {
       "entry": "src/main.js",
       "project": "**/*.js",
       "paths": {
@@ -18,7 +18,7 @@
         ]
       }
     },
-    "server": {
+    "backend": {
       "entry": "index.js",
       "project": "**/*.js"
     }

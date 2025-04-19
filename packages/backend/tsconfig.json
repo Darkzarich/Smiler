@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "lib": ["es2023"],
+    "checkJs": true,
+    "module": "NodeNext",
+    "target": "ES2020",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "isolatedModules": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "node_modules/express-request-id/types.d.ts"
+    ],
+    "paths": {
+      "@app": ["./src/app"],
+      "@config/*": ["./src/config/*"],
+      "@routes/*": ["./src/routes/*"],
+      "@controllers/*": ["./src/controllers/*"],
+      "@middlewares/*": ["./src/middlewares/*"],
+      "@libs/*": ["./src/libs/*"],
+      "@models/*": ["./src/models/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@validators/*": ["./src/validators/*"],
+      "@constants/*": ["./src/constants/*"],
+      "@type/*": ["./src/types/*"],
+      "@errors": ["./src/errors/index"],
+      "@test-utils/*": ["./tests/utils/*"],
+      "@test-data-generators": ["./tests/data-generators/index"]
+    }
+  },
+  "exclude": ["node_modules", "dist"],
+  "include": ["src/**/*.ts", "src/**/*.js", "tests/**/*", "index.ts"],
+  "files": ["./global.d.ts"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
+}

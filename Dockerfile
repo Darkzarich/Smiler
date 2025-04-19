@@ -8,6 +8,7 @@ FROM base AS build
 WORKDIR /usr/src/app
 COPY . .
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --config.ignore-scripts=true
+# Recursively build all packages if build script is present
 RUN pnpm -r --if-present build
 RUN pnpm deploy --filter "@smiler/frontend" --prod /prod/frontend
 RUN pnpm deploy --filter "@smiler/backend" --prod /prod/backend
@@ -17,7 +18,7 @@ COPY --from=build /prod/backend /prod/backend
 WORKDIR /prod/backend
 RUN chown -R node:node /prod/backend
 USER node
-CMD [ "pnpm", "start" ]
+CMD [ "node", "dist/index.js" ]
 
 FROM nginxinc/nginx-unprivileged:alpine3.19-slim AS frontend
 WORKDIR /usr/share/nginx/html
