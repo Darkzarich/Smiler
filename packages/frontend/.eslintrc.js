@@ -8,6 +8,8 @@ module.exports = {
   plugins: ['prettier'],
   extends: [
     'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'airbnb-typescript/base',
     'plugin:vue/recommended',
     '@vue/eslint-config-airbnb',
     'plugin:prettier/recommended',
@@ -23,6 +25,7 @@ module.exports = {
   ],
   ignorePatterns: ['src/components/common/icons/**'],
   rules: {
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-new': 'error',
