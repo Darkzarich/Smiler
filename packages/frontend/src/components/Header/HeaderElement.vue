@@ -167,7 +167,7 @@ export default {
       transition: all 0.2s;
     }
 
-    &-enter,
+    &-enter-from,
     &-leave-to {
       opacity: 0;
       transform: translateY(15px);

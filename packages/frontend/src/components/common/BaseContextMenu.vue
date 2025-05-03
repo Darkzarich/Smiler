@@ -72,7 +72,7 @@ export default {
     transition: all 0.1s;
   }
 
-  &-enter,
+  &-enter-from,
   &-leave-to {
     opacity: 0;
     transform: translateY(-20px);

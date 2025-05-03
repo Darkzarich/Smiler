@@ -349,7 +349,7 @@ export default {
       transition: all 0.3s;
     }
 
-    &-enter,
+    &-enter-from,
     &-leave-to {
       opacity: 0;
       transform: translateY(15px);

@@ -31,12 +31,12 @@
     "date-fns": "^3.6.0",
     "lodash": "^4.17.21",
     "normalize.css": "^8.0.1",
+    "typescript": "^5.8.3",
     "v-click-outside": "^2.1.4",
     "vue": "^3.5.13",
     "vue-router": "^4.5.1",
     "vuedraggable": "^2.24.3",
-    "vuex": "^3.0.1",
-    "typescript": "^5.8.3"
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
