@@ -1,17 +1,21 @@
 module.exports = {
+  parser: 'vue-eslint-parser',
   root: true,
   env: {
-    node: true,
     browser: true,
-    es6: true,
+    es2021: true,
+    node: true,
   },
   plugins: ['prettier'],
   extends: [
+    'plugin:import/recommended',
+    // the following lines do the trick
+    'plugin:import/typescript',
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'airbnb-typescript/base',
     'plugin:vue/recommended',
-    '@vue/eslint-config-airbnb',
+    '@vue/eslint-config-typescript/recommended',
+    'plugin:vuejs-accessibility/recommended',
     'plugin:prettier/recommended',
   ],
   overrides: [
@@ -23,6 +27,12 @@ module.exports = {
       },
     },
   ],
+  parserOptions: {
+    parser: '@typescript-eslint/parser',
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: './tsconfig.json',
+  },
   ignorePatterns: ['src/components/common/icons/**'],
   rules: {
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
@@ -98,12 +108,13 @@ module.exports = {
     ],
     'consistent-return': 'off',
     'no-underscore-dangle': 'off',
+    'import/prefer-default-export': 'off',
   },
-  parser: 'vue-eslint-parser',
   settings: {
     'import/resolver': {
+      typescript: true,
       node: {
-        extensions: ['.js', '.vue'],
+        extensions: ['.js', '.ts', '.vue'],
       },
       alias: {
         map: [
@@ -112,7 +123,7 @@ module.exports = {
           ['@common', './src/components/common'],
           ['@icons', './src/components/common/icons'],
         ],
-        extensions: ['.js', '.vue'],
+        extensions: ['.js', '.ts', '.vue'],
       },
     },
   },
