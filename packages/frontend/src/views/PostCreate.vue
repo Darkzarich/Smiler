@@ -46,7 +46,7 @@ export default {
     }),
   },
   methods: {
-    checkCanEditPost(post),
+    checkCanEditPost,
     showEditor() {
       this.post = null;
       this.edit = false;

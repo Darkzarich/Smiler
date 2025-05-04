@@ -6,10 +6,11 @@
 
     <input
       :id="label"
-      v-model="modelValue"
+      :value="modelValue"
       class="base-date-picker__input"
       :data-testid="dataTestid"
       type="date"
+      @input="$emit('update:modelValue', $event.target.value)"
     />
   </div>
 </template>
@@ -30,6 +31,7 @@ export default {
       default: '',
     },
   },
+  emits: ['update:modelValue'],
 };
 </script>
 

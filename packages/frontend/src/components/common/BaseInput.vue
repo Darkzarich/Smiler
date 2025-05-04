@@ -6,13 +6,14 @@
 
     <input
       :id="id"
-      v-model="modelValue"
+      :value="modelValue"
       :data-testid="dataTestid"
       :disabled="disabled"
       :type="type"
       :name="name"
       :placeholder="placeholder"
       class="base-input__input"
+      @input="setValue($event.target.value)"
       @keyup.enter="$emit('keyup.enter')"
     />
 

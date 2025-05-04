@@ -1,6 +1,10 @@
 <template>
   <div class="comment-form">
-    <BaseTextEditor v-model="modelValue" :data-testid="dataTestid">
+    <BaseTextEditor
+      :value="modelValue"
+      :data-testid="dataTestid"
+      @update:model-value="$emit('update:modelValue', $event)"
+    >
       <div class="comment-form__actions">
         <BaseButton
           class="comment-form__action-btn"

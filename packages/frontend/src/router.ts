@@ -156,7 +156,7 @@ export const router = createRouter({
       },
     },
     {
-      path: '*',
+      path: '/:pathMatch(.*)*',
       redirect: {
         name: 'NotFound',
       },

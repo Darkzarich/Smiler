@@ -9,12 +9,13 @@
 
     <textarea
       :id="id"
-      v-model="modelValue"
+      :value="modelValue"
       :data-testid="dataTestid"
       :disabled="disabled"
       :name="name"
       :placeholder="placeholder"
       class="base-textarea__textarea"
+      @input="setValue($event.target.value)"
     />
 
     <span

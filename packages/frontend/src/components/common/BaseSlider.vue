@@ -6,13 +6,14 @@
 
     <input
       :id="label"
-      v-model="modelValue"
+      :value="modelValue"
       class="base-slider__input"
       :data-testid="dataTestid"
       type="range"
       :max="max"
       :min="min"
       step="1"
+      @input="$emit('update:modelValue', $event.target.value)"
     />
 
     <span class="base-slider__value">
@@ -45,6 +46,7 @@ export default {
       default: 9999,
     },
   },
+  emits: ['update:modelValue'],
 };
 </script>
 
