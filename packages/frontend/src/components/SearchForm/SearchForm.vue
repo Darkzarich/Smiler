@@ -7,7 +7,7 @@
         v-model="filters.title"
         placeholder="Title"
         data-testid="search-form-input"
-        @keyup:enter="search"
+        @keyup.enter="search"
       />
     </div>
 

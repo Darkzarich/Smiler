@@ -24,7 +24,7 @@
         data-testid="post-tag-input"
         placeholder="Input up to 8 tags"
         :error="validation"
-        @keyup:enter="addTag"
+        @keyup.enter="addTag"
       />
 
       <!-- TODO: Think of a component for this -->

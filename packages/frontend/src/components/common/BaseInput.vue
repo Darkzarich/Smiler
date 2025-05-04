@@ -13,7 +13,7 @@
       :name="name"
       :placeholder="placeholder"
       class="base-input__input"
-      @keyup.enter="$emit('keyup:enter')"
+      @keyup.enter="$emit('keyup.enter')"
     />
 
     <div v-if="icon" class="base-input__icon" @click="$emit('click-icon')">
@@ -82,7 +82,7 @@ export default {
       default: '',
     },
   },
-  emits: ['update:modelValue', 'keyup:enter', 'click-icon'],
+  emits: ['update:modelValue', 'keyup.enter', 'click-icon'],
   data() {
     return {
       isDirty: false,

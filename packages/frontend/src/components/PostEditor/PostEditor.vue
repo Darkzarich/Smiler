@@ -180,11 +180,17 @@ export default {
     title() {
       this.isDirty = true;
     },
-    tags() {
-      this.isDirty = true;
+    tags: {
+      handler() {
+        this.isDirty = true;
+      },
+      deep: true,
     },
-    sections() {
-      this.isDirty = true;
+    sections: {
+      handler() {
+        this.isDirty = true;
+      },
+      deep: true,
     },
   },
   async created() {

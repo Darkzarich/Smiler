@@ -37,7 +37,7 @@
           data-testid="header-search-input"
           icon="IconSearch"
           :style="'flex-direction: row'"
-          @keyup:enter="search"
+          @keyup.enter="search"
           @click-icon="search"
         />
       </div>
