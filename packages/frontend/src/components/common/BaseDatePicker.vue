@@ -6,11 +6,10 @@
 
     <input
       :id="label"
+      v-model="modelValue"
       class="base-date-picker__input"
       :data-testid="dataTestid"
       type="date"
-      :value="value"
-      @input="$emit('input', $event.target.value)"
     />
   </div>
 </template>
@@ -22,7 +21,7 @@ export default {
       type: String,
       default: 'datepicker',
     },
-    value: {
+    modelValue: {
       type: String,
       default: '',
     },

@@ -15,7 +15,7 @@
           class="new-comment-form__submit-btn"
           :loading="loading"
           data-testid="new-comment-button"
-          @click.native="createComment"
+          @click="createComment"
         >
           Send
         </BaseButton>
@@ -44,6 +44,7 @@ export default {
       required: true,
     },
   },
+  emits: ['new-comment'],
   data() {
     return {
       commentBody: '',

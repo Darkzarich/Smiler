@@ -15,11 +15,12 @@
 
 <script>
 export default {
-  props: ['value'],
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
   methods: {
     handleInput(val) {
       console.log(val);
-      this.$emit('input', val);
+      this.$emit('update:modelValue', val);
     },
   },
 };

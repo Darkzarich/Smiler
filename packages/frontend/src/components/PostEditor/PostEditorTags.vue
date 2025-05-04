@@ -58,6 +58,7 @@ export default {
       default: () => [],
     },
   },
+  emits: ['update:tags'],
   data() {
     return {
       tagInput: '',
@@ -81,14 +82,14 @@ export default {
         const checkDouble = this.tags.find((el) => el === this.tagInput);
 
         if (!checkDouble && !this.validation) {
-          this.$emit('input', this.tags.concat(this.tagInput));
+          this.$emit('update:tags', this.tags.concat(this.tagInput));
           this.tagInput = '';
         }
       }
     },
     removeTag(tag) {
       this.$emit(
-        'input',
+        'update:tags',
         this.tags.filter((el) => el !== tag),
       );
     },

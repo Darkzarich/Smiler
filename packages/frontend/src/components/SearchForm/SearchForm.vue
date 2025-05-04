@@ -46,18 +46,10 @@
     </div>
 
     <div class="search-form__actions">
-      <BaseButton
-        data-testid="search-form-submit"
-        stretched
-        @click.native="search"
-      >
+      <BaseButton data-testid="search-form-submit" stretched @click="search">
         Submit
       </BaseButton>
-      <BaseButton
-        data-testid="search-form-clear"
-        stretched
-        @click.native="clear"
-      >
+      <BaseButton data-testid="search-form-clear" stretched @click="clear">
         Clear filters
       </BaseButton>
     </div>
@@ -79,12 +71,13 @@ export default {
     BaseSlider,
     PostEditorTags,
   },
-  props: ['value'],
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
   data() {
     return {
       filters: {
-        title: this.value.title,
-        tags: this.value.tags,
+        title: this.modelValue.title,
+        tags: this.modelValue.tags,
       },
     };
   },
@@ -94,7 +87,7 @@ export default {
       Object.keys(this.filters).forEach((el) => {
         modFilters[el] = this.filters[el];
       });
-      this.$emit('input', modFilters);
+      this.$emit('update:modelValue', modFilters);
       this.$router.push({
         query: modFilters,
       });

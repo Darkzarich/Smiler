@@ -1,3 +1,4 @@
+//TODO: Use new eslint api
 module.exports = {
   parser: 'vue-eslint-parser',
   root: true,
@@ -33,7 +34,7 @@ module.exports = {
     sourceType: 'module',
     project: './tsconfig.json',
   },
-  ignorePatterns: ['src/components/common/icons/**'],
+  ignorePatterns: ['src/components/common/icons/**', '.eslintrc.js'],
   rules: {
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',

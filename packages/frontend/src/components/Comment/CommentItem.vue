@@ -141,7 +141,7 @@
         v-if="commentData.children.length > 0"
         :data-testid="`comment-${commentData.id}-expander`"
         :is-expanded="isChildrenExpanded"
-        @click.native="isChildrenExpanded = !isChildrenExpanded"
+        @click="isChildrenExpanded = !isChildrenExpanded"
       />
     </div>
 
@@ -190,6 +190,7 @@ export default {
       default: 1,
     },
   },
+  emits: ['remove'],
   data() {
     return {
       commentData: { ...this.comment },

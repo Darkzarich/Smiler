@@ -1,9 +1,9 @@
 <template>
   <div
     class="post-editor-picture"
-    :class="value ? 'post-editor-picture--uploaded' : ''"
+    :class="modelValue ? 'post-editor-picture--uploaded' : ''"
   >
-    <div v-if="!value" class="post-editor-picture__container">
+    <div v-if="!modelValue" class="post-editor-picture__container">
       <BaseUploadForm v-model="file" class="post-editor-picture__upload-form" />
 
       <div class="post-editor-picture__or">OR</div>
@@ -22,7 +22,7 @@
           stretched
           :loading="uploading"
           :disabled="!imageUrl"
-          @click.native="upload"
+          @click="upload"
         >
           Upload
         </BaseButton>
@@ -40,8 +40,8 @@
 
     <div v-else class="post-editor-picture__image">
       <img
-        :src="$resolveImage(value)"
-        :alt="value"
+        :src="$resolveImage(modelValue)"
+        :alt="modelValue"
         @error="$resolveImageError"
       />
     </div>
@@ -61,11 +61,12 @@ export default {
     BaseInput,
   },
   props: {
-    value: {
+    modelValue: {
       type: String,
       default: '',
     },
   },
+  emits: ['update:modelValue', 'set-section'],
   data() {
     return {
       file: null,
@@ -111,13 +112,13 @@ export default {
           return;
         }
 
-        this.$emit('input', res.data.url);
+        this.$emit('update:modelValue', res.data.url);
         this.$emit('set-section', res.data);
 
         return;
       }
 
-      this.$emit('input', this.imageUrl);
+      this.$emit('update:modelValue', this.imageUrl);
     },
     error() {
       if (!(this.file instanceof File)) {

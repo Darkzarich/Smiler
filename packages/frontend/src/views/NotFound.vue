@@ -4,7 +4,7 @@
 
     <div class="not-found__info">Not existing page</div>
 
-    <BaseButton class="not-found__go-home-btn" @click.native="goHome">
+    <BaseButton class="not-found__go-home-btn" @click="goHome">
       Go home
     </BaseButton>
   </div>

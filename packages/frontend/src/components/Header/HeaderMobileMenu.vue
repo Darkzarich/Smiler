@@ -31,6 +31,7 @@ export default {
     Navigation,
     NavigationFeedLink,
   },
+  emits: ['close'],
   computed: {
     ...mapGetters(['isUserAuth']),
   },

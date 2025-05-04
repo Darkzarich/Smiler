@@ -62,7 +62,7 @@
       @selectstart="selecting = true"
       @mouseup="endSelect()"
       @focusout="setText()"
-      v-html="value"
+      v-html="modelValue"
     />
 
     <!-- TODO: Add button name for this slot it's not obvious when its "default" -->
@@ -81,11 +81,12 @@ export default {
       type: String,
       default: 'text-editor',
     },
-    value: {
+    modelValue: {
       type: String,
       default: '',
     },
   },
+  emits: ['update:modelValue'],
   data() {
     return {
       curSelection: '',
@@ -99,7 +100,13 @@ export default {
   },
   computed: {
     curSelectionComp() {
-      return document.getSelection().anchorOffset;
+      const selection = document.getSelection();
+
+      if (selection) {
+        return selection.anchorOffset;
+      }
+
+      return -1;
     },
   },
   created() {
@@ -107,13 +114,13 @@ export default {
   },
   methods: {
     removeStyles() {
-      let text = this.value;
+      let text = this.modelValue;
 
       this.tags.forEach((tag) => {
         text = text.replace(new RegExp(`((</${tag}>)|(<${tag}>))*`, 'g'), '');
       });
 
-      this.$emit('input', text);
+      this.$emit('update:modelValue', text);
     },
     endSelect() {
       const text = this.$refs[`text-editor#${this.id}`].innerHTML;
@@ -181,12 +188,12 @@ export default {
       this.selecting = true;
       this.endSelect();
       console.log('set text!');
-      this.$emit('input', this.editedText);
+      this.$emit('update:modelValue', this.editedText);
     },
     styleSelected(tag) {
       console.log('styleSelected curSelection: ', this.curSelection.trim());
       console.log('DOM Ele: ', this.selectedDOMElement);
-      console.log('beforeChange ', this.value);
+      console.log('beforeChange ', this.modelValue);
 
       if (this.curSelection.trim().length > 0) {
         // replace curSelection text with that text inside tags
@@ -207,7 +214,10 @@ export default {
         some text <b></b> and then clean empty tags 
         */
 
-        this.$emit('input', document.getElementById(this.id).innerHTML);
+        this.$emit(
+          'update:modelValue',
+          document.getElementById(this.id).innerHTML,
+        );
       }
     },
   },

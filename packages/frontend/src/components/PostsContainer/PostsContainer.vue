@@ -1,5 +1,6 @@
 <template>
   <div data-testid="posts-container" class="posts-container">
+    <!-- TODO: Replace v-scroll with something else from VueUse -->
     <div v-if="posts.length > 0" v-scroll="handleScroll">
       <Post
         v-for="post in posts"
@@ -51,6 +52,7 @@ export default {
       default: false,
     },
   },
+  emits: ['fetch-more'],
   methods: {
     handleScroll(_, el) {
       if (this.isLoading || !this.hasNextPage) {

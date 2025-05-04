@@ -16,7 +16,7 @@
           "
           :loading="requesting"
           :type="isFollowed ? 'danger' : 'primary'"
-          @click.native="handleFollow"
+          @click="handleFollow"
         >
           {{ isFollowed ? 'Unfollow' : 'Follow' }}
         </BaseButton>

@@ -1,16 +1,12 @@
 <template>
   <div class="comment-form">
-    <BaseTextEditor
-      :data-testid="dataTestid"
-      :value="value"
-      @input="$emit('input', $event)"
-    >
+    <BaseTextEditor v-model="modelValue" :data-testid="dataTestid">
       <div class="comment-form__actions">
         <BaseButton
           class="comment-form__action-btn"
           :loading="loading"
           :data-testid="`${dataTestid}-submit-btn`"
-          @click.native="$emit('submit')"
+          @click="$emit('submit')"
         >
           Send
         </BaseButton>
@@ -18,7 +14,7 @@
         <BaseButton
           class="comment-form__action-btn"
           :data-testid="`${dataTestid}-close-btn`"
-          @click.native="$emit('close')"
+          @click="$emit('close')"
         >
           Close
         </BaseButton>
@@ -41,7 +37,7 @@ export default {
       type: String,
       default: '',
     },
-    value: {
+    modelValue: {
       type: String,
       default: '',
     },
@@ -50,6 +46,7 @@ export default {
       default: false,
     },
   },
+  emits: ['submit', 'close'],
 };
 </script>
 

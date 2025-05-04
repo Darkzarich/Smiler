@@ -6,18 +6,17 @@
 
     <input
       :id="label"
+      v-model="modelValue"
       class="base-slider__input"
       :data-testid="dataTestid"
       type="range"
       :max="max"
       :min="min"
       step="1"
-      :value="value"
-      @input="$emit('input', $event.target.value)"
     />
 
     <span class="base-slider__value">
-      {{ value }}
+      {{ modelValue }}
     </span>
   </div>
 </template>
@@ -29,7 +28,7 @@ export default {
       type: String,
       default: 'slider',
     },
-    value: {
+    modelValue: {
       type: String,
       default: '0',
     },

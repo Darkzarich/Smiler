@@ -55,7 +55,7 @@
       data-testid="signup-form-submit"
       :loading="isLoading"
       :disabled="isSubmitDisabled"
-      @click.native="signUp"
+      @click.prevent="signUp"
     >
       FINISH
     </BaseButton>
@@ -148,9 +148,7 @@ export default {
     },
   },
   methods: {
-    async signUp(e) {
-      e.preventDefault();
-
+    async signUp() {
       if (this.isSubmitDisabled || this.isLoading) {
         return;
       }

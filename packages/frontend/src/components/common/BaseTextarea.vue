@@ -9,13 +9,12 @@
 
     <textarea
       :id="id"
+      v-model="modelValue"
       :data-testid="dataTestid"
       :disabled="disabled"
       :name="name"
-      :value="value"
       :placeholder="placeholder"
       class="base-textarea__textarea"
-      @input="setValue($event.target.value)"
     />
 
     <span
@@ -39,7 +38,7 @@ export default {
       type: String,
       default: 'input',
     },
-    value: {
+    modelValue: {
       type: String,
       default: '',
     },
@@ -68,6 +67,7 @@ export default {
       default: () => {},
     },
   },
+  emits: ['update:modelValue'],
   data() {
     return {
       isDirty: false,
@@ -75,7 +75,7 @@ export default {
   },
   methods: {
     setValue(val) {
-      this.$emit('input', val);
+      this.$emit('update:modelValue', val);
       this.isDirty = true;
     },
   },

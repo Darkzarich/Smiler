@@ -44,6 +44,7 @@ export default {
     IconText,
     IconVideo,
   },
+  emits: ['add-section-by-type'],
   data() {
     return {
       POST_SECTION_TYPES: consts.POST_SECTION_TYPES,

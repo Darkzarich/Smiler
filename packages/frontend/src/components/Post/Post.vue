@@ -68,7 +68,7 @@
           :key="tag"
           :data-testid="`post-${postData.id}-tag-${tag}`"
           class="post__tags-item"
-          @click="openContextMenu($event, tag)"
+          @click.prevent.stop="openContextMenu($event, tag)"
         >
           {{ tag }}
         </div>
@@ -394,8 +394,6 @@ export default {
     },
     openContextMenu(ev, tag) {
       if (!this.contextMenuData.show) {
-        ev.preventDefault();
-        ev.stopPropagation();
         // console.log(ev);
         // console.log(ev.target.getBoundingClientRect());
         this.contextMenuData.show = true;

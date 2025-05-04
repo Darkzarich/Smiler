@@ -8,7 +8,7 @@
       :error="validation.title"
     />
 
-    <PostEditorTags v-model="tags" class="post-editor__tags" />
+    <PostEditorTags v-model:tags="tags" class="post-editor__tags" />
 
     <Draggable
       :list="sections"
@@ -74,7 +74,7 @@
           data-testid="finish-edit-post-button"
           :loading="saving"
           :disabled="!sections.length"
-          @click.native="saveEdited"
+          @click="saveEdited"
         >
           Save Edited
         </BaseButton>
@@ -87,7 +87,7 @@
           data-testid="create-post-button"
           :loading="sending"
           :disabled="isSubmitDisabled"
-          @click.native="createPost"
+          @click="createPost"
         >
           Create Post
         </BaseButton>
@@ -97,7 +97,7 @@
           data-testid="save-draft-button"
           :loading="saving"
           :disabled="!isDirty"
-          @click.native="saveDraft"
+          @click="saveDraft"
         >
           Save Draft
         </BaseButton>
@@ -107,6 +107,7 @@
 </template>
 
 <script>
+import { nextTick } from 'vue';
 import Draggable from 'vuedraggable';
 import { mapState } from 'vuex';
 import PostEditorAddSectionButtons from './PostEditorAddSectionButtons.vue';
@@ -201,7 +202,7 @@ export default {
       }
     }
 
-    this.$nextTick(() => {
+    nextTick(() => {
       this.isDirty = false;
     });
   },
@@ -265,7 +266,7 @@ export default {
           message: 'Draft post has been saved successfully!',
         });
 
-        this.$nextTick(() => {
+        nextTick(() => {
           this.isDirty = false;
         });
       }

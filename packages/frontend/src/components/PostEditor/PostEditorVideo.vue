@@ -14,7 +14,7 @@
           data-testid="video-upload-button"
           :loading="uploading"
           :disabled="!url"
-          @click.native="upload"
+          @click="upload"
         >
           Upload
         </BaseButton>
@@ -54,6 +54,7 @@ export default {
       default: '',
     },
   },
+  emits: ['update:modelValue'],
   data() {
     return {
       url: '',
@@ -65,7 +66,7 @@ export default {
       this.uploading = true;
       if (typeof this.url === 'string') {
         this.url = this.$videoGenerateEmbedLink(this.url);
-        this.$emit('input', this.url);
+        this.$emit('update:modelValue', this.url);
       } else {
         this.url = '';
         this.$store.dispatch('showErrorNotification', {
