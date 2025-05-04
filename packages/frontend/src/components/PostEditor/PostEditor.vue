@@ -15,14 +15,14 @@
       :animation="200"
       ghost-class="post-editor__section--moving"
       chosen-class="post-editor__section--chosen"
+      :component-data="{
+        name: 'post-editor__section',
+      }"
+      item-key="hash"
+      tag="transition-group"
     >
-      <TransitionGroup name="post-editor__section" data-testid="post-sections">
-        <div
-          v-for="section in sections"
-          :key="section.hash"
-          class="post-editor__section"
-          data-testid="post-section"
-        >
+      <template #item="{ element: section }">
+        <div class="post-editor__section" data-testid="post-section">
           <!-- TODO: Refactor this part -->
           <template v-if="section.type === POST_SECTION_TYPES.TEXT">
             <BaseTextEditor
@@ -58,7 +58,7 @@
             />
           </button>
         </div>
-      </TransitionGroup>
+      </template>
     </Draggable>
 
     <PostEditorAddSectionButtons

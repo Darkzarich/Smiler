@@ -34,7 +34,7 @@
     "typescript": "^5.8.3",
     "vue": "^3.5.13",
     "vue-router": "^4.5.1",
-    "vuedraggable": "^2.24.3",
+    "vuedraggable": "^4.1.0",
     "vuex": "^4.1.0"
   },
   "devDependencies": {

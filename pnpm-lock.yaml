@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  vuedraggable@4.1.0:
+    hash: 26lu6onsmpilrnebo3avrgn6g4
+    path: patches/vuedraggable@4.1.0.patch
+
 importers:
 
   .:
@@ -220,8 +225,8 @@ importers:
         specifier: ^4.5.1
         version: 4.5.1(vue@3.5.13)
       vuedraggable:
-        specifier: ^2.24.3
-        version: 2.24.3
+        specifier: ^4.1.0
+        version: 4.1.0(patch_hash=26lu6onsmpilrnebo3avrgn6g4)(vue@3.5.13)
       vuex:
         specifier: ^4.1.0
         version: 4.1.0(vue@3.5.13)
@@ -7773,8 +7778,8 @@ packages:
     engines: {node: '>= 18'}
     dev: true
 
-  /sortablejs@1.10.2:
-    resolution: {integrity: sha512-YkPGufevysvfwn5rfdlGyrGjt7/CRHwvRPogD/lC+TnvcN29jDpCifKP+rBqf+LRldfXSTh+0CGLcSg0VIxq3A==}
+  /sortablejs@1.14.0:
+    resolution: {integrity: sha512-pBXvQCs5/33fdN1/39pPL0NZF20LeRbLQ5jtnheIPN9JQAaufGjKdWduZn4U7wCtVuzKhmRkI0DFYHYRbB2H1w==}
     dev: false
 
   /source-map-js@1.2.1:
@@ -8722,11 +8727,15 @@ packages:
       '@vue/shared': 3.5.13
       typescript: 5.8.3
 
-  /vuedraggable@2.24.3:
-    resolution: {integrity: sha512-6/HDXi92GzB+Hcs9fC6PAAozK1RLt1ewPTLjK0anTYguXLAeySDmcnqE8IC0xa7shvSzRjQXq3/+dsZ7ETGF3g==}
+  /vuedraggable@4.1.0(patch_hash=26lu6onsmpilrnebo3avrgn6g4)(vue@3.5.13):
+    resolution: {integrity: sha512-FU5HCWBmsf20GpP3eudURW3WdWTKIbEIQxh9/8GE806hydR9qZqRRxRE3RjqX7PkuLuMQG/A7n3cfj9rCEchww==}
+    peerDependencies:
+      vue: ^3.0.1
     dependencies:
-      sortablejs: 1.10.2
+      sortablejs: 1.14.0
+      vue: 3.5.13(typescript@5.8.3)
     dev: false
+    patched: true
 
   /vuex@4.1.0(vue@3.5.13):
     resolution: {integrity: sha512-hmV6UerDrPcgbSy9ORAtNXDr9M4wlNP4pEFKye4ujJF8oqgFFuxDCdOLS3eNoRTtq5O3hoBDh9Doj1bQMYHRbQ==}
