@@ -11,9 +11,10 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import BaseButton from '@common/BaseButton.vue';
 
-export default {
+export default defineComponent({
   components: {
     BaseButton,
   },
@@ -24,7 +25,7 @@ export default {
       });
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

@@ -20,15 +20,16 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   props: {
     user: {
       type: Object,
-      required: true,
       default: () => ({}),
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

@@ -29,7 +29,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   props: {
     id: {
       type: String,
@@ -80,7 +82,7 @@ export default {
       this.isDirty = true;
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

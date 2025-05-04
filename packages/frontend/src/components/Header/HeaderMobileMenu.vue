@@ -18,13 +18,14 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 import Navigation from '@components/Navigation/Navigation.vue';
 import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
 import CurrentUser from '@components/User/CurrentUser.vue';
 import IconExit from '@icons/IconExit.vue';
 
-export default {
+export default defineComponent({
   components: {
     CurrentUser,
     IconExit,
@@ -40,7 +41,7 @@ export default {
       this.$emit('close');
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

@@ -14,7 +14,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   props: ['modelValue'],
   emits: ['update:modelValue'],
   methods: {
@@ -23,7 +25,7 @@ export default {
       this.$emit('update:modelValue', val);
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

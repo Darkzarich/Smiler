@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { nextTick } from 'vue';
+import { defineComponent, nextTick } from 'vue';
 import Draggable from 'vuedraggable';
 import { mapState } from 'vuex';
 import PostEditorAddSectionButtons from './PostEditorAddSectionButtons.vue';
@@ -121,7 +121,7 @@ import BaseInput from '@common/BaseInput.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 import CloseIcon from '@icons/IconExit.vue';
 
-export default {
+export default defineComponent({
   components: {
     BaseButton,
     BaseInput,
@@ -300,7 +300,7 @@ export default {
       });
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

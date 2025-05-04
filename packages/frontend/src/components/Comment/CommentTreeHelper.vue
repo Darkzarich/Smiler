@@ -3,10 +3,14 @@
 </template>
 
 <script>
-export default {
+import { defineAsyncComponent, defineComponent } from 'vue';
+
+export default defineComponent({
   components: {
-    CommentList: () => import('./CommentList.vue'),
+    CommentList: defineAsyncComponent(
+      () => import('@components/Comment/CommentList.vue'),
+    ),
   },
   props: ['data', 'postId', 'level'],
-};
+});
 </script>

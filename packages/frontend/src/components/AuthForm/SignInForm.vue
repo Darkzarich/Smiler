@@ -40,12 +40,13 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import api from '@/api';
 import consts from '@/const/const';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 
-export default {
+export default defineComponent({
   components: {
     BaseButton,
     BaseInput,
@@ -118,7 +119,7 @@ export default {
       }
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

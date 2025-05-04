@@ -8,12 +8,13 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapState } from 'vuex';
 import api from '@/api/index';
 import { checkCanEditPost } from '@/utils/check-can-edit-post';
 import PostEditor from '@components/PostEditor/PostEditor.vue';
 
-export default {
+export default defineComponent({
   components: {
     PostEditor,
   },
@@ -79,7 +80,7 @@ export default {
       }
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

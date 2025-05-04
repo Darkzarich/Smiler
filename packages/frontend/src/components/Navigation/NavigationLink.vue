@@ -9,7 +9,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   props: {
     disabled: {
       type: Boolean,
@@ -21,7 +23,7 @@ export default {
       validator: (route) => Boolean(route.name),
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

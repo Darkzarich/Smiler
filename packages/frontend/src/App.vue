@@ -5,9 +5,9 @@
     <HeaderElement />
 
     <div class="content">
-      <Content class="content__main">
+      <main class="content__main">
         <RouterView />
-      </Content>
+      </main>
 
       <div v-if="isDesktop()" class="content__sidebar">
         <CurrentUser />
@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import FooterElement from '@components/FooterElement.vue';
 import HeaderElement from '@components/Header/HeaderElement.vue';
 import NotificationList from '@components/NotificationList/NotificationList.vue';
@@ -26,7 +27,7 @@ import CurrentUser from '@components/User/CurrentUser.vue';
 import { isDesktop } from '@utils/is-desktop';
 
 // TODO: global mini loader fixed to top
-export default {
+export default defineComponent({
   components: {
     HeaderElement,
     FooterElement,
@@ -46,7 +47,7 @@ export default {
   methods: {
     isDesktop,
   },
-};
+});
 </script>
 
 <style lang="scss">

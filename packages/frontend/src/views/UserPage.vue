@@ -20,12 +20,13 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import api from '@/api';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
 import consts from '@/const/const';
 import UserProfile from '@components/User/UserProfile.vue';
 
-export default {
+export default defineComponent({
   components: {
     UserProfile,
     PostsContainer,
@@ -100,5 +101,5 @@ export default {
       this.fetchPosts({ isCombine: true });
     },
   },
-};
+});
 </script>

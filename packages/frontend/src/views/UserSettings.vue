@@ -119,6 +119,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import api from '@/api';
 import consts from '@/const/const';
 import { resolveAvatar } from '@/utils/resolve-avatar';
@@ -127,7 +128,7 @@ import BaseInput from '@common/BaseInput.vue';
 import BaseTextarea from '@common/BaseTextarea.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 
-export default {
+export default defineComponent({
   components: {
     CircularLoader,
     BaseInput,
@@ -263,7 +264,7 @@ export default {
       this.requestingForTags = false;
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

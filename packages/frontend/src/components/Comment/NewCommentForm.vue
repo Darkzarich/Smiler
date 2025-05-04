@@ -28,12 +28,13 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import api from '@/api';
 import BaseButton from '@common/BaseButton.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 
-export default {
+export default defineComponent({
   components: {
     BaseButton,
     BaseTextEditor,
@@ -96,7 +97,7 @@ export default {
       this.loading = false;
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

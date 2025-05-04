@@ -23,7 +23,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   props: {
     dataTestid: {
       type: String,
@@ -47,7 +49,7 @@ export default {
     },
   },
   emits: ['update:modelValue'],
-};
+});
 </script>
 
 <style lang="scss" scoped>

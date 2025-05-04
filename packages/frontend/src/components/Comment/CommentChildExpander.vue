@@ -10,14 +10,16 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   props: {
     isExpanded: {
       type: Boolean,
       default: false,
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

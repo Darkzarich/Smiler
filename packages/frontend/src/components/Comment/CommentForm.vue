@@ -28,10 +28,11 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import BaseButton from '@common/BaseButton.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 
-export default {
+export default defineComponent({
   components: {
     BaseButton,
     BaseTextEditor,
@@ -51,7 +52,7 @@ export default {
     },
   },
   emits: ['submit', 'close'],
-};
+});
 </script>
 
 <style lang="scss">

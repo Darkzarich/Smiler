@@ -35,12 +35,13 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import AuthFormSwitcher from '../AuthForm/AuthFormSwitcher.vue';
 import CurrentUserNavigation from './CurrentUserNavigation.vue';
 import { resolveAvatar } from '@/utils/resolve-avatar';
 import UserStats from '@components/User/UserStats.vue';
 
-export default {
+export default defineComponent({
   components: {
     AuthFormSwitcher,
     UserStats,
@@ -57,7 +58,7 @@ export default {
   methods: {
     resolveAvatar,
   },
-};
+});
 </script>
 
 <style lang="scss">

@@ -33,12 +33,13 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import consts from '@/const/const';
 import IconPicture from '@icons/IconPicture.vue';
 import IconText from '@icons/IconText.vue';
 import IconVideo from '@icons/IconVideo.vue';
 
-export default {
+export default defineComponent({
   components: {
     IconPicture,
     IconText,
@@ -50,7 +51,7 @@ export default {
       POST_SECTION_TYPES: consts.POST_SECTION_TYPES,
     };
   },
-};
+});
 </script>
 
 <style lang="scss">

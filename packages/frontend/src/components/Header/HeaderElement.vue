@@ -60,6 +60,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import HeaderMobileMenu from './HeaderMobileMenu.vue';
 import SiteLogo from './SiteLogo.vue';
@@ -70,7 +71,7 @@ import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
 import IconMenuMobile from '@icons/IconMenuMobile.vue';
 import { isDesktop } from '@utils/is-desktop';
 
-export default {
+export default defineComponent({
   components: {
     HeaderMobileMenu,
     BaseInput,
@@ -115,7 +116,7 @@ export default {
     },
     isDesktop,
   },
-};
+});
 </script>
 
 <style lang="scss">

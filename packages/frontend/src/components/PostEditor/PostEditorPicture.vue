@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import api from '@/api';
 import { resolveImage } from '@/utils/resolve-image';
 import { resolveImageError } from '@/utils/resolve-image-error';
@@ -56,7 +57,7 @@ import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseUploadForm from '@common/BaseUploadForm.vue';
 
-export default {
+export default defineComponent({
   components: {
     BaseUploadForm,
     BaseButton,
@@ -139,7 +140,7 @@ export default {
       this.imageUrl = '';
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

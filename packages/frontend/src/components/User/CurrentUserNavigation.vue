@@ -30,12 +30,13 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import api from '@/api';
 import IconAdd from '@icons/IconAdd.vue';
 import IconExit from '@icons/IconExit.vue';
 import IconSettings from '@icons/IconSettings.vue';
 
-export default {
+export default defineComponent({
   components: {
     IconAdd,
     IconExit,
@@ -52,7 +53,7 @@ export default {
       this.$store.commit('clearUser');
     },
   },
-};
+});
 </script>
 
 <style lang="scss">
@@ -60,7 +61,7 @@ export default {
   margin-left: 0;
   text-align: center;
   padding-inline-start: 0;
-  margin-block: 0 0;
+  margin-block: 0;
   list-style: none;
 
   &__item-icon {

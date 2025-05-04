@@ -19,9 +19,10 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import CommentItem from './CommentItem.vue';
 
-export default {
+export default defineComponent({
   components: {
     CommentItem,
   },
@@ -61,7 +62,7 @@ export default {
       this.comments.splice(commentIndex, 1);
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

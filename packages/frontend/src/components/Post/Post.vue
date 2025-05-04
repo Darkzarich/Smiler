@@ -207,6 +207,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 import api from '@/api/index';
 import consts from '@/const/const';
@@ -222,7 +223,7 @@ import IconMinus from '@icons/IconMinus.vue';
 import IconPlus from '@icons/IconPlus.vue';
 import { isMobile } from '@utils/is-mobile';
 
-export default {
+export default defineComponent({
   components: {
     IconComments,
     IconDelete,
@@ -451,7 +452,7 @@ export default {
       });
     },
   },
-};
+});
 </script>
 
 <style lang="scss" scoped>

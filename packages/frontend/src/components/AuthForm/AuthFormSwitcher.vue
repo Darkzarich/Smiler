@@ -14,10 +14,11 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import SignInForm from './SignInForm.vue';
 import SignUpForm from './SignUpForm.vue';
 
-export default {
+export default defineComponent({
   components: {
     SignInForm,
     SignUpForm,
@@ -32,7 +33,7 @@ export default {
       this.isSignIn = !this.isSignIn;
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

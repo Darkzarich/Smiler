@@ -41,11 +41,12 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 // TODO: This can be a BasicElements
 import consts from '@/const/const';
 import BaseInput from '@common/BaseInput.vue';
 
-export default {
+export default defineComponent({
   components: {
     BaseInput,
   },
@@ -94,7 +95,7 @@ export default {
       );
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

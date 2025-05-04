@@ -10,15 +10,16 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 import NavigationLink from './NavigationLink.vue';
 
-export default {
+export default defineComponent({
   components: {
     NavigationLink,
   },
   computed: {
     ...mapGetters(['isUserAuth']),
   },
-};
+});
 </script>

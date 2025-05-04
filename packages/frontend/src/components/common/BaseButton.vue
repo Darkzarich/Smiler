@@ -19,9 +19,10 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 
-export default {
+export default defineComponent({
   components: {
     CircularLoader,
   },
@@ -57,7 +58,7 @@ export default {
       default: false,
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

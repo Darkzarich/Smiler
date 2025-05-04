@@ -57,13 +57,14 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import BaseButton from '@common/BaseButton.vue';
 import BaseDatePicker from '@common/BaseDatePicker.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseSlider from '@common/BaseSlider.vue';
 import PostEditorTags from '@components/PostEditor/PostEditorTags.vue';
 
-export default {
+export default defineComponent({
   components: {
     BaseInput,
     BaseButton,
@@ -105,7 +106,7 @@ export default {
       });
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

@@ -32,9 +32,10 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import IconSearch from '@icons/IconSearch.vue';
 
-export default {
+export default defineComponent({
   components: {
     IconSearch,
   },
@@ -95,7 +96,7 @@ export default {
       this.isDirty = true;
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

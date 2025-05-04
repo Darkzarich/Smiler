@@ -26,10 +26,11 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapState } from 'vuex';
 import IconExit from '@icons/IconExit.vue';
 
-export default {
+export default defineComponent({
   components: {
     IconExit,
   },
@@ -43,7 +44,7 @@ export default {
       this.$store.commit('removeNotification', id);
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

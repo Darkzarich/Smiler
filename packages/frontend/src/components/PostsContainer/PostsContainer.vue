@@ -30,11 +30,12 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import Post from '@components/Post/Post.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 import { checkCanEditPost } from '@utils/check-can-edit-post';
 
-export default {
+export default defineComponent({
   components: {
     Post,
     CircularLoader,
@@ -70,7 +71,7 @@ export default {
       }
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

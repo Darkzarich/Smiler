@@ -155,6 +155,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import CommentChildExpander from './CommentChildExpander.vue';
 import CommentForm from './CommentForm.vue';
@@ -169,7 +170,7 @@ import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';
 import IconPlus from '@icons/IconPlus.vue';
 
-export default {
+export default defineComponent({
   components: {
     CommentTreeHelper,
     CommentChildExpander,
@@ -433,7 +434,7 @@ export default {
       this.isRequesting = false;
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

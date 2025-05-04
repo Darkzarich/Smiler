@@ -40,13 +40,14 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import api from '@/api/index';
 import { formatFromNow } from '@/utils/format-from-now';
 import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseButton from '@common/BaseButton.vue';
 import UserStats from '@components/User/UserStats.vue';
 
-export default {
+export default defineComponent({
   components: {
     BaseButton,
     UserStats,
@@ -117,7 +118,7 @@ export default {
       }
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

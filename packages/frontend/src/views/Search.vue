@@ -25,12 +25,13 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import api from '@/api';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
 import consts from '@/const/const';
 import SearchForm from '@components/SearchForm/SearchForm.vue';
 
-export default {
+export default defineComponent({
   components: {
     SearchForm,
     PostsContainer,
@@ -111,7 +112,7 @@ export default {
       this.fetchPosts({ isCombine: true });
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

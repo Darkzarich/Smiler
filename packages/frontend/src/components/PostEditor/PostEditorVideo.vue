@@ -40,11 +40,12 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { generateVideoEmbedLink } from '@/utils/generate-video-embed-link';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 
-export default {
+export default defineComponent({
   components: {
     BaseButton,
     BaseInput,
@@ -88,7 +89,7 @@ export default {
       this.url = '';
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

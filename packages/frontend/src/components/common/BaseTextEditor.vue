@@ -71,7 +71,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   props: {
     dataTestid: {
       type: String,
@@ -221,7 +223,7 @@ export default {
       }
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

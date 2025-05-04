@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapState } from 'vuex';
 import api from '@/api';
 import CommentList from '@/components/Comment/CommentList.vue';
@@ -59,7 +60,7 @@ import NewCommentForm from '@components/Comment/NewCommentForm.vue';
 import Post from '@components/Post/Post.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 
-export default {
+export default defineComponent({
   components: {
     Post,
     NewCommentForm,
@@ -139,7 +140,7 @@ export default {
       this.comments.unshift(newComment);
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

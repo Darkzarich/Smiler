@@ -17,9 +17,10 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import NavigationLink from './NavigationLink.vue';
 
-export default {
+export default defineComponent({
   components: {
     NavigationLink,
   },
@@ -71,5 +72,5 @@ export default {
       ]),
     };
   },
-};
+});
 </script>
