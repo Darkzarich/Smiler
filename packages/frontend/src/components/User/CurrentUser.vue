@@ -16,7 +16,7 @@
           >
             <img
               class="current-user__avatar"
-              :src="$resolveAvatar(user.avatar)"
+              :src="resolveAvatar(user.avatar)"
               :alt="user.avatar"
             />
 
@@ -37,6 +37,7 @@
 <script>
 import AuthFormSwitcher from '../AuthForm/AuthFormSwitcher.vue';
 import CurrentUserNavigation from './CurrentUserNavigation.vue';
+import { resolveAvatar } from '@/utils/resolve-avatar';
 import UserStats from '@components/User/UserStats.vue';
 
 export default {
@@ -52,6 +53,9 @@ export default {
     user() {
       return this.$store.state.user;
     },
+  },
+  methods: {
+    resolveAvatar,
   },
 };
 </script>

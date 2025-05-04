@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="post-container">
-      <Post v-if="post" :post="post" :can-edit="$postCanEdit(post)" />
+      <Post v-if="post" :post="post" :can-edit="checkCanEditPost(post)" />
     </div>
 
     <div id="comments" ref="comments" class="comments">
@@ -54,6 +54,7 @@ import { mapState } from 'vuex';
 import api from '@/api';
 import CommentList from '@/components/Comment/CommentList.vue';
 import consts from '@/const/const';
+import { checkCanEditPost } from '@/utils/check-can-edit-post';
 import NewCommentForm from '@components/Comment/NewCommentForm.vue';
 import Post from '@components/Post/Post.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
@@ -91,6 +92,7 @@ export default {
     }),
   },
   methods: {
+    checkCanEditPost,
     async handleSetPost(post) {
       this.post = post;
 

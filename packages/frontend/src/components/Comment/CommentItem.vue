@@ -55,13 +55,13 @@
 
             <div class="comment-item__avatar">
               <img
-                :src="$resolveAvatar(commentData.author.avatar)"
+                :src="resolveAvatar(commentData.author.avatar)"
                 :alt="commentData.author.avatar"
               />
             </div>
           </RouterLink>
 
-          <template v-if="$commentCanEdit(comment)">
+          <template v-if="checkCanEditComment(comment)">
             <div
               class="comment-item__edit-btn"
               :data-testid="`comment-${commentData.id}-edit`"
@@ -84,7 +84,7 @@
           class="comment-item__created-at"
           :data-testid="`comment-${commentData.id}-date`"
         >
-          {{ commentData.createdAt | $fromNow }}
+          {{ formatFromNow(commentData.createdAt) }}
         </div>
       </div>
 
@@ -161,6 +161,9 @@ import CommentForm from './CommentForm.vue';
 import CommentTreeHelper from './CommentTreeHelper.vue';
 import api from '@/api';
 import consts from '@/const/const';
+import { checkCanEditComment } from '@/utils/check-can-edit-comment';
+import { formatFromNow } from '@/utils/format-from-now';
+import { resolveAvatar } from '@/utils/resolve-avatar';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';
@@ -210,6 +213,9 @@ export default {
     }),
   },
   methods: {
+    formatFromNow,
+    resolveAvatar,
+    checkCanEditComment,
     toggleReply() {
       if (!this.isUserAuth) {
         this.$store.dispatch('showErrorNotification', {

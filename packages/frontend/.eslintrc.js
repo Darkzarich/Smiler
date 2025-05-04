@@ -113,16 +113,20 @@ module.exports = {
   },
   settings: {
     'import/resolver': {
-      typescript: true,
+      typescript: {
+        alwaysTryTypes: true,
+      },
       node: {
         extensions: ['.js', '.ts', '.vue'],
       },
       alias: {
+        // TODO: Do I need this?
         map: [
           ['@', './src'],
           ['@components', './src/components'],
           ['@common', './src/components/common'],
           ['@icons', './src/components/common/icons'],
+          ['@utils', './src/utils'],
         ],
         extensions: ['.js', '.ts', '.vue'],
       },

@@ -20,7 +20,7 @@
       </RouterLink>
 
       <Navigation
-        v-if="$isDesktop()"
+        v-if="isDesktop()"
         nav-link-class="header__nav-link"
         class="header__navigation"
       >
@@ -52,7 +52,7 @@
             },
           }"
         >
-          <img :src="$resolveAvatar(user.avatar)" alt="avatar" />
+          <img :src="resolveAvatar(user.avatar)" alt="avatar" />
         </RouterLink>
       </div>
     </div>
@@ -63,10 +63,12 @@
 import { mapState, mapGetters } from 'vuex';
 import HeaderMobileMenu from './HeaderMobileMenu.vue';
 import SiteLogo from './SiteLogo.vue';
+import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseInput from '@common/BaseInput.vue';
 import Navigation from '@components/Navigation/Navigation.vue';
 import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
 import IconMenuMobile from '@icons/IconMenuMobile.vue';
+import { isDesktop } from '@utils/is-desktop';
 
 export default {
   components: {
@@ -97,6 +99,7 @@ export default {
     },
   },
   methods: {
+    resolveAvatar,
     search() {
       this.$router.push({
         name: 'Search',
@@ -110,6 +113,7 @@ export default {
     toggleMobileMenu() {
       this.isMobileMenuOpen = !this.isMobileMenuOpen;
     },
+    isDesktop,
   },
 };
 </script>

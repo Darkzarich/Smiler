@@ -18,6 +18,7 @@ export default defineConfig({
       '@icons': path.resolve(__dirname, './src/components/common/icons'),
       '@common': path.resolve(__dirname, './src/components/common'),
       '@components': path.resolve(__dirname, './src/components'),
+      '@utils': path.resolve(__dirname, './src/utils'),
     },
   },
   define: {

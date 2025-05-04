@@ -7,7 +7,7 @@
         :key="post.id"
         class="posts-container__post"
         :post="post"
-        :can-edit="$postCanEdit(post)"
+        :can-edit="checkCanEditPost(post)"
       />
     </div>
 
@@ -32,6 +32,7 @@
 <script>
 import Post from '@components/Post/Post.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
+import { checkCanEditPost } from '@utils/check-can-edit-post';
 
 export default {
   components: {
@@ -54,6 +55,7 @@ export default {
   },
   emits: ['fetch-more'],
   methods: {
+    checkCanEditPost,
     handleScroll(_, el) {
       if (this.isLoading || !this.hasNextPage) {
         return;

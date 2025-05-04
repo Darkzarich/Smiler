@@ -1,5 +1,5 @@
-import store from '@/store';
 import consts from '@/const/const';
+import store from '@/store';
 
 export function checkCanEditComment(comment: any): boolean {
   const currentId = store.state.user.id;

@@ -5,11 +5,11 @@
     <HeaderElement />
 
     <div class="content">
-      <content class="content__main">
+      <Content class="content__main">
         <RouterView />
-      </content>
+      </Content>
 
-      <div v-if="$isDesktop()" class="content__sidebar">
+      <div v-if="isDesktop()" class="content__sidebar">
         <CurrentUser />
       </div>
     </div>
@@ -23,6 +23,7 @@ import FooterElement from '@components/FooterElement.vue';
 import HeaderElement from '@components/Header/HeaderElement.vue';
 import NotificationList from '@components/NotificationList/NotificationList.vue';
 import CurrentUser from '@components/User/CurrentUser.vue';
+import { isDesktop } from '@utils/is-desktop';
 
 // TODO: global mini loader fixed to top
 export default {
@@ -41,6 +42,9 @@ export default {
     this.$store.dispatch('userGetAuthState').then(() => {
       this.show = true;
     });
+  },
+  methods: {
+    isDesktop,
   },
 };
 </script>

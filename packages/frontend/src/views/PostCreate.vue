@@ -10,6 +10,7 @@
 <script>
 import { mapState } from 'vuex';
 import api from '@/api/index';
+import { checkCanEditPost } from '@/utils/check-can-edit-post';
 import PostEditor from '@components/PostEditor/PostEditor.vue';
 
 export default {
@@ -45,6 +46,7 @@ export default {
     }),
   },
   methods: {
+    checkCanEditPost(post),
     showEditor() {
       this.post = null;
       this.edit = false;
@@ -62,7 +64,7 @@ export default {
         this.$router.push({
           name: 'Home',
         });
-      } else if (!this.$postCanEdit(data)) {
+      } else if (!this.checkCanEditPost(data)) {
         this.$store.dispatch('showErrorNotification', {
           message:
             'You cannot edit this post anymore. The time allowed to edit has expired',

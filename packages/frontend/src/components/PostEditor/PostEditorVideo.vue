@@ -40,6 +40,7 @@
 </template>
 
 <script>
+import { generateVideoEmbedLink } from '@/utils/generate-video-embed-link';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 
@@ -65,7 +66,7 @@ export default {
     async upload() {
       this.uploading = true;
       if (typeof this.url === 'string') {
-        this.url = this.$videoGenerateEmbedLink(this.url);
+        this.url = generateVideoEmbedLink(this.url);
         this.$emit('update:modelValue', this.url);
       } else {
         this.url = '';

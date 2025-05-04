@@ -42,7 +42,7 @@
               slug: postData.slug,
             },
           }"
-          :target="$isMobile() ? '' : '_blank'"
+          :target="isMobile() ? '' : '_blank'"
           :data-testid="`post-${postData.id}-title`"
         >
           {{ postData.title }}
@@ -91,10 +91,10 @@
             <div class="post__section-attachment">
               <img
                 class="post__section-image"
-                :src="$resolveImage(section.url)"
+                :src="resolveImage(section.url)"
                 :alt="section.url"
                 :data-testid="`post-${postData.id}-pic-${section.hash}`"
-                @error="$resolveImageError"
+                @error="resolveImageError"
               />
             </div>
           </template>
@@ -150,12 +150,12 @@
       <div class="post__footer">
         <div class="post__meta-info">
           <span class="post__date">
-            {{ postData.createdAt | $fromNow }}
+            {{ formatFromNow(postData.createdAt) }}
           </span>
 
           <RouterLink
             class="post__comments-count"
-            :target="$isMobile() ? '' : '_blank'"
+            :target="isMobile() ? '' : '_blank'"
             :to="{
               name: 'Single',
               hash: '#comments',
@@ -183,13 +183,13 @@
             </span>
             <img
               class="post__author-avatar"
-              :src="$resolveAvatar(postData.author.avatar)"
+              :src="resolveAvatar(postData.author.avatar)"
               :alt="postData.author.avatar"
             />
           </RouterLink>
           <span v-else class="post__author-container">
             <span> Anonymous </span>
-            <img :src="$resolveAvatar('')" :alt="'avatar'" />
+            <img :src="resolveAvatar('')" :alt="'avatar'" />
           </span>
         </div>
       </div>
@@ -210,12 +210,17 @@
 import { mapGetters } from 'vuex';
 import api from '@/api/index';
 import consts from '@/const/const';
+import { formatFromNow } from '@/utils/format-from-now';
+import { resolveAvatar } from '@/utils/resolve-avatar';
+import { resolveImage } from '@/utils/resolve-image';
+import { resolveImageError } from '@/utils/resolve-image-error';
 import BaseContextMenu from '@common/BaseContextMenu.vue';
 import IconComments from '@icons/IconComments.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';
 import IconPlus from '@icons/IconPlus.vue';
+import { isMobile } from '@utils/is-mobile';
 
 export default {
   components: {
@@ -273,6 +278,11 @@ export default {
     },
   },
   methods: {
+    isMobile,
+    formatFromNow,
+    resolveImage,
+    resolveAvatar,
+    resolveImageError,
     async upvote(id) {
       if (this.isRequesting) {
         return;

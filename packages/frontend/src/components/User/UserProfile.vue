@@ -1,7 +1,7 @@
 <template>
   <div class="user-profile">
     <div class="user-profile__avatar">
-      <img :src="$resolveAvatar(user.avatar)" :alt="user.avatar" />
+      <img :src="resolveAvatar(user.avatar)" :alt="user.avatar" />
     </div>
 
     <div class="user-profile__info">
@@ -23,7 +23,7 @@
       </div>
 
       <div class="user-profile__date">
-        Became an author {{ user.createdAt | $fromNow }}
+        Became an author {{ formatFromNow(user.createdAt) }}
       </div>
 
       <div
@@ -41,6 +41,8 @@
 
 <script>
 import api from '@/api/index';
+import { formatFromNow } from '@/utils/format-from-now';
+import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseButton from '@common/BaseButton.vue';
 import UserStats from '@components/User/UserStats.vue';
 
@@ -73,6 +75,8 @@ export default {
     },
   },
   methods: {
+    resolveAvatar,
+    formatFromNow,
     async follow() {
       if (this.requesting) {
         return;

@@ -40,9 +40,9 @@
 
     <div v-else class="post-editor-picture__image">
       <img
-        :src="$resolveImage(modelValue)"
+        :src="resolveImage(modelValue)"
         :alt="modelValue"
-        @error="$resolveImageError"
+        @error="resolveImageError"
       />
     </div>
   </div>
@@ -50,6 +50,8 @@
 
 <script>
 import api from '@/api';
+import { resolveImage } from '@/utils/resolve-image';
+import { resolveImageError } from '@/utils/resolve-image-error';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseUploadForm from '@common/BaseUploadForm.vue';
@@ -82,6 +84,8 @@ export default {
     },
   },
   methods: {
+    resolveImage,
+    resolveImageError,
     async handleUpload() {
       this.uploading = true;
 

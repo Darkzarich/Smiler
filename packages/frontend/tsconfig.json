@@ -24,7 +24,8 @@
       "@/*": ["./src/*"],
       "@components/*": ["./src/components/*"],
       "@common/*": ["./src/components/common/*"],
-      "@icons/*": ["./src/components/common/icons/*"]
+      "@icons/*": ["./src/components/common/icons/*"],
+      "@utils/*": ["./src/utils/*"]
     }
   },
   "exclude": ["node_modules", "dist"]

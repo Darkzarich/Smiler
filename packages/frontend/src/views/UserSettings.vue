@@ -16,7 +16,7 @@
             >
               <img
                 class="user-settings__following-avatar"
-                :src="$resolveAvatar(author.avatar)"
+                :src="resolveAvatar(author.avatar)"
                 alt="avatar"
               />
               {{ author.login }}
@@ -90,7 +90,7 @@
         <h3 class="user-settings__block-title">Avatar</h3>
 
         <div class="user-settings__current-avatar">
-          <img :src="$resolveAvatar(avatarEditInput)" alt="current avatar" />
+          <img :src="resolveAvatar(avatarEditInput)" alt="current avatar" />
         </div>
 
         <BaseInput
@@ -121,6 +121,7 @@
 <script>
 import api from '@/api';
 import consts from '@/const/const';
+import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseTextarea from '@common/BaseTextarea.vue';
@@ -164,6 +165,7 @@ export default {
     this.getData();
   },
   methods: {
+    resolveAvatar,
     async getData() {
       this.loading = true;
 
