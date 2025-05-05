@@ -1,6 +1,5 @@
 <template>
   <div data-testid="posts-container" class="posts-container">
-    <!-- TODO: Replace v-scroll with something else from VueUse -->
     <div v-if="posts.length > 0" v-scroll="handleScroll">
       <Post
         v-for="post in posts"
@@ -29,7 +28,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { throttle } from 'lodash-es';
 import { defineComponent } from 'vue';
 import Post from '@components/Post/Post.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
@@ -57,19 +57,21 @@ export default defineComponent({
   emits: ['fetch-more'],
   methods: {
     checkCanEditPost,
-    handleScroll(_, el) {
+    handleScroll: throttle(function (_, el) {
+      // TODO: Refactor to intersection observer or something from VueUse
       if (this.isLoading || !this.hasNextPage) {
         return;
       }
 
       const curContainerBounds = el.getBoundingClientRect();
+
       if (
         curContainerBounds.height - Math.abs(curContainerBounds.y) <
         window.innerHeight
       ) {
         this.$emit('fetch-more');
       }
-    },
+    }, 200),
   },
 });
 </script>

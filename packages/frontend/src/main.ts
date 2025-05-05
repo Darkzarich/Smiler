@@ -1,12 +1,9 @@
 import 'normalize.css';
-// import vClickOutside from 'v-click-outside';
+import vClickOutside from 'click-outside-vue3';
 import { createApp } from 'vue';
 import App from './App.vue';
 import { router } from './router';
 import store from '@/store/index';
-
-// TODO: Replace with VueUse
-// Vue.use(vClickOutside);
 
 const app = createApp(App);
 
@@ -22,5 +19,7 @@ app.directive('scroll', {
     window.addEventListener('scroll', f);
   },
 });
+
+app.use(vClickOutside);
 
 app.mount('#app');
