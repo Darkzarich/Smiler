@@ -17,6 +17,8 @@
       chosen-class="post-editor__section--chosen"
       :component-data="{
         name: 'post-editor__section',
+        tag: 'div',
+        'data-testid': 'post-sections',
       }"
       item-key="hash"
       tag="transition-group"

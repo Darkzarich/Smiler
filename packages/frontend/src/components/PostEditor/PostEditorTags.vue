@@ -40,7 +40,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 // TODO: This can be a BasicElements
 import consts from '@/const/const';
@@ -49,9 +49,6 @@ import BaseInput from '@common/BaseInput.vue';
 export default defineComponent({
   components: {
     BaseInput,
-  },
-  model: {
-    prop: 'tags',
   },
   props: {
     tags: {
@@ -88,7 +85,7 @@ export default defineComponent({
         }
       }
     },
-    removeTag(tag) {
+    removeTag(tag: string) {
       this.$emit(
         'update:tags',
         this.tags.filter((el) => el !== tag),

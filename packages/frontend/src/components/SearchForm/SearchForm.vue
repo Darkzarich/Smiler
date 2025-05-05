@@ -42,7 +42,10 @@
     </div>
 
     <div class="search-form__tags">
-      <PostEditorTags v-model="filters.tags" data-testid="search-form-tags" />
+      <PostEditorTags
+        v-model:tags="filters.tags"
+        data-testid="search-form-tags"
+      />
     </div>
 
     <div class="search-form__actions">

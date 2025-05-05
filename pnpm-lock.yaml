@@ -238,8 +238,8 @@ importers:
         specifier: ^8.4.1
         version: 8.4.1
       '@playwright/test':
-        specifier: ^1.40.1
-        version: 1.40.1
+        specifier: ^1.52.0
+        version: 1.52.0
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
@@ -274,8 +274,8 @@ importers:
         specifier: ^2.29.1
         version: 2.29.1(@typescript-eslint/parser@8.26.1)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
       eslint-plugin-playwright:
-        specifier: ^1.5.2
-        version: 1.5.2(eslint@8.57.0)
+        specifier: ^1.8.3
+        version: 1.8.3(eslint@8.57.0)
       eslint-plugin-prettier:
         specifier: ^5.1.3
         version: 5.1.3(eslint-config-prettier@9.1.0)(eslint@8.57.0)(prettier@3.2.5)
@@ -285,6 +285,9 @@ importers:
       eslint-plugin-vuejs-accessibility:
         specifier: ^2.4.1
         version: 2.4.1(eslint@8.57.0)
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       postcss-html:
         specifier: ^1.6.0
         version: 1.6.0
@@ -1972,13 +1975,12 @@ packages:
     resolution: {integrity: sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  /@playwright/test@1.40.1:
-    resolution: {integrity: sha512-EaaawMTOeEItCRvfmkI9v6rBkF1svM8wjl/YPRrg2N2Wmp+4qJYkWtJsbew1szfKKDm6fPLy4YAanBhIlf9dWw==}
-    engines: {node: '>=16'}
-    deprecated: Please update to the latest version of Playwright to test up-to-date browsers.
+  /@playwright/test@1.52.0:
+    resolution: {integrity: sha512-uh6W7sb55hl7D6vsAeA+V2p5JnlAqzhqFyF0VcJkKZXkgnFcVG9PziERRHQfPLfNGx1C292a4JqbWzhR8L4R1g==}
+    engines: {node: '>=18'}
     hasBin: true
     dependencies:
-      playwright: 1.40.1
+      playwright: 1.52.0
     dev: true
 
   /@rollup/rollup-android-arm-eabi@4.40.1:
@@ -4525,8 +4527,8 @@ packages:
       semver: 6.3.1
     dev: true
 
-  /eslint-plugin-playwright@1.5.2(eslint@8.57.0):
-    resolution: {integrity: sha512-TMzLrLGQMccngU8GogtzIc9u5RzXGnfsQEUjLfEfshINuVR2fS4SHfDtU7xYP90Vwm5vflHECf610KTdGvO53w==}
+  /eslint-plugin-playwright@1.8.3(eslint@8.57.0):
+    resolution: {integrity: sha512-h87JPFHkz8a6oPhn8GRGGhSQoAJjx0AkOv1jME6NoMk2FpEsfvfJJNaQDxLSqSALkCr0IJXPGTnp6SIRVu5Nqg==}
     engines: {node: '>=16.6.0'}
     peerDependencies:
       eslint: '>=8.40.0'
@@ -7103,18 +7105,18 @@ packages:
       find-up: 4.1.0
     dev: true
 
-  /playwright-core@1.40.1:
-    resolution: {integrity: sha512-+hkOycxPiV534c4HhpfX6yrlawqVUzITRKwHAmYfmsVreltEl6fAZJ3DPfLMOODw0H3s1Itd6MDCWmP1fl/QvQ==}
-    engines: {node: '>=16'}
+  /playwright-core@1.52.0:
+    resolution: {integrity: sha512-l2osTgLXSMeuLZOML9qYODUQoPPnUsKsb5/P6LJ2e6uPKXUdPK5WYhN4z03G+YNbWmGDY4YENauNu4ZKczreHg==}
+    engines: {node: '>=18'}
     hasBin: true
     dev: true
 
-  /playwright@1.40.1:
-    resolution: {integrity: sha512-2eHI7IioIpQ0bS1Ovg/HszsN/XKNwEG1kbzSDDmADpclKc7CyqkHw7Mg2JCz/bbCxg25QUPcjksoMW7JcIFQmw==}
-    engines: {node: '>=16'}
+  /playwright@1.52.0:
+    resolution: {integrity: sha512-JAwMNMBlxJ2oD1kce4KPtMkDeKGHQstdpFPcPH3maElAXon/QZeTvtsfXmTMRyO9TslfoYOXkSsvao2nE1ilTw==}
+    engines: {node: '>=18'}
     hasBin: true
     dependencies:
-      playwright-core: 1.40.1
+      playwright-core: 1.52.0
     optionalDependencies:
       fsevents: 2.3.2
     dev: true

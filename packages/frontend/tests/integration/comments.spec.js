@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-
 import { expect } from '@playwright/test';
 import { subMinutes } from 'date-fns';
 import createRandomAuth from './factory/auth';
@@ -544,11 +543,15 @@ test.describe('Editing or deleting a comment', () => {
     context,
     Api,
   }) => {
+    const editCommentText = 'edited comment';
+
     Api.routes.comments.updateComment.mock({
       status: 200,
+      body: {
+        ...currentUserComment,
+        body: editCommentText,
+      },
     });
-
-    const editCommentText = 'edited comment';
 
     await mockDate(context, currentUserComment.createdAt);
 

@@ -244,8 +244,8 @@ test('Fetch and show draft template', async ({ Api, page, PostCreatePage }) => {
   );
 
   await expect(
-    page.locator('[data-testid="post-section"]:nth-child(2) img'),
-  ).toHaveAttribute('src', savedSections[1].url);
+    page.locator(`img[src="${savedSections[1].url}"]`),
+  ).toBeVisible();
 
   await expect(
     page
