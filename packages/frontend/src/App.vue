@@ -20,6 +20,7 @@
 
 <script>
 import { defineComponent } from 'vue';
+import { useUserStore } from './store/user';
 import FooterElement from '@components/FooterElement.vue';
 import HeaderElement from '@components/Header/HeaderElement.vue';
 import NotificationList from '@components/NotificationList/NotificationList.vue';
@@ -40,7 +41,9 @@ export default defineComponent({
     };
   },
   beforeCreate() {
-    this.$store.dispatch('userGetAuthState').then(() => {
+    const userStore = useUserStore();
+
+    userStore.userFetchAuthState().then(() => {
       this.show = true;
     });
   },

@@ -1,10 +1,10 @@
 <template>
   <div
     class="new-comment-form"
-    :class="!isUserAuth ? 'new-comment-form--disabled' : ''"
+    :class="!user ? 'new-comment-form--disabled' : ''"
     data-testid="new-comment-form"
   >
-    <template v-if="isUserAuth">
+    <template v-if="user">
       <div class="new-comment-form__title">Share your thoughts!</div>
       <BaseTextEditor
         v-model="commentBody"
@@ -28,11 +28,13 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'pinia';
 import { defineComponent } from 'vue';
-import { mapState, mapGetters } from 'vuex';
 import api from '@/api';
 import BaseButton from '@common/BaseButton.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
+import { useUserStore } from '@/store/user';
+import { useNotificationsStore } from '@/store/notifications';
 
 export default defineComponent({
   components: {
@@ -53,15 +55,13 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapGetters(['isUserAuth']),
-    ...mapState({
-      user: (state) => state.user,
-    }),
+    ...mapState(useUserStore, ['user']),
   },
   methods: {
+    ...mapActions(useNotificationsStore, ['showErrorNotification']),
     async createComment() {
-      if (!this.commentBody) {
-        this.$store.dispatch('showErrorNotification', {
+      if (!this.commentBody || !this.user) {
+        this.showErrorNotification({
           message: 'Comment cannot be empty. Enter some text first!',
         });
 

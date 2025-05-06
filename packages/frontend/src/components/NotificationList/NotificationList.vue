@@ -25,9 +25,10 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { mapActions, mapState } from 'pinia';
 import { defineComponent } from 'vue';
-import { mapState } from 'vuex';
+import { useNotificationsStore } from '@/store/notifications';
 import IconExit from '@icons/IconExit.vue';
 
 export default defineComponent({
@@ -35,14 +36,10 @@ export default defineComponent({
     IconExit,
   },
   computed: {
-    ...mapState({
-      notifications: (state) => state.notifications.notifications,
-    }),
+    ...mapState(useNotificationsStore, ['notifications']),
   },
   methods: {
-    removeNotification(id) {
-      this.$store.commit('removeNotification', id);
-    },
+    ...mapActions(useNotificationsStore, ['removeNotification']),
   },
 });
 </script>

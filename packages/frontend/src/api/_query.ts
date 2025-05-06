@@ -1,21 +1,27 @@
-import axios from 'axios';
+import axios, { type AxiosError, type AxiosRequestConfig } from 'axios';
 import config from '@/config/config';
-import store from '@/store/index';
+import { useNotificationsStore } from '@/store/notifications';
+import { useUserStore } from '@/store/user';
 
 axios.defaults.withCredentials = true;
 
-export default async (requestData) => {
+export default async (requestData: AxiosRequestConfig) => {
+  const notificationsStore = useNotificationsStore();
+  const userStore = useUserStore();
+
   const requestDataMod = requestData;
 
   requestDataMod.url = `${config.VUE_APP_API_URL}/api/${requestDataMod.url}`;
 
   try {
     return await axios(requestDataMod);
-  } catch (error) {
+  } catch (e) {
+    const error = e as AxiosError;
+
     const { response } = error;
 
     if (!response) {
-      store.dispatch('showErrorNotification', {
+      notificationsStore.showErrorNotification({
         message:
           'Oops! Something went wrong. Please try to reload the page and try again.',
       });
@@ -28,13 +34,13 @@ export default async (requestData) => {
     if (response.data.error) {
       console.error(response.data.error.message);
 
-      store.dispatch('showErrorNotification', {
+      notificationsStore.showErrorNotification({
         message: response.data.error.message,
       });
     }
 
     if (response.status === 401) {
-      store.commit('clearUser');
+      userStore.clearUser();
     }
 
     return response;

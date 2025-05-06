@@ -11,15 +11,19 @@
       class="mobile-menu__navigation"
     >
       <template #before>
-        <NavigationFeedLink class="mobile-menu__nav-link" />
+        <NavigationFeedLink
+          :is-auth="Boolean(user)"
+          class="mobile-menu__nav-link"
+        />
       </template>
     </Navigation>
   </div>
 </template>
 
 <script>
+import { mapState } from 'pinia';
 import { defineComponent } from 'vue';
-import { mapGetters } from 'vuex';
+import { useUserStore } from '@/store/user';
 import Navigation from '@components/Navigation/Navigation.vue';
 import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
 import CurrentUser from '@components/User/CurrentUser.vue';
@@ -34,7 +38,7 @@ export default defineComponent({
   },
   emits: ['close'],
   computed: {
-    ...mapGetters(['isUserAuth']),
+    ...mapState(useUserStore, ['user']),
   },
   methods: {
     closeMenu() {

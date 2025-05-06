@@ -49,8 +49,10 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia';
 import { defineComponent } from 'vue';
 import api from '@/api';
+import { useNotificationsStore } from '@/store/notifications';
 import { resolveImage } from '@/utils/resolve-image';
 import { resolveImageError } from '@/utils/resolve-image-error';
 import BaseButton from '@common/BaseButton.vue';
@@ -85,6 +87,7 @@ export default defineComponent({
     },
   },
   methods: {
+    ...mapActions(useNotificationsStore, ['showErrorNotification']),
     resolveImage,
     resolveImageError,
     async handleUpload() {
@@ -93,7 +96,7 @@ export default defineComponent({
       try {
         await this.upload();
       } catch (e) {
-        this.$store.dispatch('showErrorNotification', {
+        this.showErrorNotification({
           message:
             'Something went wrong during upload of this picture. Please try to upload the picture again.',
         });
@@ -127,7 +130,7 @@ export default defineComponent({
     },
     error() {
       if (!(this.file instanceof File)) {
-        this.$store.dispatch('showErrorNotification', {
+        this.showErrorNotification({
           message:
             'The image link you provided is invalid. Please try a different one.',
         });

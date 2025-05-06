@@ -110,6 +110,7 @@ module.exports = {
     'consistent-return': 'off',
     'no-underscore-dangle': 'off',
     'import/prefer-default-export': 'off',
+    'import/no-cycle': 'off',
   },
   settings: {
     'import/resolver': {

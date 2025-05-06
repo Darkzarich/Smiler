@@ -1,10 +1,14 @@
 import consts from '@/const/const';
-import store from '@/store';
 
-export function checkCanEditComment(comment: any): boolean {
-  const currentId = store.state.user.id;
-
-  if (!currentId || !comment.author || comment.author.id !== currentId) {
+export function checkCanEditComment(
+  comment: any,
+  currentUserId?: string,
+): boolean {
+  if (
+    !currentUserId ||
+    !comment.author ||
+    comment.author.id !== currentUserId
+  ) {
     return false;
   }
 

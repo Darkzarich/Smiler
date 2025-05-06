@@ -124,7 +124,7 @@
             <template v-else-if="level < COMMENTS_NESTED_LIMIT">
               <div
                 :class="{
-                  'comment-item__reply-toggler--disabled': !isUserAuth,
+                  'comment-item__reply-toggler--disabled': !user,
                 }"
                 class="comment-item__reply-toggler"
                 :data-testid="`comment-${commentData.id}-toggle-reply`"
@@ -154,14 +154,16 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { mapActions, mapState } from 'pinia';
 import { defineComponent } from 'vue';
-import { mapState, mapGetters } from 'vuex';
 import CommentChildExpander from './CommentChildExpander.vue';
 import CommentForm from './CommentForm.vue';
 import CommentTreeHelper from './CommentTreeHelper.vue';
 import api from '@/api';
 import consts from '@/const/const';
+import { useNotificationsStore } from '@/store/notifications';
+import { useUserStore } from '@/store/user';
 import { checkCanEditComment } from '@/utils/check-can-edit-comment';
 import { formatFromNow } from '@/utils/format-from-now';
 import { resolveAvatar } from '@/utils/resolve-avatar';
@@ -208,18 +210,16 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapGetters(['isUserAuth']),
-    ...mapState({
-      user: (state) => state.user,
-    }),
+    ...mapState(useUserStore, ['user']),
   },
   methods: {
+    ...mapActions(useNotificationsStore, ['showErrorNotification']),
     formatFromNow,
     resolveAvatar,
     checkCanEditComment,
     toggleReply() {
-      if (!this.isUserAuth) {
-        this.$store.dispatch('showErrorNotification', {
+      if (!this.user) {
+        this.showErrorNotification({
           message: 'Please sign in or create an account to leave a reply.',
         });
 
@@ -395,8 +395,8 @@ export default defineComponent({
       this.isRequesting = false;
     },
     async reply() {
-      if (!this.replyBody) {
-        this.$store.dispatch('showErrorNotification', {
+      if (!this.replyBody || !this.user) {
+        this.showErrorNotification({
           message: 'Comment cannot be empty. Enter some text first!',
         });
 
@@ -411,7 +411,7 @@ export default defineComponent({
         body: this.replyBody,
       });
 
-      if (!res.data.error) {
+      if (res?.data && !res.data.error) {
         const newComment = {
           ...res.data,
           rated: {

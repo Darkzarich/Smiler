@@ -119,9 +119,12 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia';
 import { defineComponent } from 'vue';
 import api from '@/api';
 import consts from '@/const/const';
+import { useNotificationsStore } from '@/store/notifications';
+import { useUserStore } from '@/store/user';
 import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
@@ -166,6 +169,8 @@ export default defineComponent({
     this.getData();
   },
   methods: {
+    ...mapActions(useUserStore, ['unfollowTag', 'setAvatar']),
+    ...mapActions(useNotificationsStore, ['showInfoNotification']),
     resolveAvatar,
     async getData() {
       this.loading = true;
@@ -191,7 +196,7 @@ export default defineComponent({
       this.bioEditRequesting = false;
 
       if (!res.data.error) {
-        this.$store.dispatch('showInfoNotification', {
+        this.showInfoNotification({
           message: 'Your bio has been successfully updated!',
         });
 
@@ -210,9 +215,9 @@ export default defineComponent({
       this.avatarEditRequesting = false;
 
       if (!res.data.error) {
-        this.$store.commit('setAvatar', this.avatarEditInput);
+        this.setAvatar(this.avatarEditInput);
 
-        this.$store.dispatch('showInfoNotification', {
+        this.showInfoNotification({
           message: 'Your avatar has been successfully updated!',
         });
 
@@ -228,9 +233,9 @@ export default defineComponent({
 
         if (!res.data.error) {
           this.tagsFollowed.splice(this.tagsFollowed.indexOf(tag), 1);
-          this.$store.commit('unfollowTag', tag);
+          this.unfollowTag(tag);
 
-          this.$store.dispatch('showInfoNotification', {
+          this.showInfoNotification({
             message: 'This tag was successfully unfollowed!',
           });
         }
@@ -257,7 +262,7 @@ export default defineComponent({
         this.usersFollowed.splice(this.usersFollowed.indexOf(foundUser), 1);
       }
 
-      this.$store.dispatch('showInfoNotification', {
+      this.showInfoNotification({
         message: 'This author was successfully unfollowed!',
       });
 

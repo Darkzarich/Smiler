@@ -40,7 +40,9 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia';
 import { defineComponent } from 'vue';
+import { useNotificationsStore } from '@/store/notifications';
 import { generateVideoEmbedLink } from '@/utils/generate-video-embed-link';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
@@ -64,6 +66,7 @@ export default defineComponent({
     };
   },
   methods: {
+    ...mapActions(useNotificationsStore, ['showErrorNotification']),
     async upload() {
       this.uploading = true;
       if (typeof this.url === 'string') {
@@ -71,19 +74,18 @@ export default defineComponent({
         this.$emit('update:modelValue', this.url);
       } else {
         this.url = '';
-        this.$store.dispatch('showErrorNotification', {
+        this.showErrorNotification({
           message:
             'Something went wrong during upload of this video. Please try to upload the video again.',
         });
       }
       this.uploading = false;
     },
+    // TODO: Figure out when it's not used
     error() {
-      this.$store.dispatch('showErrorNotification', {
-        error: {
-          message:
-            'The video link you provided could not be loaded. Please try a different one.',
-        },
+      this.showErrorNotification({
+        message:
+          'The video link you provided could not be loaded. Please try a different one.',
       });
 
       this.url = '';

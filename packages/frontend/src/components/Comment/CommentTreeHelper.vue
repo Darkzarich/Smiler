@@ -2,7 +2,7 @@
   <CommentList :data="data" :post-id="postId" :level="level" />
 </template>
 
-<script>
+<script lang="ts">
 import { defineAsyncComponent, defineComponent } from 'vue';
 
 export default defineComponent({

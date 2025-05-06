@@ -8,9 +8,11 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'pinia';
 import { defineComponent } from 'vue';
-import { mapState } from 'vuex';
 import api from '@/api/index';
+import { useNotificationsStore } from '@/store/notifications';
+import { useUserStore } from '@/store/user';
 import { checkCanEditPost } from '@/utils/check-can-edit-post';
 import PostEditor from '@components/PostEditor/PostEditor.vue';
 
@@ -36,21 +38,22 @@ export default defineComponent({
   data() {
     return {
       isEdit: false,
-      post: {},
+      post: null,
       show: false,
       key: '',
     };
   },
   computed: {
-    ...mapState({
-      id: (state) => state.user.id,
+    ...mapState(useUserStore, {
+      userId: (state) => state.user?.id,
     }),
   },
   methods: {
+    ...mapActions(useNotificationsStore, ['showErrorNotification']),
     checkCanEditPost,
     showEditor() {
       this.post = null;
-      this.edit = false;
+      this.isEdit = false;
       this.show = true;
       this.key = '';
     },
@@ -59,17 +62,19 @@ export default defineComponent({
       this.key = 'edit';
 
       if (data.author.id !== this.id) {
-        this.$store.dispatch('showErrorNotification', {
+        this.showErrorNotification({
           message: "Only post's author can edit this post",
         });
+
         this.$router.push({
           name: 'Home',
         });
       } else if (!this.checkCanEditPost(data)) {
-        this.$store.dispatch('showErrorNotification', {
+        this.showErrorNotification({
           message:
             'You cannot edit this post anymore. The time allowed to edit has expired',
         });
+
         this.$router.push({
           name: 'Home',
         });

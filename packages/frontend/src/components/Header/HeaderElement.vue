@@ -25,7 +25,10 @@
         class="header__navigation"
       >
         <template #after>
-          <NavigationFeedLink class="header__nav-link" />
+          <NavigationFeedLink
+            class="header__nav-link"
+            :is-auth="Boolean(user)"
+          />
         </template>
       </Navigation>
 
@@ -42,7 +45,7 @@
         />
       </div>
 
-      <div v-if="isUserAuth" class="header__avatar">
+      <div v-if="user" class="header__avatar">
         <!-- TODO: Move everything like that to its own component AvatarLink or something -->
         <RouterLink
           :to="{
@@ -60,10 +63,11 @@
 </template>
 
 <script>
+import { mapState } from 'pinia';
 import { defineComponent } from 'vue';
-import { mapState, mapGetters } from 'vuex';
 import HeaderMobileMenu from './HeaderMobileMenu.vue';
 import SiteLogo from './SiteLogo.vue';
+import { useUserStore } from '@/store/user';
 import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseInput from '@common/BaseInput.vue';
 import Navigation from '@components/Navigation/Navigation.vue';
@@ -87,10 +91,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapGetters(['isUserAuth']),
-    ...mapState({
-      user: (state) => state.user,
-    }),
+    ...mapState(useUserStore, ['user']),
   },
   watch: {
     $route() {

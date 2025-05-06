@@ -108,16 +108,18 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { mapActions, mapState } from 'pinia';
 import { defineComponent, nextTick } from 'vue';
 import Draggable from 'vuedraggable';
-import { mapState } from 'vuex';
 import PostEditorAddSectionButtons from './PostEditorAddSectionButtons.vue';
 import PostEditorPicture from './PostEditorPicture.vue';
 import PostEditorTags from './PostEditorTags.vue';
 import PostEditorVideo from './PostEditorVideo.vue';
 import api from '@/api';
 import consts from '@/const/const';
+import { useNotificationsStore } from '@/store/notifications';
+import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
@@ -149,8 +151,8 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState({
-      userId: (state) => state.user.id,
+    ...mapState(useUserStore, {
+      userId: (state) => state.user?.id,
     }),
     isSubmitDisabled() {
       return Boolean(this.validation.title || this.validation.sections);
@@ -162,7 +164,6 @@ export default defineComponent({
       };
 
       // title
-
       if (this.title.length === 0) {
         validation.title = "Title can't be empty";
       } else if (this.title.length > consts.POST_TITLE_MAX_LENGTH) {
@@ -170,7 +171,6 @@ export default defineComponent({
       }
 
       // sections
-
       if (!this.sections.length) {
         validation.sections = 'You should add at least one section';
       }
@@ -201,6 +201,10 @@ export default defineComponent({
       this.title = this.post.title;
       this.tags = this.post.tags;
     } else {
+      if (!this.userId) {
+        return;
+      }
+
       const res = await api.users.getUserTemplate(this.userId);
 
       if (!res.data.error) {
@@ -215,6 +219,7 @@ export default defineComponent({
     });
   },
   methods: {
+    ...mapActions(useNotificationsStore, ['showErrorNotification']),
     async createPost() {
       this.sending = true;
       const res = await api.posts.createPost({
@@ -242,7 +247,7 @@ export default defineComponent({
       });
 
       if (!res.data.error) {
-        this.$store.dispatch('showInfoNotification', {
+        this.showInfoNotification({
           message: 'Post has been saved successfully',
         });
 
@@ -270,7 +275,7 @@ export default defineComponent({
         this.sections = res.data.sections;
         this.tags = res.data.tags;
 
-        this.$store.dispatch('showInfoNotification', {
+        this.showInfoNotification({
           message: 'Draft post has been saved successfully!',
         });
 

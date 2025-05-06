@@ -9,7 +9,7 @@
         {{ user.login }}
 
         <BaseButton
-          v-if="isUserAuth && !isSameUser"
+          v-if="user && !isSameUser"
           class="user-profile__follow-btn"
           :data-testid="
             isFollowed ? 'user-profile-unfollow-btn' : 'user-profile-follow-btn'
@@ -40,8 +40,10 @@
 </template>
 
 <script>
+import { mapState } from 'pinia';
 import { defineComponent } from 'vue';
 import api from '@/api/index';
+import { useUserStore } from '@/store/user';
 import { formatFromNow } from '@/utils/format-from-now';
 import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseButton from '@common/BaseButton.vue';
@@ -65,14 +67,12 @@ export default defineComponent({
     };
   },
   computed: {
-    isUserAuth() {
-      return this.$store.getters.isUserAuth;
-    },
+    ...mapState(useUserStore, {
+      user: (state) => state.user,
+      isSameUser: (state) => state.user?.id === this.user.id,
+    }),
     isFollowed() {
       return this.user.isFollowed;
-    },
-    isSameUser() {
-      return this.$store.state.user.id === this.user.id;
     },
   },
   methods: {

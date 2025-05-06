@@ -10,14 +10,18 @@ import Search from './views/Search.vue';
 import SinglePost from './views/SinglePost.vue';
 import UserPage from './views/UserPage.vue';
 import UserSettings from './views/UserSettings.vue';
-import store from '@/store/index';
+import { useNotificationsStore } from '@/store/notifications';
+import { useUserStore } from '@/store/user';
 
 const authGuard: NavigationGuard = async (to, from, next) => {
-  // TODO: Why check on each move if the user is logged in
-  await store.dispatch('userGetAuthState');
+  const userStore = useUserStore();
+  const notificationStore = useNotificationsStore();
 
-  if (!store.getters.isUserAuth) {
-    store.dispatch('showErrorNotification', {
+  // TODO: Why check on each move if the user is logged in
+  await userStore.userFetchAuthState();
+
+  if (!userStore.user) {
+    notificationStore.showErrorNotification({
       message: 'Only authenticated users can access this page.',
     });
 

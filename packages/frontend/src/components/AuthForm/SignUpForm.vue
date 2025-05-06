@@ -63,9 +63,11 @@
 </template>
 
 <script>
+import { mapWritableState } from 'pinia';
 import { defineComponent } from 'vue';
 import api from '@/api';
 import consts from '@/const/const';
+import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 
@@ -85,6 +87,7 @@ export default defineComponent({
     };
   },
   computed: {
+    ...mapWritableState(useUserStore, ['user']),
     isSubmitDisabled() {
       return Boolean(
         this.validation.email ||
@@ -172,7 +175,7 @@ export default defineComponent({
         this.login = '';
         this.requestError = res.data.error.message;
       } else if (res.data.isAuth) {
-        this.$store.commit('setUser', res.data);
+        this.user = res.data;
       }
     },
   },

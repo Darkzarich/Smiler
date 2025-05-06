@@ -1,60 +1,63 @@
 <template>
   <div>
-    <div class="post-container">
-      <Post v-if="post" :post="post" :can-edit="checkCanEditPost(post)" />
-    </div>
-
-    <div id="comments" ref="comments" class="comments">
-      <NewCommentForm
-        v-if="!isFetchingComments"
-        :post-id="post.id"
-        @new-comment="handleAddNewComment"
-      />
-
-      <CommentList
-        v-if="!isFetchingComments && comments.length > 0"
-        :data="comments"
-        :indent-level="1"
-        :post-id="post.id"
-        :level="0"
-        :is-first="true"
-      />
-
-      <div v-else-if="!isFetchingComments" class="comments__no-comments">
-        "It’s quiet here — be the first to leave a comment!"
+    <template v-if="post">
+      <div class="post-container">
+        <Post :post="post" :can-edit="checkCanEditPost(post)" />
       </div>
 
-      <div v-else class="comments__loading">
-        <CircularLoader />
+      <div id="comments" ref="comments" class="comments">
+        <NewCommentForm
+          v-if="!isFetchingComments"
+          :post-id="post.id"
+          @new-comment="handleAddNewComment"
+        />
+
+        <CommentList
+          v-if="!isFetchingComments && comments.length > 0"
+          :data="comments"
+          :indent-level="1"
+          :post-id="post.id"
+          :level="0"
+          :is-first="true"
+        />
+
+        <div v-else-if="!isFetchingComments" class="comments__no-comments">
+          "It’s quiet here — be the first to leave a comment!"
+        </div>
+
+        <div v-else class="comments__loading">
+          <CircularLoader />
+        </div>
       </div>
-    </div>
 
-    <div
-      v-if="!isFetchingComments && hasCommentsNextPage"
-      class="comments__fetch-more"
-      @click="fetchMoreComments()"
-    >
-      <template v-if="isFetchingComments">
-        <CircularLoader />
-      </template>
-      <template v-else> Click here to see more comments </template>
-    </div>
+      <div
+        v-if="!isFetchingComments && hasCommentsNextPage"
+        class="comments__fetch-more"
+        @click="fetchMoreComments()"
+      >
+        <template v-if="isFetchingComments">
+          <CircularLoader />
+        </template>
+        <template v-else> Click here to see more comments </template>
+      </div>
 
-    <div
-      v-if="comments.length > 0 && !hasCommentsNextPage"
-      class="comments__no-more"
-    >
-      You've read all the comments. Now it's your turn to share your thoughts!
-    </div>
+      <div
+        v-if="comments.length > 0 && !hasCommentsNextPage"
+        class="comments__no-more"
+      >
+        You've read all the comments. Now it's your turn to share your thoughts!
+      </div>
+    </template>
   </div>
 </template>
 
 <script>
+import { mapState } from 'pinia';
 import { defineComponent } from 'vue';
-import { mapState } from 'vuex';
 import api from '@/api';
 import CommentList from '@/components/Comment/CommentList.vue';
 import consts from '@/const/const';
+import { useUserStore } from '@/store/user';
 import { checkCanEditPost } from '@/utils/check-can-edit-post';
 import NewCommentForm from '@components/Comment/NewCommentForm.vue';
 import Post from '@components/Post/Post.vue';
@@ -68,14 +71,14 @@ export default defineComponent({
     CircularLoader,
   },
   async beforeRouteEnter(to, from, next) {
-    const post = await api.posts.getPostBySlug(to.params.slug);
+    const res = await api.posts.getPostBySlug(to.params.slug);
 
-    if (post.data.error) {
+    if (res.data.error) {
       next({
         name: 'NotFound',
       });
     } else {
-      next((vm) => vm.handleSetPost(post.data));
+      next((vm) => vm.handleSetPost(res.data));
     }
   },
   data() {
@@ -88,9 +91,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState({
-      user: (state) => state.user,
-    }),
+    ...mapState(useUserStore, ['user']),
   },
   methods: {
     checkCanEditPost,
@@ -111,6 +112,10 @@ export default defineComponent({
      * @param {boolean=} options.isCombine - if true, posts are concatenated to the existing array
      */
     async fetchComments({ isCombine } = {}) {
+      if (!this.post) {
+        return;
+      }
+
       this.isFetchingComments = true;
 
       const res = await api.comments.getComments({
@@ -136,6 +141,10 @@ export default defineComponent({
       this.fetchComments({ isCombine: true });
     },
     handleAddNewComment(newComment) {
+      if (!this.post) {
+        return;
+      }
+
       this.post.commentCount = this.post.commentCount + 1;
       this.comments.unshift(newComment);
     },

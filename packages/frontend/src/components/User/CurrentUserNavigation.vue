@@ -30,8 +30,10 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia';
 import { defineComponent } from 'vue';
 import api from '@/api';
+import { useUserStore } from '@/store/user';
 import IconAdd from '@icons/IconAdd.vue';
 import IconExit from '@icons/IconExit.vue';
 import IconSettings from '@icons/IconSettings.vue';
@@ -43,6 +45,7 @@ export default defineComponent({
     IconSettings,
   },
   methods: {
+    ...mapActions(useUserStore, ['clearUser']),
     async logout() {
       const res = await api.auth.logout();
 
@@ -50,7 +53,7 @@ export default defineComponent({
         return;
       }
 
-      this.$store.commit('clearUser');
+      this.clearUser();
     },
   },
 });

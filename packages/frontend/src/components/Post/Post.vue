@@ -206,11 +206,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { mapActions, mapState } from 'pinia';
 import { defineComponent } from 'vue';
-import { mapGetters } from 'vuex';
 import api from '@/api/index';
 import consts from '@/const/const';
+import { useNotificationsStore } from '@/store/notifications';
+import { useUserStore } from '@/store/user';
 import { formatFromNow } from '@/utils/format-from-now';
 import { resolveAvatar } from '@/utils/resolve-avatar';
 import { resolveImage } from '@/utils/resolve-image';
@@ -247,7 +249,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapGetters(['isUserAuth']),
+    ...mapState(useUserStore, ['user', 'isTagFollowed']),
     contextMenuOptions() {
       const options = [];
 
@@ -258,9 +260,9 @@ export default defineComponent({
         });
       }
 
-      if (this.isUserAuth) {
+      if (this.user) {
         const isTargetTagFollowed =
-          this.$store.getters.isTagFollowed[this.contextMenuData.target];
+          this.isTagFollowed[this.contextMenuData.target];
 
         if (isTargetTagFollowed) {
           options.push({
@@ -279,12 +281,14 @@ export default defineComponent({
     },
   },
   methods: {
+    ...mapActions(useUserStore, ['followTag', 'unfollowTag']),
+    ...mapActions(useNotificationsStore, ['showInfoNotification']),
     isMobile,
     formatFromNow,
     resolveImage,
     resolveAvatar,
     resolveImageError,
-    async upvote(id) {
+    async upvote(id: string) {
       if (this.isRequesting) {
         return;
       }
@@ -396,7 +400,7 @@ export default defineComponent({
       const res = await api.posts.deletePostById(id);
 
       if (!res.data.error) {
-        this.$store.dispatch('showInfoNotification', {
+        this.showInfoNotification({
           message: 'The post has been successfully deleted',
         });
 
@@ -423,11 +427,11 @@ export default defineComponent({
       this.closeContextMenu();
       const res = await api.tags.follow(tag);
       if (!res.data.error) {
-        this.$store.dispatch('showInfoNotification', {
+        this.showInfoNotification({
           message: "You're now following this tag!",
         });
 
-        this.$store.commit('followTag', tag);
+        this.followTag(tag);
       }
     },
     async unfollowTag(tag) {
@@ -436,11 +440,11 @@ export default defineComponent({
       const res = await api.tags.unfollow(tag);
 
       if (!res.data.error) {
-        this.$store.dispatch('showInfoNotification', {
+        this.showInfoNotification({
           message: 'This tag was successfully unfollowed!',
         });
 
-        this.$store.commit('unfollowTag', tag);
+        this.unfollowTag(tag);
       }
     },
     searchTag(tag) {

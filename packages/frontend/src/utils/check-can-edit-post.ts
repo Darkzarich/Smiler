@@ -1,10 +1,7 @@
-import store from '@/store';
 import consts from '@/const/const';
 
-export function checkCanEditPost(post: any): boolean {
-  const currentId = store.state.user.id;
-
-  if (!currentId || !post.author || post.author.id !== currentId) {
+export function checkCanEditPost(post: any, currentUserId?: string): boolean {
+  if (!currentUserId || !post.author || post.author.id !== currentUserId) {
     return false;
   }
 

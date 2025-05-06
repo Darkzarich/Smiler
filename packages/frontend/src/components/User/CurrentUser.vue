@@ -1,6 +1,6 @@
 <template>
   <div class="current-user">
-    <AuthFormSwitcher v-if="!isUserAuth" />
+    <AuthFormSwitcher v-if="!user" />
 
     <template v-else>
       <div class="current-user__main">
@@ -35,9 +35,11 @@
 </template>
 
 <script>
+import { mapState } from 'pinia';
 import { defineComponent } from 'vue';
 import AuthFormSwitcher from '../AuthForm/AuthFormSwitcher.vue';
 import CurrentUserNavigation from './CurrentUserNavigation.vue';
+import { useUserStore } from '@/store/user';
 import { resolveAvatar } from '@/utils/resolve-avatar';
 import UserStats from '@components/User/UserStats.vue';
 
@@ -48,12 +50,7 @@ export default defineComponent({
     CurrentUserNavigation,
   },
   computed: {
-    isUserAuth() {
-      return this.$store.getters.isUserAuth;
-    },
-    user() {
-      return this.$store.state.user;
-    },
+    ...mapState(useUserStore, ['user']),
   },
   methods: {
     resolveAvatar,
