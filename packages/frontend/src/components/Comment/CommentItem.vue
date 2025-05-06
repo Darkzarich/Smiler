@@ -145,7 +145,7 @@
       />
     </div>
 
-    <CommentTreeHelper
+    <CommentList
       v-if="isChildrenExpanded"
       :data="commentData.children"
       :post-id="postId"
@@ -159,7 +159,6 @@ import { mapActions, mapState } from 'pinia';
 import { defineComponent } from 'vue';
 import CommentChildExpander from './CommentChildExpander.vue';
 import CommentForm from './CommentForm.vue';
-import CommentTreeHelper from './CommentTreeHelper.vue';
 import api from '@/api';
 import consts from '@/const/const';
 import { useNotificationsStore } from '@/store/notifications';
@@ -174,7 +173,6 @@ import IconPlus from '@icons/IconPlus.vue';
 
 export default defineComponent({
   components: {
-    CommentTreeHelper,
     CommentChildExpander,
     IconEdit,
     IconMinus,

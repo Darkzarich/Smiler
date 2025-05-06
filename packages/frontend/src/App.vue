@@ -20,7 +20,7 @@
 
 <script>
 import { defineComponent } from 'vue';
-import { useUserStore } from './store/user';
+import { useUserStore } from '@/store/user';
 import FooterElement from '@components/FooterElement.vue';
 import HeaderElement from '@components/Header/HeaderElement.vue';
 import NotificationList from '@components/NotificationList/NotificationList.vue';
