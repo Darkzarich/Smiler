@@ -2,7 +2,7 @@
   <div>
     <template v-if="post">
       <div class="post-container">
-        <Post :post="post" :can-edit="checkCanEditPost(post)" />
+        <Post :post="post" :can-edit="checkCanEditPost(post, user?.id)" />
       </div>
 
       <div id="comments" ref="comments" class="comments">

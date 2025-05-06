@@ -6,7 +6,7 @@
         :key="post.id"
         class="posts-container__post"
         :post="post"
-        :can-edit="checkCanEditPost(post)"
+        :can-edit="checkCanEditPost(post, user?.id)"
       />
     </div>
 
@@ -30,7 +30,9 @@
 
 <script lang="ts">
 import { throttle } from 'lodash-es';
+import { mapState } from 'pinia';
 import { defineComponent } from 'vue';
+import { useUserStore } from '@/store/user';
 import Post from '@components/Post/Post.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 import { checkCanEditPost } from '@utils/check-can-edit-post';
@@ -55,6 +57,9 @@ export default defineComponent({
     },
   },
   emits: ['fetch-more'],
+  computed: {
+    ...mapState(useUserStore, ['user']),
+  },
   methods: {
     checkCanEditPost,
     handleScroll: throttle(function (_, el) {

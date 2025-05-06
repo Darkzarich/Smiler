@@ -61,7 +61,7 @@ export default defineComponent({
       this.show = false;
       this.key = 'edit';
 
-      if (data.author.id !== this.id) {
+      if (data.author.id !== this.userId) {
         this.showErrorNotification({
           message: "Only post's author can edit this post",
         });
@@ -69,7 +69,7 @@ export default defineComponent({
         this.$router.push({
           name: 'Home',
         });
-      } else if (!this.checkCanEditPost(data)) {
+      } else if (!this.checkCanEditPost(data, this.userId)) {
         this.showErrorNotification({
           message:
             'You cannot edit this post anymore. The time allowed to edit has expired',

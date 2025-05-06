@@ -1,6 +1,9 @@
 import consts from '@/const/const';
 
-export function checkCanEditPost(post: any, currentUserId?: string): boolean {
+export function checkCanEditPost(
+  post: any,
+  currentUserId: string | undefined | null,
+): boolean {
   if (!currentUserId || !post.author || post.author.id !== currentUserId) {
     return false;
   }

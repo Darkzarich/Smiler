@@ -61,7 +61,7 @@
             </div>
           </RouterLink>
 
-          <template v-if="checkCanEditComment(comment)">
+          <template v-if="checkCanEditComment(comment, user?.id)">
             <div
               class="comment-item__edit-btn"
               :data-testid="`comment-${commentData.id}-edit`"

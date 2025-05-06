@@ -219,7 +219,7 @@ export default defineComponent({
     });
   },
   methods: {
-    ...mapActions(useNotificationsStore, ['showErrorNotification']),
+    ...mapActions(useNotificationsStore, ['showInfoNotification']),
     async createPost() {
       this.sending = true;
       const res = await api.posts.createPost({

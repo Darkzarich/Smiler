@@ -9,7 +9,7 @@
         {{ user.login }}
 
         <BaseButton
-          v-if="user && !isSameUser"
+          v-if="currentUser && !isSameUser"
           class="user-profile__follow-btn"
           :data-testid="
             isFollowed ? 'user-profile-unfollow-btn' : 'user-profile-follow-btn'
@@ -68,8 +68,10 @@ export default defineComponent({
   },
   computed: {
     ...mapState(useUserStore, {
-      user: (state) => state.user,
-      isSameUser: (state) => state.user?.id === this.user.id,
+      currentUser: (state) => state.user,
+      isSameUser(state) {
+        return state.user?.id === this.user.id;
+      },
     }),
     isFollowed() {
       return this.user.isFollowed;

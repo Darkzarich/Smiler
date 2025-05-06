@@ -256,7 +256,7 @@ export default defineComponent({
       if (this.$route.name !== 'Search') {
         options.push({
           title: 'Search tag',
-          callback: this.searchTag,
+          callback: this.searchByTag,
         });
       }
 
@@ -267,12 +267,12 @@ export default defineComponent({
         if (isTargetTagFollowed) {
           options.push({
             title: 'Unfollow tag',
-            callback: this.unfollowTag,
+            callback: this.handleUnfollowTag,
           });
         } else {
           options.push({
             title: 'Follow tag',
-            callback: this.followTag,
+            callback: this.handleFollowTag,
           });
         }
       }
@@ -423,7 +423,7 @@ export default defineComponent({
       }
     },
     // context menu options
-    async followTag(tag) {
+    async handleFollowTag(tag) {
       this.closeContextMenu();
       const res = await api.tags.follow(tag);
       if (!res.data.error) {
@@ -434,7 +434,7 @@ export default defineComponent({
         this.followTag(tag);
       }
     },
-    async unfollowTag(tag) {
+    async handleUnfollowTag(tag) {
       this.closeContextMenu();
 
       const res = await api.tags.unfollow(tag);
@@ -447,7 +447,7 @@ export default defineComponent({
         this.unfollowTag(tag);
       }
     },
-    searchTag(tag) {
+    searchByTag(tag) {
       this.$router.push({
         name: 'Search',
         query: {
