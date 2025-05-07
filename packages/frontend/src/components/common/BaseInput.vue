@@ -13,12 +13,12 @@
       :name="name"
       :placeholder="placeholder"
       class="base-input__input"
-      @input="setValue($event.target.value)"
+      @input="setValue"
       @keyup.enter="$emit('keyup.enter')"
     />
 
-    <div v-if="icon" class="base-input__icon" @click="$emit('click-icon')">
-      <Component :is="icon" />
+    <div v-if="$slots.iconRight" class="base-input__icon">
+      <slot name="icon-right" />
     </div>
 
     <span
@@ -31,72 +31,49 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
-import IconSearch from '@icons/IconSearch.vue';
+<script lang="ts" setup>
+import { ref } from 'vue';
 
-export default defineComponent({
-  components: {
-    IconSearch,
-  },
-  props: {
-    id: {
-      type: String,
-      default: () => crypto.randomUUID(),
-    },
-    dataTestid: {
-      type: String,
-      default: 'input',
-    },
-    modelValue: {
-      type: String,
-      default: '',
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-    type: {
-      type: String,
-      default: 'text',
-      validator(val) {
-        return ['text', 'password'].indexOf(val) !== -1;
-      },
-    },
-    name: {
-      type: String,
-      default: '',
-    },
-    placeholder: {
-      type: String,
-      default: 'Enter any text',
-    },
-    error: {
-      type: String,
-      default: '',
-    },
-    icon: {
-      type: String,
-      default: '',
-    },
-  },
-  emits: ['update:modelValue', 'keyup.enter', 'click-icon'],
-  data() {
-    return {
-      isDirty: false,
-    };
-  },
-  methods: {
-    setValue(val) {
-      this.$emit('update:modelValue', val);
-      this.isDirty = true;
-    },
-  },
+interface Emit {
+  'keyup.enter': [];
+}
+
+defineEmits<Emit>();
+
+interface Props {
+  dataTestid?: string;
+  disabled?: boolean;
+  label?: string;
+  type: 'text' | 'password';
+  name?: string;
+  placeholder?: string;
+  error?: string;
+  icon: string;
+}
+
+withDefaults(defineProps<Props>(), {
+  dataTestid: 'input',
+  disabled: false,
+  label: '',
+  name: '',
+  placeholder: 'Enter any text',
+  error: '',
 });
+
+const textAreaValue = defineModel<string>({
+  default: '',
+});
+
+const id = crypto.randomUUID();
+
+const isDirty = ref(false);
+
+const setValue = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+
+  textAreaValue.value = target.value;
+  isDirty.value = true;
+};
 </script>
 
 <style lang="scss">

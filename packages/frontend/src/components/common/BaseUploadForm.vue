@@ -1,31 +1,34 @@
 <template>
   <div class="base-upload-form">
-    <label class="base-upload-form__label">
+    <label class="base-upload-form__label" :for="id">
       <span>Upload image</span>
 
       <input
+        :id="id"
         class="base-upload-form__input"
         type="file"
-        @input="handleInput($event.target.files[0])"
-        @change="handleInput($event.target.files[0])"
+        @input="handleInput"
+        @change="handleInput"
       />
     </label>
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+const file = defineModel<File>();
 
-export default defineComponent({
-  props: ['modelValue'],
-  emits: ['update:modelValue'],
-  methods: {
-    handleInput(val) {
-      console.log(val);
-      this.$emit('update:modelValue', val);
-    },
-  },
-});
+// TODO: Replace all randomUUID with nano or something
+const id = crypto.randomUUID();
+
+const handleInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+
+  if (!target.files) {
+    return;
+  }
+
+  file.value = target.files[0];
+};
 </script>
 
 <style lang="scss">

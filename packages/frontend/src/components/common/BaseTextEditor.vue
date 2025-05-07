@@ -9,6 +9,7 @@
       >
         B
       </button>
+
       <button
         class="base-text-editor__style-button"
         type="button"
@@ -17,6 +18,7 @@
       >
         I
       </button>
+
       <button
         class="base-text-editor__style-button"
         type="button"
@@ -25,6 +27,7 @@
       >
         S
       </button>
+
       <button
         class="base-text-editor__style-button"
         type="button"
@@ -33,6 +36,7 @@
       >
         U
       </button>
+
       <button
         class="base-text-editor__style-button"
         type="button"
@@ -41,11 +45,12 @@
       >
         Q
       </button>
+
       <button
         class="base-text-editor__style-button"
         type="button"
         title="remove styles"
-        @click="removeStyles()"
+        @click="removeStyles"
       >
         REMOVE STYLES
       </button>
@@ -53,16 +58,16 @@
 
     <div
       :id="id"
-      :ref="'text-editor#' + id"
+      ref="editorRef"
       class="base-text-editor__contenteditable"
       :data-testid="`${dataTestid}-input`"
       role="textbox"
       tabIndex="0"
       contenteditable
-      @selectstart="selecting = true"
+      @selectstart="isSelecting = true"
       @mouseup="endSelect()"
       @focusout="setText()"
-      v-html="modelValue"
+      v-html="textEditorValue"
     />
 
     <!-- TODO: Add button name for this slot it's not obvious when its "default" -->
@@ -70,159 +75,148 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { onMounted, ref } from 'vue';
 
-export default defineComponent({
-  props: {
-    dataTestid: {
-      type: String,
-      default: 'text-editor-container',
-    },
-    id: {
-      type: String,
-      default: 'text-editor',
-    },
-    modelValue: {
-      type: String,
-      default: '',
-    },
-  },
-  emits: ['update:modelValue'],
-  data() {
-    return {
-      curSelection: '',
-      selectedDOMElement: null,
-      anchorOffset: 0,
-      focusOffset: 0,
-      editedText: '',
-      selecting: true,
-      tags: ['b', 'i', 's', 'u', 'cite'],
-    };
-  },
-  computed: {
-    curSelectionComp() {
-      const selection = document.getSelection();
+type Tag = 'b' | 'i' | 's' | 'u' | 'cite';
 
-      if (selection) {
-        return selection.anchorOffset;
-      }
+interface Props {
+  dataTestid?: string;
+}
 
-      return -1;
-    },
-  },
-  created() {
-    document.execCommand('defaultParagraphSeparator', false, 'br');
-  },
-  methods: {
-    removeStyles() {
-      let text = this.modelValue;
+withDefaults(defineProps<Props>(), {
+  dataTestid: 'input',
+});
 
-      this.tags.forEach((tag) => {
-        text = text.replace(new RegExp(`((</${tag}>)|(<${tag}>))*`, 'g'), '');
-      });
+const textEditorValue = defineModel<string>({
+  default: '',
+});
 
-      this.$emit('update:modelValue', text);
-    },
-    endSelect() {
-      const text = this.$refs[`text-editor#${this.id}`].innerHTML;
-      const selection = document.getSelection();
+const id = crypto.randomUUID();
 
-      if (this.selecting) {
-        if (selection.toString().replace(/\n/g, '<br>')) {
-          this.curSelection = selection.toString().replace(/\n/g, '<br>');
-          this.selectedDOMElement = selection.anchorNode;
-          // selection start index
-          this.anchorOffset =
-            selection.anchorOffset < selection.focusOffset
-              ? selection.anchorOffset
-              : selection.focusOffset;
-          // selection end index
-          this.focusOffset =
-            selection.anchorOffset < selection.focusOffset
-              ? selection.focusOffset
-              : selection.anchorOffset;
-        }
+const editorRef = ref<HTMLDivElement | null>(null);
 
-        console.log('curSelection / ', this.curSelection);
+const tags: Tag[] = ['b', 'i', 's', 'u', 'cite'];
 
-        console.log('curSelection obj / ', selection);
+const selectedDOMElement = ref<Text | null>(null);
 
-        this.selecting = false;
+const curSelection = ref('');
+const anchorOffset = ref(0);
+const focusOffset = ref(0);
+const editedText = ref('');
+const isSelecting = ref(true);
 
-        console.log('text: ', text);
+const removeStyles = () => {
+  let text = textEditorValue.value;
 
-        // text.replace(/<\/div>/g, '<br>')
+  tags.forEach((tag) => {
+    text = text.replace(new RegExp(`((</${tag}>)|(<${tag}>))*`, 'g'), '');
+  });
 
-        let replacedDivText = text;
+  textEditorValue.value = text;
+};
 
-        if (text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)) {
-          replacedDivText = text.replace(
-            text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)[2],
-            '',
-          );
-          console.log(
-            'replace1: ',
-            text.replace(
-              text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)[2],
-              '',
-            ),
-          );
-        }
+const endSelect = () => {
+  if (!editorRef.value) {
+    return;
+  }
 
-        console.log('replace2: ', replacedDivText.replace(/<\/div>/g, ''));
-        replacedDivText = replacedDivText.replace(/<\/div>/g, '');
+  const text = editorRef.value.innerHTML;
+  const selection = document.getSelection();
 
-        console.log(
-          'replace3: ',
-          replacedDivText
-            .replace(/<div>/g, '<br>')
-            .replace(/(<br>){2,}/g, '<br>'),
-        );
-        replacedDivText = replacedDivText
-          .replace(/<div>/g, '<br>')
-          .replace(/(<br>){2,}/g, '<br>');
+  if (isSelecting.value && selection) {
+    if (selection.toString().replace(/\n/g, '<br>')) {
+      curSelection.value = selection.toString().replace(/\n/g, '<br>');
+      selectedDOMElement.value = selection.anchorNode as Text;
+      // selection start index
+      anchorOffset.value =
+        selection.anchorOffset < selection.focusOffset
+          ? selection.anchorOffset
+          : selection.focusOffset;
+      // selection end index
+      focusOffset.value =
+        selection.anchorOffset < selection.focusOffset
+          ? selection.focusOffset
+          : selection.anchorOffset;
+    }
 
-        this.editedText = replacedDivText;
-      }
-    },
-    setText() {
-      this.selecting = true;
-      this.endSelect();
-      console.log('set text!');
-      this.$emit('update:modelValue', this.editedText);
-    },
-    styleSelected(tag) {
-      console.log('styleSelected curSelection: ', this.curSelection.trim());
-      console.log('DOM Ele: ', this.selectedDOMElement);
-      console.log('beforeChange ', this.modelValue);
+    console.log('curSelection / ', curSelection.value);
 
-      if (this.curSelection.trim().length > 0) {
-        // replace curSelection text with that text inside tags
-        this.selectedDOMElement.textContent =
-          `${this.selectedDOMElement.wholeText.slice(0, this.anchorOffset)}` +
-          `<${tag}>${this.curSelection.toString().trim()}</${tag}>` +
-          `${this.selectedDOMElement.wholeText.slice(this.focusOffset, this.selectedDOMElement.wholeText.length)}`;
+    console.log('curSelection obj / ', selection);
 
-        let DOMHTML = document.getElementById(this.id).innerHTML;
+    isSelecting.value = false;
 
-        /* replace all &lt; and &gt; with < and > because it gets transformed 
+    console.log('text: ', text);
+
+    // text.replace(/<\/div>/g, '<br>')
+
+    let replacedDivText = text;
+
+    const textMatch = text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/);
+
+    if (textMatch) {
+      replacedDivText = text.replace(textMatch[2], '');
+
+      console.log('replace1: ', text.replace(textMatch[2], ''));
+    }
+
+    console.log('replace2: ', replacedDivText.replace(/<\/div>/g, ''));
+
+    replacedDivText = replacedDivText.replace(/<\/div>/g, '');
+
+    console.log(
+      'replace3: ',
+      replacedDivText.replace(/<div>/g, '<br>').replace(/(<br>){2,}/g, '<br>'),
+    );
+    replacedDivText = replacedDivText
+      .replace(/<div>/g, '<br>')
+      .replace(/(<br>){2,}/g, '<br>');
+
+    editedText.value = replacedDivText;
+  }
+};
+
+const setText = () => {
+  isSelecting.value = true;
+
+  endSelect();
+
+  console.log('set text!');
+
+  textEditorValue.value = editedText.value;
+};
+
+const styleSelected = (tag: Tag) => {
+  console.log('styleSelected curSelection: ', curSelection.value.trim());
+  console.log('DOM Ele: ', selectedDOMElement.value);
+  console.log('beforeChange ', textEditorValue.value);
+
+  if (curSelection.value.trim().length > 0 && selectedDOMElement.value) {
+    // replace curSelection text with that text inside tags
+    selectedDOMElement.value.textContent =
+      `${selectedDOMElement.value.wholeText.slice(0, anchorOffset.value)}` +
+      `<${tag}>${curSelection.value.toString().trim()}</${tag}>` +
+      `${selectedDOMElement.value.wholeText.slice(focusOffset.value, selectedDOMElement.value.wholeText.length)}`;
+
+    let editorInnerHTML = editorRef.value!.innerHTML;
+
+    /* replace all &lt; and &gt; with < and > because it gets transformed
         to those automatically */
-        DOMHTML = DOMHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-        document.getElementById(this.id).innerHTML = DOMHTML;
+    editorInnerHTML = editorInnerHTML
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>');
 
-        /* TODO: clear the style when a tab button is clicked 
-        and selection was already styled <b> some text </b> ----> <b></b> 
-        some text <b></b> and then clean empty tags 
-        */
+    textEditorValue.value = editorInnerHTML;
 
-        this.$emit(
-          'update:modelValue',
-          document.getElementById(this.id).innerHTML,
-        );
-      }
-    },
-  },
+    /* TODO: clear the style when a tab button is clicked
+      and selection was already styled <b> some text </b> ----> <b></b>
+      some text <b></b> and then clean empty tags
+    */
+  }
+};
+
+onMounted(() => {
+  document.execCommand('defaultParagraphSeparator', false, 'br');
 });
 </script>
 

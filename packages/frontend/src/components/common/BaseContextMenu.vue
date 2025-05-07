@@ -18,41 +18,34 @@
   </Transition>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { computed } from 'vue';
 
-export default defineComponent({
-  props: {
-    show: {
-      type: Boolean,
-      default: false,
-    },
-    posX: {
-      type: Number,
-      default: 0,
-    },
-    posY: {
-      type: Number,
-      default: 0,
-    },
-    list: {
-      type: Array,
-      default: () => [],
-    },
-    target: {
-      type: String,
-      default: '',
-    },
-  },
-  computed: {
-    getPositionStyle() {
-      return {
-        // offset for every single element + abs offset
-        top: `${Number(this.posY) - 30 * this.list.length - 30}px`,
-        left: `${this.posX}px`,
-      };
-    },
-  },
+interface Props {
+  show?: boolean;
+  posX?: number;
+  posY?: number;
+  list: Array<{
+    title: string;
+    callback: (target: string) => void;
+  }>;
+  // TODO: Do I need this?
+  target?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  show: false,
+  posX: 0,
+  posY: 0,
+  target: '',
+});
+
+const getPositionStyle = computed(() => {
+  return {
+    // offset for every single element + abs offset
+    top: `${Number(props.posY) - 30 * props.list.length - 30}px`,
+    left: `${props.posX}px`,
+  };
 });
 </script>
 

@@ -15,7 +15,7 @@
       :name="name"
       :placeholder="placeholder"
       class="base-textarea__textarea"
-      @input="setValue($event.target.value)"
+      @input="setValue"
     />
 
     <span
@@ -28,61 +28,44 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { ref } from 'vue';
 
-export default defineComponent({
-  props: {
-    id: {
-      type: String,
-      default: () => crypto.randomUUID(),
-    },
-    dataTestid: {
-      type: String,
-      default: 'input',
-    },
-    modelValue: {
-      type: String,
-      default: '',
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-    name: {
-      type: String,
-      default: '',
-    },
-    placeholder: {
-      type: String,
-      default: 'Enter any text',
-    },
-    error: {
-      type: String,
-      default: '',
-    },
-    enterCallback: {
-      type: Function,
-      default: () => {},
-    },
-  },
-  emits: ['update:modelValue'],
-  data() {
-    return {
-      isDirty: false,
-    };
-  },
-  methods: {
-    setValue(val) {
-      this.$emit('update:modelValue', val);
-      this.isDirty = true;
-    },
-  },
+interface Props {
+  dataTestid?: string;
+  disabled?: boolean;
+  label?: string;
+  name?: string;
+  placeholder?: string;
+  error?: string;
+  // TODO: Why callback?
+  enterCallback?: () => void;
+}
+
+withDefaults(defineProps<Props>(), {
+  dataTestid: 'input',
+  disabled: false,
+  label: '',
+  name: '',
+  placeholder: 'Enter any text',
+  error: '',
+  enterCallback: () => {},
 });
+
+const textAreaValue = defineModel<string>({
+  default: '',
+});
+
+const id = crypto.randomUUID();
+
+const isDirty = ref(false);
+
+const setValue = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+
+  textAreaValue.value = target.value;
+  isDirty.value = true;
+};
 </script>
 
 <style lang="scss">

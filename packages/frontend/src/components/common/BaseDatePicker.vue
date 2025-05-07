@@ -10,31 +10,31 @@
       class="base-date-picker__input"
       :data-testid="dataTestid"
       type="date"
-      @input="$emit('update:modelValue', $event.target.value)"
+      @input="handleInput"
     />
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+interface Props {
+  dataTestid?: string;
+  label?: string;
+}
 
-export default defineComponent({
-  props: {
-    dataTestid: {
-      type: String,
-      default: 'datepicker',
-    },
-    modelValue: {
-      type: String,
-      default: '',
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-  },
-  emits: ['update:modelValue'],
+const date = defineModel<string>({
+  default: '',
 });
+
+withDefaults(defineProps<Props>(), {
+  dataTestid: 'datepicker',
+  label: '',
+});
+
+const handleInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+
+  date.value = target.value;
+};
 </script>
 
 <style lang="scss" scoped>

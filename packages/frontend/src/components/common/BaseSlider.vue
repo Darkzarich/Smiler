@@ -13,7 +13,7 @@
       :max="max"
       :min="min"
       step="1"
-      @input="$emit('update:modelValue', $event.target.value)"
+      @input="handleInput"
     />
 
     <span class="base-slider__value">
@@ -22,34 +22,30 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+interface Props {
+  dataTestid?: string;
+  label?: string;
+  min?: number;
+  max?: number;
+}
 
-export default defineComponent({
-  props: {
-    dataTestid: {
-      type: String,
-      default: 'slider',
-    },
-    modelValue: {
-      type: String,
-      default: '0',
-    },
-    label: {
-      type: String,
-      default: 'Slider',
-    },
-    min: {
-      type: Number,
-      default: -2000,
-    },
-    max: {
-      type: Number,
-      default: 9999,
-    },
-  },
-  emits: ['update:modelValue'],
+withDefaults(defineProps<Props>(), {
+  dataTestid: 'slider',
+  label: 'Slider',
+  min: -2000,
+  max: 9999,
 });
+
+const sliderValue = defineModel<string>({
+  default: '0',
+});
+
+const handleInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+
+  sliderValue.value = target.value;
+};
 </script>
 
 <style lang="scss" scoped>

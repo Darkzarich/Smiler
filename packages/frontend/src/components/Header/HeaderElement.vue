@@ -38,11 +38,13 @@
           v-model.trim="searchInputValue"
           placeholder="Search"
           data-testid="header-search-input"
-          icon="IconSearch"
           :style="'flex-direction: row'"
           @keyup.enter="search"
-          @click-icon="search"
-        />
+        >
+          <template #icon-right>
+            <IconSearch @click="search" />
+          </template>
+        </BaseInput>
       </div>
 
       <div v-if="user" class="header__avatar">
@@ -73,10 +75,12 @@ import BaseInput from '@common/BaseInput.vue';
 import Navigation from '@components/Navigation/Navigation.vue';
 import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
 import IconMenuMobile from '@icons/IconMenuMobile.vue';
+import IconSearch from '@icons/IconSearch.vue';
 import { isDesktop } from '@utils/is-desktop';
 
 export default defineComponent({
   components: {
+    IconSearch,
     HeaderMobileMenu,
     BaseInput,
     IconMenuMobile,
