@@ -5,7 +5,7 @@
       'comment-child-expander--expanded': isExpanded,
     }"
   >
-    {{ isExpanded ? '[-]' : '[+]' }}
+    {{ isExpanded ? '-' : '+' }}
   </div>
 </template>
 
@@ -24,10 +24,16 @@ export default defineComponent({
 
 <style lang="scss">
 .comment-child-expander {
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
-  margin-top: 16px;
-  margin-left: -10px;
+  width: 12px;
+  height: 12px;
+  margin-top: 20px;
+  margin-left: -18px;
+  border: 1px solid currentcolor;
+  background: var(--color-bg);
   color: var(--color-primary);
   font-family: monospace;
   font-weight: bold;

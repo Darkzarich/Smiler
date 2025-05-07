@@ -145,12 +145,15 @@
       />
     </div>
 
-    <CommentList
-      v-if="isChildrenExpanded"
-      :data="commentData.children"
-      :post-id="postId"
-      :level="level + 1"
-    />
+    <div v-if="isChildrenExpanded" class="comment-item__replies">
+      <CommentItem
+        v-for="childComment in commentData.children"
+        :key="childComment.id"
+        :comment="childComment"
+        :post-id="postId"
+        :level="level + 1"
+      />
+    </div>
   </div>
 </template>
 
@@ -439,6 +442,8 @@ export default defineComponent({
 @import '@/styles/mixins';
 
 .comment-item {
+  color: var(--color-main-text);
+
   &__content {
     margin: 1rem;
     padding: 1rem;
@@ -562,6 +567,12 @@ export default defineComponent({
     &--disabled {
       color: var(--color-gray-light) !important;
     }
+  }
+
+  &__replies {
+    margin-left: 19.5px;
+    padding-left: 8px;
+    border-left: solid 1px var(--color-gray-light);
   }
 }
 </style>

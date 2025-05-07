@@ -44,17 +44,17 @@ interface Props {
   dataTestid?: string;
   disabled?: boolean;
   label?: string;
-  type: 'text' | 'password';
+  type?: 'text' | 'password';
   name?: string;
   placeholder?: string;
   error?: string;
-  icon: string;
 }
 
 withDefaults(defineProps<Props>(), {
   dataTestid: 'input',
   disabled: false,
   label: '',
+  type: 'text',
   name: '',
   placeholder: 'Enter any text',
   error: '',

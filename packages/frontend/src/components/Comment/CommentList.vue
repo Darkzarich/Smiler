@@ -4,9 +4,6 @@
       v-for="comment in comments"
       :key="comment.id"
       class="comment-list__comment"
-      :class="{
-        'comment-list__comment--first': isFirst,
-      }"
     >
       <CommentItem
         :comment="comment"
@@ -39,10 +36,6 @@ export default defineComponent({
       type: Number,
       default: 1,
     },
-    isFirst: {
-      type: Boolean,
-      default: false,
-    },
   },
   data() {
     return {
@@ -70,17 +63,8 @@ export default defineComponent({
 
 .comment-list {
   &__comment {
-    margin-left: 32px;
-    border-left: solid 1px var(--color-gray-light);
-    color: var(--color-main-text);
-
-    &--first {
-      margin-left: 0 !important;
-      border-left: none !important;
-
-      @include for-size(phone-only) {
-        margin-left: -1rem !important;
-      }
+    @include for-size(phone-only) {
+      margin-left: -1rem;
     }
   }
 }
