@@ -7,12 +7,12 @@
       :style="getPositionStyle"
     >
       <li
-        v-for="item in list"
-        :key="item.title"
+        v-for="item in items"
+        :key="item.value"
         class="base-context-menu__item"
-        @click="item.callback(target)"
+        @click="$emit('action', item.value)"
       >
-        {{ item.title }}
+        {{ item.label }}
       </li>
     </ul>
   </Transition>
@@ -21,16 +21,20 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 
+type Option = {
+  value: string;
+  label: string;
+};
+
+defineEmits<{
+  action: [value: string];
+}>();
+
 interface Props {
   show?: boolean;
   posX?: number;
   posY?: number;
-  list: Array<{
-    title: string;
-    callback: (target: string) => void;
-  }>;
-  // TODO: Do I need this?
-  target?: string;
+  items: Option[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -43,7 +47,7 @@ const props = withDefaults(defineProps<Props>(), {
 const getPositionStyle = computed(() => {
   return {
     // offset for every single element + abs offset
-    top: `${Number(props.posY) - 30 * props.list.length - 30}px`,
+    top: `${Number(props.posY) - 30 * props.items.length - 30}px`,
     left: `${props.posX}px`,
   };
 });

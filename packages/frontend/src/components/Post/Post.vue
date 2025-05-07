@@ -200,8 +200,8 @@
       :show="contextMenuData.show"
       :pos-x="contextMenuData.x"
       :pos-y="contextMenuData.y"
-      :list="contextMenuOptions"
-      :target="contextMenuData.target"
+      :items="contextMenuOptions"
+      @action="handleContextMenuAction"
     />
   </div>
 </template>
@@ -255,8 +255,8 @@ export default defineComponent({
 
       if (this.$route.name !== 'Search') {
         options.push({
-          title: 'Search tag',
-          callback: this.searchByTag,
+          label: 'Search tag',
+          value: 'search',
         });
       }
 
@@ -266,13 +266,13 @@ export default defineComponent({
 
         if (isTargetTagFollowed) {
           options.push({
-            title: 'Unfollow tag',
-            callback: this.handleUnfollowTag,
+            label: 'Unfollow tag',
+            value: 'unfollow',
           });
         } else {
           options.push({
-            title: 'Follow tag',
-            callback: this.handleFollowTag,
+            label: 'Follow tag',
+            value: 'follow',
           });
         }
       }
@@ -422,8 +422,24 @@ export default defineComponent({
         this.contextMenuData.show = false;
       }
     },
+    handleContextMenuAction(action: string) {
+      const target = this.contextMenuData.target;
+
+      if (!target) {
+        return;
+      }
+
+      switch (action) {
+        case 'follow':
+          return this.handleFollowTag(target);
+        case 'unfollow':
+          return this.handleUnfollowTag(target);
+        case 'search':
+          return this.searchByTag(target);
+      }
+    },
     // context menu options
-    async handleFollowTag(tag) {
+    async handleFollowTag(tag: string) {
       this.closeContextMenu();
       const res = await api.tags.follow(tag);
       if (!res.data.error) {
@@ -434,7 +450,7 @@ export default defineComponent({
         this.followTag(tag);
       }
     },
-    async handleUnfollowTag(tag) {
+    async handleUnfollowTag(tag: string) {
       this.closeContextMenu();
 
       const res = await api.tags.unfollow(tag);
@@ -447,7 +463,7 @@ export default defineComponent({
         this.unfollowTag(tag);
       }
     },
-    searchByTag(tag) {
+    searchByTag(tag: string) {
       this.$router.push({
         name: 'Search',
         query: {
