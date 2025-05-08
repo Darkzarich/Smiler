@@ -65,7 +65,7 @@
 <script>
 import { mapWritableState } from 'pinia';
 import { defineComponent } from 'vue';
-import api from '@/api';
+import { api } from '@/api';
 import consts from '@/const/const';
 import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';

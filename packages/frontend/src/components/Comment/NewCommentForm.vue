@@ -30,7 +30,7 @@
 <script>
 import { mapActions, mapState } from 'pinia';
 import { defineComponent } from 'vue';
-import api from '@/api';
+import { api } from '@/api';
 import BaseButton from '@common/BaseButton.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 import { useUserStore } from '@/store/user';

@@ -51,7 +51,7 @@
 <script>
 import { mapActions } from 'pinia';
 import { defineComponent } from 'vue';
-import api from '@/api';
+import { api } from '@/api';
 import { useNotificationsStore } from '@/store/notifications';
 import { resolveImage } from '@/utils/resolve-image';
 import { resolveImageError } from '@/utils/resolve-image-error';

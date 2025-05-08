@@ -1,4 +1,4 @@
-import Query from './_query';
+import Query from './ApiClient';
 
 const CONTROLLER_URL = 'comments';
 

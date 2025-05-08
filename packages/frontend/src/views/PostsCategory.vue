@@ -20,7 +20,7 @@
 
 <script>
 import { defineComponent } from 'vue';
-import api from '@/api';
+import { api } from '@/api';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
 import consts from '@/const/const';
 

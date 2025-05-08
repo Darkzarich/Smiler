@@ -121,7 +121,7 @@
 <script>
 import { mapActions } from 'pinia';
 import { defineComponent } from 'vue';
-import api from '@/api';
+import { api } from '@/api';
 import consts from '@/const/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
@@ -175,7 +175,7 @@ export default defineComponent({
     async getData() {
       this.loading = true;
 
-      const { data } = await api.users.getUserSettings();
+      const { data } = await api.users.getCurrentUserSettings();
 
       if (!data.error) {
         this.usersFollowed = data.authors;

@@ -116,7 +116,7 @@ import PostEditorAddSectionButtons from './PostEditorAddSectionButtons.vue';
 import PostEditorPicture from './PostEditorPicture.vue';
 import PostEditorTags from './PostEditorTags.vue';
 import PostEditorVideo from './PostEditorVideo.vue';
-import api from '@/api';
+import { api } from '@/api';
 import consts from '@/const/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';

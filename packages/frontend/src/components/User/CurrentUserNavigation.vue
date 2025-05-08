@@ -32,7 +32,7 @@
 <script>
 import { mapActions } from 'pinia';
 import { defineComponent } from 'vue';
-import api from '@/api';
+import { api } from '@/api';
 import { useUserStore } from '@/store/user';
 import IconAdd from '@icons/IconAdd.vue';
 import IconExit from '@icons/IconExit.vue';

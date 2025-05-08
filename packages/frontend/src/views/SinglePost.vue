@@ -54,7 +54,7 @@
 <script>
 import { mapState } from 'pinia';
 import { defineComponent } from 'vue';
-import api from '@/api';
+import { api } from '@/api';
 import CommentList from '@/components/Comment/CommentList.vue';
 import consts from '@/const/const';
 import { useUserStore } from '@/store/user';
