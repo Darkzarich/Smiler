@@ -1,0 +1,36 @@
+import type { PostSection } from '@/api/posts/type';
+
+export interface GetUserProfileResponse {
+  id: string;
+  login: string;
+  rating: number;
+  bio: string;
+  avatar: string;
+  createdAt: string;
+  followersCount: number;
+  isFollowed: boolean;
+}
+
+export type UpdateUserProfileRequest = Pick<
+  GetUserProfileResponse,
+  'bio' | 'avatar'
+>;
+
+export type UpdateUserProfileResponse = GetUserProfileResponse;
+
+export interface GetUserTemplateResponse {
+  title: string;
+  tags: string[];
+  sections: PostSection[];
+}
+
+export type UpdateUserTemplateRequest = GetUserTemplateResponse;
+
+export type UpdateUserTemplateResponse = GetUserTemplateResponse;
+
+export interface GetCurrentUserSettings {
+  tags: string[];
+  authors: string[];
+  bio: string;
+  avatar: string;
+}
