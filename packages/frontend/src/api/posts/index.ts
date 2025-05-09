@@ -1,101 +1,78 @@
-import Query from './ApiClient';
+import { apiClient } from '../ApiClient';
+import type * as types from './types';
 
 const CONTROLLER_URL = 'posts';
 
 export default {
-  search(params) {
-    return Query({
-      url: CONTROLLER_URL,
-      method: 'get',
-      params,
-    });
+  search(params: types.PostsSearchRequest) {
+    return apiClient.get<types.PostsSearchResponse>(CONTROLLER_URL, params);
   },
-  getAll(params) {
-    return Query({
-      url: `${CONTROLLER_URL}/categories/all`,
-      method: 'get',
+  getAll(params: types.GetAllRequest) {
+    return apiClient.get<types.GetAllResponse>(
+      `${CONTROLLER_URL}/categories/all`,
       params,
-    });
+    );
   },
-  getToday(params) {
-    return Query({
-      url: `${CONTROLLER_URL}/categories/today`,
-      method: 'get',
+  getToday(params: types.GetTodayRequest) {
+    return apiClient.get<types.GetTodayResponse>(
+      `${CONTROLLER_URL}/categories/today`,
       params,
-    });
+    );
   },
-  getBlowing(params) {
-    return Query({
-      url: `${CONTROLLER_URL}/categories/blowing`,
-      method: 'get',
+  getBlowing(params: types.GetBlowingRequest) {
+    return apiClient.get<types.GetBlowingResponse>(
+      `${CONTROLLER_URL}/categories/blowing`,
       params,
-    });
+    );
   },
-  getRecent(params) {
-    return Query({
-      url: `${CONTROLLER_URL}/categories/recent`,
-      method: 'get',
+  getRecent(params: types.GetRecentRequest) {
+    return apiClient.get<types.GetRecentResponse>(
+      `${CONTROLLER_URL}/categories/recent`,
       params,
-    });
+    );
   },
-  getTopThisWeek(params) {
-    return Query({
-      url: `${CONTROLLER_URL}/categories/top-this-week`,
-      method: 'get',
+  getTopThisWeek(params: types.GetTopThisWeekRequest) {
+    return apiClient.get<types.GetTopThisWeekResponse>(
+      `${CONTROLLER_URL}/categories/top-this-week`,
       params,
-    });
+    );
   },
-  getFeed(params) {
-    return Query({
-      url: `${CONTROLLER_URL}/feed`,
-      method: 'get',
+  getFeed(params: types.GetFeedRequest) {
+    return apiClient.get<types.GetFeedResponse>(
+      `${CONTROLLER_URL}/feed`,
       params,
-    });
+    );
   },
-  createPost(data) {
-    return Query({
-      url: CONTROLLER_URL,
-      method: 'post',
+  createPost(data: types.CreatePostRequest) {
+    return apiClient.post<types.CreatePostResponse>(CONTROLLER_URL, data);
+  },
+  uploadAttachment(formData: FormData) {
+    return apiClient.post<types.UploadAttachmentResponse>(
+      `${CONTROLLER_URL}/upload`,
+      formData,
+    );
+  },
+  getPostBySlug(slug: string) {
+    return apiClient.get<types.GetPostBySlugResponse>(
+      `${CONTROLLER_URL}/${slug}`,
+    );
+  },
+  updatePostById(id: string, data: types.UpdatePostByIdRequest) {
+    return apiClient.put<types.UpdatePostByIdResponse>(
+      `${CONTROLLER_URL}/${id}`,
       data,
-    });
+    );
   },
-  uploadAttachment(formData) {
-    return Query({
-      url: `${CONTROLLER_URL}/upload`,
-      method: 'post',
-      data: formData,
-    });
+  deletePostById(id: string) {
+    return apiClient.delete(`${CONTROLLER_URL}/${id}`, {});
   },
-  getPostBySlug(slug) {
-    return Query({
-      url: `${CONTROLLER_URL}/${slug}`,
-      method: 'get',
-    });
-  },
-  updatePostById(id, data) {
-    return Query({
-      url: `${CONTROLLER_URL}/${id}`,
-      method: 'put',
+  updateRateById(id: string, data: types.UpdateRateByIdRequest) {
+    return apiClient.put<types.UpdateRateByIdResponse>(
+      `${CONTROLLER_URL}/${id}/vote`,
       data,
-    });
+    );
   },
-  deletePostById(id) {
-    return Query({
-      url: `${CONTROLLER_URL}/${id}`,
-      method: 'delete',
-    });
-  },
-  updateRateById(id, data) {
-    return Query({
-      url: `${CONTROLLER_URL}/${id}/vote`,
-      method: 'put',
-      data,
-    });
-  },
-  removeRateById(id) {
-    return Query({
-      url: `${CONTROLLER_URL}/${id}/vote`,
-      method: 'delete',
-    });
+  removeRateById(id: string) {
+    return apiClient.delete(`${CONTROLLER_URL}/${id}/vote`);
   },
 };

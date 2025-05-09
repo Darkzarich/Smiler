@@ -1,0 +1,51 @@
+import type { PaginationRequest, PaginationResponse } from '../types';
+
+export interface CommentAuthor {
+  id: string;
+  login: string;
+  avatar: string;
+}
+
+export interface CommentRate {
+  isRated: boolean;
+  negative?: boolean;
+}
+
+export interface Comment {
+  id: string;
+  parent: string; // parent comment id
+  author: CommentAuthor;
+  body: string;
+  children: Comment[];
+  createdAt: string;
+  updatedAt: string;
+  rated: CommentRate;
+}
+
+export interface GetCommentsRequest extends PaginationRequest {
+  post: string; // post id
+}
+
+export interface GetCommentsResponse extends PaginationResponse {
+  comments: Comment[];
+}
+
+export interface CreateCommentRequest {
+  postId: string;
+  parent?: string;
+  body: string;
+}
+
+export type CreateCommentResponse = Comment;
+
+export interface UpdateCommentRequest {
+  body: string;
+}
+
+export type UpdateCommentResponse = Comment;
+
+export interface UpdateRateByIdRequest {
+  negative: boolean;
+}
+
+export type UpdateRateByIdResponse = Comment;

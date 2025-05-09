@@ -1,4 +1,4 @@
-import type { PostSection } from '@/api/posts/type';
+import type { PostSection } from '@/api/posts/types';
 
 export interface GetUserProfileResponse {
   id: string;

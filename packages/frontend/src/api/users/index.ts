@@ -1,22 +1,16 @@
 import { apiClient } from '../ApiClient';
-import type {
-  GetUserProfileResponse,
-  UpdateUserProfileRequest,
-  UpdateUserProfileResponse,
-  GetUserTemplateResponse,
-  UpdateUserTemplateRequest,
-  UpdateUserTemplateResponse,
-  GetCurrentUserSettings,
-} from './types';
+import type * as types from './types';
 
 const CONTROLLER_URL = 'users';
 
 export default {
   getUserProfile(login: string) {
-    return apiClient.get<GetUserProfileResponse>(`${CONTROLLER_URL}/${login}`);
+    return apiClient.get<types.GetUserProfileResponse>(
+      `${CONTROLLER_URL}/${login}`,
+    );
   },
-  updateUserProfile(data: UpdateUserProfileRequest) {
-    return apiClient.put<UpdateUserProfileResponse>(
+  updateUserProfile(data: types.UpdateUserProfileRequest) {
+    return apiClient.put<types.UpdateUserProfileResponse>(
       `${CONTROLLER_URL}/me`,
       data,
     );
@@ -25,12 +19,12 @@ export default {
     return apiClient.delete(`${CONTROLLER_URL}/me/template/${hash}`);
   },
   getUserTemplate(id: string) {
-    return apiClient.get<GetUserTemplateResponse>(
+    return apiClient.get<types.GetUserTemplateResponse>(
       `${CONTROLLER_URL}/${id}/template`,
     );
   },
-  updateUserTemplate(id: string, data: UpdateUserTemplateRequest) {
-    return apiClient.put<UpdateUserTemplateResponse>(
+  updateUserTemplate(id: string, data: types.UpdateUserTemplateRequest) {
+    return apiClient.put<types.UpdateUserTemplateResponse>(
       `${CONTROLLER_URL}/${id}/template`,
       data,
     );
@@ -42,7 +36,7 @@ export default {
     return apiClient.delete(`${CONTROLLER_URL}/${id}/follow`);
   },
   getCurrentUserSettings() {
-    return apiClient.get<GetCurrentUserSettings>(
+    return apiClient.get<types.GetCurrentUserSettings>(
       `${CONTROLLER_URL}/me/settings`,
     );
   },

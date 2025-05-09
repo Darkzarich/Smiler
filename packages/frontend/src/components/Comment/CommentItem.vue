@@ -293,7 +293,7 @@ export default defineComponent({
         this.commentData.rating =
           this.commentData.rating + consts.COMMENT_RATE_VALUE;
 
-        const res = await api.comments.updateRate(this.commentData.id, {
+        const res = await api.comments.updateRateById(this.commentData.id, {
           negative: false,
         });
 
@@ -350,7 +350,7 @@ export default defineComponent({
         this.commentData.rating =
           this.commentData.rating - consts.COMMENT_RATE_VALUE;
 
-        const res = await api.comments.updateRate(this.commentData.id, {
+        const res = await api.comments.updateRateById(this.commentData.id, {
           negative: true,
         });
 

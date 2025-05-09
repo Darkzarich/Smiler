@@ -1,23 +1,25 @@
 import { apiClient } from '../ApiClient';
-import type {
-  CurrentUserResponse,
-  SignInRequest,
-  SignInResponse,
-  SignUpRequest,
-  SignUpResponse,
-} from './types';
+import type * as types from './types';
 
 const CONTROLLER_URL = 'auth';
 
 export default {
   getAuth() {
-    return apiClient.get<CurrentUserResponse>(`${CONTROLLER_URL}/current`);
+    return apiClient.get<types.CurrentUserResponse>(
+      `${CONTROLLER_URL}/current`,
+    );
   },
-  signIn(data: SignInRequest) {
-    return apiClient.post<SignInResponse>(`${CONTROLLER_URL}/signin`, data);
+  signIn(data: types.SignInRequest) {
+    return apiClient.post<types.SignInResponse>(
+      `${CONTROLLER_URL}/signin`,
+      data,
+    );
   },
   signUp(data: SignUpRequest) {
-    return apiClient.post<SignUpResponse>(`${CONTROLLER_URL}/signup`, data);
+    return apiClient.post<types.SignUpResponse>(
+      `${CONTROLLER_URL}/signup`,
+      data,
+    );
   },
   logout() {
     return apiClient.post(`${CONTROLLER_URL}/logout`);
