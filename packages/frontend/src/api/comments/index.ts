@@ -26,6 +26,8 @@ export default {
     );
   },
   removeRate(id: string) {
-    return apiClient.delete(`${CONTROLLER_URL}/${id}/vote`);
+    return apiClient.delete<types.UpdateRateByIdResponse>(
+      `${CONTROLLER_URL}/${id}/vote`,
+    );
   },
 };

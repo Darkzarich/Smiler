@@ -118,7 +118,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { mapActions } from 'pinia';
 import { defineComponent } from 'vue';
 import { api } from '@/api';
@@ -140,8 +140,8 @@ export default defineComponent({
   },
   data() {
     return {
-      usersFollowed: [],
-      tagsFollowed: [],
+      usersFollowed: [] as object[],
+      tagsFollowed: [] as string[],
       loading: true,
       requestingForTags: false,
       requestingForUsers: false,
@@ -173,100 +173,98 @@ export default defineComponent({
     ...mapActions(useNotificationsStore, ['showInfoNotification']),
     resolveAvatar,
     async getData() {
-      this.loading = true;
+      try {
+        this.loading = true;
 
-      const { data } = await api.users.getCurrentUserSettings();
+        const data = await api.users.getCurrentUserSettings();
 
-      if (!data.error) {
         this.usersFollowed = data.authors;
         this.tagsFollowed = data.tags;
         this.bioEditInput = data.bio;
         this.avatarEditInput = data.avatar;
+      } finally {
+        this.loading = false;
       }
-
-      this.loading = false;
     },
     async editBio() {
-      this.bioEditRequesting = true;
+      try {
+        this.bioEditRequesting = true;
 
-      const res = await api.users.updateUserProfile({
-        bio: this.bioEditInput,
-      });
+        const data = await api.users.updateUserProfile({
+          bio: this.bioEditInput,
+        });
 
-      this.bioEditRequesting = false;
-
-      if (!res.data.error) {
         this.showInfoNotification({
           message: 'Your bio has been successfully updated!',
         });
 
-        return;
+        this.bioEditInput = data.bio;
+      } finally {
+        this.bioEditRequesting = false;
       }
-
-      this.bioEditInput = res.data.bio;
     },
     async editAvatar() {
-      this.avatarEditRequesting = true;
+      try {
+        this.avatarEditRequesting = true;
 
-      const res = await api.users.updateUserProfile({
-        avatar: this.avatarEditInput,
-      });
+        const data = await api.users.updateUserProfile({
+          avatar: this.avatarEditInput,
+        });
 
-      this.avatarEditRequesting = false;
-
-      if (!res.data.error) {
         this.setAvatar(this.avatarEditInput);
 
         this.showInfoNotification({
           message: 'Your avatar has been successfully updated!',
         });
 
+        this.avatarEditInput = data.avatar;
+      } finally {
+        this.avatarEditRequesting = false;
+      }
+    },
+    async unfollowTag(tag: string) {
+      if (this.requestingForUsers) {
         return;
       }
 
-      this.avatarEditInput = res.data.avatar;
-    },
-    async unfollowTag(tag) {
-      if (!this.requestingForUsers) {
+      try {
         this.requestingForUsers = true;
-        const res = await api.tags.unfollow(tag);
 
-        if (!res.data.error) {
-          this.tagsFollowed.splice(this.tagsFollowed.indexOf(tag), 1);
-          this.unfollowTag(tag);
+        await api.tags.unfollow(tag);
 
-          this.showInfoNotification({
-            message: 'This tag was successfully unfollowed!',
-          });
-        }
+        this.tagsFollowed.splice(this.tagsFollowed.indexOf(tag), 1);
 
+        this.unfollowTag(tag);
+
+        this.showInfoNotification({
+          message: 'This tag was successfully unfollowed!',
+        });
+      } finally {
         this.requestingForUsers = false;
       }
     },
-    async unfollowUser(id) {
+    async unfollowUser(id: string) {
       if (this.requestingForTags) {
         return;
       }
 
-      this.requestingForTags = true;
-      const res = await api.users.unfollowUser(id);
+      try {
+        this.requestingForTags = true;
 
-      if (res.data.error) {
+        await api.users.unfollowUser(id);
+
+        const foundUser = this.usersFollowed.find((el) => el._id === id);
+
+        if (foundUser) {
+          this.usersFollowed.splice(this.usersFollowed.indexOf(foundUser), 1);
+        }
+
+        this.showInfoNotification({
+          message: 'This author was successfully unfollowed!',
+        });
+      } finally {
         this.requestingForTags = false;
-        return;
       }
-
-      const foundUser = this.usersFollowed.find((el) => el._id === id);
-
-      if (foundUser) {
-        this.usersFollowed.splice(this.usersFollowed.indexOf(foundUser), 1);
-      }
-
-      this.showInfoNotification({
-        message: 'This author was successfully unfollowed!',
-      });
-
-      this.requestingForTags = false;
     },
   },
 });

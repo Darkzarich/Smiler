@@ -62,7 +62,7 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
 import { mapWritableState } from 'pinia';
 import { defineComponent } from 'vue';
 import { api } from '@/api';
@@ -157,25 +157,27 @@ export default defineComponent({
         return;
       }
 
-      this.isLoading = true;
+      try {
+        this.isLoading = true;
 
-      const res = await api.auth.signUp({
-        email: this.email,
-        password: this.password,
-        login: this.login,
-        confirm: this.confirm,
-      });
+        const data = await api.auth.signUp({
+          email: this.email,
+          password: this.password,
+          login: this.login,
+          confirm: this.confirm,
+        });
 
-      this.isLoading = false;
+        this.user = data;
+      } catch (e) {
+        const error = e as Error;
 
-      if (res.data.error) {
         this.email = '';
         this.password = '';
         this.confirm = '';
         this.login = '';
-        this.requestError = res.data.error.message;
-      } else if (res.data.isAuth) {
-        this.user = res.data;
+        this.requestError = error.message;
+      } finally {
+        this.isLoading = false;
       }
     },
   },

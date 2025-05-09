@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import { api } from '@/api';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
@@ -32,26 +32,26 @@ export default defineComponent({
     PostsContainer,
   },
   async beforeRouteEnter(to, from, next) {
-    const user = await api.users.getUserProfile(to.params.login);
+    try {
+      const user = await api.users.getUserProfile(to.params.login as string);
 
-    if (user.data.error) {
+      next((vm) => vm.setUser(user));
+    } catch {
       next({
         name: 'NotFound',
       });
-    } else {
-      next((vm) => vm.setUser(user.data));
     }
   },
   async beforeRouteUpdate(to, from, next) {
-    const user = await api.users.getUserProfile(to.params.login);
+    try {
+      const user = await api.users.getUserProfile(to.params.login as string);
 
-    if (user.data.error) {
+      this.setUser(user);
+      this.fetchPosts();
+    } catch {
       next({
         name: 'NotFound',
       });
-    } else {
-      this.setUser(user.data);
-      this.fetchPosts();
     }
   },
   data() {
@@ -75,26 +75,26 @@ export default defineComponent({
      * @param {Object} options
      * @param {boolean=} options.isCombine - if true, posts are concatenated to the existing array
      */
-    async fetchPosts({ isCombine } = {}) {
-      this.isLoading = true;
+    async fetchPosts({ isCombine = false } = {}) {
+      try {
+        this.isLoading = true;
 
-      const res = await api.posts.search({
-        author: this.user.login || this.$route.params.login,
-        limit: consts.POSTS_INITIAL_COUNT,
-        offset: this.curPage * consts.POSTS_INITIAL_COUNT,
-      });
+        const data = await api.posts.search({
+          author: this.user.login || this.$route.params.login,
+          limit: consts.POSTS_INITIAL_COUNT,
+          offset: this.curPage * consts.POSTS_INITIAL_COUNT,
+        });
 
-      if (res && !res.data.error) {
-        this.hasNextPage = res.data.hasNextPage;
+        this.hasNextPage = data.hasNextPage;
 
         if (isCombine) {
-          this.posts = this.posts.concat(res.data.posts);
+          this.posts = this.posts.concat(data.posts);
         } else {
-          this.posts = res.data.posts;
+          this.posts = data.posts;
         }
+      } finally {
+        this.isLoading = false;
       }
-
-      this.isLoading = false;
     },
     handleNextPage() {
       this.curPage = this.curPage + 1;

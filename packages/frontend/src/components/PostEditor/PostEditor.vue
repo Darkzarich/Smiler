@@ -74,7 +74,7 @@
         <BaseButton
           class="post-editor__submit-form-btn"
           data-testid="finish-edit-post-button"
-          :loading="saving"
+          :loading="isSaving"
           :disabled="!sections.length"
           @click="saveEdited"
         >
@@ -87,7 +87,7 @@
           class="post-editor__submit-form-btn"
           stretched
           data-testid="create-post-button"
-          :loading="sending"
+          :loading="isSending"
           :disabled="isSubmitDisabled"
           @click="createPost"
         >
@@ -97,7 +97,7 @@
           stretched
           class="post-editor__submit-form-btn"
           data-testid="save-draft-button"
-          :loading="saving"
+          :loading="isSaving"
           :disabled="!isDirty"
           @click="saveDraft"
         >
@@ -142,8 +142,8 @@ export default defineComponent({
     return {
       isDirty: false,
       title: '',
-      sending: false,
-      saving: false,
+      isSending: false,
+      isSaving: false,
       sections: [],
       tags: [],
       POST_SECTION_TYPES: consts.POST_SECTION_TYPES,
@@ -205,13 +205,11 @@ export default defineComponent({
         return;
       }
 
-      const res = await api.users.getUserTemplate(this.userId);
+      const data = await api.users.getUserTemplate(this.userId);
 
-      if (!res.data.error) {
-        this.title = res.data.title;
-        this.sections = res.data.sections || [];
-        this.tags = res.data.tags || [];
-      }
+      this.title = data.title;
+      this.sections = data.sections || [];
+      this.tags = data.tags || [];
     }
 
     nextTick(() => {
@@ -221,59 +219,56 @@ export default defineComponent({
   methods: {
     ...mapActions(useNotificationsStore, ['showInfoNotification']),
     async createPost() {
-      this.sending = true;
-      const res = await api.posts.createPost({
-        sections: this.sections,
-        title: this.title,
-        tags: this.tags,
-      });
+      try {
+        this.isSending = true;
 
-      if (!res.data.error) {
+        const data = await api.posts.createPost({
+          sections: this.sections,
+          title: this.title,
+          tags: this.tags,
+        });
+
         this.$router.push({
           name: 'Single',
           params: {
-            slug: res.data.slug,
+            slug: data.slug,
           },
         });
+      } finally {
+        this.isSending = false;
       }
-
-      this.sending = false;
     },
     async saveEdited() {
-      const res = await api.posts.updatePostById(this.post.id, {
+      await api.posts.updatePostById(this.post.id, {
         title: this.title,
         sections: this.sections,
         tags: this.tags,
       });
 
-      if (!res.data.error) {
-        this.showInfoNotification({
-          message: 'Post has been saved successfully',
-        });
+      this.showInfoNotification({
+        message: 'Post has been saved successfully',
+      });
 
-        this.$router.push({
-          name: 'Single',
-          params: {
-            slug: this.post.slug,
-          },
-        });
-      }
+      this.$router.push({
+        name: 'Single',
+        params: {
+          slug: this.post.slug,
+        },
+      });
     },
     async saveDraft() {
-      this.saving = true;
+      try {
+        this.isSaving = true;
 
-      const res = await api.users.updateUserTemplate(this.userId, {
-        title: this.title,
-        sections: this.sections,
-        tags: this.tags,
-      });
+        const data = await api.users.updateUserTemplate(this.userId, {
+          title: this.title,
+          sections: this.sections,
+          tags: this.tags,
+        });
 
-      this.saving = false;
-
-      if (!res.data.error) {
-        this.title = res.data.title;
-        this.sections = res.data.sections;
-        this.tags = res.data.tags;
+        this.title = data.title;
+        this.sections = data.sections;
+        this.tags = data.tags;
 
         this.showInfoNotification({
           message: 'Draft post has been saved successfully!',
@@ -282,18 +277,16 @@ export default defineComponent({
         nextTick(() => {
           this.isDirty = false;
         });
+      } finally {
+        this.isSaving = false;
       }
     },
     async deleteSection(section) {
       if (section.type === this.POST_SECTION_TYPES.PICTURE && section.isFile) {
-        const res = await api.users.removeFilePicSection(section.hash);
-
-        if (!res.data.error) {
-          this.sections.splice(this.sections.indexOf(section), 1);
-        }
-      } else {
-        this.sections.splice(this.sections.indexOf(section), 1);
+        await api.users.removeFilePicSection(section.hash);
       }
+
+      this.sections.splice(this.sections.indexOf(section), 1);
     },
     setSection(data) {
       const section = this.sections.find((el) => el.url === data.url);

@@ -18,7 +18,7 @@
   </PostsContainer>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import { api } from '@/api';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
@@ -54,7 +54,7 @@ export default defineComponent({
      * @param {Object} options
      * @param {boolean=} options.isCombine - if true, posts are concatenated to the existing array
      */
-    async fetchPosts({ isCombine } = {}) {
+    async fetchPosts({ isCombine = false } = {}) {
       const pageRequestsMap = {
         Home: api.posts.getToday,
         All: api.posts.getAll,
@@ -68,14 +68,14 @@ export default defineComponent({
         return;
       }
 
-      this.isLoading = true;
+      try {
+        this.isLoading = true;
 
-      const res = await pageRequestsMap[this.$route.name]({
-        limit: consts.POSTS_INITIAL_COUNT,
-        offset: this.curPage * consts.POSTS_INITIAL_COUNT,
-      });
+        const res = await pageRequestsMap[this.$route.name]({
+          limit: consts.POSTS_INITIAL_COUNT,
+          offset: this.curPage * consts.POSTS_INITIAL_COUNT,
+        });
 
-      if (res && !res.data.error) {
         this.hasNextPage = res.data.hasNextPage;
 
         if (isCombine) {
@@ -83,9 +83,9 @@ export default defineComponent({
         } else {
           this.posts = res.data.posts;
         }
+      } finally {
+        this.isLoading = false;
       }
-
-      this.isLoading = false;
     },
     handleNextPage() {
       this.curPage = this.curPage + 1;

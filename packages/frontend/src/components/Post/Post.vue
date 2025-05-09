@@ -209,7 +209,7 @@
 <script lang="ts">
 import { mapActions, mapState } from 'pinia';
 import { defineComponent } from 'vue';
-import api from '@/api/index';
+import { api } from '@/api';
 import consts from '@/const/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
@@ -297,52 +297,54 @@ export default defineComponent({
 
       if (!this.postData.rated.isRated) {
         // Optimistic update
-        this.postData.rated.isRated = true;
-        this.postData.rated.negative = false;
-        this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
+        try {
+          this.postData.rated.isRated = true;
+          this.postData.rated.negative = false;
+          this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
 
-        const res = await api.posts.updateRateById(id, {
-          negative: false,
-        });
+          const data = await api.posts.updateRateById(id, {
+            negative: false,
+          });
 
-        this.isRequesting = false;
-
-        if (res.data.error) {
+          this.postData = {
+            ...this.postData,
+            rating: data.rating,
+            commentCount: data.commentCount,
+          };
+        } catch {
           this.postData.rated.isRated = false;
           this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
-
-          return;
+        } finally {
+          this.isRequesting = false;
         }
 
-        this.postData = {
-          ...this.postData,
-          rating: res.data.rating,
-          commentCount: res.data.commentCount,
-        };
-      } else if (this.postData.rated.negative) {
+        return;
+      }
+
+      if (this.postData.rated.negative) {
         // Optimistic update
-        this.postData.rated.isRated = false;
-        this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
+        try {
+          this.postData.rated.isRated = false;
+          this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
 
-        const res = await api.posts.removeRateById(id);
+          const data = await api.posts.removeRateById(id);
 
-        this.isRequesting = false;
-
-        if (res.data.error) {
+          this.postData = {
+            ...this.postData,
+            rating: data.rating,
+            commentCount: data.commentCount,
+          };
+        } catch {
           this.postData.rated.isRated = true;
           this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
-
-          return;
+        } finally {
+          this.isRequesting = false;
         }
 
-        this.postData = {
-          ...this.postData,
-          rating: res.data.rating,
-          commentCount: res.data.commentCount,
-        };
+        return;
       }
     },
-    async downvote(id) {
+    async downvote(id: string) {
       if (this.isRequesting) {
         return;
       }
@@ -351,61 +353,60 @@ export default defineComponent({
 
       if (!this.postData.rated.isRated) {
         // Optimistic update
-        this.postData.rated.isRated = true;
-        this.postData.rated.negative = true;
-        this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
+        try {
+          this.postData.rated.isRated = true;
+          this.postData.rated.negative = true;
+          this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
 
-        const res = await api.posts.updateRateById(id, {
-          negative: true,
-        });
+          const data = await api.posts.updateRateById(id, {
+            negative: true,
+          });
 
-        this.isRequesting = false;
-
-        if (res.data.error) {
+          this.postData = {
+            ...this.postData,
+            rating: data.rating,
+            commentCount: data.commentCount,
+          };
+        } catch {
           this.postData.rated.isRated = false;
           this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
-
-          return;
+        } finally {
+          this.isRequesting = false;
         }
 
-        this.postData = {
-          ...this.postData,
-          rating: res.data.rating,
-          commentCount: res.data.commentCount,
-        };
-      } else if (!this.postData.rated.negative) {
+        return;
+      }
+
+      if (!this.postData.rated.negative) {
         // Optimistic update
-        this.postData.rated.isRated = false;
-        this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
+        try {
+          this.postData.rated.isRated = false;
+          this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
 
-        const res = await api.posts.removeRateById(id);
-
-        this.isRequesting = false;
-
-        if (res.data.error) {
+          const data = await api.posts.removeRateById(id);
+          this.postData = {
+            ...this.postData,
+            rating: data.rating,
+            commentCount: data.commentCount,
+          };
+        } catch {
           this.postData.rated.isRated = true;
           this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
-
-          return;
+        } finally {
+          this.isRequesting = false;
         }
 
-        this.postData = {
-          ...this.postData,
-          rating: res.data.rating,
-          commentCount: res.data.commentCount,
-        };
+        return;
       }
     },
-    async deletePost(id) {
-      const res = await api.posts.deletePostById(id);
+    async deletePost(id: string) {
+      await api.posts.deletePostById(id);
 
-      if (!res.data.error) {
-        this.showInfoNotification({
-          message: 'The post has been successfully deleted',
-        });
+      this.showInfoNotification({
+        message: 'The post has been successfully deleted',
+      });
 
-        this.$router.push({ name: 'Home' });
-      }
+      this.$router.push({ name: 'Home' });
     },
     openContextMenu(ev, tag) {
       if (!this.contextMenuData.show) {
@@ -441,27 +442,25 @@ export default defineComponent({
     // context menu options
     async handleFollowTag(tag: string) {
       this.closeContextMenu();
-      const res = await api.tags.follow(tag);
-      if (!res.data.error) {
-        this.showInfoNotification({
-          message: "You're now following this tag!",
-        });
 
-        this.followTag(tag);
-      }
+      await api.tags.follow(tag);
+
+      this.showInfoNotification({
+        message: "You're now following this tag!",
+      });
+
+      this.followTag(tag);
     },
     async handleUnfollowTag(tag: string) {
       this.closeContextMenu();
 
-      const res = await api.tags.unfollow(tag);
+      await api.tags.unfollow(tag);
 
-      if (!res.data.error) {
-        this.showInfoNotification({
-          message: 'This tag was successfully unfollowed!',
-        });
+      this.showInfoNotification({
+        message: 'This tag was successfully unfollowed!',
+      });
 
-        this.unfollowTag(tag);
-      }
+      this.unfollowTag(tag);
     },
     searchByTag(tag: string) {
       this.$router.push({

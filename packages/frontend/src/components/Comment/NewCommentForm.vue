@@ -13,7 +13,7 @@
       >
         <BaseButton
           class="new-comment-form__submit-btn"
-          :loading="loading"
+          :loading="isLoading"
           data-testid="new-comment-button"
           @click="createComment"
         >
@@ -31,10 +31,10 @@
 import { mapActions, mapState } from 'pinia';
 import { defineComponent } from 'vue';
 import { api } from '@/api';
+import { useNotificationsStore } from '@/store/notifications';
+import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
-import { useUserStore } from '@/store/user';
-import { useNotificationsStore } from '@/store/notifications';
 
 export default defineComponent({
   components: {
@@ -51,7 +51,7 @@ export default defineComponent({
   data() {
     return {
       commentBody: '',
-      loading: false,
+      isLoading: false,
     };
   },
   computed: {
@@ -68,16 +68,16 @@ export default defineComponent({
         return;
       }
 
-      this.loading = true;
+      try {
+        this.isLoading = true;
 
-      const res = await api.comments.createComment({
-        post: this.postId,
-        body: this.commentBody,
-      });
+        const data = await api.comments.createComment({
+          post: this.postId,
+          body: this.commentBody,
+        });
 
-      if (!res.data.error) {
         const newComment = {
-          ...res.data,
+          ...data,
           rated: {
             isRated: false,
             negative: false,
@@ -92,9 +92,9 @@ export default defineComponent({
         this.$emit('new-comment', newComment);
 
         this.commentBody = '';
+      } finally {
+        this.isLoading = false;
       }
-
-      this.loading = false;
     },
   },
 });

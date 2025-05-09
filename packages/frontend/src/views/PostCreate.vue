@@ -7,10 +7,10 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { mapActions, mapState } from 'pinia';
 import { defineComponent } from 'vue';
-import api from '@/api/index';
+import { api } from '@/api';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { checkCanEditPost } from '@/utils/check-can-edit-post';
@@ -22,14 +22,14 @@ export default defineComponent({
   },
   async beforeRouteEnter(to, from, next) {
     if (to.meta.mode === 'edit') {
-      const res = await api.posts.getPostBySlug(to.params.slug);
+      try {
+        const data = await api.posts.getPostBySlug(to.params.slug as string);
 
-      if (res.data.error) {
+        next((vm) => vm.setPost(data));
+      } catch {
         next({
           name: 'NotFound',
         });
-      } else {
-        next((vm) => vm.setPost(res.data));
       }
     } else {
       next((vm) => vm.showEditor());

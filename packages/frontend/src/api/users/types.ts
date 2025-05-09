@@ -11,9 +11,8 @@ export interface GetUserProfileResponse {
   isFollowed: boolean;
 }
 
-export type UpdateUserProfileRequest = Pick<
-  GetUserProfileResponse,
-  'bio' | 'avatar'
+export type UpdateUserProfileRequest = Partial<
+  Pick<GetUserProfileResponse, 'bio' | 'avatar'>
 >;
 
 export type UpdateUserProfileResponse = GetUserProfileResponse;
@@ -30,7 +29,7 @@ export type UpdateUserTemplateResponse = GetUserTemplateResponse;
 
 export interface GetCurrentUserSettings {
   tags: string[];
-  authors: string[];
+  authors: Pick<GetUserProfileResponse, 'login' | 'avatar' | 'id'>[];
   bio: string;
   avatar: string;
 }

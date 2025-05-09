@@ -14,7 +14,7 @@
           :data-testid="
             isFollowed ? 'user-profile-unfollow-btn' : 'user-profile-follow-btn'
           "
-          :loading="requesting"
+          :loading="isRequesting"
           :type="isFollowed ? 'danger' : 'primary'"
           @click="handleFollow"
         >
@@ -39,10 +39,10 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { mapState } from 'pinia';
 import { defineComponent } from 'vue';
-import api from '@/api/index';
+import { api } from '@/api';
 import { useUserStore } from '@/store/user';
 import { formatFromNow } from '@/utils/format-from-now';
 import { resolveAvatar } from '@/utils/resolve-avatar';
@@ -63,7 +63,7 @@ export default defineComponent({
   },
   data() {
     return {
-      requesting: false,
+      isRequesting: false,
     };
   },
   computed: {
@@ -81,36 +81,36 @@ export default defineComponent({
     resolveAvatar,
     formatFromNow,
     async follow() {
-      if (this.requesting) {
+      if (this.isRequesting) {
         return;
       }
 
-      this.requesting = true;
+      try {
+        this.isRequesting = true;
 
-      const res = await api.users.followUser(this.user.id);
+        await api.users.followUser(this.user.id);
 
-      if (!res.data.error) {
         this.user.followersAmount = this.user.followersAmount + 1;
         this.user.isFollowed = true;
+      } finally {
+        this.isRequesting = false;
       }
-
-      this.requesting = false;
     },
     async unfollow() {
-      if (this.requesting) {
+      if (this.isRequesting) {
         return;
       }
 
-      this.requesting = true;
+      try {
+        this.isRequesting = true;
 
-      const res = await api.users.unfollowUser(this.user.id);
+        await api.users.unfollowUser(this.user.id);
 
-      if (!res.data.error) {
         this.user.followersAmount = this.user.followersAmount - 1;
         this.user.isFollowed = false;
+      } finally {
+        this.isRequesting = false;
       }
-
-      this.requesting = false;
     },
     async handleFollow() {
       if (this.isFollowed) {

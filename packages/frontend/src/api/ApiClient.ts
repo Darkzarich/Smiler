@@ -20,12 +20,12 @@ class ApiClient {
     withCredentials: true,
   });
 
-  private notificationsStore = useNotificationsStore();
-  private userStore = useUserStore();
-
   private async request<Response = OkResponse>(
     requestData: AxiosRequestConfig,
   ) {
+    const notificationsStore = useNotificationsStore();
+    const userStore = useUserStore();
+
     try {
       const res = await this.axiosClient.request<Response>(requestData);
 
@@ -35,7 +35,7 @@ class ApiClient {
         const { response } = error;
 
         if (!response || !response.data || !response.data.error.message) {
-          this.notificationsStore.showErrorNotification({
+          notificationsStore.showErrorNotification({
             message:
               'Oops! Something went wrong. Please try to reload the page and try again.',
           });
@@ -43,12 +43,12 @@ class ApiClient {
           throw error;
         }
 
-        this.notificationsStore.showErrorNotification({
+        notificationsStore.showErrorNotification({
           message: response.data.error.message,
         });
 
         if (response.status === 401) {
-          this.userStore.clearUser();
+          userStore.clearUser();
         }
       }
 

@@ -20,6 +20,8 @@ export interface Comment {
   createdAt: string;
   updatedAt: string;
   rated: CommentRate;
+  rating: number;
+  deleted?: boolean;
 }
 
 export interface GetCommentsRequest extends PaginationRequest {
@@ -31,7 +33,7 @@ export interface GetCommentsResponse extends PaginationResponse {
 }
 
 export interface CreateCommentRequest {
-  postId: string;
+  post: string; // post id
   parent?: string;
   body: string;
 }

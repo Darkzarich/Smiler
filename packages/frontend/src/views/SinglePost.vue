@@ -51,7 +51,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { mapState } from 'pinia';
 import { defineComponent } from 'vue';
 import { api } from '@/api';
@@ -71,14 +71,14 @@ export default defineComponent({
     CircularLoader,
   },
   async beforeRouteEnter(to, from, next) {
-    const res = await api.posts.getPostBySlug(to.params.slug);
+    try {
+      const data = await api.posts.getPostBySlug(to.params.slug as string);
 
-    if (res.data.error) {
+      next((vm) => vm.handleSetPost(data));
+    } catch {
       next({
         name: 'NotFound',
       });
-    } else {
-      next((vm) => vm.handleSetPost(res.data));
     }
   },
   data() {
@@ -111,30 +111,30 @@ export default defineComponent({
      * @param {Object} options
      * @param {boolean=} options.isCombine - if true, posts are concatenated to the existing array
      */
-    async fetchComments({ isCombine } = {}) {
+    async fetchComments({ isCombine = false } = {}) {
       if (!this.post) {
         return;
       }
 
-      this.isFetchingComments = true;
+      try {
+        this.isFetchingComments = true;
 
-      const res = await api.comments.getComments({
-        limit: consts.COMMENTS_INITIAL_COUNT,
-        post: this.post.id,
-        offset: 0 + this.commentsCurrentPage * consts.COMMENTS_INITIAL_COUNT,
-      });
+        const data = await api.comments.getComments({
+          limit: consts.COMMENTS_INITIAL_COUNT,
+          post: this.post.id,
+          offset: 0 + this.commentsCurrentPage * consts.COMMENTS_INITIAL_COUNT,
+        });
 
-      if (res && !res.data.error) {
-        this.hasCommentsNextPage = res.data.hasNextPage;
+        this.hasCommentsNextPage = data.hasNextPage;
 
         if (isCombine) {
-          this.comments = this.comments.concat(res.data.comments);
+          this.comments = this.comments.concat(data.comments);
         } else {
-          this.comments = res.data.comments;
+          this.comments = data.comments;
         }
+      } finally {
+        this.isFetchingComments = false;
       }
-
-      this.isFetchingComments = false;
     },
     async fetchMoreComments() {
       this.commentsCurrentPage = this.commentsCurrentPage + 1;

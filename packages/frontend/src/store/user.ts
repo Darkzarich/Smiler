@@ -40,10 +40,14 @@ export const useUserStore = defineStore('user', {
       this.user = null;
     },
     async userFetchAuthState() {
-      const res = await api.auth.getAuth();
+      try {
+        const user = await api.auth.getAuth();
 
-      if (res?.data?.isAuth) {
-        this.user = res.data;
+        if (user.isAuth) {
+          this.user = user;
+        }
+      } catch {
+        this.user = null;
       }
     },
     followTag(tag: string) {

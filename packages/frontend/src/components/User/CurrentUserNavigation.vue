@@ -47,13 +47,11 @@ export default defineComponent({
   methods: {
     ...mapActions(useUserStore, ['clearUser']),
     async logout() {
-      const res = await api.auth.logout();
-
-      if (!res.data.ok) {
-        return;
+      try {
+        await api.auth.logout();
+      } finally {
+        this.clearUser();
       }
-
-      this.clearUser();
     },
   },
 });

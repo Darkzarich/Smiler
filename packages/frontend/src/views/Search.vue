@@ -24,7 +24,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import { api } from '@/api';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
@@ -86,26 +86,26 @@ export default defineComponent({
      * @param {boolean=} options.isCombine - if true, posts are concatenated to the existing array
      * @param {Object} options.filters - filters to be applied to the request
      */
-    async fetchPosts({ isCombine, filters = this.filter } = {}) {
-      this.isLoading = true;
+    async fetchPosts({ isCombine = false, filters = this.filter } = {}) {
+      try {
+        this.isLoading = true;
 
-      const res = await api.posts.search({
-        limit: consts.POSTS_INITIAL_COUNT,
-        offset: this.curPage * consts.POSTS_INITIAL_COUNT,
-        ...filters,
-      });
+        const data = await api.posts.search({
+          limit: consts.POSTS_INITIAL_COUNT,
+          offset: this.curPage * consts.POSTS_INITIAL_COUNT,
+          ...filters,
+        });
 
-      if (res && !res.data.error) {
-        this.hasNextPage = res.data.hasNextPage;
+        this.hasNextPage = data.hasNextPage;
 
         if (isCombine) {
-          this.posts = this.posts.concat(res.data.posts);
+          this.posts = this.posts.concat(data.posts);
         } else {
-          this.posts = res.data.posts;
+          this.posts = data.posts;
         }
+      } finally {
+        this.isLoading = false;
       }
-
-      this.isLoading = false;
     },
     handleNextPage() {
       this.curPage = this.curPage + 1;

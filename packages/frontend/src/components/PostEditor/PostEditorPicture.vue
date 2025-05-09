@@ -111,19 +111,16 @@ export default defineComponent({
 
         formData.append('picture', this.file);
 
-        const res = await api.posts.uploadAttachment(formData);
+        try {
+          const data = await api.posts.uploadAttachment(formData);
 
-        // an error occurred
-        if (!res || !res.data.url) {
+          this.$emit('update:modelValue', data.url);
+          this.$emit('set-section', data);
+        } catch {
           this.reset();
 
           return;
         }
-
-        this.$emit('update:modelValue', res.data.url);
-        this.$emit('set-section', res.data);
-
-        return;
       }
 
       this.$emit('update:modelValue', this.imageUrl);

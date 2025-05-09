@@ -103,7 +103,7 @@
           class="comment-item__comment-form"
           :loading="isRequesting"
           data-testid="comment-edit"
-          @submit="edit(commentData.id)"
+          @submit="edit()"
           @close="toggleEdit"
         />
 
@@ -234,21 +234,22 @@ export default defineComponent({
       this.isEditComment = !this.isEditComment;
     },
     async edit() {
-      this.isRequesting = true;
+      try {
+        this.isRequesting = true;
 
-      const res = await api.comments.updateComment(this.commentData.id, {
-        body: this.editBody,
-      });
+        const data = await api.comments.updateComment(this.commentData.id, {
+          body: this.editBody,
+        });
 
-      if (!res.data.error) {
         this.commentData = {
           ...this.commentData,
-          ...res.data,
+          ...data,
         };
-        this.toggleEdit();
-      }
 
-      this.isRequesting = false;
+        this.toggleEdit();
+      } finally {
+        this.isRequesting = false;
+      }
     },
     // TODO: Changing post comment count on delete
     async handleDeleteComment() {
@@ -256,28 +257,23 @@ export default defineComponent({
         return;
       }
 
-      this.isRequesting = true;
+      try {
+        this.isRequesting = true;
 
-      const { id } = this.commentData;
+        const { id } = this.commentData;
 
-      const res = await api.comments.deleteComment(id);
+        await api.comments.deleteComment(id);
 
-      this.isRequesting = false;
+        if (!this.commentData.children?.length) {
+          this.$emit('remove');
 
-      if (res.data.error) {
-        return;
+          return;
+        }
+
+        this.commentData.deleted = true;
+      } finally {
+        this.isRequesting = false;
       }
-
-      if (
-        !this.commentData.children ||
-        this.commentData.children.length === 0
-      ) {
-        this.$emit('remove');
-
-        return;
-      }
-
-      this.commentData.deleted = true;
     },
     async upvote() {
       if (this.isRequesting) {
@@ -288,53 +284,55 @@ export default defineComponent({
 
       if (!this.commentData.rated.isRated) {
         // Optimistic update
-        this.commentData.rated.isRated = true;
-        this.commentData.rated.negative = false;
-        this.commentData.rating =
-          this.commentData.rating + consts.COMMENT_RATE_VALUE;
+        try {
+          this.commentData.rated.isRated = true;
+          this.commentData.rated.negative = false;
+          this.commentData.rating =
+            this.commentData.rating + consts.COMMENT_RATE_VALUE;
 
-        const res = await api.comments.updateRateById(this.commentData.id, {
-          negative: false,
-        });
+          const data = await api.comments.updateRateById(this.commentData.id, {
+            negative: false,
+          });
 
-        this.isRequesting = false;
-
-        if (res.data.error) {
+          this.commentData = {
+            ...this.commentData,
+            rating: data.rating,
+            deleted: data.deleted,
+          };
+        } catch {
           this.commentData.rated.isRated = false;
           this.commentData.rating =
             this.commentData.rating - consts.COMMENT_RATE_VALUE;
-
-          return;
+        } finally {
+          this.isRequesting = false;
         }
 
-        this.commentData = {
-          ...this.commentData,
-          rating: res.data.rating,
-          deleted: res.data.deleted,
-        };
-      } else if (this.commentData.rated.negative) {
+        return;
+      }
+
+      if (this.commentData.rated.negative) {
         // Optimistic update
-        this.commentData.rated.isRated = false;
-        this.commentData.rating =
-          this.commentData.rating + consts.COMMENT_RATE_VALUE;
+        try {
+          this.commentData.rated.isRated = false;
+          this.commentData.rating =
+            this.commentData.rating + consts.COMMENT_RATE_VALUE;
 
-        const res = await api.comments.removeRate(this.commentData.id);
+          const data = await api.comments.removeRate(this.commentData.id);
 
-        this.isRequesting = false;
-
-        if (res.data.error) {
+          this.commentData = {
+            ...this.commentData,
+            rating: data.rating,
+            deleted: data.deleted,
+          };
+        } catch {
           this.commentData.rated.isRated = true;
           this.commentData.rating =
             this.commentData.rating - consts.COMMENT_RATE_VALUE;
-
-          return;
+        } finally {
+          this.isRequesting = false;
         }
 
-        this.commentData = {
-          ...this.commentData,
-          rating: res.data.rating,
-          deleted: res.data.deleted,
-        };
+        return;
       }
     },
     async downvote() {
@@ -345,55 +343,55 @@ export default defineComponent({
       this.isRequesting = true;
 
       if (!this.commentData.rated.isRated) {
-        this.commentData.rated.isRated = true;
-        this.commentData.rated.negative = true;
-        this.commentData.rating =
-          this.commentData.rating - consts.COMMENT_RATE_VALUE;
+        try {
+          this.commentData.rated.isRated = true;
+          this.commentData.rated.negative = true;
+          this.commentData.rating =
+            this.commentData.rating - consts.COMMENT_RATE_VALUE;
 
-        const res = await api.comments.updateRateById(this.commentData.id, {
-          negative: true,
-        });
+          const data = await api.comments.updateRateById(this.commentData.id, {
+            negative: true,
+          });
 
-        this.isRequesting = false;
-
-        if (res.data.error) {
+          this.commentData = {
+            ...this.commentData,
+            rating: data.rating,
+            deleted: data.deleted,
+          };
+        } catch {
           this.commentData.rated.isRated = false;
           this.commentData.rating =
             this.commentData.rating + consts.COMMENT_RATE_VALUE;
-
-          return;
+        } finally {
+          this.isRequesting = false;
         }
 
-        this.commentData = {
-          ...this.commentData,
-          rating: res.data.rating,
-          deleted: res.data.deleted,
-        };
-      } else if (!this.commentData.rated.negative) {
-        this.commentData.rated.isRated = false;
-        this.commentData.rating =
-          this.commentData.rating - consts.COMMENT_RATE_VALUE;
+        return;
+      }
 
-        const res = await api.comments.removeRate(this.commentData.id);
+      if (!this.commentData.rated.negative) {
+        try {
+          this.commentData.rated.isRated = false;
+          this.commentData.rating =
+            this.commentData.rating - consts.COMMENT_RATE_VALUE;
 
-        this.isRequesting = false;
+          const data = await api.comments.removeRate(this.commentData.id);
 
-        if (res.data.error) {
+          this.commentData = {
+            ...this.commentData,
+            rating: data.rating,
+            deleted: data.deleted,
+          };
+        } catch {
           this.commentData.rated.isRated = true;
           this.commentData.rating =
             this.commentData.rating + consts.COMMENT_RATE_VALUE;
-
-          return;
+        } finally {
+          this.isRequesting = false;
         }
 
-        this.commentData = {
-          ...this.commentData,
-          rating: res.data.rating,
-          deleted: res.data.deleted,
-        };
+        return;
       }
-
-      this.isRequesting = false;
     },
     async reply() {
       if (!this.replyBody || !this.user) {
@@ -404,17 +402,17 @@ export default defineComponent({
         return;
       }
 
-      this.isRequesting = true;
+      try {
+        this.isRequesting = true;
 
-      const res = await api.comments.createComment({
-        post: this.postId,
-        parent: this.commentData.id,
-        body: this.replyBody,
-      });
+        const data = await api.comments.createComment({
+          post: this.postId,
+          parent: this.commentData.id,
+          body: this.replyBody,
+        });
 
-      if (res?.data && !res.data.error) {
         const newComment = {
-          ...res.data,
+          ...data,
           rated: {
             isRated: false,
             negative: false,
@@ -430,9 +428,9 @@ export default defineComponent({
 
         this.replyBody = '';
         this.toggleReply();
+      } finally {
+        this.isRequesting = false;
       }
-
-      this.isRequesting = false;
     },
   },
 });
