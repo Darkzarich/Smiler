@@ -71,17 +71,17 @@ export default defineComponent({
       try {
         this.isLoading = true;
 
-        const res = await pageRequestsMap[this.$route.name]({
+        const data = await pageRequestsMap[this.$route.name]({
           limit: consts.POSTS_INITIAL_COUNT,
           offset: this.curPage * consts.POSTS_INITIAL_COUNT,
         });
 
-        this.hasNextPage = res.data.hasNextPage;
+        this.hasNextPage = data.hasNextPage;
 
         if (isCombine) {
-          this.posts = this.posts.concat(res.data.posts);
+          this.posts = this.posts.concat(data.posts);
         } else {
-          this.posts = res.data.posts;
+          this.posts = data.posts;
         }
       } finally {
         this.isLoading = false;
