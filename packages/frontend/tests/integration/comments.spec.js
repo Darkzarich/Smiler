@@ -13,8 +13,6 @@ const auth = createRandomAuth({
 const post = createRandomPost();
 const comment = createRandomComment({}, true);
 
-// ! FIX TESTS!!!
-
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
     body: auth,

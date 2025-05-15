@@ -43,7 +43,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 // TODO: This can be a BasicElements
-import consts from '@/const/const';
+import * as consts from '@/const';
 import BaseInput from '@common/BaseInput.vue';
 
 export default defineComponent({

@@ -1,7 +1,8 @@
-import consts from '@/const/const';
+import type * as commentTypes from '@/api/comments/types';
+import * as consts from '@/const';
 
 export function checkCanEditComment(
-  comment: any,
+  comment: commentTypes.Comment,
   currentUserId?: string,
 ): boolean {
   if (

@@ -43,7 +43,7 @@
 import { mapWritableState } from 'pinia';
 import { defineComponent } from 'vue';
 import { api } from '@/api';
-import consts from '@/const/const';
+import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';

@@ -1,9 +1,9 @@
-import consts from '@/const/const';
+import * as consts from '@/const';
 
 export function generateVideoEmbedLink(url: string): string {
   try {
     const youtubeRegExp = consts.POST_SECTION_VIDEO_REGEXP.YOUTUBE;
-    let matchedURL = url.match(youtubeRegExp);
+    const matchedURL = url.match(youtubeRegExp);
 
     if (matchedURL) {
       if (matchedURL.length > 0 && (matchedURL[6] || matchedURL[8])) {
@@ -11,14 +11,15 @@ export function generateVideoEmbedLink(url: string): string {
       }
     }
 
-    matchedURL = consts.POST_SECTION_VIDEO_REGEXP.OTHERS.test(url);
+    const isOtherVideoService =
+      consts.POST_SECTION_VIDEO_REGEXP.OTHERS.test(url);
 
-    if (matchedURL) {
+    if (isOtherVideoService) {
       return url;
     }
 
     return 'error';
-  } catch (e) {
+  } catch {
     return 'error';
   }
 }

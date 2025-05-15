@@ -1,7 +1,8 @@
-import consts from '@/const/const';
+import type * as postTypes from '@/api/posts/types';
+import * as consts from '@/const';
 
 export function checkCanEditPost(
-  post: any,
+  post: postTypes.Post,
   currentUserId: string | undefined | null,
 ): boolean {
   if (!currentUserId || !post.author || post.author.id !== currentUserId) {

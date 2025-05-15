@@ -117,7 +117,7 @@ import PostEditorPicture from './PostEditorPicture.vue';
 import PostEditorTags from './PostEditorTags.vue';
 import PostEditorVideo from './PostEditorVideo.vue';
 import { api } from '@/api';
-import consts from '@/const/const';
+import * as consts from '@/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';

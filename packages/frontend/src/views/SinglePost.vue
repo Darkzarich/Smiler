@@ -56,7 +56,7 @@ import { mapState } from 'pinia';
 import { defineComponent } from 'vue';
 import { api } from '@/api';
 import CommentList from '@/components/Comment/CommentList.vue';
-import consts from '@/const/const';
+import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
 import { checkCanEditPost } from '@/utils/check-can-edit-post';
 import NewCommentForm from '@components/Comment/NewCommentForm.vue';

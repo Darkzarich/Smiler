@@ -210,7 +210,7 @@
 import { mapActions, mapState } from 'pinia';
 import { defineComponent } from 'vue';
 import { api } from '@/api';
-import consts from '@/const/const';
+import * as consts from '@/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { formatFromNow } from '@/utils/format-from-now';

@@ -34,7 +34,7 @@
 
 <script>
 import { defineComponent } from 'vue';
-import consts from '@/const/const';
+import * as consts from '@/const';
 import IconPicture from '@icons/IconPicture.vue';
 import IconText from '@icons/IconText.vue';
 import IconVideo from '@icons/IconVideo.vue';

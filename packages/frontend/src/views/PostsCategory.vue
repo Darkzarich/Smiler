@@ -22,7 +22,7 @@
 import { defineComponent } from 'vue';
 import { api } from '@/api';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
-import consts from '@/const/const';
+import * as consts from '@/const';
 
 export default defineComponent({
   components: {
