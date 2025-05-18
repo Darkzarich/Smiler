@@ -38,7 +38,7 @@ const handleInput = (event: Event) => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .base-date-picker {
   &__label {

@@ -24,11 +24,11 @@ const goHome = () => {
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .not-found {
-  @include widget;
-  @include flex-col;
+  @include mixins.widget;
+  @include mixins.flex-col;
 
   align-items: center;
 
@@ -43,7 +43,7 @@ const goHome = () => {
     color: var(--color-main-text);
     font-size: 48px;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       font-size: 32px;
     }
   }

@@ -113,7 +113,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .search-form {
   &__title {
@@ -129,14 +129,14 @@ export default defineComponent({
   }
 
   &__columns {
-    @include flex-row;
+    @include mixins.flex-row;
 
     justify-content: space-around;
     margin-bottom: 12px;
   }
 
   &__column {
-    @include flex-col;
+    @include mixins.flex-col;
 
     justify-content: center;
   }
@@ -147,7 +147,7 @@ export default defineComponent({
   }
 
   &__actions {
-    @include flex-row;
+    @include mixins.flex-row;
 
     gap: 16px;
     margin-top: 24px;

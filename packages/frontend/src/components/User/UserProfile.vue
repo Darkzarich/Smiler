@@ -124,10 +124,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .user-profile {
-  @include flex-row;
+  @include mixins.flex-row;
 
   position: relative;
   margin-bottom: var(--variable-widget-margin);
@@ -137,7 +137,7 @@ export default defineComponent({
   background: var(--color-widget-bg);
   color: var(--color-main-text);
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     width: 100%;
     margin-left: 0;
     border: none;
@@ -159,7 +159,7 @@ export default defineComponent({
     filter: grayscale(1);
     pointer-events: none;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       display: none;
     }
   }
@@ -176,7 +176,7 @@ export default defineComponent({
   }
 
   &__login {
-    @include flex-row;
+    @include mixins.flex-row;
 
     align-items: center;
     font-size: 1.5rem;

@@ -101,13 +101,13 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .new-comment-form {
   padding: 1rem;
   padding-top: 0;
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     padding: 0;
   }
 

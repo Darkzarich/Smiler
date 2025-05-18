@@ -59,10 +59,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .current-user {
-  @include widget;
+  @include mixins.widget;
 
   padding: 0;
 
@@ -77,7 +77,7 @@ export default defineComponent({
     background: var(--color-header);
     user-select: none;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       padding: 0.5rem;
     }
   }
@@ -97,7 +97,7 @@ export default defineComponent({
     text-align: center;
     font-size: 1rem;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       margin: 0.5rem;
     }
   }

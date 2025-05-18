@@ -153,7 +153,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .post-container {
   margin-bottom: 1.5rem;
@@ -163,7 +163,7 @@ export default defineComponent({
   margin-bottom: 2rem;
   padding: 1rem;
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     padding: 0;
     border: none;
   }
@@ -189,7 +189,7 @@ export default defineComponent({
     text-align: center;
     font-size: 1.2rem;
 
-    @include widget;
+    @include mixins.widget;
   }
 
   &__fetch-more {

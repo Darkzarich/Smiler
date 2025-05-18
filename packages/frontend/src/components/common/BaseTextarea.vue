@@ -69,10 +69,10 @@ const setValue = (event: Event) => {
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .base-textarea {
-  @include flex-col;
+  @include mixins.flex-col;
 
   &__label {
     margin-bottom: 4px;

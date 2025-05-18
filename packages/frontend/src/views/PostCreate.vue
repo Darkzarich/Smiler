@@ -89,13 +89,13 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .post-create {
-  @include widget;
-  @include flex-col;
+  @include mixins.widget;
+  @include mixins.flex-col;
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     padding-right: 0;
     padding-left: 0;
     border: none;

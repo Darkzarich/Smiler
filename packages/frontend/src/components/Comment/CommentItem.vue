@@ -437,7 +437,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .comment-item {
   color: var(--color-main-text);
@@ -448,7 +448,7 @@ export default defineComponent({
     border-radius: 8px;
     background: var(--color-widget-bg);
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       margin-right: 0;
     }
 

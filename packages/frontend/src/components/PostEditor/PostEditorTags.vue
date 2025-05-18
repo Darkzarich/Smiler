@@ -96,10 +96,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .post-editor-tags {
-  @include flex-row;
+  @include mixins.flex-row;
 
   flex-wrap: wrap;
   align-items: center;

@@ -45,7 +45,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .notification-list {
   position: fixed;
@@ -54,7 +54,7 @@ export default defineComponent({
   width: 100%;
 
   &__item {
-    @include flex-row;
+    @include mixins.flex-row;
 
     justify-content: center;
     align-items: center;
@@ -85,7 +85,7 @@ export default defineComponent({
       opacity: 0;
       transform: translateY(15px);
 
-      @include for-size(phone-only) {
+      @include mixins.for-size(phone-only) {
         transform: translateY(-15px);
       }
     }

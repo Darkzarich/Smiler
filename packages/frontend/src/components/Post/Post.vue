@@ -475,7 +475,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .post {
   display: flex;
@@ -487,7 +487,7 @@ export default defineComponent({
     align-items: center;
     width: 10%;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       display: none;
     }
   }
@@ -530,7 +530,7 @@ export default defineComponent({
       fill: var(--color-gray-light);
       transition: all 200ms ease-out;
 
-      @include for-size(phone-only) {
+      @include mixins.for-size(phone-only) {
         width: 3rem;
       }
     }
@@ -558,7 +558,7 @@ export default defineComponent({
   }
 
   &__tags {
-    @include flex-row;
+    @include mixins.flex-row;
 
     flex-wrap: wrap;
     margin-bottom: 1rem;
@@ -580,12 +580,12 @@ export default defineComponent({
   }
 
   &__main {
-    @include widget;
+    @include mixins.widget;
 
     width: 90%;
     color: var(--color-main-text);
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       width: 100%;
       border: none;
       border-radius: 0;
@@ -595,7 +595,7 @@ export default defineComponent({
   &__rate-mobile {
     display: none;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -621,7 +621,7 @@ export default defineComponent({
     margin-top: 1rem;
     margin-bottom: 1rem;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       width: 110%;
       margin-left: -1rem;
       border: none;
@@ -635,7 +635,7 @@ export default defineComponent({
   }
 
   &__footer {
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       margin-top: -1rem;
     }
   }
@@ -652,7 +652,7 @@ export default defineComponent({
     border-bottom-left-radius: 8px;
     background: var(--color-header);
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       border-top: none;
     }
   }

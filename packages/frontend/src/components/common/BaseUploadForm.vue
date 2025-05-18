@@ -32,10 +32,10 @@ const handleInput = (event: Event) => {
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .base-upload-form {
-  @include flex-col;
+  @include mixins.flex-col;
 
   &__label {
     display: block;

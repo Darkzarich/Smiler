@@ -125,7 +125,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .header {
   display: flex;
@@ -138,7 +138,7 @@ export default defineComponent({
   padding: 0.5rem;
   background-color: var(--color-header);
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     height: 46px;
   }
 
@@ -152,7 +152,7 @@ export default defineComponent({
     max-width: 1110px;
     padding-left: 40px;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       padding-right: 0;
       padding-left: 0;
     }
@@ -163,7 +163,7 @@ export default defineComponent({
     margin-right: 1rem;
     cursor: pointer;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       display: block;
 
       svg {
@@ -182,7 +182,7 @@ export default defineComponent({
       opacity: 0;
       transform: translateY(15px);
 
-      @include for-size(phone-only) {
+      @include mixins.for-size(phone-only) {
         transform: translateY(-15px);
       }
     }
@@ -195,13 +195,13 @@ export default defineComponent({
   }
 
   &__navigation {
-    @include flex-row;
+    @include mixins.flex-row;
 
     align-items: center;
     gap: 16px;
     margin-left: 4rem;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       margin-left: 0;
     }
   }
@@ -229,7 +229,7 @@ export default defineComponent({
     align-items: center;
     margin-left: auto;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       width: 70%;
     }
   }
@@ -246,7 +246,7 @@ export default defineComponent({
       border-radius: 50%;
       cursor: pointer;
 
-      @include for-size(phone-only) {
+      @include mixins.for-size(phone-only) {
         width: 2rem;
         height: 2rem;
       }

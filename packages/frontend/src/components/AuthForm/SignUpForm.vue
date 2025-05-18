@@ -185,10 +185,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .signup-form {
-  @include flex-col;
+  @include mixins.flex-col;
 
   align-items: center;
 

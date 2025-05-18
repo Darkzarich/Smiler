@@ -49,7 +49,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .mobile-menu {
   position: fixed;
@@ -72,7 +72,7 @@ export default defineComponent({
   }
 
   &__navigation {
-    @include flex-col;
+    @include mixins.flex-col;
 
     overflow-x: hidden;
   }

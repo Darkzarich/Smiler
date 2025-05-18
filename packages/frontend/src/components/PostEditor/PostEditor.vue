@@ -304,7 +304,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .post-editor {
   &__title {
@@ -317,7 +317,7 @@ export default defineComponent({
   }
 
   &__section {
-    @include flex-row;
+    @include mixins.flex-row;
 
     align-items: center;
     position: relative;
@@ -328,7 +328,7 @@ export default defineComponent({
       border: 1px solid var(--color-gray-light);
       border-radius: 8px;
 
-      @include for-size(phone-only) {
+      @include mixins.for-size(phone-only) {
         border-right: none;
         border-left: none;
         border-radius: 0;
@@ -370,7 +370,7 @@ export default defineComponent({
     border: none;
     background-color: transparent;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       top: -14px;
       right: 12px;
       width: 10px;

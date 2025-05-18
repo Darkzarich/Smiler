@@ -33,10 +33,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .user-stats {
-  @include flex-row;
+  @include mixins.flex-row;
 
   gap: 2rem;
   color: var(--color-main-text);

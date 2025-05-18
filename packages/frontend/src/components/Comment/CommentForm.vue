@@ -56,11 +56,11 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .comment-form {
   &__actions {
-    @include flex-row;
+    @include mixins.flex-row;
 
     gap: 16px;
     margin-top: 20px;

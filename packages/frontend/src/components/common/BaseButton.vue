@@ -1,4 +1,3 @@
-
 <template>
   <button
     :type="attrType"
@@ -42,7 +41,7 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .base-button {
   display: flex;

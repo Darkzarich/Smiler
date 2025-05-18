@@ -54,7 +54,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 :root {
   --variable-widget-margin: 24px;
@@ -139,7 +139,7 @@ h6 {
     flex: 1;
     margin-right: var(--variable-widget-margin);
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       width: 100%;
       margin-right: 0;
     }
@@ -148,7 +148,7 @@ h6 {
   &__sidebar {
     width: 26%;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       display: none;
     }
   }

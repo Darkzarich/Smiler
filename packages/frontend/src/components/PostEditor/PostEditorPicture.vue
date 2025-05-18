@@ -144,7 +144,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .post-editor-picture {
   width: 100%;
@@ -152,7 +152,7 @@ export default defineComponent({
   border: 1px solid var(--color-gray-light);
   border-radius: 8px;
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     border-right: none;
     border-left: none;
     border-radius: 0;

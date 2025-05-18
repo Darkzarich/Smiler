@@ -77,10 +77,10 @@ const setValue = (event: Event) => {
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .base-input {
-  @include flex-col;
+  @include mixins.flex-col;
 
   // TODO: Width 100%?
 

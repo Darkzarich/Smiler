@@ -20,12 +20,12 @@ export default defineComponent({});
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 footer {
-  @include flex-row;
+  @include mixins.flex-row;
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     height: 2rem;
   }
 

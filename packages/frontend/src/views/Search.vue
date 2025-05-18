@@ -116,13 +116,13 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .search {
   &__form {
-    @include widget;
+    @include mixins.widget;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       margin-left: 0;
       border: none;
     }

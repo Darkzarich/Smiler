@@ -59,11 +59,11 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .comment-list {
   &__comment {
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       margin-left: -1rem;
     }
   }

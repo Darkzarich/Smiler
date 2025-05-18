@@ -221,16 +221,16 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .base-text-editor {
-  @include widget;
+  @include mixins.widget;
 
   width: 100%;
   padding: 1rem;
   transition: border 200ms ease-out;
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     padding-right: 0;
     padding-left: 0;
     border-right: 1px solid transparent;
@@ -238,12 +238,12 @@ onMounted(() => {
   }
 
   &__style-buttons {
-    @include flex-row;
+    @include mixins.flex-row;
 
     gap: 8px;
     margin-bottom: 1rem;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       margin-left: 1rem;
     }
   }
@@ -292,7 +292,7 @@ onMounted(() => {
       background-color: var(--color-widget-bg);
     }
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       min-height: 9rem;
       border-right: none;
       border-left: none;

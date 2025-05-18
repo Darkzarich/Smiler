@@ -82,7 +82,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .posts-container {
   &__loading,
@@ -91,7 +91,7 @@ export default defineComponent({
     margin-left: 10%;
     text-align: center;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       margin-left: 0% !important;
       border: none !important;
       border-radius: 0 !important;
@@ -103,15 +103,15 @@ export default defineComponent({
   }
 
   &__loading {
-    @include widget;
-    @include flex-row;
+    @include mixins.widget;
+    @include mixins.flex-row;
 
     justify-content: center;
   }
 
   &__no-posts,
   &__no-more {
-    @include widget;
+    @include mixins.widget;
 
     display: flex;
     justify-content: center;
