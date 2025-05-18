@@ -68,7 +68,7 @@ export interface PostsSearchResponse extends PaginationResponse {
   posts: Post[];
 }
 
-export interface GetCommonListResponse extends PaginationRequest {
+export interface GetCommonListResponse extends PaginationResponse {
   posts: Post[];
 }
 

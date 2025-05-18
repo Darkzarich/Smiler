@@ -1,7 +1,7 @@
 <template>
   <PostsContainer
     :posts="posts"
-    :is-loading="isLoading"
+    :is-loading="isFetching"
     :has-next-page="hasNextPage"
     @fetch-more="handleNextPage"
   >
@@ -18,79 +18,82 @@
   </PostsContainer>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { onBeforeMount, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { api } from '@/api';
+import type { Post } from '@/api/posts/types';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
 import * as consts from '@/const';
 
-export default defineComponent({
-  components: {
-    PostsContainer,
-  },
-  data() {
-    return {
-      isLoading: false,
-      posts: [],
-      curPage: 0,
-      hasNextPage: false,
-    };
-  },
-  watch: {
-    '$route.name': function () {
-      this.posts = [];
-      this.isLoading = false;
-      this.curPage = 0;
-      this.hasNextPage = false;
-      this.fetchPosts();
-    },
-  },
-  created() {
-    this.fetchPosts();
-  },
-  methods: {
-    /**
-     *
-     * @param {Object} options
-     * @param {boolean=} options.isCombine - if true, posts are concatenated to the existing array
-     */
-    async fetchPosts({ isCombine = false } = {}) {
-      const pageRequestsMap = {
-        Home: api.posts.getToday,
-        All: api.posts.getAll,
-        Blowing: api.posts.getBlowing,
-        TopThisWeek: api.posts.getTopThisWeek,
-        New: api.posts.getRecent,
-        Feed: api.posts.getFeed,
-      };
+const route = useRoute();
 
-      if (!pageRequestsMap[this.$route.name]) {
-        return;
-      }
+const isFetching = ref(false);
 
-      try {
-        this.isLoading = true;
+const posts = ref<Post[]>([]);
 
-        const data = await pageRequestsMap[this.$route.name]({
-          limit: consts.POSTS_INITIAL_COUNT,
-          offset: this.curPage * consts.POSTS_INITIAL_COUNT,
-        });
+const curPage = ref(0);
+const hasNextPage = ref(false);
 
-        this.hasNextPage = data.hasNextPage;
+/**
+ *
+ * @param options
+ * @param options.isCombine - if true, posts are concatenated to the existing array
+ */
+const fetchPosts = async ({ isCombine = false } = {}) => {
+  const pageApiRequestsMap = {
+    Home: api.posts.getToday,
+    All: api.posts.getAll,
+    Blowing: api.posts.getBlowing,
+    TopThisWeek: api.posts.getTopThisWeek,
+    New: api.posts.getRecent,
+    Feed: api.posts.getFeed,
+  };
 
-        if (isCombine) {
-          this.posts = this.posts.concat(data.posts);
-        } else {
-          this.posts = data.posts;
-        }
-      } finally {
-        this.isLoading = false;
-      }
-    },
-    handleNextPage() {
-      this.curPage = this.curPage + 1;
-      this.fetchPosts({ isCombine: true });
-    },
+  const apiRequestByPageName =
+    pageApiRequestsMap[route.name as keyof typeof pageApiRequestsMap];
+
+  if (!apiRequestByPageName) {
+    return;
+  }
+
+  try {
+    isFetching.value = true;
+
+    const data = await apiRequestByPageName({
+      limit: consts.POSTS_INITIAL_COUNT,
+      offset: curPage.value * consts.POSTS_INITIAL_COUNT,
+    });
+
+    hasNextPage.value = data.hasNextPage;
+
+    if (isCombine) {
+      posts.value = posts.value.concat(data.posts);
+    } else {
+      posts.value = data.posts;
+    }
+  } finally {
+    isFetching.value = false;
+  }
+};
+
+const handleNextPage = () => {
+  curPage.value = curPage.value + 1;
+  fetchPosts({ isCombine: true });
+};
+
+watch(
+  () => route.name,
+  () => {
+    posts.value = [];
+    isFetching.value = false;
+    curPage.value = 0;
+    hasNextPage.value = false;
+    fetchPosts();
   },
+);
+
+onBeforeMount(() => {
+  fetchPosts();
 });
 </script>

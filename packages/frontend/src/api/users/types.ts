@@ -1,6 +1,7 @@
 import type { PostSection } from '@/api/posts/types';
 
 export interface GetUserProfileResponse {
+  _id: string;
   id: string;
   login: string;
   rating: number;
@@ -29,7 +30,7 @@ export type UpdateUserTemplateResponse = GetUserTemplateResponse;
 
 export interface GetCurrentUserSettings {
   tags: string[];
-  authors: Pick<GetUserProfileResponse, 'login' | 'avatar' | 'id'>[];
+  authors: Pick<GetUserProfileResponse, 'login' | 'avatar' | '_id'>[];
   bio: string;
   avatar: string;
 }

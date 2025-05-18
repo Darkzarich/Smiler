@@ -1,6 +1,6 @@
 <template>
   <div class="user-settings">
-    <div v-if="!loading" class="user-settings__data">
+    <div v-if="!isFetching" class="user-settings__data">
       <h1 class="user-settings__title">Settings</h1>
 
       <div class="user-settings__block">
@@ -23,7 +23,7 @@
               <span
                 class="user-settings__unfollow"
                 :data-testid="`user-settings-author-${author._id}-unfollow`"
-                @click="unfollowUser(author._id)"
+                @click="handleUnfollowUser(author._id)"
               >
                 x
               </span>
@@ -46,7 +46,7 @@
               <span
                 class="user-settings__unfollow"
                 :data-testid="`user-settings-tag-${tag}-unfollow`"
-                @click="unfollowTag(tag)"
+                @click="handleUnfollowTag(tag)"
               >
                 x
               </span>
@@ -78,7 +78,7 @@
         <BaseButton
           class="user-settings__submit-btn"
           data-testid="user-settings-bio-submit"
-          :loading="bioEditRequesting"
+          :is-fetching="bioEditRequesting"
           :disabled="Boolean(bioTooLongError)"
           @click="editBio"
         >
@@ -103,8 +103,8 @@
         <BaseButton
           class="user-settings__submit-btn"
           data-testid="user-settings-avatar-submit"
-          :loading="avatarEditRequesting"
-          :disabled="avatarEditInput.length > USER_MAX_AVATAR_LENGTH"
+          :is-fetching="avatarEditRequesting"
+          :disabled="avatarEditInput.length > consts.USER_MAX_AVATAR_LENGTH"
           @click="editAvatar"
         >
           Save
@@ -112,16 +112,16 @@
       </div>
     </div>
 
-    <div v-else class="user-settings__loading">
+    <div v-else class="user-settings__isFetching">
       <CircularLoader />
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { mapActions } from 'pinia';
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { computed, onBeforeMount, ref } from 'vue';
 import { api } from '@/api';
+import type { GetCurrentUserSettings as Settings } from '@/api/users/types';
 import * as consts from '@/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
@@ -131,142 +131,140 @@ import BaseInput from '@common/BaseInput.vue';
 import BaseTextarea from '@common/BaseTextarea.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 
-export default defineComponent({
-  components: {
-    CircularLoader,
-    BaseInput,
-    BaseTextarea,
-    BaseButton,
-  },
-  data() {
-    return {
-      usersFollowed: [] as object[],
-      tagsFollowed: [] as string[],
-      loading: true,
-      requestingForTags: false,
-      requestingForUsers: false,
-      bioEditInput: '',
-      bioEditRequesting: false,
-      avatarEditInput: '',
-      avatarEditRequesting: false,
-      USER_MAX_BIO_LENGTH: consts.USER_MAX_BIO_LENGTH,
-      USER_MAX_AVATAR_LENGTH: consts.USER_MAX_AVATAR_LENGTH,
-    };
-  },
-  computed: {
-    isFollowingAnything() {
-      return this.usersFollowed.length || this.tagsFollowed.length;
-    },
-    bioTooLongError() {
-      if (this.bioEditInput.length > this.USER_MAX_BIO_LENGTH) {
-        return 'Bio is too long';
-      }
+const { unfollowTag, setAvatar } = useUserStore();
 
-      return '';
-    },
-  },
-  created() {
-    this.getData();
-  },
-  methods: {
-    ...mapActions(useUserStore, ['unfollowTag', 'setAvatar']),
-    ...mapActions(useNotificationsStore, ['showInfoNotification']),
-    resolveAvatar,
-    async getData() {
-      try {
-        this.loading = true;
+const { showInfoNotification } = useNotificationsStore();
 
-        const data = await api.users.getCurrentUserSettings();
+const isFetching = ref(true);
+const isUpdating = ref(false);
 
-        this.usersFollowed = data.authors;
-        this.tagsFollowed = data.tags;
-        this.bioEditInput = data.bio;
-        this.avatarEditInput = data.avatar;
-      } finally {
-        this.loading = false;
-      }
-    },
-    async editBio() {
-      try {
-        this.bioEditRequesting = true;
+const usersFollowed = ref<Settings['authors']>([]);
 
-        const data = await api.users.updateUserProfile({
-          bio: this.bioEditInput,
-        });
+const handleUnfollowUser = async (id: string) => {
+  if (isUpdating.value) {
+    return;
+  }
 
-        this.showInfoNotification({
-          message: 'Your bio has been successfully updated!',
-        });
+  try {
+    isUpdating.value = true;
 
-        this.bioEditInput = data.bio;
-      } finally {
-        this.bioEditRequesting = false;
-      }
-    },
-    async editAvatar() {
-      try {
-        this.avatarEditRequesting = true;
+    await api.users.unfollowUser(id);
 
-        const data = await api.users.updateUserProfile({
-          avatar: this.avatarEditInput,
-        });
+    const foundUser = usersFollowed.value.find((el) => el._id === id);
 
-        this.setAvatar(this.avatarEditInput);
+    if (foundUser) {
+      usersFollowed.value.splice(usersFollowed.value.indexOf(foundUser), 1);
+    }
 
-        this.showInfoNotification({
-          message: 'Your avatar has been successfully updated!',
-        });
+    showInfoNotification({
+      message: 'This author was successfully unfollowed!',
+    });
+  } finally {
+    isUpdating.value = false;
+  }
+};
 
-        this.avatarEditInput = data.avatar;
-      } finally {
-        this.avatarEditRequesting = false;
-      }
-    },
-    async unfollowTag(tag: string) {
-      if (this.requestingForUsers) {
-        return;
-      }
+const tagsFollowed = ref<Settings['tags']>([]);
 
-      try {
-        this.requestingForUsers = true;
+const handleUnfollowTag = async (tag: string) => {
+  if (isUpdating.value) {
+    return;
+  }
 
-        await api.tags.unfollow(tag);
+  try {
+    isUpdating.value = true;
 
-        this.tagsFollowed.splice(this.tagsFollowed.indexOf(tag), 1);
+    await api.tags.unfollow(tag);
 
-        this.unfollowTag(tag);
+    const unfollowedTagIndex = tagsFollowed.value.indexOf(tag);
 
-        this.showInfoNotification({
-          message: 'This tag was successfully unfollowed!',
-        });
-      } finally {
-        this.requestingForUsers = false;
-      }
-    },
-    async unfollowUser(id: string) {
-      if (this.requestingForTags) {
-        return;
-      }
+    if (unfollowedTagIndex !== -1) {
+      tagsFollowed.value.splice(unfollowedTagIndex, 1);
+    }
 
-      try {
-        this.requestingForTags = true;
+    unfollowTag(tag);
 
-        await api.users.unfollowUser(id);
+    showInfoNotification({
+      message: 'This tag was successfully unfollowed!',
+    });
+  } finally {
+    isUpdating.value = false;
+  }
+};
 
-        const foundUser = this.usersFollowed.find((el) => el._id === id);
+const isFollowingAnything = computed(
+  () => usersFollowed.value.length || tagsFollowed.value.length,
+);
 
-        if (foundUser) {
-          this.usersFollowed.splice(this.usersFollowed.indexOf(foundUser), 1);
-        }
+const bioEditInput = ref('');
+const bioEditRequesting = ref(false);
 
-        this.showInfoNotification({
-          message: 'This author was successfully unfollowed!',
-        });
-      } finally {
-        this.requestingForTags = false;
-      }
-    },
-  },
+const bioTooLongError = computed(() => {
+  if (bioEditInput.value.length > consts.USER_MAX_BIO_LENGTH) {
+    return 'Bio is too long';
+  }
+
+  return '';
+});
+
+const editBio = async () => {
+  try {
+    bioEditRequesting.value = true;
+
+    const data = await api.users.updateUserProfile({
+      bio: bioEditInput.value,
+    });
+
+    showInfoNotification({
+      message: 'Your bio has been successfully updated!',
+    });
+
+    bioEditInput.value = data.bio;
+  } finally {
+    bioEditRequesting.value = false;
+  }
+};
+
+const avatarEditInput = ref('');
+const avatarEditRequesting = ref(false);
+
+const editAvatar = async () => {
+  try {
+    avatarEditRequesting.value = true;
+
+    const data = await api.users.updateUserProfile({
+      avatar: avatarEditInput.value,
+    });
+
+    setAvatar(avatarEditInput.value);
+
+    showInfoNotification({
+      message: 'Your avatar has been successfully updated!',
+    });
+
+    avatarEditInput.value = data.avatar;
+  } finally {
+    avatarEditRequesting.value = false;
+  }
+};
+
+const fetchData = async () => {
+  try {
+    isFetching.value = true;
+
+    const data = await api.users.getCurrentUserSettings();
+
+    usersFollowed.value = data.authors;
+    tagsFollowed.value = data.tags;
+    bioEditInput.value = data.bio;
+    avatarEditInput.value = data.avatar;
+  } finally {
+    isFetching.value = false;
+  }
+};
+
+onBeforeMount(() => {
+  fetchData();
 });
 </script>
 

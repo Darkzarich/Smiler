@@ -10,22 +10,17 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script setup>
+import { useRouter } from 'vue-router';
 import BaseButton from '@common/BaseButton.vue';
 
-export default defineComponent({
-  components: {
-    BaseButton,
-  },
-  methods: {
-    goHome() {
-      this.$router.push({
-        name: 'Home',
-      });
-    },
-  },
-});
+const router = useRouter();
+
+const goHome = () => {
+  router.push({
+    name: 'Home',
+  });
+};
 </script>
 
 <style lang="scss">
