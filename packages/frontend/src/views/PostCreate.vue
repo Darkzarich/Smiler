@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" class="post-create">
+  <div v-if="isShow" class="post-create">
     <h1 class="post-create__header" data-testid="post-create-header">
       {{ isEdit ? 'Edit' : 'Make' }} Post
     </h1>
@@ -7,84 +7,87 @@
   </div>
 </template>
 
-<script lang="ts">
-import { mapActions, mapState } from 'pinia';
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+// TODO: Rename component to something better
+import { onBeforeMount, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { api } from '@/api';
+import type { Post } from '@/api/posts/types';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { checkCanEditPost } from '@/utils/check-can-edit-post';
 import PostEditor from '@components/PostEditor/PostEditor.vue';
 
-export default defineComponent({
-  components: {
-    PostEditor,
-  },
-  async beforeRouteEnter(to, from, next) {
-    if (to.meta.mode === 'edit') {
-      try {
-        const data = await api.posts.getPostBySlug(to.params.slug as string);
+const route = useRoute();
+const router = useRouter();
 
-        next((vm) => vm.setPost(data));
-      } catch {
-        next({
-          name: 'NotFound',
-        });
-      }
-    } else {
-      next((vm) => vm.showEditor());
+const userStore = useUserStore();
+
+const { showErrorNotification } = useNotificationsStore();
+
+const key = ref('');
+
+// TODO: Loader \ Skeleton
+const isShow = ref(false);
+
+const isEdit = ref(false);
+
+const post = ref<Post | null>(null);
+
+const showEditor = () => {
+  post.value = null;
+  isEdit.value = false;
+  isShow.value = true;
+  key.value = '';
+};
+
+const handleSetPost = (fetchedPost: Post) => {
+  isShow.value = false;
+  key.value = 'edit';
+
+  const userId = userStore.user?.id;
+
+  if (fetchedPost.author.id !== userId) {
+    showErrorNotification({
+      message: "Only post's author can edit this post",
+    });
+
+    return router.push({
+      name: 'Home',
+    });
+  }
+
+  if (!checkCanEditPost(fetchedPost, userId)) {
+    showErrorNotification({
+      message:
+        'You cannot edit this post anymore. The time allowed to edit has expired',
+    });
+
+    return router.push({
+      name: 'Home',
+    });
+  }
+
+  post.value = fetchedPost;
+  isEdit.value = true;
+  isShow.value = true;
+};
+
+onBeforeMount(async () => {
+  // TODO: ??? was that the only way?
+  if (route.meta.mode === 'edit') {
+    try {
+      const data = await api.posts.getPostBySlug(route.params.slug as string);
+
+      handleSetPost(data);
+    } catch {
+      router.push({
+        name: 'NotFound',
+      });
     }
-  },
-  data() {
-    return {
-      isEdit: false,
-      post: null,
-      show: false,
-      key: '',
-    };
-  },
-  computed: {
-    ...mapState(useUserStore, {
-      userId: (state) => state.user?.id,
-    }),
-  },
-  methods: {
-    ...mapActions(useNotificationsStore, ['showErrorNotification']),
-    checkCanEditPost,
-    showEditor() {
-      this.post = null;
-      this.isEdit = false;
-      this.show = true;
-      this.key = '';
-    },
-    setPost(data) {
-      this.show = false;
-      this.key = 'edit';
-
-      if (data.author.id !== this.userId) {
-        this.showErrorNotification({
-          message: "Only post's author can edit this post",
-        });
-
-        this.$router.push({
-          name: 'Home',
-        });
-      } else if (!this.checkCanEditPost(data, this.userId)) {
-        this.showErrorNotification({
-          message:
-            'You cannot edit this post anymore. The time allowed to edit has expired',
-        });
-
-        this.$router.push({
-          name: 'Home',
-        });
-      } else {
-        this.post = data;
-        this.isEdit = true;
-        this.show = true;
-      }
-    },
-  },
+  } else {
+    showEditor();
+  }
 });
 </script>
 

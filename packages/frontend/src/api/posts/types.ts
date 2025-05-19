@@ -57,6 +57,7 @@ export interface Post {
 }
 
 export interface PostsSearchRequest extends PaginationRequest {
+  author?: string;
   title?: string;
   dateFrom?: string;
   dateTo?: string;

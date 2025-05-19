@@ -1,6 +1,7 @@
 <template>
   <div>
-    <UserProfile :user="user" />
+    <!-- TODO: Skeleton? -->
+    <UserProfile v-if="user" :user="user" />
 
     <PostsContainer
       :posts="posts"
@@ -19,87 +20,88 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { onBeforeMount, ref } from 'vue';
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { api } from '@/api';
+import type { Post } from '@/api/posts/types';
+import type { GetUserProfileResponse } from '@/api/users/types';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
 import * as consts from '@/const';
 import UserProfile from '@components/User/UserProfile.vue';
 
-export default defineComponent({
-  components: {
-    UserProfile,
-    PostsContainer,
-  },
-  async beforeRouteEnter(to, from, next) {
-    try {
-      const user = await api.users.getUserProfile(to.params.login as string);
+const route = useRoute();
+const router = useRouter();
 
-      next((vm) => vm.setUser(user));
-    } catch {
-      next({
-        name: 'NotFound',
-      });
+const posts = ref<Post[]>([]);
+
+const user = ref<GetUserProfileResponse | null>(null);
+
+const isLoading = ref(false);
+
+const curPage = ref(0);
+const hasNextPage = ref(false);
+
+const handleFetchUser = async () => {
+  try {
+    console.log(route.params.login);
+
+    const fetchedUser = await api.users.getUserProfile(
+      route.params.login as string,
+    );
+
+    user.value = fetchedUser;
+  } catch {
+    router.push({
+      name: 'NotFound',
+    });
+  }
+};
+
+/**
+ *
+ * @param options
+ * @param isCombine - if true, posts are concatenated to the existing array
+ */
+const handleFetchPosts = async ({ isCombine = false } = {}) => {
+  try {
+    isLoading.value = true;
+
+    const data = await api.posts.search({
+      author: user.value?.login || (route.params.login as string),
+      limit: consts.POSTS_INITIAL_COUNT,
+      offset: curPage.value * consts.POSTS_INITIAL_COUNT,
+    });
+
+    hasNextPage.value = data.hasNextPage;
+
+    if (isCombine) {
+      posts.value = posts.value.concat(data.posts);
+    } else {
+      posts.value = data.posts;
     }
-  },
-  async beforeRouteUpdate(to, from, next) {
-    try {
-      const user = await api.users.getUserProfile(to.params.login as string);
+  } finally {
+    isLoading.value = false;
+  }
+};
 
-      this.setUser(user);
-      this.fetchPosts();
-    } catch {
-      next({
-        name: 'NotFound',
-      });
-    }
-  },
-  data() {
-    return {
-      posts: [],
-      user: {},
-      isLoading: false,
-      curPage: 0,
-      hasNextPage: false,
-    };
-  },
-  async created() {
-    this.fetchPosts();
-  },
-  methods: {
-    setUser(user) {
-      this.user = user;
-    },
-    /**
-     *
-     * @param {Object} options
-     * @param {boolean=} options.isCombine - if true, posts are concatenated to the existing array
-     */
-    async fetchPosts({ isCombine = false } = {}) {
-      try {
-        this.isLoading = true;
+const handleNextPage = () => {
+  curPage.value = curPage.value + 1;
+  handleFetchPosts({ isCombine: true });
+};
 
-        const data = await api.posts.search({
-          author: this.user.login || this.$route.params.login,
-          limit: consts.POSTS_INITIAL_COUNT,
-          offset: this.curPage * consts.POSTS_INITIAL_COUNT,
-        });
+const handleFetchAll = async () => {
+  await handleFetchUser();
+  await handleFetchPosts();
+};
 
-        this.hasNextPage = data.hasNextPage;
+onBeforeRouteUpdate((to, from) => {
+  if (to.params.login !== from.params.login) {
+    handleFetchAll();
+  }
+});
 
-        if (isCombine) {
-          this.posts = this.posts.concat(data.posts);
-        } else {
-          this.posts = data.posts;
-        }
-      } finally {
-        this.isLoading = false;
-      }
-    },
-    handleNextPage() {
-      this.curPage = this.curPage + 1;
-      this.fetchPosts({ isCombine: true });
-    },
-  },
+onBeforeMount(() => {
+  handleFetchAll();
 });
 </script>
