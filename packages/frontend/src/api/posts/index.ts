@@ -1,64 +1,64 @@
 import { apiClient } from '../ApiClient';
-import type * as types from './types';
+import * as postTypes from './types';
 
 const CONTROLLER_URL = 'posts';
 
 export default {
-  search(params: types.PostsSearchRequest) {
-    return apiClient.get<types.PostsSearchResponse>(CONTROLLER_URL, params);
+  search(params: postTypes.PostsSearchRequest) {
+    return apiClient.get<postTypes.PostsSearchResponse>(CONTROLLER_URL, params);
   },
-  getAll(params: types.GetAllRequest) {
-    return apiClient.get<types.GetAllResponse>(
+  getAll(params: postTypes.GetAllRequest) {
+    return apiClient.get<postTypes.GetAllResponse>(
       `${CONTROLLER_URL}/categories/all`,
       params,
     );
   },
-  getToday(params: types.GetTodayRequest) {
-    return apiClient.get<types.GetTodayResponse>(
+  getToday(params: postTypes.GetTodayRequest) {
+    return apiClient.get<postTypes.GetTodayResponse>(
       `${CONTROLLER_URL}/categories/today`,
       params,
     );
   },
-  getBlowing(params: types.GetBlowingRequest) {
-    return apiClient.get<types.GetBlowingResponse>(
+  getBlowing(params: postTypes.GetBlowingRequest) {
+    return apiClient.get<postTypes.GetBlowingResponse>(
       `${CONTROLLER_URL}/categories/blowing`,
       params,
     );
   },
-  getRecent(params: types.GetRecentRequest) {
-    return apiClient.get<types.GetRecentResponse>(
+  getRecent(params: postTypes.GetRecentRequest) {
+    return apiClient.get<postTypes.GetRecentResponse>(
       `${CONTROLLER_URL}/categories/recent`,
       params,
     );
   },
-  getTopThisWeek(params: types.GetTopThisWeekRequest) {
-    return apiClient.get<types.GetTopThisWeekResponse>(
+  getTopThisWeek(params: postTypes.GetTopThisWeekRequest) {
+    return apiClient.get<postTypes.GetTopThisWeekResponse>(
       `${CONTROLLER_URL}/categories/top-this-week`,
       params,
     );
   },
-  getFeed(params: types.GetFeedRequest) {
-    return apiClient.get<types.GetFeedResponse>(
+  getFeed(params: postTypes.GetFeedRequest) {
+    return apiClient.get<postTypes.GetFeedResponse>(
       `${CONTROLLER_URL}/feed`,
       params,
     );
   },
-  createPost(data: types.CreatePostRequest) {
-    return apiClient.post<types.CreatePostResponse>(CONTROLLER_URL, data);
+  createPost(data: postTypes.CreatePostRequest) {
+    return apiClient.post<postTypes.CreatePostResponse>(CONTROLLER_URL, data);
   },
   uploadAttachment(formData: FormData) {
-    return apiClient.post<types.UploadAttachmentResponse>(
+    return apiClient.post<postTypes.UploadAttachmentResponse>(
       `${CONTROLLER_URL}/upload`,
       formData,
     );
   },
   getPostBySlug(slug: string) {
-    return apiClient.get<types.GetPostBySlugResponse>(
+    return apiClient.get<postTypes.GetPostBySlugResponse>(
       `${CONTROLLER_URL}/${slug}`,
     );
   },
-  updatePostById(id: string, data: types.UpdatePostByIdRequest) {
-    return apiClient.put<types.UpdatePostByIdResponse>(
+  updatePostById(id: string, data: postTypes.UpdatePostByIdRequest) {
+    return apiClient.put<postTypes.UpdatePostByIdResponse>(
       `${CONTROLLER_URL}/${id}`,
       data,
     );
@@ -66,15 +66,17 @@ export default {
   deletePostById(id: string) {
     return apiClient.delete(`${CONTROLLER_URL}/${id}`, {});
   },
-  updateRateById(id: string, data: types.UpdateRateByIdRequest) {
-    return apiClient.put<types.UpdateRateByIdResponse>(
+  updateRateById(id: string, data: postTypes.UpdateRateByIdRequest) {
+    return apiClient.put<postTypes.UpdateRateByIdResponse>(
       `${CONTROLLER_URL}/${id}/vote`,
       data,
     );
   },
   removeRateById(id: string) {
-    return apiClient.delete<types.UpdateRateByIdResponse>(
+    return apiClient.delete<postTypes.UpdateRateByIdResponse>(
       `${CONTROLLER_URL}/${id}/vote`,
     );
   },
 };
+
+export { postTypes };

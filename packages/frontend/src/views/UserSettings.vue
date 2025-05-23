@@ -121,7 +121,7 @@
 <script lang="ts" setup>
 import { computed, onBeforeMount, ref } from 'vue';
 import { api } from '@/api';
-import type { GetCurrentUserSettings as Settings } from '@/api/users/types';
+import { userTypes } from '@/api/users';
 import * as consts from '@/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
@@ -138,7 +138,7 @@ const { showInfoNotification } = useNotificationsStore();
 const isFetching = ref(true);
 const isUpdating = ref(false);
 
-const usersFollowed = ref<Settings['authors']>([]);
+const usersFollowed = ref<userTypes.GetCurrentUserSettings['authors']>([]);
 
 const handleUnfollowUser = async (id: string) => {
   if (isUpdating.value) {
@@ -164,7 +164,7 @@ const handleUnfollowUser = async (id: string) => {
   }
 };
 
-const tagsFollowed = ref<Settings['tags']>([]);
+const tagsFollowed = ref<userTypes.GetCurrentUserSettings['tags']>([]);
 
 const handleUnfollowTag = async (tag: string) => {
   if (isUpdating.value) {

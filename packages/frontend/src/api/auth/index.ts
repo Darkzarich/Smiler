@@ -1,22 +1,22 @@
 import { apiClient } from '../ApiClient';
-import type * as types from './types';
+import * as authTypes from './types';
 
 const CONTROLLER_URL = 'auth';
 
 export default {
   getAuth() {
-    return apiClient.get<types.CurrentUserResponse>(
+    return apiClient.get<authTypes.CurrentUserResponse>(
       `${CONTROLLER_URL}/current`,
     );
   },
-  signIn(data: types.SignInRequest) {
-    return apiClient.post<types.SignInResponse>(
+  signIn(data: authTypes.SignInRequest) {
+    return apiClient.post<authTypes.SignInResponse>(
       `${CONTROLLER_URL}/signin`,
       data,
     );
   },
-  signUp(data: SignUpRequest) {
-    return apiClient.post<types.SignUpResponse>(
+  signUp(data: authTypes.SignUpRequest) {
+    return apiClient.post<authTypes.SignUpResponse>(
       `${CONTROLLER_URL}/signup`,
       data,
     );
@@ -25,3 +25,5 @@ export default {
     return apiClient.post(`${CONTROLLER_URL}/logout`);
   },
 };
+
+export { authTypes };

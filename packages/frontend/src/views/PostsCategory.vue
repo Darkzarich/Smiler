@@ -22,7 +22,7 @@
 import { onBeforeMount, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from '@/api';
-import type { Post } from '@/api/posts/types';
+import { postTypes } from '@/api/posts';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
 import * as consts from '@/const';
 
@@ -30,7 +30,7 @@ const route = useRoute();
 
 const isFetching = ref(false);
 
-const posts = ref<Post[]>([]);
+const posts = ref<postTypes.Post[]>([]);
 
 const curPage = ref(0);
 const hasNextPage = ref(false);

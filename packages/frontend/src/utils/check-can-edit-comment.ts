@@ -1,4 +1,4 @@
-import type * as commentTypes from '@/api/comments/types';
+import { commentTypes } from '@/api/comments';
 import * as consts from '@/const';
 
 export function checkCanEditComment(

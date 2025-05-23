@@ -59,10 +59,10 @@ export interface Post {
 export interface PostsSearchRequest extends PaginationRequest {
   author?: string;
   title?: string;
-  dateFrom?: string;
-  dateTo?: string;
-  ratingFrom?: number;
-  ratingTo?: number;
+  dateFrom?: string | null;
+  dateTo?: string | null;
+  ratingFrom?: number | null;
+  ratingTo?: number | null;
 }
 
 export interface PostsSearchResponse extends PaginationResponse {

@@ -24,8 +24,8 @@
 import { onBeforeMount, ref } from 'vue';
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { api } from '@/api';
-import type { Post } from '@/api/posts/types';
-import type { GetUserProfileResponse } from '@/api/users/types';
+import { postTypes } from '@/api/posts';
+import { userTypes } from '@/api/users';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
 import * as consts from '@/const';
 import UserProfile from '@components/User/UserProfile.vue';
@@ -33,9 +33,9 @@ import UserProfile from '@components/User/UserProfile.vue';
 const route = useRoute();
 const router = useRouter();
 
-const posts = ref<Post[]>([]);
+const posts = ref<postTypes.Post[]>([]);
 
-const user = ref<GetUserProfileResponse | null>(null);
+const user = ref<userTypes.GetUserProfileResponse | null>(null);
 
 const isLoading = ref(false);
 

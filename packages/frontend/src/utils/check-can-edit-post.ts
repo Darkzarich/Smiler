@@ -1,4 +1,4 @@
-import type * as postTypes from '@/api/posts/types';
+import { postTypes } from '@/api/posts';
 import * as consts from '@/const';
 
 export function checkCanEditPost(

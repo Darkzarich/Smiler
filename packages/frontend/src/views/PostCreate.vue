@@ -12,7 +12,7 @@
 import { onBeforeMount, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '@/api';
-import type { Post } from '@/api/posts/types';
+import { postTypes } from '@/api/posts';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { checkCanEditPost } from '@/utils/check-can-edit-post';
@@ -32,7 +32,7 @@ const isShow = ref(false);
 
 const isEdit = ref(false);
 
-const post = ref<Post | null>(null);
+const post = ref<postTypes.Post | null>(null);
 
 const showEditor = () => {
   post.value = null;
@@ -41,7 +41,7 @@ const showEditor = () => {
   key.value = '';
 };
 
-const handleSetPost = (fetchedPost: Post) => {
+const handleSetPost = (fetchedPost: postTypes.Post) => {
   isShow.value = false;
   key.value = 'edit';
 
