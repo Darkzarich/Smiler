@@ -1,7 +1,6 @@
 import 'normalize.css';
 // TODO: Replace with a solution from VueUse
 import vClickOutside from 'click-outside-vue3';
-import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import App from './App.vue';
 import { router } from './router';

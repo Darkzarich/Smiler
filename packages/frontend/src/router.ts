@@ -13,6 +13,13 @@ import UserSettings from './views/UserSettings.vue';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 
+declare module 'vue-router' {
+  interface RouteMeta {
+    title?: string;
+    titleParam?: string;
+  }
+}
+
 const authGuard: NavigationGuard = async (to, from, next) => {
   const userStore = useUserStore();
   const notificationStore = useNotificationsStore();

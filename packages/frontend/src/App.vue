@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" id="app">
+  <div v-if="isShow" id="app">
     <NotificationList />
 
     <HeaderElement />
@@ -18,8 +18,8 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { onBeforeMount, ref } from 'vue';
 import { useUserStore } from '@/store/user';
 import FooterElement from '@components/FooterElement.vue';
 import HeaderElement from '@components/Header/HeaderElement.vue';
@@ -27,29 +27,16 @@ import NotificationList from '@components/NotificationList/NotificationList.vue'
 import CurrentUser from '@components/User/CurrentUser.vue';
 import { isDesktop } from '@utils/is-desktop';
 
-// TODO: global mini loader fixed to top
-export default defineComponent({
-  components: {
-    HeaderElement,
-    FooterElement,
-    NotificationList,
-    CurrentUser,
-  },
-  data() {
-    return {
-      show: false,
-    };
-  },
-  beforeCreate() {
-    const userStore = useUserStore();
+// TODO: maybe global mini loader fixed to top
 
-    userStore.userFetchAuthState().then(() => {
-      this.show = true;
-    });
-  },
-  methods: {
-    isDesktop,
-  },
+const userStore = useUserStore();
+
+const isShow = ref(false);
+
+onBeforeMount(async () => {
+  await userStore.userFetchAuthState();
+
+  isShow.value = true;
 });
 </script>
 
