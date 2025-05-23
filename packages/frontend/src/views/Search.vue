@@ -24,94 +24,104 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { computed, onBeforeMount, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { api } from '@/api';
+import { postTypes } from '@/api/posts';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
 import * as consts from '@/const';
 import SearchForm from '@components/SearchForm/SearchForm.vue';
 
-export default defineComponent({
-  components: {
-    SearchForm,
-    PostsContainer,
-  },
-  data() {
-    return {
-      isLoading: false,
-      posts: [],
-      curPage: 0,
-      hasNextPage: false,
-      filter: {
-        title: '',
-        ratingFrom: null,
-        ratingTo: null,
-        dateFrom: '',
-        dateTo: '',
-        tags: [],
-      },
-    };
-  },
-  computed: {
-    isAnyFilterActive() {
-      return Object.keys(this.filter).some((filterKey) => {
-        if (filterKey === 'tags') {
-          return this.filter.tags.length > 0;
-        }
+interface SearchFilter {
+  title: string;
+  ratingFrom: number | null;
+  ratingTo: number | null;
+  dateFrom: string;
+  dateTo: string;
+  tags: string[];
+}
 
-        return Boolean(this.filter[filterKey]);
-      });
-    },
-  },
-  watch: {
-    filter(newVal) {
-      this.fetchPosts({ filters: newVal });
-    },
-  },
-  created() {
-    Object.keys(this.$route.query).forEach((filterKey) => {
-      if (this.$route.query[filterKey]) {
-        this.filter[filterKey] = this.$route.query[filterKey];
-      }
+const route = useRoute();
+
+const isLoading = ref(false);
+
+const posts = ref<postTypes.Post[]>([]);
+
+const currentPage = ref(0);
+const hasNextPage = ref(false);
+
+const filter = ref<SearchFilter>({
+  title: '',
+  ratingFrom: null,
+  ratingTo: null,
+  dateFrom: '',
+  dateTo: '',
+  tags: [],
+});
+
+/**
+ *
+ * @param {Object} options
+ * @param {boolean=} options.isCombine - if true, posts are concatenated to the existing array
+ * @param {Object} options.filters - filters to be applied to the request
+ */
+const fetchPosts = async ({
+  isCombine = false,
+  filters = filter.value,
+}: { isCombine?: boolean; filters?: SearchFilter } = {}) => {
+  try {
+    isLoading.value = true;
+
+    const data = await api.posts.search({
+      limit: consts.POSTS_INITIAL_COUNT,
+      offset: currentPage.value * consts.POSTS_INITIAL_COUNT,
+      ...filters,
     });
 
-    if (this.isAnyFilterActive) {
-      this.fetchPosts({ filters: this.filter });
+    hasNextPage.value = data.hasNextPage;
+
+    if (isCombine) {
+      posts.value = posts.value.concat(data.posts);
+    } else {
+      posts.value = data.posts;
     }
-  },
-  methods: {
-    /**
-     *
-     * @param {Object} options
-     * @param {boolean=} options.isCombine - if true, posts are concatenated to the existing array
-     * @param {Object} options.filters - filters to be applied to the request
-     */
-    async fetchPosts({ isCombine = false, filters = this.filter } = {}) {
-      try {
-        this.isLoading = true;
+  } finally {
+    isLoading.value = false;
+  }
+};
 
-        const data = await api.posts.search({
-          limit: consts.POSTS_INITIAL_COUNT,
-          offset: this.curPage * consts.POSTS_INITIAL_COUNT,
-          ...filters,
-        });
+const handleNextPage = () => {
+  currentPage.value = currentPage.value + 1;
+  fetchPosts({ isCombine: true });
+};
 
-        this.hasNextPage = data.hasNextPage;
+watch(filter, (newVal) => {
+  fetchPosts({ filters: newVal });
+});
 
-        if (isCombine) {
-          this.posts = this.posts.concat(data.posts);
-        } else {
-          this.posts = data.posts;
-        }
-      } finally {
-        this.isLoading = false;
-      }
-    },
-    handleNextPage() {
-      this.curPage = this.curPage + 1;
-      this.fetchPosts({ isCombine: true });
-    },
-  },
+const isAnyFilterActive = computed(() => {
+  return Object.keys(filter.value).some((filterKey) => {
+    if (filterKey === 'tags') {
+      return filter.value.tags.length > 0;
+    }
+
+    return Boolean(filter.value[filterKey as keyof SearchFilter]);
+  });
+});
+
+onBeforeMount(() => {
+  Object.keys(route.query).forEach((filterKey) => {
+    if (route.query[filterKey]) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (filter.value[filterKey as keyof SearchFilter] as any) =
+        route.query[filterKey];
+    }
+  });
+
+  if (isAnyFilterActive.value) {
+    fetchPosts({ filters: filter.value });
+  }
 });
 </script>
 
