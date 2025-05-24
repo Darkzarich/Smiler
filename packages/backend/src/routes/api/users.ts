@@ -60,7 +60,7 @@ const router = express.Router();
           "createdAt": {
             "type": "string"
           },
-          "followersCount": {
+          "followersAmount": {
             "type": "number"
           },
           "isFollowed": {

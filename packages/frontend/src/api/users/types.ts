@@ -8,7 +8,7 @@ export interface GetUserProfileResponse {
   bio: string;
   avatar: string;
   createdAt: string;
-  followersCount: number;
+  followersAmount: number;
   isFollowed: boolean;
 }
 
