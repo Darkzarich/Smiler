@@ -8,21 +8,16 @@
   </RouterLink>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import type { RouteLocationRaw } from 'vue-router';
 
-export default defineComponent({
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    to: {
-      type: Object,
-      required: true,
-      validator: (route) => Boolean(route.name),
-    },
-  },
+interface Props {
+  disabled?: boolean;
+  to: RouteLocationRaw & { name: string };
+}
+
+withDefaults(defineProps<Props>(), {
+  disabled: false,
 });
 </script>
 

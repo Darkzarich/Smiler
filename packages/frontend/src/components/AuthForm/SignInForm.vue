@@ -39,92 +39,78 @@
   </form>
 </template>
 
-<script lang="ts">
-import { mapWritableState } from 'pinia';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed, ref } from 'vue';
 import { api } from '@/api';
 import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 
-export default defineComponent({
-  components: {
-    BaseButton,
-    BaseInput,
-  },
-  data() {
-    return {
-      email: '',
-      password: '',
-      isLoading: false,
-      requestError: '',
-    };
-  },
-  computed: {
-    ...mapWritableState(useUserStore, ['user']),
-    isSubmitDisabled() {
-      return !!(this.validation.email || this.validation.password);
-    },
-    validation() {
-      const validation = {
-        email: '',
-        password: '',
-      };
+const userStore = useUserStore();
 
-      if (this.requestError && !(this.password || this.email)) {
-        validation.email = this.requestError;
-        validation.password = this.requestError;
-      } else {
-        // email
+const isLoading = ref(false);
+const requestError = ref('');
 
-        this.requestError = '';
+const email = ref('');
+const password = ref('');
 
-        if (this.email.length === 0) {
-          validation.email = "Email can't be empty";
-        } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(this.email)) {
-          validation.email = 'Email is not valid';
-        }
+const validation = computed(() => {
+  const validation = {
+    email: '',
+    password: '',
+  };
 
-        // password
+  if (requestError.value && !(password.value || email.value)) {
+    validation.email = requestError.value;
+    validation.password = requestError.value;
+  } else {
+    requestError.value = '';
 
-        if (this.password.length === 0) {
-          validation.password = "Password can't be empty";
-        } else if (this.password.length < consts.PASSWORD_MIN_LENGTH) {
-          validation.password = `Password length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
-        }
-      }
+    if (email.value.length === 0) {
+      validation.email = "Email can't be empty";
+    } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(email.value)) {
+      validation.email = 'Email is not valid';
+    }
 
-      return validation;
-    },
-  },
-  methods: {
-    async signIn() {
-      if (this.isSubmitDisabled || this.isLoading) {
-        return;
-      }
+    if (password.value.length === 0) {
+      validation.password = "Password can't be empty";
+    } else if (password.value.length < consts.PASSWORD_MIN_LENGTH) {
+      validation.password = `Password length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
+    }
+  }
 
-      try {
-        this.isLoading = true;
-
-        const data = await api.auth.signIn({
-          email: this.email,
-          password: this.password,
-        });
-
-        this.user = data;
-      } catch (e) {
-        const error = e as Error;
-
-        this.email = '';
-        this.password = '';
-        this.requestError = error.message;
-      } finally {
-        this.isLoading = false;
-      }
-    },
-  },
+  return validation;
 });
+
+const isSubmitDisabled = computed(
+  () => !!(validation.value.email || validation.value.password),
+);
+
+async function signIn() {
+  if (isSubmitDisabled.value || isLoading.value) {
+    return;
+  }
+
+  try {
+    isLoading.value = true;
+
+    const data = await api.auth.signIn({
+      email: email.value,
+      password: password.value,
+    });
+
+    userStore.user = data;
+  } catch (e) {
+    const error = e as Error;
+
+    email.value = '';
+    password.value = '';
+    requestError.value = error.message;
+  } finally {
+    isLoading.value = false;
+  }
+}
 </script>
 
 <style lang="scss">

@@ -9,19 +9,14 @@
   </NavigationLink>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import NavigationLink from './NavigationLink.vue';
 
-export default defineComponent({
-  components: {
-    NavigationLink,
-  },
-  props: {
-    isAuth: {
-      type: Boolean,
-      default: false,
-    },
-  },
+interface Props {
+  isAuth?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  isAuth: false,
 });
 </script>

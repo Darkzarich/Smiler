@@ -12,7 +12,7 @@
     >
       <template #before>
         <NavigationFeedLink
-          :is-auth="Boolean(user)"
+          :is-auth="Boolean(userStore.user)"
           class="mobile-menu__nav-link"
         />
       </template>
@@ -20,32 +20,24 @@
   </div>
 </template>
 
-<script>
-import { mapState } from 'pinia';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import { useUserStore } from '@/store/user';
 import Navigation from '@components/Navigation/Navigation.vue';
 import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
 import CurrentUser from '@components/User/CurrentUser.vue';
 import IconExit from '@icons/IconExit.vue';
 
-export default defineComponent({
-  components: {
-    CurrentUser,
-    IconExit,
-    Navigation,
-    NavigationFeedLink,
-  },
-  emits: ['close'],
-  computed: {
-    ...mapState(useUserStore, ['user']),
-  },
-  methods: {
-    closeMenu() {
-      this.$emit('close');
-    },
-  },
-});
+type Emits = {
+  close: [];
+};
+
+const emit = defineEmits<Emits>();
+
+const userStore = useUserStore();
+
+const closeMenu = () => {
+  emit('close');
+};
 </script>
 
 <style lang="scss">

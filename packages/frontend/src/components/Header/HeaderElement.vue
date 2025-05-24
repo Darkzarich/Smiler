@@ -33,7 +33,7 @@
       </Navigation>
 
       <!-- TODO: Move to Search component -->
-      <div v-if="$route.name !== 'Search'" class="header__search">
+      <div v-if="route.name !== 'Search'" class="header__search">
         <BaseInput
           v-model.trim="searchInputValue"
           placeholder="Search"
@@ -64,9 +64,10 @@
   </header>
 </template>
 
-<script>
-import { mapState } from 'pinia';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import HeaderMobileMenu from './HeaderMobileMenu.vue';
 import SiteLogo from './SiteLogo.vue';
 import { useUserStore } from '@/store/user';
@@ -78,50 +79,37 @@ import IconMenuMobile from '@icons/IconMenuMobile.vue';
 import IconSearch from '@icons/IconSearch.vue';
 import { isDesktop } from '@utils/is-desktop';
 
-export default defineComponent({
-  components: {
-    IconSearch,
-    HeaderMobileMenu,
-    BaseInput,
-    IconMenuMobile,
-    SiteLogo,
-    Navigation,
-    NavigationFeedLink,
-  },
-  data() {
-    return {
-      isMobileMenuOpen: false,
-      searchInputValue: '',
-    };
-  },
-  computed: {
-    ...mapState(useUserStore, ['user']),
-  },
-  watch: {
-    $route() {
-      if (this.isMobileMenuOpen) {
-        this.toggleMobileMenu();
-      }
-    },
-  },
-  methods: {
-    resolveAvatar,
-    search() {
-      this.$router.push({
-        name: 'Search',
-        query: {
-          title: this.searchInputValue,
-        },
-      });
+const route = useRoute();
+const router = useRouter();
 
-      this.searchInputValue = '';
+const { user } = storeToRefs(useUserStore());
+
+const isMobileMenuOpen = ref(false);
+const searchInputValue = ref('');
+
+const search = () => {
+  router.push({
+    name: 'Search',
+    query: {
+      title: searchInputValue.value,
     },
-    toggleMobileMenu() {
-      this.isMobileMenuOpen = !this.isMobileMenuOpen;
-    },
-    isDesktop,
+  });
+
+  searchInputValue.value = '';
+};
+
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
+
+watch(
+  () => route,
+  () => {
+    if (isMobileMenuOpen.value) {
+      toggleMobileMenu();
+    }
   },
-});
+);
 </script>
 
 <style lang="scss">
