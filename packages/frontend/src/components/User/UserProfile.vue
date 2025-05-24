@@ -39,88 +39,73 @@
   </div>
 </template>
 
-<script lang="ts">
-import { mapState } from 'pinia';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { ref, computed } from 'vue';
 import { api } from '@/api';
+import type { userTypes } from '@/api/users';
 import { useUserStore } from '@/store/user';
 import { formatFromNow } from '@/utils/format-from-now';
 import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseButton from '@common/BaseButton.vue';
 import UserStats from '@components/User/UserStats.vue';
 
-export default defineComponent({
-  components: {
-    BaseButton,
-    UserStats,
-  },
-  props: {
-    user: {
-      type: Object,
-      required: true,
-      default: () => ({}),
-    },
-  },
-  data() {
-    return {
-      isRequesting: false,
-    };
-  },
-  computed: {
-    ...mapState(useUserStore, {
-      currentUser: (state) => state.user,
-      isSameUser(state) {
-        return state.user?.id === this.user.id;
-      },
-    }),
-    isFollowed() {
-      return this.user.isFollowed;
-    },
-  },
-  methods: {
-    resolveAvatar,
-    formatFromNow,
-    async follow() {
-      if (this.isRequesting) {
-        return;
-      }
+interface Props {
+  user: userTypes.GetUserProfileResponse;
+}
 
-      try {
-        this.isRequesting = true;
+const props = defineProps<Props>();
 
-        await api.users.followUser(this.user.id);
+const isRequesting = ref(false);
 
-        this.user.followersAmount = this.user.followersAmount + 1;
-        this.user.isFollowed = true;
-      } finally {
-        this.isRequesting = false;
-      }
-    },
-    async unfollow() {
-      if (this.isRequesting) {
-        return;
-      }
+const userStore = useUserStore();
 
-      try {
-        this.isRequesting = true;
+const { user: currentUser } = storeToRefs(userStore);
 
-        await api.users.unfollowUser(this.user.id);
+const isSameUser = computed(() => currentUser.value?.id === props.user.id);
+const isFollowed = computed(() => props.user.isFollowed);
 
-        this.user.followersAmount = this.user.followersAmount - 1;
-        this.user.isFollowed = false;
-      } finally {
-        this.isRequesting = false;
-      }
-    },
-    async handleFollow() {
-      if (this.isFollowed) {
-        await this.unfollow();
-      } else {
-        await this.follow();
-      }
-    },
-  },
-});
+async function follow() {
+  if (isRequesting.value) {
+    return;
+  }
+
+  try {
+    isRequesting.value = true;
+
+    await api.users.followUser(props.user.id);
+
+    props.user.followersAmount = props.user.followersAmount + 1;
+    props.user.isFollowed = true;
+  } finally {
+    isRequesting.value = false;
+  }
+}
+
+async function unfollow() {
+  if (isRequesting.value) {
+    return;
+  }
+
+  try {
+    isRequesting.value = true;
+
+    await api.users.unfollowUser(props.user.id);
+
+    props.user.followersAmount = props.user.followersAmount - 1;
+    props.user.isFollowed = false;
+  } finally {
+    isRequesting.value = false;
+  }
+}
+
+async function handleFollow() {
+  if (isFollowed.value) {
+    await unfollow();
+  } else {
+    await follow();
+  }
+}
 </script>
 
 <style lang="scss">

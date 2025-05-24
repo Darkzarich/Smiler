@@ -16,7 +16,7 @@
 
         <div
           class="notification-list__close"
-          @click="removeNotification(notification.id)"
+          @click="notificationsStore.removeNotification(notification.id)"
         >
           <IconExit />
         </div>
@@ -25,23 +25,14 @@
   </div>
 </template>
 
-<script lang="ts">
-import { mapActions, mapState } from 'pinia';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import { useNotificationsStore } from '@/store/notifications';
 import IconExit from '@icons/IconExit.vue';
 
-export default defineComponent({
-  components: {
-    IconExit,
-  },
-  computed: {
-    ...mapState(useNotificationsStore, ['notifications']),
-  },
-  methods: {
-    ...mapActions(useNotificationsStore, ['removeNotification']),
-  },
-});
+const notificationsStore = useNotificationsStore();
+
+const { notifications } = storeToRefs(notificationsStore);
 </script>
 
 <style lang="scss">

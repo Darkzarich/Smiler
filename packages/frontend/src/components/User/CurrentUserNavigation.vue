@@ -29,32 +29,22 @@
   </ul>
 </template>
 
-<script>
-import { mapActions } from 'pinia';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import { api } from '@/api';
 import { useUserStore } from '@/store/user';
 import IconAdd from '@icons/IconAdd.vue';
 import IconExit from '@icons/IconExit.vue';
 import IconSettings from '@icons/IconSettings.vue';
 
-export default defineComponent({
-  components: {
-    IconAdd,
-    IconExit,
-    IconSettings,
-  },
-  methods: {
-    ...mapActions(useUserStore, ['clearUser']),
-    async logout() {
-      try {
-        await api.auth.logout();
-      } finally {
-        this.clearUser();
-      }
-    },
-  },
-});
+const userStore = useUserStore();
+
+const logout = async () => {
+  try {
+    await api.auth.logout();
+  } finally {
+    userStore.clearUser();
+  }
+};
 </script>
 
 <style lang="scss">

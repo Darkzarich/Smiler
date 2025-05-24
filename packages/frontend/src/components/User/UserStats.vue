@@ -19,17 +19,12 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { userTypes } from '@/api/users';
 
-export default defineComponent({
-  props: {
-    user: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-});
+defineProps<{
+  user: userTypes.GetUserProfileResponse;
+}>();
 </script>
 
 <style lang="scss">

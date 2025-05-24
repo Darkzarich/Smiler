@@ -34,28 +34,17 @@
   </div>
 </template>
 
-<script>
-import { mapState } from 'pinia';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import AuthFormSwitcher from '../AuthForm/AuthFormSwitcher.vue';
 import CurrentUserNavigation from './CurrentUserNavigation.vue';
 import { useUserStore } from '@/store/user';
 import { resolveAvatar } from '@/utils/resolve-avatar';
 import UserStats from '@components/User/UserStats.vue';
 
-export default defineComponent({
-  components: {
-    AuthFormSwitcher,
-    UserStats,
-    CurrentUserNavigation,
-  },
-  computed: {
-    ...mapState(useUserStore, ['user']),
-  },
-  methods: {
-    resolveAvatar,
-  },
-});
+const userStore = useUserStore();
+
+const user = computed(() => userStore.user);
 </script>
 
 <style lang="scss">
