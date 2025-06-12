@@ -37,14 +37,14 @@ withDefaults(defineProps<Props>(), {
   max: 9999,
 });
 
-const sliderValue = defineModel<string>({
-  default: '0',
+const sliderValue = defineModel<number | null>({
+  default: 0,
 });
 
 const handleInput = (event: Event) => {
   const target = event.target as HTMLInputElement;
 
-  sliderValue.value = target.value;
+  sliderValue.value = Number(target.value);
 };
 </script>
 

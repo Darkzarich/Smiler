@@ -52,64 +52,73 @@
       <BaseButton data-testid="search-form-submit" stretched @click="search">
         Submit
       </BaseButton>
-      <BaseButton data-testid="search-form-clear" stretched @click="clear">
+
+      <BaseButton
+        data-testid="search-form-clear"
+        stretched
+        @click="clearFilters"
+      >
         Clear filters
       </BaseButton>
     </div>
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { cloneDeep, omitBy } from 'lodash-es';
+import { ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import type { SearchFilter } from './types';
 import BaseButton from '@common/BaseButton.vue';
 import BaseDatePicker from '@common/BaseDatePicker.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseSlider from '@common/BaseSlider.vue';
 import PostEditorTags from '@components/PostEditor/PostEditorTags.vue';
 
-export default defineComponent({
-  components: {
-    BaseInput,
-    BaseButton,
-    BaseDatePicker,
-    BaseSlider,
-    PostEditorTags,
+const defaultFilters: SearchFilter = {
+  title: '',
+  tags: [],
+  dateFrom: '',
+  dateTo: '',
+  ratingFrom: null,
+  ratingTo: null,
+};
+
+const router = useRouter();
+
+const modelValue = defineModel<SearchFilter>();
+
+const filters = ref<SearchFilter>(cloneDeep(defaultFilters));
+
+watch(
+  modelValue,
+  (newVal) => {
+    if (newVal) {
+      filters.value = cloneDeep(newVal);
+    }
   },
-  props: ['modelValue'],
-  emits: ['update:modelValue'],
-  data() {
-    return {
-      filters: {
-        title: this.modelValue.title,
-        tags: this.modelValue.tags,
-      },
-    };
-  },
-  methods: {
-    search() {
-      const modFilters = {};
-      Object.keys(this.filters).forEach((el) => {
-        modFilters[el] = this.filters[el];
-      });
-      this.$emit('update:modelValue', modFilters);
-      this.$router.push({
-        query: modFilters,
-      });
-    },
-    clear() {
-      Object.keys(this.filters).forEach((el) => {
-        if (typeof this.filters[el] === 'object') {
-          this.filters[el] = [];
-        } else {
-          this.filters[el] = undefined;
-        }
-      });
-      this.$router.push({
-        query: this.filters,
-      });
-    },
-  },
-});
+  { immediate: true },
+);
+
+const search = () => {
+  modelValue.value = filters.value;
+
+  applyFiltersToRoute();
+};
+
+const clearFilters = () => {
+  filters.value = cloneDeep(defaultFilters);
+
+  modelValue.value = filters.value;
+
+  applyFiltersToRoute();
+};
+
+const applyFiltersToRoute = () => {
+  router.push({
+    query: omitBy(filters.value, (value) => !value),
+  });
+};
 </script>
 
 <style lang="scss">

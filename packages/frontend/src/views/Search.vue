@@ -32,15 +32,7 @@ import { postTypes } from '@/api/posts';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
 import * as consts from '@/const';
 import SearchForm from '@components/SearchForm/SearchForm.vue';
-
-interface SearchFilter {
-  title: string;
-  ratingFrom: number | null;
-  ratingTo: number | null;
-  dateFrom: string;
-  dateTo: string;
-  tags: string[];
-}
+import type { SearchFilter } from '@components/SearchForm/types';
 
 const route = useRoute();
 
@@ -97,7 +89,17 @@ const handleNextPage = () => {
 };
 
 watch(filter, (newVal) => {
-  fetchPosts({ filters: newVal });
+  const isAnyFilterActive = Object.keys(newVal).some((filterKey) => {
+    if (filterKey === 'tags') {
+      return newVal.tags.length > 0;
+    }
+
+    return Boolean(newVal[filterKey as keyof SearchFilter]);
+  });
+
+  if (isAnyFilterActive) {
+    fetchPosts({ filters: newVal });
+  }
 });
 
 const isAnyFilterActive = computed(() => {
