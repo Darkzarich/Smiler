@@ -64,7 +64,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { cloneDeep, omitBy } from 'lodash-es';
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';

@@ -7,7 +7,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 // TODO: Rename component to something better
 import { onBeforeMount, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';

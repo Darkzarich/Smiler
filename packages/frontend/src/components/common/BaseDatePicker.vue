@@ -15,7 +15,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 interface Props {
   dataTestid?: string;
   label?: string;

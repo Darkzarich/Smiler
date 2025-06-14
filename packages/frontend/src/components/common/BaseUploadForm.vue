@@ -14,7 +14,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 const file = defineModel<File>();
 
 // TODO: Replace all randomUUID with nano or something

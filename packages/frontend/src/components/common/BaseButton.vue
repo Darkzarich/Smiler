@@ -18,7 +18,7 @@
   </button>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 
 interface Props {

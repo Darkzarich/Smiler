@@ -15,7 +15,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import CommentItem from './CommentItem.vue';
 import type { Comment } from './types';

@@ -118,7 +118,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue';
 import { api } from '@/api';
 import { userTypes } from '@/api/users';

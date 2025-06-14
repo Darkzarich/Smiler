@@ -18,7 +18,7 @@
   </PostsContainer>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { onBeforeMount, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from '@/api';

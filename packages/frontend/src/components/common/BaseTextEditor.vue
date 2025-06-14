@@ -75,7 +75,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { onMounted, ref } from 'vue';
 
 type Tag = 'b' | 'i' | 's' | 'u' | 'cite';
