@@ -87,8 +87,6 @@ const fetchComments = async ({ isCombine = false } = {}) => {
     return;
   }
 
-  console.log('FETCH COMMENTS');
-
   try {
     isFetchingComments.value = true;
 
@@ -98,16 +96,12 @@ const fetchComments = async ({ isCombine = false } = {}) => {
       offset: 0 + commentsCurrentPage.value * consts.COMMENTS_INITIAL_COUNT,
     });
 
-    console.log(data);
-
     hasCommentsNextPage.value = data.hasNextPage;
 
     if (isCombine) {
       comments.value = comments.value.concat(data.comments);
     } else {
       comments.value = data.comments;
-
-      console.log('comments :>> ', comments);
     }
   } finally {
     isFetchingComments.value = false;

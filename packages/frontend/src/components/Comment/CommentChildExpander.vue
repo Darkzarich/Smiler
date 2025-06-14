@@ -9,16 +9,13 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+type Props = {
+  isExpanded?: boolean;
+};
 
-export default defineComponent({
-  props: {
-    isExpanded: {
-      type: Boolean,
-      default: false,
-    },
-  },
+withDefaults(defineProps<Props>(), {
+  isExpanded: false,
 });
 </script>
 

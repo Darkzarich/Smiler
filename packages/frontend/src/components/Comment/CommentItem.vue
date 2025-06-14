@@ -3,40 +3,40 @@
     <div
       class="comment-item__content"
       :class="{
-        'comment-item__content--created': Boolean(commentData.created),
+        'comment-item__content--created': Boolean(comment.created),
       }"
     >
       <div class="comment-item__header">
-        <template v-if="!commentData.deleted">
+        <template v-if="!comment.deleted">
           <div
             class="comment-item__rating"
-            :data-testid="`comment-${commentData.id}-rating`"
+            :data-testid="`comment-${comment.id}-rating`"
           >
-            {{ commentData.rating }}
+            {{ comment.rating }}
           </div>
 
           <div
             class="comment-item__upvote-btn"
-            :data-testid="`comment-${commentData.id}-upvote`"
+            :data-testid="`comment-${comment.id}-upvote`"
             :class="
-              commentData.rated.isRated && !commentData.rated.negative
+              comment.rated.isRated && !comment.rated.negative
                 ? 'comment-item__upvote-btn--active'
                 : ''
             "
-            @click="upvote()"
+            @click="handleUpvote()"
           >
             <IconPlus />
           </div>
 
           <div
-            :data-testid="`comment-${commentData.id}-downvote`"
+            :data-testid="`comment-${comment.id}-downvote`"
             class="comment-item__downvote-btn"
             :class="
-              commentData.rated.isRated && commentData.rated.negative
+              comment.rated.isRated && comment.rated.negative
                 ? 'comment-item__downvote-btn--active'
                 : ''
             "
-            @click="downvote()"
+            @click="handleDownvote()"
           >
             <IconMinus />
           </div>
@@ -45,26 +45,26 @@
             :to="{
               name: 'UserPage',
               params: {
-                login: commentData.author.login,
+                login: comment.author.login,
               },
             }"
           >
             <div class="comment-item__author">
-              {{ commentData.author.login }}
+              {{ comment.author.login }}
             </div>
 
             <div class="comment-item__avatar">
               <img
-                :src="resolveAvatar(commentData.author.avatar)"
-                :alt="commentData.author.avatar"
+                :src="resolveAvatar(comment.author.avatar)"
+                :alt="comment.author.avatar"
               />
             </div>
           </RouterLink>
 
-          <template v-if="checkCanEditComment(comment, user?.id)">
+          <template v-if="checkCanEditComment(comment, userStore.user?.id)">
             <div
               class="comment-item__edit-btn"
-              :data-testid="`comment-${commentData.id}-edit`"
+              :data-testid="`comment-${comment.id}-edit`"
               @click="toggleEdit()"
             >
               <IconEdit />
@@ -72,7 +72,7 @@
 
             <div
               class="comment-item__delete-btn"
-              :data-testid="`comment-${commentData.id}-delete`"
+              :data-testid="`comment-${comment.id}-delete`"
               @click="handleDeleteComment()"
             >
               <IconDelete />
@@ -82,52 +82,52 @@
 
         <div
           class="comment-item__created-at"
-          :data-testid="`comment-${commentData.id}-date`"
+          :data-testid="`comment-${comment.id}-date`"
         >
-          {{ formatFromNow(commentData.createdAt) }}
+          {{ formatFromNow(comment.createdAt) }}
         </div>
       </div>
 
       <div
         class="comment-item__body"
-        :data-testid="`comment-${commentData.id}-body`"
+        :data-testid="`comment-${comment.id}-body`"
       >
-        <template v-if="commentData.deleted">
+        <template v-if="comment.deleted">
           <i>This comment has been deleted</i>
         </template>
 
         <!-- TODO: Make only one CommentForm form -->
         <CommentForm
-          v-else-if="isEditComment"
+          v-else-if="isEditToggled"
           v-model="editBody"
           class="comment-item__comment-form"
           :loading="isRequesting"
           data-testid="comment-edit"
-          @submit="edit()"
+          @submit="handleEdit()"
           @close="toggleEdit"
         />
 
         <template v-else>
-          <div v-html="commentData.body" />
+          <div v-html="comment.body" />
 
           <div class="comment-item__reply">
             <CommentForm
-              v-if="isReplyComment"
+              v-if="isReplyToggled"
               v-model="replyBody"
               class="comment-item__comment-form"
               :loading="isRequesting"
               data-testid="comment-reply"
-              @submit="reply()"
+              @submit="handleReply()"
               @close="toggleReply"
             />
 
-            <template v-else-if="level < COMMENTS_NESTED_LIMIT">
+            <template v-else-if="level < consts.COMMENTS_NESTED_LIMIT">
               <div
                 :class="{
-                  'comment-item__reply-toggler--disabled': !user,
+                  'comment-item__reply-toggler--disabled': !userStore.user,
                 }"
                 class="comment-item__reply-toggler"
-                :data-testid="`comment-${commentData.id}-toggle-reply`"
+                :data-testid="`comment-${comment.id}-toggle-reply`"
                 @click="toggleReply()"
               >
                 Reply
@@ -138,8 +138,8 @@
       </div>
 
       <CommentChildExpander
-        v-if="commentData.children.length > 0"
-        :data-testid="`comment-${commentData.id}-expander`"
+        v-if="comment.children.length > 0"
+        :data-testid="`comment-${comment.id}-expander`"
         :is-expanded="isChildrenExpanded"
         @click="isChildrenExpanded = !isChildrenExpanded"
       />
@@ -147,7 +147,7 @@
 
     <div v-if="isChildrenExpanded" class="comment-item__replies">
       <CommentItem
-        v-for="childComment in commentData.children"
+        v-for="childComment in comment.children"
         :key="childComment.id"
         :comment="childComment"
         :post-id="postId"
@@ -157,11 +157,11 @@
   </div>
 </template>
 
-<script lang="ts">
-import { mapActions, mapState } from 'pinia';
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { ref } from 'vue';
 import CommentChildExpander from './CommentChildExpander.vue';
 import CommentForm from './CommentForm.vue';
+import type { Comment } from './types';
 import { api } from '@/api';
 import * as consts from '@/const';
 import { useNotificationsStore } from '@/store/notifications';
@@ -174,266 +174,258 @@ import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';
 import IconPlus from '@icons/IconPlus.vue';
 
-export default defineComponent({
-  components: {
-    CommentChildExpander,
-    IconEdit,
-    IconMinus,
-    IconPlus,
-    IconDelete,
-    CommentForm,
-  },
-  props: {
-    postId: {
-      type: String,
-      default: '',
-    },
-    comment: {
-      type: Object,
-      default: () => {},
-    },
-    level: {
-      type: Number,
-      default: 1,
-    },
-  },
-  emits: ['remove'],
-  data() {
-    return {
-      commentData: { ...this.comment },
-      isRequesting: false,
-      isChildrenExpanded: this.level <= consts.COMMENT_AUTO_HIDE_LEVEL,
-      COMMENTS_NESTED_LIMIT: consts.COMMENTS_NESTED_LIMIT,
-      replyBody: '',
-      isReplyComment: false,
-      editBody: '',
-      isEditComment: false,
-    };
-  },
-  computed: {
-    ...mapState(useUserStore, ['user']),
-  },
-  methods: {
-    ...mapActions(useNotificationsStore, ['showErrorNotification']),
-    formatFromNow,
-    resolveAvatar,
-    checkCanEditComment,
-    toggleReply() {
-      if (!this.user) {
-        this.showErrorNotification({
-          message: 'Please sign in or create an account to leave a reply.',
-        });
+type Props = {
+  postId: string;
+  comment: Comment;
+  level?: number;
+};
 
-        return;
-      }
-
-      this.isReplyComment = !this.isReplyComment;
-    },
-    toggleEdit() {
-      this.editBody = this.commentData.body;
-      this.isEditComment = !this.isEditComment;
-    },
-    async edit() {
-      try {
-        this.isRequesting = true;
-
-        const data = await api.comments.updateComment(this.commentData.id, {
-          body: this.editBody,
-        });
-
-        this.commentData = {
-          ...this.commentData,
-          ...data,
-        };
-
-        this.toggleEdit();
-      } finally {
-        this.isRequesting = false;
-      }
-    },
-    // TODO: Changing post comment count on delete
-    async handleDeleteComment() {
-      if (this.isRequesting) {
-        return;
-      }
-
-      try {
-        this.isRequesting = true;
-
-        const { id } = this.commentData;
-
-        await api.comments.deleteComment(id);
-
-        if (!this.commentData.children?.length) {
-          this.$emit('remove');
-
-          return;
-        }
-
-        this.commentData.deleted = true;
-      } finally {
-        this.isRequesting = false;
-      }
-    },
-    async upvote() {
-      if (this.isRequesting) {
-        return;
-      }
-
-      this.isRequesting = true;
-
-      if (!this.commentData.rated.isRated) {
-        // Optimistic update
-        try {
-          this.commentData.rated.isRated = true;
-          this.commentData.rated.negative = false;
-          this.commentData.rating =
-            this.commentData.rating + consts.COMMENT_RATE_VALUE;
-
-          const data = await api.comments.updateRateById(this.commentData.id, {
-            negative: false,
-          });
-
-          this.commentData = {
-            ...this.commentData,
-            rating: data.rating,
-            deleted: data.deleted,
-          };
-        } catch {
-          this.commentData.rated.isRated = false;
-          this.commentData.rating =
-            this.commentData.rating - consts.COMMENT_RATE_VALUE;
-        } finally {
-          this.isRequesting = false;
-        }
-
-        return;
-      }
-
-      if (this.commentData.rated.negative) {
-        // Optimistic update
-        try {
-          this.commentData.rated.isRated = false;
-          this.commentData.rating =
-            this.commentData.rating + consts.COMMENT_RATE_VALUE;
-
-          const data = await api.comments.removeRate(this.commentData.id);
-
-          this.commentData = {
-            ...this.commentData,
-            rating: data.rating,
-            deleted: data.deleted,
-          };
-        } catch {
-          this.commentData.rated.isRated = true;
-          this.commentData.rating =
-            this.commentData.rating - consts.COMMENT_RATE_VALUE;
-        } finally {
-          this.isRequesting = false;
-        }
-
-        return;
-      }
-    },
-    async downvote() {
-      if (this.isRequesting) {
-        return;
-      }
-
-      this.isRequesting = true;
-
-      if (!this.commentData.rated.isRated) {
-        try {
-          this.commentData.rated.isRated = true;
-          this.commentData.rated.negative = true;
-          this.commentData.rating =
-            this.commentData.rating - consts.COMMENT_RATE_VALUE;
-
-          const data = await api.comments.updateRateById(this.commentData.id, {
-            negative: true,
-          });
-
-          this.commentData = {
-            ...this.commentData,
-            rating: data.rating,
-            deleted: data.deleted,
-          };
-        } catch {
-          this.commentData.rated.isRated = false;
-          this.commentData.rating =
-            this.commentData.rating + consts.COMMENT_RATE_VALUE;
-        } finally {
-          this.isRequesting = false;
-        }
-
-        return;
-      }
-
-      if (!this.commentData.rated.negative) {
-        try {
-          this.commentData.rated.isRated = false;
-          this.commentData.rating =
-            this.commentData.rating - consts.COMMENT_RATE_VALUE;
-
-          const data = await api.comments.removeRate(this.commentData.id);
-
-          this.commentData = {
-            ...this.commentData,
-            rating: data.rating,
-            deleted: data.deleted,
-          };
-        } catch {
-          this.commentData.rated.isRated = true;
-          this.commentData.rating =
-            this.commentData.rating + consts.COMMENT_RATE_VALUE;
-        } finally {
-          this.isRequesting = false;
-        }
-
-        return;
-      }
-    },
-    async reply() {
-      if (!this.replyBody || !this.user) {
-        this.showErrorNotification({
-          message: 'Comment cannot be empty. Enter some text first!',
-        });
-
-        return;
-      }
-
-      try {
-        this.isRequesting = true;
-
-        const data = await api.comments.createComment({
-          post: this.postId,
-          parent: this.commentData.id,
-          body: this.replyBody,
-        });
-
-        const newComment = {
-          ...data,
-          rated: {
-            isRated: false,
-            negative: false,
-          },
-          author: {
-            avatar: this.user.avatar,
-            login: this.user.login,
-          },
-          created: true,
-        };
-
-        this.commentData.children.unshift(newComment);
-
-        this.replyBody = '';
-        this.toggleReply();
-      } finally {
-        this.isRequesting = false;
-      }
-    },
-  },
+const props = withDefaults(defineProps<Props>(), {
+  level: 1,
 });
+
+type Emits = {
+  remove: [];
+};
+
+const emit = defineEmits<Emits>();
+
+const userStore = useUserStore();
+
+const notificationsStore = useNotificationsStore();
+
+const comment = ref(props.comment);
+
+const isRequesting = ref(false);
+
+const isChildrenExpanded = ref(props.level <= consts.COMMENT_AUTO_HIDE_LEVEL);
+
+// replyBody and editBody potentially can be optimized by using a single one of them
+
+const replyBody = ref('');
+const isReplyToggled = ref(false);
+
+const toggleReply = () => {
+  if (!userStore.user) {
+    notificationsStore.showErrorNotification({
+      message: 'Please sign in or create an account to leave a reply.',
+    });
+
+    return;
+  }
+
+  isReplyToggled.value = !isReplyToggled.value;
+};
+
+const handleReply = async () => {
+  const user = userStore.user;
+
+  if (!replyBody.value || !user) {
+    notificationsStore.showErrorNotification({
+      message: 'Comment cannot be empty. Enter some text first!',
+    });
+
+    return;
+  }
+
+  try {
+    isRequesting.value = true;
+
+    const data = await api.comments.createComment({
+      post: props.postId,
+      parent: comment.value.id,
+      body: replyBody.value,
+    });
+
+    const newComment: Comment = {
+      ...data,
+      rated: {
+        isRated: false,
+        negative: false,
+      },
+      author: {
+        id: user.id,
+        avatar: user.avatar,
+        login: user.login,
+      },
+      created: true,
+    };
+
+    comment.value.children.unshift(newComment);
+
+    replyBody.value = '';
+    toggleReply();
+  } finally {
+    isRequesting.value = false;
+  }
+};
+
+const editBody = ref('');
+const isEditToggled = ref(false);
+
+const toggleEdit = () => {
+  editBody.value = comment.value.body;
+  isEditToggled.value = !isEditToggled.value;
+};
+
+const handleEdit = async () => {
+  try {
+    isRequesting.value = true;
+
+    const data = await api.comments.updateComment(comment.value.id, {
+      body: editBody.value,
+    });
+
+    comment.value = {
+      ...comment.value,
+      ...data,
+    };
+
+    toggleEdit();
+  } finally {
+    isRequesting.value = false;
+  }
+};
+
+// TODO: Changing post comment count on delete
+const handleDeleteComment = async () => {
+  if (isRequesting.value) {
+    return;
+  }
+
+  try {
+    isRequesting.value = true;
+
+    const { id } = comment.value;
+
+    await api.comments.deleteComment(id);
+
+    if (!comment.value.children?.length) {
+      emit('remove');
+
+      return;
+    }
+
+    comment.value.deleted = true;
+  } finally {
+    isRequesting.value = false;
+  }
+};
+
+const handleUpvote = async () => {
+  // TODO: Maybe if a user clicks downvote after upvote
+  // it should fully apply that downvote and not through intermediate state
+
+  if (isRequesting.value) {
+    return;
+  }
+
+  isRequesting.value = true;
+
+  if (!comment.value.rated.isRated) {
+    // Optimistic update
+    try {
+      comment.value.rated.isRated = true;
+      comment.value.rated.negative = false;
+      comment.value.rating = comment.value.rating + consts.COMMENT_RATE_VALUE;
+
+      const data = await api.comments.updateRateById(comment.value.id, {
+        negative: false,
+      });
+
+      comment.value = {
+        ...comment.value,
+        rating: data.rating,
+        deleted: data.deleted,
+      };
+    } catch {
+      comment.value.rated.isRated = false;
+      comment.value.rating = comment.value.rating - consts.COMMENT_RATE_VALUE;
+    } finally {
+      isRequesting.value = false;
+    }
+
+    return;
+  }
+
+  if (comment.value.rated.negative) {
+    // Optimistic update
+    try {
+      comment.value.rated.isRated = false;
+      comment.value.rating = comment.value.rating + consts.COMMENT_RATE_VALUE;
+
+      const data = await api.comments.removeRate(comment.value.id);
+
+      comment.value = {
+        ...comment.value,
+        rating: data.rating,
+        deleted: data.deleted,
+      };
+    } catch {
+      comment.value.rated.isRated = true;
+      comment.value.rating = comment.value.rating - consts.COMMENT_RATE_VALUE;
+    } finally {
+      isRequesting.value = false;
+    }
+
+    return;
+  }
+};
+
+const handleDownvote = async () => {
+  if (isRequesting.value) {
+    return;
+  }
+
+  isRequesting.value = true;
+
+  if (!comment.value.rated.isRated) {
+    try {
+      comment.value.rated.isRated = true;
+      comment.value.rated.negative = true;
+      comment.value.rating = comment.value.rating - consts.COMMENT_RATE_VALUE;
+
+      const data = await api.comments.updateRateById(comment.value.id, {
+        negative: true,
+      });
+
+      comment.value = {
+        ...comment.value,
+        rating: data.rating,
+        deleted: data.deleted,
+      };
+    } catch {
+      comment.value.rated.isRated = false;
+      comment.value.rating = comment.value.rating + consts.COMMENT_RATE_VALUE;
+    } finally {
+      isRequesting.value = false;
+    }
+
+    return;
+  }
+
+  if (!comment.value.rated.negative) {
+    try {
+      comment.value.rated.isRated = false;
+      comment.value.rating = comment.value.rating - consts.COMMENT_RATE_VALUE;
+
+      const data = await api.comments.removeRate(comment.value.id);
+
+      comment.value = {
+        ...comment.value,
+        rating: data.rating,
+        deleted: data.deleted,
+      };
+    } catch {
+      comment.value.rated.isRated = true;
+      comment.value.rating = comment.value.rating + consts.COMMENT_RATE_VALUE;
+    } finally {
+      isRequesting.value = false;
+    }
+
+    return;
+  }
+};
 </script>
 
 <style lang="scss">

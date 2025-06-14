@@ -3,7 +3,7 @@
     <BaseTextEditor
       :value="modelValue"
       :data-testid="dataTestid"
-      @update:model-value="$emit('update:modelValue', $event)"
+      @update:model-value="modelValue = $event"
     >
       <div class="comment-form__actions">
         <BaseButton
@@ -27,31 +27,27 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
 import BaseButton from '@common/BaseButton.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 
-export default defineComponent({
-  components: {
-    BaseButton,
-    BaseTextEditor,
-  },
-  props: {
-    dataTestid: {
-      type: String,
-      default: '',
-    },
-    modelValue: {
-      type: String,
-      default: '',
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['submit', 'close'],
+defineEmits<{
+  submit: [];
+  close: [];
+}>();
+
+type Props = {
+  dataTestid?: string;
+  loading?: boolean;
+};
+
+withDefaults(defineProps<Props>(), {
+  dataTestid: '',
+  loading: false,
+});
+
+const modelValue = defineModel<string>({
+  default: '',
 });
 </script>
 

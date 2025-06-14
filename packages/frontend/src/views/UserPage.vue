@@ -44,8 +44,6 @@ const hasNextPage = ref(false);
 
 const handleFetchUser = async () => {
   try {
-    console.log(route.params.login);
-
     const fetchedUser = await api.users.getUserProfile(
       route.params.login as string,
     );

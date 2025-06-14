@@ -90,9 +90,12 @@ module.exports = {
     'vue/multi-word-component-names': 'off',
     'vue/no-mutating-props': 'warn',
     'vue/no-side-effects-in-computed-properties': 'warn',
+    // TODO: Fix all accessibility rules
     'vuejs-accessibility/click-events-have-key-events': 'warn',
     'vuejs-accessibility/media-has-caption': 'warn',
     'vuejs-accessibility/mouse-events-have-key-events': 'warn',
+    'vuejs-accessibility/click-events-have-key-events': 'warn',
+    'vuejs-accessibility/no-static-element-interactions': 'off',
     // Override ForInStatement and ForOfStatement rule in airbnb config
     'no-restricted-syntax': [
       'error',

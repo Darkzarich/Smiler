@@ -1,10 +1,10 @@
 <template>
   <div
     class="new-comment-form"
-    :class="!user ? 'new-comment-form--disabled' : ''"
+    :class="!userStore.user ? 'new-comment-form--disabled' : ''"
     data-testid="new-comment-form"
   >
-    <template v-if="user">
+    <template v-if="userStore.user">
       <div class="new-comment-form__title">Share your thoughts!</div>
       <BaseTextEditor
         v-model="commentBody"
@@ -27,77 +27,75 @@
   </div>
 </template>
 
-<script>
-import { mapActions, mapState } from 'pinia';
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { ref } from 'vue';
+import type { Comment } from './types';
 import { api } from '@/api';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 
-export default defineComponent({
-  components: {
-    BaseButton,
-    BaseTextEditor,
-  },
-  props: {
-    postId: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: ['new-comment'],
-  data() {
-    return {
-      commentBody: '',
-      isLoading: false,
+type Props = {
+  postId: string;
+};
+
+const props = defineProps<Props>();
+
+type Emits = {
+  'new-comment': [Comment];
+};
+
+const emit = defineEmits<Emits>();
+
+const userStore = useUserStore();
+
+const notificationsStore = useNotificationsStore();
+
+const commentBody = ref('');
+
+const isLoading = ref(false);
+
+const createComment = async () => {
+  const user = userStore.user;
+
+  if (!commentBody.value || !user) {
+    notificationsStore.showErrorNotification({
+      message: 'Comment cannot be empty. Enter some text first!',
+    });
+
+    return;
+  }
+
+  try {
+    isLoading.value = true;
+
+    const data = await api.comments.createComment({
+      post: props.postId,
+      body: commentBody.value,
+    });
+
+    const newComment: Comment = {
+      ...data,
+      rated: {
+        isRated: false,
+        negative: false,
+      },
+      author: {
+        id: user.id,
+        avatar: user.avatar,
+        login: user.login,
+      },
+      created: true,
     };
-  },
-  computed: {
-    ...mapState(useUserStore, ['user']),
-  },
-  methods: {
-    ...mapActions(useNotificationsStore, ['showErrorNotification']),
-    async createComment() {
-      if (!this.commentBody || !this.user) {
-        this.showErrorNotification({
-          message: 'Comment cannot be empty. Enter some text first!',
-        });
 
-        return;
-      }
+    emit('new-comment', newComment);
 
-      try {
-        this.isLoading = true;
-
-        const data = await api.comments.createComment({
-          post: this.postId,
-          body: this.commentBody,
-        });
-
-        const newComment = {
-          ...data,
-          rated: {
-            isRated: false,
-            negative: false,
-          },
-          author: {
-            avatar: this.user.avatar,
-            login: this.user.login,
-          },
-          created: true,
-        };
-
-        this.$emit('new-comment', newComment);
-
-        this.commentBody = '';
-      } finally {
-        this.isLoading = false;
-      }
-    },
-  },
-});
+    commentBody.value = '';
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>
 
 <style lang="scss">

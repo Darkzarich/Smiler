@@ -15,47 +15,32 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { ref } from 'vue';
 import CommentItem from './CommentItem.vue';
+import type { Comment } from './types';
 
-export default defineComponent({
-  components: {
-    CommentItem,
-  },
-  props: {
-    data: {
-      type: Array,
-      default: () => [],
-    },
-    postId: {
-      type: String,
-      default: '',
-    },
-    level: {
-      type: Number,
-      default: 1,
-    },
-  },
-  data() {
-    return {
-      comments: this.data,
-    };
-  },
-  methods: {
-    handleRemoveComment(id) {
-      const commentIndex = this.comments.findIndex(
-        (comment) => comment.id === id,
-      );
+type Props = {
+  data: Comment[];
+  postId: string;
+  level?: number;
+};
 
-      if (commentIndex === -1) {
-        return;
-      }
-
-      this.comments.splice(commentIndex, 1);
-    },
-  },
+const props = withDefaults(defineProps<Props>(), {
+  level: 1,
 });
+
+const comments = ref(props.data);
+
+const handleRemoveComment = (id: string) => {
+  const commentIndex = comments.value.findIndex((comment) => comment.id === id);
+
+  if (commentIndex === -1) {
+    return;
+  }
+
+  comments.value.splice(commentIndex, 1);
+};
 </script>
 
 <style lang="scss">
