@@ -27,9 +27,9 @@ import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
 import CurrentUser from '@components/User/CurrentUser.vue';
 import IconExit from '@icons/IconExit.vue';
 
-type Emits = {
+interface Emits {
   close: [];
-};
+}
 
 const emit = defineEmits<Emits>();
 

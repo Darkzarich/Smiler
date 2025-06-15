@@ -36,10 +36,10 @@ defineEmits<{
   close: [];
 }>();
 
-type Props = {
+interface Props {
   dataTestid?: string;
   loading?: boolean;
-};
+}
 
 withDefaults(defineProps<Props>(), {
   dataTestid: '',

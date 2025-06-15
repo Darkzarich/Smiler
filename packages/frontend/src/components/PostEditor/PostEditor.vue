@@ -141,10 +141,10 @@ const userStore = useUserStore();
 
 const notificationsStore = useNotificationsStore();
 
-type Props = {
+interface Props {
   isEdit: boolean;
   post: postTypes.Post;
-};
+}
 
 const props = defineProps<Props>();
 

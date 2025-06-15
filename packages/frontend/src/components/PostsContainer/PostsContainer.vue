@@ -6,7 +6,7 @@
         :key="post.id"
         class="posts-container__post"
         :post="post"
-        :can-edit="checkCanEditPost(post, user?.id)"
+        :can-edit="checkCanEditPost(post, userStore.userId)"
       />
     </div>
 
@@ -28,57 +28,45 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { throttle } from 'lodash-es';
-import { mapState } from 'pinia';
-import { defineComponent } from 'vue';
+import { postTypes } from '@/api/posts';
 import { useUserStore } from '@/store/user';
 import Post from '@components/Post/Post.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 import { checkCanEditPost } from '@utils/check-can-edit-post';
 
-export default defineComponent({
-  components: {
-    Post,
-    CircularLoader,
-  },
-  props: {
-    posts: {
-      type: Array,
-      default: () => [],
-    },
-    isLoading: {
-      type: Boolean,
-      default: false,
-    },
-    hasNextPage: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['fetch-more'],
-  computed: {
-    ...mapState(useUserStore, ['user']),
-  },
-  methods: {
-    checkCanEditPost,
-    handleScroll: throttle(function (_, el) {
-      // TODO: Refactor to intersection observer or something from VueUse
-      if (this.isLoading || !this.hasNextPage) {
-        return;
-      }
+interface Emits {
+  'fetch-more': [];
+}
 
-      const curContainerBounds = el.getBoundingClientRect();
+const emit = defineEmits<Emits>();
 
-      if (
-        curContainerBounds.height - Math.abs(curContainerBounds.y) <
-        window.innerHeight
-      ) {
-        this.$emit('fetch-more');
-      }
-    }, 200),
-  },
-});
+interface Props {
+  posts: postTypes.Post[];
+  isLoading?: boolean;
+  hasNextPage?: boolean;
+}
+
+const props = defineProps<Props>();
+
+const userStore = useUserStore();
+
+const handleScroll = throttle(function (_, el) {
+  // TODO: Refactor to intersection observer or something from VueUse
+  if (props.isLoading || !props.hasNextPage) {
+    return;
+  }
+
+  const curContainerBounds = el.getBoundingClientRect();
+
+  if (
+    curContainerBounds.height - Math.abs(curContainerBounds.y) <
+    window.innerHeight
+  ) {
+    emit('fetch-more');
+  }
+}, 200);
 </script>
 
 <style lang="scss">

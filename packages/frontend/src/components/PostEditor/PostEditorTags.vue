@@ -49,9 +49,9 @@ import { computed, ref } from 'vue';
 import * as consts from '@/const';
 import BaseInput from '@common/BaseInput.vue';
 
-type Props = {
+interface Props {
   dataTestid?: string;
-};
+}
 
 defineProps<Props>();
 

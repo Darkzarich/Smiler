@@ -36,15 +36,15 @@ import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 
-type Props = {
+interface Props {
   postId: string;
-};
+}
 
 const props = defineProps<Props>();
 
-type Emits = {
+interface Emits {
   'new-comment': [Comment];
-};
+}
 
 const emit = defineEmits<Emits>();
 

@@ -10,9 +10,9 @@
 </template>
 
 <script setup lang="ts">
-type Props = {
+interface Props {
   isExpanded?: boolean;
-};
+}
 
 withDefaults(defineProps<Props>(), {
   isExpanded: false,

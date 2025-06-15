@@ -20,11 +20,11 @@ import { ref } from 'vue';
 import CommentItem from './CommentItem.vue';
 import type { Comment } from './types';
 
-type Props = {
+interface Props {
   data: Comment[];
   postId: string;
   level?: number;
-};
+}
 
 const props = withDefaults(defineProps<Props>(), {
   level: 1,

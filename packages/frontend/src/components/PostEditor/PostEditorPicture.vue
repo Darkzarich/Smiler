@@ -59,9 +59,9 @@ import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseUploadForm from '@common/BaseUploadForm.vue';
 
-type Emits = {
+interface Emits {
   'add-section': [postTypes.PostPictureSection];
-};
+}
 
 const emit = defineEmits<Emits>();
 

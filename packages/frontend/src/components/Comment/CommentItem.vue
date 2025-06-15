@@ -174,19 +174,19 @@ import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';
 import IconPlus from '@icons/IconPlus.vue';
 
-type Props = {
+interface Props {
   postId: string;
   comment: Comment;
   level?: number;
-};
+}
 
 const props = withDefaults(defineProps<Props>(), {
   level: 1,
 });
 
-type Emits = {
+interface Emits {
   remove: [];
-};
+}
 
 const emit = defineEmits<Emits>();
 
