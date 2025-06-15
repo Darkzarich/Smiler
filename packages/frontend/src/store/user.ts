@@ -20,6 +20,9 @@ export const useUserStore = defineStore('user', {
     user: null,
   }),
   getters: {
+    userId(state) {
+      return state.user?.id;
+    },
     isTagFollowed(state) {
       const result: Record<string, string> = {};
       const user = state.user;

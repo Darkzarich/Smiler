@@ -211,9 +211,14 @@
 import { storeToRefs } from 'pinia';
 import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import {
+  isTextSection,
+  isPictureSection,
+  isVideoSection,
+} from './is-section-of-type';
 import { api } from '@/api';
-import type { postTypes } from '@/api/posts';
-import { POST_SECTION_TYPES, POST_RATE_VALUE } from '@/const';
+import { postTypes } from '@/api/posts';
+import { POST_RATE_VALUE } from '@/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { formatFromNow } from '@/utils/format-from-now';
@@ -259,21 +264,6 @@ const contextMenuData = reactive<ContextMenuData>({
   y: 0,
   target: null,
 });
-
-const isTextSection = (
-  section: postTypes.PostSection,
-): section is postTypes.PostTextSection =>
-  section.type === POST_SECTION_TYPES.TEXT;
-
-const isPictureSection = (
-  section: postTypes.PostSection,
-): section is postTypes.PostPictureSection =>
-  section.type === POST_SECTION_TYPES.PICTURE;
-
-const isVideoSection = (
-  section: postTypes.PostSection,
-): section is postTypes.PostVideoSection =>
-  section.type === POST_SECTION_TYPES.VIDEO;
 
 const contextMenuOptions = computed(() => {
   const options = [];

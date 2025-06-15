@@ -3,7 +3,7 @@
     <div v-if="!value" class="post-editor-video__container">
       <div class="post-editor-video__input-url">
         <BaseInput
-          v-model.lazy="url"
+          v-model.lazy="videoUrl"
           placeholder="Paste URL of the video [youtube]"
           data-testid="video-url-input"
         />
@@ -12,8 +12,8 @@
           class="post-editor-video__upload-btn"
           stretched
           data-testid="video-upload-button"
-          :loading="uploading"
-          :disabled="!url"
+          :loading="isUploading"
+          :disabled="!videoUrl"
           @click="upload"
         >
           Upload
@@ -39,59 +39,46 @@
   </div>
 </template>
 
-<script>
-import { mapActions } from 'pinia';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
 import { useNotificationsStore } from '@/store/notifications';
 import { generateVideoEmbedLink } from '@/utils/generate-video-embed-link';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 
-export default defineComponent({
-  components: {
-    BaseButton,
-    BaseInput,
-  },
-  props: {
-    value: {
-      type: String,
-      default: '',
-    },
-  },
-  emits: ['update:modelValue'],
-  data() {
-    return {
-      url: '',
-      uploading: false,
-    };
-  },
-  methods: {
-    ...mapActions(useNotificationsStore, ['showErrorNotification']),
-    async upload() {
-      this.uploading = true;
-      if (typeof this.url === 'string') {
-        this.url = generateVideoEmbedLink(this.url);
-        this.$emit('update:modelValue', this.url);
-      } else {
-        this.url = '';
-        this.showErrorNotification({
-          message:
-            'Something went wrong during upload of this video. Please try to upload the video again.',
-        });
-      }
-      this.uploading = false;
-    },
-    // TODO: Figure out when it's not used
-    error() {
-      this.showErrorNotification({
-        message:
-          'The video link you provided could not be loaded. Please try a different one.',
-      });
+const notificationsStore = useNotificationsStore();
 
-      this.url = '';
-    },
-  },
+const videoUrl = ref('');
+
+const isUploading = ref(false);
+
+const value = defineModel<string>({
+  default: '',
 });
+
+const upload = () => {
+  isUploading.value = true;
+
+  if (typeof value.value !== 'string') {
+    handleError();
+  }
+
+  value.value = generateVideoEmbedLink(value.value);
+
+  isUploading.value = false;
+};
+
+// TODO: Figure out why it's not triggered sometimes
+const handleError = () => {
+  isUploading.value = false;
+
+  notificationsStore.showErrorNotification({
+    message:
+      'The video link you provided could not be loaded. Please try a different one.',
+  });
+
+  videoUrl.value = '';
+};
 </script>
 
 <style lang="scss">

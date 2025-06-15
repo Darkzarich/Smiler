@@ -2,11 +2,6 @@ export const POSTS_INITIAL_COUNT = 15;
 export const POST_RATE_VALUE = 1;
 export const POST_MAX_SECTIONS = 8;
 export const POST_TIME_TO_UPDATE = 1000 * 60 * 10;
-export const POST_SECTION_TYPES = {
-  TEXT: 'text',
-  PICTURE: 'pic',
-  VIDEO: 'vid',
-};
 export const POST_SECTION_VIDEO_EMBED = {
   YOUTUBE: 'https://www.youtube.com/embed/',
 };

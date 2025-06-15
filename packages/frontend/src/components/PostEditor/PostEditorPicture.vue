@@ -10,7 +10,7 @@
 
       <div class="post-editor-picture__input-url">
         <BaseInput
-          v-model.lazy="imageUrl"
+          v-model.lazy="imageUrlInput"
           :disabled="Boolean(file)"
           placeholder="Paste URL"
           data-testid="image-url-input"
@@ -20,9 +20,9 @@
           class="post-editor-picture__upload-btn"
           data-testid="image-upload-button"
           stretched
-          :loading="uploading"
-          :disabled="!imageUrl"
-          @click="upload"
+          :loading="isUploading"
+          :disabled="!imageUrlInput"
+          @click="createSectionWithAttachment"
         >
           Upload
         </BaseButton>
@@ -30,11 +30,11 @@
 
       <!-- A way to check if the image is inserted successfully -->
       <img
-        v-if="!file && imageUrl"
+        v-if="!file && imageUrlInput"
         hidden
-        :src="imageUrl"
+        :src="imageUrlInput"
         alt="error"
-        @error="error()"
+        @error="handleImgError()"
       />
     </div>
 
@@ -48,10 +48,10 @@
   </div>
 </template>
 
-<script>
-import { mapActions } from 'pinia';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { ref, watch } from 'vue';
 import { api } from '@/api';
+import { postTypes } from '@/api/posts';
 import { useNotificationsStore } from '@/store/notifications';
 import { resolveImage } from '@/utils/resolve-image';
 import { resolveImageError } from '@/utils/resolve-image-error';
@@ -59,88 +59,78 @@ import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseUploadForm from '@common/BaseUploadForm.vue';
 
-export default defineComponent({
-  components: {
-    BaseUploadForm,
-    BaseButton,
-    BaseInput,
-  },
-  props: {
-    modelValue: {
-      type: String,
-      default: '',
-    },
-  },
-  emits: ['update:modelValue', 'set-section'],
-  data() {
-    return {
-      file: null,
-      imageUrl: '',
-      uploading: false,
-    };
-  },
-  watch: {
-    file(newFile) {
-      if (newFile instanceof File) {
-        this.imageUrl = newFile.name;
-      }
-    },
-  },
-  methods: {
-    ...mapActions(useNotificationsStore, ['showErrorNotification']),
-    resolveImage,
-    resolveImageError,
-    async handleUpload() {
-      this.uploading = true;
+type Emits = {
+  'add-section': [postTypes.PostPictureSection];
+};
 
-      try {
-        await this.upload();
-      } catch (e) {
-        this.showErrorNotification({
-          message:
-            'Something went wrong during upload of this picture. Please try to upload the picture again.',
-        });
-      } finally {
-        this.reset();
-        this.uploading = false;
-      }
-    },
-    async upload() {
-      if (this.file instanceof File) {
-        const formData = new FormData();
+const emit = defineEmits<Emits>();
 
-        formData.append('picture', this.file);
-
-        try {
-          const data = await api.posts.uploadAttachment(formData);
-
-          this.$emit('update:modelValue', data.url);
-          this.$emit('set-section', data);
-        } catch {
-          this.reset();
-
-          return;
-        }
-      }
-
-      this.$emit('update:modelValue', this.imageUrl);
-    },
-    error() {
-      if (!(this.file instanceof File)) {
-        this.showErrorNotification({
-          message:
-            'The image link you provided is invalid. Please try a different one.',
-        });
-
-        this.reset();
-      }
-    },
-    reset() {
-      this.file = null;
-      this.imageUrl = '';
-    },
-  },
+const value = defineModel<string>({
+  default: '',
 });
+
+const notificationsStore = useNotificationsStore();
+
+const imageUrlInput = ref('');
+
+const isUploading = ref(false);
+
+const file = ref<File | null>(null);
+
+watch(file, (newFile) => {
+  if (newFile) {
+    // Show the name of the uploaded file
+    imageUrlInput.value = newFile.name;
+  }
+});
+
+const createSectionWithAttachment = async () => {
+  if (!file.value) {
+    value.value = imageUrlInput.value;
+
+    return;
+  }
+
+  isUploading.value = true;
+
+  try {
+    const formData = new FormData();
+
+    formData.append('picture', file.value);
+
+    const newSection = await api.posts.uploadAttachment(formData);
+
+    emit('add-section', newSection);
+
+    value.value = newSection.url;
+  } catch {
+    notificationsStore.showErrorNotification({
+      message:
+        'Something went wrong during upload of this picture. Please try to upload the picture again.',
+    });
+  } finally {
+    resetFormState();
+
+    isUploading.value = false;
+  }
+};
+
+const handleImgError = () => {
+  // TODO: Do I need this?
+  if (!file.value) {
+    notificationsStore.showErrorNotification({
+      message:
+        'The image link you provided is invalid. Please try a different one.',
+    });
+
+    resetFormState();
+  }
+};
+
+const resetFormState = () => {
+  file.value = null;
+  imageUrlInput.value = '';
+};
 </script>
 
 <style lang="scss">

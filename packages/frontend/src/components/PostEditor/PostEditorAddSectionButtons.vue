@@ -5,7 +5,7 @@
       class="post-editor-add-section-buttons__button"
       data-testid="add-text-button"
       tabindex="0"
-      @click="$emit('add-section-by-type', POST_SECTION_TYPES.TEXT)"
+      @click="$emit('add-section', postTypes.POST_SECTION_TYPES.TEXT)"
     >
       <IconText />
     </button>
@@ -15,7 +15,7 @@
       class="post-editor-add-section-buttons__button"
       data-testid="add-pic-button"
       tabindex="0"
-      @click="$emit('add-section-by-type', POST_SECTION_TYPES.PICTURE)"
+      @click="$emit('add-section', postTypes.POST_SECTION_TYPES.PICTURE)"
     >
       <IconPicture />
     </button>
@@ -25,33 +25,22 @@
       class="post-editor-add-section-buttons__button"
       data-testid="add-video-button"
       tabindex="0"
-      @click="$emit('add-section-by-type', POST_SECTION_TYPES.VIDEO)"
+      @click="$emit('add-section', postTypes.POST_SECTION_TYPES.VIDEO)"
     >
       <IconVideo />
     </button>
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
-import * as consts from '@/const';
+<script setup lang="ts">
+import { postTypes } from '@/api/posts';
 import IconPicture from '@icons/IconPicture.vue';
 import IconText from '@icons/IconText.vue';
 import IconVideo from '@icons/IconVideo.vue';
 
-export default defineComponent({
-  components: {
-    IconPicture,
-    IconText,
-    IconVideo,
-  },
-  emits: ['add-section-by-type'],
-  data() {
-    return {
-      POST_SECTION_TYPES: consts.POST_SECTION_TYPES,
-    };
-  },
-});
+defineEmits<{
+  'add-section': [postTypes.POST_SECTION_TYPES];
+}>();
 </script>
 
 <style lang="scss">

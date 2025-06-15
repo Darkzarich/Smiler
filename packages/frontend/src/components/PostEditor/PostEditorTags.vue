@@ -18,12 +18,15 @@
       </div>
     </div>
 
-    <div v-if="tags.length < POST_MAX_TAGS" class="post-editor-tags__form">
+    <div
+      v-if="tags.length < consts.POST_MAX_TAGS"
+      class="post-editor-tags__form"
+    >
       <BaseInput
         v-model="tagInput"
         data-testid="post-tag-input"
         placeholder="Input up to 8 tags"
-        :error="validation"
+        :error="tagInputValidation"
         @keyup.enter="addTag"
       />
 
@@ -40,59 +43,54 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 // TODO: This can be a BasicElements
+import { computed, ref } from 'vue';
 import * as consts from '@/const';
 import BaseInput from '@common/BaseInput.vue';
 
-export default defineComponent({
-  components: {
-    BaseInput,
-  },
-  props: {
-    tags: {
-      type: Array,
-      default: () => [],
-    },
-  },
-  emits: ['update:tags'],
-  data() {
-    return {
-      tagInput: '',
-      POST_MAX_TAGS: consts.POST_MAX_TAGS,
-    };
-  },
-  computed: {
-    validation() {
-      let validation = '';
+type Props = {
+  dataTestid?: string;
+};
 
-      if (this.tagInput.length > consts.POST_MAX_TAG_LEN) {
-        validation = `Tag can't be longer than ${consts.POST_MAX_TAG_LEN}`;
-      }
+defineProps<Props>();
 
-      return validation;
-    },
-  },
-  methods: {
-    addTag() {
-      if (this.tagInput.length > 0) {
-        const checkDouble = this.tags.find((el) => el === this.tagInput);
-
-        if (!checkDouble && !this.validation) {
-          this.$emit('update:tags', this.tags.concat(this.tagInput));
-          this.tagInput = '';
-        }
-      }
-    },
-    removeTag(tag: string) {
-      this.$emit(
-        'update:tags',
-        this.tags.filter((el) => el !== tag),
-      );
-    },
-  },
+const tags = defineModel<string[]>('tags', {
+  required: true,
 });
+
+const tagInput = ref('');
+
+const tagInputValidation = computed(() => {
+  if (tagInput.value.length > consts.POST_MAX_TAG_LEN) {
+    return `Tag can't be longer than ${consts.POST_MAX_TAG_LEN}`;
+  }
+
+  return '';
+});
+
+const addTag = () => {
+  if (!tagInput.value.length) {
+    return;
+  }
+
+  const checkDouble = tags.value.find((el) => el === tagInput.value);
+
+  if (!checkDouble && !tagInputValidation.value) {
+    tags.value.push(tagInput.value);
+    tagInput.value = '';
+  }
+};
+
+const removeTag = (tag: string) => {
+  const tagIndex = tags.value.indexOf(tag);
+
+  if (tagIndex === -1) {
+    return;
+  }
+
+  tags.value.splice(tagIndex, 1);
+};
 </script>
 
 <style lang="scss">

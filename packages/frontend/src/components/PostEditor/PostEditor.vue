@@ -26,7 +26,7 @@
       <template #item="{ element: section }">
         <div class="post-editor__section" data-testid="post-section">
           <!-- TODO: Refactor this part -->
-          <template v-if="section.type === POST_SECTION_TYPES.TEXT">
+          <template v-if="section.type === postTypes.POST_SECTION_TYPES.TEXT">
             <BaseTextEditor
               :id="section.hash"
               v-model="section.content"
@@ -34,15 +34,19 @@
             />
           </template>
 
-          <template v-else-if="section.type === POST_SECTION_TYPES.PICTURE">
+          <template
+            v-else-if="section.type === postTypes.POST_SECTION_TYPES.PICTURE"
+          >
             <PostEditorPicture
               v-model="section.url"
               data-testid="pic-section"
-              @set-section="setSection"
+              @add-section="addPictureSection"
             />
           </template>
 
-          <template v-else-if="section.type === POST_SECTION_TYPES.VIDEO">
+          <template
+            v-else-if="section.type === postTypes.POST_SECTION_TYPES.VIDEO"
+          >
             <PostEditorVideo
               v-model="section.url"
               data-testid="video-section"
@@ -64,9 +68,9 @@
     </Draggable>
 
     <PostEditorAddSectionButtons
-      v-if="sections.length < POST_MAX_SECTIONS"
+      v-if="sections.length < consts.POST_MAX_SECTIONS"
       class="post-editor__add-section-buttons"
-      @add-section-by-type="createSection"
+      @add-section="createSection"
     />
 
     <div class="post-editor__submit-form">
@@ -108,15 +112,21 @@
   </div>
 </template>
 
-<script lang="ts">
-import { mapActions, mapState } from 'pinia';
-import { defineComponent, nextTick } from 'vue';
+<script setup lang="ts">
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import Draggable from 'vuedraggable';
+import {
+  isPictureSection,
+  isTextSection,
+  isVideoSection,
+} from '../Post/is-section-of-type';
 import PostEditorAddSectionButtons from './PostEditorAddSectionButtons.vue';
 import PostEditorPicture from './PostEditorPicture.vue';
 import PostEditorTags from './PostEditorTags.vue';
 import PostEditorVideo from './PostEditorVideo.vue';
 import { api } from '@/api';
+import { postTypes } from '@/api/posts';
 import * as consts from '@/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
@@ -125,182 +135,195 @@ import BaseInput from '@common/BaseInput.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 import CloseIcon from '@icons/IconExit.vue';
 
-export default defineComponent({
-  components: {
-    BaseButton,
-    BaseInput,
-    BaseTextEditor,
-    PostEditorAddSectionButtons,
-    PostEditorPicture,
-    PostEditorVideo,
-    PostEditorTags,
-    CloseIcon,
-    Draggable,
+const router = useRouter();
+
+const userStore = useUserStore();
+
+const notificationsStore = useNotificationsStore();
+
+type Props = {
+  isEdit: boolean;
+  post: postTypes.Post;
+};
+
+const props = defineProps<Props>();
+
+const isSending = ref(false);
+
+const isSaving = ref(false);
+
+// Post fields
+const title = ref('');
+const tags = ref<string[]>([]);
+const sections = ref<postTypes.PostSection[]>([]);
+
+const isDirty = ref(false);
+
+const validation = computed(() => {
+  const validation = {
+    title: '',
+    sections: '',
+  };
+
+  // title
+  if (title.value.length === 0) {
+    validation.title = "Title can't be empty";
+  }
+
+  if (title.value.length > consts.POST_TITLE_MAX_LENGTH) {
+    validation.title = `Title can't be longer than ${consts.POST_TITLE_MAX_LENGTH} symbols`;
+  }
+
+  // sections
+  if (!sections.value.length) {
+    validation.sections = 'You should add at least one section';
+  }
+
+  return validation;
+});
+
+watch(
+  [title, tags, sections],
+  () => {
+    isDirty.value = true;
   },
-  props: ['isEdit', 'post'],
-  data() {
-    return {
-      isDirty: false,
-      title: '',
-      isSending: false,
-      isSaving: false,
-      sections: [],
-      tags: [],
-      POST_SECTION_TYPES: consts.POST_SECTION_TYPES,
-      POST_MAX_SECTIONS: consts.POST_MAX_SECTIONS,
-    };
-  },
-  computed: {
-    ...mapState(useUserStore, {
-      userId: (state) => state.user?.id,
-    }),
-    isSubmitDisabled() {
-      return Boolean(this.validation.title || this.validation.sections);
-    },
-    validation() {
-      const validation = {
-        title: '',
-        sections: '',
-      };
+  { deep: true },
+);
 
-      // title
-      if (this.title.length === 0) {
-        validation.title = "Title can't be empty";
-      } else if (this.title.length > consts.POST_TITLE_MAX_LENGTH) {
-        validation.title = `Title can't be longer than ${consts.POST_TITLE_MAX_LENGTH} symbols`;
-      }
+const isSubmitDisabled = computed(() => {
+  return Boolean(validation.value.title || validation.value.sections);
+});
 
-      // sections
-      if (!this.sections.length) {
-        validation.sections = 'You should add at least one section';
-      }
+const createSection = (type: postTypes.POST_SECTION_TYPES) => {
+  const base = {
+    type,
+    hash: (Math.random() * Math.random()).toString(36),
+  } as postTypes.PostSection;
 
-      return validation;
-    },
-  },
-  watch: {
-    title() {
-      this.isDirty = true;
-    },
-    tags: {
-      handler() {
-        this.isDirty = true;
-      },
-      deep: true,
-    },
-    sections: {
-      handler() {
-        this.isDirty = true;
-      },
-      deep: true,
-    },
-  },
-  async created() {
-    if (this.isEdit) {
-      this.sections = this.post.sections;
-      this.title = this.post.title;
-      this.tags = this.post.tags;
-    } else {
-      if (!this.userId) {
-        return;
-      }
+  if (isPictureSection(base)) {
+    base.url = '';
+  }
 
-      const data = await api.users.getUserTemplate(this.userId);
+  if (isVideoSection(base)) {
+    base.url = '';
+  }
 
-      this.title = data.title;
-      this.sections = data.sections || [];
-      this.tags = data.tags || [];
+  if (isTextSection(base)) {
+    base.content = '';
+  }
+
+  sections.value.push(base);
+};
+
+const addPictureSection = (data: postTypes.PostPictureSection) => {
+  const currentSection = sections.value.find(
+    (section) => isPictureSection(section) && section.url === data.url,
+  );
+
+  if (!currentSection) {
+    return;
+  }
+
+  const currentSectionIndex = sections.value.indexOf(currentSection);
+
+  sections.value[currentSectionIndex] = data;
+};
+
+const deleteSection = (section: postTypes.PostSection) => {
+  if (section.type === postTypes.POST_SECTION_TYPES.PICTURE && section.isFile) {
+    api.users.removeFilePicSection(section.hash);
+  }
+
+  sections.value.splice(sections.value.indexOf(section), 1);
+};
+
+onMounted(async () => {
+  if (props.isEdit) {
+    sections.value = props.post.sections;
+    title.value = props.post.title;
+    tags.value = props.post.tags;
+  } else {
+    if (!userStore.userId) {
+      return;
     }
 
-    nextTick(() => {
-      this.isDirty = false;
-    });
-  },
-  methods: {
-    ...mapActions(useNotificationsStore, ['showInfoNotification']),
-    async createPost() {
-      try {
-        this.isSending = true;
+    const data = await api.users.getUserTemplate(userStore.userId);
 
-        const data = await api.posts.createPost({
-          sections: this.sections,
-          title: this.title,
-          tags: this.tags,
-        });
+    title.value = data.title;
+    sections.value = data.sections || [];
+    tags.value = data.tags || [];
+  }
 
-        this.$router.push({
-          name: 'Single',
-          params: {
-            slug: data.slug,
-          },
-        });
-      } finally {
-        this.isSending = false;
-      }
-    },
-    async saveEdited() {
-      await api.posts.updatePostById(this.post.id, {
-        title: this.title,
-        sections: this.sections,
-        tags: this.tags,
-      });
-
-      this.showInfoNotification({
-        message: 'Post has been saved successfully',
-      });
-
-      this.$router.push({
-        name: 'Single',
-        params: {
-          slug: this.post.slug,
-        },
-      });
-    },
-    async saveDraft() {
-      try {
-        this.isSaving = true;
-
-        const data = await api.users.updateUserTemplate(this.userId, {
-          title: this.title,
-          sections: this.sections,
-          tags: this.tags,
-        });
-
-        this.title = data.title;
-        this.sections = data.sections;
-        this.tags = data.tags;
-
-        this.showInfoNotification({
-          message: 'Draft post has been saved successfully!',
-        });
-
-        nextTick(() => {
-          this.isDirty = false;
-        });
-      } finally {
-        this.isSaving = false;
-      }
-    },
-    async deleteSection(section) {
-      if (section.type === this.POST_SECTION_TYPES.PICTURE && section.isFile) {
-        await api.users.removeFilePicSection(section.hash);
-      }
-
-      this.sections.splice(this.sections.indexOf(section), 1);
-    },
-    setSection(data) {
-      const section = this.sections.find((el) => el.url === data.url);
-
-      this.sections[this.sections.indexOf(section)] = data;
-    },
-    createSection(type) {
-      this.sections.push({
-        type,
-        hash: (Math.random() * Math.random()).toString(36),
-      });
-    },
-  },
+  nextTick(() => {
+    isDirty.value = false;
+  });
 });
+
+const createPost = async () => {
+  try {
+    isSending.value = true;
+
+    const data = await api.posts.createPost({
+      sections: sections.value,
+      title: title.value,
+      tags: tags.value,
+    });
+
+    router.push({
+      name: 'Single',
+      params: {
+        slug: data.slug,
+      },
+    });
+  } finally {
+    isSending.value = false;
+  }
+};
+
+const saveEdited = async () => {
+  await api.posts.updatePostById(props.post.id, {
+    title: title.value,
+    sections: sections.value,
+    tags: tags.value,
+  });
+
+  notificationsStore.showInfoNotification({
+    message: 'Post has been saved successfully',
+  });
+
+  router.push({
+    name: 'Single',
+    params: {
+      slug: props.post.slug,
+    },
+  });
+};
+
+const saveDraft = async () => {
+  try {
+    isSaving.value = true;
+
+    const data = await api.users.updateUserTemplate(userStore.userId!, {
+      title: title.value,
+      sections: sections.value,
+      tags: tags.value,
+    });
+
+    title.value = data.title;
+    sections.value = data.sections;
+    tags.value = data.tags;
+
+    notificationsStore.showInfoNotification({
+      message: 'Draft post has been saved successfully!',
+    });
+
+    nextTick(() => {
+      isDirty.value = false;
+    });
+  } finally {
+    isSaving.value = false;
+  }
+};
 </script>
 
 <style lang="scss">
