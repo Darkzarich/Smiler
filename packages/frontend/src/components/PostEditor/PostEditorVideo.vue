@@ -14,7 +14,7 @@
           data-testid="video-upload-button"
           :loading="isUploading"
           :disabled="!videoUrl"
-          @click="upload"
+          @click="handleUpload"
         >
           Upload
         </BaseButton>
@@ -56,14 +56,16 @@ const value = defineModel<string>({
   default: '',
 });
 
-const upload = () => {
+const handleUpload = () => {
   isUploading.value = true;
 
-  if (typeof value.value !== 'string') {
+  if (typeof videoUrl.value !== 'string') {
     handleError();
+
+    return;
   }
 
-  value.value = generateVideoEmbedLink(value.value);
+  value.value = generateVideoEmbedLink(videoUrl.value);
 
   isUploading.value = false;
 };
