@@ -1,9 +1,9 @@
 <template>
   <div
     class="post-editor-picture"
-    :class="modelValue ? 'post-editor-picture--uploaded' : ''"
+    :class="value ? 'post-editor-picture--uploaded' : ''"
   >
-    <div v-if="!modelValue" class="post-editor-picture__container">
+    <div v-if="!value" class="post-editor-picture__container">
       <BaseUploadForm v-model="file" class="post-editor-picture__upload-form" />
 
       <div class="post-editor-picture__or">OR</div>
@@ -39,11 +39,7 @@
     </div>
 
     <div v-else class="post-editor-picture__image">
-      <img
-        :src="resolveImage(modelValue)"
-        :alt="modelValue"
-        @error="resolveImageError"
-      />
+      <img :src="resolveImage(value)" :alt="value" @error="resolveImageError" />
     </div>
   </div>
 </template>

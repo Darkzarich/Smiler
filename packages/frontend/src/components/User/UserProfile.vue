@@ -34,7 +34,7 @@
         <i>{{ user.bio }}</i>
       </div>
 
-      <UserStats :user="user" />
+      <UserStats :stats="user" />
     </div>
   </div>
 </template>

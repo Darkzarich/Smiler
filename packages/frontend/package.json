@@ -21,10 +21,10 @@
     "test:e2e": "pnpm exec playwright test",
     "test:e2e:ui": "pnpm exec playwright test --ui",
     "lint:css": "pnpm exec stylelint '**/*.{css,scss,vue}'",
-    "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore .",
-    "lint:js:fix": "eslint --ext .js,.vue --ignore-path .gitignore --fix .",
-    "lint:ts": "pnpm exec vue-tsc --noEmit",
-    "prettier": "prettier \"src/**/*.{js,scss,css,html,json,vue}\" --write"
+    "lint:ts": "eslint --ext .js,.ts,.vue --ignore-path .gitignore .",
+    "lint:ts:fix": "eslint --ext .js,.ts,.vue --ignore-path .gitignore --fix .",
+    "lint:types": "pnpm exec vue-tsc --noEmit",
+    "prettier": "prettier \"src/**/*.{js,ts,scss,css,html,json,vue}\" --write"
   },
   "dependencies": {
     "axios": "^1.9.0",

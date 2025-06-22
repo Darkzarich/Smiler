@@ -26,7 +26,7 @@
           </RouterLink>
         </div>
 
-        <UserStats :user="user" class="current-user__stats" />
+        <UserStats :stats="user" class="current-user__stats" />
 
         <CurrentUserNavigation />
       </div>

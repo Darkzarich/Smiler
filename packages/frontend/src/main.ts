@@ -15,7 +15,7 @@ app.use(vClickOutside);
 // TODO: Replace with a solution from VueUse
 app.directive('scroll', {
   mounted(el, binding) {
-    const f = (evt) => {
+    const f = (evt: Event) => {
       binding.value(evt, el);
     };
     window.addEventListener('scroll', f);

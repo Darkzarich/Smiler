@@ -143,7 +143,7 @@ const notificationsStore = useNotificationsStore();
 
 interface Props {
   isEdit: boolean;
-  post: postTypes.Post;
+  post: postTypes.Post | null;
 }
 
 const props = defineProps<Props>();
@@ -238,7 +238,7 @@ const deleteSection = (section: postTypes.PostSection) => {
 };
 
 onMounted(async () => {
-  if (props.isEdit) {
+  if (props.isEdit && props.post) {
     sections.value = props.post.sections;
     title.value = props.post.title;
     tags.value = props.post.tags;
@@ -281,6 +281,10 @@ const createPost = async () => {
 };
 
 const saveEdited = async () => {
+  if (!props.post) {
+    return;
+  }
+
   await api.posts.updatePostById(props.post.id, {
     title: title.value,
     sections: sections.value,
