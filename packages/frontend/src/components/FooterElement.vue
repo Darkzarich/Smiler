@@ -19,15 +19,15 @@
 footer {
   @include mixins.flex-row;
 
-  @include mixins.for-size(phone-only) {
-    height: 2rem;
-  }
-
   align-items: center;
   width: 100%;
   height: 4rem;
   margin-top: 1.5rem;
   background: var(--color-header);
+
+  @include mixins.for-size(phone-only) {
+    height: 2rem;
+  }
 
   .footer-content {
     display: flex;

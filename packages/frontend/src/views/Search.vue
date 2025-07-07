@@ -134,13 +134,13 @@ onBeforeMount(() => {
   &__form {
     @include mixins.widget;
 
+    margin-bottom: var(--variable-widget-margin);
+    margin-left: 10%;
+
     @include mixins.for-size(phone-only) {
       margin-left: 0;
       border: none;
     }
-
-    margin-bottom: var(--variable-widget-margin);
-    margin-left: 10%;
   }
 }
 </style>
