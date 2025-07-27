@@ -4,8 +4,8 @@
 import { expect } from '@playwright/test';
 import createRandomAuth from './factory/auth';
 import createRandomPost from './factory/post';
-import test from './page-objects';
 import createSection from './factory/section';
+import test from './page-objects';
 
 const authUser = createRandomAuth({
   isAuth: true,

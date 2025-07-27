@@ -117,9 +117,7 @@ export default class PostCreatePage extends AbstractPage {
 
   async awaitDragAndDropAnimation() {
     await this.page.waitForFunction(() => {
-      const element = document.querySelector(
-        '[data-testid="post-section"]',
-      );
+      const element = document.querySelector('[data-testid="post-section"]');
       const computedStyle = window.getComputedStyle(element);
       console.log(computedStyle.opacity);
       return (

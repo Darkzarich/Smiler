@@ -19,20 +19,10 @@ module.exports = {
     'plugin:vuejs-accessibility/recommended',
     'plugin:prettier/recommended',
   ],
-  overrides: [
-    {
-      files: ['tests/**/*.js'],
-      extends: ['plugin:playwright/recommended'],
-      rules: {
-        'no-console': 'off',
-      },
-    },
-  ],
   parserOptions: {
     parser: '@typescript-eslint/parser',
     ecmaVersion: 'latest',
     sourceType: 'module',
-    project: './tsconfig.json',
   },
   ignorePatterns: ['src/components/common/icons/**', '.eslintrc.js'],
   rules: {

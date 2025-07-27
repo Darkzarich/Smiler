@@ -74,7 +74,7 @@ test('Searches posts by title using search page', async ({
 
   expect(postsResponse.url()).toContain('title=test');
   await expect(currentPage).toHaveTitle(SearchPage.title);
-  await expect(SearchPage.pageHasTitleQueryParam('test')).toBe(true);
+  expect(SearchPage.pageHasTitleQueryParam('test')).toBe(true);
 });
 
 test('Searches posts by dateTo and dateFrom', async ({
@@ -100,7 +100,7 @@ test('Searches posts by dateTo and dateFrom', async ({
     `dateFrom=${dates.from}&dateTo=${dates.to}`,
   );
   await expect(currentPage).toHaveTitle(SearchPage.title);
-  await expect(SearchPage.pageHasDateQueryParams(dates)).toBe(true);
+  expect(SearchPage.pageHasDateQueryParams(dates)).toBe(true);
 });
 
 test('Searches posts by ratingFrom and ratingTo', async ({
@@ -126,7 +126,7 @@ test('Searches posts by ratingFrom and ratingTo', async ({
     `ratingFrom=${ratings.from}&ratingTo=${ratings.to}`,
   );
   await expect(currentPage).toHaveTitle(SearchPage.title);
-  await expect(SearchPage.pageHasRatingQueryParams(ratings)).toBe(true);
+  expect(SearchPage.pageHasRatingQueryParams(ratings)).toBe(true);
 });
 
 test('Searches posts by tags', async ({
@@ -148,7 +148,7 @@ test('Searches posts by tags', async ({
 
   expect(postsResponse.url()).toContain(requestQueryTags);
   await expect(currentPage).toHaveTitle(SearchPage.title);
-  await expect(SearchPage.pageHasTagsQueryParams(tags)).toBe(true);
+  expect(SearchPage.pageHasTagsQueryParams(tags)).toBe(true);
 });
 
 test('Sets all filters from URL', async ({
@@ -177,20 +177,20 @@ test('Sets all filters from URL', async ({
     preRequestAction: SearchPage.goto.bind(SearchPage, searchParams.toString()),
   });
 
-  await expect(SearchPage.pageHasTitleQueryParam(filters.title)).toBe(true);
-  await expect(
+  expect(SearchPage.pageHasTitleQueryParam(filters.title)).toBe(true);
+  expect(
     SearchPage.pageHasDateQueryParams({
       from: filters.dateFrom,
       to: filters.dateTo,
     }),
   ).toBe(true);
-  await expect(
+  expect(
     SearchPage.pageHasRatingQueryParams({
       from: filters.ratingFrom,
       to: filters.ratingTo,
     }),
   ).toBe(true);
-  await expect(SearchPage.pageHasTagsQueryParams(tags)).toBe(true);
+  expect(SearchPage.pageHasTagsQueryParams(tags)).toBe(true);
   await expect(currentPage).toHaveTitle(SearchPage.title);
   expect(postsResponse.url()).toContain(requestQueryTags);
 });
@@ -240,7 +240,7 @@ test('Searches posts by clicking on a tag name and then "Search tag" option in t
 
   expect(postsResponse.url()).toContain(`tags[]=${tags[0]}`);
   await expect(currentPage).toHaveTitle(SearchPage.title);
-  await expect(SearchPage.pageHasTagsQueryParams([tags[0]])).toBe(true);
+  expect(SearchPage.pageHasTagsQueryParams([tags[0]])).toBe(true);
 });
 
 test('Empty posts lists after search', async ({

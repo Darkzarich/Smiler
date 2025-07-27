@@ -24,7 +24,7 @@
     "lint:ts": "eslint --ext .js,.ts,.vue --ignore-path .gitignore .",
     "lint:ts:fix": "eslint --ext .js,.ts,.vue --ignore-path .gitignore --fix .",
     "lint:types": "pnpm exec vue-tsc --noEmit",
-    "prettier": "prettier \"src/**/*.{js,ts,scss,css,html,json,vue}\" --write"
+    "prettier": "prettier \"**/*.{js,ts,scss,css,html,json,vue}\" --write"
   },
   "dependencies": {
     "axios": "^1.9.0",
