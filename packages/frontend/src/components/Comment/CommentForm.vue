@@ -1,7 +1,7 @@
 <template>
   <div class="comment-form">
     <BaseTextEditor
-      :value="modelValue"
+      :model-value="modelValue"
       :data-testid="dataTestid"
       @update:model-value="modelValue = $event"
     >

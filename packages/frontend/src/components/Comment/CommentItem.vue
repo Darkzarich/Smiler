@@ -152,6 +152,7 @@
         :comment="childComment"
         :post-id="postId"
         :level="level + 1"
+        @remove="handleRemoveComment"
       />
     </div>
   </div>
@@ -185,7 +186,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 interface Emits {
-  remove: [];
+  remove: [id: string];
 }
 
 const emit = defineEmits<Emits>();
@@ -301,7 +302,7 @@ const handleDeleteComment = async () => {
     await api.comments.deleteComment(id);
 
     if (!comment.value.children?.length) {
-      emit('remove');
+      emit('remove', id);
 
       return;
     }
@@ -310,6 +311,20 @@ const handleDeleteComment = async () => {
   } finally {
     isRequesting.value = false;
   }
+};
+
+const handleRemoveComment = (id: string) => {
+  debugger;
+
+  const commentIndex = comment.value.children.findIndex(
+    (comment) => comment.id === id,
+  );
+
+  if (commentIndex === -1) {
+    return;
+  }
+
+  comment.value.children.splice(commentIndex, 1);
 };
 
 const handleUpvote = async () => {

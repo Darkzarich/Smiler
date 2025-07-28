@@ -9,7 +9,7 @@
         :comment="comment"
         :post-id="postId"
         :level="level"
-        @remove="handleRemoveComment(comment.id)"
+        @remove="handleRemoveComment"
       />
     </div>
   </div>
@@ -27,7 +27,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  level: 1,
+  level: 0,
 });
 
 const comments = ref(props.data);
