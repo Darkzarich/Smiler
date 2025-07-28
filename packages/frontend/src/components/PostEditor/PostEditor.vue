@@ -40,7 +40,7 @@
             <PostEditorPicture
               v-model="section.url"
               data-testid="pic-section"
-              @add-section="addPictureSection"
+              @update-section="updatePictureSection"
             />
           </template>
 
@@ -215,7 +215,7 @@ const createSection = (type: postTypes.POST_SECTION_TYPES) => {
   sections.value.push(base);
 };
 
-const addPictureSection = (data: postTypes.PostPictureSection) => {
+const updatePictureSection = (data: postTypes.PostPictureSection) => {
   const currentSection = sections.value.find(
     (section) => isPictureSection(section) && section.url === data.url,
   );

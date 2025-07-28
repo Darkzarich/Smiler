@@ -56,7 +56,7 @@ import BaseInput from '@common/BaseInput.vue';
 import BaseUploadForm from '@common/BaseUploadForm.vue';
 
 interface Emits {
-  'add-section': [postTypes.PostPictureSection];
+  'update-section': [postTypes.PostPictureSection];
 }
 
 const emit = defineEmits<Emits>();
@@ -96,9 +96,9 @@ const createSectionWithAttachment = async () => {
 
     const newSection = await api.posts.uploadAttachment(formData);
 
-    emit('add-section', newSection);
-
     value.value = newSection.url;
+
+    emit('update-section', newSection);
   } catch {
     notificationsStore.showErrorNotification({
       message:
