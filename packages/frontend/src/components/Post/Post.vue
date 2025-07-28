@@ -522,6 +522,8 @@ const searchByTag = (tag: string) => {
   &__upvote,
   &__rating,
   &__downvote {
+    border: none;
+    background: transparent;
     color: var(--color-gray-light);
     transition: all 200ms ease-out;
 

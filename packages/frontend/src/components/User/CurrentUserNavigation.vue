@@ -30,17 +30,22 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 import { api } from '@/api';
 import { useUserStore } from '@/store/user';
 import IconAdd from '@icons/IconAdd.vue';
 import IconExit from '@icons/IconExit.vue';
 import IconSettings from '@icons/IconSettings.vue';
 
+const router = useRouter();
+
 const userStore = useUserStore();
 
 const logout = async () => {
   try {
     await api.auth.logout();
+
+    router.push({ name: 'Home' });
   } finally {
     userStore.clearUser();
   }

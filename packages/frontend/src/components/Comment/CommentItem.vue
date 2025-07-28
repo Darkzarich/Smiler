@@ -314,8 +314,6 @@ const handleDeleteComment = async () => {
 };
 
 const handleRemoveComment = (id: string) => {
-  debugger;
-
   const commentIndex = comment.value.children.findIndex(
     (comment) => comment.id === id,
   );
