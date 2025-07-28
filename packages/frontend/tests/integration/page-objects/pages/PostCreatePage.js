@@ -86,6 +86,8 @@ export default class PostCreatePage extends AbstractPage {
   }
 
   async uploadPictureWithUrl(url = '') {
+    console.log('url', url);
+
     await this.page.getByTestId('image-url-input').fill(url);
     await this.getImageUploadBtn().click();
   }

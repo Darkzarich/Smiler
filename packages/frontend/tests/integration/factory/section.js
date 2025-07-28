@@ -13,7 +13,7 @@ function createPicSection() {
   return {
     type: 'pic',
     hash: faker.string.uuid(),
-    url: faker.image.url(),
+    url: 'https://placehold.co/600x400',
   };
 }
 
