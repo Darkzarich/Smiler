@@ -701,5 +701,10 @@ const searchByTag = (tag: string) => {
     margin-left: 0.5rem;
     border-radius: 50%;
   }
+
+  &__delete-button {
+    border: none;
+    background: transparent;
+  }
 }
 </style>

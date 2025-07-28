@@ -230,7 +230,12 @@ const updatePictureSection = (data: postTypes.PostPictureSection) => {
 };
 
 const deleteSection = (section: postTypes.PostSection) => {
-  if (section.type === postTypes.POST_SECTION_TYPES.PICTURE && section.isFile) {
+  // When it's edit mode backend logic will handle the deletion of an uploaded picture
+  if (
+    section.type === postTypes.POST_SECTION_TYPES.PICTURE &&
+    section.isFile &&
+    !isEdit.value
+  ) {
     api.users.removeFilePicSection(section.hash);
   }
 
