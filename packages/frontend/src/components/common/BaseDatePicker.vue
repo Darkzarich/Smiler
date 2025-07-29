@@ -6,36 +6,39 @@
 
     <input
       :id="label"
+      :value="modelValue"
       class="base-date-picker__input"
       :data-testid="dataTestid"
       type="date"
-      :value="value"
-      @input="$emit('input', $event.target.value)"
+      @input="handleInput"
     />
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    dataTestid: {
-      type: String,
-      default: 'datepicker',
-    },
-    value: {
-      type: String,
-      default: '',
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-  },
+<script setup lang="ts">
+interface Props {
+  dataTestid?: string;
+  label?: string;
+}
+
+const date = defineModel<string>({
+  default: '',
+});
+
+withDefaults(defineProps<Props>(), {
+  dataTestid: 'datepicker',
+  label: '',
+});
+
+const handleInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+
+  date.value = target.value;
 };
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .base-date-picker {
   &__label {

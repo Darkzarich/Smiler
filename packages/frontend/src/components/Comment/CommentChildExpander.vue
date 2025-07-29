@@ -5,27 +5,32 @@
       'comment-child-expander--expanded': isExpanded,
     }"
   >
-    {{ isExpanded ? '[-]' : '[+]' }}
+    {{ isExpanded ? '-' : '+' }}
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    isExpanded: {
-      type: Boolean,
-      default: false,
-    },
-  },
-};
+<script setup lang="ts">
+interface Props {
+  isExpanded?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  isExpanded: false,
+});
 </script>
 
 <style lang="scss">
 .comment-child-expander {
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
-  margin-top: 16px;
-  margin-left: -10px;
+  width: 12px;
+  height: 12px;
+  margin-top: 20px;
+  margin-left: -18px;
+  border: 1px solid currentcolor;
+  background: var(--color-bg);
   color: var(--color-primary);
   font-family: monospace;
   font-weight: bold;

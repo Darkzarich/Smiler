@@ -8,23 +8,25 @@
       :error="validation.title"
     />
 
-    <PostEditorTags v-model="tags" class="post-editor__tags" />
+    <PostEditorTags v-model:tags="tags" class="post-editor__tags" />
 
     <Draggable
       :list="sections"
       :animation="200"
       ghost-class="post-editor__section--moving"
       chosen-class="post-editor__section--chosen"
+      :component-data="{
+        name: 'post-editor__section',
+        tag: 'div',
+        'data-testid': 'post-sections',
+      }"
+      item-key="hash"
+      tag="transition-group"
     >
-      <TransitionGroup name="post-editor__section" data-testid="post-sections">
-        <div
-          v-for="section in sections"
-          :key="section.hash"
-          class="post-editor__section"
-          data-testid="post-section"
-        >
+      <template #item="{ element: section }">
+        <div class="post-editor__section" data-testid="post-section">
           <!-- TODO: Refactor this part -->
-          <template v-if="section.type === POST_SECTION_TYPES.TEXT">
+          <template v-if="section.type === postTypes.POST_SECTION_TYPES.TEXT">
             <BaseTextEditor
               :id="section.hash"
               v-model="section.content"
@@ -32,15 +34,19 @@
             />
           </template>
 
-          <template v-else-if="section.type === POST_SECTION_TYPES.PICTURE">
+          <template
+            v-else-if="section.type === postTypes.POST_SECTION_TYPES.PICTURE"
+          >
             <PostEditorPicture
               v-model="section.url"
               data-testid="pic-section"
-              @set-section="setSection"
+              @update-section="updatePictureSection"
             />
           </template>
 
-          <template v-else-if="section.type === POST_SECTION_TYPES.VIDEO">
+          <template
+            v-else-if="section.type === postTypes.POST_SECTION_TYPES.VIDEO"
+          >
             <PostEditorVideo
               v-model="section.url"
               data-testid="video-section"
@@ -58,13 +64,13 @@
             />
           </button>
         </div>
-      </TransitionGroup>
+      </template>
     </Draggable>
 
     <PostEditorAddSectionButtons
-      v-if="sections.length < POST_MAX_SECTIONS"
+      v-if="sections.length < consts.POST_MAX_SECTIONS"
       class="post-editor__add-section-buttons"
-      @add-section-by-type="createSection"
+      @add-section="createSection"
     />
 
     <div class="post-editor__submit-form">
@@ -72,9 +78,9 @@
         <BaseButton
           class="post-editor__submit-form-btn"
           data-testid="finish-edit-post-button"
-          :loading="saving"
+          :loading="isSaving"
           :disabled="!sections.length"
-          @click.native="saveEdited"
+          @click="saveEdited"
         >
           Save Edited
         </BaseButton>
@@ -85,9 +91,9 @@
           class="post-editor__submit-form-btn"
           stretched
           data-testid="create-post-button"
-          :loading="sending"
+          :loading="isSending"
           :disabled="isSubmitDisabled"
-          @click.native="createPost"
+          @click="createPost"
         >
           Create Post
         </BaseButton>
@@ -95,9 +101,9 @@
           stretched
           class="post-editor__submit-form-btn"
           data-testid="save-draft-button"
-          :loading="saving"
+          :loading="isSaving"
           :disabled="!isDirty"
-          @click.native="saveDraft"
+          @click="saveDraft"
         >
           Save Draft
         </BaseButton>
@@ -106,198 +112,231 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import Draggable from 'vuedraggable';
-import { mapState } from 'vuex';
+import {
+  isPictureSection,
+  isTextSection,
+  isVideoSection,
+} from '../Post/is-section-of-type';
 import PostEditorAddSectionButtons from './PostEditorAddSectionButtons.vue';
 import PostEditorPicture from './PostEditorPicture.vue';
 import PostEditorTags from './PostEditorTags.vue';
 import PostEditorVideo from './PostEditorVideo.vue';
-import api from '@/api';
-import consts from '@/const/const';
+import { api } from '@/api';
+import { postTypes } from '@/api/posts';
+import * as consts from '@/const';
+import { useNotificationsStore } from '@/store/notifications';
+import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 import CloseIcon from '@icons/IconExit.vue';
 
-export default {
-  components: {
-    BaseButton,
-    BaseInput,
-    BaseTextEditor,
-    PostEditorAddSectionButtons,
-    PostEditorPicture,
-    PostEditorVideo,
-    PostEditorTags,
-    CloseIcon,
-    Draggable,
+const router = useRouter();
+
+const userStore = useUserStore();
+
+const notificationsStore = useNotificationsStore();
+
+interface Props {
+  isEdit: boolean;
+  post: postTypes.Post | null;
+}
+
+const props = defineProps<Props>();
+
+const isSending = ref(false);
+
+const isSaving = ref(false);
+
+// Post fields
+const title = ref('');
+const tags = ref<string[]>([]);
+const sections = ref<postTypes.PostSection[]>([]);
+
+const isDirty = ref(false);
+
+const validation = computed(() => {
+  const validation = {
+    title: '',
+    sections: '',
+  };
+
+  // title
+  if (title.value.length === 0) {
+    validation.title = "Title can't be empty";
+  }
+
+  if (title.value.length > consts.POST_TITLE_MAX_LENGTH) {
+    validation.title = `Title can't be longer than ${consts.POST_TITLE_MAX_LENGTH} symbols`;
+  }
+
+  // sections
+  if (!sections.value.length) {
+    validation.sections = 'You should add at least one section';
+  }
+
+  return validation;
+});
+
+watch(
+  [title, tags, sections],
+  () => {
+    isDirty.value = true;
   },
-  props: ['isEdit', 'post'],
-  data() {
-    return {
-      isDirty: false,
-      title: '',
-      sending: false,
-      saving: false,
-      sections: [],
-      tags: [],
-      POST_SECTION_TYPES: consts.POST_SECTION_TYPES,
-      POST_MAX_SECTIONS: consts.POST_MAX_SECTIONS,
-    };
-  },
-  computed: {
-    ...mapState({
-      userId: (state) => state.user.id,
-    }),
-    isSubmitDisabled() {
-      return Boolean(this.validation.title || this.validation.sections);
-    },
-    validation() {
-      const validation = {
-        title: '',
-        sections: '',
-      };
+  { deep: true },
+);
 
-      // title
+const isSubmitDisabled = computed(() => {
+  return Boolean(validation.value.title || validation.value.sections);
+});
 
-      if (this.title.length === 0) {
-        validation.title = "Title can't be empty";
-      } else if (this.title.length > consts.POST_TITLE_MAX_LENGTH) {
-        validation.title = `Title can't be longer than ${consts.POST_TITLE_MAX_LENGTH} symbols`;
-      }
+const createSection = (type: postTypes.POST_SECTION_TYPES) => {
+  const base = {
+    type,
+    hash: (Math.random() * Math.random()).toString(36),
+  } as postTypes.PostSection;
 
-      // sections
+  if (isPictureSection(base)) {
+    base.url = '';
+  }
 
-      if (!this.sections.length) {
-        validation.sections = 'You should add at least one section';
-      }
+  if (isVideoSection(base)) {
+    base.url = '';
+  }
 
-      return validation;
-    },
-  },
-  watch: {
-    title() {
-      this.isDirty = true;
-    },
-    tags() {
-      this.isDirty = true;
-    },
-    sections() {
-      this.isDirty = true;
-    },
-  },
-  async created() {
-    if (this.isEdit) {
-      this.sections = this.post.sections;
-      this.title = this.post.title;
-      this.tags = this.post.tags;
-    } else {
-      const res = await api.users.getUserTemplate(this.userId);
+  if (isTextSection(base)) {
+    base.content = '';
+  }
 
-      if (!res.data.error) {
-        this.title = res.data.title;
-        this.sections = res.data.sections || [];
-        this.tags = res.data.tags || [];
-      }
+  sections.value.push(base);
+};
+
+const updatePictureSection = (data: postTypes.PostPictureSection) => {
+  const currentSection = sections.value.find(
+    (section) => isPictureSection(section) && section.url === data.url,
+  );
+
+  if (!currentSection) {
+    return;
+  }
+
+  const currentSectionIndex = sections.value.indexOf(currentSection);
+
+  sections.value[currentSectionIndex] = data;
+};
+
+const deleteSection = (section: postTypes.PostSection) => {
+  // When it's edit mode backend logic will handle the deletion of an uploaded picture
+  if (
+    section.type === postTypes.POST_SECTION_TYPES.PICTURE &&
+    section.isFile &&
+    !isEdit.value
+  ) {
+    api.users.removeFilePicSection(section.hash);
+  }
+
+  sections.value.splice(sections.value.indexOf(section), 1);
+};
+
+onMounted(async () => {
+  if (props.isEdit && props.post) {
+    sections.value = props.post.sections;
+    title.value = props.post.title;
+    tags.value = props.post.tags;
+  } else {
+    if (!userStore.userId) {
+      return;
     }
 
-    this.$nextTick(() => {
-      this.isDirty = false;
+    const data = await api.users.getUserTemplate(userStore.userId);
+
+    title.value = data.title;
+    sections.value = data.sections || [];
+    tags.value = data.tags || [];
+  }
+
+  nextTick(() => {
+    isDirty.value = false;
+  });
+});
+
+const createPost = async () => {
+  try {
+    isSending.value = true;
+
+    const data = await api.posts.createPost({
+      sections: sections.value,
+      title: title.value,
+      tags: tags.value,
     });
-  },
-  methods: {
-    async createPost() {
-      this.sending = true;
-      const res = await api.posts.createPost({
-        sections: this.sections,
-        title: this.title,
-        tags: this.tags,
-      });
 
-      if (!res.data.error) {
-        this.$router.push({
-          name: 'Single',
-          params: {
-            slug: res.data.slug,
-          },
-        });
-      }
+    router.push({
+      name: 'Single',
+      params: {
+        slug: data.slug,
+      },
+    });
+  } finally {
+    isSending.value = false;
+  }
+};
 
-      this.sending = false;
+const saveEdited = async () => {
+  if (!props.post) {
+    return;
+  }
+
+  await api.posts.updatePostById(props.post.id, {
+    title: title.value,
+    sections: sections.value,
+    tags: tags.value,
+  });
+
+  notificationsStore.showInfoNotification({
+    message: 'Post has been saved successfully',
+  });
+
+  router.push({
+    name: 'Single',
+    params: {
+      slug: props.post.slug,
     },
-    async saveEdited() {
-      const res = await api.posts.updatePostById(this.post.id, {
-        title: this.title,
-        sections: this.sections,
-        tags: this.tags,
-      });
+  });
+};
 
-      if (!res.data.error) {
-        this.$store.dispatch('showInfoNotification', {
-          message: 'Post has been saved successfully',
-        });
+const saveDraft = async () => {
+  try {
+    isSaving.value = true;
 
-        this.$router.push({
-          name: 'Single',
-          params: {
-            slug: this.post.slug,
-          },
-        });
-      }
-    },
-    async saveDraft() {
-      this.saving = true;
+    const data = await api.users.updateUserTemplate(userStore.userId!, {
+      title: title.value,
+      sections: sections.value,
+      tags: tags.value,
+    });
 
-      const res = await api.users.updateUserTemplate(this.userId, {
-        title: this.title,
-        sections: this.sections,
-        tags: this.tags,
-      });
+    title.value = data.title;
+    sections.value = data.sections;
+    tags.value = data.tags;
 
-      this.saving = false;
+    notificationsStore.showInfoNotification({
+      message: 'Draft post has been saved successfully!',
+    });
 
-      if (!res.data.error) {
-        this.title = res.data.title;
-        this.sections = res.data.sections;
-        this.tags = res.data.tags;
-
-        this.$store.dispatch('showInfoNotification', {
-          message: 'Draft post has been saved successfully!',
-        });
-
-        this.$nextTick(() => {
-          this.isDirty = false;
-        });
-      }
-    },
-    async deleteSection(section) {
-      if (section.type === this.POST_SECTION_TYPES.PICTURE && section.isFile) {
-        const res = await api.users.removeFilePicSection(section.hash);
-
-        if (!res.data.error) {
-          this.sections.splice(this.sections.indexOf(section), 1);
-        }
-      } else {
-        this.sections.splice(this.sections.indexOf(section), 1);
-      }
-    },
-    setSection(data) {
-      const section = this.sections.find((el) => el.url === data.url);
-
-      this.sections[this.sections.indexOf(section)] = data;
-    },
-    createSection(type) {
-      this.sections.push({
-        type,
-        hash: (Math.random() * Math.random()).toString(36),
-      });
-    },
-  },
+    nextTick(() => {
+      isDirty.value = false;
+    });
+  } finally {
+    isSaving.value = false;
+  }
 };
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .post-editor {
   &__title {
@@ -310,7 +349,7 @@ export default {
   }
 
   &__section {
-    @include flex-row;
+    @include mixins.flex-row;
 
     align-items: center;
     position: relative;
@@ -321,7 +360,7 @@ export default {
       border: 1px solid var(--color-gray-light);
       border-radius: 8px;
 
-      @include for-size(phone-only) {
+      @include mixins.for-size(phone-only) {
         border-right: none;
         border-left: none;
         border-radius: 0;
@@ -349,7 +388,7 @@ export default {
       transition: all 0.3s;
     }
 
-    &-enter,
+    &-enter-from,
     &-leave-to {
       opacity: 0;
       transform: translateY(15px);
@@ -363,7 +402,7 @@ export default {
     border: none;
     background-color: transparent;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       top: -14px;
       right: 12px;
       width: 10px;

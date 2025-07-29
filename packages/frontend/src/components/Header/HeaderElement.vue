@@ -20,29 +20,34 @@
       </RouterLink>
 
       <Navigation
-        v-if="$isDesktop()"
+        v-if="isDesktop()"
         nav-link-class="header__nav-link"
         class="header__navigation"
       >
         <template #after>
-          <NavigationFeedLink class="header__nav-link" />
+          <NavigationFeedLink
+            class="header__nav-link"
+            :is-auth="Boolean(user)"
+          />
         </template>
       </Navigation>
 
       <!-- TODO: Move to Search component -->
-      <div v-if="$route.name !== 'Search'" class="header__search">
+      <div v-if="route.name !== 'Search'" class="header__search">
         <BaseInput
           v-model.trim="searchInputValue"
           placeholder="Search"
           data-testid="header-search-input"
-          icon="IconSearch"
           :style="'flex-direction: row'"
-          @keyup:enter="search"
-          @click-icon="search"
-        />
+          @keyup.enter="search"
+        >
+          <template #icon-right>
+            <IconSearch @click="search" />
+          </template>
+        </BaseInput>
       </div>
 
-      <div v-if="isUserAuth" class="header__avatar">
+      <div v-if="user" class="header__avatar">
         <!-- TODO: Move everything like that to its own component AvatarLink or something -->
         <RouterLink
           :to="{
@@ -52,70 +57,63 @@
             },
           }"
         >
-          <img :src="$resolveAvatar(user.avatar)" alt="avatar" />
+          <img :src="resolveAvatar(user.avatar)" alt="avatar" />
         </RouterLink>
       </div>
     </div>
   </header>
 </template>
 
-<script>
-import { mapState, mapGetters } from 'vuex';
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import HeaderMobileMenu from './HeaderMobileMenu.vue';
 import SiteLogo from './SiteLogo.vue';
+import { useUserStore } from '@/store/user';
+import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseInput from '@common/BaseInput.vue';
 import Navigation from '@components/Navigation/Navigation.vue';
 import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
 import IconMenuMobile from '@icons/IconMenuMobile.vue';
+import IconSearch from '@icons/IconSearch.vue';
+import { isDesktop } from '@utils/is-desktop';
 
-export default {
-  components: {
-    HeaderMobileMenu,
-    BaseInput,
-    IconMenuMobile,
-    SiteLogo,
-    Navigation,
-    NavigationFeedLink,
-  },
-  data() {
-    return {
-      isMobileMenuOpen: false,
-      searchInputValue: '',
-    };
-  },
-  computed: {
-    ...mapGetters(['isUserAuth']),
-    ...mapState({
-      user: (state) => state.user,
-    }),
-  },
-  watch: {
-    $route() {
-      if (this.isMobileMenuOpen) {
-        this.toggleMobileMenu();
-      }
-    },
-  },
-  methods: {
-    search() {
-      this.$router.push({
-        name: 'Search',
-        query: {
-          title: this.searchInputValue,
-        },
-      });
+const route = useRoute();
+const router = useRouter();
 
-      this.searchInputValue = '';
+const { user } = storeToRefs(useUserStore());
+
+const isMobileMenuOpen = ref(false);
+const searchInputValue = ref('');
+
+const search = () => {
+  router.push({
+    name: 'Search',
+    query: {
+      title: searchInputValue.value,
     },
-    toggleMobileMenu() {
-      this.isMobileMenuOpen = !this.isMobileMenuOpen;
-    },
-  },
+  });
+
+  searchInputValue.value = '';
 };
+
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
+
+watch(
+  () => route,
+  () => {
+    if (isMobileMenuOpen.value) {
+      toggleMobileMenu();
+    }
+  },
+);
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .header {
   display: flex;
@@ -128,7 +126,7 @@ export default {
   padding: 0.5rem;
   background-color: var(--color-header);
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     height: 46px;
   }
 
@@ -142,7 +140,7 @@ export default {
     max-width: 1110px;
     padding-left: 40px;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       padding-right: 0;
       padding-left: 0;
     }
@@ -153,7 +151,7 @@ export default {
     margin-right: 1rem;
     cursor: pointer;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       display: block;
 
       svg {
@@ -167,12 +165,12 @@ export default {
       transition: all 0.2s;
     }
 
-    &-enter,
+    &-enter-from,
     &-leave-to {
       opacity: 0;
       transform: translateY(15px);
 
-      @include for-size(phone-only) {
+      @include mixins.for-size(phone-only) {
         transform: translateY(-15px);
       }
     }
@@ -185,13 +183,13 @@ export default {
   }
 
   &__navigation {
-    @include flex-row;
+    @include mixins.flex-row;
 
     align-items: center;
     gap: 16px;
     margin-left: 4rem;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       margin-left: 0;
     }
   }
@@ -219,7 +217,7 @@ export default {
     align-items: center;
     margin-left: auto;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       width: 70%;
     }
   }
@@ -236,7 +234,7 @@ export default {
       border-radius: 50%;
       cursor: pointer;
 
-      @include for-size(phone-only) {
+      @include mixins.for-size(phone-only) {
         width: 2rem;
         height: 2rem;
       }

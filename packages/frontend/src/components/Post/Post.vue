@@ -2,31 +2,35 @@
   <div class="post">
     <div class="post__left">
       <div
-        :data-testid="`post-${postData.id}-upvote`"
+        :data-testid="`post-${post.id}-upvote`"
         class="post__upvote"
         :class="
-          postData.rated.isRated && !postData.rated.negative
+          post.rated.isRated && !post.rated.negative
             ? 'post__upvote--active'
             : ''
         "
-        @click="upvote(postData.id)"
+        role="button"
+        tabindex="0"
+        @click="upvote(post.id)"
       >
         <IconPlus />
       </div>
 
-      <div class="post__rating" :data-testid="`post-${postData.id}-rating`">
-        {{ postData.rating }}
+      <div class="post__rating" :data-testid="`post-${post.id}-rating`">
+        {{ post.rating }}
       </div>
 
       <div
-        :data-testid="`post-${postData.id}-downvote`"
+        :data-testid="`post-${post.id}-downvote`"
         class="post__downvote"
         :class="
-          postData.rated.isRated && postData.rated.negative
+          post.rated.isRated && post.rated.negative
             ? 'post__downvote--active'
             : ''
         "
-        @click="downvote(postData.id)"
+        role="button"
+        tabindex="0"
+        @click="downvote(post.id)"
       >
         <IconMinus />
       </div>
@@ -39,157 +43,154 @@
           :to="{
             name: 'Single',
             params: {
-              slug: postData.slug,
+              slug: post.slug,
             },
           }"
-          :target="$isMobile() ? '' : '_blank'"
-          :data-testid="`post-${postData.id}-title`"
+          :target="isMobile() ? '' : '_blank'"
+          :data-testid="`post-${post.id}-title`"
         >
-          {{ postData.title }}
+          {{ post.title }}
         </RouterLink>
 
         <template v-if="canEdit">
           <RouterLink
             title="Edit post"
-            :to="{ name: 'PostEdit', params: { slug: postData.slug } }"
+            :to="{ name: 'PostEdit', params: { slug: post.slug } }"
           >
             <IconEdit data-testid="post-edit-icon" />
           </RouterLink>
 
-          <span @click="deletePost(postData.id)">
+          <button class="post__delete-button" @click="deletePost(post.id)">
             <IconDelete data-testid="post-delete-icon" />
-          </span>
+          </button>
         </template>
       </div>
 
-      <div v-if="postData.tags.length > 0" class="post__tags">
-        <div
-          v-for="tag in postData.tags"
+      <div v-if="post.tags.length > 0" class="post__tags">
+        <button
+          v-for="tag in post.tags"
           :key="tag"
-          :data-testid="`post-${postData.id}-tag-${tag}`"
+          :data-testid="`post-${post.id}-tag-${tag}`"
           class="post__tags-item"
-          @click="openContextMenu($event, tag)"
+          @click.prevent.stop="openContextMenu($event, tag)"
         >
           {{ tag }}
-        </div>
+        </button>
       </div>
 
       <div class="post__body">
         <div
-          v-for="section in postData.sections"
+          v-for="section in post.sections"
           :key="section.hash"
           class="post__sections"
         >
-          <template v-if="section.type === POST_SECTION_TYPES.TEXT">
-            <div
-              :data-testid="`post-${postData.id}-text-${section.hash}`"
-              v-html="section.content"
+          <div
+            v-if="isTextSection(section)"
+            :data-testid="`post-${post.id}-text-${section.hash}`"
+            v-html="section.content"
+          />
+
+          <div
+            v-if="isPictureSection(section)"
+            class="post__section-attachment"
+          >
+            <img
+              class="post__section-image"
+              :src="resolveImage(section.url)"
+              :alt="section.url"
+              :data-testid="`post-${post.id}-pic-${section.hash}`"
+              @error="resolveImageError"
             />
-          </template>
+          </div>
 
-          <template v-else-if="section.type === POST_SECTION_TYPES.PICTURE">
-            <div class="post__section-attachment">
-              <img
-                class="post__section-image"
-                :src="$resolveImage(section.url)"
-                :alt="section.url"
-                :data-testid="`post-${postData.id}-pic-${section.hash}`"
-                @error="$resolveImageError"
-              />
-            </div>
-          </template>
-
-          <template v-else-if="section.type === POST_SECTION_TYPES.VIDEO">
-            <div class="post__section-attachment">
-              <video
-                class="post__section-video"
-                controls
-                :src="section.url"
-                :data-testid="`post-${postData.id}-vid-${section.hash}`"
-              >
-                <track kind="captions" />
-              </video>
-            </div>
-          </template>
+          <div v-if="isVideoSection(section)" class="post__section-attachment">
+            <video
+              class="post__section-video"
+              controls
+              :src="section.url"
+              :data-testid="`post-${post.id}-vid-${section.hash}`"
+            >
+              <track kind="captions" />
+            </video>
+          </div>
         </div>
       </div>
 
       <!-- for mobile -->
-
       <div class="post__rate-mobile">
-        <div
+        <button
           class="post__upvote"
-          :data-testid="`m-post-${postData.id}-upvote`"
+          :data-testid="`m-post-${post.id}-upvote`"
           :class="
-            postData.rated.isRated && !postData.rated.negative
+            post.rated.isRated && !post.rated.negative
               ? 'post__upvote--active'
               : ''
           "
-          @click="upvote(postData.id)"
+          @click="upvote(post.id)"
         >
           <IconPlus />
-        </div>
+        </button>
         <div class="post__rating">
-          {{ postData.rating }}
+          {{ post.rating }}
         </div>
-        <div
+        <button
           class="post__downvote"
-          :data-testid="`m-post-${postData.id}-downvote`"
+          :data-testid="`m-post-${post.id}-downvote`"
           :class="
-            postData.rated.isRated && postData.rated.negative
+            post.rated.isRated && post.rated.negative
               ? 'post__downvote--active'
               : ''
           "
-          @click="downvote(postData.id)"
+          @click="downvote(post.id)"
         >
           <IconMinus />
-        </div>
+        </button>
       </div>
 
       <!-- for mobile -->
       <div class="post__footer">
         <div class="post__meta-info">
           <span class="post__date">
-            {{ postData.createdAt | $fromNow }}
+            {{ formatFromNow(post.createdAt) }}
           </span>
 
           <RouterLink
             class="post__comments-count"
-            :target="$isMobile() ? '' : '_blank'"
+            :target="isMobile() ? '' : '_blank'"
             :to="{
               name: 'Single',
               hash: '#comments',
               params: {
-                slug: postData.slug,
+                slug: post.slug,
               },
             }"
           >
-            <IconComments /> {{ postData.commentCount }}
+            <IconComments /> {{ post.commentCount }}
           </RouterLink>
 
           <RouterLink
-            v-if="postData.author"
+            v-if="post.author"
             :to="{
               name: 'UserPage',
               params: {
-                login: postData.author.login,
+                login: post.author.login,
               },
             }"
-            :data-testid="`post-${postData.id}-author`"
+            :data-testid="`post-${post.id}-author`"
             class="post__author-container"
           >
             <span class="post__author-login">
-              {{ postData.author.login }}
+              {{ post.author.login }}
             </span>
             <img
               class="post__author-avatar"
-              :src="$resolveAvatar(postData.author.avatar)"
-              :alt="postData.author.avatar"
+              :src="resolveAvatar(post.author.avatar)"
+              :alt="post.author.avatar"
             />
           </RouterLink>
           <span v-else class="post__author-container">
             <span> Anonymous </span>
-            <img :src="$resolveAvatar('')" :alt="'avatar'" />
+            <img :src="resolveAvatar('')" :alt="'avatar'" />
           </span>
         </div>
       </div>
@@ -200,254 +201,281 @@
       :show="contextMenuData.show"
       :pos-x="contextMenuData.x"
       :pos-y="contextMenuData.y"
-      :list="contextMenuOptions"
-      :target="contextMenuData.target"
+      :items="contextMenuOptions"
+      @action="handleContextMenuAction"
     />
   </div>
 </template>
 
-<script>
-import { mapGetters } from 'vuex';
-import api from '@/api/index';
-import consts from '@/const/const';
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { computed, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import {
+  isTextSection,
+  isPictureSection,
+  isVideoSection,
+} from './is-section-of-type';
+import { api } from '@/api';
+import { postTypes } from '@/api/posts';
+import { POST_RATE_VALUE } from '@/const';
+import { useNotificationsStore } from '@/store/notifications';
+import { useUserStore } from '@/store/user';
+import { formatFromNow } from '@/utils/format-from-now';
+import { resolveAvatar } from '@/utils/resolve-avatar';
+import { resolveImage } from '@/utils/resolve-image';
+import { resolveImageError } from '@/utils/resolve-image-error';
 import BaseContextMenu from '@common/BaseContextMenu.vue';
 import IconComments from '@icons/IconComments.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';
 import IconPlus from '@icons/IconPlus.vue';
+import { isMobile } from '@utils/is-mobile';
 
-export default {
-  components: {
-    IconComments,
-    IconDelete,
-    IconEdit,
-    IconMinus,
-    BaseContextMenu,
-    IconPlus,
-  },
-  props: ['post', 'canEdit'],
-  data() {
-    return {
-      postData: this.post,
-      isRequesting: false,
-      POST_SECTION_TYPES: consts.POST_SECTION_TYPES,
-      contextMenuData: {
-        show: false,
-        x: 0,
-        y: 0,
-        target: null,
-      },
-    };
-  },
-  computed: {
-    ...mapGetters(['isUserAuth']),
-    contextMenuOptions() {
-      const options = [];
+interface Props {
+  post: postTypes.Post;
+  canEdit?: boolean;
+}
 
-      if (this.$route.name !== 'Search') {
-        options.push({
-          title: 'Search tag',
-          callback: this.searchTag,
-        });
-      }
+interface ContextMenuData {
+  show: boolean;
+  x: number;
+  y: number;
+  target: string | null;
+}
 
-      if (this.isUserAuth) {
-        const isTargetTagFollowed =
-          this.$store.getters.isTagFollowed[this.contextMenuData.target];
+const props = withDefaults(defineProps<Props>(), {
+  canEdit: false,
+});
 
-        if (isTargetTagFollowed) {
-          options.push({
-            title: 'Unfollow tag',
-            callback: this.unfollowTag,
-          });
-        } else {
-          options.push({
-            title: 'Follow tag',
-            callback: this.followTag,
-          });
-        }
-      }
+const router = useRouter();
 
-      return options;
-    },
-  },
-  methods: {
-    async upvote(id) {
-      if (this.isRequesting) {
-        return;
-      }
+const isRequesting = ref(false);
 
-      this.isRequesting = true;
+const userStore = useUserStore();
+const { user, isTagFollowed } = storeToRefs(userStore);
 
-      if (!this.postData.rated.isRated) {
-        // Optimistic update
-        this.postData.rated.isRated = true;
-        this.postData.rated.negative = false;
-        this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
+const notificationsStore = useNotificationsStore();
 
-        const res = await api.posts.updateRateById(id, {
-          negative: false,
-        });
+const contextMenuData = reactive<ContextMenuData>({
+  show: false,
+  x: 0,
+  y: 0,
+  target: null,
+});
 
-        this.isRequesting = false;
+const contextMenuOptions = computed(() => {
+  const options = [];
 
-        if (res.data.error) {
-          this.postData.rated.isRated = false;
-          this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
+  if (router.currentRoute.value.name !== 'Search') {
+    options.push({
+      label: 'Search tag',
+      value: 'search',
+    });
+  }
 
-          return;
-        }
+  if (user.value) {
+    const isTargetTagFollowed = contextMenuData.target
+      ? isTagFollowed.value[contextMenuData.target]
+      : false;
 
-        this.postData = {
-          ...this.postData,
-          rating: res.data.rating,
-          commentCount: res.data.commentCount,
-        };
-      } else if (this.postData.rated.negative) {
-        // Optimistic update
-        this.postData.rated.isRated = false;
-        this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
-
-        const res = await api.posts.removeRateById(id);
-
-        this.isRequesting = false;
-
-        if (res.data.error) {
-          this.postData.rated.isRated = true;
-          this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
-
-          return;
-        }
-
-        this.postData = {
-          ...this.postData,
-          rating: res.data.rating,
-          commentCount: res.data.commentCount,
-        };
-      }
-    },
-    async downvote(id) {
-      if (this.isRequesting) {
-        return;
-      }
-
-      this.isRequesting = true;
-
-      if (!this.postData.rated.isRated) {
-        // Optimistic update
-        this.postData.rated.isRated = true;
-        this.postData.rated.negative = true;
-        this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
-
-        const res = await api.posts.updateRateById(id, {
-          negative: true,
-        });
-
-        this.isRequesting = false;
-
-        if (res.data.error) {
-          this.postData.rated.isRated = false;
-          this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
-
-          return;
-        }
-
-        this.postData = {
-          ...this.postData,
-          rating: res.data.rating,
-          commentCount: res.data.commentCount,
-        };
-      } else if (!this.postData.rated.negative) {
-        // Optimistic update
-        this.postData.rated.isRated = false;
-        this.postData.rating = this.postData.rating - consts.POST_RATE_VALUE;
-
-        const res = await api.posts.removeRateById(id);
-
-        this.isRequesting = false;
-
-        if (res.data.error) {
-          this.postData.rated.isRated = true;
-          this.postData.rating = this.postData.rating + consts.POST_RATE_VALUE;
-
-          return;
-        }
-
-        this.postData = {
-          ...this.postData,
-          rating: res.data.rating,
-          commentCount: res.data.commentCount,
-        };
-      }
-    },
-    async deletePost(id) {
-      const res = await api.posts.deletePostById(id);
-
-      if (!res.data.error) {
-        this.$store.dispatch('showInfoNotification', {
-          message: 'The post has been successfully deleted',
-        });
-
-        this.$router.push({ name: 'Home' });
-      }
-    },
-    openContextMenu(ev, tag) {
-      if (!this.contextMenuData.show) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        // console.log(ev);
-        // console.log(ev.target.getBoundingClientRect());
-        this.contextMenuData.show = true;
-        this.contextMenuData.target = tag;
-        this.contextMenuData.x = ev.layerX;
-        this.contextMenuData.y = ev.layerY;
-      }
-    },
-    closeContextMenu() {
-      if (this.contextMenuData.show) {
-        this.contextMenuData.show = false;
-      }
-    },
-    // context menu options
-    async followTag(tag) {
-      this.closeContextMenu();
-      const res = await api.tags.follow(tag);
-      if (!res.data.error) {
-        this.$store.dispatch('showInfoNotification', {
-          message: "You're now following this tag!",
-        });
-
-        this.$store.commit('followTag', tag);
-      }
-    },
-    async unfollowTag(tag) {
-      this.closeContextMenu();
-
-      const res = await api.tags.unfollow(tag);
-
-      if (!res.data.error) {
-        this.$store.dispatch('showInfoNotification', {
-          message: 'This tag was successfully unfollowed!',
-        });
-
-        this.$store.commit('unfollowTag', tag);
-      }
-    },
-    searchTag(tag) {
-      this.$router.push({
-        name: 'Search',
-        query: {
-          tags: [tag],
-        },
+    if (isTargetTagFollowed) {
+      options.push({
+        label: 'Unfollow tag',
+        value: 'unfollow',
       });
+    } else {
+      options.push({
+        label: 'Follow tag',
+        value: 'follow',
+      });
+    }
+  }
+
+  return options;
+});
+
+const upvote = async (id: string) => {
+  if (isRequesting.value) {
+    return;
+  }
+
+  isRequesting.value = true;
+
+  if (!props.post.rated.isRated) {
+    try {
+      props.post.rated.isRated = true;
+      props.post.rated.negative = false;
+      props.post.rating = props.post.rating + POST_RATE_VALUE;
+
+      const data = await api.posts.updateRateById(id, {
+        negative: false,
+      });
+
+      Object.assign(props.post, {
+        rating: data.rating,
+        commentCount: data.commentCount,
+      });
+    } catch {
+      props.post.rated.isRated = false;
+      props.post.rating = props.post.rating - POST_RATE_VALUE;
+    } finally {
+      isRequesting.value = false;
+    }
+
+    return;
+  }
+
+  if (props.post.rated.negative) {
+    try {
+      props.post.rated.isRated = false;
+      props.post.rating = props.post.rating + POST_RATE_VALUE;
+
+      const data = await api.posts.removeRateById(id);
+
+      Object.assign(props.post, {
+        rating: data.rating,
+        commentCount: data.commentCount,
+      });
+    } catch {
+      props.post.rated.isRated = true;
+      props.post.rating = props.post.rating - POST_RATE_VALUE;
+    } finally {
+      isRequesting.value = false;
+    }
+  }
+};
+
+const downvote = async (id: string) => {
+  if (isRequesting.value) {
+    return;
+  }
+
+  isRequesting.value = true;
+
+  if (!props.post.rated.isRated) {
+    try {
+      props.post.rated.isRated = true;
+      props.post.rated.negative = true;
+      props.post.rating = props.post.rating - POST_RATE_VALUE;
+
+      const data = await api.posts.updateRateById(id, {
+        negative: true,
+      });
+
+      Object.assign(props.post, {
+        rating: data.rating,
+        commentCount: data.commentCount,
+      });
+    } catch {
+      props.post.rated.isRated = false;
+      props.post.rating = props.post.rating + POST_RATE_VALUE;
+    } finally {
+      isRequesting.value = false;
+    }
+
+    return;
+  }
+
+  if (!props.post.rated.negative) {
+    try {
+      props.post.rated.isRated = false;
+      props.post.rating = props.post.rating - POST_RATE_VALUE;
+
+      const data = await api.posts.removeRateById(id);
+
+      Object.assign(props.post, {
+        rating: data.rating,
+        commentCount: data.commentCount,
+      });
+    } catch {
+      props.post.rated.isRated = true;
+      props.post.rating = props.post.rating + POST_RATE_VALUE;
+    } finally {
+      isRequesting.value = false;
+    }
+  }
+};
+
+const deletePost = async (id: string) => {
+  await api.posts.deletePostById(id);
+
+  notificationsStore.showInfoNotification({
+    message: 'The post has been successfully deleted',
+  });
+
+  router.push({ name: 'Home' });
+};
+
+const openContextMenu = (ev: MouseEvent, tag: string) => {
+  if (!contextMenuData.show) {
+    contextMenuData.show = true;
+    contextMenuData.target = tag;
+    contextMenuData.x = ev.layerX;
+    contextMenuData.y = ev.layerY;
+  }
+};
+
+const closeContextMenu = () => {
+  if (contextMenuData.show) {
+    contextMenuData.show = false;
+  }
+};
+
+const handleContextMenuAction = (action: string) => {
+  const target = contextMenuData.target;
+
+  if (!target) {
+    return;
+  }
+
+  switch (action) {
+    case 'follow':
+      return handleFollowTag(target);
+    case 'unfollow':
+      return handleUnfollowTag(target);
+    case 'search':
+      return searchByTag(target);
+  }
+};
+
+const handleFollowTag = async (tag: string) => {
+  closeContextMenu();
+
+  await api.tags.follow(tag);
+
+  notificationsStore.showInfoNotification({
+    message: "You're now following this tag!",
+  });
+
+  userStore.followTag(tag);
+};
+
+const handleUnfollowTag = async (tag: string) => {
+  closeContextMenu();
+
+  await api.tags.unfollow(tag);
+
+  notificationsStore.showInfoNotification({
+    message: 'This tag was successfully unfollowed!',
+  });
+
+  userStore.unfollowTag(tag);
+};
+
+const searchByTag = (tag: string) => {
+  router.push({
+    name: 'Search',
+    query: {
+      tags: [tag],
     },
-  },
+  });
 };
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .post {
   display: flex;
@@ -459,7 +487,7 @@ export default {
     align-items: center;
     width: 10%;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       display: none;
     }
   }
@@ -494,6 +522,8 @@ export default {
   &__upvote,
   &__rating,
   &__downvote {
+    border: none;
+    background: transparent;
     color: var(--color-gray-light);
     transition: all 200ms ease-out;
 
@@ -502,7 +532,7 @@ export default {
       fill: var(--color-gray-light);
       transition: all 200ms ease-out;
 
-      @include for-size(phone-only) {
+      @include mixins.for-size(phone-only) {
         width: 3rem;
       }
     }
@@ -530,7 +560,7 @@ export default {
   }
 
   &__tags {
-    @include flex-row;
+    @include mixins.flex-row;
 
     flex-wrap: wrap;
     margin-bottom: 1rem;
@@ -552,12 +582,12 @@ export default {
   }
 
   &__main {
-    @include widget;
+    @include mixins.widget;
 
     width: 90%;
     color: var(--color-main-text);
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       width: 100%;
       border: none;
       border-radius: 0;
@@ -567,7 +597,7 @@ export default {
   &__rate-mobile {
     display: none;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -593,7 +623,7 @@ export default {
     margin-top: 1rem;
     margin-bottom: 1rem;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       width: 110%;
       margin-left: -1rem;
       border: none;
@@ -607,7 +637,7 @@ export default {
   }
 
   &__footer {
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       margin-top: -1rem;
     }
   }
@@ -624,7 +654,7 @@ export default {
     border-bottom-left-radius: 8px;
     background: var(--color-header);
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       border-top: none;
     }
   }
@@ -672,6 +702,11 @@ export default {
     height: 1.5rem;
     margin-left: 0.5rem;
     border-radius: 50%;
+  }
+
+  &__delete-button {
+    border: none;
+    background: transparent;
   }
 }
 </style>

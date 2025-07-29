@@ -23,5 +23,10 @@
     "concurrently": "^7.6.0",
     "cspell": "^8.8.1",
     "knip": "^5.41.1"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "vuedraggable@4.1.0": "patches/vuedraggable@4.1.0.patch"
+    }
   }
 }

@@ -86,6 +86,8 @@ export default class PostCreatePage extends AbstractPage {
   }
 
   async uploadPictureWithUrl(url = '') {
+    console.log('url', url);
+
     await this.page.getByTestId('image-url-input').fill(url);
     await this.getImageUploadBtn().click();
   }
@@ -117,9 +119,7 @@ export default class PostCreatePage extends AbstractPage {
 
   async awaitDragAndDropAnimation() {
     await this.page.waitForFunction(() => {
-      const element = document.querySelector(
-        '[data-testid="post-sections"] > div:last-child',
-      );
+      const element = document.querySelector('[data-testid="post-section"]');
       const computedStyle = window.getComputedStyle(element);
       console.log(computedStyle.opacity);
       return (

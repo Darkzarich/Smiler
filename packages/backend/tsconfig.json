@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
+    "baseUrl": ".",
     "lib": ["es2023"],
     "checkJs": true,
     "module": "NodeNext",

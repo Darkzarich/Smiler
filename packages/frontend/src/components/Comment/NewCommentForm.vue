@@ -1,10 +1,10 @@
 <template>
   <div
     class="new-comment-form"
-    :class="!isUserAuth ? 'new-comment-form--disabled' : ''"
+    :class="!userStore.user ? 'new-comment-form--disabled' : ''"
     data-testid="new-comment-form"
   >
-    <template v-if="isUserAuth">
+    <template v-if="userStore.user">
       <div class="new-comment-form__title">Share your thoughts!</div>
       <BaseTextEditor
         v-model="commentBody"
@@ -13,9 +13,9 @@
       >
         <BaseButton
           class="new-comment-form__submit-btn"
-          :loading="loading"
+          :loading="isLoading"
           data-testid="new-comment-button"
-          @click.native="createComment"
+          @click="createComment"
         >
           Send
         </BaseButton>
@@ -27,85 +27,85 @@
   </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from 'vuex';
-import api from '@/api';
+<script setup lang="ts">
+import { ref } from 'vue';
+import type { Comment } from './types';
+import { api } from '@/api';
+import { useNotificationsStore } from '@/store/notifications';
+import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 
-export default {
-  components: {
-    BaseButton,
-    BaseTextEditor,
-  },
-  props: {
-    postId: {
-      type: String,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      commentBody: '',
-      loading: false,
+interface Props {
+  postId: string;
+}
+
+const props = defineProps<Props>();
+
+interface Emits {
+  'new-comment': [Comment];
+}
+
+const emit = defineEmits<Emits>();
+
+const userStore = useUserStore();
+
+const notificationsStore = useNotificationsStore();
+
+const commentBody = ref('');
+
+const isLoading = ref(false);
+
+const createComment = async () => {
+  const user = userStore.user;
+
+  if (!commentBody.value || !user) {
+    notificationsStore.showErrorNotification({
+      message: 'Comment cannot be empty. Enter some text first!',
+    });
+
+    return;
+  }
+
+  try {
+    isLoading.value = true;
+
+    const data = await api.comments.createComment({
+      post: props.postId,
+      body: commentBody.value,
+    });
+
+    const newComment: Comment = {
+      ...data,
+      rated: {
+        isRated: false,
+        negative: false,
+      },
+      author: {
+        id: user.id,
+        avatar: user.avatar,
+        login: user.login,
+      },
+      created: true,
     };
-  },
-  computed: {
-    ...mapGetters(['isUserAuth']),
-    ...mapState({
-      user: (state) => state.user,
-    }),
-  },
-  methods: {
-    async createComment() {
-      if (!this.commentBody) {
-        this.$store.dispatch('showErrorNotification', {
-          message: 'Comment cannot be empty. Enter some text first!',
-        });
 
-        return;
-      }
+    emit('new-comment', newComment);
 
-      this.loading = true;
-
-      const res = await api.comments.createComment({
-        post: this.postId,
-        body: this.commentBody,
-      });
-
-      if (!res.data.error) {
-        const newComment = {
-          ...res.data,
-          rated: {
-            isRated: false,
-            negative: false,
-          },
-          author: {
-            avatar: this.user.avatar,
-            login: this.user.login,
-          },
-          created: true,
-        };
-
-        this.$emit('new-comment', newComment);
-
-        this.commentBody = '';
-      }
-
-      this.loading = false;
-    },
-  },
+    commentBody.value = '';
+  } finally {
+    isLoading.value = false;
+  }
 };
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .new-comment-form {
   padding: 1rem;
   padding-top: 0;
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     padding: 0;
   }
 

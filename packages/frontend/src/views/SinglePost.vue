@@ -1,147 +1,154 @@
 <template>
   <div>
-    <div class="post-container">
-      <Post v-if="post" :post="post" :can-edit="$postCanEdit(post)" />
-    </div>
-
-    <div id="comments" ref="comments" class="comments">
-      <NewCommentForm
-        v-if="!isFetchingComments"
-        :post-id="post.id"
-        @new-comment="handleAddNewComment"
-      />
-
-      <CommentList
-        v-if="!isFetchingComments && comments.length > 0"
-        :data="comments"
-        :indent-level="1"
-        :post-id="post.id"
-        :level="0"
-        :is-first="true"
-      />
-
-      <div v-else-if="!isFetchingComments" class="comments__no-comments">
-        "It’s quiet here — be the first to leave a comment!"
+    <template v-if="post">
+      <div class="post-container">
+        <Post
+          :post="post"
+          :can-edit="checkCanEditPost(post, userStore.user?.id)"
+        />
       </div>
 
-      <div v-else class="comments__loading">
-        <CircularLoader />
+      <div id="comments" class="comments">
+        <NewCommentForm
+          v-if="!isFetchingComments"
+          :post-id="post.id"
+          @new-comment="handleAddNewComment"
+        />
+
+        <CommentList
+          v-if="!isFetchingComments && comments.length > 0"
+          :data="comments"
+          :indent-level="1"
+          :post-id="post.id"
+          :level="0"
+          :is-first="true"
+        />
+
+        <div v-else-if="!isFetchingComments" class="comments__no-comments">
+          "It’s quiet here — be the first to leave a comment!"
+        </div>
+
+        <div v-else class="comments__loading">
+          <CircularLoader />
+        </div>
       </div>
-    </div>
 
-    <div
-      v-if="!isFetchingComments && hasCommentsNextPage"
-      class="comments__fetch-more"
-      @click="fetchMoreComments()"
-    >
-      <template v-if="isFetchingComments">
-        <CircularLoader />
-      </template>
-      <template v-else> Click here to see more comments </template>
-    </div>
+      <div
+        v-if="!isFetchingComments && hasCommentsNextPage"
+        class="comments__fetch-more"
+        @click="fetchMoreComments()"
+      >
+        <template v-if="isFetchingComments">
+          <CircularLoader />
+        </template>
+        <template v-else> Click here to see more comments </template>
+      </div>
 
-    <div
-      v-if="comments.length > 0 && !hasCommentsNextPage"
-      class="comments__no-more"
-    >
-      You've read all the comments. Now it's your turn to share your thoughts!
-    </div>
+      <div
+        v-if="comments.length > 0 && !hasCommentsNextPage"
+        class="comments__no-more"
+      >
+        You've read all the comments. Now it's your turn to share your thoughts!
+      </div>
+    </template>
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex';
-import api from '@/api';
+<script setup lang="ts">
+import { onBeforeMount, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { api } from '@/api';
+import { commentTypes } from '@/api/comments';
+import { postTypes } from '@/api/posts';
 import CommentList from '@/components/Comment/CommentList.vue';
-import consts from '@/const/const';
+import * as consts from '@/const';
+import { useUserStore } from '@/store/user';
+import { checkCanEditPost } from '@/utils/check-can-edit-post';
 import NewCommentForm from '@components/Comment/NewCommentForm.vue';
 import Post from '@components/Post/Post.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 
-export default {
-  components: {
-    Post,
-    NewCommentForm,
-    CommentList,
-    CircularLoader,
-  },
-  async beforeRouteEnter(to, from, next) {
-    const post = await api.posts.getPostBySlug(to.params.slug);
+const route = useRoute();
+const router = useRouter();
 
-    if (post.data.error) {
-      next({
-        name: 'NotFound',
-      });
+const userStore = useUserStore();
+
+const post = ref<postTypes.Post | null>(null);
+
+const comments = ref<commentTypes.Comment[]>([]);
+
+const commentsCurrentPage = ref(0);
+const hasCommentsNextPage = ref(false);
+
+const isFetchingComments = ref(true);
+
+const fetchComments = async ({ isCombine = false } = {}) => {
+  if (!post.value) {
+    return;
+  }
+
+  try {
+    isFetchingComments.value = true;
+
+    const data = await api.comments.getComments({
+      limit: consts.COMMENTS_INITIAL_COUNT,
+      post: post.value.id,
+      offset: 0 + commentsCurrentPage.value * consts.COMMENTS_INITIAL_COUNT,
+    });
+
+    hasCommentsNextPage.value = data.hasNextPage;
+
+    if (isCombine) {
+      comments.value = comments.value.concat(data.comments);
     } else {
-      next((vm) => vm.handleSetPost(post.data));
+      comments.value = data.comments;
     }
-  },
-  data() {
-    return {
-      post: null,
-      comments: [],
-      isFetchingComments: true,
-      commentsCurrentPage: 0,
-      hasCommentsNextPage: false,
-    };
-  },
-  computed: {
-    ...mapState({
-      user: (state) => state.user,
-    }),
-  },
-  methods: {
-    async handleSetPost(post) {
-      this.post = post;
-
-      window.document.title = `${this.post.title} | Smiler`;
-
-      // comments
-
-      // TODO: Come up with a way to track new comments user didn't see yet
-      // e.g. save in store seen comments and then check if each comment is in there
-      this.fetchComments();
-    },
-    /**
-     *
-     * @param {Object} options
-     * @param {boolean=} options.isCombine - if true, posts are concatenated to the existing array
-     */
-    async fetchComments({ isCombine } = {}) {
-      this.isFetchingComments = true;
-
-      const res = await api.comments.getComments({
-        limit: consts.COMMENTS_INITIAL_COUNT,
-        post: this.post.id,
-        offset: 0 + this.commentsCurrentPage * consts.COMMENTS_INITIAL_COUNT,
-      });
-
-      if (res && !res.data.error) {
-        this.hasCommentsNextPage = res.data.hasNextPage;
-
-        if (isCombine) {
-          this.comments = this.comments.concat(res.data.comments);
-        } else {
-          this.comments = res.data.comments;
-        }
-      }
-
-      this.isFetchingComments = false;
-    },
-    async fetchMoreComments() {
-      this.commentsCurrentPage = this.commentsCurrentPage + 1;
-      this.fetchComments({ isCombine: true });
-    },
-    handleAddNewComment(newComment) {
-      this.post.commentCount = this.post.commentCount + 1;
-      this.comments.unshift(newComment);
-    },
-  },
+  } finally {
+    isFetchingComments.value = false;
+  }
 };
+
+const fetchMoreComments = async () => {
+  commentsCurrentPage.value = commentsCurrentPage.value + 1;
+  fetchComments({ isCombine: true });
+};
+
+const fetchPostBySlug = async () => {
+  try {
+    const fetchedPost = await api.posts.getPostBySlug(
+      route.params.slug as string,
+    );
+
+    post.value = fetchedPost;
+
+    window.document.title = `${post.value?.title} | Smiler`;
+
+    // TODO: Come up with a way to track new comments user didn't see yet
+    // e.g. save in store seen comments and then check if each comment is in there
+    fetchComments();
+  } catch {
+    router.push({
+      name: 'NotFound',
+    });
+  }
+};
+
+const handleAddNewComment = (newComment: commentTypes.Comment) => {
+  if (!post.value) {
+    return;
+  }
+
+  post.value.commentCount = post.value.commentCount + 1;
+  comments.value.unshift(newComment);
+};
+
+onBeforeMount(async () => {
+  fetchPostBySlug();
+});
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .post-container {
   margin-bottom: 1.5rem;
@@ -151,7 +158,7 @@ export default {
   margin-bottom: 2rem;
   padding: 1rem;
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     padding: 0;
     border: none;
   }
@@ -177,7 +184,7 @@ export default {
     text-align: center;
     font-size: 1.2rem;
 
-    @include widget;
+    @include mixins.widget;
   }
 
   &__fetch-more {

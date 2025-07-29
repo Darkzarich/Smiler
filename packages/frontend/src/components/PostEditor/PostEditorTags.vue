@@ -18,13 +18,16 @@
       </div>
     </div>
 
-    <div v-if="tags.length < POST_MAX_TAGS" class="post-editor-tags__form">
+    <div
+      v-if="tags.length < consts.POST_MAX_TAGS"
+      class="post-editor-tags__form"
+    >
       <BaseInput
         v-model="tagInput"
         data-testid="post-tag-input"
         placeholder="Input up to 8 tags"
-        :error="validation"
-        @keyup:enter="addTag"
+        :error="tagInputValidation"
+        @keyup.enter="addTag"
       />
 
       <!-- TODO: Think of a component for this -->
@@ -40,67 +43,61 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 // TODO: This can be a BasicElements
-import consts from '@/const/const';
+import { computed, ref } from 'vue';
+import * as consts from '@/const';
 import BaseInput from '@common/BaseInput.vue';
 
-export default {
-  components: {
-    BaseInput,
-  },
-  model: {
-    prop: 'tags',
-  },
-  props: {
-    tags: {
-      type: Array,
-      default: () => [],
-    },
-  },
-  data() {
-    return {
-      tagInput: '',
-      POST_MAX_TAGS: consts.POST_MAX_TAGS,
-    };
-  },
-  computed: {
-    validation() {
-      let validation = '';
+interface Props {
+  dataTestid?: string;
+}
 
-      if (this.tagInput.length > consts.POST_MAX_TAG_LEN) {
-        validation = `Tag can't be longer than ${consts.POST_MAX_TAG_LEN}`;
-      }
+defineProps<Props>();
 
-      return validation;
-    },
-  },
-  methods: {
-    addTag() {
-      if (this.tagInput.length > 0) {
-        const checkDouble = this.tags.find((el) => el === this.tagInput);
+const tags = defineModel<string[]>('tags', {
+  required: true,
+});
 
-        if (!checkDouble && !this.validation) {
-          this.$emit('input', this.tags.concat(this.tagInput));
-          this.tagInput = '';
-        }
-      }
-    },
-    removeTag(tag) {
-      this.$emit(
-        'input',
-        this.tags.filter((el) => el !== tag),
-      );
-    },
-  },
+const tagInput = ref('');
+
+const tagInputValidation = computed(() => {
+  if (tagInput.value.length > consts.POST_MAX_TAG_LEN) {
+    return `Tag can't be longer than ${consts.POST_MAX_TAG_LEN}`;
+  }
+
+  return '';
+});
+
+const addTag = () => {
+  if (!tagInput.value.length) {
+    return;
+  }
+
+  const checkDouble = tags.value.find((el) => el === tagInput.value);
+
+  if (!checkDouble && !tagInputValidation.value) {
+    tags.value.push(tagInput.value);
+    tagInput.value = '';
+  }
+};
+
+const removeTag = (tag: string) => {
+  const tagIndex = tags.value.indexOf(tag);
+
+  if (tagIndex === -1) {
+    return;
+  }
+
+  tags.value.splice(tagIndex, 1);
 };
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .post-editor-tags {
-  @include flex-row;
+  @include mixins.flex-row;
 
   flex-wrap: wrap;
   align-items: center;

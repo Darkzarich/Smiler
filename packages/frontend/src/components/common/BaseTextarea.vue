@@ -9,13 +9,13 @@
 
     <textarea
       :id="id"
+      :value="modelValue"
       :data-testid="dataTestid"
       :disabled="disabled"
       :name="name"
-      :value="value"
       :placeholder="placeholder"
       class="base-textarea__textarea"
-      @input="setValue($event.target.value)"
+      @input="setValue"
     />
 
     <span
@@ -28,65 +28,51 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    id: {
-      type: String,
-      default: () => crypto.randomUUID(),
-    },
-    dataTestid: {
-      type: String,
-      default: 'input',
-    },
-    value: {
-      type: String,
-      default: '',
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-    name: {
-      type: String,
-      default: '',
-    },
-    placeholder: {
-      type: String,
-      default: 'Enter any text',
-    },
-    error: {
-      type: String,
-      default: '',
-    },
-    enterCallback: {
-      type: Function,
-      default: () => {},
-    },
-  },
-  data() {
-    return {
-      isDirty: false,
-    };
-  },
-  methods: {
-    setValue(val) {
-      this.$emit('input', val);
-      this.isDirty = true;
-    },
-  },
+<script setup lang="ts">
+import { ref } from 'vue';
+
+interface Props {
+  dataTestid?: string;
+  disabled?: boolean;
+  label?: string;
+  name?: string;
+  placeholder?: string;
+  error?: string;
+  // TODO: Why callback?
+  enterCallback?: () => void;
+}
+
+withDefaults(defineProps<Props>(), {
+  dataTestid: 'input',
+  disabled: false,
+  label: '',
+  name: '',
+  placeholder: 'Enter any text',
+  error: '',
+  enterCallback: () => {},
+});
+
+const textAreaValue = defineModel<string>({
+  default: '',
+});
+
+const id = crypto.randomUUID();
+
+const isDirty = ref(false);
+
+const setValue = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+
+  textAreaValue.value = target.value;
+  isDirty.value = true;
 };
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .base-textarea {
-  @include flex-col;
+  @include mixins.flex-col;
 
   &__label {
     margin-bottom: 4px;

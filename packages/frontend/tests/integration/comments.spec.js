@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-
 import { expect } from '@playwright/test';
 import { subMinutes } from 'date-fns';
 import createRandomAuth from './factory/auth';
@@ -265,9 +264,9 @@ test.describe('Votes', () => {
       negative: false,
     });
 
-    await expect(
-      await Comments.getIsCommentByIdUpvoted(notRatedComment.id),
-    ).toBe(true);
+    expect(await Comments.getIsCommentByIdUpvoted(notRatedComment.id)).toBe(
+      true,
+    );
 
     await expect(
       Comments.getCommentRatingById(notRatedComment.id),
@@ -302,9 +301,9 @@ test.describe('Votes', () => {
       negative: true,
     });
 
-    await expect(
-      await Comments.getIsCommentByIdDownvoted(notRatedComment.id),
-    ).toBe(true);
+    expect(await Comments.getIsCommentByIdDownvoted(notRatedComment.id)).toBe(
+      true,
+    );
 
     await expect(
       Comments.getCommentRatingById(notRatedComment.id),
@@ -347,9 +346,7 @@ test.describe('Votes', () => {
 
     await SinglePostPage.goto(post.slug);
 
-    await expect(await Comments.getIsCommentByIdUpvoted(ratedComment.id)).toBe(
-      true,
-    );
+    expect(await Comments.getIsCommentByIdUpvoted(ratedComment.id)).toBe(true);
 
     await Api.routes.comments.removeRate.waitForRequest({
       preRequestAction: Comments.downvoteCommentById.bind(
@@ -358,9 +355,7 @@ test.describe('Votes', () => {
       ),
     });
 
-    await expect(await Comments.getIsCommentByIdUpvoted(ratedComment.id)).toBe(
-      false,
-    );
+    expect(await Comments.getIsCommentByIdUpvoted(ratedComment.id)).toBe(false);
 
     await expect(Comments.getCommentRatingById(ratedComment.id)).toContainText(
       String(ratedComment.rating - 2),
@@ -403,9 +398,9 @@ test.describe('Votes', () => {
 
     await SinglePostPage.goto(post.slug);
 
-    await expect(
-      await Comments.getIsCommentByIdDownvoted(downvotedComment.id),
-    ).toBe(true);
+    expect(await Comments.getIsCommentByIdDownvoted(downvotedComment.id)).toBe(
+      true,
+    );
 
     await Api.routes.comments.removeRate.waitForRequest({
       preRequestAction: Comments.upvoteCommentById.bind(
@@ -414,9 +409,9 @@ test.describe('Votes', () => {
       ),
     });
 
-    await expect(
-      await Comments.getIsCommentByIdDownvoted(downvotedComment.id),
-    ).toBe(false);
+    expect(await Comments.getIsCommentByIdDownvoted(downvotedComment.id)).toBe(
+      false,
+    );
 
     await expect(
       Comments.getCommentRatingById(downvotedComment.id),
@@ -544,11 +539,15 @@ test.describe('Editing or deleting a comment', () => {
     context,
     Api,
   }) => {
+    const editCommentText = 'edited comment';
+
     Api.routes.comments.updateComment.mock({
       status: 200,
+      body: {
+        ...currentUserComment,
+        body: editCommentText,
+      },
     });
-
-    const editCommentText = 'edited comment';
 
     await mockDate(context, currentUserComment.createdAt);
 

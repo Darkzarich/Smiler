@@ -13,25 +13,21 @@
   </footer>
 </template>
 
-<script>
-export default {};
-</script>
-
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 footer {
-  @include flex-row;
-
-  @include for-size(phone-only) {
-    height: 2rem;
-  }
+  @include mixins.flex-row;
 
   align-items: center;
   width: 100%;
   height: 4rem;
   margin-top: 1.5rem;
   background: var(--color-header);
+
+  @include mixins.for-size(phone-only) {
+    height: 2rem;
+  }
 
   .footer-content {
     display: flex;

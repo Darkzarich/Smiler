@@ -29,29 +29,26 @@
   </ul>
 </template>
 
-<script>
-import api from '@/api';
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
+import { api } from '@/api';
+import { useUserStore } from '@/store/user';
 import IconAdd from '@icons/IconAdd.vue';
 import IconExit from '@icons/IconExit.vue';
 import IconSettings from '@icons/IconSettings.vue';
 
-export default {
-  components: {
-    IconAdd,
-    IconExit,
-    IconSettings,
-  },
-  methods: {
-    async logout() {
-      const res = await api.auth.logout();
+const router = useRouter();
 
-      if (!res.data.ok) {
-        return;
-      }
+const userStore = useUserStore();
 
-      this.$store.commit('clearUser');
-    },
-  },
+const logout = async () => {
+  try {
+    await api.auth.logout();
+
+    router.push({ name: 'Home' });
+  } finally {
+    userStore.clearUser();
+  }
 };
 </script>
 
@@ -60,7 +57,7 @@ export default {
   margin-left: 0;
   text-align: center;
   padding-inline-start: 0;
-  margin-block: 0 0;
+  margin-block: 0;
   list-style: none;
 
   &__item-icon {

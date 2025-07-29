@@ -1,6 +1,6 @@
 <template>
   <div class="current-user">
-    <AuthFormSwitcher v-if="!isUserAuth" />
+    <AuthFormSwitcher v-if="!user" />
 
     <template v-else>
       <div class="current-user__main">
@@ -16,7 +16,7 @@
           >
             <img
               class="current-user__avatar"
-              :src="$resolveAvatar(user.avatar)"
+              :src="resolveAvatar(user.avatar)"
               :alt="user.avatar"
             />
 
@@ -26,7 +26,7 @@
           </RouterLink>
         </div>
 
-        <UserStats :user="user" class="current-user__stats" />
+        <UserStats :stats="user" class="current-user__stats" />
 
         <CurrentUserNavigation />
       </div>
@@ -34,33 +34,24 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from 'vue';
 import AuthFormSwitcher from '../AuthForm/AuthFormSwitcher.vue';
 import CurrentUserNavigation from './CurrentUserNavigation.vue';
+import { useUserStore } from '@/store/user';
+import { resolveAvatar } from '@/utils/resolve-avatar';
 import UserStats from '@components/User/UserStats.vue';
 
-export default {
-  components: {
-    AuthFormSwitcher,
-    UserStats,
-    CurrentUserNavigation,
-  },
-  computed: {
-    isUserAuth() {
-      return this.$store.getters.isUserAuth;
-    },
-    user() {
-      return this.$store.state.user;
-    },
-  },
-};
+const userStore = useUserStore();
+
+const user = computed(() => userStore.user);
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .current-user {
-  @include widget;
+  @include mixins.widget;
 
   padding: 0;
 
@@ -75,7 +66,7 @@ export default {
     background: var(--color-header);
     user-select: none;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       padding: 0.5rem;
     }
   }
@@ -95,7 +86,7 @@ export default {
     text-align: center;
     font-size: 1rem;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       margin: 0.5rem;
     }
   }

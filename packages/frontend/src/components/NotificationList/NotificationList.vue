@@ -16,7 +16,7 @@
 
         <div
           class="notification-list__close"
-          @click="removeNotification(notification.id)"
+          @click="notificationsStore.removeNotification(notification.id)"
         >
           <IconExit />
         </div>
@@ -25,29 +25,18 @@
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex';
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { useNotificationsStore } from '@/store/notifications';
 import IconExit from '@icons/IconExit.vue';
 
-export default {
-  components: {
-    IconExit,
-  },
-  computed: {
-    ...mapState({
-      notifications: (state) => state.notifications.notifications,
-    }),
-  },
-  methods: {
-    removeNotification(id) {
-      this.$store.commit('removeNotification', id);
-    },
-  },
-};
+const notificationsStore = useNotificationsStore();
+
+const { notifications } = storeToRefs(notificationsStore);
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .notification-list {
   position: fixed;
@@ -56,7 +45,7 @@ export default {
   width: 100%;
 
   &__item {
-    @include flex-row;
+    @include mixins.flex-row;
 
     justify-content: center;
     align-items: center;
@@ -82,12 +71,12 @@ export default {
       transition: all 0.3s;
     }
 
-    &-enter,
+    &-enter-from,
     &-leave-to {
       opacity: 0;
       transform: translateY(15px);
 
-      @include for-size(phone-only) {
+      @include mixins.for-size(phone-only) {
         transform: translateY(-15px);
       }
     }

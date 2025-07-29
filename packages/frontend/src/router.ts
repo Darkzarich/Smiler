@@ -1,5 +1,8 @@
-import Vue from 'vue';
-import Router from 'vue-router';
+import {
+  createRouter,
+  createWebHistory,
+  type NavigationGuard,
+} from 'vue-router';
 import NotFound from './views/NotFound.vue';
 import PostCreate from './views/PostCreate.vue';
 import PostsCategory from './views/PostsCategory.vue';
@@ -7,16 +10,25 @@ import Search from './views/Search.vue';
 import SinglePost from './views/SinglePost.vue';
 import UserPage from './views/UserPage.vue';
 import UserSettings from './views/UserSettings.vue';
-import store from '@/store/index';
+import { useNotificationsStore } from '@/store/notifications';
+import { useUserStore } from '@/store/user';
 
-Vue.use(Router);
+declare module 'vue-router' {
+  interface RouteMeta {
+    title?: string;
+    titleParam?: string;
+  }
+}
 
-const authGuard = async (to, from, next) => {
+const authGuard: NavigationGuard = async (to, from, next) => {
+  const userStore = useUserStore();
+  const notificationStore = useNotificationsStore();
+
   // TODO: Why check on each move if the user is logged in
-  await store.dispatch('userGetAuthState');
+  await userStore.userFetchAuthState();
 
-  if (!store.getters.isUserAuth) {
-    store.dispatch('showErrorNotification', {
+  if (!userStore.user) {
+    notificationStore.showErrorNotification({
       message: 'Only authenticated users can access this page.',
     });
 
@@ -28,14 +40,13 @@ const authGuard = async (to, from, next) => {
   next();
 };
 
-const router = new Router({
-  mode: 'history',
-  base: '/',
+export const router = createRouter({
+  history: createWebHistory('/'),
   scrollBehavior(to) {
     if (to.hash) {
       return { selector: to.hash };
     }
-    return { x: 0, y: 0 };
+    return { x: 0, top: 0 };
   },
   routes: [
     {
@@ -156,7 +167,7 @@ const router = new Router({
       },
     },
     {
-      path: '*',
+      path: '/:pathMatch(.*)*',
       redirect: {
         name: 'NotFound',
       },
@@ -165,7 +176,7 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  // set title
+  // Setting page title
   const ending = ' | Smiler';
   const titleTo = to.meta.title;
   const titleParams = to.meta.titleParam;
@@ -178,5 +189,3 @@ router.beforeEach((to, from, next) => {
 
   next();
 });
-
-export default router;

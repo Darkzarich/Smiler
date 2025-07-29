@@ -1,7 +1,7 @@
 <template>
   <div class="user-profile">
     <div class="user-profile__avatar">
-      <img :src="$resolveAvatar(user.avatar)" :alt="user.avatar" />
+      <img :src="resolveAvatar(user.avatar)" :alt="user.avatar" />
     </div>
 
     <div class="user-profile__info">
@@ -9,21 +9,21 @@
         {{ user.login }}
 
         <BaseButton
-          v-if="isUserAuth && !isSameUser"
+          v-if="currentUser && !isSameUser"
           class="user-profile__follow-btn"
           :data-testid="
             isFollowed ? 'user-profile-unfollow-btn' : 'user-profile-follow-btn'
           "
-          :loading="requesting"
+          :loading="isRequesting"
           :type="isFollowed ? 'danger' : 'primary'"
-          @click.native="handleFollow"
+          @click="handleFollow"
         >
           {{ isFollowed ? 'Unfollow' : 'Follow' }}
         </BaseButton>
       </div>
 
       <div class="user-profile__date">
-        Became an author {{ user.createdAt | $fromNow }}
+        Became an author {{ formatFromNow(user.createdAt) }}
       </div>
 
       <div
@@ -34,93 +34,85 @@
         <i>{{ user.bio }}</i>
       </div>
 
-      <UserStats :user="user" />
+      <UserStats :stats="user" />
     </div>
   </div>
 </template>
 
-<script>
-import api from '@/api/index';
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { ref, computed } from 'vue';
+import { api } from '@/api';
+import type { userTypes } from '@/api/users';
+import { useUserStore } from '@/store/user';
+import { formatFromNow } from '@/utils/format-from-now';
+import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseButton from '@common/BaseButton.vue';
 import UserStats from '@components/User/UserStats.vue';
 
-export default {
-  components: {
-    BaseButton,
-    UserStats,
-  },
-  props: {
-    user: {
-      type: Object,
-      required: true,
-      default: () => ({}),
-    },
-  },
-  data() {
-    return {
-      requesting: false,
-    };
-  },
-  computed: {
-    isUserAuth() {
-      return this.$store.getters.isUserAuth;
-    },
-    isFollowed() {
-      return this.user.isFollowed;
-    },
-    isSameUser() {
-      return this.$store.state.user.id === this.user.id;
-    },
-  },
-  methods: {
-    async follow() {
-      if (this.requesting) {
-        return;
-      }
+interface Props {
+  user: userTypes.GetUserProfileResponse;
+}
 
-      this.requesting = true;
+const props = defineProps<Props>();
 
-      const res = await api.users.followUser(this.user.id);
+const isRequesting = ref(false);
 
-      if (!res.data.error) {
-        this.user.followersAmount = this.user.followersAmount + 1;
-        this.user.isFollowed = true;
-      }
+const userStore = useUserStore();
 
-      this.requesting = false;
-    },
-    async unfollow() {
-      if (this.requesting) {
-        return;
-      }
+const { user: currentUser } = storeToRefs(userStore);
 
-      this.requesting = true;
+const isSameUser = computed(() => currentUser.value?.id === props.user.id);
+const isFollowed = computed(() => props.user.isFollowed);
 
-      const res = await api.users.unfollowUser(this.user.id);
+async function follow() {
+  if (isRequesting.value) {
+    return;
+  }
 
-      if (!res.data.error) {
-        this.user.followersAmount = this.user.followersAmount - 1;
-        this.user.isFollowed = false;
-      }
+  try {
+    isRequesting.value = true;
 
-      this.requesting = false;
-    },
-    async handleFollow() {
-      if (this.isFollowed) {
-        await this.unfollow();
-      } else {
-        await this.follow();
-      }
-    },
-  },
-};
+    await api.users.followUser(props.user.id);
+
+    props.user.followersAmount = props.user.followersAmount + 1;
+    props.user.isFollowed = true;
+  } finally {
+    isRequesting.value = false;
+  }
+}
+
+async function unfollow() {
+  if (isRequesting.value) {
+    return;
+  }
+
+  try {
+    isRequesting.value = true;
+
+    await api.users.unfollowUser(props.user.id);
+
+    props.user.followersAmount = props.user.followersAmount - 1;
+    props.user.isFollowed = false;
+  } finally {
+    isRequesting.value = false;
+  }
+}
+
+async function handleFollow() {
+  if (isFollowed.value) {
+    await unfollow();
+  } else {
+    await follow();
+  }
+}
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .user-profile {
-  @include flex-row;
+  @include mixins.flex-row;
 
   position: relative;
   margin-bottom: var(--variable-widget-margin);
@@ -130,7 +122,7 @@ export default {
   background: var(--color-widget-bg);
   color: var(--color-main-text);
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     width: 100%;
     margin-left: 0;
     border: none;
@@ -152,7 +144,7 @@ export default {
     filter: grayscale(1);
     pointer-events: none;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       display: none;
     }
   }
@@ -169,7 +161,7 @@ export default {
   }
 
   &__login {
-    @include flex-row;
+    @include mixins.flex-row;
 
     align-items: center;
     font-size: 1.5rem;

@@ -18,50 +18,30 @@
   </button>
 </template>
 
-<script>
+<script setup lang="ts">
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 
-export default {
-  components: {
-    CircularLoader,
-  },
-  props: {
-    dataTestid: {
-      type: String,
-      default: 'button',
-    },
-    attrType: {
-      type: String,
-      default: 'button',
-      validator(val) {
-        return ['button', 'submit', 'reset'].indexOf(val) !== -1;
-      },
-    },
-    type: {
-      type: String,
-      default: 'primary',
-      validator(val) {
-        return ['primary', 'danger'].indexOf(val) !== -1;
-      },
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-    stretched: {
-      type: Boolean,
-      default: false,
-    },
-  },
-};
+interface Props {
+  dataTestid?: string;
+  attrType?: 'button' | 'submit' | 'reset';
+  type?: 'primary' | 'danger';
+  disabled?: boolean;
+  loading?: boolean;
+  stretched?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  dataTestid: 'button',
+  attrType: 'button',
+  type: 'primary',
+  disabled: false,
+  loading: false,
+  stretched: false,
+});
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .base-button {
   display: flex;

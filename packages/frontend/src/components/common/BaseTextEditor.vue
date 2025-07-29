@@ -9,6 +9,7 @@
       >
         B
       </button>
+
       <button
         class="base-text-editor__style-button"
         type="button"
@@ -17,6 +18,7 @@
       >
         I
       </button>
+
       <button
         class="base-text-editor__style-button"
         type="button"
@@ -25,6 +27,7 @@
       >
         S
       </button>
+
       <button
         class="base-text-editor__style-button"
         type="button"
@@ -33,6 +36,7 @@
       >
         U
       </button>
+
       <button
         class="base-text-editor__style-button"
         type="button"
@@ -41,11 +45,12 @@
       >
         Q
       </button>
+
       <button
         class="base-text-editor__style-button"
         type="button"
         title="remove styles"
-        @click="removeStyles()"
+        @click="removeStyles"
       >
         REMOVE STYLES
       </button>
@@ -53,16 +58,16 @@
 
     <div
       :id="id"
-      :ref="'text-editor#' + id"
+      ref="editorRef"
       class="base-text-editor__contenteditable"
       :data-testid="`${dataTestid}-input`"
       role="textbox"
       tabIndex="0"
       contenteditable
-      @selectstart="selecting = true"
+      @selectstart="isSelecting = true"
       @mouseup="endSelect()"
       @focusout="setText()"
-      v-html="value"
+      v-html="textEditorValue"
     />
 
     <!-- TODO: Add button name for this slot it's not obvious when its "default" -->
@@ -70,161 +75,162 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    dataTestid: {
-      type: String,
-      default: 'text-editor-container',
-    },
-    id: {
-      type: String,
-      default: 'text-editor',
-    },
-    value: {
-      type: String,
-      default: '',
-    },
-  },
-  data() {
-    return {
-      curSelection: '',
-      selectedDOMElement: null,
-      anchorOffset: 0,
-      focusOffset: 0,
-      editedText: '',
-      selecting: true,
-      tags: ['b', 'i', 's', 'u', 'cite'],
-    };
-  },
-  computed: {
-    curSelectionComp() {
-      return document.getSelection().anchorOffset;
-    },
-  },
-  created() {
-    document.execCommand('defaultParagraphSeparator', false, 'br');
-  },
-  methods: {
-    removeStyles() {
-      let text = this.value;
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
 
-      this.tags.forEach((tag) => {
-        text = text.replace(new RegExp(`((</${tag}>)|(<${tag}>))*`, 'g'), '');
-      });
+type Tag = 'b' | 'i' | 's' | 'u' | 'cite';
 
-      this.$emit('input', text);
-    },
-    endSelect() {
-      const text = this.$refs[`text-editor#${this.id}`].innerHTML;
-      const selection = document.getSelection();
+interface Props {
+  dataTestid?: string;
+}
 
-      if (this.selecting) {
-        if (selection.toString().replace(/\n/g, '<br>')) {
-          this.curSelection = selection.toString().replace(/\n/g, '<br>');
-          this.selectedDOMElement = selection.anchorNode;
-          // selection start index
-          this.anchorOffset =
-            selection.anchorOffset < selection.focusOffset
-              ? selection.anchorOffset
-              : selection.focusOffset;
-          // selection end index
-          this.focusOffset =
-            selection.anchorOffset < selection.focusOffset
-              ? selection.focusOffset
-              : selection.anchorOffset;
-        }
+withDefaults(defineProps<Props>(), {
+  dataTestid: 'input',
+});
 
-        console.log('curSelection / ', this.curSelection);
+const textEditorValue = defineModel<string>({
+  default: '',
+});
 
-        console.log('curSelection obj / ', selection);
+const id = crypto.randomUUID();
 
-        this.selecting = false;
+const editorRef = ref<HTMLDivElement | null>(null);
 
-        console.log('text: ', text);
+const tags: Tag[] = ['b', 'i', 's', 'u', 'cite'];
 
-        // text.replace(/<\/div>/g, '<br>')
+const selectedDOMElement = ref<Text | null>(null);
 
-        let replacedDivText = text;
+const curSelection = ref('');
+const anchorOffset = ref(0);
+const focusOffset = ref(0);
+const editedText = ref('');
+const isSelecting = ref(true);
 
-        if (text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)) {
-          replacedDivText = text.replace(
-            text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)[2],
-            '',
-          );
-          console.log(
-            'replace1: ',
-            text.replace(
-              text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/)[2],
-              '',
-            ),
-          );
-        }
+const removeStyles = () => {
+  let text = textEditorValue.value;
 
-        console.log('replace2: ', replacedDivText.replace(/<\/div>/g, ''));
-        replacedDivText = replacedDivText.replace(/<\/div>/g, '');
+  tags.forEach((tag) => {
+    text = text.replace(new RegExp(`((</${tag}>)|(<${tag}>))*`, 'g'), '');
+  });
 
-        console.log(
-          'replace3: ',
-          replacedDivText
-            .replace(/<div>/g, '<br>')
-            .replace(/(<br>){2,}/g, '<br>'),
-        );
-        replacedDivText = replacedDivText
-          .replace(/<div>/g, '<br>')
-          .replace(/(<br>){2,}/g, '<br>');
-
-        this.editedText = replacedDivText;
-      }
-    },
-    setText() {
-      this.selecting = true;
-      this.endSelect();
-      console.log('set text!');
-      this.$emit('input', this.editedText);
-    },
-    styleSelected(tag) {
-      console.log('styleSelected curSelection: ', this.curSelection.trim());
-      console.log('DOM Ele: ', this.selectedDOMElement);
-      console.log('beforeChange ', this.value);
-
-      if (this.curSelection.trim().length > 0) {
-        // replace curSelection text with that text inside tags
-        this.selectedDOMElement.textContent =
-          `${this.selectedDOMElement.wholeText.slice(0, this.anchorOffset)}` +
-          `<${tag}>${this.curSelection.toString().trim()}</${tag}>` +
-          `${this.selectedDOMElement.wholeText.slice(this.focusOffset, this.selectedDOMElement.wholeText.length)}`;
-
-        let DOMHTML = document.getElementById(this.id).innerHTML;
-
-        /* replace all &lt; and &gt; with < and > because it gets transformed 
-        to those automatically */
-        DOMHTML = DOMHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-        document.getElementById(this.id).innerHTML = DOMHTML;
-
-        /* TODO: clear the style when a tab button is clicked 
-        and selection was already styled <b> some text </b> ----> <b></b> 
-        some text <b></b> and then clean empty tags 
-        */
-
-        this.$emit('input', document.getElementById(this.id).innerHTML);
-      }
-    },
-  },
+  textEditorValue.value = text;
 };
+
+const endSelect = () => {
+  if (!editorRef.value) {
+    return;
+  }
+
+  const text = editorRef.value.innerHTML;
+  const selection = document.getSelection();
+
+  if (isSelecting.value && selection) {
+    if (selection.toString().replace(/\n/g, '<br>')) {
+      curSelection.value = selection.toString().replace(/\n/g, '<br>');
+      selectedDOMElement.value = selection.anchorNode as Text;
+      // selection start index
+      anchorOffset.value =
+        selection.anchorOffset < selection.focusOffset
+          ? selection.anchorOffset
+          : selection.focusOffset;
+      // selection end index
+      focusOffset.value =
+        selection.anchorOffset < selection.focusOffset
+          ? selection.focusOffset
+          : selection.anchorOffset;
+    }
+
+    console.log('curSelection / ', curSelection.value);
+
+    console.log('curSelection obj / ', selection);
+
+    isSelecting.value = false;
+
+    console.log('text: ', text);
+
+    // text.replace(/<\/div>/g, '<br>')
+
+    let replacedDivText = text;
+
+    const textMatch = text.match(/<div>(\d*|\w*|\s*)*((<br>)+)<\/div>/);
+
+    if (textMatch) {
+      replacedDivText = text.replace(textMatch[2], '');
+
+      console.log('replace1: ', text.replace(textMatch[2], ''));
+    }
+
+    console.log('replace2: ', replacedDivText.replace(/<\/div>/g, ''));
+
+    replacedDivText = replacedDivText.replace(/<\/div>/g, '');
+
+    console.log(
+      'replace3: ',
+      replacedDivText.replace(/<div>/g, '<br>').replace(/(<br>){2,}/g, '<br>'),
+    );
+    replacedDivText = replacedDivText
+      .replace(/<div>/g, '<br>')
+      .replace(/(<br>){2,}/g, '<br>');
+
+    editedText.value = replacedDivText;
+  }
+};
+
+const setText = () => {
+  isSelecting.value = true;
+
+  endSelect();
+
+  console.log('set text!');
+
+  textEditorValue.value = editedText.value;
+};
+
+const styleSelected = (tag: Tag) => {
+  console.log('styleSelected curSelection: ', curSelection.value.trim());
+  console.log('DOM Ele: ', selectedDOMElement.value);
+  console.log('beforeChange ', textEditorValue.value);
+
+  if (curSelection.value.trim().length > 0 && selectedDOMElement.value) {
+    // replace curSelection text with that text inside tags
+    selectedDOMElement.value.textContent =
+      `${selectedDOMElement.value.wholeText.slice(0, anchorOffset.value)}` +
+      `<${tag}>${curSelection.value.toString().trim()}</${tag}>` +
+      `${selectedDOMElement.value.wholeText.slice(focusOffset.value, selectedDOMElement.value.wholeText.length)}`;
+
+    let editorInnerHTML = editorRef.value!.innerHTML;
+
+    /* replace all &lt; and &gt; with < and > because it gets transformed
+        to those automatically */
+    editorInnerHTML = editorInnerHTML
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>');
+
+    textEditorValue.value = editorInnerHTML;
+
+    /* TODO: clear the style when a tab button is clicked
+      and selection was already styled <b> some text </b> ----> <b></b>
+      some text <b></b> and then clean empty tags
+    */
+  }
+};
+
+onMounted(() => {
+  document.execCommand('defaultParagraphSeparator', false, 'br');
+});
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .base-text-editor {
-  @include widget;
+  @include mixins.widget;
 
   width: 100%;
   padding: 1rem;
   transition: border 200ms ease-out;
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     padding-right: 0;
     padding-left: 0;
     border-right: 1px solid transparent;
@@ -232,12 +238,12 @@ export default {
   }
 
   &__style-buttons {
-    @include flex-row;
+    @include mixins.flex-row;
 
     gap: 8px;
     margin-bottom: 1rem;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       margin-left: 1rem;
     }
   }
@@ -286,7 +292,7 @@ export default {
       background-color: var(--color-widget-bg);
     }
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       min-height: 9rem;
       border-right: none;
       border-left: none;

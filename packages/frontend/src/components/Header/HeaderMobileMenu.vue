@@ -11,39 +11,37 @@
       class="mobile-menu__navigation"
     >
       <template #before>
-        <NavigationFeedLink class="mobile-menu__nav-link" />
+        <NavigationFeedLink
+          :is-auth="Boolean(userStore.user)"
+          class="mobile-menu__nav-link"
+        />
       </template>
     </Navigation>
   </div>
 </template>
 
-<script>
-import { mapGetters } from 'vuex';
+<script setup lang="ts">
+import { useUserStore } from '@/store/user';
 import Navigation from '@components/Navigation/Navigation.vue';
 import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
 import CurrentUser from '@components/User/CurrentUser.vue';
 import IconExit from '@icons/IconExit.vue';
 
-export default {
-  components: {
-    CurrentUser,
-    IconExit,
-    Navigation,
-    NavigationFeedLink,
-  },
-  computed: {
-    ...mapGetters(['isUserAuth']),
-  },
-  methods: {
-    closeMenu() {
-      this.$emit('close');
-    },
-  },
+interface Emits {
+  close: [];
+}
+
+const emit = defineEmits<Emits>();
+
+const userStore = useUserStore();
+
+const closeMenu = () => {
+  emit('close');
 };
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .mobile-menu {
   position: fixed;
@@ -66,7 +64,7 @@ export default {
   }
 
   &__navigation {
-    @include flex-col;
+    @include mixins.flex-col;
 
     overflow-x: hidden;
   }

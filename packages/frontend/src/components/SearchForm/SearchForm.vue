@@ -7,7 +7,7 @@
         v-model="filters.title"
         placeholder="Title"
         data-testid="search-form-input"
-        @keyup:enter="search"
+        @keyup.enter="search"
       />
     </div>
 
@@ -42,21 +42,21 @@
     </div>
 
     <div class="search-form__tags">
-      <PostEditorTags v-model="filters.tags" data-testid="search-form-tags" />
+      <PostEditorTags
+        v-model:tags="filters.tags"
+        data-testid="search-form-tags"
+      />
     </div>
 
     <div class="search-form__actions">
-      <BaseButton
-        data-testid="search-form-submit"
-        stretched
-        @click.native="search"
-      >
+      <BaseButton data-testid="search-form-submit" stretched @click="search">
         Submit
       </BaseButton>
+
       <BaseButton
         data-testid="search-form-clear"
         stretched
-        @click.native="clear"
+        @click="clearFilters"
       >
         Clear filters
       </BaseButton>
@@ -64,59 +64,65 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { cloneDeep, omitBy } from 'lodash-es';
+import { ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import type { SearchFilter } from './types';
 import BaseButton from '@common/BaseButton.vue';
 import BaseDatePicker from '@common/BaseDatePicker.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseSlider from '@common/BaseSlider.vue';
 import PostEditorTags from '@components/PostEditor/PostEditorTags.vue';
 
-export default {
-  components: {
-    BaseInput,
-    BaseButton,
-    BaseDatePicker,
-    BaseSlider,
-    PostEditorTags,
+const defaultFilters: SearchFilter = {
+  title: '',
+  tags: [],
+  dateFrom: '',
+  dateTo: '',
+  ratingFrom: null,
+  ratingTo: null,
+};
+
+const router = useRouter();
+
+const modelValue = defineModel<SearchFilter>();
+
+const filters = ref<SearchFilter>(cloneDeep(defaultFilters));
+
+watch(
+  modelValue,
+  (newVal) => {
+    if (newVal) {
+      filters.value = cloneDeep(newVal);
+    }
   },
-  props: ['value'],
-  data() {
-    return {
-      filters: {
-        title: this.value.title,
-        tags: this.value.tags,
-      },
-    };
-  },
-  methods: {
-    search() {
-      const modFilters = {};
-      Object.keys(this.filters).forEach((el) => {
-        modFilters[el] = this.filters[el];
-      });
-      this.$emit('input', modFilters);
-      this.$router.push({
-        query: modFilters,
-      });
-    },
-    clear() {
-      Object.keys(this.filters).forEach((el) => {
-        if (typeof this.filters[el] === 'object') {
-          this.filters[el] = [];
-        } else {
-          this.filters[el] = undefined;
-        }
-      });
-      this.$router.push({
-        query: this.filters,
-      });
-    },
-  },
+  { immediate: true },
+);
+
+const search = () => {
+  modelValue.value = filters.value;
+
+  applyFiltersToRoute();
+};
+
+const clearFilters = () => {
+  filters.value = cloneDeep(defaultFilters);
+
+  modelValue.value = filters.value;
+
+  applyFiltersToRoute();
+};
+
+const applyFiltersToRoute = () => {
+  router.push({
+    query: omitBy(filters.value, (value) => !value),
+  });
 };
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .search-form {
   &__title {
@@ -132,14 +138,14 @@ export default {
   }
 
   &__columns {
-    @include flex-row;
+    @include mixins.flex-row;
 
     justify-content: space-around;
     margin-bottom: 12px;
   }
 
   &__column {
-    @include flex-col;
+    @include mixins.flex-col;
 
     justify-content: center;
   }
@@ -150,7 +156,7 @@ export default {
   }
 
   &__actions {
-    @include flex-row;
+    @include mixins.flex-row;
 
     gap: 16px;
     margin-top: 24px;

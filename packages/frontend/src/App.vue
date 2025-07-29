@@ -1,15 +1,15 @@
 <template>
-  <div v-if="show" id="app">
+  <div v-if="isShow" id="app">
     <NotificationList />
 
     <HeaderElement />
 
     <div class="content">
-      <content class="content__main">
+      <main class="content__main">
         <RouterView />
-      </content>
+      </main>
 
-      <div v-if="$isDesktop()" class="content__sidebar">
+      <div v-if="isDesktop()" class="content__sidebar">
         <CurrentUser />
       </div>
     </div>
@@ -18,35 +18,30 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { onBeforeMount, ref } from 'vue';
+import { useUserStore } from '@/store/user';
 import FooterElement from '@components/FooterElement.vue';
 import HeaderElement from '@components/Header/HeaderElement.vue';
 import NotificationList from '@components/NotificationList/NotificationList.vue';
 import CurrentUser from '@components/User/CurrentUser.vue';
+import { isDesktop } from '@utils/is-desktop';
 
-// TODO: global mini loader fixed to top
-export default {
-  components: {
-    HeaderElement,
-    FooterElement,
-    NotificationList,
-    CurrentUser,
-  },
-  data() {
-    return {
-      show: false,
-    };
-  },
-  beforeCreate() {
-    this.$store.dispatch('userGetAuthState').then(() => {
-      this.show = true;
-    });
-  },
-};
+// TODO: maybe global mini loader fixed to top
+
+const userStore = useUserStore();
+
+const isShow = ref(false);
+
+onBeforeMount(async () => {
+  await userStore.userFetchAuthState();
+
+  isShow.value = true;
+});
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 :root {
   --variable-widget-margin: 24px;
@@ -131,7 +126,7 @@ h6 {
     flex: 1;
     margin-right: var(--variable-widget-margin);
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       width: 100%;
       margin-right: 0;
     }
@@ -140,7 +135,7 @@ h6 {
   &__sidebar {
     width: 26%;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       display: none;
     }
   }

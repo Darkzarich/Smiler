@@ -6,51 +6,50 @@
 
     <input
       :id="label"
+      :value="modelValue"
       class="base-slider__input"
       :data-testid="dataTestid"
       type="range"
       :max="max"
       :min="min"
       step="1"
-      :value="value"
-      @input="$emit('input', $event.target.value)"
+      @input="handleInput"
     />
 
     <span class="base-slider__value">
-      {{ value }}
+      {{ modelValue }}
     </span>
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    dataTestid: {
-      type: String,
-      default: 'slider',
-    },
-    value: {
-      type: String,
-      default: '0',
-    },
-    label: {
-      type: String,
-      default: 'Slider',
-    },
-    min: {
-      type: Number,
-      default: -2000,
-    },
-    max: {
-      type: Number,
-      default: 9999,
-    },
-  },
+<script setup lang="ts">
+interface Props {
+  dataTestid?: string;
+  label?: string;
+  min?: number;
+  max?: number;
+}
+
+withDefaults(defineProps<Props>(), {
+  dataTestid: 'slider',
+  label: 'Slider',
+  min: -2000,
+  max: 9999,
+});
+
+const sliderValue = defineModel<number | null>({
+  default: 0,
+});
+
+const handleInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+
+  sliderValue.value = Number(target.value);
 };
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .base-slider {
   &__label {

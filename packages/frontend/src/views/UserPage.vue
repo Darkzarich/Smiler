@@ -1,6 +1,7 @@
 <template>
   <div>
-    <UserProfile :user="user" />
+    <!-- TODO: Skeleton? -->
+    <UserProfile v-if="user" :user="user" />
 
     <PostsContainer
       :posts="posts"
@@ -19,86 +20,86 @@
   </div>
 </template>
 
-<script>
-import api from '@/api';
+<script setup lang="ts">
+import { onBeforeMount, ref } from 'vue';
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+import { api } from '@/api';
+import { postTypes } from '@/api/posts';
+import { userTypes } from '@/api/users';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
-import consts from '@/const/const';
+import * as consts from '@/const';
 import UserProfile from '@components/User/UserProfile.vue';
 
-export default {
-  components: {
-    UserProfile,
-    PostsContainer,
-  },
-  async beforeRouteEnter(to, from, next) {
-    const user = await api.users.getUserProfile(to.params.login);
+const route = useRoute();
+const router = useRouter();
 
-    if (user.data.error) {
-      next({
-        name: 'NotFound',
-      });
-    } else {
-      next((vm) => vm.setUser(user.data));
-    }
-  },
-  async beforeRouteUpdate(to, from, next) {
-    const user = await api.users.getUserProfile(to.params.login);
+const posts = ref<postTypes.Post[]>([]);
 
-    if (user.data.error) {
-      next({
-        name: 'NotFound',
-      });
-    } else {
-      this.setUser(user.data);
-      this.fetchPosts();
-    }
-  },
-  data() {
-    return {
-      posts: [],
-      user: {},
-      isLoading: false,
-      curPage: 0,
-      hasNextPage: false,
-    };
-  },
-  async created() {
-    this.fetchPosts();
-  },
-  methods: {
-    setUser(user) {
-      this.user = user;
-    },
-    /**
-     *
-     * @param {Object} options
-     * @param {boolean=} options.isCombine - if true, posts are concatenated to the existing array
-     */
-    async fetchPosts({ isCombine } = {}) {
-      this.isLoading = true;
+const user = ref<userTypes.GetUserProfileResponse | null>(null);
 
-      const res = await api.posts.search({
-        author: this.user.login || this.$route.params.login,
-        limit: consts.POSTS_INITIAL_COUNT,
-        offset: this.curPage * consts.POSTS_INITIAL_COUNT,
-      });
+const isLoading = ref(false);
 
-      if (res && !res.data.error) {
-        this.hasNextPage = res.data.hasNextPage;
+const curPage = ref(0);
+const hasNextPage = ref(false);
 
-        if (isCombine) {
-          this.posts = this.posts.concat(res.data.posts);
-        } else {
-          this.posts = res.data.posts;
-        }
-      }
+const handleFetchUser = async () => {
+  try {
+    const fetchedUser = await api.users.getUserProfile(
+      route.params.login as string,
+    );
 
-      this.isLoading = false;
-    },
-    handleNextPage() {
-      this.curPage = this.curPage + 1;
-      this.fetchPosts({ isCombine: true });
-    },
-  },
+    user.value = fetchedUser;
+  } catch {
+    router.push({
+      name: 'NotFound',
+    });
+  }
 };
+
+/**
+ *
+ * @param options
+ * @param isCombine - if true, posts are concatenated to the existing array
+ */
+const handleFetchPosts = async ({ isCombine = false } = {}) => {
+  try {
+    isLoading.value = true;
+
+    const data = await api.posts.search({
+      author: user.value?.login || (route.params.login as string),
+      limit: consts.POSTS_INITIAL_COUNT,
+      offset: curPage.value * consts.POSTS_INITIAL_COUNT,
+    });
+
+    hasNextPage.value = data.hasNextPage;
+
+    if (isCombine) {
+      posts.value = posts.value.concat(data.posts);
+    } else {
+      posts.value = data.posts;
+    }
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const handleNextPage = () => {
+  curPage.value = curPage.value + 1;
+  handleFetchPosts({ isCombine: true });
+};
+
+const handleFetchAll = async () => {
+  await handleFetchUser();
+  await handleFetchPosts();
+};
+
+onBeforeRouteUpdate((to, from) => {
+  if (to.params.login !== from.params.login) {
+    handleFetchAll();
+  }
+});
+
+onBeforeMount(() => {
+  handleFetchAll();
+});
 </script>

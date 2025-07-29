@@ -1,24 +1,22 @@
 <template>
   <NavigationLink
-    :title="isUserAuth ? '' : 'Sign in to access this page'"
+    :title="isAuth ? '' : 'Sign in to access this page'"
     :to="{ name: 'Feed' }"
     data-testid="feed-link"
-    :disabled="!isUserAuth"
+    :disabled="!isAuth"
   >
     MY FEED
   </NavigationLink>
 </template>
 
-<script>
-import { mapGetters } from 'vuex';
+<script setup lang="ts">
 import NavigationLink from './NavigationLink.vue';
 
-export default {
-  components: {
-    NavigationLink,
-  },
-  computed: {
-    ...mapGetters(['isUserAuth']),
-  },
-};
+interface Props {
+  isAuth?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  isAuth: false,
+});
 </script>

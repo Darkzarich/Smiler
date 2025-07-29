@@ -16,60 +16,60 @@
   </nav>
 </template>
 
-<script>
+<script setup lang="ts">
 import NavigationLink from './NavigationLink.vue';
 
-export default {
-  components: {
-    NavigationLink,
-  },
-  props: {
-    navLinkClass: {
-      type: String,
-      default: '',
+interface NavLink {
+  label: string;
+  route: {
+    name: string;
+  };
+  dataTestId: string;
+}
+
+interface Props {
+  navLinkClass?: string;
+}
+
+withDefaults(defineProps<Props>(), {
+  navLinkClass: '',
+});
+
+const links: readonly NavLink[] = Object.freeze([
+  {
+    label: 'TODAY',
+    route: {
+      name: 'Home',
     },
+    dataTestId: 'today-link',
   },
-  data() {
-    return {
-      links: Object.freeze([
-        {
-          label: 'TODAY',
-          route: {
-            name: 'Home',
-          },
-          // This field is used in tests to access this element
-          dataTestId: 'today-link',
-        },
-        {
-          label: 'ALL',
-          route: {
-            name: 'All',
-          },
-          dataTestId: 'all-link',
-        },
-        {
-          label: 'BLOWING',
-          route: {
-            name: 'Blowing',
-          },
-          dataTestId: 'blowing-link',
-        },
-        {
-          label: 'TOP THIS WEEK',
-          route: {
-            name: 'TopThisWeek',
-          },
-          dataTestId: 'top-this-week-link',
-        },
-        {
-          label: 'NEW',
-          route: {
-            name: 'New',
-          },
-          dataTestId: 'new-link',
-        },
-      ]),
-    };
+  {
+    label: 'ALL',
+    route: {
+      name: 'All',
+    },
+    dataTestId: 'all-link',
   },
-};
+  {
+    label: 'BLOWING',
+    route: {
+      name: 'Blowing',
+    },
+    dataTestId: 'blowing-link',
+  },
+  {
+    label: 'TOP THIS WEEK',
+    route: {
+      name: 'TopThisWeek',
+    },
+    dataTestId: 'top-this-week-link',
+  },
+  {
+    label: 'NEW',
+    route: {
+      name: 'New',
+    },
+    dataTestId: 'new-link',
+  },
+]);
 </script>

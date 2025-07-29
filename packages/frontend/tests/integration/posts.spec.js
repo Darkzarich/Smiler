@@ -318,7 +318,7 @@ test.describe('Post votes', () => {
     expect(upvoteResponse.postDataJSON()).toEqual({
       negative: false,
     });
-    await expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(true);
+    expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(true);
     await expect(Post.getRatingById(post1.id)).toContainText(
       String(post1.rating + 2),
     );
@@ -350,7 +350,7 @@ test.describe('Post votes', () => {
     expect(downvoteResponse.postDataJSON()).toEqual({
       negative: true,
     });
-    await expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(true);
+    expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(true);
     await expect(Post.getRatingById(post1.id)).toContainText(
       String(post1.rating - 2),
     );
@@ -393,7 +393,7 @@ test.describe('Post votes', () => {
 
     await PostsPage.goto(PostsPage.urls.today);
 
-    await expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(true);
+    expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(true);
 
     const removeUpvoteResponse =
       await Api.routes.posts.removeRateById.waitForRequest({
@@ -401,7 +401,7 @@ test.describe('Post votes', () => {
       });
 
     expect(removeUpvoteResponse.url()).toContain(post1.id);
-    await expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(false);
+    expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(false);
     await expect(Post.getRatingById(post1.id)).toContainText(
       String(post1.rating - 2),
     );
@@ -444,7 +444,7 @@ test.describe('Post votes', () => {
 
     await PostsPage.goto(PostsPage.urls.today);
 
-    await expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(true);
+    expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(true);
 
     const removeDownvoteResponse =
       await Api.routes.posts.removeRateById.waitForRequest({
@@ -452,7 +452,7 @@ test.describe('Post votes', () => {
       });
 
     expect(removeDownvoteResponse.url()).toContain(post1.id);
-    await expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(false);
+    expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(false);
     await expect(Post.getRatingById(post1.id)).toContainText(
       String(post1.rating + 2),
     );

@@ -32,102 +32,92 @@
       data-testid="signin-form-submit"
       :loading="isLoading"
       :disabled="isSubmitDisabled"
-      @click.native="signIn"
+      @click.prevent="signIn"
     >
       SIGN IN
     </BaseButton>
   </form>
 </template>
 
-<script>
-import api from '@/api';
-import consts from '@/const/const';
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import { api } from '@/api';
+import * as consts from '@/const';
+import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 
-export default {
-  components: {
-    BaseButton,
-    BaseInput,
-  },
-  data() {
-    return {
-      email: '',
-      password: '',
-      isLoading: false,
-      requestError: '',
-    };
-  },
-  computed: {
-    isSubmitDisabled() {
-      return !!(this.validation.email || this.validation.password);
-    },
-    validation() {
-      const validation = {
-        email: '',
-        password: '',
-      };
+const userStore = useUserStore();
 
-      if (this.requestError && !(this.password || this.email)) {
-        validation.email = this.requestError;
-        validation.password = this.requestError;
-      } else {
-        // email
+const isLoading = ref(false);
+const requestError = ref('');
 
-        this.requestError = '';
+const email = ref('');
+const password = ref('');
 
-        if (this.email.length === 0) {
-          validation.email = "Email can't be empty";
-        } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(this.email)) {
-          validation.email = 'Email is not valid';
-        }
+const validation = computed(() => {
+  const validation = {
+    email: '',
+    password: '',
+  };
 
-        // password
+  if (requestError.value && !(password.value || email.value)) {
+    validation.email = requestError.value;
+    validation.password = requestError.value;
+  } else {
+    requestError.value = '';
 
-        if (this.password.length === 0) {
-          validation.password = "Password can't be empty";
-        } else if (this.password.length < consts.PASSWORD_MIN_LENGTH) {
-          validation.password = `Password length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
-        }
-      }
+    if (email.value.length === 0) {
+      validation.email = "Email can't be empty";
+    } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(email.value)) {
+      validation.email = 'Email is not valid';
+    }
 
-      return validation;
-    },
-  },
-  methods: {
-    async signIn(e) {
-      e.preventDefault();
+    if (password.value.length === 0) {
+      validation.password = "Password can't be empty";
+    } else if (password.value.length < consts.PASSWORD_MIN_LENGTH) {
+      validation.password = `Password length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
+    }
+  }
 
-      if (this.isSubmitDisabled || this.isLoading) {
-        return;
-      }
+  return validation;
+});
 
-      this.isLoading = true;
+const isSubmitDisabled = computed(
+  () => !!(validation.value.email || validation.value.password),
+);
 
-      const res = await api.auth.signIn({
-        email: this.email,
-        password: this.password,
-      });
+async function signIn() {
+  if (isSubmitDisabled.value || isLoading.value) {
+    return;
+  }
 
-      this.isLoading = false;
+  try {
+    isLoading.value = true;
 
-      if (res.data.error) {
-        this.email = '';
-        this.password = '';
-        this.requestError = res.data.error.message;
-      } else if (res.data.isAuth) {
-        this.$store.commit('setUser', res.data);
-      }
-    },
-  },
-};
+    const data = await api.auth.signIn({
+      email: email.value,
+      password: password.value,
+    });
+
+    userStore.user = data;
+  } catch (e) {
+    const error = e as Error;
+
+    email.value = '';
+    password.value = '';
+    requestError.value = error.message;
+  } finally {
+    isLoading.value = false;
+  }
+}
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .signin-form {
-  @include flex-col;
+  @include mixins.flex-col;
 
   align-items: center;
 

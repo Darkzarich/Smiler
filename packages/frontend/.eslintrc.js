@@ -1,28 +1,32 @@
+//TODO: Use new eslint api
 module.exports = {
+  parser: 'vue-eslint-parser',
   root: true,
   env: {
-    node: true,
     browser: true,
-    es6: true,
+    es2021: true,
+    node: true,
   },
   plugins: ['prettier'],
   extends: [
+    'plugin:import/recommended',
+    // the following lines do the trick
+    'plugin:import/typescript',
     'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
     'plugin:vue/recommended',
-    '@vue/eslint-config-airbnb',
+    '@vue/eslint-config-typescript/recommended',
+    'plugin:vuejs-accessibility/recommended',
     'plugin:prettier/recommended',
   ],
-  overrides: [
-    {
-      files: ['tests/**/*.js'],
-      extends: ['plugin:playwright/recommended'],
-      rules: {
-        'no-console': 'off',
-      },
-    },
-  ],
-  ignorePatterns: ['src/components/common/icons/**'],
+  parserOptions: {
+    parser: '@typescript-eslint/parser',
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+  },
+  ignorePatterns: ['src/components/common/icons/**', '.eslintrc.js'],
   rules: {
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-new': 'error',
@@ -76,9 +80,12 @@ module.exports = {
     'vue/multi-word-component-names': 'off',
     'vue/no-mutating-props': 'warn',
     'vue/no-side-effects-in-computed-properties': 'warn',
+    // TODO: Fix all accessibility rules
     'vuejs-accessibility/click-events-have-key-events': 'warn',
     'vuejs-accessibility/media-has-caption': 'warn',
     'vuejs-accessibility/mouse-events-have-key-events': 'warn',
+    'vuejs-accessibility/click-events-have-key-events': 'warn',
+    'vuejs-accessibility/no-static-element-interactions': 'off',
     // Override ForInStatement and ForOfStatement rule in airbnb config
     'no-restricted-syntax': [
       'error',
@@ -95,21 +102,27 @@ module.exports = {
     ],
     'consistent-return': 'off',
     'no-underscore-dangle': 'off',
+    'import/prefer-default-export': 'off',
+    'import/no-cycle': 'off',
   },
-  parser: 'vue-eslint-parser',
   settings: {
     'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+      },
       node: {
-        extensions: ['.js', '.vue'],
+        extensions: ['.js', '.ts', '.vue'],
       },
       alias: {
+        // TODO: Do I need this?
         map: [
           ['@', './src'],
           ['@components', './src/components'],
           ['@common', './src/components/common'],
           ['@icons', './src/components/common/icons'],
+          ['@utils', './src/utils'],
         ],
-        extensions: ['.js', '.vue'],
+        extensions: ['.js', '.ts', '.vue'],
       },
     },
   },

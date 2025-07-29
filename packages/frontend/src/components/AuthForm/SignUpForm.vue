@@ -55,136 +55,126 @@
       data-testid="signup-form-submit"
       :loading="isLoading"
       :disabled="isSubmitDisabled"
-      @click.native="signUp"
+      @click.prevent="signUp"
     >
       FINISH
     </BaseButton>
   </form>
 </template>
 
-<script>
-import api from '@/api';
-import consts from '@/const/const';
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { ref, computed } from 'vue';
+import { api } from '@/api';
+import * as consts from '@/const';
+import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 
-export default {
-  components: {
-    BaseButton,
-    BaseInput,
-  },
-  data() {
-    return {
-      email: '',
-      login: '',
-      password: '',
-      confirm: '',
-      isLoading: false,
-      requestError: '',
-    };
-  },
-  computed: {
-    isSubmitDisabled() {
-      return Boolean(
-        this.validation.email ||
-          this.validation.password ||
-          this.validation.confirm ||
-          this.validation.login,
-      );
-    },
-    validation() {
-      const validation = {
-        email: '',
-        login: '',
-        confirm: '',
-        password: '',
-      };
+const { user } = storeToRefs(useUserStore());
 
-      if (this.requestError && !(this.password || this.email)) {
-        validation.email = this.requestError;
-        validation.login = this.requestError;
-      } else {
-        // email
+const email = ref('');
+const login = ref('');
+const password = ref('');
+const confirm = ref('');
+const isLoading = ref(false);
+const requestError = ref('');
 
-        this.requestError = '';
+const validation = computed(() => {
+  const validation = {
+    email: '',
+    login: '',
+    confirm: '',
+    password: '',
+  };
 
-        if (this.email.length === 0) {
-          validation.email = "Email can't be empty";
-        } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(this.email)) {
-          validation.email = 'Email is not valid';
-        }
+  if (requestError.value && !(password.value || email.value)) {
+    validation.email = requestError.value;
+    validation.login = requestError.value;
+  } else {
+    // email
+    requestError.value = '';
 
-        // login
+    if (email.value.length === 0) {
+      validation.email = "Email can't be empty";
+    } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(email.value)) {
+      validation.email = 'Email is not valid';
+    }
 
-        if (this.login.length === 0) {
-          validation.login = "Login can't be empty";
-        } else if (
-          this.login.length < consts.LOGIN_MIN_LENGTH ||
-          this.login.length > consts.LOGIN_MAX_LENGTH
-        ) {
-          validation.login = `Login length must be ${consts.LOGIN_MIN_LENGTH}-${consts.LOGIN_MAX_LENGTH}`;
-        }
+    // login
+    if (login.value.length === 0) {
+      validation.login = "Login can't be empty";
+    } else if (
+      login.value.length < consts.LOGIN_MIN_LENGTH ||
+      login.value.length > consts.LOGIN_MAX_LENGTH
+    ) {
+      validation.login = `Login length must be ${consts.LOGIN_MIN_LENGTH}-${consts.LOGIN_MAX_LENGTH}`;
+    }
 
-        // password
+    // password
+    if (password.value.length === 0) {
+      validation.password = "Password can't be empty";
+    } else if (password.value.length < consts.PASSWORD_MIN_LENGTH) {
+      validation.password = `Password length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
+    }
 
-        if (this.password.length === 0) {
-          validation.password = "Password can't be empty";
-        } else if (this.password.length < consts.PASSWORD_MIN_LENGTH) {
-          validation.password = `Password length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
-        }
+    // confirm
+    if (confirm.value.length === 0) {
+      validation.confirm = "Password confirm can't be empty";
+    } else if (confirm.value.length < consts.PASSWORD_MIN_LENGTH) {
+      validation.confirm = `Password confirm length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
+    } else if (confirm.value !== password.value) {
+      validation.confirm = 'Password and password confirm must be equal';
+    }
+  }
 
-        // confirm
+  return validation;
+});
 
-        if (this.confirm.length === 0) {
-          validation.confirm = "Password confirm can't be empty";
-        } else if (this.confirm.length < consts.PASSWORD_MIN_LENGTH) {
-          validation.confirm = `Password confirm length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
-        } else if (this.confirm !== this.password) {
-          validation.confirm = 'Password and password confirm must be equal';
-        }
-      }
+const isSubmitDisabled = computed(() => {
+  return Boolean(
+    validation.value.email ||
+      validation.value.password ||
+      validation.value.confirm ||
+      validation.value.login,
+  );
+});
 
-      return validation;
-    },
-  },
-  methods: {
-    async signUp(e) {
-      e.preventDefault();
+async function signUp() {
+  if (isSubmitDisabled.value || isLoading.value) {
+    return;
+  }
 
-      if (this.isSubmitDisabled || this.isLoading) {
-        return;
-      }
+  try {
+    isLoading.value = true;
 
-      this.isLoading = true;
+    const data = await api.auth.signUp({
+      email: email.value,
+      password: password.value,
+      login: login.value,
+      confirm: confirm.value,
+    });
 
-      const res = await api.auth.signUp({
-        email: this.email,
-        password: this.password,
-        login: this.login,
-        confirm: this.confirm,
-      });
+    user.value = data;
+  } catch (e) {
+    const error = e as Error;
 
-      this.isLoading = false;
-
-      if (res.data.error) {
-        this.email = '';
-        this.password = '';
-        this.confirm = '';
-        this.login = '';
-        this.requestError = res.data.error.message;
-      } else if (res.data.isAuth) {
-        this.$store.commit('setUser', res.data);
-      }
-    },
-  },
-};
+    email.value = '';
+    password.value = '';
+    confirm.value = '';
+    login.value = '';
+    requestError.value = error.message;
+  } finally {
+    isLoading.value = false;
+  }
+}
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .signup-form {
-  @include flex-col;
+  @include mixins.flex-col;
 
   align-items: center;
 

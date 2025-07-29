@@ -1,12 +1,12 @@
 import path from 'path';
-import vue from '@vitejs/plugin-vue2';
+import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 
 const apiRoute = process.env.API_URL;
 
 console.log(path.resolve(__dirname, './src'));
 
-// https://vitejs.dev/config/
+/** @type {import('vite').UserConfig} */
 export default defineConfig({
   server: {
     port: 8080,
@@ -18,6 +18,7 @@ export default defineConfig({
       '@icons': path.resolve(__dirname, './src/components/common/icons'),
       '@common': path.resolve(__dirname, './src/components/common'),
       '@components': path.resolve(__dirname, './src/components'),
+      '@utils': path.resolve(__dirname, './src/utils'),
     },
   },
   define: {

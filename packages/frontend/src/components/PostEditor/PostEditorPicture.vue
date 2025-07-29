@@ -10,7 +10,7 @@
 
       <div class="post-editor-picture__input-url">
         <BaseInput
-          v-model.lazy="imageUrl"
+          v-model.lazy="imageUrlInput"
           :disabled="Boolean(file)"
           placeholder="Paste URL"
           data-testid="image-url-input"
@@ -20,9 +20,9 @@
           class="post-editor-picture__upload-btn"
           data-testid="image-upload-button"
           stretched
-          :loading="uploading"
-          :disabled="!imageUrl"
-          @click.native="upload"
+          :loading="isUploading"
+          :disabled="!imageUrlInput"
+          @click="createSectionWithAttachment"
         >
           Upload
         </BaseButton>
@@ -30,115 +30,107 @@
 
       <!-- A way to check if the image is inserted successfully -->
       <img
-        v-if="!file && imageUrl"
+        v-if="!file && imageUrlInput"
         hidden
-        :src="imageUrl"
+        :src="imageUrlInput"
         alt="error"
-        @error="error()"
+        @error="handleImgError()"
       />
     </div>
 
     <div v-else class="post-editor-picture__image">
-      <img
-        :src="$resolveImage(value)"
-        :alt="value"
-        @error="$resolveImageError"
-      />
+      <img :src="resolveImage(value)" :alt="value" @error="resolveImageError" />
     </div>
   </div>
 </template>
 
-<script>
-import api from '@/api';
+<script setup lang="ts">
+import { ref, watch } from 'vue';
+import { api } from '@/api';
+import { postTypes } from '@/api/posts';
+import { useNotificationsStore } from '@/store/notifications';
+import { resolveImage } from '@/utils/resolve-image';
+import { resolveImageError } from '@/utils/resolve-image-error';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseUploadForm from '@common/BaseUploadForm.vue';
 
-export default {
-  components: {
-    BaseUploadForm,
-    BaseButton,
-    BaseInput,
-  },
-  props: {
-    value: {
-      type: String,
-      default: '',
-    },
-  },
-  data() {
-    return {
-      file: null,
-      imageUrl: '',
-      uploading: false,
-    };
-  },
-  watch: {
-    file(newFile) {
-      if (newFile instanceof File) {
-        this.imageUrl = newFile.name;
-      }
-    },
-  },
-  methods: {
-    async handleUpload() {
-      this.uploading = true;
+interface Emits {
+  'update-section': [postTypes.PostPictureSection];
+}
 
-      try {
-        await this.upload();
-      } catch (e) {
-        this.$store.dispatch('showErrorNotification', {
-          message:
-            'Something went wrong during upload of this picture. Please try to upload the picture again.',
-        });
-      } finally {
-        this.reset();
-        this.uploading = false;
-      }
-    },
-    async upload() {
-      if (this.file instanceof File) {
-        const formData = new FormData();
+const emit = defineEmits<Emits>();
 
-        formData.append('picture', this.file);
+const value = defineModel<string>({
+  default: '',
+});
 
-        const res = await api.posts.uploadAttachment(formData);
+const notificationsStore = useNotificationsStore();
 
-        // an error occurred
-        if (!res || !res.data.url) {
-          this.reset();
+const imageUrlInput = ref('');
 
-          return;
-        }
+const isUploading = ref(false);
 
-        this.$emit('input', res.data.url);
-        this.$emit('set-section', res.data);
+const file = ref<File | null>(null);
 
-        return;
-      }
+watch(file, (newFile) => {
+  if (newFile) {
+    // Show the name of the uploaded file
+    imageUrlInput.value = newFile.name;
+  }
+});
 
-      this.$emit('input', this.imageUrl);
-    },
-    error() {
-      if (!(this.file instanceof File)) {
-        this.$store.dispatch('showErrorNotification', {
-          message:
-            'The image link you provided is invalid. Please try a different one.',
-        });
+const createSectionWithAttachment = async () => {
+  if (!file.value) {
+    value.value = imageUrlInput.value;
 
-        this.reset();
-      }
-    },
-    reset() {
-      this.file = null;
-      this.imageUrl = '';
-    },
-  },
+    return;
+  }
+
+  isUploading.value = true;
+
+  try {
+    const formData = new FormData();
+
+    formData.append('picture', file.value);
+
+    const newSection = await api.posts.uploadAttachment(formData);
+
+    value.value = newSection.url;
+
+    emit('update-section', newSection);
+  } catch {
+    notificationsStore.showErrorNotification({
+      message:
+        'Something went wrong during upload of this picture. Please try to upload the picture again.',
+    });
+  } finally {
+    resetFormState();
+
+    isUploading.value = false;
+  }
+};
+
+const handleImgError = () => {
+  // TODO: Do I need this?
+  if (!file.value) {
+    notificationsStore.showErrorNotification({
+      message:
+        'The image link you provided is invalid. Please try a different one.',
+    });
+
+    resetFormState();
+  }
+};
+
+const resetFormState = () => {
+  file.value = null;
+  imageUrlInput.value = '';
 };
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .post-editor-picture {
   width: 100%;
@@ -146,7 +138,7 @@ export default {
   border: 1px solid var(--color-gray-light);
   border-radius: 8px;
 
-  @include for-size(phone-only) {
+  @include mixins.for-size(phone-only) {
     border-right: none;
     border-left: none;
     border-radius: 0;

@@ -8,20 +8,17 @@
   </RouterLink>
 </template>
 
-<script>
-export default {
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    to: {
-      type: Object,
-      required: true,
-      validator: (route) => Boolean(route.name),
-    },
-  },
-};
+<script setup lang="ts">
+import type { RouteLocationRaw } from 'vue-router';
+
+interface Props {
+  disabled?: boolean;
+  to: RouteLocationRaw & { name: string };
+}
+
+withDefaults(defineProps<Props>(), {
+  disabled: false,
+});
 </script>
 
 <style lang="scss">

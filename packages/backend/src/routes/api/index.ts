@@ -81,8 +81,6 @@ router.use(
       return;
     }
 
-    console.log('error', error);
-
     // Handle MongoDB duplicate document error, when unique index is violated
     if (isDuplicateKeyError(error)) {
       handleSendError(new ConflictError(error.message), res);

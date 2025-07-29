@@ -4,6 +4,7 @@
 import { expect } from '@playwright/test';
 import createRandomAuth from './factory/auth';
 import createRandomPost from './factory/post';
+import createSection from './factory/section';
 import test from './page-objects';
 
 const authUser = createRandomAuth({
@@ -11,7 +12,7 @@ const authUser = createRandomAuth({
 });
 
 const title = 'Test post';
-const picUrl = 'https://placehold.co/600x400';
+const picSection = createSection({ type: 'pic' });
 const vidCode = 'dQw4w9WgXcQ';
 
 const createdPost = createRandomPost();
@@ -82,7 +83,7 @@ test('Creates a post with title, tags and content', async ({
   await PostCreatePage.fillTextSection('test text');
 
   await PostCreatePage.addPictureSection();
-  await PostCreatePage.uploadPictureWithUrl(picUrl);
+  await PostCreatePage.uploadPictureWithUrl(picSection.url);
 
   await PostCreatePage.addVideoSection();
   await PostCreatePage.uploadVideoWithUrl(vidCode);
@@ -108,7 +109,7 @@ test('Creates a post with title, tags and content', async ({
       },
       {
         type: 'pic',
-        url: picUrl,
+        url: picSection.url,
       },
       {
         type: 'vid',
@@ -125,7 +126,7 @@ test('Uploads a picture in the picture section', async ({
   Api.routes.posts.uploadAttachment.mock({
     body: {
       type: 'pic',
-      url: picUrl,
+      url: picSection.url,
       hash: (Math.random() * Math.random()).toString(36),
       isFile: true,
     },
@@ -217,7 +218,7 @@ test('Fetch and show draft template', async ({ Api, page, PostCreatePage }) => {
     },
     {
       type: 'pic',
-      url: picUrl,
+      url: picSection.url,
       hash: 2,
     },
     {
@@ -244,8 +245,8 @@ test('Fetch and show draft template', async ({ Api, page, PostCreatePage }) => {
   );
 
   await expect(
-    page.locator('[data-testid="post-section"]:nth-child(2) img'),
-  ).toHaveAttribute('src', savedSections[1].url);
+    page.locator(`img[src="${savedSections[1].url}"]`),
+  ).toBeVisible();
 
   await expect(
     page
@@ -278,7 +279,7 @@ test('Saves draft template', async ({
   await PostCreatePage.fillTextSection('test text');
 
   await PostCreatePage.addPictureSection();
-  await PostCreatePage.uploadPictureWithUrl(picUrl);
+  await PostCreatePage.uploadPictureWithUrl(picSection.url);
 
   await PostCreatePage.addVideoSection();
   await PostCreatePage.uploadVideoWithUrl(vidCode);
@@ -302,7 +303,7 @@ test('Saves draft template', async ({
       },
       {
         type: 'pic',
-        url: picUrl,
+        url: picSection.url,
       },
       {
         type: 'vid',

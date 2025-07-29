@@ -4,7 +4,7 @@ import posts from './posts';
 import tags from './tags';
 import users from './users';
 
-export default {
+export const api = {
   users,
   auth,
   posts,

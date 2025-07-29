@@ -27,6 +27,7 @@
   }
 }
 
+// TODO: Remove these SCSS mixins (since they repeat styles instead of copying them over)
 @mixin flex-row {
   display: flex;
   flex-flow: row nowrap;

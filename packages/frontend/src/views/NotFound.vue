@@ -4,35 +4,31 @@
 
     <div class="not-found__info">Not existing page</div>
 
-    <BaseButton class="not-found__go-home-btn" @click.native="goHome">
+    <BaseButton class="not-found__go-home-btn" @click="goHome">
       Go home
     </BaseButton>
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
 import BaseButton from '@common/BaseButton.vue';
 
-export default {
-  components: {
-    BaseButton,
-  },
-  methods: {
-    goHome() {
-      this.$router.push({
-        name: 'Home',
-      });
-    },
-  },
+const router = useRouter();
+
+const goHome = () => {
+  router.push({
+    name: 'Home',
+  });
 };
 </script>
 
 <style lang="scss">
-@import '@/styles/mixins';
+@use '@/styles/mixins';
 
 .not-found {
-  @include widget;
-  @include flex-col;
+  @include mixins.widget;
+  @include mixins.flex-col;
 
   align-items: center;
 
@@ -47,7 +43,7 @@ export default {
     color: var(--color-main-text);
     font-size: 48px;
 
-    @include for-size(phone-only) {
+    @include mixins.for-size(phone-only) {
       font-size: 32px;
     }
   }
