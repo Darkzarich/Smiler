@@ -103,7 +103,7 @@ const toggleMobileMenu = () => {
 };
 
 watch(
-  () => route,
+  () => route.name,
   () => {
     if (isMobileMenuOpen.value) {
       toggleMobileMenu();
