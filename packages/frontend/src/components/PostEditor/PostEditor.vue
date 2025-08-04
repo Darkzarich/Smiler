@@ -234,7 +234,7 @@ const deleteSection = (section: postTypes.PostSection) => {
   if (
     section.type === postTypes.POST_SECTION_TYPES.PICTURE &&
     section.isFile &&
-    !isEdit.value
+    !props.isEdit
   ) {
     api.users.removeFilePicSection(section.hash);
   }
