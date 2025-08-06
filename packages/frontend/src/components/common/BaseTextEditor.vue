@@ -140,13 +140,7 @@ const endSelect = () => {
           : selection.anchorOffset;
     }
 
-    console.log('curSelection / ', curSelection.value);
-
-    console.log('curSelection obj / ', selection);
-
     isSelecting.value = false;
-
-    console.log('text: ', text);
 
     // text.replace(/<\/div>/g, '<br>')
 
@@ -156,18 +150,10 @@ const endSelect = () => {
 
     if (textMatch) {
       replacedDivText = text.replace(textMatch[2], '');
-
-      console.log('replace1: ', text.replace(textMatch[2], ''));
     }
-
-    console.log('replace2: ', replacedDivText.replace(/<\/div>/g, ''));
 
     replacedDivText = replacedDivText.replace(/<\/div>/g, '');
 
-    console.log(
-      'replace3: ',
-      replacedDivText.replace(/<div>/g, '<br>').replace(/(<br>){2,}/g, '<br>'),
-    );
     replacedDivText = replacedDivText
       .replace(/<div>/g, '<br>')
       .replace(/(<br>){2,}/g, '<br>');
@@ -181,16 +167,10 @@ const setText = () => {
 
   endSelect();
 
-  console.log('set text!');
-
   textEditorValue.value = editedText.value;
 };
 
 const styleSelected = (tag: Tag) => {
-  console.log('styleSelected curSelection: ', curSelection.value.trim());
-  console.log('DOM Ele: ', selectedDOMElement.value);
-  console.log('beforeChange ', textEditorValue.value);
-
   if (curSelection.value.trim().length > 0 && selectedDOMElement.value) {
     // replace curSelection text with that text inside tags
     selectedDOMElement.value.textContent =
