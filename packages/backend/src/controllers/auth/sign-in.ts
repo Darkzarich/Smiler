@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { pbkdf2Sync, timingSafeEqual } from 'crypto';
+import crypto from 'node:crypto';
 import { UserModel } from '@models/User';
 import { ValidationError, UnauthorizedError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
@@ -47,15 +47,11 @@ export async function signIn(
     throw new UnauthorizedError(ERRORS.AUTH_INVALID_CREDENTIALS);
   }
 
-  const hash = pbkdf2Sync(
-    fields.password!,
-    foundUser.salt,
-    10000,
-    512,
-    'sha512',
-  ).toString('hex');
+  const hash = crypto
+    .pbkdf2Sync(fields.password!, foundUser.salt, 10000, 512, 'sha512')
+    .toString('hex');
 
-  const isEqual = timingSafeEqual(
+  const isEqual = crypto.timingSafeEqual(
     Buffer.from(hash),
     Buffer.from(foundUser.hash),
   );

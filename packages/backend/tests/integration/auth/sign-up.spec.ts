@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import request from 'supertest';
 import { ERRORS } from '@errors';
 import { UserModel } from '@models/User';

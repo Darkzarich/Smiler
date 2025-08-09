@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import { UserModel } from '@models/User';
 import { ValidationError, ConflictError, AbstractError, ERRORS } from '@errors';
 import { isDuplicateKeyError } from '@utils/check-mongo-db-error';

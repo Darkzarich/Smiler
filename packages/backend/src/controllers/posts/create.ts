@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import slugLib from 'slug';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import { UserModel } from '@models/User';
 import { Post, PostModel, PostSection } from '@models/Post';
 import { sendSuccess } from '@utils/response-utils';
