@@ -25,8 +25,8 @@ export function generateRandomPost(overrides = {}) {
         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       },
     ],
-    commentCount: 0,
-    rating: 0,
+    commentCount: Math.floor(Math.random() * 100),
+    rating: Math.floor(Math.random() * 100),
   };
 
   return defaults(overrides, post);
