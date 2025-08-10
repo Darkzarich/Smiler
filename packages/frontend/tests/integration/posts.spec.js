@@ -356,6 +356,114 @@ test.describe('Post votes', () => {
     );
   });
 
+  test('Overrides a downvote with an upvote', async ({
+    Api,
+    Post,
+    PostsPage,
+  }) => {
+    Api.routes.posts.getToday.mock({
+      body: {
+        pages: 1,
+        hasNextPage: false,
+        total: 1,
+        posts: [
+          {
+            ...post1,
+            rated: {
+              isRated: true,
+              negative: true,
+            },
+          },
+        ],
+      },
+    });
+
+    Api.routes.posts.updateRateById.mock({
+      status: 200,
+      body: {
+        ...post1,
+        // Increases more than the default rate to test using the response data
+        rating: post1.rating + 2,
+        rated: {
+          isRated: true,
+          negative: false,
+        },
+      },
+    });
+
+    await PostsPage.goto(PostsPage.urls.today);
+    await Post.getTitleById(post1.id).isVisible();
+
+    const upvoteResponse = await Api.routes.posts.updateRateById.waitForRequest(
+      {
+        preRequestAction: Post.upvotePostById.bind(Post, post1.id),
+      },
+    );
+
+    expect(upvoteResponse.url()).toContain(post1.id);
+    expect(upvoteResponse.postDataJSON()).toEqual({
+      negative: false,
+    });
+    expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(true);
+    await expect(Post.getRatingById(post1.id)).toContainText(
+      String(post1.rating + 2),
+    );
+  });
+
+  test('Overrides an upvote with a downvote', async ({
+    Api,
+    Post,
+    PostsPage,
+  }) => {
+    Api.routes.posts.getToday.mock({
+      body: {
+        pages: 1,
+        hasNextPage: false,
+        total: 1,
+        posts: [
+          {
+            ...post1,
+            rated: {
+              isRated: true,
+              negative: false,
+            },
+          },
+        ],
+      },
+    });
+
+    Api.routes.posts.updateRateById.mock({
+      status: 200,
+      body: {
+        ...post1,
+        // Increases more than the default rate to test using the response data
+        rating: post1.rating + 2,
+        rated: {
+          isRated: true,
+          negative: true,
+        },
+      },
+    });
+
+    await PostsPage.goto(PostsPage.urls.today);
+    await Post.getTitleById(post1.id).isVisible();
+
+    const upvoteResponse = await Api.routes.posts.updateRateById.waitForRequest(
+      {
+        preRequestAction: Post.downvotePostById.bind(Post, post1.id),
+      },
+    );
+
+    expect(upvoteResponse.url()).toContain(post1.id);
+    expect(upvoteResponse.postDataJSON()).toEqual({
+      negative: true,
+    });
+    expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(true);
+    await expect(Post.getRatingById(post1.id)).toContainText(
+      String(post1.rating + 2),
+    );
+  });
+
   test('Removes a vote from a post if it was upvoted before', async ({
     Post,
     PostsPage,
@@ -397,7 +505,7 @@ test.describe('Post votes', () => {
 
     const removeUpvoteResponse =
       await Api.routes.posts.removeRateById.waitForRequest({
-        preRequestAction: Post.downvotePostById.bind(Post, post1.id),
+        preRequestAction: Post.upvotePostById.bind(Post, post1.id),
       });
 
     expect(removeUpvoteResponse.url()).toContain(post1.id);
@@ -448,7 +556,7 @@ test.describe('Post votes', () => {
 
     const removeDownvoteResponse =
       await Api.routes.posts.removeRateById.waitForRequest({
-        preRequestAction: Post.upvotePostById.bind(Post, post1.id),
+        preRequestAction: Post.downvotePostById.bind(Post, post1.id),
       });
 
     expect(removeDownvoteResponse.url()).toContain(post1.id);
