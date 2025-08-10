@@ -13,7 +13,7 @@ export enum RateTargetModel {
   COMMENT = 'Comment',
 }
 
-@index({ post: 1 })
+@index({ target: 1 })
 @modelOptions({
   schemaOptions: {
     timestamps: true,
