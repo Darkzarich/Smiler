@@ -6,7 +6,7 @@
 
     <PostsContainer
       v-if="isAnyFilterActive"
-      :posts="posts"
+      v-model:posts="posts"
       :is-loading="isLoading"
       :has-next-page="hasNextPage"
       @fetch-more="handleNextPage"

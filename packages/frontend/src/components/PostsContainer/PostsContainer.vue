@@ -2,10 +2,10 @@
   <div data-testid="posts-container" class="posts-container">
     <div v-if="posts.length > 0" v-scroll="handleScroll">
       <Post
-        v-for="post in posts"
+        v-for="(post, index) in posts"
         :key="post.id"
+        v-model:post="posts[index]"
         class="posts-container__post"
-        :post="post"
         :can-edit="checkCanEditPost(post, userStore.userId)"
       />
     </div>
@@ -43,12 +43,15 @@ interface Emits {
 const emit = defineEmits<Emits>();
 
 interface Props {
-  posts: postTypes.Post[];
   isLoading?: boolean;
   hasNextPage?: boolean;
 }
 
 const props = defineProps<Props>();
+
+const posts = defineModel<postTypes.Post[]>('posts', {
+  required: true,
+});
 
 const userStore = useUserStore();
 

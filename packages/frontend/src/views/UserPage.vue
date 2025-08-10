@@ -4,7 +4,7 @@
     <UserProfile v-if="user" :user="user" />
 
     <PostsContainer
-      :posts="posts"
+      v-model:posts="posts"
       :is-loading="isLoading"
       :has-next-page="hasNextPage"
       @fetch-more="handleNextPage"

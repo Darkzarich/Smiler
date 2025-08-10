@@ -3,7 +3,7 @@
     <template v-if="post">
       <div class="post-container">
         <Post
-          :post="post"
+          v-model:post="post"
           :can-edit="checkCanEditPost(post, userStore.user?.id)"
         />
       </div>
