@@ -139,7 +139,7 @@ describe('PUT /comments/:id/vote', () => {
     ['increase', false],
     ['decrease', true],
   ])(
-    "Should %s author's rating after after the comment is rated",
+    "Should %s author's rating after the comment is rated",
     async (_, isNegative) => {
       const { sessionCookie } = await signUpRequest(global.app);
 

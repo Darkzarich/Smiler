@@ -452,8 +452,8 @@ describe('PUT /posts/:id', () => {
         login: expect.any(String),
         avatar: expect.any(String),
       },
-      rating: 0,
-      commentCount: 0,
+      commentCount: post.commentCount,
+      rating: post.rating,
       tags,
       rated: {
         isRated: false,

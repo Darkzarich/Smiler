@@ -129,7 +129,7 @@ describe('DELETE /comments/:id/vote', () => {
     ['increase', true],
     ['decrease', false],
   ])(
-    "Should %s author's rating after after the comment is unrated",
+    "Should %s author's rating after the comment is unrated",
     async (_, isNegative) => {
       const { sessionCookie, currentUser } = await signUpRequest(global.app);
 

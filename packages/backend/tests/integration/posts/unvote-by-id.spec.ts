@@ -128,7 +128,7 @@ describe('DELETE /posts/:id/vote', () => {
     ['increase', true],
     ['decrease', false],
   ])(
-    "Should %s author's rating after after the post is unrated",
+    "Should %s author's rating after the post is unrated",
     async (_, isNegative) => {
       const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
@@ -198,6 +198,6 @@ describe('DELETE /posts/:id/vote', () => {
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(200);
-    expect(response.body.rating).toBe(-POST_RATE_VALUE);
+    expect(response.body.rating).toBe(post.rating + -POST_RATE_VALUE);
   });
 });

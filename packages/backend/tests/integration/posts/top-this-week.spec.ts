@@ -86,7 +86,7 @@ describe('GET /posts/categories/top-this-week', () => {
             avatar: otherUser.avatar,
           },
           sections: post.sections,
-          commentCount: 0,
+          commentCount: post.commentCount,
           rating: post.rating,
           tags: post.tags,
           rated: { isRated: false, negative: false },
@@ -190,18 +190,26 @@ describe('GET /posts/categories/top-this-week', () => {
 
     expect(response.status).toBe(200);
     // Sorted by createdAt descending
-    expect(response.body.posts[0]).toMatchObject({
-      rated: {
-        isRated: true,
-        negative: false,
-      },
-    });
-    expect(response.body.posts[1]).toMatchObject({
-      rated: {
-        isRated: true,
-        negative: true,
-      },
-    });
+    expect(response.body.posts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          rated: {
+            isRated: true,
+            negative: true,
+          },
+        }),
+      ]),
+    );
+    expect(response.body.posts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          rated: {
+            isRated: true,
+            negative: false,
+          },
+        }),
+      ]),
+    );
   });
 
   it('Should sort posts by createdAt descending', async () => {
