@@ -9,6 +9,8 @@ import { POST_TIME_TO_UPDATE } from '@constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '@errors';
 import { removeFileByPath } from '@utils/remove-file-by-path';
 import { sendSuccess } from '@utils/response-utils';
+import { UserModel } from '@models/User';
+import { RateModel } from '@models/Rate';
 
 interface DeleteByIdParams {
   id: string;
@@ -26,6 +28,7 @@ export async function deleteById(
       author: 1,
       createdAt: 1,
       commentCount: 1,
+      rating: 1,
       sections: 1,
     })
     .lean();
@@ -49,8 +52,16 @@ export async function deleteById(
     throw new ForbiddenError(ERRORS.POST_CANT_DELETE_WITH_COMMENTS);
   }
 
-  // TODO: Remove rates for the post as well
-  await PostModel.deleteOne({ _id: id });
+  // TODO: Remove rates from users as well
+
+  await Promise.all([
+    PostModel.deleteOne({ _id: id }),
+    UserModel.updateOne(
+      { _id: targetPost.author },
+      { $inc: { rating: -targetPost.rating } },
+    ),
+    RateModel.deleteMany({ target: id }),
+  ]);
 
   sendSuccess(res);
 

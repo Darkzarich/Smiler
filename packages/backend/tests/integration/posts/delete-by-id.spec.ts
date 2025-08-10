@@ -3,8 +3,10 @@ import { removeFileByPath } from '@utils/remove-file-by-path';
 import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
 import { signUpRequest } from '@test-utils/request-auth';
 import { PostModel, POST_SECTION_TYPES } from '@models/Post';
-import { generateRandomPost } from '@test-data-generators';
+import { generateRandomPost, generateRate } from '@test-data-generators';
 import { ERRORS } from '@errors';
+import { UserModel } from '@models/User';
+import { RateModel, RateTargetModel } from '@models/Rate';
 
 describe('DELETE /posts/:id', () => {
   const mockRemoveFileByPath = jest.mocked(removeFileByPath);
@@ -96,17 +98,66 @@ describe('DELETE /posts/:id', () => {
     const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
+        commentCount: 0,
       }),
     );
 
     const response = await request(global.app)
-      .delete(`/api/posts/${post.id}`)
+      .delete(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie);
 
-    const updatedPost = await PostModel.findById(post.id).lean();
+    const updatedPost = await PostModel.findById(post._id).lean();
 
     expect(updatedPost).toBe(null);
     expect(response.status).toBe(200);
+  });
+
+  it('Should decrease user rating after the post is deleted', async () => {
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+
+    const post = await PostModel.create(
+      generateRandomPost({
+        author: currentUser.id,
+        commentCount: 0,
+      }),
+    );
+
+    await request(global.app)
+      .delete(`/api/posts/${post._id}`)
+      .set('Cookie', sessionCookie);
+
+    const updatedUser = await UserModel.findById(currentUser.id).lean();
+
+    expect(updatedUser!.rating).toBe(currentUser.rating - post.rating);
+  });
+
+  it('Should delete all rates for the post after the post is deleted', async () => {
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+
+    const post = await PostModel.create(
+      generateRandomPost({
+        author: currentUser.id,
+        commentCount: 0,
+      }),
+    );
+
+    await Promise.all([
+      RateModel.create(
+        generateRate({
+          target: post._id,
+          negative: false,
+          targetModel: RateTargetModel.POST,
+        }),
+      ),
+    ]);
+
+    await request(global.app)
+      .delete(`/api/posts/${post._id}`)
+      .set('Cookie', sessionCookie);
+
+    const rates = await RateModel.find({ target: post._id }).lean();
+
+    expect(rates.length).toBe(0);
   });
 
   it('Should delete picture files corresponding to the deleted post picture sections with isFile=true', async () => {
@@ -115,6 +166,7 @@ describe('DELETE /posts/:id', () => {
     const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
+        commentCount: 0,
         sections: [
           {
             type: POST_SECTION_TYPES.PICTURE,
