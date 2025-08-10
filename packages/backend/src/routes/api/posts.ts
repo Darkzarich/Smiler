@@ -840,7 +840,7 @@ router.post(
   "/posts/{id}/vote": {
     "put": {
       "summary": "Vote for a post", 
-      "description": "Changes vote for post. `negative` decides direction. Cannot rate the post again before deleting previous rate",
+      "description": "Changes vote for a post. Field `negative` decides the direction of the vote.",
       "tags": [
         "Posts"
       ],
