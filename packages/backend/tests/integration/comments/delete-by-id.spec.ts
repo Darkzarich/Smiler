@@ -8,6 +8,8 @@ import {
   generateRandomComment,
 } from '@test-data-generators';
 import { ERRORS } from '@errors';
+import { Types } from 'mongoose';
+import { subMinutes } from 'date-fns';
 
 describe('DELETE /comments/:id', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -33,7 +35,7 @@ describe('DELETE /comments/:id', () => {
 
     const comment = await CommentModel.create(
       generateRandomComment({
-        author: '5d5467b4c17806706f3df347',
+        author: new Types.ObjectId('5d5467b4c17806706f3df347'),
       }),
     );
 
@@ -53,7 +55,7 @@ describe('DELETE /comments/:id', () => {
     const comment = await CommentModel.create(
       generateRandomComment({
         author: currentUser.id,
-        createdAt: Date.now() - COMMENT_TIME_TO_UPDATE - 1,
+        createdAt: subMinutes(Date.now(), COMMENT_TIME_TO_UPDATE - 1),
       }),
     );
 
@@ -74,7 +76,7 @@ describe('DELETE /comments/:id', () => {
       generateRandomComment({
         author: currentUser.id,
         // random id
-        children: ['5d5467b4c17806706f3df347'],
+        children: [new Types.ObjectId('5d5467b4c17806706f3df347')],
       }),
     );
 
