@@ -211,7 +211,9 @@ describe('PUT /comments/:id/vote', () => {
         .set('Cookie', sessionCookie);
 
       expect(response.status).toBe(200);
-      expect(response.body.rating).toBe(-COMMENT_RATE_VALUE);
+      expect(response.body.rating).toBe(
+        otherUserComment.rating + -COMMENT_RATE_VALUE,
+      );
     });
   });
 
