@@ -377,7 +377,7 @@ router.delete(
   "/comments/{id}/vote": {
     "put": {
       "summary": "Change rate on comment",
-      "description": "Changes rate for comment. `negative` decides direction. You can't rate comment again before deleting previous rate",
+      "description": "Changes vote for a comment. Field `negative` decides the direction of the vote.",
       "tags": [
         "Comments"
       ],
