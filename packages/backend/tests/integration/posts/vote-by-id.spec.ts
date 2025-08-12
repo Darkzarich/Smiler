@@ -144,22 +144,22 @@ describe('PUT /posts/:id/vote', () => {
 
         const otherUser = await UserModel.create(generateRandomUser());
 
-        const post = await PostModel.create(
+        const otherUserPost = await PostModel.create(
           generateRandomPost({
             author: otherUser._id,
           }),
         );
 
         await request(global.app)
-          .put(`/api/posts/${post._id}/vote`)
+          .put(`/api/posts/${otherUserPost._id}/vote`)
           .send({ negative: isNegative })
           .set('Cookie', sessionCookie);
 
-        const votedPost = await PostModel.findById(post._id);
+        const votedPost = await PostModel.findById(otherUserPost._id);
 
         const rateValue = isNegative ? -POST_RATE_VALUE : POST_RATE_VALUE;
 
-        expect(post.rating).toBe(votedPost!.rating - rateValue);
+        expect(otherUserPost.rating).toBe(votedPost!.rating - rateValue);
       },
     );
 
@@ -173,14 +173,14 @@ describe('PUT /posts/:id/vote', () => {
 
         const otherUser = await UserModel.create(generateRandomUser());
 
-        const post = await PostModel.create(
+        const otherUserPost = await PostModel.create(
           generateRandomPost({
             author: otherUser._id,
           }),
         );
 
         await request(global.app)
-          .put(`/api/posts/${post._id}/vote`)
+          .put(`/api/posts/${otherUserPost._id}/vote`)
           .send({ negative: isNegative })
           .set('Cookie', sessionCookie);
 
@@ -197,19 +197,19 @@ describe('PUT /posts/:id/vote', () => {
 
       const otherUser = await UserModel.create(generateRandomUser());
 
-      const post = await PostModel.create(
+      const otherUserPost = await PostModel.create(
         generateRandomPost({
           author: otherUser._id,
         }),
       );
 
       const response = await request(global.app)
-        .put(`/api/posts/${post._id}/vote`)
+        .put(`/api/posts/${otherUserPost._id}/vote`)
         .send({ negative: true })
         .set('Cookie', sessionCookie);
 
       expect(response.status).toBe(200);
-      expect(response.body.rating).toBe(post.rating + -POST_RATE_VALUE);
+      expect(response.body.rating).toBe(otherUserPost.rating + -POST_RATE_VALUE);
     });
   });
 
