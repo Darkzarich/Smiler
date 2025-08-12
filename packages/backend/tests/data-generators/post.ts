@@ -1,6 +1,7 @@
+import { Post } from '@models/Post';
 import { defaults } from 'lodash';
 
-export function generateRandomPost(overrides = {}) {
+export function generateRandomPost(overrides: Partial<Post> = {}) {
   const post = {
     title: 'My post title',
     slug: `my-post-title-d2k5g8${Math.random().toString(36)}`,

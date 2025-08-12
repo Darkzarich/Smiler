@@ -326,7 +326,7 @@ describe('GET /posts', () => {
 
     await PostModel.create(
       generateRandomPost({
-        createdAt: addMilliseconds(dateTo, 1).toISOString(),
+        createdAt: addMilliseconds(dateTo, 1),
       }),
     );
 

@@ -45,7 +45,7 @@ describe('GET /posts/categories/recent', () => {
 
     await PostModel.create(
       generateRandomPost({
-        createdAt: subDays(new Date(), 2).toISOString(),
+        createdAt: subDays(new Date(), 2),
       }),
     );
 
@@ -216,9 +216,9 @@ describe('GET /posts/categories/recent', () => {
 
   it('Should sort posts by createdAt descending', async () => {
     const dates = [
-      subSeconds(new Date(), 2).toISOString(),
-      subSeconds(new Date(), 1).toISOString(),
-      new Date().toISOString(),
+      subSeconds(new Date(), 2),
+      subSeconds(new Date(), 1),
+      new Date(),
     ];
 
     await Promise.all([
@@ -244,8 +244,14 @@ describe('GET /posts/categories/recent', () => {
     );
 
     expect(response.status).toBe(200);
-    expect(response.body.posts[0].createdAt).toBe(dates[2]);
-    expect(response.body.posts[1].createdAt).toBe(dates[1]);
-    expect(response.body.posts[2].createdAt).toBe(dates[0]);
+    expect(response.body.posts[0].createdAt.toString()).toBe(
+      dates[2].toISOString(),
+    );
+    expect(response.body.posts[1].createdAt.toString()).toBe(
+      dates[1].toISOString(),
+    );
+    expect(response.body.posts[2].createdAt.toString()).toBe(
+      dates[0].toISOString(),
+    );
   });
 });

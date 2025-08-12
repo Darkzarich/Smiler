@@ -7,6 +7,8 @@ import { generateRandomPost, generateRate } from '@test-data-generators';
 import { ERRORS } from '@errors';
 import { UserModel } from '@models/User';
 import { RateModel, RateTargetModel } from '@models/Rate';
+import { Types } from 'mongoose';
+import { subMinutes } from 'date-fns';
 
 describe('DELETE /posts/:id', () => {
   const mockRemoveFileByPath = jest.mocked(removeFileByPath);
@@ -38,7 +40,7 @@ describe('DELETE /posts/:id', () => {
 
     const post = await PostModel.create(
       generateRandomPost({
-        author: '5d5467b4c17806706f3df347',
+        author: new Types.ObjectId('5d5467b4c17806706f3df347'),
       }),
     );
 
@@ -58,7 +60,7 @@ describe('DELETE /posts/:id', () => {
     const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
-        createdAt: Date.now() - COMMENT_TIME_TO_UPDATE - 1,
+        createdAt: subMinutes(Date.now(), COMMENT_TIME_TO_UPDATE - 1),
       }),
     );
 
@@ -172,11 +174,13 @@ describe('DELETE /posts/:id', () => {
             type: POST_SECTION_TYPES.PICTURE,
             isFile: true,
             url: '/uploads/test/1724110246594.jpg',
+            hash: '1234',
           },
           {
             type: POST_SECTION_TYPES.PICTURE,
             isFile: true,
             url: '/uploads/test/1724110246595.jpg',
+            hash: '4321',
           },
         ],
       }),

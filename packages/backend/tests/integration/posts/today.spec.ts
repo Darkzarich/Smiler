@@ -43,7 +43,7 @@ describe('GET /posts/categories/today', () => {
 
     await PostModel.create(
       generateRandomPost({
-        createdAt: subDays(new Date(), 2).toISOString(),
+        createdAt: subDays(new Date(), 2),
       }),
     );
 
@@ -213,9 +213,9 @@ describe('GET /posts/categories/today', () => {
 
   it('Should sort posts by rating descending', async () => {
     const dates = [
-      subSeconds(new Date(), 1).toISOString(),
-      subSeconds(new Date(), 2).toISOString(),
-      subSeconds(new Date(), 3).toISOString(),
+      subSeconds(new Date(), 1),
+      subSeconds(new Date(), 2),
+      subSeconds(new Date(), 3),
     ];
 
     await Promise.all([
