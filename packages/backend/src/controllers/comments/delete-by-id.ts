@@ -5,6 +5,8 @@ import { PostModel } from '@models/Post';
 import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
+import { UserModel } from '@models/User';
+import { RateModel } from '@models/Rate';
 
 interface DeleteByIdParams {
   id: string;
@@ -37,13 +39,21 @@ export async function deleteById(
   // If comment has replies we cannot delete it completely
   // instead we mark it as deleted with a flag
   if (comment.children.length > 0) {
-    const updateComment = await CommentModel.findByIdAndUpdate(comment._id, {
-      deleted: true,
-    });
+    const [updateComment] = await Promise.all([
+      CommentModel.findByIdAndUpdate(comment._id, {
+        deleted: true,
+      }),
+      UserModel.updateOne(
+        { _id: comment.author },
+        { $inc: { rating: -comment.rating } },
+      ),
+      RateModel.deleteMany({ target: id }),
+    ]);
 
     return sendSuccess(res, updateComment?.toJSON());
   }
 
+  // TODO: Remove rates from users as well
   await Promise.all([
     CommentModel.updateOne(
       { _id: comment.parent },
@@ -54,10 +64,14 @@ export async function deleteById(
       },
     ),
     PostModel.decreaseCommentCount(comment.post.toString()),
-    // TODO: Remove rates for the comment as well
     CommentModel.deleteOne({
       _id: comment._id,
     }),
+    UserModel.updateOne(
+      { _id: comment.author },
+      { $inc: { rating: -comment.rating } },
+    ),
+    RateModel.deleteMany({ target: id }),
   ]);
 
   return sendSuccess(res);
