@@ -208,6 +208,7 @@
 </template>
 
 <script setup lang="ts">
+import { cloneDeep } from 'lodash-es';
 import { storeToRefs } from 'pinia';
 import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -234,19 +235,13 @@ import IconPlus from '@icons/IconPlus.vue';
 import { isMobile } from '@utils/is-mobile';
 
 interface Props {
-  post: postTypes.Post;
   canEdit?: boolean;
 }
 
-interface ContextMenuData {
-  show: boolean;
-  x: number;
-  y: number;
-  target: string | null;
-}
+defineProps<Props>();
 
-const props = withDefaults(defineProps<Props>(), {
-  canEdit: false,
+const post = defineModel<postTypes.Post>('post', {
+  required: true,
 });
 
 const router = useRouter();
@@ -257,6 +252,13 @@ const userStore = useUserStore();
 const { user, isTagFollowed } = storeToRefs(userStore);
 
 const notificationsStore = useNotificationsStore();
+
+interface ContextMenuData {
+  show: boolean;
+  x: number;
+  y: number;
+  target: string | null;
+}
 
 const contextMenuData = reactive<ContextMenuData>({
   show: false,
@@ -296,55 +298,85 @@ const contextMenuOptions = computed(() => {
   return options;
 });
 
+const handleRemoveVote = async (id: string) => {
+  isRequesting.value = true;
+
+  const rateValue = post.value.rated.negative
+    ? POST_RATE_VALUE
+    : -POST_RATE_VALUE;
+
+  const prevPostState = cloneDeep(post.value);
+
+  try {
+    // Optimistic update
+    post.value = {
+      ...post.value,
+      rated: {
+        negative: post.value.rated.negative,
+        isRated: false,
+      },
+      rating: post.value.rating + rateValue,
+    };
+
+    const data = await api.posts.removeRateById(id);
+
+    post.value = {
+      ...post.value,
+      rating: data.rating,
+      commentCount: data.commentCount,
+    };
+  } catch {
+    post.value = prevPostState;
+  } finally {
+    isRequesting.value = false;
+  }
+};
+
 const upvote = async (id: string) => {
   if (isRequesting.value) {
     return;
   }
 
+  if (post.value.rated.isRated && !post.value.rated.negative) {
+    return handleRemoveVote(id);
+  }
+
   isRequesting.value = true;
 
-  if (!props.post.rated.isRated) {
-    try {
-      props.post.rated.isRated = true;
-      props.post.rated.negative = false;
-      props.post.rating = props.post.rating + POST_RATE_VALUE;
+  const rateValue = post.value.rated.isRated
+    ? POST_RATE_VALUE * 2
+    : POST_RATE_VALUE;
 
-      const data = await api.posts.updateRateById(id, {
+  const prevPostState = cloneDeep(post.value);
+
+  try {
+    // Optimistic update
+    post.value = {
+      ...post.value,
+      rated: {
+        ...post.value.rated,
+        isRated: true,
         negative: false,
-      });
+      },
+      rating: post.value.rating + rateValue,
+    };
 
-      Object.assign(props.post, {
-        rating: data.rating,
-        commentCount: data.commentCount,
-      });
-    } catch {
-      props.post.rated.isRated = false;
-      props.post.rating = props.post.rating - POST_RATE_VALUE;
-    } finally {
-      isRequesting.value = false;
-    }
+    const data = await api.posts.updateRateById(id, {
+      negative: false,
+    });
 
-    return;
+    post.value = {
+      ...post.value,
+      rating: data.rating,
+      commentCount: data.commentCount,
+    };
+  } catch {
+    post.value = prevPostState;
+  } finally {
+    isRequesting.value = false;
   }
 
-  if (props.post.rated.negative) {
-    try {
-      props.post.rated.isRated = false;
-      props.post.rating = props.post.rating + POST_RATE_VALUE;
-
-      const data = await api.posts.removeRateById(id);
-
-      Object.assign(props.post, {
-        rating: data.rating,
-        commentCount: data.commentCount,
-      });
-    } catch {
-      props.post.rated.isRated = true;
-      props.post.rating = props.post.rating - POST_RATE_VALUE;
-    } finally {
-      isRequesting.value = false;
-    }
-  }
+  return;
 };
 
 const downvote = async (id: string) => {
@@ -352,50 +384,46 @@ const downvote = async (id: string) => {
     return;
   }
 
+  if (post.value.rated.isRated && post.value.rated.negative) {
+    return handleRemoveVote(id);
+  }
+
   isRequesting.value = true;
 
-  if (!props.post.rated.isRated) {
-    try {
-      props.post.rated.isRated = true;
-      props.post.rated.negative = true;
-      props.post.rating = props.post.rating - POST_RATE_VALUE;
+  const rateValue = post.value.rated.isRated
+    ? POST_RATE_VALUE * 2
+    : POST_RATE_VALUE;
 
-      const data = await api.posts.updateRateById(id, {
+  const prevPostState = cloneDeep(post.value);
+
+  try {
+    // Optimistic update
+    post.value = {
+      ...post.value,
+      rated: {
+        ...post.value.rated,
+        isRated: true,
         negative: true,
-      });
+      },
+      rating: post.value.rating - rateValue,
+    };
 
-      Object.assign(props.post, {
-        rating: data.rating,
-        commentCount: data.commentCount,
-      });
-    } catch {
-      props.post.rated.isRated = false;
-      props.post.rating = props.post.rating + POST_RATE_VALUE;
-    } finally {
-      isRequesting.value = false;
-    }
+    const data = await api.posts.updateRateById(id, {
+      negative: true,
+    });
 
-    return;
+    post.value = {
+      ...post.value,
+      rating: data.rating,
+      commentCount: data.commentCount,
+    };
+  } catch {
+    post.value = prevPostState;
+  } finally {
+    isRequesting.value = false;
   }
 
-  if (!props.post.rated.negative) {
-    try {
-      props.post.rated.isRated = false;
-      props.post.rating = props.post.rating - POST_RATE_VALUE;
-
-      const data = await api.posts.removeRateById(id);
-
-      Object.assign(props.post, {
-        rating: data.rating,
-        commentCount: data.commentCount,
-      });
-    } catch {
-      props.post.rated.isRated = true;
-      props.post.rating = props.post.rating + POST_RATE_VALUE;
-    } finally {
-      isRequesting.value = false;
-    }
-  }
+  return;
 };
 
 const deletePost = async (id: string) => {

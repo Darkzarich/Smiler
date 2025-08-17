@@ -13,6 +13,7 @@ import { PostModel, POST_SECTION_TYPES } from '@models/Post';
 import { generateRandomPost } from '@test-data-generators';
 import { ERRORS } from '@errors';
 import { removeFileByPath } from '@utils/remove-file-by-path';
+import { subMinutes } from 'date-fns';
 
 const requiredPostFields = pick(generateRandomPost(), ['title', 'sections']);
 
@@ -48,7 +49,7 @@ describe('PUT /posts/:id', () => {
     const post = await PostModel.create(
       generateRandomPost({
         author: currentUser.id,
-        createdAt: Date.now() - POST_TIME_TO_UPDATE - 1,
+        createdAt: subMinutes(Date.now(), POST_TIME_TO_UPDATE - 1),
       }),
     );
 
@@ -452,8 +453,8 @@ describe('PUT /posts/:id', () => {
         login: expect.any(String),
         avatar: expect.any(String),
       },
-      rating: 0,
-      commentCount: 0,
+      commentCount: post.commentCount,
+      rating: post.rating,
       tags,
       rated: {
         isRated: false,
@@ -500,11 +501,13 @@ describe('PUT /posts/:id', () => {
             type: POST_SECTION_TYPES.PICTURE,
             isFile: true,
             url: '/uploads/test/1724110246594.jpg',
+            hash: '1234',
           },
           {
             type: POST_SECTION_TYPES.PICTURE,
             isFile: true,
             url: '/uploads/test/1724110246595.jpg',
+            hash: '4321',
           },
         ],
       }),

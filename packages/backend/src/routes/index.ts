@@ -6,7 +6,7 @@ import apiRoutes from '@routes/api';
 
 const router = express.Router();
 
-if (!Config.IS_JEST) {
+if (!Config.IS_JEST && !Config.IS_PRODUCTION) {
   const swaggerSpec = swaggerJSDoc({
     apis: ['./src/routes/**/*.ts'],
     definition: {

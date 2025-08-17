@@ -22,7 +22,7 @@ export async function voteById(
 ) {
   const { userId } = req.session;
   const { id: postId } = req.params;
-  const { negative } = req.body;
+  const { negative: shouldRateNegative } = req.body;
 
   const targetPost = await PostModel.findById(postId).select({ author: 1 });
 
@@ -42,22 +42,25 @@ export async function voteById(
     throw new ForbiddenError(ERRORS.USER_NOT_FOUND);
   }
 
-  const ratedForCurrentUser = currentUser.isRated(targetPost.id);
+  const {
+    rated: rateDoc,
+    negative: currentRate,
+    result: isRated,
+  } = currentUser.isRated(targetPost.id);
 
-  if (ratedForCurrentUser.result) {
+  // If is already rated and rated for the same direction
+  if (isRated && currentRate === shouldRateNegative) {
     throw new ForbiddenError(ERRORS.POST_CANT_RATE_ALREADY_RATED);
   }
 
-  const rateValue = negative ? -POST_RATE_VALUE : POST_RATE_VALUE;
-
-  const newRate = await RateModel.create({
-    target: targetPost.id,
-    targetModel: RateTargetModel.POST,
-    negative,
-  });
+  const directionValue = shouldRateNegative
+    ? -POST_RATE_VALUE
+    : POST_RATE_VALUE;
+  // If is already rated that rate value to the other direction should be doubled
+  const rateValue = isRated ? directionValue * 2 : directionValue;
 
   // TODO: Use transaction here
-  const [updatedPost] = await Promise.all([
+  const promises: Promise<any>[] = [
     PostModel.findByIdAndUpdate(
       targetPost.id,
       { $inc: { rating: rateValue } },
@@ -67,11 +70,33 @@ export async function voteById(
       { _id: targetPost.author },
       { $inc: { rating: rateValue } },
     ),
-    UserModel.updateOne(
-      { _id: currentUser.id },
-      { $push: { rates: newRate.id } },
-    ),
-  ]);
+  ];
 
-  sendSuccess(res, updatedPost!);
+  if (isRated) {
+    promises.push(
+      RateModel.updateOne(
+        { _id: rateDoc!._id },
+        {
+          $set: { negative: shouldRateNegative },
+        },
+      ),
+    );
+  } else {
+    const newRate = await RateModel.create({
+      target: targetPost.id,
+      targetModel: RateTargetModel.POST,
+      negative: shouldRateNegative,
+    });
+
+    promises.push(
+      UserModel.updateOne(
+        { _id: currentUser.id },
+        { $push: { rates: newRate.id } },
+      ),
+    );
+  }
+
+  const [updatedPost] = await Promise.all(promises);
+
+  sendSuccess(res, updatedPost! as Post);
 }

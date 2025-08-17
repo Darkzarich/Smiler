@@ -19,7 +19,7 @@
     "start": "node dist/index.js",
     "dev": "ts-node index.ts",
     "dev:watch": "nodemon --exec ts-node index.ts",
-    "dev:debug": "ts-node --swc index.ts",
+    "dev:debug": "node --inspect -r ts-node/register index.ts",
     "lint:code": "eslint --ext .js --ext .ts --ignore-path .gitignore .",
     "lint:types": "tsc --noEmit",
     "prettier": "prettier . --write"
@@ -38,6 +38,7 @@
   "author": "Darkzarich",
   "license": "MIT",
   "devDependencies": {
+    "@swc/core": "^1.13.3",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/express-session": "^1.18.2",
@@ -66,6 +67,7 @@
     "supertest": "^7.1.4",
     "ts-jest": "^29.3.0",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.3"
   },
   "dependencies": {

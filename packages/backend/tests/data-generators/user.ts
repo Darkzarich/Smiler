@@ -1,6 +1,7 @@
+import { User } from '@models/User';
 import { defaultsDeep } from 'lodash';
 
-export function generateRandomUser(overrides = {}) {
+export function generateRandomUser(overrides: Partial<User> = {}) {
   const user = {
     login: `test${Math.random()}`,
     email: 'test@gmail.com',

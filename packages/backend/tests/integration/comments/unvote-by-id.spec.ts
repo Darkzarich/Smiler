@@ -54,7 +54,7 @@ describe('DELETE /comments/:id/vote', () => {
 
     const otherUser = await UserModel.create(generateRandomUser());
 
-    const comment = await CommentModel.create(
+    const otherUserComment = await CommentModel.create(
       generateRandomComment({
         author: otherUser.id,
       }),
@@ -62,7 +62,7 @@ describe('DELETE /comments/:id/vote', () => {
 
     const prevRate = await RateModel.create(
       generateRate({
-        target: comment._id,
+        target: otherUserComment._id,
         negative: true,
         targetModel: RateTargetModel.COMMENT,
       }),
@@ -73,10 +73,10 @@ describe('DELETE /comments/:id/vote', () => {
     });
 
     await request(global.app)
-      .delete(`/api/comments/${comment._id}/vote`)
+      .delete(`/api/comments/${otherUserComment._id}/vote`)
       .set('Cookie', sessionCookie);
 
-    const rate = await RateModel.findOne({ target: comment._id });
+    const rate = await RateModel.findOne({ target: otherUserComment._id });
 
     expect(rate).toBe(null);
   });
@@ -91,7 +91,7 @@ describe('DELETE /comments/:id/vote', () => {
 
       const otherUser = await UserModel.create(generateRandomUser());
 
-      const comment = await CommentModel.create(
+      const otherUserComment = await CommentModel.create(
         generateRandomComment({
           author: otherUser._id,
           rating: 1,
@@ -100,7 +100,7 @@ describe('DELETE /comments/:id/vote', () => {
 
       const prevRate = await RateModel.create(
         generateRate({
-          target: comment._id,
+          target: otherUserComment._id,
           negative: isNegative,
           targetModel: RateTargetModel.COMMENT,
         }),
@@ -111,16 +111,16 @@ describe('DELETE /comments/:id/vote', () => {
       });
 
       await request(global.app)
-        .delete(`/api/comments/${comment._id}/vote`)
+        .delete(`/api/comments/${otherUserComment._id}/vote`)
         .set('Cookie', sessionCookie);
 
-      const commentVotedFor = await CommentModel.findById(comment._id);
+      const commentVotedFor = await CommentModel.findById(otherUserComment._id);
 
       // the effect a vote had on the rating is reset
       expect(commentVotedFor!.rating).toBe(
         isNegative
-          ? comment.rating + COMMENT_RATE_VALUE
-          : comment.rating - COMMENT_RATE_VALUE,
+          ? otherUserComment.rating + COMMENT_RATE_VALUE
+          : otherUserComment.rating - COMMENT_RATE_VALUE,
       );
     },
   );
@@ -129,7 +129,7 @@ describe('DELETE /comments/:id/vote', () => {
     ['increase', true],
     ['decrease', false],
   ])(
-    "Should %s author's rating after after the comment is unrated",
+    "Should %s author's rating after the comment is unrated",
     async (_, isNegative) => {
       const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
@@ -139,7 +139,7 @@ describe('DELETE /comments/:id/vote', () => {
         }),
       );
 
-      const comment = await CommentModel.create(
+      const otherUserComment = await CommentModel.create(
         generateRandomComment({
           author: otherUser._id,
         }),
@@ -147,7 +147,7 @@ describe('DELETE /comments/:id/vote', () => {
 
       const prevRate = await RateModel.create(
         generateRate({
-          target: comment._id,
+          target: otherUserComment._id,
           negative: isNegative,
           targetModel: RateTargetModel.COMMENT,
         }),
@@ -158,7 +158,7 @@ describe('DELETE /comments/:id/vote', () => {
       });
 
       await request(global.app)
-        .delete(`/api/comments/${comment._id}/vote`)
+        .delete(`/api/comments/${otherUserComment._id}/vote`)
         .set('Cookie', sessionCookie);
 
       const commentVotedFor = await UserModel.findById(otherUser._id);
@@ -176,7 +176,7 @@ describe('DELETE /comments/:id/vote', () => {
 
     const otherUser = await UserModel.create(generateRandomUser());
 
-    const comment = await CommentModel.create(
+    const otherUserComment = await CommentModel.create(
       generateRandomComment({
         author: otherUser._id,
       }),
@@ -184,7 +184,7 @@ describe('DELETE /comments/:id/vote', () => {
 
     const prevRate = await RateModel.create(
       generateRate({
-        target: comment._id,
+        target: otherUserComment._id,
         negative: false,
         targetModel: RateTargetModel.COMMENT,
       }),
@@ -195,10 +195,12 @@ describe('DELETE /comments/:id/vote', () => {
     });
 
     const response = await request(global.app)
-      .delete(`/api/comments/${comment._id}/vote`)
+      .delete(`/api/comments/${otherUserComment._id}/vote`)
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(200);
-    expect(response.body.rating).toBe(-COMMENT_RATE_VALUE);
+    expect(response.body.rating).toBe(
+      otherUserComment.rating + -COMMENT_RATE_VALUE,
+    );
   });
 });

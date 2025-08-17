@@ -43,7 +43,7 @@ describe('GET /posts/categories/top-this-week', () => {
 
     await PostModel.create(
       generateRandomPost({
-        createdAt: subMilliseconds(startOfWeek(Date.now()), 1).toISOString(),
+        createdAt: subMilliseconds(startOfWeek(Date.now()), 1),
       }),
     );
 
@@ -86,7 +86,7 @@ describe('GET /posts/categories/top-this-week', () => {
             avatar: otherUser.avatar,
           },
           sections: post.sections,
-          commentCount: 0,
+          commentCount: post.commentCount,
           rating: post.rating,
           tags: post.tags,
           rated: { isRated: false, negative: false },
@@ -190,25 +190,33 @@ describe('GET /posts/categories/top-this-week', () => {
 
     expect(response.status).toBe(200);
     // Sorted by createdAt descending
-    expect(response.body.posts[0]).toMatchObject({
-      rated: {
-        isRated: true,
-        negative: false,
-      },
-    });
-    expect(response.body.posts[1]).toMatchObject({
-      rated: {
-        isRated: true,
-        negative: true,
-      },
-    });
+    expect(response.body.posts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          rated: {
+            isRated: true,
+            negative: true,
+          },
+        }),
+      ]),
+    );
+    expect(response.body.posts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          rated: {
+            isRated: true,
+            negative: false,
+          },
+        }),
+      ]),
+    );
   });
 
   it('Should sort posts by createdAt descending', async () => {
     const dates = [
-      subSeconds(new Date(), 2).toISOString(),
-      subSeconds(new Date(), 1).toISOString(),
-      new Date().toISOString(),
+      subSeconds(new Date(), 2),
+      subSeconds(new Date(), 1),
+      new Date(),
     ];
 
     await Promise.all([
@@ -234,8 +242,8 @@ describe('GET /posts/categories/top-this-week', () => {
     );
 
     expect(response.status).toBe(200);
-    expect(response.body.posts[0].createdAt).toBe(dates[2]);
-    expect(response.body.posts[1].createdAt).toBe(dates[1]);
-    expect(response.body.posts[2].createdAt).toBe(dates[0]);
+    expect(response.body.posts[0].createdAt).toBe(dates[2].toISOString());
+    expect(response.body.posts[1].createdAt).toBe(dates[1].toISOString());
+    expect(response.body.posts[2].createdAt).toBe(dates[0].toISOString());
   });
 });

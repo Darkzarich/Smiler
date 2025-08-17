@@ -6,8 +6,13 @@ import { CommentModel } from '@models/Comment';
 import {
   generateRandomPost,
   generateRandomComment,
+  generateRate,
 } from '@test-data-generators';
 import { ERRORS } from '@errors';
+import { Types } from 'mongoose';
+import { subMinutes } from 'date-fns';
+import { UserModel } from '@models/User';
+import { RateModel, RateTargetModel } from '@models/Rate';
 
 describe('DELETE /comments/:id', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -33,7 +38,7 @@ describe('DELETE /comments/:id', () => {
 
     const comment = await CommentModel.create(
       generateRandomComment({
-        author: '5d5467b4c17806706f3df347',
+        author: new Types.ObjectId('5d5467b4c17806706f3df347'),
       }),
     );
 
@@ -53,7 +58,7 @@ describe('DELETE /comments/:id', () => {
     const comment = await CommentModel.create(
       generateRandomComment({
         author: currentUser.id,
-        createdAt: Date.now() - COMMENT_TIME_TO_UPDATE - 1,
+        createdAt: subMinutes(Date.now(), COMMENT_TIME_TO_UPDATE - 1),
       }),
     );
 
@@ -67,95 +72,195 @@ describe('DELETE /comments/:id', () => {
     expect(response.status).toBe(403);
   });
 
-  it('Should set "deleted" flag to true if comment had replies before being deleted', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+  describe('Has no replies', () => {
+    it('Should remove comment from the database if it had no replies before being deleted', async () => {
+      const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const comment = await CommentModel.create(
-      generateRandomComment({
-        author: currentUser.id,
-        // random id
-        children: ['5d5467b4c17806706f3df347'],
-      }),
-    );
+      const comment = await CommentModel.create(
+        generateRandomComment({
+          author: currentUser.id,
+        }),
+      );
 
-    const response = await request(global.app)
-      .delete(`/api/comments/${comment.id}`)
-      .set('Cookie', sessionCookie);
+      const response = await request(global.app)
+        .delete(`/api/comments/${comment.id}`)
+        .set('Cookie', sessionCookie);
 
-    const updatedComment = await CommentModel.findById(comment.id).lean();
+      const updatedComment = await CommentModel.findById(comment.id).lean();
 
-    expect(updatedComment!.deleted).toBe(true);
-    expect(response.status).toBe(200);
+      expect(updatedComment).toBe(null);
+      expect(response.status).toBe(200);
+    });
+
+    it("Should remove comment from parent's children if it had a parent and no replies before being deleted", async () => {
+      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+
+      const parentComment = await CommentModel.create(
+        generateRandomComment({
+          author: currentUser.id,
+        }),
+      );
+
+      const comment = await CommentModel.create(
+        generateRandomComment({
+          author: currentUser.id,
+          parent: parentComment.id,
+        }),
+      );
+
+      parentComment.children.push(comment.id);
+      await parentComment.save();
+
+      const response = await request(global.app)
+        .delete(`/api/comments/${comment.id}`)
+        .set('Cookie', sessionCookie);
+
+      const updatedParentComment = await CommentModel.findById(
+        parentComment.id,
+      ).lean();
+
+      expect(updatedParentComment!.children).toEqual([]);
+      expect(response.status).toBe(200);
+    });
+
+    it('Should decrease post comments count if a comment of the post was deleted', async () => {
+      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+
+      const post = await PostModel.create(generateRandomPost());
+
+      const comment = await CommentModel.create(
+        generateRandomComment({
+          author: currentUser.id,
+          post: post.id,
+        }),
+      );
+
+      await request(global.app)
+        .delete(`/api/comments/${comment.id}`)
+        .set('Cookie', sessionCookie);
+
+      const updatedPost = await PostModel.findById(post.id).lean();
+
+      expect(updatedPost!.commentCount).toBe(post.commentCount - 1);
+    });
+
+    it('Should decrease user rating after the comment is deleted', async () => {
+      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+
+      const comment = await CommentModel.create(
+        generateRandomComment({
+          author: currentUser.id,
+        }),
+      );
+
+      const response = await request(global.app)
+        .delete(`/api/comments/${comment.id}`)
+        .set('Cookie', sessionCookie);
+
+      const updatedUser = await UserModel.findById(currentUser.id).lean();
+
+      expect(updatedUser!.rating).toBe(currentUser.rating - comment.rating);
+    });
+
+    it('Should delete all rates for the comment after the comment is deleted', async () => {
+      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+
+      const comment = await CommentModel.create(
+        generateRandomComment({
+          author: currentUser.id,
+        }),
+      );
+
+      await Promise.all([
+        RateModel.create(
+          generateRate({
+            target: comment._id,
+            negative: false,
+            targetModel: RateTargetModel.COMMENT,
+          }),
+        ),
+      ]);
+
+      await request(global.app)
+        .delete(`/api/comments/${comment.id}`)
+        .set('Cookie', sessionCookie);
+
+      const rates = await RateModel.find({ target: comment._id }).lean();
+
+      expect(rates.length).toBe(0);
+    });
   });
 
-  it('Should remove comment from the database if it had no replies before being deleted', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+  describe('Has replies', () => {
+    it('Should set "deleted" flag to true if comment had replies before being deleted', async () => {
+      const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const comment = await CommentModel.create(
-      generateRandomComment({
-        author: currentUser.id,
-      }),
-    );
+      const comment = await CommentModel.create(
+        generateRandomComment({
+          author: currentUser.id,
+          // random id
+          children: [new Types.ObjectId('5d5467b4c17806706f3df347')],
+        }),
+      );
 
-    const response = await request(global.app)
-      .delete(`/api/comments/${comment.id}`)
-      .set('Cookie', sessionCookie);
+      const response = await request(global.app)
+        .delete(`/api/comments/${comment.id}`)
+        .set('Cookie', sessionCookie);
 
-    const updatedComment = await CommentModel.findById(comment.id).lean();
+      const updatedComment = await CommentModel.findById(comment.id).lean();
 
-    expect(updatedComment).toBe(null);
-    expect(response.status).toBe(200);
-  });
+      expect(updatedComment!.deleted).toBe(true);
+      expect(response.status).toBe(200);
+    });
 
-  it("Should remove comment from parent's children if it had a parent and no replies before being deleted", async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    it('Should decrease user rating after the comment is deleted', async () => {
+      const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    const parentComment = await CommentModel.create(
-      generateRandomComment({
-        author: currentUser.id,
-      }),
-    );
+      const comment = await CommentModel.create(
+        generateRandomComment({
+          author: currentUser.id,
+          // random id
+          children: [new Types.ObjectId('5d5467b4c17806706f3df347')],
+        }),
+      );
 
-    const comment = await CommentModel.create(
-      generateRandomComment({
-        author: currentUser.id,
-        parent: parentComment.id,
-      }),
-    );
+      const response = await request(global.app)
+        .delete(`/api/comments/${comment.id}`)
+        .set('Cookie', sessionCookie);
 
-    parentComment.children.push(comment.id);
-    await parentComment.save();
+      const updatedUser = await UserModel.findById(currentUser.id).lean();
 
-    const response = await request(global.app)
-      .delete(`/api/comments/${comment.id}`)
-      .set('Cookie', sessionCookie);
+      expect(updatedUser!.rating).toBe(currentUser.rating - comment.rating);
+    });
 
-    const updatedParentComment = await CommentModel.findById(
-      parentComment.id,
-    ).lean();
+    it('Should delete all rates for the comment after the comment is deleted', async () => {
+      const { sessionCookie, currentUser } = await signUpRequest(global.app);
 
-    expect(updatedParentComment!.children).toEqual([]);
-    expect(response.status).toBe(200);
-  });
+      const comment = await CommentModel.create(
+        generateRandomComment({
+          author: currentUser.id,
+          // random id
+          children: [new Types.ObjectId('5d5467b4c17806706f3df347')],
+        }),
+      );
 
-  it('Should decrease post comments count if a comment of the post was deleted', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+      await Promise.all([
+        RateModel.create(
+          generateRate({
+            target: comment._id,
+            negative: false,
+            targetModel: RateTargetModel.COMMENT,
+          }),
+        ),
+      ]);
 
-    const post = await PostModel.create(generateRandomPost());
+      await request(global.app)
+        .delete(`/api/comments/${comment.id}`)
+        .set('Cookie', sessionCookie);
 
-    const comment = await CommentModel.create(
-      generateRandomComment({
-        author: currentUser.id,
-        post: post.id,
-      }),
-    );
+      const rates = await RateModel.find({ target: comment._id }).lean();
 
-    await request(global.app)
-      .delete(`/api/comments/${comment.id}`)
-      .set('Cookie', sessionCookie);
-
-    const updatedPost = await PostModel.findById(post.id).lean();
-
-    expect(updatedPost!.commentCount).toBe(post.commentCount - 1);
+      expect(rates.length).toBe(0);
+    });
   });
 });

@@ -61,8 +61,8 @@ describe('GET /posts/categories/all', () => {
             avatar: otherUser.avatar,
           },
           sections: post.sections,
-          commentCount: 0,
-          rating: 0,
+          commentCount: post.commentCount,
+          rating: post.rating,
           tags: post.tags,
           rated: { isRated: false, negative: false },
           createdAt: post.createdAt.toISOString(),
@@ -164,18 +164,26 @@ describe('GET /posts/categories/all', () => {
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(200);
-    expect(response.body.posts[0]).toMatchObject({
-      rated: {
-        isRated: true,
-        negative: true,
-      },
-    });
-    expect(response.body.posts[1]).toMatchObject({
-      rated: {
-        isRated: true,
-        negative: false,
-      },
-    });
+    expect(response.body.posts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          rated: {
+            isRated: true,
+            negative: true,
+          },
+        }),
+      ]),
+    );
+    expect(response.body.posts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          rated: {
+            isRated: true,
+            negative: false,
+          },
+        }),
+      ]),
+    );
   });
 
   it('Should sort posts by rating descending', async () => {

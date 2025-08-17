@@ -44,7 +44,11 @@ describe('GET /posts/categories/blowing', () => {
   it('Should return empty list of posts if are posts but do not have enough rating', async () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
-    await PostModel.create(generateRandomPost());
+    await PostModel.create(
+      generateRandomPost({
+        rating: 0,
+      }),
+    );
 
     const response = await request(global.app)
       .get('/api/posts/categories/blowing')
@@ -109,7 +113,7 @@ describe('GET /posts/categories/blowing', () => {
             avatar: otherUser.avatar,
           },
           sections: post.sections,
-          commentCount: 0,
+          commentCount: post.commentCount,
           rating: post.rating,
           tags: post.tags,
           rated: { isRated: false, negative: false },
@@ -216,18 +220,26 @@ describe('GET /posts/categories/blowing', () => {
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(200);
-    expect(response.body.posts[0]).toMatchObject({
-      rated: {
-        isRated: true,
-        negative: true,
-      },
-    });
-    expect(response.body.posts[1]).toMatchObject({
-      rated: {
-        isRated: true,
-        negative: false,
-      },
-    });
+    expect(response.body.posts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          rated: {
+            isRated: true,
+            negative: true,
+          },
+        }),
+      ]),
+    );
+    expect(response.body.posts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          rated: {
+            isRated: true,
+            negative: false,
+          },
+        }),
+      ]),
+    );
   });
 
   it('Should sort posts by rating descending', async () => {

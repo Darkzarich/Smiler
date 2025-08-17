@@ -43,7 +43,7 @@ describe('GET /posts/categories/today', () => {
 
     await PostModel.create(
       generateRandomPost({
-        createdAt: subDays(new Date(), 2).toISOString(),
+        createdAt: subDays(new Date(), 2),
       }),
     );
 
@@ -86,7 +86,7 @@ describe('GET /posts/categories/today', () => {
             avatar: otherUser.avatar,
           },
           sections: post.sections,
-          commentCount: 0,
+          commentCount: post.commentCount,
           rating: post.rating,
           tags: post.tags,
           rated: { isRated: false, negative: false },
@@ -189,25 +189,33 @@ describe('GET /posts/categories/today', () => {
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(200);
-    expect(response.body.posts[0]).toMatchObject({
-      rated: {
-        isRated: true,
-        negative: true,
-      },
-    });
-    expect(response.body.posts[1]).toMatchObject({
-      rated: {
-        isRated: true,
-        negative: false,
-      },
-    });
+    expect(response.body.posts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          rated: {
+            isRated: true,
+            negative: true,
+          },
+        }),
+      ]),
+    );
+    expect(response.body.posts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          rated: {
+            isRated: true,
+            negative: false,
+          },
+        }),
+      ]),
+    );
   });
 
   it('Should sort posts by rating descending', async () => {
     const dates = [
-      subSeconds(new Date(), 1).toISOString(),
-      subSeconds(new Date(), 2).toISOString(),
-      subSeconds(new Date(), 3).toISOString(),
+      subSeconds(new Date(), 1),
+      subSeconds(new Date(), 2),
+      subSeconds(new Date(), 3),
     ];
 
     await Promise.all([

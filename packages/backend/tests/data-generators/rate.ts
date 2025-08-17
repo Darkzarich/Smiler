@@ -1,7 +1,7 @@
 import { defaultsDeep } from 'lodash';
-import { RateTargetModel } from '@models/Rate';
+import { Rate, RateTargetModel } from '@models/Rate';
 
-export function generateRate(overrides = {}) {
+export function generateRate(overrides: Partial<Rate> = {}) {
   const rate = {
     negative: false,
     target: '5d5467b4c17806706f3df347',

@@ -1,6 +1,7 @@
+import { Post } from '@models/Post';
 import { defaults } from 'lodash';
 
-export function generateRandomPost(overrides = {}) {
+export function generateRandomPost(overrides: Partial<Post> = {}) {
   const post = {
     title: 'My post title',
     slug: `my-post-title-d2k5g8${Math.random().toString(36)}`,
@@ -25,8 +26,8 @@ export function generateRandomPost(overrides = {}) {
         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       },
     ],
-    commentCount: 0,
-    rating: 0,
+    commentCount: Math.floor(Math.random() * 100),
+    rating: Math.floor(Math.random() * 100),
   };
 
   return defaults(overrides, post);

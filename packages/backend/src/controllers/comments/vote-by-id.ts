@@ -22,7 +22,7 @@ export async function voteById(
 ) {
   const { userId } = req.session;
   const { id: commentId } = req.params;
-  const { negative } = req.body;
+  const { negative: shouldRateNegative } = req.body;
 
   const targetComment = await CommentModel.findOne({
     _id: commentId,
@@ -45,36 +45,61 @@ export async function voteById(
     throw new ForbiddenError(ERRORS.USER_NOT_FOUND);
   }
 
-  const ratedForCurrentUser = currentUser.isRated(targetComment._id.toString());
+  const {
+    rated: rateDoc,
+    negative: currentRate,
+    result: isRated,
+  } = currentUser.isRated(targetComment._id.toString());
 
-  if (ratedForCurrentUser.result) {
+  // If is already rated and rated for the same direction
+  if (isRated && currentRate === shouldRateNegative) {
     throw new ForbiddenError(ERRORS.COMMENT_CANT_RATE_ALREADY_RATED);
   }
 
-  const rateValue = negative ? -COMMENT_RATE_VALUE : COMMENT_RATE_VALUE;
-
-  const newRate = await RateModel.create({
-    target: targetComment._id,
-    targetModel: RateTargetModel.COMMENT,
-    negative,
-  });
+  const directionValue = shouldRateNegative
+    ? -COMMENT_RATE_VALUE
+    : COMMENT_RATE_VALUE;
+  // If is already rated that rate value to the other direction should be doubled
+  const rateValue = isRated ? directionValue * 2 : directionValue;
 
   // TODO: Use transaction here
-  const [updatedComment] = await Promise.all([
+  const promises: Promise<any>[] = [
     CommentModel.findByIdAndUpdate(
       targetComment._id,
       { $inc: { rating: rateValue } },
       { new: true, lean: true },
     ),
     UserModel.updateOne(
-      { _id: currentUser.id },
-      { $push: { rates: newRate.id } },
-    ),
-    UserModel.updateOne(
       { _id: targetComment.author },
       { $inc: { rating: rateValue } },
     ),
-  ]);
+  ];
 
-  sendSuccess(res, updatedComment);
+  if (isRated) {
+    promises.push(
+      RateModel.updateOne(
+        { _id: rateDoc!._id },
+        {
+          $set: { negative: shouldRateNegative },
+        },
+      ),
+    );
+  } else {
+    const newRate = await RateModel.create({
+      target: targetComment._id,
+      targetModel: RateTargetModel.COMMENT,
+      negative: shouldRateNegative,
+    });
+
+    promises.push(
+      UserModel.updateOne(
+        { _id: currentUser.id },
+        { $push: { rates: newRate.id } },
+      ),
+    );
+  }
+
+  const [updatedComment] = await Promise.all(promises);
+
+  sendSuccess(res, updatedComment! as Comment);
 }
