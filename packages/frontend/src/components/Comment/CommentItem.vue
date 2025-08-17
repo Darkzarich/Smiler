@@ -23,7 +23,7 @@
                 ? 'comment-item__upvote-btn--active'
                 : ''
             "
-            @click="handleUpvote()"
+            @click="upvote()"
           >
             <IconPlus />
           </div>
@@ -36,7 +36,7 @@
                 ? 'comment-item__downvote-btn--active'
                 : ''
             "
-            @click="handleDownvote()"
+            @click="downvote()"
           >
             <IconMinus />
           </div>
@@ -121,7 +121,7 @@
               @close="toggleReply"
             />
 
-            <template v-else-if="level < consts.COMMENTS_NESTED_LIMIT">
+            <template v-else-if="level < COMMENTS_NESTED_LIMIT">
               <div
                 :class="{
                   'comment-item__reply-toggler--disabled': !userStore.user,
@@ -159,12 +159,17 @@
 </template>
 
 <script setup lang="ts">
+import { cloneDeep } from 'lodash-es';
 import { ref } from 'vue';
 import CommentChildExpander from './CommentChildExpander.vue';
 import CommentForm from './CommentForm.vue';
 import type { Comment } from './types';
 import { api } from '@/api';
-import * as consts from '@/const';
+import {
+  COMMENT_RATE_VALUE,
+  COMMENT_AUTO_HIDE_LEVEL,
+  COMMENTS_NESTED_LIMIT,
+} from '@/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { checkCanEditComment } from '@/utils/check-can-edit-comment';
@@ -199,7 +204,7 @@ const comment = ref(props.comment);
 
 const isRequesting = ref(false);
 
-const isChildrenExpanded = ref(props.level <= consts.COMMENT_AUTO_HIDE_LEVEL);
+const isChildrenExpanded = ref(props.level <= COMMENT_AUTO_HIDE_LEVEL);
 
 // replyBody and editBody potentially can be optimized by using a single one of them
 
@@ -325,118 +330,124 @@ const handleRemoveComment = (id: string) => {
   comment.value.children.splice(commentIndex, 1);
 };
 
-const handleUpvote = async () => {
-  // TODO: Maybe if a user clicks downvote after upvote
-  // it should fully apply that downvote and not through intermediate state
-
-  if (isRequesting.value) {
-    return;
-  }
-
+const handleRemoveVote = async () => {
   isRequesting.value = true;
 
-  if (!comment.value.rated.isRated) {
+  const rateValue = comment.value.rated.negative
+    ? COMMENT_RATE_VALUE
+    : -COMMENT_RATE_VALUE;
+
+  const prevCommentState = cloneDeep(comment.value);
+
+  try {
     // Optimistic update
-    try {
-      comment.value.rated.isRated = true;
-      comment.value.rated.negative = false;
-      comment.value.rating = comment.value.rating + consts.COMMENT_RATE_VALUE;
+    comment.value = {
+      ...comment.value,
+      rated: {
+        negative: comment.value.rated.negative,
+        isRated: false,
+      },
+      rating: comment.value.rating + rateValue,
+    };
 
-      const data = await api.comments.updateRateById(comment.value.id, {
-        negative: false,
-      });
+    const data = await api.comments.removeRate(comment.value.id);
 
-      comment.value = {
-        ...comment.value,
-        rating: data.rating,
-        deleted: data.deleted,
-      };
-    } catch {
-      comment.value.rated.isRated = false;
-      comment.value.rating = comment.value.rating - consts.COMMENT_RATE_VALUE;
-    } finally {
-      isRequesting.value = false;
-    }
-
-    return;
-  }
-
-  if (comment.value.rated.negative) {
-    // Optimistic update
-    try {
-      comment.value.rated.isRated = false;
-      comment.value.rating = comment.value.rating + consts.COMMENT_RATE_VALUE;
-
-      const data = await api.comments.removeRate(comment.value.id);
-
-      comment.value = {
-        ...comment.value,
-        rating: data.rating,
-        deleted: data.deleted,
-      };
-    } catch {
-      comment.value.rated.isRated = true;
-      comment.value.rating = comment.value.rating - consts.COMMENT_RATE_VALUE;
-    } finally {
-      isRequesting.value = false;
-    }
-
-    return;
+    comment.value = {
+      ...comment.value,
+      rating: data.rating,
+    };
+  } catch {
+    comment.value = prevCommentState;
+  } finally {
+    isRequesting.value = false;
   }
 };
 
-const handleDownvote = async () => {
+const upvote = async () => {
   if (isRequesting.value) {
     return;
   }
 
+  if (comment.value.rated.isRated && !comment.value.rated.negative) {
+    return handleRemoveVote();
+  }
+
   isRequesting.value = true;
 
-  if (!comment.value.rated.isRated) {
-    try {
-      comment.value.rated.isRated = true;
-      comment.value.rated.negative = true;
-      comment.value.rating = comment.value.rating - consts.COMMENT_RATE_VALUE;
+  const rateValue = comment.value.rated.isRated
+    ? COMMENT_RATE_VALUE * 2
+    : COMMENT_RATE_VALUE;
 
-      const data = await api.comments.updateRateById(comment.value.id, {
-        negative: true,
-      });
+  const prevCommentState = cloneDeep(comment.value);
 
-      comment.value = {
-        ...comment.value,
-        rating: data.rating,
-        deleted: data.deleted,
-      };
-    } catch {
-      comment.value.rated.isRated = false;
-      comment.value.rating = comment.value.rating + consts.COMMENT_RATE_VALUE;
-    } finally {
-      isRequesting.value = false;
-    }
+  try {
+    // Optimistic update
+    comment.value = {
+      ...comment.value,
+      rated: {
+        ...comment.value.rated,
+        isRated: true,
+        negative: false,
+      },
+      rating: comment.value.rating + rateValue,
+    };
 
+    const data = await api.comments.updateRateById(comment.value.id, {
+      negative: false,
+    });
+
+    comment.value = {
+      ...comment.value,
+      rating: data.rating,
+    };
+  } catch {
+    comment.value = prevCommentState;
+  } finally {
+    isRequesting.value = false;
+  }
+};
+
+const downvote = async () => {
+  if (isRequesting.value) {
     return;
   }
 
-  if (!comment.value.rated.negative) {
-    try {
-      comment.value.rated.isRated = false;
-      comment.value.rating = comment.value.rating - consts.COMMENT_RATE_VALUE;
+  if (comment.value.rated.isRated && comment.value.rated.negative) {
+    return handleRemoveVote();
+  }
 
-      const data = await api.comments.removeRate(comment.value.id);
+  isRequesting.value = true;
 
-      comment.value = {
-        ...comment.value,
-        rating: data.rating,
-        deleted: data.deleted,
-      };
-    } catch {
-      comment.value.rated.isRated = true;
-      comment.value.rating = comment.value.rating + consts.COMMENT_RATE_VALUE;
-    } finally {
-      isRequesting.value = false;
-    }
+  const rateValue = comment.value.rated.isRated
+    ? COMMENT_RATE_VALUE * 2
+    : COMMENT_RATE_VALUE;
 
-    return;
+  const prevCommentState = cloneDeep(comment.value);
+
+  try {
+    // Optimistic update
+    comment.value = {
+      ...comment.value,
+      rated: {
+        ...comment.value.rated,
+        isRated: true,
+        negative: true,
+      },
+      rating: comment.value.rating - rateValue,
+    };
+
+    const data = await api.comments.updateRateById(comment.value.id, {
+      negative: true,
+    });
+
+    comment.value = {
+      ...comment.value,
+      rating: data.rating,
+    };
+  } catch {
+    comment.value = prevCommentState;
+  } finally {
+    isRequesting.value = false;
   }
 };
 </script>
