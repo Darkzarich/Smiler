@@ -448,14 +448,13 @@ test.describe('Post votes', () => {
     await PostsPage.goto(PostsPage.urls.today);
     await Post.getTitleById(post1.id).isVisible();
 
-    const upvoteResponse = await Api.routes.posts.updateRateById.waitForRequest(
-      {
+    const downvoteResponse =
+      await Api.routes.posts.updateRateById.waitForRequest({
         preRequestAction: Post.downvotePostById.bind(Post, post1.id),
-      },
-    );
+      });
 
-    expect(upvoteResponse.url()).toContain(post1.id);
-    expect(upvoteResponse.postDataJSON()).toEqual({
+    expect(downvoteResponse.url()).toContain(post1.id);
+    expect(downvoteResponse.postDataJSON()).toEqual({
       negative: true,
     });
     expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(true);

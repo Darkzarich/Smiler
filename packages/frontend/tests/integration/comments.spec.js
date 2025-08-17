@@ -279,7 +279,7 @@ test.describe('Votes', () => {
       body: {
         ...notRatedComment,
         // Decreases more than the default rate to test using the response data
-        rating: notRatedComment.rating - 2,
+        rating: notRatedComment.rating - 10,
         rated: {
           isRated: true,
           negative: true,
@@ -307,7 +307,113 @@ test.describe('Votes', () => {
 
     await expect(
       Comments.getCommentRatingById(notRatedComment.id),
-    ).toContainText(String(notRatedComment.rating - 2));
+    ).toContainText(String(notRatedComment.rating - 10));
+  });
+
+  test('Overrides a downvote with an upvote', async ({
+    SinglePostPage,
+    Comments,
+    Api,
+  }) => {
+    Api.routes.comments.getComments.mock({
+      body: {
+        pages: 1,
+        comments: [
+          {
+            ...comment,
+            rated: {
+              isRated: true,
+              negative: true,
+            },
+          },
+        ],
+        hasNextPage: false,
+        total: 1,
+      },
+    });
+
+    Api.routes.comments.updateRate.mock({
+      status: 200,
+      body: {
+        ...comment,
+        // Increases more than the default rate to test using the response data
+        rating: comment.rating + 10,
+        rated: {
+          isRated: true,
+          negative: false,
+        },
+      },
+    });
+
+    await SinglePostPage.goto(post.slug);
+
+    const upvoteResponse = await Api.routes.comments.updateRate.waitForRequest({
+      preRequestAction: Comments.upvoteCommentById.bind(Comments, comment.id),
+    });
+
+    expect(upvoteResponse.url()).toContain(comment.id);
+    expect(upvoteResponse.postDataJSON()).toEqual({
+      negative: false,
+    });
+    expect(await Comments.getIsCommentByIdUpvoted(comment.id)).toBe(true);
+    await expect(Comments.getCommentRatingById(comment.id)).toContainText(
+      String(comment.rating + 10),
+    );
+  });
+
+  test('Overrides an upvote with a downvote', async ({
+    SinglePostPage,
+    Comments,
+    Api,
+  }) => {
+    Api.routes.comments.getComments.mock({
+      body: {
+        pages: 1,
+        hasNextPage: false,
+        total: 1,
+        comments: [
+          {
+            ...comment,
+            rated: {
+              isRated: true,
+              negative: false,
+            },
+          },
+        ],
+      },
+    });
+
+    Api.routes.comments.updateRate.mock({
+      status: 200,
+      body: {
+        ...comment,
+        // Increases more than the default rate to test using the response data
+        rating: comment.rating + 10,
+        rated: {
+          isRated: true,
+          negative: true,
+        },
+      },
+    });
+
+    await SinglePostPage.goto(post.slug);
+
+    const downvoteResponse =
+      await Api.routes.comments.updateRate.waitForRequest({
+        preRequestAction: Comments.downvoteCommentById.bind(
+          Comments,
+          comment.id,
+        ),
+      });
+
+    expect(downvoteResponse.url()).toContain(comment.id);
+    expect(downvoteResponse.postDataJSON()).toEqual({
+      negative: true,
+    });
+    expect(await Comments.getIsCommentByIdDownvoted(comment.id)).toBe(true);
+    await expect(Comments.getCommentRatingById(comment.id)).toContainText(
+      String(comment.rating + 10),
+    );
   });
 
   test('Removes a vote from a comment if it was upvoted before', async ({
@@ -336,7 +442,7 @@ test.describe('Votes', () => {
       body: {
         ...ratedComment,
         // Decreases more than the default rate to test using the response data
-        rating: ratedComment.rating - 2,
+        rating: ratedComment.rating - 10,
         rated: {
           isRated: false,
           negative: false,
@@ -348,17 +454,18 @@ test.describe('Votes', () => {
 
     expect(await Comments.getIsCommentByIdUpvoted(ratedComment.id)).toBe(true);
 
-    await Api.routes.comments.removeRate.waitForRequest({
-      preRequestAction: Comments.downvoteCommentById.bind(
-        Comments,
-        ratedComment.id,
-      ),
-    });
+    const removeUpvoteResponse =
+      await Api.routes.comments.removeRate.waitForRequest({
+        preRequestAction: Comments.upvoteCommentById.bind(
+          Comments,
+          ratedComment.id,
+        ),
+      });
 
+    expect(removeUpvoteResponse.url()).toContain(ratedComment.id);
     expect(await Comments.getIsCommentByIdUpvoted(ratedComment.id)).toBe(false);
-
     await expect(Comments.getCommentRatingById(ratedComment.id)).toContainText(
-      String(ratedComment.rating - 2),
+      String(ratedComment.rating - 10),
     );
   });
 
@@ -387,8 +494,8 @@ test.describe('Votes', () => {
       status: 200,
       body: {
         ...downvotedComment,
-        // Increases more than the default rate to test using the response data
-        rating: downvotedComment.rating + 2,
+        // Decreases more than the default rate to test using the response data
+        rating: downvotedComment.rating + 10,
         rated: {
           isRated: false,
           negative: false,
@@ -402,20 +509,21 @@ test.describe('Votes', () => {
       true,
     );
 
-    await Api.routes.comments.removeRate.waitForRequest({
-      preRequestAction: Comments.upvoteCommentById.bind(
-        Comments,
-        downvotedComment.id,
-      ),
-    });
+    const removeDownvoteResponse =
+      await Api.routes.comments.removeRate.waitForRequest({
+        preRequestAction: Comments.downvoteCommentById.bind(
+          Comments,
+          downvotedComment.id,
+        ),
+      });
 
-    expect(await Comments.getIsCommentByIdDownvoted(downvotedComment.id)).toBe(
+    expect(removeDownvoteResponse.url()).toContain(downvotedComment.id);
+    expect(await Comments.getIsCommentByIdUpvoted(downvotedComment.id)).toBe(
       false,
     );
-
     await expect(
       Comments.getCommentRatingById(downvotedComment.id),
-    ).toContainText(String(downvotedComment.rating + 2));
+    ).toContainText(String(downvotedComment.rating + 10));
   });
 });
 
