@@ -21,7 +21,7 @@ export async function unvoteById(
 
   const targetComment = await CommentModel.findOne({
     _id: commentId,
-    deleted: false,
+    deleted: { $ne: true },
   })
     .select('author')
     .lean();

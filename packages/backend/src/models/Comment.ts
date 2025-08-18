@@ -25,7 +25,7 @@ export type CommentDocument = DocumentType<Comment>;
 })
 @plugin(mongooseAutoPopulate)
 export class Comment {
-  @prop({ default: false })
+  @prop()
   public deleted!: boolean;
 
   @prop({ required: true })

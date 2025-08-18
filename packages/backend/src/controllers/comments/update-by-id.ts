@@ -31,7 +31,7 @@ export async function updateById(
 
   const comment = await CommentModel.findOne({
     _id: id,
-    deleted: false,
+    deleted: { $ne: true },
   }).lean();
 
   if (!comment) {
