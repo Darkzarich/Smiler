@@ -12,6 +12,8 @@
         role="button"
         tabindex="0"
         @click="upvote(post.id)"
+        @keydown.enter="upvote(post.id)"
+        @keydown.space="upvote(post.id)"
       >
         <IconPlus />
       </div>
@@ -31,6 +33,8 @@
         role="button"
         tabindex="0"
         @click="downvote(post.id)"
+        @keydown.enter="downvote(post.id)"
+        @keydown.space="downvote(post.id)"
       >
         <IconMinus />
       </div>
@@ -73,6 +77,8 @@
           :data-testid="`post-${post.id}-tag-${tag}`"
           class="post__tags-item"
           @click.prevent.stop="openContextMenu($event, tag)"
+          @keydown.enter.prevent.stop="openContextMenu($event, tag)"
+          @keydown.space.prevent.stop="openContextMenu($event, tag)"
         >
           {{ tag }}
         </button>
@@ -375,8 +381,6 @@ const upvote = async (id: string) => {
   } finally {
     isRequesting.value = false;
   }
-
-  return;
 };
 
 const downvote = async (id: string) => {
@@ -422,8 +426,6 @@ const downvote = async (id: string) => {
   } finally {
     isRequesting.value = false;
   }
-
-  return;
 };
 
 const deletePost = async (id: string) => {
@@ -436,12 +438,22 @@ const deletePost = async (id: string) => {
   router.push({ name: 'Home' });
 };
 
-const openContextMenu = (ev: MouseEvent, tag: string) => {
+const openContextMenu = (ev: MouseEvent | KeyboardEvent, tag: string) => {
   if (!contextMenuData.show) {
     contextMenuData.show = true;
     contextMenuData.target = tag;
-    contextMenuData.x = ev.layerX;
-    contextMenuData.y = ev.layerY;
+
+    if ('clientX' in ev) {
+      // MouseEvent
+      contextMenuData.x = ev.clientX;
+      contextMenuData.y = ev.clientY;
+    } else {
+      // KeyboardEvent - they the target element position
+      const target = ev.target as HTMLElement;
+      const rect = target.getBoundingClientRect();
+      contextMenuData.x = rect.left;
+      contextMenuData.y = rect.bottom;
+    }
   }
 };
 
@@ -465,6 +477,9 @@ const handleContextMenuAction = (action: string) => {
       return handleUnfollowTag(target);
     case 'search':
       return searchByTag(target);
+    default:
+      // Handle unexpected action
+      break;
   }
 };
 
