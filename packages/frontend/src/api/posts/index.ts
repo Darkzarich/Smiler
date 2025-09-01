@@ -52,9 +52,9 @@ export default {
       formData,
     );
   },
-  getPostBySlug(slug: string) {
+  getPostBySlug(params: postTypes.GetPostBySlugRequest) {
     return apiClient.get<postTypes.GetPostBySlugResponse>(
-      `${CONTROLLER_URL}/${slug}`,
+      `${CONTROLLER_URL}/${params.slug}`,
     );
   },
   updatePostById(id: string, data: postTypes.UpdatePostByIdRequest) {
@@ -63,8 +63,8 @@ export default {
       data,
     );
   },
-  deletePostById(id: string) {
-    return apiClient.delete(`${CONTROLLER_URL}/${id}`, {});
+  deletePostById(params: postTypes.DeletePostByIdRequest) {
+    return apiClient.delete(`${CONTROLLER_URL}/${params.id}`, {});
   },
   updateRateById(id: string, data: postTypes.UpdateRateByIdRequest) {
     return apiClient.put<postTypes.UpdateRateByIdResponse>(

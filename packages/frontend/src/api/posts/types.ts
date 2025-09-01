@@ -31,13 +31,13 @@ export type PostSection =
   | PostVideoSection
   | PostTextSection;
 
-export interface PostAuthor {
+interface PostAuthor {
   id: string;
   login: string;
   avatar: string;
 }
 
-export interface PostRate {
+interface PostRate {
   isRated: boolean;
   negative?: boolean;
 }
@@ -69,7 +69,7 @@ export interface PostsSearchResponse extends PaginationResponse {
   posts: Post[];
 }
 
-export interface GetCommonListResponse extends PaginationResponse {
+interface GetCommonListResponse extends PaginationResponse {
   posts: Post[];
 }
 

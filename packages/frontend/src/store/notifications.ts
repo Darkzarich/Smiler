@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-export enum NotificationTheme {
+enum NotificationTheme {
   Info = 'info',
   Error = 'error',
 }

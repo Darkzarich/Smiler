@@ -77,7 +77,9 @@ onBeforeMount(async () => {
   // TODO: ??? was that the only way?
   if (route.meta.mode === 'edit') {
     try {
-      const data = await api.posts.getPostBySlug(route.params.slug as string);
+      const data = await api.posts.getPostBySlug({
+        slug: route.params.slug as string,
+      });
 
       handleSetPost(data);
     } catch {

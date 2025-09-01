@@ -429,7 +429,9 @@ const downvote = async (id: string) => {
 };
 
 const deletePost = async (id: string) => {
-  await api.posts.deletePostById(id);
+  await api.posts.deletePostById({
+    id,
+  });
 
   notificationsStore.showInfoNotification({
     message: 'The post has been successfully deleted',

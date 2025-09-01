@@ -115,9 +115,9 @@ const fetchMoreComments = async () => {
 
 const fetchPostBySlug = async () => {
   try {
-    const fetchedPost = await api.posts.getPostBySlug(
-      route.params.slug as string,
-    );
+    const fetchedPost = await api.posts.getPostBySlug({
+      slug: route.params.slug as string,
+    });
 
     post.value = fetchedPost;
 

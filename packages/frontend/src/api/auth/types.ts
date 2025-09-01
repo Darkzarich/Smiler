@@ -1,4 +1,4 @@
-export interface CurrentUser {
+interface CurrentUser {
   isAuth: boolean;
   id: string;
   email: string;

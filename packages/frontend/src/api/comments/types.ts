@@ -1,12 +1,12 @@
 import type { PaginationRequest, PaginationResponse } from '../types';
 
-export interface CommentAuthor {
+interface CommentAuthor {
   id: string;
   login: string;
   avatar: string;
 }
 
-export interface CommentRate {
+interface CommentRate {
   isRated: boolean;
   negative?: boolean;
 }
