@@ -9,16 +9,12 @@
     "**/playwright-report",
     "package.json",
     "package-lock.json",
-    "server/logs/**"
+    "pnpm-lock.yaml",
+    "patches/**",
+    "server/logs/**",
+    "packages/backend/logs/**"
   ],
-  "dictionaries": [
-    "node",
-    "html",
-    "bash",
-    "css",
-    "docker",
-    "vue"
-  ],
+  "dictionaries": ["node", "html", "bash", "css", "docker", "vue"],
   "words": [
     "9gag",
     "autopopulate",
