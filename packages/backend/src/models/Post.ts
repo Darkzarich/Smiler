@@ -26,13 +26,13 @@ export interface PostPictureSection {
   isFile?: boolean;
 }
 
-export interface PostVideoSection {
+interface PostVideoSection {
   type: POST_SECTION_TYPES.VIDEO;
   hash: string;
   url: string;
 }
 
-export interface PostTextSection {
+interface PostTextSection {
   type: POST_SECTION_TYPES.TEXT;
   content: string;
   hash: string;
