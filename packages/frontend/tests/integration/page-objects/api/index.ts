@@ -1,6 +1,11 @@
+import { BrowserContext, Page } from '@playwright/test';
 import routes from './routes';
 
 export default class Api {
+  context: BrowserContext | undefined;
+  page: Page | undefined;
+  routes: typeof routes;
+
   /**
    * @param {import('@playwright/test').BrowserContext} context
    * @param {import('@playwright/test').Page} page

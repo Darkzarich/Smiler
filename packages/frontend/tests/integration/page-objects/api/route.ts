@@ -1,24 +1,27 @@
+import type { Page, BrowserContext } from '@playwright/test';
+
+export enum Method {
+  GET = 'GET',
+  POST = 'POST',
+  DELETE = 'DELETE',
+  PUT = 'PUT',
+}
+
 export default class Route {
-  /**
-   *
-   * @param {String} url
-   * @param {'GET'|'POST'|'DELETE'|'PUT'} [method]
-   */
-  constructor(url = '', method = 'GET') {
+  url: string;
+  method: Method;
+  context: BrowserContext | undefined;
+  page: Page | undefined;
+
+  constructor(url = '', method = Method.GET) {
     this.url = url;
     this.method = method;
   }
 
-  /**
-   * @param {import('@playwright/test').BrowserContext} context
-   */
   setContext(context) {
     this.context = context;
   }
 
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
   setPage(page) {
     this.page = page;
   }
@@ -45,12 +48,13 @@ export default class Route {
     return new RegExp(`${this.getPreparedUrl()}(\\?.*)?$`, 'm');
   }
 
-  /**
-   * @param {Object} [options]
-   * @param {Object} [options.body]
-   * @param {Number} [options.status]
-   */
-  async mock({ body = undefined, status = 200 } = {}) {
+  async mock({
+    body = undefined,
+    status = 200,
+  }: {
+    body: any;
+    status: number;
+  }) {
     if (!this.context) {
       throw new Error('Context is not set');
     }
@@ -72,15 +76,25 @@ export default class Route {
   /**
    * Wait for the request to be fulfilled.
    *
-   * @param {Object} [options]
-   * @param {Function} [options.preRequestAction] - An optional function to be executed
+   * @param options
+   * @param options.preRequestAction - An optional function to be executed
    * before waiting for the request.
-   * @param {import('@playwright/test').Page} [options.page] - Some tests open another tab and then
+   * @param options.page - Some tests open another tab and then
    * the context set in the init will not work. This option allows to provide a page
    * instead of this.page
    */
-  async waitForRequest({ preRequestAction = () => undefined, page } = {}) {
+  async waitForRequest({
+    preRequestAction = () => undefined,
+    page,
+  }: {
+    preRequestAction?: () => void;
+    page?: Page;
+  }) {
     const currentPage = page || this.page;
+
+    if (!currentPage) {
+      throw new Error('Page is not set');
+    }
 
     const request = currentPage.waitForRequest(
       (res) =>
@@ -98,6 +112,10 @@ export default class Route {
    */
   watchIfRequestWasCalled() {
     let wasRequestSent = false;
+
+    if (!this.page) {
+      throw new Error('Page is not set');
+    }
 
     this.page.on('request', (req) => {
       if (req.url().includes(`api${this.url}`)) {
