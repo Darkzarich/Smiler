@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "description": "Smiler project monorepository.",
   "packageManager": "pnpm@8.6.0",
+  "engines": {
+    "node": ">=v20.16.0",
+    "pnpm": ">=8.6.0"
+  },
   "scripts": {
     "dev": "concurrently --kill-others \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
     "front:build": "pnpm --filter \"frontend\" build",
@@ -20,9 +24,9 @@
   },
   "homepage": "https://github.com/Darkzarich/Smiler#readme",
   "devDependencies": {
-    "concurrently": "^7.6.0",
-    "cspell": "^8.8.1",
-    "knip": "^5.41.1"
+    "concurrently": "^9.2.1",
+    "cspell": "^8.19.4",
+    "knip": "^5.63.0"
   },
   "pnpm": {
     "patchedDependencies": {
