@@ -13,7 +13,7 @@ interface CommentRate {
 
 export interface Comment {
   id: string;
-  parent: string; // parent comment id
+  parent?: string; // parent comment id
   author: CommentAuthor;
   body: string;
   children: Comment[];

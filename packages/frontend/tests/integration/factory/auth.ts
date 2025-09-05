@@ -1,15 +1,18 @@
 import { faker } from '@faker-js/faker';
-import defaultsDeep from 'lodash/defaultsDeep';
+import defaultsDeep from 'lodash-es/defaultsDeep';
+import { authTypes } from '@/api/auth';
 
 /**
  * Factory function to create an authentication fixture with optional overrides.
  *
- * @param {object} [overrides] - Object containing properties to override in the new profile object.
+ * @param overrides - Object containing properties to override in the new profile object.
  * Defaults to `false`.
- * @returns {object} The newly created authentication fixture.
+ * @returns The newly created authentication fixture.
  */
-export default function createRandomAuth(overrides = {}) {
-  const auth = overrides.isAuth
+export default function createRandomAuth(
+  overrides: Partial<authTypes.CurrentUserResponse> = {},
+): authTypes.CurrentUserResponse {
+  const auth: Partial<authTypes.CurrentUserResponse> = overrides.isAuth
     ? {
         isAuth: true,
         tagsFollowed: faker.helpers.arrayElements([

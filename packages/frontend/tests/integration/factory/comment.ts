@@ -1,20 +1,24 @@
 import { faker } from '@faker-js/faker';
-import defaultsDeep from 'lodash/defaultsDeep';
-import times from 'lodash/times';
+import defaultsDeep from 'lodash-es/defaultsDeep';
+import times from 'lodash-es/times';
+import { commentTypes } from '@/api/comments';
 
 /**
  * Factory function to create a new comment object with optional overrides.
  * By default, the comment object will have no children.
  *
- * @param {object} [overrides] - An object containing properties to override
- * @param {boolean} [withChildren] - Whether to generate child comments for the
+ * @param overrides - An object containing properties to override
+ * @param withChildren - Whether to generate child comments for the
  * in the new comment object. Creates 3 levels tree structure if true.
- * @return {object} - The newly created comment object.
+ * @return The newly created comment object.
  */
-export default function createRandomComment(overrides, withChildren = false) {
+export default function createRandomComment(
+  overrides: Partial<commentTypes.Comment>,
+  withChildren = false,
+): commentTypes.Comment {
   const id = faker.string.uuid();
 
-  const comment = {
+  const comment: commentTypes.Comment = {
     body: faker.lorem.sentence(3),
     author: {
       login: faker.internet.userName(),
@@ -30,6 +34,7 @@ export default function createRandomComment(overrides, withChildren = false) {
     },
     deleted: false,
     children: [],
+    updatedAt: faker.date.past().toISOString(),
   };
 
   // Generate children comments if needed

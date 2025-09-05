@@ -1,22 +1,24 @@
-// TODO: Replace with lodash-es when moving to TypeScript
 import { faker } from '@faker-js/faker';
-import defaultsDeep from 'lodash/defaultsDeep';
+import defaultsDeep from 'lodash-es/defaultsDeep';
 import createSection from './section';
+import { postTypes } from '@/api/posts';
 
 /**
  * Factory function to create a new post object with optional overrides.
  *
- * @param {object} [overrides] - An object containing properties to override in
+ * @param overrides - An object containing properties to override in
  * the new post object.
- * @return {object} The newly created post object.
+ * @return The newly created post object.
  */
-export default function createRandomPost(overrides = {}) {
-  const post = {
+export default function createRandomPost(
+  overrides: Partial<postTypes.Post> = {},
+): postTypes.Post {
+  const post: postTypes.Post = {
     title: faker.lorem.sentence(),
     sections: [
-      createSection({ type: 'text' }),
-      createSection({ type: 'pic' }),
-      createSection({ type: 'vid' }),
+      createSection({ type: postTypes.POST_SECTION_TYPES.TEXT }),
+      createSection({ type: postTypes.POST_SECTION_TYPES.PICTURE }),
+      createSection({ type: postTypes.POST_SECTION_TYPES.VIDEO }),
     ],
     slug: faker.lorem.slug(),
     author: {
@@ -33,6 +35,7 @@ export default function createRandomPost(overrides = {}) {
       isRated: faker.datatype.boolean(),
       negative: faker.datatype.boolean(),
     },
+    updatedAt: faker.date.past().toISOString(),
   };
 
   return defaultsDeep(overrides, post);

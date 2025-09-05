@@ -1,25 +1,26 @@
 import { faker } from '@faker-js/faker';
-import defaults from 'lodash/defaults';
+import defaults from 'lodash-es/defaults';
+import { postTypes } from '@/api/posts';
 
-function createTextSection() {
+function createTextSection(): postTypes.PostTextSection {
   return {
-    type: 'text',
+    type: postTypes.POST_SECTION_TYPES.TEXT,
     hash: faker.string.uuid(),
     content: faker.lorem.sentence(),
   };
 }
 
-function createPicSection() {
+function createPicSection(): postTypes.PostPictureSection {
   return {
-    type: 'pic',
+    type: postTypes.POST_SECTION_TYPES.PICTURE,
     hash: faker.string.uuid(),
     url: 'https://placehold.co/600x400',
   };
 }
 
-function createVideoSection() {
+function createVideoSection(): postTypes.PostVideoSection {
   return {
-    type: 'vid',
+    type: postTypes.POST_SECTION_TYPES.VIDEO,
     hash: faker.string.uuid(),
     url: faker.image.url(),
   };
@@ -38,7 +39,9 @@ const createSectionFns = {
  * the new post object.
  * @return {object} The newly generated post object.
  */
-export default function createSection(overrides = {}) {
+export default function createSection(
+  overrides: Partial<postTypes.PostSection> = {},
+) {
   const type =
     overrides.type || faker.helpers.arrayElement(['text', 'pic', 'vid']);
 
