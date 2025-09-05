@@ -1,7 +1,8 @@
+import { type Page } from '@playwright/test';
 import AbstractPage from './AbstractPage';
 
 export default class PostsPage extends AbstractPage {
-  titles = {
+  readonly titles = {
     today: AbstractPage.formatTitle('Today'),
     all: AbstractPage.formatTitle('All Posts'),
     blowing: AbstractPage.formatTitle('Blowing'),
@@ -10,7 +11,7 @@ export default class PostsPage extends AbstractPage {
     feed: AbstractPage.formatTitle('My Feed'),
   };
 
-  urls = {
+  readonly urls = {
     today: '/',
     all: '/posts/all',
     blowing: '/posts/blowing',
@@ -19,7 +20,7 @@ export default class PostsPage extends AbstractPage {
     feed: '/posts/feed',
   };
 
-  groups = {
+  readonly groups = {
     today: 'today-link',
     all: 'all-link',
     blowing: 'blowing-link',
@@ -28,10 +29,9 @@ export default class PostsPage extends AbstractPage {
     feed: 'feed-link',
   };
 
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
-  constructor(page, isMobile) {
+  readonly isMobile: boolean;
+
+  constructor(page: Page, isMobile: boolean) {
     super(page);
     this.isMobile = isMobile;
   }

@@ -1,9 +1,10 @@
+import type { Page } from '@playwright/test';
 import AbstractPage from './AbstractPage';
 
 export default class NotFoundPage extends AbstractPage {
-  title = AbstractPage.formatTitle('Not Found');
+  readonly title = AbstractPage.formatTitle('Not Found');
 
-  url = '/error/404';
+  readonly url = '/error/404';
 
   async waitForNotFoundPage() {
     await this.page.waitForURL(this.url);

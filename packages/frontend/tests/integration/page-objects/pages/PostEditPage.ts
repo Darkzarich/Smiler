@@ -1,7 +1,7 @@
 import AbstractPage from './AbstractPage';
 
 export default class PostEditPage extends AbstractPage {
-  title = AbstractPage.formatTitle('Edit Post');
+  readonly title = AbstractPage.formatTitle('Edit Post');
 
   // eslint-disable-next-line class-methods-use-this
   getUrlWithSlug(slug = '') {

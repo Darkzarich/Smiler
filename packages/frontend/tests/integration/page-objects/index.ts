@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { test as base, type Page, type BrowserContext } from '@playwright/test';
 import Api from './api';
 import AuthForm from './components/AuthForm';
 import Comments from './components/Comments';
@@ -17,8 +17,28 @@ import SearchPage from './pages/SearchPage';
 import SettingsPage from './pages/SettingsPage';
 import SinglePostPage from './pages/SinglePostPage';
 
+export interface TestFixtures {
+  Api: Api;
+  PostsPage: PostsPage;
+  SinglePostPage: SinglePostPage;
+  PostEditPage: PostEditPage;
+  PostCreatePage: PostCreatePage;
+  SettingsPage: SettingsPage;
+  ProfilePage: ProfilePage;
+  SearchPage: SearchPage;
+  NotFoundPage: NotFoundPage;
+  Post: Post;
+  Comments: Comments;
+  AuthForm: AuthForm;
+  Menu: Menu;
+  PostEditor: PostEditor;
+  CurrentUser: CurrentUser;
+  NotificationList: NotificationList;
+  TagsList: TagsList;
+}
+
 // Extend base test by providing common page objects
-export default test.extend({
+const test = base.extend<TestFixtures>({
   Api: async ({ page, context }, use) => {
     await use(new Api(page, context));
   },
@@ -71,3 +91,5 @@ export default test.extend({
     await use(new TagsList(page));
   },
 });
+
+export default test;

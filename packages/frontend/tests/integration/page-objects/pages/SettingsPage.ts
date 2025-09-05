@@ -1,16 +1,21 @@
 import AbstractPage from './AbstractPage';
+import { type Locator, type Page } from '@playwright/test';
 
 export default class SettingsPage extends AbstractPage {
-  url = '/user/settings';
+  readonly url = '/user/settings';
 
-  title = AbstractPage.formatTitle('Settings');
+  readonly avatarInput: Locator;
+  readonly avatarSubmitBtn: Locator;
+  readonly bioInput: Locator;
+  readonly bioError: Locator;
+  readonly bioSubmitBtn: Locator;
+  readonly noSubscriptionsBlock: Locator;
 
-  avatarPlaceholderUrl = 'https://placehold.co/128x128';
+  readonly title = AbstractPage.formatTitle('Settings');
 
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
-  constructor(page) {
+  readonly avatarPlaceholderUrl = 'https://placehold.co/128x128';
+
+  constructor(page: Page) {
     super(page);
 
     this.avatarInput = page.getByTestId('user-settings-avatar-input');

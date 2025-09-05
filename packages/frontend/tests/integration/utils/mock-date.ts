@@ -1,5 +1,7 @@
+import type { BrowserContext } from '@playwright/test';
+
 export default async function mockDate(
-  context,
+  context: BrowserContext,
   ISOTimestamp = '2024-03-06T00:00:00.000Z',
 ) {
   const mockedDate = new Date(ISOTimestamp);

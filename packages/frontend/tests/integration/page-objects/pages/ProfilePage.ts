@@ -1,10 +1,15 @@
+import { expect, type Locator, type Page } from '@playwright/test';
 import AbstractPage from './AbstractPage';
 
 export default class ProfilePage extends AbstractPage {
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
-  constructor(page) {
+  readonly login: Locator;
+  readonly rating: Locator;
+  readonly followersCount: Locator;
+  readonly bio: Locator;
+  readonly unfollowBtn: Locator;
+  readonly followBtn: Locator;
+
+  constructor(page: Page) {
     super(page);
 
     this.login = page.getByTestId('user-profile-login');

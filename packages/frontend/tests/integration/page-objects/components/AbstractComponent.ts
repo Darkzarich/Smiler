@@ -1,8 +1,9 @@
+import type { Page } from '@playwright/test';
+
 export default class AbstractComponent {
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
-  constructor(page) {
+  readonly page: Page;
+
+  constructor(page: Page) {
     this.page = page;
   }
 

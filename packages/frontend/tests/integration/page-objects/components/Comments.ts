@@ -1,10 +1,12 @@
+import { type Locator, type Page } from '@playwright/test';
 import AbstractComponent from './AbstractComponent';
 
 export default class Comments extends AbstractComponent {
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
-  constructor(page) {
+  readonly newCommentForm: Locator;
+  readonly newCommentFormEditor: Locator;
+  readonly newCommentFormInput: Locator;
+
+  constructor(page: Page) {
     super(page);
 
     this.newCommentForm = page.getByTestId('new-comment-form');
@@ -58,14 +60,14 @@ export default class Comments extends AbstractComponent {
     const commentClass =
       await this.getUpvoteBtnById(commentId).getAttribute('class');
 
-    return /upvote-btn--active/.test(commentClass);
+    return commentClass ? /upvote-btn--active/.test(commentClass) : false;
   }
 
   async getIsCommentByIdDownvoted(commentId = '') {
     const commentClass =
       await this.getDownvoteBtnById(commentId).getAttribute('class');
 
-    return /downvote-btn--active/.test(commentClass);
+    return commentClass ? /downvote-btn--active/.test(commentClass) : false;
   }
 
   async toggleRepliesExpanderById(commentId = '') {

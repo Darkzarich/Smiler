@@ -1,14 +1,23 @@
 import AbstractPage from './AbstractPage';
+import { type Locator, type Page } from '@playwright/test';
+
+interface DateRange {
+  from: string;
+  to: string;
+}
 
 export default class SearchPage extends AbstractPage {
-  title = AbstractPage.formatTitle('Search');
+  readonly title = AbstractPage.formatTitle('Search');
 
-  url = '/posts/search';
+  readonly searchInput: Locator;
+  readonly dateFrom: Locator;
+  readonly dateTo: Locator;
+  readonly ratingFrom: Locator;
+  readonly ratingTo: Locator;
 
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
-  constructor(page) {
+  readonly url = '/posts/search';
+
+  constructor(page: Page) {
     super(page);
 
     this.searchInput = page.getByTestId('search-form-input');
@@ -31,7 +40,7 @@ export default class SearchPage extends AbstractPage {
     return regexp.test(this.page.url());
   }
 
-  pageHasDateQueryParams({ from, to }) {
+  pageHasDateQueryParams({ from, to }: DateRange) {
     const normalizedFrom = encodeURIComponent(from);
     const normalizedTo = encodeURIComponent(to);
     const regexp = new RegExp(
@@ -41,7 +50,7 @@ export default class SearchPage extends AbstractPage {
     return regexp.test(this.page.url());
   }
 
-  pageHasRatingQueryParams({ from, to }) {
+  pageHasRatingQueryParams({ from, to }: DateRange) {
     const regexp = new RegExp(
       `${this.url}?.*ratingFrom=${from}&ratingTo=${to}`,
     );

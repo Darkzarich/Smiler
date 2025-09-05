@@ -5,7 +5,7 @@ import Route, { Method } from './route';
 /** Api routes that can be awaited and\or mocked in tests
  * '*' matches any url param
  */
-export default {
+export const routes = {
   posts: {
     getPosts: new Route('/posts', Method.GET),
     getAll: new Route('/posts/categories/all', Method.GET),
@@ -50,4 +50,6 @@ export default {
     follow: new Route('/tags/*/follow', Method.PUT),
     unfollow: new Route('/tags/*/follow', Method.DELETE),
   },
-};
+} as const;
+
+export type Routes = typeof routes;

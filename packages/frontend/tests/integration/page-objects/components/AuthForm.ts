@@ -1,9 +1,29 @@
-export default class AuthForm {
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
-  constructor(page) {
-    this.page = page;
+import { type Locator, type Page } from '@playwright/test';
+import AbstractComponent from './AbstractComponent';
+
+export default class AuthForm extends AbstractComponent {
+  readonly SignInForm: Locator;
+  readonly SignUpForm: Locator;
+  readonly authFormModeToggler: Locator;
+
+  readonly signInPassword: Locator;
+  readonly signInPasswordError: Locator;
+  readonly signInEmail: Locator;
+  readonly signInEmailError: Locator;
+  readonly signInSubmitBtn: Locator;
+
+  readonly signUpEmail: Locator;
+  readonly signUpEmailError: Locator;
+  readonly signUpLogin: Locator;
+  readonly signUpLoginError: Locator;
+  readonly signUpPassword: Locator;
+  readonly signUpPasswordError: Locator;
+  readonly signUpConfirm: Locator;
+  readonly signUpConfirmError: Locator;
+  readonly signUpSubmitBtn: Locator;
+
+  constructor(page: Page) {
+    super(page);
 
     this.SignInForm = page.getByTestId('signin-form');
     this.SignUpForm = page.getByTestId('signup-form');

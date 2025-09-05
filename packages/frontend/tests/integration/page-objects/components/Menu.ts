@@ -1,10 +1,13 @@
-export default class Menu {
-  /**
-   * @param {import('@playwright/test').Page} page
-   * @param {boolean} isMobile
-   */
-  constructor(page, isMobile) {
-    this.page = page;
+import AbstractComponent from './AbstractComponent';
+import { type Locator, type Page } from '@playwright/test';
+
+export default class Menu extends AbstractComponent {
+  readonly isMobile: boolean;
+  readonly createPostBtn: Locator;
+
+  constructor(page: Page, isMobile: boolean) {
+    super(page);
+
     this.isMobile = isMobile;
     this.createPostBtn = page.getByTestId('create-post-btn');
   }

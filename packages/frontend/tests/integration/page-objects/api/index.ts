@@ -1,28 +1,26 @@
-import { BrowserContext, Page } from '@playwright/test';
-import routes from './routes';
+import type { BrowserContext, Page } from '@playwright/test';
+import { routes, type Routes } from './routes';
 
 export default class Api {
   context: BrowserContext | undefined;
   page: Page | undefined;
-  routes: typeof routes;
+  routes: Routes;
 
-  /**
-   * @param {import('@playwright/test').BrowserContext} context
-   * @param {import('@playwright/test').Page} page
-   */
-  constructor(page, context) {
+  constructor(page: Page, context: BrowserContext) {
     this.page = page;
     this.context = context;
     this.routes = routes;
 
-    const controllers = Object.keys(routes);
+    const controllers = Object.keys(routes) as (keyof Routes)[];
 
     controllers.forEach((controller) => {
-      const endPoints = Object.keys(routes[controller]);
+      const endPoints = Object.keys(
+        routes[controller],
+      ) as (keyof Routes['auth'])[];
 
       endPoints.forEach((endPoint) => {
-        routes[controller][endPoint].setContext(context);
-        routes[controller][endPoint].setPage(page);
+        routes[controller as 'auth'][endPoint].setContext(context);
+        routes[controller as 'auth'][endPoint].setPage(page);
       });
     });
   }

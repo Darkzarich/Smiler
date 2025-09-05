@@ -1,15 +1,16 @@
-import { expect } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import AbstractPage from './AbstractPage';
 
 export default class PostCreatePage extends AbstractPage {
-  url = '/post/create';
+  readonly url = '/post/create';
 
-  title = AbstractPage.formatTitle('Edit Post');
+  readonly header: Locator;
+  readonly postTitleInput: Locator;
+  readonly postTagInput: Locator;
 
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
-  constructor(page) {
+  readonly title = AbstractPage.formatTitle('Edit Post');
+
+  constructor(page: Page) {
     super(page);
 
     this.header = page.getByTestId('post-create-header');
@@ -100,7 +101,7 @@ export default class PostCreatePage extends AbstractPage {
     await this.getImageUploadBtn().click();
   }
 
-  async uploadVideoWithUrl(vidCode) {
+  async uploadVideoWithUrl(vidCode: string) {
     await this.page
       .getByTestId('video-url-input')
       .fill(`https://www.youtube.com/watch?v=${vidCode}`);
@@ -118,6 +119,11 @@ export default class PostCreatePage extends AbstractPage {
   async awaitDragAndDropAnimation() {
     await this.page.waitForFunction(() => {
       const element = document.querySelector('[data-testid="post-section"]');
+
+      if (!element) {
+        return false;
+      }
+
       const computedStyle = window.getComputedStyle(element);
 
       return (

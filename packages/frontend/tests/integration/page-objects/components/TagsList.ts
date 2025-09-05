@@ -1,8 +1,9 @@
+import { type Page } from '@playwright/test';
+
 export default class TagsList {
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
-  constructor(page) {
+  readonly page: Page;
+
+  constructor(page: Page) {
     this.page = page;
   }
 
@@ -11,7 +12,7 @@ export default class TagsList {
     await this.page.getByTestId('post-tag-input').press('Enter');
   }
 
-  async addEachTag(tags = []) {
+  async addEachTag(tags: string[] = []) {
     for (const tag of tags) {
       // eslint-disable-next-line no-await-in-loop
       await this.addTag(tag);

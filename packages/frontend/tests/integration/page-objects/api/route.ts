@@ -18,11 +18,11 @@ export default class Route {
     this.method = method;
   }
 
-  setContext(context) {
+  setContext(context: BrowserContext) {
     this.context = context;
   }
 
-  setPage(page) {
+  setPage(page: Page) {
     this.page = page;
   }
 

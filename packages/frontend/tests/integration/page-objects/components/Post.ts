@@ -1,23 +1,25 @@
 import AbstractComponent from './AbstractComponent';
+import { type Locator, type Page } from '@playwright/test';
 
 export default class Post extends AbstractComponent {
-  /**
-   * @param {import('@playwright/test').Page} page
-   * @param {boolean} isMobile
-   */
-  constructor(page, isMobile) {
+  readonly context: any;
+  readonly isMobile: boolean;
+  readonly postsList: Locator;
+  readonly editBtn: Locator;
+  readonly deleteBtn: Locator;
+
+  constructor(page: Page, isMobile: boolean) {
     super(page);
+
     this.context = page.context();
     this.isMobile = isMobile;
 
     this.postsList = page.getByTestId('posts-container');
-
     this.editBtn = page.getByTestId('post-edit-icon');
     this.deleteBtn = page.getByTestId('post-delete-icon');
   }
 
-  /** @param {import('@playwright/test').Page} page */
-  setPage(page) {
+  setPage(page: Page) {
     this.page = page;
   }
 
@@ -25,7 +27,7 @@ export default class Post extends AbstractComponent {
     return this.page.getByTestId(`post-${id}-rating`);
   }
 
-  getTitleById(id) {
+  getTitleById(id: string) {
     return this.page.getByTestId(`post-${id}-title`);
   }
 
@@ -76,14 +78,14 @@ export default class Post extends AbstractComponent {
   async getIsPostByIdUpvoted(postId = '') {
     const postClass = await this.getUpvoteBtnById(postId).getAttribute('class');
 
-    return /upvote--active/.test(postClass);
+    return postClass ? /upvote--active/.test(postClass) : false;
   }
 
   async getIsPostByIdDownvoted(postId = '') {
     const postClass =
       await this.getDownvoteBtnById(postId).getAttribute('class');
 
-    return /downvote--active/.test(postClass);
+    return postClass ? /downvote--active/.test(postClass) : false;
   }
 
   async clickTag(postId = '', tag = '') {
@@ -105,13 +107,13 @@ export default class Post extends AbstractComponent {
     await this.getSearchTagBtn().click();
   }
 
-  async openPostById(id) {
+  async openPostById(id: string) {
     await this.getTitleById(id).click();
   }
 
   /** On Desktop a post's page opens in a new browser tab.
    * This method returns that new tab fixture after clicking on the title by post.id */
-  async openPostByIdInNewTab(postId) {
+  async openPostByIdInNewTab(postId: string) {
     const [newPage] = await Promise.all([
       this.context.waitForEvent('page'),
       this.getTitleById(postId).click(),
@@ -120,7 +122,7 @@ export default class Post extends AbstractComponent {
     return newPage;
   }
 
-  async openPostAuthorProfile(postId) {
+  async openPostAuthorProfile(postId: string) {
     this.page.getByTestId(`post-${postId}-author`).click();
   }
 
