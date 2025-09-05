@@ -1,10 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { defineConfig, devices } = require('@playwright/test');
+import { defineConfig, devices } from '@playwright/test';
 
 const BASE_URL = 'http://localhost:4173';
 
 module.exports = defineConfig({
   testDir: './tests/integration',
+  tsconfig: './tests/integration/tsconfig.test.json',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   workers: process.env.CI ? 1 : undefined,

@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import defaultsDeep from 'lodash-es/defaultsDeep';
 import times from 'lodash-es/times';
-import { commentTypes } from '@/api/comments';
+import { commentTypes } from '@api/comments';
 
 /**
  * Factory function to create a new comment object with optional overrides.

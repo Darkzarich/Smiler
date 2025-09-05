@@ -6,7 +6,7 @@ npm-debug.log
 .git
 .gitignore
 stylelint.config.js
-playwright.config.js
+playwright.config.ts
 tests
 test-results
 playwright-report

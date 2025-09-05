@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import defaults from 'lodash-es/defaults';
-import { postTypes } from '@/api/posts';
+import { postTypes } from '@api/posts';
 
 function createTextSection(): postTypes.PostTextSection {
   return {

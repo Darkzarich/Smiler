@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import defaultsDeep from 'lodash-es/defaultsDeep';
-import { authTypes } from '@/api/auth';
+import { authTypes } from '@api/auth';
 
 /**
  * Factory function to create an authentication fixture with optional overrides.

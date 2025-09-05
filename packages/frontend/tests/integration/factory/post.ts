@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import defaultsDeep from 'lodash-es/defaultsDeep';
 import createSection from './section';
-import { postTypes } from '@/api/posts';
+import { postTypes } from '@api/posts';
 
 /**
  * Factory function to create a new post object with optional overrides.

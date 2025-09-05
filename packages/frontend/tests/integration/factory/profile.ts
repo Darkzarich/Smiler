@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import defaultsDeep from 'lodash-es/defaultsDeep';
-import { userTypes } from '@/api/users';
+import { userTypes } from '@api/users';
 
 /**
  * Factory function to create a new profile object with optional overrides.
