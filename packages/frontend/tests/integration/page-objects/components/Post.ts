@@ -1,8 +1,8 @@
+import { type BrowserContext, type Locator, type Page } from '@playwright/test';
 import AbstractComponent from './AbstractComponent';
-import { type Locator, type Page } from '@playwright/test';
 
 export default class Post extends AbstractComponent {
-  readonly context: any;
+  readonly context: BrowserContext;
   readonly isMobile: boolean;
   readonly postsList: Locator;
   readonly editBtn: Locator;

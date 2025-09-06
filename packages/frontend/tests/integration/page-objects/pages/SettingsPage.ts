@@ -1,5 +1,5 @@
-import AbstractPage from './AbstractPage';
 import { type Locator, type Page } from '@playwright/test';
+import AbstractPage from './AbstractPage';
 
 export default class SettingsPage extends AbstractPage {
   readonly url = '/user/settings';

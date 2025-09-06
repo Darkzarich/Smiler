@@ -52,7 +52,8 @@ export default class Route {
     body = undefined,
     status = 200,
   }: {
-    body: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    body: Record<string, any> | undefined;
     status: number;
   }) {
     if (!this.context) {

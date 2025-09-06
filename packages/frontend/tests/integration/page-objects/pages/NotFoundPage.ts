@@ -1,4 +1,3 @@
-import type { Page } from '@playwright/test';
 import AbstractPage from './AbstractPage';
 
 export default class NotFoundPage extends AbstractPage {

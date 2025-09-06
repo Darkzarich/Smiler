@@ -1,4 +1,4 @@
-import { test as base, type Page, type BrowserContext } from '@playwright/test';
+import { test as base } from '@playwright/test';
 import Api from './api';
 import AuthForm from './components/AuthForm';
 import Comments from './components/Comments';

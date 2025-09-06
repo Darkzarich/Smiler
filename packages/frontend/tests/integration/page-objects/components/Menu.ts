@@ -1,5 +1,5 @@
-import AbstractComponent from './AbstractComponent';
 import { type Locator, type Page } from '@playwright/test';
+import AbstractComponent from './AbstractComponent';
 
 export default class Menu extends AbstractComponent {
   readonly isMobile: boolean;
