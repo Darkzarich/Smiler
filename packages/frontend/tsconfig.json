@@ -28,6 +28,5 @@
       "@utils/*": ["./src/utils/*"]
     }
   },
-  "exclude": ["node_modules", "dist", "tests/integration"],
-  "references": [{ "path": "./tests/integration/tsconfig.test.json" }]
+  "exclude": ["node_modules", "dist", "tests"]
 }

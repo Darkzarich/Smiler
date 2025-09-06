@@ -1,0 +1,3 @@
+{
+  "extends": ["./integration/tsconfig.json"]
+}

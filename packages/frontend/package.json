@@ -23,7 +23,7 @@
     "lint:css": "pnpm exec stylelint '**/*.{css,scss,vue}'",
     "lint:ts": "eslint --ext .js,.ts,.vue --ignore-path .gitignore .",
     "lint:ts:fix": "eslint --ext .js,.ts,.vue --ignore-path .gitignore --fix .",
-    "lint:types": "pnpm exec vue-tsc --noEmit",
+    "lint:types": "pnpm exec vue-tsc --noEmit && pnpm exec tsc --noEmit --project tests/tsconfig.json",
     "prettier": "prettier \"**/*.{js,ts,scss,css,html,json,vue}\" --write"
   },
   "dependencies": {

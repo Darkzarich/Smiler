@@ -1,10 +1,16 @@
 {
-  "eslint.validate": ["vue", "javascript", "javascriptreact"],
+  "eslint.validate": [
+    "vue",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "eslint.workingDirectories": [
     {
-      "mode": "auto"
+      "pattern": "./packages/*"
     }
   ],
   "stylelint.validate": ["css", "less", "postcss", "vue", "scss"],
