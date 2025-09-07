@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
-import createRandomAuth from './factory/auth';
-import createRandomProfile from './factory/profile';
 import test from './page-objects';
+import createRandomAuth from '@factory/auth';
+import createRandomProfile from '@factory/profile';
 
 const testUser = createRandomAuth({
   isAuth: true,

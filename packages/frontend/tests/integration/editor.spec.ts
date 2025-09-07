@@ -2,17 +2,18 @@
 /* eslint-disable no-await-in-loop */
 
 import { expect } from '@playwright/test';
-import createRandomAuth from './factory/auth';
-import createRandomPost from './factory/post';
-import createSection from './factory/section';
 import test from './page-objects';
+import { postTypes } from '@api/posts';
+import createRandomAuth from '@factory/auth';
+import createRandomPost from '@factory/post';
+import createRandomSection from '@factory/section';
 
 const authUser = createRandomAuth({
   isAuth: true,
 });
 
 const title = 'Test post';
-const picSection = createSection({ type: 'pic' });
+const picSection = createRandomSection(postTypes.POST_SECTION_TYPES.PICTURE);
 const vidCode = 'dQw4w9WgXcQ';
 
 const createdPost = createRandomPost();
@@ -211,22 +212,19 @@ test('D&D post sections to change order of sections', async ({
 test('Fetch and show draft template', async ({ Api, page, PostCreatePage }) => {
   const savedTitle = 'Saved title';
   const savedSections = [
-    {
-      type: 'text',
+    createRandomSection(postTypes.POST_SECTION_TYPES.TEXT, {
       content: 'test text',
-      hash: 1,
-    },
-    {
-      type: 'pic',
+      hash: '1',
+    }),
+    createRandomSection(postTypes.POST_SECTION_TYPES.PICTURE, {
       url: picSection.url,
-      hash: 2,
-    },
-    {
-      type: 'vid',
+      hash: '2',
+    }),
+    createRandomSection(postTypes.POST_SECTION_TYPES.VIDEO, {
       url: `https://www.youtube.com/embed/${vidCode}`,
-      hash: 3,
-    },
-  ];
+      hash: '3',
+    }),
+  ] as const;
   const savedTags = ['test tag 1', 'test tag 2'];
 
   Api.routes.users.getUserTemplate.mock({

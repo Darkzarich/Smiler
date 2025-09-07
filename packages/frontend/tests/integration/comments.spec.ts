@@ -1,11 +1,11 @@
 /* eslint-disable no-await-in-loop */
 import { expect } from '@playwright/test';
 import { subMinutes } from 'date-fns';
-import createRandomAuth from './factory/auth';
-import createRandomComment from './factory/comment';
-import createRandomPost from './factory/post';
 import test from './page-objects';
 import mockDate from './utils/mock-date';
+import createRandomAuth from '@factory/auth';
+import createRandomComment from '@factory/comment';
+import createRandomPost from '@factory/post';
 
 const auth = createRandomAuth({
   isAuth: true,
@@ -666,10 +666,7 @@ test.describe('Editing or deleting a comment', () => {
 
     const editCommentResponse =
       await Api.routes.comments.updateComment.waitForRequest({
-        preRequestAction: Comments.submitEditedComment.bind(
-          Comments,
-          currentUserComment.id,
-        ),
+        preRequestAction: Comments.submitEditedComment.bind(Comments),
       });
 
     expect(editCommentResponse.postDataJSON()).toEqual({

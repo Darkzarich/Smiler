@@ -2,10 +2,10 @@
 /* eslint-disable no-shadow */
 
 import { expect } from '@playwright/test';
-import createRandomAuth from './factory/auth';
-import createRandomPost from './factory/post';
-import createRandomProfile from './factory/profile';
 import test from './page-objects';
+import createRandomAuth from '@factory/auth';
+import createRandomPost from '@factory/post';
+import createRandomProfile from '@factory/profile';
 
 const post = createRandomPost();
 

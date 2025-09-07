@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
-import defaultsDeep from 'lodash-es/defaultsDeep';
-import times from 'lodash-es/times';
+import { defaultsDeep, times } from 'lodash';
 import { commentTypes } from '@api/comments';
 
 /**
@@ -13,7 +12,7 @@ import { commentTypes } from '@api/comments';
  * @return The newly created comment object.
  */
 export default function createRandomComment(
-  overrides: Partial<commentTypes.Comment>,
+  overrides: DeepPartial<commentTypes.Comment> = {},
   withChildren = false,
 ): commentTypes.Comment {
   const id = faker.string.uuid();

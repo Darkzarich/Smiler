@@ -1,10 +1,12 @@
 /* eslint-disable no-await-in-loop */
 
 import { expect } from '@playwright/test';
-import createRandomAuth from './factory/auth';
-import createRandomPost from './factory/post';
 import test from './page-objects';
 import mockDate from './utils/mock-date';
+import { postTypes } from '@api/posts';
+import createRandomAuth from '@factory/auth';
+import createRandomPost from '@factory/post';
+import createRandomSection from '@factory/section';
 
 const post1 = createRandomPost({
   rated: {
@@ -568,11 +570,7 @@ test.describe('Post votes', () => {
 
 test.describe('Sections', () => {
   test('Shows text section', async ({ Post, PostsPage, Api }) => {
-    const section = {
-      hash: '1',
-      type: 'text',
-      content: 'test',
-    };
+    const section = createRandomSection(postTypes.POST_SECTION_TYPES.TEXT);
 
     const post = createRandomPost({
       sections: [section],
@@ -595,11 +593,7 @@ test.describe('Sections', () => {
   });
 
   test('Shows pic section', async ({ Post, PostsPage, Api }) => {
-    const section = {
-      hash: '2',
-      type: 'pic',
-      url: 'test',
-    };
+    const section = createRandomSection(postTypes.POST_SECTION_TYPES.PICTURE);
 
     const post = createRandomPost({
       sections: [section],
@@ -623,11 +617,7 @@ test.describe('Sections', () => {
   });
 
   test('Shows video section', async ({ Post, PostsPage, Api }) => {
-    const section = {
-      hash: '3',
-      type: 'vid',
-      url: 'test',
-    };
+    const section = createRandomSection(postTypes.POST_SECTION_TYPES.VIDEO);
 
     const post = createRandomPost({
       sections: [section],
@@ -654,21 +644,13 @@ test.describe('Sections', () => {
 
   test('Shows multiple sections', async ({ Post, PostsPage, Api }) => {
     const sections = [
-      {
-        hash: '1',
-        type: 'pic',
-        url: 'test',
-      },
-      {
-        hash: '2',
-        type: 'text',
-        content: 'test text',
-      },
-      {
-        hash: '3',
-        type: 'vid',
-        url: 'test',
-      },
+      createRandomSection(postTypes.POST_SECTION_TYPES.PICTURE),
+      createRandomSection(postTypes.POST_SECTION_TYPES.TEXT),
+      createRandomSection(postTypes.POST_SECTION_TYPES.VIDEO),
+    ] as [
+      postTypes.PostPictureSection,
+      postTypes.PostTextSection,
+      postTypes.PostVideoSection,
     ];
 
     const post = createRandomPost({

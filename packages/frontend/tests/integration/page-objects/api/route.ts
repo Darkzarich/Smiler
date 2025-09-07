@@ -53,8 +53,8 @@ export default class Route {
     status = 200,
   }: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    body: Record<string, any> | undefined;
-    status: number;
+    body?: Record<string, any> | undefined;
+    status?: number;
   }) {
     if (!this.context) {
       throw new Error('Context is not set');

@@ -17,3 +17,9 @@ declare module 'click-outside-vue3' {
 
   export default vClickOutside;
 }
+
+type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>;
+    }
+  : T;

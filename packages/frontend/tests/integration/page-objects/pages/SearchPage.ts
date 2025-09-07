@@ -1,9 +1,9 @@
 import { type Locator, type Page } from '@playwright/test';
 import AbstractPage from './AbstractPage';
 
-interface DateRange {
-  from: string;
-  to: string;
+interface RangeProps {
+  from: string | number;
+  to: string | number;
 }
 
 export default class SearchPage extends AbstractPage {
@@ -40,7 +40,7 @@ export default class SearchPage extends AbstractPage {
     return regexp.test(this.page.url());
   }
 
-  pageHasDateQueryParams({ from, to }: DateRange) {
+  pageHasDateQueryParams({ from, to }: RangeProps) {
     const normalizedFrom = encodeURIComponent(from);
     const normalizedTo = encodeURIComponent(to);
     const regexp = new RegExp(
@@ -50,7 +50,7 @@ export default class SearchPage extends AbstractPage {
     return regexp.test(this.page.url());
   }
 
-  pageHasRatingQueryParams({ from, to }: DateRange) {
+  pageHasRatingQueryParams({ from, to }: RangeProps) {
     const regexp = new RegExp(
       `${this.url}?.*ratingFrom=${from}&ratingTo=${to}`,
     );
@@ -58,7 +58,7 @@ export default class SearchPage extends AbstractPage {
     return regexp.test(this.page.url());
   }
 
-  pageHasTagsQueryParams(tags = []) {
+  pageHasTagsQueryParams(tags: string[] = []) {
     const urlTags = tags.map((t) => `tags=${t}`).join('&');
     const regexp = new RegExp(`${this.url}?.*${urlTags}`);
 

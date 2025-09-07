@@ -2,8 +2,8 @@
 /* eslint-disable playwright/no-conditional-in-test */
 
 import { expect } from '@playwright/test';
-import createRandomAuth from './factory/auth';
 import test from './page-objects';
+import createRandomAuth from '@factory/auth';
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({

@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import defaults from 'lodash-es/defaults';
+import { defaults } from 'lodash';
 import { postTypes } from '@api/posts';
 
 function createTextSection(): postTypes.PostTextSection {
@@ -26,7 +26,7 @@ function createVideoSection(): postTypes.PostVideoSection {
   };
 }
 
-const createSectionFns = {
+const createRandomSectionFns = {
   text: createTextSection,
   pic: createPicSection,
   vid: createVideoSection,
@@ -39,17 +39,25 @@ const createSectionFns = {
  * the new post object.
  * @return {object} The newly generated post object.
  */
-export default function createSection(
-  overrides: Partial<postTypes.PostSection> = {},
-) {
-  const type =
-    overrides.type || faker.helpers.arrayElement(['text', 'pic', 'vid']);
+export default function createRandomSection<
+  T extends postTypes.POST_SECTION_TYPES,
+  M extends {
+    [postTypes.POST_SECTION_TYPES.TEXT]: postTypes.PostTextSection;
+    [postTypes.POST_SECTION_TYPES.PICTURE]: postTypes.PostPictureSection;
+    [postTypes.POST_SECTION_TYPES.VIDEO]: postTypes.PostVideoSection;
+  },
+>(type?: T, overrides: Partial<M[T]> = {}) {
+  const _type =
+    type ||
+    faker.helpers.arrayElement([
+      postTypes.POST_SECTION_TYPES.TEXT,
+      postTypes.POST_SECTION_TYPES.PICTURE,
+      postTypes.POST_SECTION_TYPES.VIDEO,
+    ]);
 
-  const newSection = createSectionFns[type]();
+  const newSection = createRandomSectionFns[_type]();
 
-  if (!overrides) {
-    return newSection;
-  }
-
-  return defaults(overrides, newSection);
+  return defaults(overrides, newSection) as T extends undefined
+    ? NonNullable<postTypes.PostSection & Partial<M[T]>>
+    : NonNullable<M[T] & Partial<M[T]>>;
 }

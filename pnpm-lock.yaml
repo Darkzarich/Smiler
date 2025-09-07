@@ -237,6 +237,9 @@ importers:
       '@playwright/test':
         specifier: ^1.54.2
         version: 1.54.2
+      '@types/lodash':
+        specifier: ^4.17.20
+        version: 4.17.20
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
@@ -282,6 +285,9 @@ importers:
       eslint-plugin-vuejs-accessibility:
         specifier: ^2.4.1
         version: 2.4.1(eslint@8.57.1)
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       postcss-html:
         specifier: ^1.8.0
         version: 1.8.0

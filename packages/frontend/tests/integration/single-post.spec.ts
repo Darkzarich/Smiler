@@ -2,13 +2,14 @@
 
 import { expect } from '@playwright/test';
 import { subMinutes } from 'date-fns';
-import createRandomAuth from './factory/auth';
-import createRandomComment from './factory/comment';
-import createRandomPost from './factory/post';
-import createRandomProfile from './factory/profile';
-import createRandomSection from './factory/section';
 import test from './page-objects';
 import mockDate from './utils/mock-date';
+import { postTypes } from '@api/posts';
+import createRandomAuth from '@factory/auth';
+import createRandomComment from '@factory/comment';
+import createRandomPost from '@factory/post';
+import createRandomProfile from '@factory/profile';
+import createRandomSection from '@factory/section';
 
 const auth = createRandomAuth({
   isAuth: true,
@@ -169,7 +170,7 @@ test('Opens user profile after clicking on the author of the post', async ({
 
 test.describe('Sections', () => {
   test('Shows text section', async ({ Api, SinglePostPage, Post }) => {
-    const section = createRandomSection({ type: 'text' });
+    const section = createRandomSection(postTypes.POST_SECTION_TYPES.TEXT);
 
     const postWithSections = createRandomPost({
       sections: [section],
@@ -187,7 +188,7 @@ test.describe('Sections', () => {
   });
 
   test('Shows pic section', async ({ Api, SinglePostPage, Post }) => {
-    const section = createRandomSection({ type: 'pic' });
+    const section = createRandomSection(postTypes.POST_SECTION_TYPES.PICTURE);
 
     const postWithSections = createRandomPost({
       sections: [section],
@@ -208,7 +209,7 @@ test.describe('Sections', () => {
   });
 
   test('Shows video section', async ({ Api, SinglePostPage, Post }) => {
-    const section = createRandomSection({ type: 'vid' });
+    const section = createRandomSection(postTypes.POST_SECTION_TYPES.VIDEO);
 
     const postWithSections = createRandomPost({
       sections: [section],
@@ -234,9 +235,13 @@ test.describe('Sections', () => {
     Post,
   }) => {
     const sections = [
-      createRandomSection({ type: 'pic' }),
-      createRandomSection({ type: 'text' }),
-      createRandomSection({ type: 'vid' }),
+      createRandomSection(postTypes.POST_SECTION_TYPES.PICTURE),
+      createRandomSection(postTypes.POST_SECTION_TYPES.TEXT),
+      createRandomSection(postTypes.POST_SECTION_TYPES.VIDEO),
+    ] as [
+      postTypes.PostPictureSection,
+      postTypes.PostTextSection,
+      postTypes.PostVideoSection,
     ];
 
     const postWithSections = createRandomPost({
@@ -277,8 +282,18 @@ test.describe('Post edit', () => {
     author: {
       id: auth.id,
     },
-  });
-  currentUserNewerPost.sections = currentUserNewerPost.sections.slice(0, 1);
+  }) as postTypes.Post & {
+    sections: [
+      postTypes.PostTextSection,
+      postTypes.PostPictureSection,
+      postTypes.PostVideoSection,
+    ];
+  };
+
+  currentUserNewerPost.sections = currentUserNewerPost.sections.slice(
+    0,
+    1,
+  ) as typeof currentUserNewerPost.sections;
 
   test.beforeEach(async ({ Api }) => {
     Api.routes.posts.getPostBySlug.mock({
@@ -425,8 +440,7 @@ test.describe('Post edit', () => {
     expect(editPostResponse.postDataJSON()).toMatchObject({
       sections: [
         {
-          hash: currentUserNewerPost.sections[0].hash,
-          type: 'text',
+          ...currentUserNewerPost.sections[0],
           content: `edited${currentUserNewerPost.sections[0].content}`,
         },
       ],

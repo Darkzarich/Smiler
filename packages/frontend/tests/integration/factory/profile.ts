@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import defaultsDeep from 'lodash-es/defaultsDeep';
+import { defaultsDeep } from 'lodash';
 import { userTypes } from '@api/users';
 
 /**

@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
-import defaultsDeep from 'lodash-es/defaultsDeep';
-import createSection from './section';
+import { defaultsDeep } from 'lodash';
+import createRandomSection from './section';
 import { postTypes } from '@api/posts';
 
 /**
@@ -11,14 +11,14 @@ import { postTypes } from '@api/posts';
  * @return The newly created post object.
  */
 export default function createRandomPost(
-  overrides: Partial<postTypes.Post> = {},
+  overrides: DeepPartial<postTypes.Post> = {},
 ): postTypes.Post {
   const post: postTypes.Post = {
     title: faker.lorem.sentence(),
     sections: [
-      createSection({ type: postTypes.POST_SECTION_TYPES.TEXT }),
-      createSection({ type: postTypes.POST_SECTION_TYPES.PICTURE }),
-      createSection({ type: postTypes.POST_SECTION_TYPES.VIDEO }),
+      createRandomSection(postTypes.POST_SECTION_TYPES.TEXT),
+      createRandomSection(postTypes.POST_SECTION_TYPES.PICTURE),
+      createRandomSection(postTypes.POST_SECTION_TYPES.VIDEO),
     ],
     slug: faker.lorem.slug(),
     author: {

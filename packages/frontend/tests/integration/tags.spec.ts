@@ -1,9 +1,9 @@
 /* eslint-disable no-await-in-loop */
 
 import { expect } from '@playwright/test';
-import createRandomAuth from './factory/auth';
-import createRandomPost from './factory/post';
 import test from './page-objects';
+import createRandomAuth from '@factory/auth';
+import createRandomPost from '@factory/post';
 
 const tags = ['tag1', 'tag2', 'tag3'];
 const post = createRandomPost({
