@@ -23,7 +23,7 @@
     "lint:css": "pnpm exec stylelint '**/*.{css,scss,vue}'",
     "lint:ts": "eslint --ext .js,.ts,.vue --ignore-path .gitignore .",
     "lint:ts:fix": "eslint --ext .js,.ts,.vue --ignore-path .gitignore --fix .",
-    "lint:types": "pnpm exec vue-tsc --noEmit",
+    "lint:types": "pnpm exec vue-tsc --noEmit && pnpm exec tsc --noEmit --project tests/tsconfig.json",
     "prettier": "prettier \"**/*.{js,ts,scss,css,html,json,vue}\" --write"
   },
   "dependencies": {
@@ -42,6 +42,7 @@
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
     "@playwright/test": "^1.54.2",
+    "@types/lodash": "^4.17.20",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.19.9",
     "@typescript-eslint/eslint-plugin": "^8.38.0",

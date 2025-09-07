@@ -237,6 +237,9 @@ importers:
       '@playwright/test':
         specifier: ^1.54.2
         version: 1.54.2
+      '@types/lodash':
+        specifier: ^4.17.20
+        version: 4.17.20
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12

@@ -1,28 +1,31 @@
 //TODO: Use new eslint api
 module.exports = {
-  parser: 'vue-eslint-parser',
   root: true,
+  parser: 'vue-eslint-parser',
   env: {
     browser: true,
     es2021: true,
     node: true,
   },
-  plugins: ['prettier'],
+  plugins: ['@typescript-eslint', 'vue'],
   extends: [
-    'plugin:import/recommended',
-    // the following lines do the trick
-    'plugin:import/typescript',
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:vue/recommended',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
     '@vue/eslint-config-typescript/recommended',
     'plugin:vuejs-accessibility/recommended',
     'plugin:prettier/recommended',
+    'prettier',
   ],
   parserOptions: {
     parser: '@typescript-eslint/parser',
     ecmaVersion: 'latest',
     sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true,
+    },
   },
   ignorePatterns: ['src/components/common/icons/**', '.eslintrc.js'],
   rules: {

@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@api/*": ["../../src/api/*"],
+      "@factory/*": ["./factory/*"],
+      // application paths, need just so tsc won't complain when running on tests that import from src
+      "@/*": ["../../src/*"]
+    }
+  },
+  "include": ["./**/*.ts", "../../src/global.d.ts"],
+  "exclude": ["node_modules"]
+}
