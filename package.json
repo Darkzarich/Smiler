@@ -10,12 +10,9 @@
   },
   "scripts": {
     "dev": "concurrently --kill-others \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
-    "front:build": "pnpm --filter \"frontend\" build",
-    "front:dev": "pnpm --filter \"frontend\" dev",
-    "back:dev": "pnpm --filter \"backend\" dev",
-    "back:serve": "pnpm --filter \"backend\" start",
+    "build": "pnpm --filter backend build; pnpm --filter frontend build",
     "lint:spell": "cspell --no-progress .",
-    "test:all": "pnpm --filter \"backend\" test; pnpm --filter \"frontend\" test:e2e:ci",
+    "test": "pnpm --filter \"backend\" test; pnpm --filter \"frontend\" test:e2e:ci",
     "knip": "knip"
   },
   "license": "MIT",

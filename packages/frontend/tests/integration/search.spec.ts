@@ -138,7 +138,7 @@ test('Searches posts by tags', async ({
   await SearchPage.goto();
 
   const tags = ['tag1', 'tag2'];
-  const requestQueryTags = tags.map((t) => `tags[]=${t}`).join('&');
+  const requestQueryTags = tags.map((t) => encodeURI(`tags[]=${t}`)).join('&');
 
   await TagsList.addEachTag(tags);
 
@@ -157,7 +157,7 @@ test('Sets all filters from URL', async ({
   Api,
 }) => {
   const tags = ['tag1', 'tag2'];
-  const requestQueryTags = tags.map((t) => `tags[]=${t}`).join('&');
+  const requestQueryTags = tags.map((t) => encodeURI(`tags[]=${t}`)).join('&');
 
   const filters = {
     title: 'test',
@@ -238,7 +238,7 @@ test('Searches posts by clicking on a tag name and then "Search tag" option in t
     ),
   });
 
-  expect(postsResponse.url()).toContain(`tags[]=${tags[0]}`);
+  expect(postsResponse.url()).toContain(encodeURI(`tags[]=${tags[0]}`));
   await expect(currentPage).toHaveTitle(SearchPage.title);
   expect(SearchPage.pageHasTagsQueryParams([tags[0]])).toBe(true);
 });
