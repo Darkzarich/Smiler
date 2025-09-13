@@ -70,7 +70,7 @@
     "stylelint-order": "^6.0.4",
     "stylelint-prettier": "^5.0.3",
     "stylelint-scss": "^6.12.1",
-    "vite": "^6.3.5",
+    "vite": "^6.3.6",
     "vue-eslint-parser": "^10.2.0",
     "vue-tsc": "^3.0.5"
   }
