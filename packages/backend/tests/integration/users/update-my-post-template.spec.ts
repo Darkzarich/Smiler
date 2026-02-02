@@ -15,9 +15,9 @@ const post = generateRandomPost();
 
 const requiredPostFields = pick(post, ['title', 'sections']);
 
-describe('PUT /users/:id/template', () => {
+describe('PUT /users/me/template', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
-    const response = await request(global.app).put('/api/users/1234/template');
+    const response = await request(global.app).put('/api/users/me/template');
 
     expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);
     expect(response.status).toBe(401);
@@ -27,7 +27,7 @@ describe('PUT /users/:id/template', () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
     const response = await request(global.app)
-      .put('/api/users/1234/template')
+      .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
       .send({
         ...requiredPostFields,
@@ -44,7 +44,7 @@ describe('PUT /users/:id/template', () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
     const response = await request(global.app)
-      .put('/api/users/1234/template')
+      .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
       .send({
         ...requiredPostFields,
@@ -59,7 +59,7 @@ describe('PUT /users/:id/template', () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
     const response = await request(global.app)
-      .put('/api/users/1234/template')
+      .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
       .send({
         ...requiredPostFields,
@@ -74,7 +74,7 @@ describe('PUT /users/:id/template', () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
     const response = await request(global.app)
-      .put('/api/users/1234/template')
+      .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
       .send({
         ...requiredPostFields,
@@ -91,7 +91,7 @@ describe('PUT /users/:id/template', () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
     const response = await request(global.app)
-      .put('/api/users/1234/template')
+      .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
       .send({
         ...requiredPostFields,
@@ -114,7 +114,7 @@ describe('PUT /users/:id/template', () => {
     };
 
     await request(global.app)
-      .put('/api/users/1234/template')
+      .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
       .send(template);
 
@@ -131,7 +131,7 @@ describe('PUT /users/:id/template', () => {
     };
 
     await request(global.app)
-      .put('/api/users/1234/template')
+      .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
       .send(template);
 
@@ -153,7 +153,7 @@ describe('PUT /users/:id/template', () => {
     };
 
     await request(global.app)
-      .put('/api/users/1234/template')
+      .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
       .send(template);
 
@@ -177,7 +177,7 @@ describe('PUT /users/:id/template', () => {
     };
 
     await request(global.app)
-      .put('/api/users/1234/template')
+      .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
       .send(template);
 
