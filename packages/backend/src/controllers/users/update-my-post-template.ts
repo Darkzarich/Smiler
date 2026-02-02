@@ -10,13 +10,13 @@ import {
   POST_SECTIONS_MAX,
 } from '@constants/index';
 
-type UpdatePostTemplateBody = Partial<UserTemplate>;
+type UpdateMyPostTemplateBody = Partial<UserTemplate>;
 
-type UpdatePostTemplateResponse = UserTemplate;
+type UpdateMyPostTemplateResponse = UserTemplate;
 
-export async function updatePostTemplate(
-  req: Request<unknown, unknown, UpdatePostTemplateBody>,
-  res: Response<UpdatePostTemplateResponse>,
+export async function updateMyPostTemplate(
+  req: Request<unknown, unknown, UpdateMyPostTemplateBody>,
+  res: Response<UpdateMyPostTemplateResponse>,
 ) {
   // TODO: validate title, sections just like in posts
 

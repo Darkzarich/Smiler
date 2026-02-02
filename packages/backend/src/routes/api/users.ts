@@ -3,8 +3,8 @@ import { asyncControllerErrorHandler } from '@utils/async-controller-error-handl
 import {
   getByLogin,
   updateMe,
-  getPostTemplate,
-  updatePostTemplate,
+  getMyPostTemplate,
+  updateMyPostTemplate,
   getSettings,
   followById,
   unfollowById,
@@ -224,9 +224,9 @@ router.put(
 /**
 @swagger
 {
-  "/users/{id}/template": {
+  "/users/me/template": {
     "get": {
-      "summary": "Get user saved template",
+      "summary": "Get current user saved template",
       "tags": [
         "Users"
       ],
@@ -235,18 +235,7 @@ router.put(
           "cookieAuth": []
         }
       ],
-      "description": "Returns user's saved template for post with `title` and `sections`",
-      "parameters": [
-        {
-          "in": "path",
-          "name": "id",
-          "schema": {
-            "type": "string"
-          },
-          "required": true,
-          "description": "User id"
-        }
-      ],
+      "description": "Returns current user's saved template for post with `title` and `sections`",
       "responses": {
         "200": {
           "description": "ok",
@@ -261,31 +250,20 @@ router.put(
         "401": {
           "$ref": "#/components/responses/Unauthorized"
         },
-        "403": {
-          "$ref": "#/components/responses/Forbidden"
+        "404": {
+          "$ref": "#/components/responses/NotFound"
         }
       }
     },
     "put": {
-      "summary": "Update user template",
+      "summary": "Update current user template",
       "tags": [
         "Users"
       ],
-      "description": "Update user post template `sections`, `title` and `tags`",
+      "description": "Update current user post template `sections`, `title` and `tags`",
       "security": [
         {
           "cookieAuth": []
-        }
-      ],
-      "parameters": [
-        {
-          "in": "path",
-          "name": "id",
-          "schema": {
-            "type": "string"
-          },
-          "required": true,
-          "description": "User id"
         }
       ],
       "requestBody": {
@@ -328,8 +306,8 @@ router.put(
         "401": {
           "$ref": "#/components/responses/Unauthorized"
         },
-        "403": {
-          "$ref": "#/components/responses/Forbidden"
+        "404": {
+          "$ref": "#/components/responses/NotFound"
         },
         "422": {
           "$ref": "#/components/responses/UnprocessableEntity"
@@ -340,16 +318,15 @@ router.put(
 }
 */
 
-// TODO: me/template
 router.get(
-  '/:id/template',
+  '/me/template',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(getPostTemplate),
+  asyncControllerErrorHandler(getMyPostTemplate),
 );
 router.put(
-  '/:id/template',
+  '/me/template',
   authRequiredMiddleware,
-  asyncControllerErrorHandler(updatePostTemplate),
+  asyncControllerErrorHandler(updateMyPostTemplate),
 );
 
 /**

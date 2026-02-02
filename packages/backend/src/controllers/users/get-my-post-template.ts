@@ -1,18 +1,14 @@
 import type { Request, Response } from 'express';
 import { UserModel, UserTemplate } from '@models/User';
-import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
+import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
-type GetPostTemplateResponse = UserTemplate;
+type GetMyPostTemplateResponse = UserTemplate;
 
-export async function getPostTemplate(
+export async function getMyPostTemplate(
   req: Request,
-  res: Response<GetPostTemplateResponse>,
+  res: Response<GetMyPostTemplateResponse>,
 ) {
-  if (req.session.userId !== req.params.id) {
-    throw new ForbiddenError(ERRORS.TEMPLATE_CANT_SEE_NOT_OWN);
-  }
-
   const template = await UserModel.findById(req.session.userId)
     .select('template')
     .lean();
