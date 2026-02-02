@@ -252,7 +252,7 @@ onMounted(async () => {
       return;
     }
 
-    const data = await api.users.getUserTemplate(userStore.userId);
+    const data = await api.users.getMyTemplate();
 
     title.value = data.title;
     sections.value = data.sections || [];
@@ -312,7 +312,7 @@ const saveDraft = async () => {
   try {
     isSaving.value = true;
 
-    const data = await api.users.updateUserTemplate(userStore.userId!, {
+    const data = await api.users.updateMyTemplate({
       title: title.value,
       sections: sections.value,
       tags: tags.value,

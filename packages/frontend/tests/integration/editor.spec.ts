@@ -40,7 +40,7 @@ test.beforeEach(async ({ Api }) => {
     body: authUser,
   });
 
-  Api.routes.users.getUserTemplate.mock({
+  Api.routes.users.getMyTemplate.mock({
     body: { title: '', sections: [], tags: [] },
   });
 });
@@ -227,16 +227,13 @@ test('Fetch and show draft template', async ({ Api, page, PostCreatePage }) => {
   ] as const;
   const savedTags = ['test tag 1', 'test tag 2'];
 
-  Api.routes.users.getUserTemplate.mock({
+  Api.routes.users.getMyTemplate.mock({
     body: { title: savedTitle, sections: savedSections, tags: savedTags },
   });
 
-  const getUserTemplateResponse =
-    await Api.routes.users.getUserTemplate.waitForRequest({
-      preRequestAction: PostCreatePage.goto.bind(PostCreatePage),
-    });
-
-  expect(getUserTemplateResponse.url()).toContain(authUser.id);
+  await Api.routes.users.getMyTemplate.waitForRequest({
+    preRequestAction: PostCreatePage.goto.bind(PostCreatePage),
+  });
 
   await expect(page.getByTestId('post-section').first()).toContainText(
     savedSections[0].content,
@@ -259,7 +256,7 @@ test('Saves draft template', async ({
   Api,
   NotificationList,
 }) => {
-  Api.routes.users.updateUserTemplate.mock({
+  Api.routes.users.updateMyTemplate.mock({
     body: {
       ok: true,
     },
@@ -282,16 +279,15 @@ test('Saves draft template', async ({
   await PostCreatePage.addVideoSection();
   await PostCreatePage.uploadVideoWithUrl(vidCode);
 
-  const updateUserTemplateResponse =
-    await Api.routes.users.updateUserTemplate.waitForRequest({
+  const updateMyTemplateResponse =
+    await Api.routes.users.updateMyTemplate.waitForRequest({
       preRequestAction: PostCreatePage.saveDraft.bind(PostCreatePage),
     });
 
   await expect(NotificationList.root).toHaveText(
     'Draft post has been saved successfully!',
   );
-  expect(updateUserTemplateResponse.url()).toContain(authUser.id);
-  expect(updateUserTemplateResponse.postDataJSON()).toMatchObject({
+  expect(updateMyTemplateResponse.postDataJSON()).toMatchObject({
     title,
     tags: [tag],
     sections: [

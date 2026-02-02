@@ -18,14 +18,14 @@ export default {
   removeFilePicSection(hash: string) {
     return apiClient.delete(`${CONTROLLER_URL}/me/template/${hash}`);
   },
-  getUserTemplate(id: string) {
+  getMyTemplate() {
     return apiClient.get<userTypes.GetUserTemplateResponse>(
-      `${CONTROLLER_URL}/${id}/template`,
+      `${CONTROLLER_URL}/me/template`,
     );
   },
-  updateUserTemplate(id: string, data: userTypes.UpdateUserTemplateRequest) {
+  updateMyTemplate(data: userTypes.UpdateUserTemplateRequest) {
     return apiClient.put<userTypes.UpdateUserTemplateResponse>(
-      `${CONTROLLER_URL}/${id}/template`,
+      `${CONTROLLER_URL}/me/template`,
       data,
     );
   },
