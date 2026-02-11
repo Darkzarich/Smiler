@@ -81,7 +81,7 @@
     "express": "^5.2.0",
     "express-session": "^1.18.2",
     "helmet": "^7.1.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "mongoose": "^8.12.2",
     "mongoose-autopopulate": "^1.1.0",
     "morgan": "^1.9.1",
