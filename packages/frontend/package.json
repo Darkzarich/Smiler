@@ -58,7 +58,7 @@
     "eslint-plugin-prettier": "^5.5.3",
     "eslint-plugin-vue": "^10.4.0",
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "postcss-html": "^1.8.0",
     "prettier": "3.2.5",
     "sass": "^1.89.2",
