@@ -1,6 +1,6 @@
 <template>
   <div data-testid="posts-container" class="posts-container">
-    <div v-if="posts.length > 0" v-scroll="handleScroll">
+    <div v-if="posts.length > 0">
       <Post
         v-for="(post, index) in posts"
         :key="post.id"
@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { throttle } from 'lodash-es';
+import { useInfiniteScroll } from '@vueuse/core';
 import { postTypes } from '@/api/posts';
 import { useUserStore } from '@/store/user';
 import Post from '@components/Post/Post.vue';
@@ -55,21 +55,16 @@ const posts = defineModel<postTypes.Post[]>('posts', {
 
 const userStore = useUserStore();
 
-const handleScroll = throttle(function (_, el) {
-  // TODO: Refactor to intersection observer or something from VueUse
-  if (props.isLoading || !props.hasNextPage) {
-    return;
-  }
-
-  const curContainerBounds = el.getBoundingClientRect();
-
-  if (
-    curContainerBounds.height - Math.abs(curContainerBounds.y) <
-    window.innerHeight
-  ) {
-    emit('fetch-more');
-  }
-}, 200);
+useInfiniteScroll(
+  typeof window !== 'undefined' ? window : undefined,
+  () => emit('fetch-more'),
+  {
+    // Load when ~1 viewport from bottom (original UX); 400px fallback
+    distance: typeof window !== 'undefined' ? window.innerHeight : 400,
+    interval: 200,
+    canLoadMore: () => !!(props.hasNextPage && !props.isLoading),
+  },
+);
 </script>
 
 <style lang="scss">
