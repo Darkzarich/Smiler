@@ -56,6 +56,7 @@ const getPositionStyle = computed(() => {
 <style lang="scss">
 .base-context-menu {
   position: absolute;
+  z-index: 1;
   margin: 0;
   padding: 0;
   border-radius: 8px;

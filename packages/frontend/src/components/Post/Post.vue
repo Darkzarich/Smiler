@@ -1,5 +1,5 @@
 <template>
-  <div class="post">
+  <div ref="postRef" class="post">
     <div class="post__left">
       <div
         :data-testid="`post-${post.id}-upvote`"
@@ -440,21 +440,25 @@ const deletePost = async (id: string) => {
   router.push({ name: 'Home' });
 };
 
+const postRef = ref<HTMLElement | null>(null);
+
 const openContextMenu = (ev: MouseEvent | KeyboardEvent, tag: string) => {
-  if (!contextMenuData.show) {
+  if (!contextMenuData.show && postRef.value) {
+    const postRect = postRef.value.getBoundingClientRect();
+
     contextMenuData.show = true;
     contextMenuData.target = tag;
 
     if ('clientX' in ev) {
-      // MouseEvent
-      contextMenuData.x = ev.clientX;
-      contextMenuData.y = ev.clientY;
+      // MouseEvent: convert viewport coords to post-relative
+      contextMenuData.x = ev.clientX - postRect.left;
+      contextMenuData.y = ev.clientY - postRect.top;
     } else {
-      // KeyboardEvent - they the target element position
+      // KeyboardEvent: use target element position, relative to post
       const target = ev.target as HTMLElement;
       const rect = target.getBoundingClientRect();
-      contextMenuData.x = rect.left;
-      contextMenuData.y = rect.bottom;
+      contextMenuData.x = rect.left - postRect.left;
+      contextMenuData.y = rect.bottom - postRect.top;
     }
   }
 };
@@ -525,6 +529,7 @@ const searchByTag = (tag: string) => {
 .post {
   display: flex;
   flex-flow: row nowrap;
+  position: relative;
 
   &__left {
     display: flex;
