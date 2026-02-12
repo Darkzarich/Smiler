@@ -1,6 +1,5 @@
 import 'normalize.css';
-// TODO: Replace with a solution from VueUse
-import vClickOutside from 'click-outside-vue3';
+import { vOnClickOutside } from '@vueuse/components';
 import { createApp } from 'vue';
 import App from './App.vue';
 import { router } from './router';
@@ -10,7 +9,7 @@ const app = createApp(App);
 
 app.use(pinia);
 app.use(router);
-app.use(vClickOutside);
+app.directive('on-click-outside', vOnClickOutside);
 
 // TODO: Replace with a solution from VueUse
 app.directive('scroll', {

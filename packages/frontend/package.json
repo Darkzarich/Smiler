@@ -27,8 +27,9 @@
     "prettier": "prettier \"**/*.{js,ts,scss,css,html,json,vue}\" --write"
   },
   "dependencies": {
+    "@vueuse/components": "^14.2.0",
+    "@vueuse/core": "^14.2.0",
     "axios": "^1.13.5",
-    "click-outside-vue3": "4.0.1",
     "core-js": "^3.44.0",
     "date-fns": "^3.6.0",
     "lodash-es": "^4.17.23",

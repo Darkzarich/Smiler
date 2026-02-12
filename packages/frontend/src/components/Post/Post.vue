@@ -203,7 +203,7 @@
     </div>
 
     <BaseContextMenu
-      v-click-outside="closeContextMenu"
+      v-on-click-outside="closeContextMenu"
       :show="contextMenuData.show"
       :pos-x="contextMenuData.x"
       :pos-y="contextMenuData.y"
