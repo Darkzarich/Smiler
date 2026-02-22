@@ -38,8 +38,6 @@ interface Props {
   name?: string;
   placeholder?: string;
   error?: string;
-  // TODO: Why callback?
-  enterCallback?: () => void;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -49,7 +47,6 @@ withDefaults(defineProps<Props>(), {
   name: '',
   placeholder: 'Enter any text',
   error: '',
-  enterCallback: () => {},
 });
 
 const textAreaValue = defineModel<string>({
