@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 import { v4 as uuidv4 } from 'uuid';
 import type { RequestHandler } from 'express';
 
@@ -11,9 +12,7 @@ export function requestIdMiddleware(): RequestHandler {
 
     response.set(REQUEST_HEADER, id);
 
-    // TODO: fix this
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // eslint-disable-next-line security/detect-object-injection
     request[REQUEST_PROPERTY] = id;
 
     next();
