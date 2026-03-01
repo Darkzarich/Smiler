@@ -3,6 +3,7 @@ import {
   COMMENT_TIME_TO_UPDATE,
   POST_MAX_UPLOAD_IMAGE_SIZE,
   POST_TIME_TO_UPDATE,
+  POST_TITLE_MAX_LENGTH,
 } from '@constants/index';
 
 export const ERRORS = {
@@ -51,7 +52,7 @@ export const ERRORS = {
   POST_CANT_RATE_OWN: 'Cannot rate your own post',
   POST_ID_REQUIRED: 'Post id must be specified',
   POST_TITLE_REQUIRED: 'Title is required',
-  POST_TITLE_MAX_LENGTH_EXCEEDED: 'Exceeded max length of title',
+  POST_TITLE_MAX_LENGTH_EXCEEDED: `Title can't be longer than ${POST_TITLE_MAX_LENGTH} characters`,
   POST_SECTIONS_REQUIRED: 'At least one section is required',
   POST_TAGS_REQUIRED: 'At least one tag is required',
   POST_MAX_TAGS_EXCEEDED: 'Exceeded max amount of tags',
