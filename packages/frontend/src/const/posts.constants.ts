@@ -12,6 +12,6 @@ export const POST_SECTION_VIDEO_REGEXP = {
 };
 
 export const POST_SECTIONS_MAX_LENGTH = 10000;
-export const POST_TITLE_MAX_LENGTH = 40;
+export const POST_TITLE_MAX_LENGTH = 100;
 export const POST_MAX_TAGS = 8;
 export const POST_MAX_TAG_LEN = 20;
