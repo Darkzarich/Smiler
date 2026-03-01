@@ -4,7 +4,7 @@
       <div
         v-for="notification in notifications"
         :key="notification.id"
-        class="notification-list__item"
+        class="notification-list__item u-flex-row"
         :class="{
           'notification-list__item--error': notification.theme === 'error',
           'notification-list__item--info': notification.theme === 'info',
@@ -45,8 +45,6 @@ const { notifications } = storeToRefs(notificationsStore);
   width: 100%;
 
   &__item {
-    @include mixins.flex-row;
-
     justify-content: center;
     align-items: center;
     position: relative;

@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <div class="post__main">
+    <div class="post__main u-widget">
       <div class="post__title">
         <RouterLink
           class="post__title-link"
@@ -70,7 +70,7 @@
         </template>
       </div>
 
-      <div v-if="post.tags.length > 0" class="post__tags">
+      <div v-if="post.tags.length > 0" class="post__tags u-flex-row">
         <button
           v-for="tag in post.tags"
           :key="tag"
@@ -610,8 +610,6 @@ const searchByTag = (tag: string) => {
   }
 
   &__tags {
-    @include mixins.flex-row;
-
     flex-wrap: wrap;
     margin-bottom: 1rem;
   }
@@ -632,8 +630,6 @@ const searchByTag = (tag: string) => {
   }
 
   &__main {
-    @include mixins.widget;
-
     width: 90%;
     color: var(--color-main-text);
 

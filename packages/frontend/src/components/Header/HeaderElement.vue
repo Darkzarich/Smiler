@@ -22,7 +22,7 @@
       <Navigation
         v-if="isDesktop()"
         nav-link-class="header__nav-link"
-        class="header__navigation"
+        class="header__navigation u-flex-row"
       >
         <template #after>
           <NavigationFeedLink
@@ -183,8 +183,6 @@ watch(
   }
 
   &__navigation {
-    @include mixins.flex-row;
-
     align-items: center;
     gap: 16px;
     margin-left: 4rem;

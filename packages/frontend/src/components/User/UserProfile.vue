@@ -1,11 +1,11 @@
 <template>
-  <div class="user-profile">
+  <div class="user-profile u-flex-row">
     <div class="user-profile__avatar">
       <img :src="resolveAvatar(user.avatar)" :alt="user.avatar" />
     </div>
 
     <div class="user-profile__info">
-      <div class="user-profile__login" data-testid="user-profile-login">
+      <div class="user-profile__login u-flex-row" data-testid="user-profile-login">
         {{ user.login }}
 
         <BaseButton
@@ -112,8 +112,6 @@ async function handleFollow() {
 @use '@/styles/mixins';
 
 .user-profile {
-  @include mixins.flex-row;
-
   position: relative;
   margin-bottom: var(--variable-widget-margin);
   margin-left: 10%;
@@ -161,8 +159,6 @@ async function handleFollow() {
   }
 
   &__login {
-    @include mixins.flex-row;
-
     align-items: center;
     font-size: 1.5rem;
   }

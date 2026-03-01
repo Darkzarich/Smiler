@@ -35,7 +35,7 @@
 
       <div
         v-if="!isFetchingComments && hasCommentsNextPage"
-        class="comments__fetch-more"
+        class="comments__fetch-more u-widget"
         @click="fetchMoreComments()"
       >
         <template v-if="isFetchingComments">
@@ -46,7 +46,7 @@
 
       <div
         v-if="comments.length > 0 && !hasCommentsNextPage"
-        class="comments__no-more"
+        class="comments__no-more u-widget"
       >
         You've read all the comments. Now it's your turn to share your thoughts!
       </div>
@@ -183,8 +183,6 @@ onBeforeMount(async () => {
     color: var(--color-main-text);
     text-align: center;
     font-size: 1.2rem;
-
-    @include mixins.widget;
   }
 
   &__fetch-more {

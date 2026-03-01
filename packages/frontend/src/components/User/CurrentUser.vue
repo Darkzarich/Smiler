@@ -1,5 +1,5 @@
 <template>
-  <div class="current-user">
+  <div class="u-widget current-user">
     <AuthFormSwitcher v-if="!user" />
 
     <template v-else>
@@ -51,9 +51,7 @@ const user = computed(() => userStore.user);
 @use '@/styles/mixins';
 
 .current-user {
-  @include mixins.widget;
-
-  padding: 0;
+  padding: 0 !important;
 
   &__avatar-container {
     display: flex;

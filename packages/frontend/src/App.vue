@@ -42,6 +42,7 @@ onBeforeMount(async () => {
 
 <style lang="scss">
 @use '@/styles/mixins';
+@use '@/styles/utilities';
 
 :root {
   --variable-widget-margin: 24px;

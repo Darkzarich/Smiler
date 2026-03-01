@@ -1,5 +1,5 @@
 <template>
-  <div class="user-stats">
+  <div class="user-stats u-flex-row">
     <div
       :class="{
         'user-stats__stat--positive': stats.rating > 0,
@@ -31,8 +31,6 @@ defineProps<{
 @use '@/styles/mixins';
 
 .user-stats {
-  @include mixins.flex-row;
-
   gap: 2rem;
   color: var(--color-main-text);
 

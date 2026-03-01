@@ -24,7 +24,7 @@
       tag="transition-group"
     >
       <template #item="{ element: section }">
-        <div class="post-editor__section" data-testid="post-section">
+        <div class="post-editor__section u-flex-row" data-testid="post-section">
           <!-- TODO: Refactor this part -->
           <template v-if="section.type === postTypes.POST_SECTION_TYPES.TEXT">
             <BaseTextEditor
@@ -349,8 +349,6 @@ const saveDraft = async () => {
   }
 
   &__section {
-    @include mixins.flex-row;
-
     align-items: center;
     position: relative;
     margin-bottom: 32px;

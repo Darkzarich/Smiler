@@ -1,0 +1,34 @@
+// Global utility classes for common layout and widget patterns.
+
+.u-flex-row {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.u-flex-col {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.u-widget {
+  padding: 1rem;
+  border-radius: 8px;
+  background: var(--color-widget-bg);
+}
+
+.u-scroll {
+  &::-webkit-scrollbar {
+    width: 10px;
+    background-color: var(--color-scrollbar);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-gray-light);
+  }
+
+  &::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px
+      color-mix(in srgb, var(--color-black) 30%, transparent);
+    background-color: var(--color-widget-bg);
+  }
+}

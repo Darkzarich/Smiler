@@ -1,5 +1,5 @@
 <template>
-  <footer>
+  <footer class="u-flex-row">
     <div class="footer-content">
       <a
         class="github-link"
@@ -17,8 +17,6 @@
 @use '@/styles/mixins';
 
 footer {
-  @include mixins.flex-row;
-
   align-items: center;
   width: 100%;
   height: 4rem;

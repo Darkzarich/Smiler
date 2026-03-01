@@ -11,8 +11,8 @@
       />
     </div>
 
-    <div class="search-form__columns">
-      <div class="search-form__column">
+    <div class="search-form__columns u-flex-row">
+      <div class="search-form__column u-flex-col">
         <BaseDatePicker
           v-model="filters.dateFrom"
           class="search-form__date-picker-from"
@@ -26,7 +26,7 @@
         />
       </div>
 
-      <div class="search-form__column">
+      <div class="search-form__column u-flex-col">
         <BaseSlider
           v-model="filters.ratingFrom"
           data-testid="search-form-rating-from"
@@ -48,7 +48,7 @@
       />
     </div>
 
-    <div class="search-form__actions">
+    <div class="search-form__actions u-flex-row">
       <BaseButton data-testid="search-form-submit" stretched @click="search">
         Submit
       </BaseButton>
@@ -138,15 +138,11 @@ const applyFiltersToRoute = () => {
   }
 
   &__columns {
-    @include mixins.flex-row;
-
     justify-content: space-around;
     margin-bottom: 12px;
   }
 
   &__column {
-    @include mixins.flex-col;
-
     justify-content: center;
   }
 
@@ -156,8 +152,6 @@ const applyFiltersToRoute = () => {
   }
 
   &__actions {
-    @include mixins.flex-row;
-
     gap: 16px;
     margin-top: 24px;
   }

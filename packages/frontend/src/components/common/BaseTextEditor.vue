@@ -1,6 +1,9 @@
 <template>
-  <div class="base-text-editor">
-    <div class="base-text-editor__style-buttons" :data-testid="dataTestid">
+  <div class="base-text-editor u-widget">
+    <div
+      class="base-text-editor__style-buttons u-flex-row"
+      :data-testid="dataTestid"
+    >
       <button
         class="base-text-editor__style-button"
         type="button"
@@ -204,8 +207,6 @@ onMounted(() => {
 @use '@/styles/mixins';
 
 .base-text-editor {
-  @include mixins.widget;
-
   width: 100%;
   padding: 1rem;
   transition: border 200ms ease-out;
@@ -218,8 +219,6 @@ onMounted(() => {
   }
 
   &__style-buttons {
-    @include mixins.flex-row;
-
     gap: 8px;
     margin-bottom: 1rem;
 

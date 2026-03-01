@@ -1,5 +1,5 @@
 <template>
-  <form class="signin-form">
+  <form class="signin-form u-flex-col">
     <div class="signin-form__header" data-testid="signin-form">Sign In</div>
 
     <div class="signin-form__input">
@@ -117,8 +117,6 @@ async function signIn() {
 @use '@/styles/mixins';
 
 .signin-form {
-  @include mixins.flex-col;
-
   align-items: center;
 
   &__header {

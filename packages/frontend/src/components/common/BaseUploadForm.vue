@@ -1,5 +1,5 @@
 <template>
-  <div class="base-upload-form">
+  <div class="base-upload-form u-flex-col">
     <label class="base-upload-form__label" :for="id">
       <span>Upload image</span>
 
@@ -35,8 +35,6 @@ const handleInput = (event: Event) => {
 @use '@/styles/mixins';
 
 .base-upload-form {
-  @include mixins.flex-col;
-
   &__label {
     display: block;
     padding: 1rem;

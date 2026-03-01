@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isShow" class="post-create">
+  <div v-if="isShow" class="post-create u-widget u-flex-col">
     <h1 class="post-create__header" data-testid="post-create-header">
       {{ isEdit ? 'Edit' : 'Make' }} Post
     </h1>
@@ -97,9 +97,6 @@ onBeforeMount(async () => {
 @use '@/styles/mixins';
 
 .post-create {
-  @include mixins.widget;
-  @include mixins.flex-col;
-
   @include mixins.for-size(phone-only) {
     padding-right: 0;
     padding-left: 0;

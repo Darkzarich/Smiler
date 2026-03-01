@@ -5,7 +5,7 @@
       :data-testid="dataTestid"
       @update:model-value="modelValue = $event"
     >
-      <div class="comment-form__actions">
+      <div class="comment-form__actions u-flex-row">
         <BaseButton
           class="comment-form__action-btn"
           :loading="loading"
@@ -56,8 +56,6 @@ const modelValue = defineModel<string>({
 
 .comment-form {
   &__actions {
-    @include mixins.flex-row;
-
     gap: 16px;
     margin-top: 20px;
   }

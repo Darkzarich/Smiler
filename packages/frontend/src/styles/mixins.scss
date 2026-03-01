@@ -26,36 +26,3 @@
     }
   }
 }
-
-// TODO: Remove these SCSS mixins (since they repeat styles instead of copying them over)
-@mixin flex-row {
-  display: flex;
-  flex-flow: row nowrap;
-}
-
-@mixin flex-col {
-  display: flex;
-  flex-flow: column nowrap;
-}
-
-@mixin widget {
-  padding: 1rem;
-  border-radius: 8px;
-  background: var(--color-widget-bg);
-}
-
-@mixin scroll {
-  &::-webkit-scrollbar {
-    width: 10px;
-    background-color: var(--color-scrollbar);
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--color-gray-light);
-  }
-
-  &::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 6px rgb(--color-black / 30%);
-    background-color: var(--color-widget-bg);
-  }
-}

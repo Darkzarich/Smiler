@@ -1,6 +1,6 @@
 <template>
   <div class="search">
-    <div class="search__form">
+    <div class="search__form u-widget">
       <SearchForm v-model="filter" />
     </div>
 
@@ -132,8 +132,6 @@ onBeforeMount(() => {
 
 .search {
   &__form {
-    @include mixins.widget;
-
     margin-bottom: var(--variable-widget-margin);
     margin-left: 10%;
 

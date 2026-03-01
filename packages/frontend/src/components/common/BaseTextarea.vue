@@ -1,6 +1,6 @@
 <template>
   <div
-    class="base-textarea"
+    class="base-textarea u-flex-col"
     :class="error && isDirty ? 'base-textarea--error' : ''"
   >
     <label v-if="label" class="base-textarea__label" :for="id">
@@ -69,8 +69,6 @@ const setValue = (event: Event) => {
 @use '@/styles/mixins';
 
 .base-textarea {
-  @include mixins.flex-col;
-
   &__label {
     margin-bottom: 4px;
     color: var(--color-main-text);

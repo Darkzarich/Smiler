@@ -12,17 +12,17 @@
 
     <div
       v-else-if="!isLoading"
-      class="posts-container__no-posts"
+      class="posts-container__no-posts u-widget"
       data-testid="no-content"
     >
       <slot name="no-content" />
     </div>
 
-    <div v-if="hasNextPage" class="posts-container__no-more">
+    <div v-if="hasNextPage" class="posts-container__no-more u-widget">
       <slot name="no-more-content" />
     </div>
 
-    <div v-if="isLoading" class="posts-container__loading">
+    <div v-if="isLoading" class="posts-container__loading u-widget u-flex-row">
       <CircularLoader />
     </div>
   </div>
@@ -89,16 +89,11 @@ useInfiniteScroll(
   }
 
   &__loading {
-    @include mixins.widget;
-    @include mixins.flex-row;
-
     justify-content: center;
   }
 
   &__no-posts,
   &__no-more {
-    @include mixins.widget;
-
     display: flex;
     justify-content: center;
     color: var(--color-main-text);

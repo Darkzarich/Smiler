@@ -1,5 +1,5 @@
 <template>
-  <div class="user-settings">
+  <div class="user-settings u-widget">
     <div v-if="!isFetching" class="user-settings__data">
       <h1 class="user-settings__title">Settings</h1>
 
@@ -272,8 +272,6 @@ onBeforeMount(() => {
 @use '@/styles/mixins';
 
 .user-settings {
-  @include mixins.widget;
-
   @include mixins.for-size(phone-only) {
     border-right: none;
     border-left: none;

@@ -1,5 +1,5 @@
 <template>
-  <div class="not-found">
+  <div class="not-found u-widget u-flex-col">
     <div class="not-found__404">404</div>
 
     <div class="not-found__info">Not existing page</div>
@@ -27,9 +27,6 @@ const goHome = () => {
 @use '@/styles/mixins';
 
 .not-found {
-  @include mixins.widget;
-  @include mixins.flex-col;
-
   align-items: center;
 
   &__404 {

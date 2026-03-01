@@ -8,7 +8,7 @@
 
     <Navigation
       nav-link-class="mobile-menu__nav-link"
-      class="mobile-menu__navigation"
+      class="mobile-menu__navigation u-flex-col"
     >
       <template #before>
         <NavigationFeedLink
@@ -64,8 +64,6 @@ const closeMenu = () => {
   }
 
   &__navigation {
-    @include mixins.flex-col;
-
     overflow-x: hidden;
   }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="base-input" :class="error && isDirty ? 'base-input--error' : ''">
+  <div class="base-input u-flex-col" :class="error && isDirty ? 'base-input--error' : ''">
     <label v-if="label" class="base-input__label" :for="id">
       {{ label }}
     </label>
@@ -80,8 +80,6 @@ const setValue = (event: Event) => {
 @use '@/styles/mixins';
 
 .base-input {
-  @include mixins.flex-col;
-
   // TODO: Width 100%?
 
   position: relative;

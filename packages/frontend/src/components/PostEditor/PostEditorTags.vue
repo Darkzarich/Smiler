@@ -1,5 +1,5 @@
 <template>
-  <div class="post-editor-tags">
+  <div class="post-editor-tags u-flex-row">
     <div
       v-if="tags.length"
       class="post-editor-tags__list"
@@ -97,8 +97,6 @@ const removeTag = (tag: string) => {
 @use '@/styles/mixins';
 
 .post-editor-tags {
-  @include mixins.flex-row;
-
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
