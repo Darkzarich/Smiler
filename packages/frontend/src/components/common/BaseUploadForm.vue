@@ -17,7 +17,6 @@
 <script setup lang="ts">
 const file = defineModel<File | null>();
 
-// TODO: Replace all randomUUID with nano or something
 const id = crypto.randomUUID();
 
 const handleInput = (event: Event) => {

@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import slugLib from 'slug';
-import crypto from 'node:crypto';
+import { nanoid } from 'nanoid';
 import { UserModel } from '@models/User';
 import { Post, PostModel, PostSection } from '@models/Post';
 import { sendSuccess } from '@utils/response-utils';
@@ -33,7 +33,7 @@ export async function create(
       title,
       sections,
       tags,
-      slug: `${slugLib(title)}-${crypto.randomUUID()}`,
+      slug: `${slugLib(title)}-${nanoid(3)}`,
       author: userId,
     }),
     // Clear user template
