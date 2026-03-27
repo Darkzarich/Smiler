@@ -23,7 +23,7 @@
   "devDependencies": {
     "concurrently": "^9.2.1",
     "cspell": "^8.19.4",
-    "knip": "^5.63.0"
+    "knip": "^5.88.1"
   },
   "pnpm": {
     "patchedDependencies": {

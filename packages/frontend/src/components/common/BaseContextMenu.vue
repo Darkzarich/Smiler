@@ -59,13 +59,13 @@ const getPositionStyle = computed(() => {
   z-index: 1;
   margin: 0;
   padding: 0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   box-shadow:
     0 3px 6px -4px rgb(0 0 0 / 24%),
     0 6px 12px 0 rgb(0 0 0 / 16%),
     0 9px 18px 8px rgb(0 0 0 / 10%);
   background: var(--color-surface-secondary);
-  border: 1px solid var(--color-border);
   list-style: none;
 
   &-enter-active,
