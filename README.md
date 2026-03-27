@@ -4,7 +4,9 @@
 
 # Smiler
 
-### [Demo](https://smiler.darkzarich.com/posts/all)
+### [**View Demo →**](https://smiler.darkzarich.com/posts/all)
+
+Smiler is a Reddit-style social platform where users share posts with text, images, and videos, follow creators and topics, and engage through comments and ratings.
 
 ## Table of Contents
 
@@ -12,15 +14,14 @@
   - [Common Features](#common-features)
   - [Backend Key Features](#backend-key-features)
   - [Frontend Key Features](#frontend-key-features)
+- [Why This Project?](#why-this-project)
 - [Motivation](#motivation)
-- [Get Involved](#get-involved)
-- [Requirements](#requirements)
+- [Contribution](#contribution)
 - [How to Run It](#how-to-run-it)
   - [Prerequisites](#prerequisites)
   - [Option 1: Running Without Docker](#option-1-running-without-docker)
-  - [Option 2: Running with Docker](#option-2-running-with-docker)
-  - [Option 3: Running with Docker Compose (All-in-One)](#option-3-running-with-docker-compose-all-in-one)
-- [Building Images](#building-images)
+  - [Option 2: Running With Docker](#option-2-running-with-docker)
+  - [Option 3: Running With Docker Compose (All-in-One)](#option-3-running-with-docker-compose-all-in-one)
 
 ## Key Features
 
@@ -32,7 +33,7 @@ This project is built on the MEVN stack (MongoDB, Express, Vue.js, Node.js) and 
 
 ### Backend Key Features
 
-- **General**:
+- **Core Infrastructure**:
 
   - **Clustering**: If an exception occurs on the server, the app won't crash. Instead, another instance will be spawned to keep the application running.
   - **CORS Protection**: The API restricts access to allowed domains via environment variables.
@@ -41,21 +42,21 @@ This project is built on the MEVN stack (MongoDB, Express, Vue.js, Node.js) and 
 
 - **Posts**:
 
-  - **Creating Posts**: Users can create posts with a slug generated from the title. Posts are composed of "sections," which can be text, pictures, picture links, or video links. Sections retain their order in the database, and users can add up to 8 sections per post.
+  - **Creating Posts**: Users can create posts with a slug generated from the title. Posts are composed of "sections," which can be text, pictures, picture links, or video links. Sections keep their order in the database, and users can add up to 8 sections per post.
   - **Uploading Pictures**: Images can be uploaded directly or via a link. Uploaded images are **resized and optimized** for performance.
   - **Updating and Deleting Posts**: Users can update or delete their posts, but only within 10 minutes of creation.
-  - **Feed**: Users can view the latest posts from followed users or tags.
-  - **Tags**: Posts can have up to 8 tags, and users can follow/unfollow tags to customize their feed.
-  - **Post Retrieval**: Posts can be retrieved with pagination and filtered by author, date, rating, or title regex. The API also indicates if the user has already rated a post.
+  - **Feed**: View the latest posts from followed users or tags.
+  - **Tags**: Posts can have up to 8 tags, and users can follow or unfollow tags to customize their feed.
+  - **Post Retrieval**: Posts can be retrieved with pagination and filtered by author, date, rating, or title regex. The API also shows if the user has already rated a post.
   - **Post Rating**: Posts have a rating system that contributes to the user's overall rating.
 
 - **Users**:
 
   - **Profile Picture**: Users can set a profile picture using a link.
-  - **Following Users**: Users can follow/unfollow other users.
+  - **Following Users**: Users can follow or unfollow other users.
   - **Bio**: Users can add a short description about themselves.
   - **Registration and Authentication**: Standard registration and authentication features are implemented.
-  - **Sessions**: Instead of JWT, the app uses sessions for enhanced security.
+  - **Sessions**: The app uses sessions instead of JWT for better security.
   - **Saving Drafts**: Users can save post drafts, including sections, title, and body, without publishing them.
   - **Individual Rating**: Each user has a rating based on the sum of ratings for their posts and comments.
 
@@ -69,7 +70,7 @@ This project is built on the MEVN stack (MongoDB, Express, Vue.js, Node.js) and 
 
 ### Frontend Key Features
 
-- **General**:
+- **Core Features**:
 
   - **Auth Guards**: Routes requiring authentication are protected.
   - **Allowed Routes Guard**: Non-existent routes redirect to a 404 page.
@@ -81,19 +82,19 @@ This project is built on the MEVN stack (MongoDB, Express, Vue.js, Node.js) and 
 
 - **Posts**:
 
-  - **Multiple Post Pages**: Includes pages like _Today_, _All_, _Blowing_, _Top This Week_, and _New_, each with unique sorting and filtering.
+  - **Multiple Post Pages**: Includes pages like _Today_, _All_, _Trending_, _Top This Week_, and _New_, each with unique sorting and filtering.
   - **Post Editor**: A rich text editor for creating and editing posts, with drag-and-drop support for sections.
   - **Preloader**: Smooth loading animations for better UX.
-  - **Infinite Scroll**: Loads more posts as the user scrolls.
-  - **Search with Filters**: Allows users to search posts with advanced filters.
-  - **Following Tags**: Users can follow/unfollow tags directly from the UI.
+  - **Infinite Scroll**: Loads more posts as you scroll.
+  - **Search with Filters**: Search posts with advanced filters.
+  - **Following Tags**: Follow or unfollow tags directly from the UI.
 
 - **Users**:
 
   - **Auth State Management**: Handles authentication state, hiding unavailable features for logged-out users.
   - **User Profile Page**: Displays user posts, rating, followers, bio, and avatar.
-  - **Follow/Unfollow Users**: Users can follow or unfollow others.
-  - **Settings**: Users can manage their profile, including bio, avatar, and followed users/tags.
+  - **Follow/Unfollow Users**: Follow or unfollow other users.
+  - **Settings**: Manage your profile, including bio, avatar, and followed users/tags.
   - **Registration and Login**: Standard registration and login forms.
 
 - **Comments**:
@@ -101,13 +102,13 @@ This project is built on the MEVN stack (MongoDB, Express, Vue.js, Node.js) and 
   - **Rich Text Editor**: For creating and updating comments.
   - **Delete and Update Comments**: Users can delete or update their comments within a specific time frame.
 
+## Why This Project?
+
+This project gave me the chance to work with the full MEVN stack, implement clustering for better reliability, and build a robust testing setup with both integration tests on the backend and E2E tests on the frontend. I also explored different ways to handle file uploads, implemented a hierarchical comment system, and figured out how to structure a multi-section post format.
+
 ## Motivation
 
-The primary motivation behind this project is to have fun while learning new technologies and implementing creative solutions. By focusing on integration testing for the backend, I aim to ensure the application remains robust and maintainable as it evolves.
-
-## Get Involved
-
-I hope you find this project as enjoyable as I do! Feel free to explore the code, report issues, or contribute. Your feedback and contributions are always welcome!
+I built Smiler to practice building a full-stack application from scratch, experimenting with different architectural patterns and testing strategies along the way. It's a playground for trying out new ideas and seeing what works (and what doesn't) in a real project context.
 
 ## How to Run It
 
@@ -207,6 +208,10 @@ If you want to run both the application and MongoDB using Docker Compose, follow
      # Optionally add --build to build images instead of pulling them from Docker Hub
      docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
      ```
+
+## Contribution
+
+Feel free to check out the code, open issues if you find bugs, or suggest improvements. Pull requests are welcome too.
 
 ## License
 
