@@ -47,6 +47,8 @@
         </BaseInput>
       </div>
 
+      <ThemeToggle v-if="isDesktop()" class="header__theme-toggle" />
+
       <div v-if="user" class="header__avatar">
         <!-- TODO: Move everything like that to its own component AvatarLink or something -->
         <RouterLink
@@ -75,6 +77,7 @@ import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseInput from '@common/BaseInput.vue';
 import Navigation from '@components/Navigation/Navigation.vue';
 import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
+import ThemeToggle from '@components/Theme/ThemeToggle.vue';
 import IconMenuMobile from '@icons/IconMenuMobile.vue';
 import IconSearch from '@icons/IconSearch.vue';
 import { isDesktop } from '@utils/is-desktop';
@@ -124,7 +127,7 @@ watch(
   width: 100%;
   height: 56px;
   padding: 0.5rem;
-  background-color: var(--color-header);
+  background-color: var(--color-surface-elevated);
 
   @include mixins.for-size(phone-only) {
     height: 46px;
@@ -156,7 +159,7 @@ watch(
 
       svg {
         height: 100%;
-        fill: var(--color-gray-light);
+        fill: var(--color-text-secondary);
       }
     }
 
@@ -177,7 +180,7 @@ watch(
 
     &--active {
       svg {
-        fill: var(--color-main-text);
+        fill: var(--color-text-primary);
       }
     }
   }
@@ -218,6 +221,10 @@ watch(
     @include mixins.for-size(phone-only) {
       width: 70%;
     }
+  }
+
+  &__theme-toggle {
+    margin-left: 16px;
   }
 
   &__avatar {

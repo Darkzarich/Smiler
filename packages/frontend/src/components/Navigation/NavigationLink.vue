@@ -23,12 +23,12 @@ withDefaults(defineProps<Props>(), {
 
 <style lang="scss">
 .nav-link {
-  color: var(--color-main-text);
+  color: var(--color-text-primary);
   text-decoration: none;
   font-weight: bold;
 
   &--disabled {
-    color: var(--color-gray-light);
+    color: var(--color-text-secondary);
     user-select: none;
     pointer-events: none;
   }

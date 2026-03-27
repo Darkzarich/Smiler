@@ -5,7 +5,10 @@
     </div>
 
     <div class="user-profile__info">
-      <div class="user-profile__login u-flex-row" data-testid="user-profile-login">
+      <div
+        class="user-profile__login u-flex-row"
+        data-testid="user-profile-login"
+      >
         {{ user.login }}
 
         <BaseButton
@@ -117,8 +120,8 @@ async function handleFollow() {
   margin-left: 10%;
   padding: 1rem;
   border-radius: 8px;
-  background: var(--color-widget-bg);
-  color: var(--color-main-text);
+  background: var(--color-surface-secondary);
+  color: var(--color-text-primary);
 
   @include mixins.for-size(phone-only) {
     width: 100%;
@@ -178,7 +181,7 @@ async function handleFollow() {
 
   &__date {
     margin-bottom: 12px;
-    color: var(--color-gray-light);
+    color: var(--color-text-secondary);
     font-size: 13px;
   }
 }

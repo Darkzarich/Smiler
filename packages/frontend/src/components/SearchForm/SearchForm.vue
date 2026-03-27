@@ -127,7 +127,7 @@ const applyFiltersToRoute = () => {
 .search-form {
   &__title {
     margin-bottom: 12px;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     text-align: center;
     font-size: 1.5rem;
     font-weight: 500;

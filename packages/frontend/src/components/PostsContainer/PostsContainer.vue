@@ -96,7 +96,7 @@ useInfiniteScroll(
   &__no-more {
     display: flex;
     justify-content: center;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     text-align: center;
     font-size: 1.3rem;
     line-height: 1.7rem;

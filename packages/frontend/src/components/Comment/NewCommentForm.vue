@@ -111,14 +111,14 @@ const createComment = async () => {
 
   &--disabled {
     padding-top: 1rem;
-    border: 1px solid var(--color-gray-light);
-    background: var(--color-widget-bg);
-    color: var(--color-main-text);
+    border: 1px solid var(--color-text-secondary);
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
   }
 
   &__title {
     margin-bottom: 1rem;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     text-align: center;
     font-size: 1.2rem;
   }

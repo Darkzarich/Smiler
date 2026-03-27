@@ -1,5 +1,8 @@
 <template>
-  <div class="base-input u-flex-col" :class="error && isDirty ? 'base-input--error' : ''">
+  <div
+    class="base-input u-flex-col"
+    :class="error && isDirty ? 'base-input--error' : ''"
+  >
     <label v-if="label" class="base-input__label" :for="id">
       {{ label }}
     </label>
@@ -86,16 +89,16 @@ const setValue = (event: Event) => {
 
   &__label {
     margin-bottom: 4px;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     font-size: 13px;
   }
 
   &__input {
     padding: 0.5rem;
-    border: 1px solid var(--color-gray-light);
+    border: 1px solid var(--color-border);
     border-radius: 8px;
-    background: var(--color-bg);
-    color: var(--color-main-text);
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
     transition: all 200ms ease-out;
 
     &:focus {
@@ -134,7 +137,7 @@ const setValue = (event: Event) => {
     right: 7px;
 
     svg {
-      fill: var(--color-gray-light);
+      fill: var(--color-text-secondary);
       cursor: pointer;
     }
   }

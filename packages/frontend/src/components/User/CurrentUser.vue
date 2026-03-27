@@ -61,7 +61,7 @@ const user = computed(() => userStore.user);
     width: 100%;
     margin: 0 auto;
     padding: 1rem;
-    background: var(--color-header);
+    background: var(--color-surface-elevated);
     user-select: none;
 
     @include mixins.for-size(phone-only) {
@@ -80,7 +80,7 @@ const user = computed(() => userStore.user);
 
   &__login {
     margin: 1rem;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     text-align: center;
     font-size: 1rem;
 

@@ -16,6 +16,12 @@
           class="mobile-menu__nav-link"
         />
       </template>
+
+      <template #after>
+        <div class="mobile-menu__nav-link mobile-menu__theme-item">
+          <ThemeToggle />
+        </div>
+      </template>
     </Navigation>
   </div>
 </template>
@@ -24,6 +30,7 @@
 import { useUserStore } from '@/store/user';
 import Navigation from '@components/Navigation/Navigation.vue';
 import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
+import ThemeToggle from '@components/Theme/ThemeToggle.vue';
 import CurrentUser from '@components/User/CurrentUser.vue';
 import IconExit from '@icons/IconExit.vue';
 
@@ -50,7 +57,7 @@ const closeMenu = () => {
   z-index: 1000;
   width: 100%;
   height: 100%;
-  background: var(--color-widget-bg);
+  background: var(--color-surface-secondary);
   overflow-y: scroll;
 
   &__close-btn {
@@ -70,11 +77,17 @@ const closeMenu = () => {
   &__nav-link {
     width: 100%;
     padding: 1rem;
-    border-bottom: 1px solid var(--color-gray-light);
+    border-bottom: 1px solid var(--color-border);
 
     &:first-child {
-      border-top: 1px solid var(--color-gray-light);
+      border-top: 1px solid var(--color-border);
     }
+  }
+
+  &__theme-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   &__user {

@@ -44,16 +44,16 @@ const handleInput = (event: Event) => {
   &__label {
     display: inline-block;
     min-width: 80px;
-    color: var(--color-gray-light);
+    color: var(--color-text-secondary);
   }
 
   &__input {
     width: 135px;
     padding: 8px;
     outline: var(--color-primary);
-    border: 1px solid var(--color-gray-light);
-    background: var(--color-bg);
-    color: var(--color-main-text);
+    border: 1px solid var(--color-text-secondary);
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
     color-scheme: dark;
 
     &::-webkit-inner-spin-button {

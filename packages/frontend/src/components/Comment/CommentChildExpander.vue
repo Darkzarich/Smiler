@@ -30,7 +30,7 @@ withDefaults(defineProps<Props>(), {
   margin-top: 20px;
   margin-left: -18px;
   border: 1px solid currentcolor;
-  background: var(--color-bg);
+  background: var(--color-surface-primary);
   color: var(--color-primary);
   font-family: monospace;
   font-weight: bold;
@@ -42,7 +42,7 @@ withDefaults(defineProps<Props>(), {
   }
 
   &--expanded {
-    color: var(--color-gray-light);
+    color: var(--color-text-secondary);
   }
 }
 </style>

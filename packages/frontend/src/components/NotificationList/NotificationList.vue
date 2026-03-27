@@ -50,18 +50,18 @@ const { notifications } = storeToRefs(notificationsStore);
     position: relative;
     opacity: 1;
     padding: 5px;
-    border-bottom: 1px solid var(--color-bg);
+    border-bottom: 1px solid var(--color-surface-primary);
     background: var(--color-danger);
     transition: opacity 0.2s 0s ease-in-out;
 
     &--info {
       background: var(--color-primary-dark);
-      color: var(--color-white);
+      color: #fff;
     }
 
     &--error {
       background: var(--color-danger);
-      color: var(--color-white);
+      color: #fff;
     }
 
     &-enter-active,
@@ -91,7 +91,7 @@ const { notifications } = storeToRefs(notificationsStore);
     cursor: pointer;
 
     svg {
-      fill: var(--color-bg);
+      fill: var(--color-surface-primary);
     }
   }
 }

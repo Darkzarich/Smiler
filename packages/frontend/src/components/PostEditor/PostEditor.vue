@@ -355,7 +355,7 @@ const saveDraft = async () => {
     cursor: move;
 
     .base-text-editor {
-      border: 1px solid var(--color-gray-light);
+      border: 1px solid var(--color-text-secondary);
       border-radius: 8px;
 
       @include mixins.for-size(phone-only) {

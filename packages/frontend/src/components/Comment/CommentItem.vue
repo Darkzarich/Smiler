@@ -456,13 +456,13 @@ const downvote = async () => {
 @use '@/styles/mixins';
 
 .comment-item {
-  color: var(--color-main-text);
+  color: var(--color-text-primary);
 
   &__content {
     margin: 1rem;
     padding: 1rem;
     border-radius: 8px;
-    background: var(--color-widget-bg);
+    background: var(--color-surface-secondary);
 
     @include mixins.for-size(phone-only) {
       margin-right: 0;
@@ -473,11 +473,11 @@ const downvote = async () => {
 
       @keyframes flash {
         0% {
-          background: var(--color-comments-animation);
+          background: var(--color-accent-transparent);
         }
 
         100% {
-          background: var(--color-widget-bg);
+          background: var(--color-surface-secondary);
         }
       }
     }
@@ -489,7 +489,7 @@ const downvote = async () => {
 
     a {
       display: flex;
-      color: var(--color-main-text);
+      color: var(--color-text-primary);
       text-decoration: none;
     }
   }
@@ -506,7 +506,7 @@ const downvote = async () => {
   &__downvote-btn,
   &__edit-btn,
   &__delete-btn {
-    color: var(--color-gray-light);
+    color: var(--color-text-secondary);
     cursor: pointer;
 
     svg {
@@ -514,7 +514,7 @@ const downvote = async () => {
       top: -8px;
       width: 2rem;
       height: 2rem;
-      fill: var(--color-gray-light);
+      fill: var(--color-text-secondary);
       transform: scale(1.2);
     }
   }
@@ -553,7 +553,7 @@ const downvote = async () => {
 
   &__created-at {
     margin-left: 0.5rem;
-    color: var(--color-gray-light);
+    color: var(--color-text-secondary);
   }
 
   &__body {
@@ -579,14 +579,14 @@ const downvote = async () => {
     }
 
     &--disabled {
-      color: var(--color-gray-light) !important;
+      color: var(--color-text-secondary) !important;
     }
   }
 
   &__replies {
     margin-left: 19.5px;
     padding-left: 8px;
-    border-left: solid 1px var(--color-gray-light);
+    border-left: solid 1px var(--color-text-secondary);
   }
 }
 </style>

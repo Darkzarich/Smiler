@@ -30,14 +30,14 @@ const goHome = () => {
   align-items: center;
 
   &__404 {
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     font-size: 48px;
     font-weight: bold;
   }
 
   &__info {
     margin-bottom: 1rem;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     font-size: 48px;
 
     @include mixins.for-size(phone-only) {

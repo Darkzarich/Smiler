@@ -8,6 +8,7 @@ import NotificationList from './components/NotificationList';
 import Post from './components/Post';
 import PostEditor from './components/PostEditor';
 import TagsList from './components/TagsList';
+import ThemeToggle from './components/ThemeToggle';
 import NotFoundPage from './pages/NotFoundPage';
 import PostCreatePage from './pages/PostCreatePage';
 import PostEditPage from './pages/PostEditPage';
@@ -35,6 +36,7 @@ export interface TestFixtures {
   CurrentUser: CurrentUser;
   NotificationList: NotificationList;
   TagsList: TagsList;
+  ThemeToggle: ThemeToggle;
 }
 
 // Extend base test by providing common page objects
@@ -89,6 +91,9 @@ const test = base.extend<TestFixtures>({
   },
   TagsList: async ({ page }, use) => {
     await use(new TagsList(page));
+  },
+  ThemeToggle: async ({ page }, use) => {
+    await use(new ThemeToggle(page));
   },
 });
 

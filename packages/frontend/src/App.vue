@@ -19,7 +19,8 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue';
+import { onBeforeMount, onMounted, ref } from 'vue';
+import { useThemeStore } from '@/store/theme';
 import { useUserStore } from '@/store/user';
 import FooterElement from '@components/FooterElement.vue';
 import HeaderElement from '@components/Header/HeaderElement.vue';
@@ -27,42 +28,29 @@ import NotificationList from '@components/NotificationList/NotificationList.vue'
 import CurrentUser from '@components/User/CurrentUser.vue';
 import { isDesktop } from '@utils/is-desktop';
 
-// TODO: maybe global mini loader fixed to top
-
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 
 const isShow = ref(false);
 
 onBeforeMount(async () => {
   await userStore.userFetchAuthState();
-
   isShow.value = true;
+});
+
+onMounted(() => {
+  themeStore.initTheme();
 });
 </script>
 
 <style lang="scss">
 @use '@/styles/mixins';
 @use '@/styles/utilities';
+@use '@/styles/themes/dark';
+@use '@/styles/themes/light';
 
 :root {
   --variable-widget-margin: 24px;
-}
-
-[color-scheme='dark'] {
-  --color-primary: #86c232;
-  --color-primary-dark: #61892f;
-  --color-danger: #ff4646;
-  --color-danger-dark: #892f2f;
-  --color-gray: #474b4f;
-  --color-gray-light: #6b6e70;
-  --color-white: #fff;
-  --color-black: #000;
-  --color-main-text: #bfbfbf;
-  --color-header: #1f2529;
-  --color-bg: #1c2125;
-  --color-widget-bg: #272b2d;
-  --color-comments-animation: #7fbc3236;
-  --color-scrollbar: #f5f5f5;
 }
 
 html {
@@ -80,7 +68,7 @@ html {
 
 body {
   margin: 0;
-  background: var(--color-bg);
+  background: var(--color-surface-primary);
   overflow-y: hidden;
 
   &::-webkit-scrollbar {
@@ -88,12 +76,12 @@ body {
   }
 
   &::-webkit-scrollbar-track {
-    background: var(--color-bg);
+    background: var(--color-surface-primary);
   }
 
   &::-webkit-scrollbar-thumb {
     border-radius: 20px;
-    background-color: var(--color-gray-light);
+    background-color: var(--color-text-secondary);
   }
 }
 

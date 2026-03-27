@@ -37,10 +37,10 @@ const handleInput = (event: Event) => {
   &__label {
     display: block;
     padding: 1rem;
-    border: 2px solid var(--color-gray-light);
+    border: 2px solid var(--color-text-secondary);
     border-radius: 3px;
-    background: var(--color-bg);
-    color: var(--color-main-text);
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
     text-align: center;
   }
 

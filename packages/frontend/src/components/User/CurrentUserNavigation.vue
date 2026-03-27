@@ -63,7 +63,7 @@ const logout = async () => {
   &__item-icon {
     width: 2rem;
     margin-right: 0.5rem;
-    fill: var(--color-main-text);
+    fill: var(--color-text-primary);
     transition: all 200ms ease-out;
   }
 
@@ -73,7 +73,7 @@ const logout = async () => {
     align-items: center;
     padding: 1rem;
     border-left: 2px solid transparent;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     text-decoration: none;
     cursor: pointer;
     font-weight: 500;

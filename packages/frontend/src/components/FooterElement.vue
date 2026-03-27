@@ -21,7 +21,7 @@ footer {
   width: 100%;
   height: 4rem;
   margin-top: 1.5rem;
-  background: var(--color-header);
+  background: var(--color-surface-elevated);
 
   @include mixins.for-size(phone-only) {
     height: 2rem;

@@ -106,7 +106,7 @@ onBeforeMount(async () => {
 
   &__header {
     margin-bottom: 16px;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     font-size: 1.5rem;
     align-self: center;
     font-weight: 500;
