@@ -121,7 +121,7 @@ async function signIn() {
 
   &__header {
     margin-bottom: 0.5rem;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     font-weight: bold;
   }
 

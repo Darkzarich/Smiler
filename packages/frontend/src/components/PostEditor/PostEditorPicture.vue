@@ -135,7 +135,7 @@ const resetFormState = () => {
 .post-editor-picture {
   width: 100%;
   padding: 16px;
-  border: 1px solid var(--color-gray-light);
+  border: 1px solid var(--color-text-secondary);
   border-radius: 8px;
 
   @include mixins.for-size(phone-only) {
@@ -154,7 +154,7 @@ const resetFormState = () => {
 
   &__or {
     margin-bottom: 12px;
-    color: var(--color-gray-light);
+    color: var(--color-text-secondary);
     text-align: center;
     font-weight: bold;
   }

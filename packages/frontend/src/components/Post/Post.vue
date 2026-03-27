@@ -559,13 +559,13 @@ const searchByTag = (tag: string) => {
     svg {
       position: relative;
       top: 3px;
-      fill: var(--color-gray-light);
+      fill: var(--color-text-secondary);
       cursor: pointer;
     }
   }
 
   &__title-link {
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     text-decoration: none;
   }
 
@@ -574,12 +574,12 @@ const searchByTag = (tag: string) => {
   &__downvote {
     border: none;
     background: transparent;
-    color: var(--color-gray-light);
+    color: var(--color-text-secondary);
     transition: all 200ms ease-out;
 
     svg {
       width: 5rem;
-      fill: var(--color-gray-light);
+      fill: var(--color-text-secondary);
       transition: all 200ms ease-out;
 
       @include mixins.for-size(phone-only) {
@@ -631,7 +631,7 @@ const searchByTag = (tag: string) => {
 
   &__main {
     width: 90%;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
 
     @include mixins.for-size(phone-only) {
       width: 100%;
@@ -658,8 +658,8 @@ const searchByTag = (tag: string) => {
       margin-top: 0.5rem;
       padding: 0.5rem;
       padding-left: 1rem;
-      border: 1px solid var(--color-gray-light);
-      background: var(--color-bg);
+      border: 1px solid var(--color-text-secondary);
+      background: var(--color-surface-primary);
     }
   }
 
@@ -698,7 +698,7 @@ const searchByTag = (tag: string) => {
     padding: 0.5rem;
     border-bottom-right-radius: 8px;
     border-bottom-left-radius: 8px;
-    background: var(--color-header);
+    background: var(--color-surface-elevated);
 
     @include mixins.for-size(phone-only) {
       border-top: none;
@@ -711,7 +711,7 @@ const searchByTag = (tag: string) => {
 
   &__comments-count {
     flex: 1;
-    color: var(--color-gray-light);
+    color: var(--color-text-secondary);
     text-align: center;
     text-decoration: none;
 
@@ -722,7 +722,7 @@ const searchByTag = (tag: string) => {
       width: 1rem;
       height: 1rem;
       margin-right: 0.2rem;
-      fill: var(--color-main-text);
+      fill: var(--color-text-primary);
     }
   }
 
@@ -731,7 +731,7 @@ const searchByTag = (tag: string) => {
     flex: 1;
     justify-content: flex-end;
     align-items: center;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     text-decoration: none;
   }
 
@@ -739,7 +739,7 @@ const searchByTag = (tag: string) => {
     border-bottom: 1px solid transparent;
 
     &:hover {
-      border-bottom: 1px solid var(--color-main-text);
+      border-bottom: 1px solid var(--color-text-primary);
     }
   }
 

@@ -71,16 +71,16 @@ const setValue = (event: Event) => {
 .base-textarea {
   &__label {
     margin-bottom: 4px;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     font-size: 13px;
   }
 
   &__textarea {
     padding: 0.5rem;
-    border: 1px solid var(--color-gray-light);
+    border: 1px solid var(--color-border);
     border-radius: 8px;
-    background: var(--color-bg);
-    color: var(--color-main-text);
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
     transition: all 200ms ease-out;
 
     &:focus {

@@ -64,7 +64,8 @@ const getPositionStyle = computed(() => {
     0 3px 6px -4px rgb(0 0 0 / 24%),
     0 6px 12px 0 rgb(0 0 0 / 16%),
     0 9px 18px 8px rgb(0 0 0 / 10%);
-  background: var(--color-gray-light);
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border);
   list-style: none;
 
   &-enter-active,
@@ -80,8 +81,8 @@ const getPositionStyle = computed(() => {
 
   &__item {
     padding: 0.5rem;
-    background: var(--color-gray-light);
-    color: var(--color-main-text);
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
     font-size: 0.9rem;
     cursor: pointer;
     transition: all 200ms ease-out;
@@ -97,7 +98,7 @@ const getPositionStyle = computed(() => {
     }
 
     &:hover {
-      filter: brightness(1.3);
+      background: var(--color-surface-primary);
     }
   }
 }

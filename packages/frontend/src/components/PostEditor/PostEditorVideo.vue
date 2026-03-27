@@ -89,7 +89,7 @@ const handleError = () => {
 .post-editor-video {
   width: 100%;
   padding: 1rem;
-  border: 1px solid var(--color-gray-light);
+  border: 1px solid var(--color-text-secondary);
   border-radius: 8px;
 
   @include mixins.for-size(phone-only) {
@@ -105,7 +105,7 @@ const handleError = () => {
   &__video {
     display: flex;
     flex-flow: row nowrap;
-    border: 1px solid var(--color-gray-light);
+    border: 1px solid var(--color-text-secondary);
 
     video,
     iframe {

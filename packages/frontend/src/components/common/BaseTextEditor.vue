@@ -233,14 +233,14 @@ onMounted(() => {
     outline: none;
     border: 1px solid var(--color-primary);
     border-radius: 3px;
-    background: var(--color-bg);
-    color: var(--color-main-text);
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
     font-family: monospace;
     font-weight: bold;
     cursor: pointer;
 
     &:hover {
-      background: var(--color-widget-bg);
+      background: var(--color-surface-secondary);
     }
   }
 
@@ -250,10 +250,10 @@ onMounted(() => {
     min-height: 240px;
     padding: 16px;
     outline: var(--color-primary);
-    border: 1px solid var(--color-gray-light);
+    border: 1px solid var(--color-text-secondary);
     border-radius: 8px;
-    background: var(--color-bg);
-    color: var(--color-main-text);
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
     cursor: text;
 
     br {
@@ -267,8 +267,8 @@ onMounted(() => {
       margin-top: 8px;
       margin-bottom: 8px;
       padding: 16px;
-      border: var(--color-gray) solid 1px;
-      background-color: var(--color-widget-bg);
+      border: var(--color-gray-500) solid 1px;
+      background-color: var(--color-surface-secondary);
     }
 
     @include mixins.for-size(phone-only) {

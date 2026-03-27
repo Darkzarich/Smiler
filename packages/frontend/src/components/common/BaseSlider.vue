@@ -55,21 +55,21 @@ const handleInput = (event: Event) => {
   &__label {
     display: inline-block;
     min-width: 85px;
-    color: var(--color-gray-light);
+    color: var(--color-text-secondary);
   }
 
   &__value {
     position: absolute;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
   }
 
   &__input {
     margin: 0 8px;
     outline: var(--color-primary);
-    border: 1px solid var(--color-gray-light);
+    border: 1px solid var(--color-text-secondary);
     border-radius: 5px;
-    background: var(--color-bg);
-    color: var(--color-main-text);
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
     appearance: none;
 
     &::-webkit-slider-thumb {
@@ -86,7 +86,7 @@ const handleInput = (event: Event) => {
       height: 0.5rem;
       border: none;
       border-radius: 5px;
-      background: var(--color-gray-light);
+      background: var(--color-text-secondary);
       cursor: pointer;
     }
   }

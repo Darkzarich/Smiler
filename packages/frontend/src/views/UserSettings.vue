@@ -285,7 +285,7 @@ onBeforeMount(() => {
 
   &__title {
     margin-bottom: 12px;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     text-align: center;
     font-size: 1.5rem;
     font-weight: 500;
@@ -301,7 +301,7 @@ onBeforeMount(() => {
 
   &__block-title {
     margin-bottom: 16px;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     text-align: center;
     font-weight: 400;
   }
@@ -338,7 +338,7 @@ onBeforeMount(() => {
 
     img {
       width: 128px;
-      border: 1px solid var(--color-gray-light);
+      border: 1px solid var(--color-text-secondary);
       border-radius: 50%;
     }
   }
@@ -349,7 +349,7 @@ onBeforeMount(() => {
   }
 
   &__no-subscriptions {
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
   }
 
   &__following {
@@ -365,7 +365,7 @@ onBeforeMount(() => {
   }
 
   &__following-type {
-    color: var(--color-gray-light);
+    color: var(--color-text-secondary);
     font-weight: bold;
   }
 
@@ -379,13 +379,13 @@ onBeforeMount(() => {
     display: flex;
     align-items: center;
     gap: 4px;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
   }
 
   &__following-avatar {
     width: 16px;
     height: 16px;
-    border: 1px solid var(--color-gray-light);
+    border: 1px solid var(--color-text-secondary);
     border-radius: 50%;
   }
 

@@ -172,7 +172,7 @@ onBeforeMount(async () => {
     margin-top: 0.5rem;
 
     // TODO: Set this text for <body> and remove everywhere else
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     text-align: center;
     font-size: 1.2rem;
   }
@@ -180,7 +180,7 @@ onBeforeMount(async () => {
   &__fetch-more,
   &__no-more {
     margin-top: 0.5rem;
-    color: var(--color-main-text);
+    color: var(--color-text-primary);
     text-align: center;
     font-size: 1.2rem;
   }

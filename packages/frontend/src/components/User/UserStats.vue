@@ -32,7 +32,7 @@ defineProps<{
 
 .user-stats {
   gap: 2rem;
-  color: var(--color-main-text);
+  color: var(--color-text-primary);
 
   &__stat-count {
     font-size: 28px;

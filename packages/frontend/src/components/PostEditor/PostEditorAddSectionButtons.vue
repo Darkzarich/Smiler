@@ -51,15 +51,15 @@ defineEmits<{
 
   &__button {
     padding: 16px;
-    border: 2px solid var(--color-gray-light);
+    border: 2px solid var(--color-text-secondary);
     border-radius: 8px;
-    background: var(--color-bg);
+    background: var(--color-surface-primary);
     cursor: pointer;
     transition: all 200ms ease-out;
 
     svg {
       transition: all 200ms ease-out;
-      fill: var(--color-gray-light);
+      fill: var(--color-text-secondary);
     }
 
     &:hover {
