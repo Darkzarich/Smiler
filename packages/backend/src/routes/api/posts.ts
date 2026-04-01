@@ -18,6 +18,12 @@ import {
   unvoteById,
 } from '@controllers/posts';
 import authRequiredMiddleware from '@middlewares/auth-required';
+import {
+  uploadRateLimiter,
+  writeRateLimiter,
+  voteRateLimiter,
+  apiRateLimiter,
+} from '@middlewares/rate-limiter';
 
 const router = express.Router();
 
@@ -366,6 +372,7 @@ const router = express.Router();
 */
 router.get(
   '/',
+  apiRateLimiter,
   asyncControllerErrorHandler((req, res) => {
     if (req.query.author) {
       return getListByAuthor(req, res);
@@ -375,7 +382,12 @@ router.get(
   }),
 );
 
-router.post('/', authRequiredMiddleware, asyncControllerErrorHandler(create));
+router.post(
+  '/',
+  authRequiredMiddleware,
+  writeRateLimiter,
+  asyncControllerErrorHandler(create),
+);
 
 /**
 @swagger
@@ -412,7 +424,7 @@ router.post('/', authRequiredMiddleware, asyncControllerErrorHandler(create));
 }
 */
 
-router.get('/categories/all', asyncControllerErrorHandler(all));
+router.get('/categories/all', apiRateLimiter, asyncControllerErrorHandler(all));
 
 /**
 @swagger
@@ -449,7 +461,7 @@ router.get('/categories/all', asyncControllerErrorHandler(all));
 }
 */
 
-router.get('/categories/today', asyncControllerErrorHandler(today));
+router.get('/categories/today', apiRateLimiter, asyncControllerErrorHandler(today));
 
 /**
 @swagger
@@ -486,7 +498,7 @@ router.get('/categories/today', asyncControllerErrorHandler(today));
 }
 */
 
-router.get('/categories/blowing', asyncControllerErrorHandler(blowing));
+router.get('/categories/blowing', apiRateLimiter, asyncControllerErrorHandler(blowing));
 
 /**
 @swagger
@@ -523,7 +535,7 @@ router.get('/categories/blowing', asyncControllerErrorHandler(blowing));
 }
 */
 
-router.get('/categories/recent', asyncControllerErrorHandler(recent));
+router.get('/categories/recent', apiRateLimiter, asyncControllerErrorHandler(recent));
 
 /**
 @swagger
@@ -562,6 +574,7 @@ router.get('/categories/recent', asyncControllerErrorHandler(recent));
 
 router.get(
   '/categories/top-this-week',
+  apiRateLimiter,
   asyncControllerErrorHandler(topThisWeek),
 );
 
@@ -606,6 +619,7 @@ router.get(
 router.get(
   '/feed',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(getFeed),
 );
 
@@ -755,15 +769,17 @@ router.get(
   }
 }
 */
-router.get('/:slug', asyncControllerErrorHandler(getBySlug));
+router.get('/:slug', apiRateLimiter, asyncControllerErrorHandler(getBySlug));
 router.put(
   '/:id',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(updateById),
 );
 router.delete(
   '/:id',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(deleteById),
 );
 
@@ -831,6 +847,7 @@ router.delete(
 router.post(
   '/upload',
   authRequiredMiddleware,
+  uploadRateLimiter,
   asyncControllerErrorHandler(upload),
 );
 
@@ -942,11 +959,13 @@ router.post(
 router.put(
   '/:id/vote',
   authRequiredMiddleware,
+  voteRateLimiter,
   asyncControllerErrorHandler(voteById),
 );
 router.delete(
   '/:id/vote',
   authRequiredMiddleware,
+  voteRateLimiter,
   asyncControllerErrorHandler(unvoteById),
 );
 
