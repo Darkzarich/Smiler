@@ -9,6 +9,7 @@ import {
   unvoteById,
 } from '@controllers/comments';
 import authRequiredMiddleware from '@middlewares/auth-required';
+import { writeRateLimiter, voteRateLimiter, apiRateLimiter } from '@middlewares/rate-limiter';
 
 const router = express.Router();
 
@@ -252,9 +253,14 @@ const router = express.Router();
   }
 }
 */
-router.get('/', asyncControllerErrorHandler(getList));
+router.get('/', apiRateLimiter, asyncControllerErrorHandler(getList));
 
-router.post('/', authRequiredMiddleware, asyncControllerErrorHandler(create));
+router.post(
+  '/',
+  authRequiredMiddleware,
+  writeRateLimiter,
+  asyncControllerErrorHandler(create),
+);
 
 /**
 @swagger
@@ -363,11 +369,13 @@ router.post('/', authRequiredMiddleware, asyncControllerErrorHandler(create));
 router.put(
   '/:id',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(updateById),
 );
 router.delete(
   '/:id',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(deleteById),
 );
 
@@ -476,11 +484,13 @@ router.delete(
 router.put(
   '/:id/vote',
   authRequiredMiddleware,
+  voteRateLimiter,
   asyncControllerErrorHandler(voteById),
 );
 router.delete(
   '/:id/vote',
   authRequiredMiddleware,
+  voteRateLimiter,
   asyncControllerErrorHandler(unvoteById),
 );
 

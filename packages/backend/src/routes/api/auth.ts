@@ -2,6 +2,7 @@ import express from 'express';
 import { asyncControllerErrorHandler } from '@utils/async-controller-error-handler';
 import { current, signIn, signUp, logout } from '@controllers/auth';
 import authRequiredMiddleware from '@middlewares/auth-required';
+import { authRateLimiter, apiRateLimiter } from '@middlewares/rate-limiter';
 
 const router = express.Router();
 
@@ -79,7 +80,7 @@ const router = express.Router();
   }
 }
 */
-router.get('/current', asyncControllerErrorHandler(current));
+router.get('/current', apiRateLimiter, asyncControllerErrorHandler(current));
 
 /**
 @swagger
@@ -146,7 +147,11 @@ router.get('/current', asyncControllerErrorHandler(current));
   }
 }
 */
-router.post('/signin', asyncControllerErrorHandler(signIn));
+router.post(
+  '/signin',
+  authRateLimiter,
+  asyncControllerErrorHandler(signIn),
+);
 
 /**
 @swagger
@@ -217,7 +222,11 @@ router.post('/signin', asyncControllerErrorHandler(signIn));
   }
 }
 */
-router.post('/signup', asyncControllerErrorHandler(signUp));
+router.post(
+  '/signup',
+  authRateLimiter,
+  asyncControllerErrorHandler(signUp),
+);
 
 /**
 @swagger
@@ -245,6 +254,7 @@ router.post('/signup', asyncControllerErrorHandler(signUp));
 router.post(
   '/logout',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(logout),
 );
 

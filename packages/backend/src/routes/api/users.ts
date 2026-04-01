@@ -11,6 +11,7 @@ import {
   deletePostTemplatePicture,
 } from '@controllers/users';
 import authRequiredMiddleware from '@middlewares/auth-required';
+import { apiRateLimiter } from '@middlewares/rate-limiter';
 
 const router = express.Router();
 /**
@@ -214,10 +215,11 @@ const router = express.Router();
   }
 }
 */
-router.get('/:login', asyncControllerErrorHandler(getByLogin));
+router.get('/:login', apiRateLimiter, asyncControllerErrorHandler(getByLogin));
 router.put(
   '/me',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(updateMe),
 );
 
@@ -321,11 +323,13 @@ router.put(
 router.get(
   '/me/template',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(getMyPostTemplate),
 );
 router.put(
   '/me/template',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(updateMyPostTemplate),
 );
 
@@ -373,6 +377,7 @@ router.put(
 router.get(
   '/me/settings',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(getSettings),
 );
 
@@ -459,11 +464,13 @@ router.get(
 router.put(
   '/:id/follow',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(followById),
 );
 router.delete(
   '/:id/follow',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(unfollowById),
 );
 
@@ -518,6 +525,7 @@ router.delete(
 router.delete(
   '/me/template/:hash',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(deletePostTemplatePicture),
 );
 

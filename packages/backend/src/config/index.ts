@@ -1,7 +1,6 @@
 import { config } from 'dotenv';
 import { resolve } from 'path';
 
-// Load environment variables from .env file, won't override any existing environment variables.
 config({ path: resolve(process.cwd(), '../../.env') });
 
 const {
@@ -14,6 +13,12 @@ const {
   FRONT_ORIGIN_LOCAL,
   FRONTEND_PORT,
   FRONT_ORIGIN_REMOTE,
+  RATE_LIMIT_ENABLED,
+  RATE_LIMIT_AUTH_MAX,
+  RATE_LIMIT_API_MAX,
+  RATE_LIMIT_WRITE_MAX,
+  RATE_LIMIT_VOTE_MAX,
+  RATE_LIMIT_UPLOAD_MAX,
 } = process.env;
 
 export default {
@@ -27,4 +32,10 @@ export default {
   FRONT_ORIGIN_LOCAL:
     FRONT_ORIGIN_LOCAL || `http://localhost:${FRONTEND_PORT || 8000}`,
   FRONT_ORIGIN_REMOTE,
+  RATE_LIMIT_ENABLED: RATE_LIMIT_ENABLED !== 'false',
+  RATE_LIMIT_AUTH_MAX: parseInt(RATE_LIMIT_AUTH_MAX || '10', 10),
+  RATE_LIMIT_API_MAX: parseInt(RATE_LIMIT_API_MAX || '100', 10),
+  RATE_LIMIT_WRITE_MAX: parseInt(RATE_LIMIT_WRITE_MAX || '30', 10),
+  RATE_LIMIT_VOTE_MAX: parseInt(RATE_LIMIT_VOTE_MAX || '60', 10),
+  RATE_LIMIT_UPLOAD_MAX: parseInt(RATE_LIMIT_UPLOAD_MAX || '20', 10),
 };

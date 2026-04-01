@@ -2,6 +2,7 @@ import express from 'express';
 import { asyncControllerErrorHandler } from '@utils/async-controller-error-handler';
 import { follow, unfollow } from '@controllers/tags';
 import authRequiredMiddleware from '@middlewares/auth-required';
+import { apiRateLimiter } from '@middlewares/rate-limiter';
 
 const router = express.Router();
 /**
@@ -79,11 +80,13 @@ const router = express.Router();
 router.put(
   '/:tag/follow',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(follow),
 );
 router.delete(
   '/:tag/follow',
   authRequiredMiddleware,
+  apiRateLimiter,
   asyncControllerErrorHandler(unfollow),
 );
 
