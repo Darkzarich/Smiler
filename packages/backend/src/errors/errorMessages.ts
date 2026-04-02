@@ -1,5 +1,6 @@
 import { millisecondsToMinutes } from 'date-fns';
 import {
+  COMMENT_MAX_BODY_LENGTH,
   COMMENT_TIME_TO_UPDATE,
   POST_MAX_UPLOAD_IMAGE_SIZE,
   POST_TIME_TO_UPDATE,
@@ -40,6 +41,7 @@ export const ERRORS = {
   COMMENT_CAN_EDIT_WITHIN_TIME: `You can update comment only within the first ${millisecondsToMinutes(COMMENT_TIME_TO_UPDATE)} min`,
   COMMENT_CAN_DELETE_WITHIN_TIME: `You can delete comment only within the first ${millisecondsToMinutes(COMMENT_TIME_TO_UPDATE)} min`,
   COMMENT_LIMIT_PARAM_EXCEEDED: "Limit can't be more than 30",
+  COMMENT_BODY_MAX_LENGTH_EXCEEDED: `Comment body can't be longer than ${COMMENT_MAX_BODY_LENGTH} characters`,
 
   POST_NOT_FOUND: 'Post is not found',
   POST_LIMIT_PARAM_EXCEEDED: "Limit can't be more than 15",

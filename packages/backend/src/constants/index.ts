@@ -18,6 +18,7 @@ export const POST_MAX_IMAGE_WIDTH = 360;
 export const COMMENT_RATE_VALUE = 0.5;
 export const COMMENT_TIME_TO_UPDATE = minutesToMilliseconds(10);
 export const COMMENT_MAX_LIMIT = 30;
+export const COMMENT_MAX_BODY_LENGTH = 10000;
 
 export const USER_MAX_BIO_LENGTH = 300;
 export const USER_MAX_AVATAR_LENGTH = 150;

@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import sanitizeHtml from '@libs/sanitize-html';
 import { Comment, CommentModel } from '@models/Comment';
 import { PostModel } from '@models/Post';
+import { CommentValidator } from '@validators/CommentValidator';
 
 import { ValidationError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
@@ -21,9 +22,7 @@ export async function create(
   const { userId } = req.session;
   const { body, parent, post: postId } = req.body;
 
-  if (!body) {
-    throw new ValidationError(ERRORS.COMMENT_SHOULD_NOT_BE_EMPTY);
-  }
+  CommentValidator.validateBody(body);
 
   if (!postId) {
     throw new ValidationError(ERRORS.POST_ID_REQUIRED);

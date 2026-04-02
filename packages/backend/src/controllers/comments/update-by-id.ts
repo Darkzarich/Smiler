@@ -3,6 +3,7 @@ import { differenceInMilliseconds } from 'date-fns';
 import sanitizeHtml from '@libs/sanitize-html';
 import { Comment, CommentModel } from '@models/Comment';
 import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
+import { CommentValidator } from '@validators/CommentValidator';
 import {
   ForbiddenError,
   NotFoundError,
@@ -28,6 +29,10 @@ export async function updateById(
   const { userId } = req.session;
   const { id } = req.params;
   const { body } = req.body;
+
+  if (body) {
+    CommentValidator.validateBodyLength(body);
+  }
 
   const comment = await CommentModel.findOne({
     _id: id,

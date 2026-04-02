@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
+import { COMMENT_TIME_TO_UPDATE, COMMENT_MAX_BODY_LENGTH } from '@constants/index';
 import { signUpRequest } from '@test-utils/request-auth';
 import { CommentModel } from '@models/Comment';
 import { UserModel } from '@models/User';
@@ -88,6 +88,26 @@ describe('PUT /comments/:id', () => {
 
     expect(updatedComment!.body).toBe(body);
     expect(response.status).toBe(200);
+  });
+
+  it("Should return status 422 and an expected message if comment's body exceeds max length", async () => {
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+
+    const comment = await CommentModel.create(
+      generateRandomComment({
+        author: currentUser.id,
+      }),
+    );
+
+    const response = await request(global.app)
+      .put(`/api/comments/${comment.id}`)
+      .send({ body: 'a'.repeat(COMMENT_MAX_BODY_LENGTH + 1) })
+      .set('Cookie', sessionCookie);
+
+    expect(response.body.error.message).toBe(
+      ERRORS.COMMENT_BODY_MAX_LENGTH_EXCEEDED,
+    );
+    expect(response.status).toBe(422);
   });
 
   it('Should return status 200 and the updated comment', async () => {

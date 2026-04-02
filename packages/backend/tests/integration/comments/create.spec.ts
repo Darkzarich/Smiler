@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { signUpRequest } from '@test-utils/request-auth';
+import { COMMENT_MAX_BODY_LENGTH } from '@constants/index';
 import { PostModel } from '@models/Post';
 import { CommentModel } from '@models/Comment';
 import {
@@ -26,6 +27,25 @@ describe('POST /comments', () => {
 
     expect(response.body.error.message).toBe(
       ERRORS.COMMENT_SHOULD_NOT_BE_EMPTY,
+    );
+    expect(response.status).toBe(422);
+  });
+
+  it("Should return status 422 and an expected message if comment's body exceeds max length", async () => {
+    const { sessionCookie } = await signUpRequest(global.app);
+
+    const post = await PostModel.create(generateRandomPost());
+
+    const response = await request(global.app)
+      .post('/api/comments')
+      .send({
+        body: 'a'.repeat(COMMENT_MAX_BODY_LENGTH + 1),
+        post: post.id,
+      })
+      .set('Cookie', sessionCookie);
+
+    expect(response.body.error.message).toBe(
+      ERRORS.COMMENT_BODY_MAX_LENGTH_EXCEEDED,
     );
     expect(response.status).toBe(422);
   });
