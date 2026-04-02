@@ -500,13 +500,13 @@ describe('PUT /posts/:id', () => {
           {
             type: POST_SECTION_TYPES.PICTURE,
             isFile: true,
-            url: '/uploads/test/1724110246594.jpg',
+            url: `/uploads/${currentUser.id}/1724110246594.jpg`,
             hash: '1234',
           },
           {
             type: POST_SECTION_TYPES.PICTURE,
             isFile: true,
-            url: '/uploads/test/1724110246595.jpg',
+            url: `/uploads/${currentUser.id}/1724110246595.jpg`,
             hash: '4321',
           },
         ],
@@ -526,10 +526,10 @@ describe('PUT /posts/:id', () => {
       });
 
     expect(mockRemoveFileByPath.mock.calls[0][0]).toBe(
-      '/uploads/test/1724110246594.jpg',
+      `/uploads/${currentUser.id}/1724110246594.jpg`,
     );
     expect(mockRemoveFileByPath.mock.calls[1][0]).toBe(
-      '/uploads/test/1724110246595.jpg',
+      `/uploads/${currentUser.id}/1724110246595.jpg`,
     );
   });
 });

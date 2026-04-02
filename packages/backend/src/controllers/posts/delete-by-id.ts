@@ -66,7 +66,10 @@ export async function deleteById(
   sendSuccess(res);
 
   const filePictureSections = targetPost.sections.filter(
-    (sec) => sec.type === POST_SECTION_TYPES.PICTURE && sec.isFile,
+    (sec) =>
+      sec.type === POST_SECTION_TYPES.PICTURE &&
+      sec.isFile &&
+      sec.url.startsWith(`/uploads/${userId}/`),
   ) as PostPictureSection[];
 
   // eslint-disable-next-line no-restricted-syntax

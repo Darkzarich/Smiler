@@ -71,7 +71,7 @@ export async function updateById(
           newSection.url === section.url,
       );
 
-      if (isSectionGone) {
+      if (isSectionGone && section.url.startsWith(`/uploads/${userId}/`)) {
         filePathsToDelete.push(section.url);
       }
     });

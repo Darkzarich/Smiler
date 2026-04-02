@@ -79,8 +79,15 @@ export class PostValidator {
           throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_INVALID);
         }
 
-        if (section.isFile && !section.url.startsWith('/uploads')) {
-          throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_INVALID);
+        if (section.isFile) {
+          if (
+            !section.url.match(
+              /^\/uploads\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_.-]+\.(jpg|jpeg|png|gif)$/i,
+            ) ||
+            section.url.includes('..')
+          ) {
+            throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_INVALID);
+          }
         }
       }
 
