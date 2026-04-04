@@ -60,18 +60,22 @@ export default class Route {
       throw new Error('Context is not set');
     }
 
-    await this.context.route(this.getURLRegExp(), async (route) => {
-      if (route.request().method() === this.method) {
-        route.fulfill({
-          json: body,
-          status,
-        });
+    try {
+      await this.context.route(this.getURLRegExp(), async (route) => {
+        if (route.request().method() === this.method) {
+          route.fulfill({
+            json: body,
+            status,
+          });
 
-        return;
-      }
+          return;
+        }
 
-      route.fallback();
-    });
+        route.fallback();
+      });
+    } catch {
+      // Ignore errors if context is closed or if the request was cancelled
+    }
   }
 
   /**
