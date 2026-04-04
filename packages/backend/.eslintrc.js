@@ -62,17 +62,24 @@ module.exports = {
   },
   overrides: [
     {
-      files: [
-        '**/*.spec.js',
-        '**/*.spec.ts',
-        'tests/**/*.js',
-        'tests/**/*.ts',
-      ],
+      files: ['**/*.spec.js', '**/*.spec.ts', 'tests/**/*.js', 'tests/**/*.ts'],
       env: {
         jest: true,
       },
       rules: {
         'import/no-extraneous-dependencies': 'off',
+      },
+    },
+    {
+      files: ['src/models/**/*.ts'],
+      rules: {
+        'import/no-cycle': 'off',
+      },
+    },
+    {
+      files: ['jest.config.ts'],
+      rules: {
+        'import/no-import-module-exports': 'off',
       },
     },
   ],

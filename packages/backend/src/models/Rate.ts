@@ -5,8 +5,8 @@ import {
   index,
   modelOptions,
 } from '@typegoose/typegoose';
-import { Comment } from '@models/Comment';
-import { Post } from '@models/Post';
+import type { Comment } from '@models/Comment';
+import type { Post } from '@models/Post';
 
 export enum RateTargetModel {
   POST = 'Post',

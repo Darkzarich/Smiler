@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { UserModel } from '@models/User';
 import { Post, PostModel } from '@models/Post';
 import { RateModel, RateTargetModel } from '@models/Rate';
@@ -60,7 +61,7 @@ export async function voteById(
   const rateValue = isRated ? directionValue * 2 : directionValue;
 
   // TODO: Use transaction here
-  const promises: Promise<any>[] = [
+  const promises: Promise<Post | null | mongoose.mongo.UpdateResult>[] = [
     PostModel.findByIdAndUpdate(
       targetPost.id,
       { $inc: { rating: rateValue } },

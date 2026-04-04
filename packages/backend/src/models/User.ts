@@ -10,7 +10,7 @@ import {
 } from '@typegoose/typegoose';
 import mongoose, { ObjectId } from 'mongoose';
 import { Rate } from '@models/Rate';
-import { PostSection } from '@models/Post';
+import type { PostSection } from '@models/Post';
 import { USER_MAX_AVATAR_LENGTH, USER_MAX_BIO_LENGTH } from '@constants/index';
 
 export interface UserTemplate {

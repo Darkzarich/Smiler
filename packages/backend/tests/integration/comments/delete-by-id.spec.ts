@@ -153,7 +153,7 @@ describe('DELETE /comments/:id', () => {
         }),
       );
 
-      const response = await request(global.app)
+      await request(global.app)
         .delete(`/api/comments/${comment.id}`)
         .set('Cookie', sessionCookie);
 
@@ -224,7 +224,7 @@ describe('DELETE /comments/:id', () => {
         }),
       );
 
-      const response = await request(global.app)
+      await request(global.app)
         .delete(`/api/comments/${comment.id}`)
         .set('Cookie', sessionCookie);
 
