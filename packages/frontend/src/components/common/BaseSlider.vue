@@ -1,11 +1,11 @@
 <template>
   <div class="base-slider">
-    <label class="base-slider__label" :for="label">
+    <label v-if="label" class="base-slider__label" :for="inputId">
       {{ label }}
     </label>
 
     <input
-      :id="label"
+      :id="inputId"
       :value="modelValue"
       class="base-slider__input"
       :data-testid="dataTestid"
@@ -36,6 +36,8 @@ withDefaults(defineProps<Props>(), {
   min: -2000,
   max: 9999,
 });
+
+const inputId = crypto.randomUUID();
 
 const sliderValue = defineModel<number | null>({
   default: 0,

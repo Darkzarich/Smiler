@@ -95,6 +95,14 @@ module.exports = {
     'vuejs-accessibility/mouse-events-have-key-events': 'warn',
     'vuejs-accessibility/click-events-have-key-events': 'warn',
     'vuejs-accessibility/no-static-element-interactions': 'off',
+    'vuejs-accessibility/label-has-for': [
+      'error',
+      {
+        required: {
+          every: ['id'],
+        },
+      },
+    ],
     // Override ForInStatement and ForOfStatement rule in airbnb config
     'no-restricted-syntax': [
       'error',

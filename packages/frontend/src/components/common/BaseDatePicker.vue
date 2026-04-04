@@ -1,11 +1,11 @@
 <template>
   <div class="base-date-picker">
-    <label class="base-date-picker__label" :for="label">
+    <label v-if="label" class="base-date-picker__label" :for="inputId">
       {{ label }}
     </label>
 
     <input
-      :id="label"
+      :id="inputId"
       :value="modelValue"
       class="base-date-picker__input"
       :data-testid="dataTestid"
@@ -29,6 +29,8 @@ withDefaults(defineProps<Props>(), {
   dataTestid: 'datepicker',
   label: '',
 });
+
+const inputId = crypto.randomUUID();
 
 const handleInput = (event: Event) => {
   const target = event.target as HTMLInputElement;
