@@ -1,6 +1,7 @@
 import { minutesToMilliseconds } from 'date-fns';
 
 export const BASE_UPLOAD_FOLDER = '/uploads';
+export const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
 
 export const POST_TIME_TO_UPDATE = minutesToMilliseconds(10);
 export const POST_RATE_VALUE = 1;

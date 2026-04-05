@@ -1,6 +1,5 @@
 import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
-import sanitizeHtml from '@libs/sanitize-html';
 import { Comment, CommentModel } from '@models/Comment';
 import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
 import { CommentValidator } from '@validators/CommentValidator';
@@ -28,11 +27,7 @@ export async function updateById(
 ) {
   const { userId } = req.session;
   const { id } = req.params;
-  const { body } = req.body;
-
-  if (body) {
-    CommentValidator.validateBodyLength(body);
-  }
+  let { body } = req.body;
 
   const comment = await CommentModel.findOne({
     _id: id,
@@ -58,11 +53,13 @@ export async function updateById(
     throw new ForbiddenError(ERRORS.COMMENT_CAN_EDIT_WITHIN_TIME);
   }
 
+  body = CommentValidator.validateAndPrepareBody(body);
+
   const updatedComment = await CommentModel.findByIdAndUpdate(
     comment._id,
     {
       $set: {
-        body: sanitizeHtml(body),
+        body,
       },
     },
     {

@@ -1,13 +1,22 @@
 import { COMMENT_MAX_BODY_LENGTH } from '@constants/index';
 import { ValidationError, ERRORS } from '@errors';
+import sanitizeHtml from '@libs/sanitize-html';
 
 export class CommentValidator {
-  static validateBody(body: string | undefined): asserts body is string {
+  static validateAndPrepareBody(body: string | undefined) {
     if (!body) {
       throw new ValidationError(ERRORS.COMMENT_SHOULD_NOT_BE_EMPTY);
     }
 
     CommentValidator.validateBodyLength(body);
+
+    const sanitizedBody = sanitizeHtml(body);
+
+    if (!sanitizedBody) {
+      throw new ValidationError(ERRORS.COMMENT_SHOULD_NOT_BE_EMPTY);
+    }
+
+    return sanitizedBody;
   }
 
   static validateBodyLength(body: string): void {

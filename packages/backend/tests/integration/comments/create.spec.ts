@@ -20,9 +20,13 @@ describe('POST /comments', () => {
   it("Should return status 422 and an expected message if comment's body is empty", async () => {
     const { sessionCookie } = await signUpRequest(global.app);
 
+    const post = await PostModel.create(generateRandomPost());
+
     const response = await request(global.app)
       .post('/api/comments')
-      .send({})
+      .send({
+        post: post.id,
+      })
       .set('Cookie', sessionCookie);
 
     expect(response.body.error.message).toBe(

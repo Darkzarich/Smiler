@@ -1,5 +1,4 @@
 import type { Request, Response } from 'express';
-import sanitizeHtml from '@libs/sanitize-html';
 import { Comment, CommentModel } from '@models/Comment';
 import { PostModel } from '@models/Post';
 import { CommentValidator } from '@validators/CommentValidator';
@@ -20,9 +19,8 @@ export async function create(
   res: Response<CreateResponse>,
 ) {
   const { userId } = req.session;
-  const { body, parent, post: postId } = req.body;
-
-  CommentValidator.validateBody(body);
+  const { parent, post: postId } = req.body;
+  let { body } = req.body;
 
   if (!postId) {
     throw new ValidationError(ERRORS.POST_ID_REQUIRED);
@@ -34,13 +32,13 @@ export async function create(
     throw new NotFoundError(ERRORS.POST_NOT_FOUND);
   }
 
-  const sanitizedBody = sanitizeHtml(body);
+  body = CommentValidator.validateAndPrepareBody(body);
 
   if (!parent) {
     const [comment] = await Promise.all([
       CommentModel.create({
         post: postId,
-        body: sanitizedBody,
+        body,
         author: userId,
       }),
       PostModel.increaseCommentCount(postId),
@@ -62,7 +60,7 @@ export async function create(
 
   const comment = await CommentModel.create({
     post: postId,
-    body: sanitizedBody,
+    body,
     parent,
     author: userId,
   });

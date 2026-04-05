@@ -14,7 +14,7 @@ export function generateRandomPost(overrides: Partial<Post> = {}) {
       },
       {
         type: 'pic',
-        url: 'https://picsum.photos/200/300',
+        url: 'https://fastly.picsum.photos/id/4/200/300.jpg?hmac=y6_DgDO4ccUuOHUJcEWirdjxlpPwMcEZo7fz1MpuaWg',
       },
       {
         type: 'pic',

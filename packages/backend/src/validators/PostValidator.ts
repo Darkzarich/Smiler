@@ -5,13 +5,13 @@ import {
   POST_TITLE_MAX_LENGTH,
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
+  ALLOWED_EXTENSIONS,
 } from '@constants/index';
 import { ValidationError, ERRORS } from '@errors';
 import sanitizeHtml from '@libs/sanitize-html';
 
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 
-// TODO: think about making validation more strict
 export class PostValidator {
   /** Validate title length */
   private static validateTitle(title: string) {
@@ -28,6 +28,28 @@ export class PostValidator {
 
     if (tags.some((tag) => tag.length > POST_MAX_TAG_LEN)) {
       throw new ValidationError(ERRORS.POST_TAG_MAX_LEN_EXCEEDED);
+    }
+  }
+
+  private static isValidExternalImageUrl(urlString: string): boolean {
+    try {
+      const url = new URL(urlString);
+      if (!['http:', 'https:'].includes(url.protocol)) return false;
+
+      // Block localhost, private IPs (SSRF protection)
+      const { hostname } = url;
+      if (['localhost', '127.0.0.1', '::1'].includes(hostname)) return false;
+      if (/^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\.|^192\.168\./.test(hostname))
+        return false;
+
+      const { pathname } = url;
+      const ext = pathname.split('.').pop()?.toLowerCase();
+
+      if (!ext) return false;
+
+      return ALLOWED_EXTENSIONS.includes(ext);
+    } catch {
+      return false;
     }
   }
 
@@ -63,6 +85,12 @@ export class PostValidator {
           }
 
           section.content = sanitizeHtml(section.content);
+
+          if (!section.content) {
+            throw new ValidationError(
+              ERRORS.POST_TEXT_SECTION_CONTENT_REQUIRED,
+            );
+          }
         }
       }
 
@@ -71,19 +99,19 @@ export class PostValidator {
           throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_REQUIRED);
         }
 
-        if (!section.isFile && !section.url.match(/^https?:\/\//)) {
+        // Handle external image URLs
+        if (!section.isFile && !this.isValidExternalImageUrl(section.url)) {
           throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_INVALID);
         }
 
-        if (section.isFile) {
-          if (
-            !section.url.match(
-              /^\/uploads\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_.-]+\.(jpg|jpeg|png|gif)$/i,
-            ) ||
-            section.url.includes('..')
-          ) {
-            throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_INVALID);
-          }
+        const internalUrlRegex =
+          /^\/uploads\/[\w/-]{1,100}\/[\w.-]+\.(jpg|jpeg|png|gif|webp|avif)$/i;
+
+        if (
+          section.isFile &&
+          (!section.url.match(internalUrlRegex) || section.url.includes('..'))
+        ) {
+          throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_INVALID);
         }
       }
 
