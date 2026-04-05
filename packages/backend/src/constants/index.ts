@@ -1,7 +1,31 @@
 import { minutesToMilliseconds } from 'date-fns';
 
 export const BASE_UPLOAD_FOLDER = '/uploads';
-export const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
+
+export const ALLOWED_PICTURE_EXTENSIONS = [
+  'jpg',
+  'jpeg',
+  'png',
+  'gif',
+  'webp',
+  'avif',
+];
+export const ALLOWED_VIDEO_EXTENSIONS = ['mp4', 'webm', 'mov', 'ogg', 'm4v'];
+
+export const ALLOWED_VIDEO_EMBEDS = [
+  'youtube.com',
+  'www.youtube.com',
+  'youtu.be',
+  'vimeo.com',
+  'www.vimeo.com',
+  'dailymotion.com',
+  'www.dailymotion.com',
+  'twitch.tv',
+  'www.twitch.tv',
+  'player.twitch.tv',
+  'youtube-nocookie.com',
+  'www.youtube-nocookie.com',
+];
 
 export const POST_TIME_TO_UPDATE = minutesToMilliseconds(10);
 export const POST_RATE_VALUE = 1;

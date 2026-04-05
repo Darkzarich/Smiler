@@ -14,12 +14,20 @@
     "server/logs/**",
     "packages/backend/logs/**"
   ],
-  "dictionaries": ["node", "html", "bash", "css", "docker", "vue"],
+  "dictionaries": [
+    "node",
+    "html",
+    "bash",
+    "css",
+    "docker",
+    "vue"
+  ],
   "words": [
     "9gag",
     "autopopulate",
     "concats",
     "consts",
+    "dailymotion",
     "Darkzarich",
     "dataid",
     "DOMHTML",

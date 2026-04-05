@@ -5,7 +5,9 @@ import {
   POST_TITLE_MAX_LENGTH,
   POST_MAX_TAGS,
   POST_MAX_TAG_LEN,
-  ALLOWED_EXTENSIONS,
+  ALLOWED_PICTURE_EXTENSIONS,
+  ALLOWED_VIDEO_EMBEDS,
+  ALLOWED_VIDEO_EXTENSIONS,
 } from '@constants/index';
 import { ValidationError, ERRORS } from '@errors';
 import sanitizeHtml from '@libs/sanitize-html';
@@ -13,6 +15,12 @@ import sanitizeHtml from '@libs/sanitize-html';
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 
 export class PostValidator {
+  static LOCAL_HOST_NAMES = ['localhost', '127.0.0.1', '::1'];
+  static PROTOCOLS = ['http:', 'https:'];
+  static PRIVATE_IP_REGEXP = /^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\.|^192\.168\./;
+  static ALLOWED_PICTURE_EXTENSIONS_FOR_REGEXP =
+    ALLOWED_PICTURE_EXTENSIONS.join('|');
+
   /** Validate title length */
   private static validateTitle(title: string) {
     if (title.length > POST_TITLE_MAX_LENGTH) {
@@ -34,20 +42,47 @@ export class PostValidator {
   private static isValidExternalImageUrl(urlString: string): boolean {
     try {
       const url = new URL(urlString);
-      if (!['http:', 'https:'].includes(url.protocol)) return false;
+      if (!PostValidator.PROTOCOLS.includes(url.protocol)) return false;
 
       // Block localhost, private IPs (SSRF protection)
       const { hostname } = url;
-      if (['localhost', '127.0.0.1', '::1'].includes(hostname)) return false;
-      if (/^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\.|^192\.168\./.test(hostname))
-        return false;
+      if (PostValidator.LOCAL_HOST_NAMES.includes(hostname)) return false;
+      if (PostValidator.PRIVATE_IP_REGEXP.test(hostname)) return false;
 
       const { pathname } = url;
       const ext = pathname.split('.').pop()?.toLowerCase();
 
       if (!ext) return false;
 
-      return ALLOWED_EXTENSIONS.includes(ext);
+      return ALLOWED_PICTURE_EXTENSIONS.includes(ext);
+    } catch {
+      return false;
+    }
+  }
+
+  private static isValidVideoUrl(urlString: string): boolean {
+    try {
+      const url = new URL(urlString);
+      if (!PostValidator.PROTOCOLS.includes(url.protocol)) return false;
+
+      // Block localhost, private IPs (SSRF protection)
+      const { hostname } = url;
+      if (PostValidator.LOCAL_HOST_NAMES.includes(hostname)) return false;
+      if (PostValidator.PRIVATE_IP_REGEXP.test(hostname)) return false;
+
+      // Direct video file URLs
+      const { pathname } = url;
+      const ext = pathname.split('.').pop()?.toLowerCase();
+      if (ext && ALLOWED_VIDEO_EXTENSIONS.includes(ext)) {
+        return true;
+      }
+
+      // Known embed platform (check hostname)
+      if (ALLOWED_VIDEO_EMBEDS.includes(hostname)) {
+        return true;
+      }
+
+      return false;
     } catch {
       return false;
     }
@@ -104,8 +139,11 @@ export class PostValidator {
           throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_INVALID);
         }
 
-        const internalUrlRegex =
-          /^\/uploads\/[\w/-]{1,100}\/[\w.-]+\.(jpg|jpeg|png|gif|webp|avif)$/i;
+        // eslint-disable-next-line security/detect-non-literal-regexp
+        const internalUrlRegex = new RegExp(
+          `^\\/uploads\\/[\\w/-]{1,100}\\/[\\w.-]+\\.(${PostValidator.ALLOWED_PICTURE_EXTENSIONS_FOR_REGEXP})$`,
+          'i',
+        );
 
         if (
           section.isFile &&
@@ -116,7 +154,7 @@ export class PostValidator {
       }
 
       if (section.type === POST_SECTION_TYPES.VIDEO) {
-        if (!section.url || !section.url.match(/^https?:\/\//)) {
+        if (!section.url || !this.isValidVideoUrl(section.url)) {
           throw new ValidationError(ERRORS.POST_VIDEO_SECTION_URL_REQUIRED);
         }
       }
