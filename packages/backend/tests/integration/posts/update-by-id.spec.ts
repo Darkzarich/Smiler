@@ -447,7 +447,10 @@ describe('PUT /posts/:id', () => {
       id: expect.any(String),
       slug: expect.stringMatching(/^.+-.+$/),
       title,
-      sections: newSections,
+      sections: newSections.map((section) => ({
+        ...section,
+        hash: expect.any(String),
+      })),
       author: {
         id: currentUser.id.toString(),
         login: expect.any(String),

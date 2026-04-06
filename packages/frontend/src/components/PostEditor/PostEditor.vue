@@ -197,7 +197,8 @@ const isSubmitDisabled = computed(() => {
 const createSection = (type: postTypes.POST_SECTION_TYPES) => {
   const base = {
     type,
-    hash: (Math.random() * Math.random()).toString(36),
+    // Client-side only, backend will override this
+    hash: crypto.randomUUID(),
   } as postTypes.PostSection;
 
   if (isPictureSection(base)) {

@@ -11,6 +11,7 @@ import {
 } from '@constants/index';
 import { ValidationError, ERRORS } from '@errors';
 import sanitizeHtml from '@libs/sanitize-html';
+import { nanoid } from 'nanoid';
 
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 
@@ -157,6 +158,10 @@ export class PostValidator {
         if (!section.url || !this.isValidVideoUrl(section.url)) {
           throw new ValidationError(ERRORS.POST_VIDEO_SECTION_URL_REQUIRED);
         }
+      }
+
+      if (section.hash?.length !== 4) {
+        section.hash = nanoid(4);
       }
     }
 

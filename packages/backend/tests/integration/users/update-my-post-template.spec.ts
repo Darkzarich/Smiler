@@ -102,7 +102,10 @@ describe('PUT /users/me/template', () => {
     expect(response.body).toEqual({
       title: requiredPostFields.title,
       tags: post.tags,
-      sections: requiredPostFields.sections,
+      sections: requiredPostFields.sections.map((section) => ({
+        ...section,
+        hash: expect.any(String),
+      })),
     });
   });
 
@@ -159,7 +162,12 @@ describe('PUT /users/me/template', () => {
 
     const userFromDb = await UserModel.findById(currentUser.id).lean();
 
-    expect(userFromDb!.template.sections).toEqual(template.sections);
+    expect(userFromDb!.template.sections).toEqual(
+      template.sections.map((section) => ({
+        ...section,
+        hash: expect.any(String),
+      })),
+    );
   });
 
   it('Should update all: title, tags and sections in user.template in the database', async () => {
@@ -183,6 +191,12 @@ describe('PUT /users/me/template', () => {
 
     const userFromDb = await UserModel.findById(currentUser.id).lean();
 
-    expect(userFromDb!.template).toEqual(template);
+    expect(userFromDb!.template).toEqual({
+      ...template,
+      sections: template.sections.map((section) => ({
+        ...section,
+        hash: expect.any(String),
+      })),
+    });
   });
 });

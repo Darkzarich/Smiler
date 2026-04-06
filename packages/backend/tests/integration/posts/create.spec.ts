@@ -332,7 +332,10 @@ describe('POST /posts', () => {
       id: expect.any(String),
       slug: expect.stringMatching(/^.+-.+$/),
       title: requiredPostFields.title,
-      sections: requiredPostFields.sections,
+      sections: requiredPostFields.sections.map((section) => ({
+        ...section,
+        hash: expect.any(String),
+      })),
       author: {
         id: currentUser.id.toString(),
         login: expect.any(String),

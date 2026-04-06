@@ -6,6 +6,7 @@ import { NotFoundError, ForbiddenError, ERRORS } from '@errors';
 import { removeFileByPath } from '@utils/remove-file-by-path';
 import { sendSuccess } from '@utils/response-utils';
 import { PostValidator } from '@validators/PostValidator';
+import { nanoid } from 'nanoid';
 
 interface UpdateByIdParams {
   id: string;
@@ -57,25 +58,23 @@ export async function updateById(
 
   const filePathsToDelete: string[] = [];
 
-  if (newSections) {
-    // Looking for sections with "picture" type that were uploaded as a file
-    // and that got removed from the post in the update
-    targetPost.sections.forEach((section) => {
-      if (section.type !== POST_SECTION_TYPES.PICTURE || !section.isFile) {
-        return;
-      }
+  // Looking for sections with "picture" type that were uploaded as a file
+  // and that got removed from the post in the update
+  targetPost.sections.forEach((section) => {
+    if (section.type !== POST_SECTION_TYPES.PICTURE || !section.isFile) {
+      return;
+    }
 
-      const isSectionGone = !newSections.some(
-        (newSection) =>
-          newSection.type === POST_SECTION_TYPES.PICTURE &&
-          newSection.url === section.url,
-      );
+    const isPictureSectionGone = !newSections.some(
+      (newSection) =>
+        newSection.type === POST_SECTION_TYPES.PICTURE &&
+        newSection.hash === section.hash,
+    );
 
-      if (isSectionGone && section.url.startsWith(`/uploads/${userId}/`)) {
-        filePathsToDelete.push(section.url);
-      }
-    });
-  }
+    if (isPictureSectionGone && section.url.startsWith(`/uploads/${userId}/`)) {
+      filePathsToDelete.push(section.url);
+    }
+  });
 
   targetPost.title = title;
   targetPost.tags = tags || [];

@@ -21,6 +21,7 @@ import {
   ERRORS,
 } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
+import { nanoid } from 'nanoid';
 
 type UploadResponse = PostPictureSection;
 
@@ -124,7 +125,7 @@ export async function upload(
     const newSection = {
       type: POST_SECTION_TYPES.PICTURE as const,
       url: fileRelativePath,
-      hash: (Math.random() * Math.random()).toString(36),
+      hash: nanoid(4),
       isFile: true,
     };
 
