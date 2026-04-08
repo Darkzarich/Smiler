@@ -461,7 +461,11 @@ router.get('/categories/all', apiRateLimiter, asyncControllerErrorHandler(all));
 }
 */
 
-router.get('/categories/today', apiRateLimiter, asyncControllerErrorHandler(today));
+router.get(
+  '/categories/today',
+  apiRateLimiter,
+  asyncControllerErrorHandler(today),
+);
 
 /**
 @swagger
@@ -498,7 +502,11 @@ router.get('/categories/today', apiRateLimiter, asyncControllerErrorHandler(toda
 }
 */
 
-router.get('/categories/blowing', apiRateLimiter, asyncControllerErrorHandler(blowing));
+router.get(
+  '/categories/blowing',
+  apiRateLimiter,
+  asyncControllerErrorHandler(blowing),
+);
 
 /**
 @swagger
@@ -535,7 +543,11 @@ router.get('/categories/blowing', apiRateLimiter, asyncControllerErrorHandler(bl
 }
 */
 
-router.get('/categories/recent', apiRateLimiter, asyncControllerErrorHandler(recent));
+router.get(
+  '/categories/recent',
+  apiRateLimiter,
+  asyncControllerErrorHandler(recent),
+);
 
 /**
 @swagger
@@ -773,13 +785,13 @@ router.get('/:slug', apiRateLimiter, asyncControllerErrorHandler(getBySlug));
 router.put(
   '/:id',
   authRequiredMiddleware,
-  apiRateLimiter,
+  writeRateLimiter,
   asyncControllerErrorHandler(updateById),
 );
 router.delete(
   '/:id',
   authRequiredMiddleware,
-  apiRateLimiter,
+  writeRateLimiter,
   asyncControllerErrorHandler(deleteById),
 );
 

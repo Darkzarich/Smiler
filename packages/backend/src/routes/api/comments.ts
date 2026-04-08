@@ -9,7 +9,11 @@ import {
   unvoteById,
 } from '@controllers/comments';
 import authRequiredMiddleware from '@middlewares/auth-required';
-import { writeRateLimiter, voteRateLimiter, apiRateLimiter } from '@middlewares/rate-limiter';
+import {
+  writeRateLimiter,
+  voteRateLimiter,
+  apiRateLimiter,
+} from '@middlewares/rate-limiter';
 
 const router = express.Router();
 
@@ -369,13 +373,13 @@ router.post(
 router.put(
   '/:id',
   authRequiredMiddleware,
-  apiRateLimiter,
+  writeRateLimiter,
   asyncControllerErrorHandler(updateById),
 );
 router.delete(
   '/:id',
   authRequiredMiddleware,
-  apiRateLimiter,
+  writeRateLimiter,
   asyncControllerErrorHandler(deleteById),
 );
 

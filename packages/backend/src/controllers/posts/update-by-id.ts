@@ -6,7 +6,6 @@ import { NotFoundError, ForbiddenError, ERRORS } from '@errors';
 import { removeFileByPath } from '@utils/remove-file-by-path';
 import { sendSuccess } from '@utils/response-utils';
 import { PostValidator } from '@validators/PostValidator';
-import { nanoid } from 'nanoid';
 
 interface UpdateByIdParams {
   id: string;
@@ -21,9 +20,6 @@ export async function updateById(
   req: Request<UpdateByIdParams, unknown, UpdateByIdBody>,
   res: Response<UpdateByIdResponse>,
 ) {
-  // TODO: validate sections on update by type and other stuff the same as when creating post
-  // TODO: move all Post validation in one place
-
   const { userId } = req.session;
   const { id: postId } = req.params;
 
