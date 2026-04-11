@@ -12,6 +12,7 @@ import {
 import { ValidationError, ERRORS } from '@errors';
 import sanitizeHtml from '@libs/sanitize-html';
 import { nanoid } from 'nanoid';
+import { isValidExternalImageUrl } from '@utils/is-valid-external-image-url';
 
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 
@@ -37,27 +38,6 @@ export class PostValidator {
 
     if (tags.some((tag) => tag.length > POST_MAX_TAG_LEN)) {
       throw new ValidationError(ERRORS.POST_TAG_MAX_LEN_EXCEEDED);
-    }
-  }
-
-  private static isValidExternalImageUrl(urlString: string): boolean {
-    try {
-      const url = new URL(urlString);
-      if (!PostValidator.PROTOCOLS.includes(url.protocol)) return false;
-
-      // Block localhost, private IPs (SSRF protection)
-      const { hostname } = url;
-      if (PostValidator.LOCAL_HOST_NAMES.includes(hostname)) return false;
-      if (PostValidator.PRIVATE_IP_REGEXP.test(hostname)) return false;
-
-      const { pathname } = url;
-      const ext = pathname.split('.').pop()?.toLowerCase();
-
-      if (!ext) return false;
-
-      return ALLOWED_PICTURE_EXTENSIONS.includes(ext);
-    } catch {
-      return false;
     }
   }
 
@@ -136,7 +116,7 @@ export class PostValidator {
         }
 
         // Handle external image URLs
-        if (!section.isFile && !this.isValidExternalImageUrl(section.url)) {
+        if (!section.isFile && !isValidExternalImageUrl(section.url)) {
           throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_INVALID);
         }
 

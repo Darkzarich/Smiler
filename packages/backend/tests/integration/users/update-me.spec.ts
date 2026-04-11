@@ -39,7 +39,7 @@ describe('PUT /users/me', () => {
       })
       .set('Cookie', sessionCookie);
 
-    expect(response.body.error.message).toContain('is not an url');
+    expect(response.body.error.message).toBe(ERRORS.USER_AVATAR_INVALID);
     expect(response.status).toBe(422);
   });
 
@@ -49,13 +49,48 @@ describe('PUT /users/me', () => {
     const response = await request(global.app)
       .put('/api/users/me')
       .send({
-        avatar: `https://${'a'.repeat(USER_MAX_AVATAR_LENGTH)}.jpg`,
+        avatar: `https://example.com/${'a'.repeat(USER_MAX_AVATAR_LENGTH)}.jpg`,
       })
       .set('Cookie', sessionCookie);
 
     expect(response.body.error.message).toContain(
       'longer than the maximum allowed length',
     );
+    expect(response.status).toBe(422);
+  });
+
+  it('Should ignore protected user fields', async () => {
+    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+
+    const response = await request(global.app)
+      .put('/api/users/me')
+      .send({
+        bio: 'updated bio',
+        rating: 100,
+        email: 'attacker@example.com',
+      })
+      .set('Cookie', sessionCookie);
+
+    const user = await UserModel.findById(currentUser.id).lean();
+
+    expect(response.status).toBe(200);
+    expect(response.body.bio).toBe('updated bio');
+    expect(user?.bio).toBe('updated bio');
+    expect(user?.rating).toBe(0);
+    expect(user?.email).toBe(currentUser.email);
+  });
+
+  it('Should return status 422 and an expected message if an update field is not a string', async () => {
+    const { sessionCookie } = await signUpRequest(global.app);
+
+    const response = await request(global.app)
+      .put('/api/users/me')
+      .send({
+        bio: ['updated bio'],
+      })
+      .set('Cookie', sessionCookie);
+
+    expect(response.body.error.message).toBe(ERRORS.USER_UPDATE_FIELD_INVALID);
     expect(response.status).toBe(422);
   });
 
@@ -87,5 +122,18 @@ describe('PUT /users/me', () => {
     expect(response.status).toBe(200);
     expect(response.body.bio).toBe(bio);
     expect(response.body.avatar).toBe(avatar);
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      login: expect.any(String),
+      rating: expect.any(Number),
+      bio,
+      avatar,
+      followersAmount: expect.any(Number),
+      createdAt: expect.any(String),
+    });
+    expect(response.body).not.toHaveProperty('_id');
+    expect(response.body).not.toHaveProperty('email');
+    expect(response.body).not.toHaveProperty('hash');
+    expect(response.body).not.toHaveProperty('salt');
   });
 });

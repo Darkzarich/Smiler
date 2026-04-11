@@ -24,6 +24,8 @@ export const ERRORS = {
   USER_CANT_FOLLOW_ALREADY_FOLLOWED: 'You cannot follow the same author twice',
   USER_CANT_UNFOLLOW_NOT_FOLLOWED: "You're not following this author",
   USER_CANT_UNFOLLOW_OWN: 'You cannot unfollow yourself',
+  USER_AVATAR_INVALID: 'Invalid avatar image url',
+  USER_UPDATE_FIELD_INVALID: 'User update fields must be strings',
 
   TARGET_IS_NOT_RATED: "It's not yet rated by the current user",
   AUTHOR_NOT_FOUND: 'Author is not found',
