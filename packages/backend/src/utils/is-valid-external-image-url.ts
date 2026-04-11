@@ -1,6 +1,6 @@
 import { ALLOWED_PICTURE_EXTENSIONS } from '@constants/index';
 
-const LOCAL_HOST_NAMES = ['localhost', '127.0.0.1', '::1'];
+const LOCAL_HOST_NAMES = ['localhost', '127.0.0.1', '::1', '[::1]'];
 const PROTOCOLS = ['http:', 'https:'];
 const PRIVATE_IP_REGEXP = /^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\.|^192\.168\./;
 
