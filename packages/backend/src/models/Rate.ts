@@ -31,6 +31,14 @@ interface RemoveForUserParams {
   targetModel: RateTargetModel;
 }
 
+interface FindRatedTargetsParams {
+  userId?: string;
+  targetIds: string[];
+  targetModel: RateTargetModel;
+}
+
+export type RatedTargets = Map<string, boolean>;
+
 type ApplyChangeResult =
   | {
       alreadyRated: true;
@@ -175,6 +183,27 @@ export class Rate {
       target: targetId,
       targetModel,
     });
+  }
+
+  public static async findRatedTargets(
+    this: ReturnModelType<typeof Rate>,
+    { userId, targetIds, targetModel }: FindRatedTargetsParams,
+  ): Promise<RatedTargets | undefined> {
+    if (!userId || targetIds.length === 0) {
+      return undefined;
+    }
+
+    const rates = await this.find({
+      user: userId,
+      target: { $in: targetIds },
+      targetModel,
+    })
+      .select({ target: 1, negative: 1 })
+      .lean();
+
+    return new Map(
+      rates.map((rate) => [rate.target.toString(), rate.negative]),
+    );
   }
 }
 

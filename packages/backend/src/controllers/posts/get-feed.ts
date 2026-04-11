@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
 import { Post, PostModel } from '@models/Post';
+import { RateModel, RateTargetModel } from '@models/Rate';
 import { UnauthorizedError, ValidationError, ERRORS } from '@errors';
 import { POST_MAX_LIMIT } from '@constants/index';
 import { sendSuccess } from '@utils/response-utils';
@@ -26,7 +27,7 @@ export async function getFeed(
     throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
   }
 
-  const user = await UserModel.findById(userId).populate('rates');
+  const user = await UserModel.findById(userId);
 
   if (!user) {
     throw new UnauthorizedError(ERRORS.UNAUTHORIZED);
@@ -65,7 +66,13 @@ export async function getFeed(
     PostModel.countDocuments(query),
   ]);
 
-  const transPosts = posts.map((post) => post.toResponse(user));
+  const ratedTargets = await RateModel.findRatedTargets({
+    userId,
+    targetIds: posts.map((post) => post.id),
+    targetModel: RateTargetModel.POST,
+  });
+
+  const transPosts = posts.map((post) => post.toResponse(ratedTargets));
 
   sendSuccess(res, {
     posts: transPosts,

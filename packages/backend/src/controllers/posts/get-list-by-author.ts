@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
 import { Post, PostModel } from '@models/Post';
+import { RateModel, RateTargetModel } from '@models/Rate';
 import { ValidationError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { POST_MAX_LIMIT } from '@constants/index';
@@ -41,17 +42,22 @@ export async function getListByAuthor(
     author: foundAuthor.id,
   };
 
-  const [posts, user, total] = await Promise.all([
+  const [posts, total] = await Promise.all([
     PostModel.find(query)
       .sort({ createdAt: -1 })
       .populate('author', 'login avatar')
       .limit(limit)
       .skip(offset),
-    UserModel.findById(userId).select('rates').populate('rates'),
     PostModel.countDocuments(query),
   ]);
 
-  const postsWithRated = posts.map((post) => post.toResponse(user));
+  const ratedTargets = await RateModel.findRatedTargets({
+    userId,
+    targetIds: posts.map((post) => post.id),
+    targetModel: RateTargetModel.POST,
+  });
+
+  const postsWithRated = posts.map((post) => post.toResponse(ratedTargets));
 
   sendSuccess(res, {
     posts: postsWithRated,

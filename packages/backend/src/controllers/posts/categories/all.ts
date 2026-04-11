@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { POST_MAX_LIMIT } from '@constants/index';
-import { UserModel } from '@models/User';
 import { PostModel, Post } from '@models/Post';
+import { RateModel, RateTargetModel } from '@models/Rate';
 import { ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { PaginationRequest, PaginationResponse } from '@type/pagination';
@@ -24,17 +24,22 @@ export async function all(
     throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
   }
 
-  const [posts, user, total] = await Promise.all([
+  const [posts, total] = await Promise.all([
     PostModel.find()
       .sort({ rating: -1 })
       .populate('author', 'login avatar')
       .limit(limit)
       .skip(offset),
-    UserModel.findById(userId).select('rates').populate('rates'),
     PostModel.countDocuments(),
   ]);
 
-  const postsWithRated = posts.map((post) => post.toResponse(user));
+  const ratedTargets = await RateModel.findRatedTargets({
+    userId,
+    targetIds: posts.map((post) => post.id),
+    targetModel: RateTargetModel.POST,
+  });
+
+  const postsWithRated = posts.map((post) => post.toResponse(ratedTargets));
 
   sendSuccess(res, {
     posts: postsWithRated,

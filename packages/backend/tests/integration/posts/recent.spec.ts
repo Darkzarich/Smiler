@@ -168,6 +168,7 @@ describe('GET /posts/categories/recent', () => {
 
     const rate1 = await RateModel.create(
       generateRate({
+        user: currentUser.id,
         target: post1._id,
         negative: true,
         targetModel: RateTargetModel.POST,
@@ -176,6 +177,7 @@ describe('GET /posts/categories/recent', () => {
 
     const rate2 = await RateModel.create(
       generateRate({
+        user: currentUser.id,
         target: post2._id,
         negative: false,
         targetModel: RateTargetModel.POST,

@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { RootFilterQuery } from 'mongoose';
-import { UserModel } from '@models/User';
 import { Post, PostModel } from '@models/Post';
+import { RateModel, RateTargetModel } from '@models/Rate';
 import { POST_TITLE_MAX_LENGTH, POST_MAX_LIMIT } from '@constants/index';
 import { ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
@@ -98,17 +98,22 @@ export async function search(
     };
   }
 
-  const [posts, user, total] = await Promise.all([
+  const [posts, total] = await Promise.all([
     PostModel.find(query)
       .sort({ rating: -1 })
       .populate('author', 'login avatar')
       .limit(limit)
       .skip(offset),
-    UserModel.findById(userId).select('rates').populate('rates'),
     PostModel.countDocuments(query),
   ]);
 
-  const postsWithRated = posts.map((post) => post.toResponse(user));
+  const ratedTargets = await RateModel.findRatedTargets({
+    userId,
+    targetIds: posts.map((post) => post.id),
+    targetModel: RateTargetModel.POST,
+  });
+
+  const postsWithRated = posts.map((post) => post.toResponse(ratedTargets));
 
   sendSuccess(res, {
     posts: postsWithRated,

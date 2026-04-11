@@ -11,6 +11,7 @@ import {
   Severity,
 } from '@typegoose/typegoose';
 import { User } from '@models/User';
+import type { RatedTargets } from '@models/Rate';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export enum POST_SECTION_TYPES {
@@ -85,11 +86,9 @@ export class Post {
   public createdAt!: Date;
   public updatedAt!: Date;
 
-  public toResponse(
-    this: DocumentType<Post>,
-    user?: DocumentType<User> | null,
-  ) {
-    const rated = user ? user.isRated(this._id.toString()) : null;
+  public toResponse(this: DocumentType<Post>, ratedTargets?: RatedTargets) {
+    const postId = this._id.toString();
+    const isRated = ratedTargets?.has(postId) ?? false;
 
     return {
       title: this.title,
@@ -107,15 +106,10 @@ export class Post {
       rating: this.rating,
       createdAt: this.createdAt,
       tags: this.tags,
-      rated: rated
-        ? {
-            isRated: rated.result,
-            negative: rated.negative,
-          }
-        : {
-            isRated: false,
-            negative: false,
-          },
+      rated: {
+        isRated,
+        negative: ratedTargets?.get(postId) ?? false,
+      },
     };
   }
 

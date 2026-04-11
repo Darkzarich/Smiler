@@ -169,7 +169,7 @@ describe('GET /posts/feed', () => {
       commentCount: post.commentCount,
       rating: post.rating,
       tags: post.tags,
-      rated: { isRated: false },
+      rated: { isRated: false, negative: false },
       createdAt: post.createdAt.toISOString(),
     });
   });

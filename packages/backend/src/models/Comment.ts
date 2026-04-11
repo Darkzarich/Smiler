@@ -10,6 +10,7 @@ import {
 import mongooseAutoPopulate from 'mongoose-autopopulate';
 import { Post } from '@models/Post';
 import { User } from '@models/User';
+import type { RatedTargets } from '@models/Rate';
 
 export type CommentDocument = DocumentType<Comment>;
 
@@ -54,7 +55,7 @@ export class Comment {
   public createdAt!: Date;
   public updatedAt!: Date;
 
-  public toResponse(this: CommentDocument, user?: DocumentType<User> | null) {
+  public toResponse(this: CommentDocument, ratedTargets?: RatedTargets) {
     if (this.deleted) {
       return {
         author: this.author,
@@ -66,7 +67,7 @@ export class Comment {
       };
     }
 
-    const rated = user ? user.isRated(this._id.toString()) : null;
+    const rated = ratedTargets?.get(this._id.toString());
 
     return {
       body: this.body,
@@ -76,14 +77,13 @@ export class Comment {
       parent: this.parent,
       rating: this.rating,
       createdAt: this.createdAt,
-      rated: rated
+      rated: rated !== undefined
         ? {
-            isRated: rated.result,
-            negative: rated.negative,
+            isRated: true,
+            negative: rated,
           }
         : {
             isRated: false,
-            negative: false,
           },
       deleted: false,
     };

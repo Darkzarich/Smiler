@@ -1,6 +1,11 @@
 import type { Request, Response } from 'express';
 import { CommentModel, CommentDocument, Comment } from '@models/Comment';
-import { UserModel, UserDocument } from '@models/User';
+import { UserModel } from '@models/User';
+import {
+  RateModel,
+  RateTargetModel,
+  type RatedTargets,
+} from '@models/Rate';
 import { NotFoundError, ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { COMMENT_MAX_LIMIT } from '@constants/index';
@@ -19,27 +24,34 @@ interface GetListResponse extends PaginationResponse {
 // TODO: Rewrite from recursion to iteration
 function fillWithRatedRecursive({
   comments,
-  user,
+  ratedTargets,
 }: {
   comments: CommentDocument[];
-  user?: UserDocument;
+  ratedTargets?: RatedTargets;
 }) {
   if (!comments) {
     return [];
   }
 
   return comments.map((comment) => {
-    const commentWithUser = comment.toResponse(user);
+    const commentWithUser = comment.toResponse(ratedTargets);
 
     if (commentWithUser.children && commentWithUser.children.length > 0) {
       commentWithUser.children = fillWithRatedRecursive({
         comments: comment.children as CommentDocument[],
-        user,
+        ratedTargets,
       }) as unknown as CommentDocument[];
     }
 
     return commentWithUser;
   });
+}
+
+function collectCommentIds(comments: CommentDocument[]): string[] {
+  return comments.flatMap((comment) => [
+    comment.id,
+    ...collectCommentIds(comment.children as CommentDocument[]),
+  ]);
 }
 
 export async function getList(
@@ -79,14 +91,19 @@ export async function getList(
     query.author = foundAuthor._id.toString();
   }
 
-  const [comments, currentUser, total] = await Promise.all([
+  const [comments, total] = await Promise.all([
     CommentModel.find(query).sort({ rating: -1 }).skip(offset).limit(limit),
-    UserModel.findById(userId).select('rates').populate('rates'),
     CommentModel.countDocuments(query),
   ]);
 
+  const ratedTargets = await RateModel.findRatedTargets({
+    userId,
+    targetIds: collectCommentIds(comments),
+    targetModel: RateTargetModel.COMMENT,
+  });
+
   sendSuccess(res, {
-    comments: fillWithRatedRecursive({ comments, user: currentUser! }),
+    comments: fillWithRatedRecursive({ comments, ratedTargets }),
     total,
     pages: Math.ceil(total / limit),
     hasNextPage: offset + limit < total,

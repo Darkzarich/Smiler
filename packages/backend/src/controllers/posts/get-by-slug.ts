@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import { UserModel } from '@models/User';
 import { Post, PostModel } from '@models/Post';
+import { RateModel, RateTargetModel } from '@models/Rate';
 import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
@@ -19,18 +19,19 @@ export async function getBySlug(
 
   const { slug } = req.params;
 
-  const [post, user] = await Promise.all([
-    PostModel.findOne({
-      slug,
-    }).populate('author', 'login avatar'),
-    userId
-      ? UserModel.findById(userId).select('rates').populate('rates')
-      : null,
-  ]);
+  const post = await PostModel.findOne({
+    slug,
+  }).populate('author', 'login avatar');
 
   if (!post) {
     throw new NotFoundError(ERRORS.POST_NOT_FOUND);
   }
 
-  sendSuccess(res, post.toResponse(user));
+  const ratedTargets = await RateModel.findRatedTargets({
+    userId,
+    targetIds: [post.id],
+    targetModel: RateTargetModel.POST,
+  });
+
+  sendSuccess(res, post.toResponse(ratedTargets));
 }
