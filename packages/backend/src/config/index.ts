@@ -21,12 +21,26 @@ const {
   RATE_LIMIT_UPLOAD_MAX,
 } = process.env;
 
+const IS_PRODUCTION = NODE_ENV === 'production';
+
+function validateProductionConfig() {
+  if (!IS_PRODUCTION) {
+    return;
+  }
+
+  if (!SESSION_SECRET || SESSION_SECRET === 'no-secret') {
+    throw new Error('SESSION_SECRET must be set in production');
+  }
+}
+
+validateProductionConfig();
+
 export default {
   PORT: BACKEND_PORT || 3000,
   DB_URL:
     DB_URL ||
     `mongodb://localhost:${DB_PORT || 27017}/${MONGO_INITDB_DATABASE}?authSource=admin`,
-  IS_PRODUCTION: NODE_ENV === 'production',
+  IS_PRODUCTION,
   IS_JEST: NODE_ENV === 'test',
   SESSION_SECRET: SESSION_SECRET || 'no-secret',
   FRONT_ORIGIN_LOCAL:
