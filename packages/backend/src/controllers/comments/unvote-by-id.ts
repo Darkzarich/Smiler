@@ -61,10 +61,6 @@ export async function unvoteById(
       { _id: targetComment.author },
       { $inc: { rating: rateValue } },
     ),
-    UserModel.updateOne(
-      { _id: userId },
-      { $pull: { rates: rate._id } },
-    ),
   ]);
 
   sendSuccess(res, updatedComment!);

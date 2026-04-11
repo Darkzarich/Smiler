@@ -337,7 +337,7 @@ describe('GET /comments', () => {
       }),
     );
 
-    const rate = await RateModel.create(
+    await RateModel.create(
       generateRate({
         user: currentUser.id,
         target: otherUserComment._id,
@@ -345,11 +345,6 @@ describe('GET /comments', () => {
         targetModel: RateTargetModel.COMMENT,
       }),
     );
-
-    await UserModel.findByIdAndUpdate(currentUser.id, {
-      $push: { rates: rate._id },
-    });
-
     const response = await request(global.app)
       .get(`/api/comments?post=${post.id}`)
       .set('Cookie', sessionCookie);

@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { RateModel, RateTargetModel } from '@models/Rate';
 import { CommentModel } from '@models/Comment';
-import { UserDocument, UserModel } from '@models/User';
+import { UserModel } from '@models/User';
 import {
   generateRandomComment,
   generateRandomUser,
@@ -11,6 +11,8 @@ import { signUpRequest } from '@test-utils/request-auth';
 import { ERRORS } from '@errors';
 import { COMMENT_RATE_VALUE } from '@constants/index';
 
+type SignedInUser = Awaited<ReturnType<typeof signUpRequest>>['currentUser'];
+
 /**
  * Create voted comment state in the database:
  * - Create other than the current user
@@ -18,7 +20,7 @@ import { COMMENT_RATE_VALUE } from '@constants/index';
  * - Makes that new comment voted by the current user
  * */
 async function createVotedOtherUserComment(
-  currentUser: UserDocument,
+  currentUser: SignedInUser,
   isNegative: boolean,
 ) {
   const otherUser = await UserModel.create(generateRandomUser());
@@ -29,7 +31,7 @@ async function createVotedOtherUserComment(
     }),
   );
 
-  const rate = await RateModel.create(
+  await RateModel.create(
     generateRate({
       user: currentUser.id,
       target: otherUserComment._id,
@@ -38,14 +40,9 @@ async function createVotedOtherUserComment(
     }),
   );
 
-  await UserModel.findByIdAndUpdate(currentUser.id, {
-    $push: { rates: rate._id },
-  });
-
   return {
     otherUserComment,
     otherUser,
-    rate,
   };
 }
 

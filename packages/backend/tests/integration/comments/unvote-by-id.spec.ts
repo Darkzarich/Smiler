@@ -60,7 +60,7 @@ describe('DELETE /comments/:id/vote', () => {
       }),
     );
 
-    const prevRate = await RateModel.create(
+    await RateModel.create(
       generateRate({
         user: currentUser.id,
         target: otherUserComment._id,
@@ -68,11 +68,6 @@ describe('DELETE /comments/:id/vote', () => {
         targetModel: RateTargetModel.COMMENT,
       }),
     );
-
-    await UserModel.findByIdAndUpdate(currentUser.id, {
-      $push: { rates: prevRate._id },
-    });
-
     await request(global.app)
       .delete(`/api/comments/${otherUserComment._id}/vote`)
       .set('Cookie', sessionCookie);
@@ -99,7 +94,7 @@ describe('DELETE /comments/:id/vote', () => {
         }),
       );
 
-      const prevRate = await RateModel.create(
+      await RateModel.create(
         generateRate({
           user: currentUser.id,
           target: otherUserComment._id,
@@ -107,11 +102,6 @@ describe('DELETE /comments/:id/vote', () => {
           targetModel: RateTargetModel.COMMENT,
         }),
       );
-
-      await UserModel.findByIdAndUpdate(currentUser.id, {
-        $push: { rates: prevRate._id },
-      });
-
       await request(global.app)
         .delete(`/api/comments/${otherUserComment._id}/vote`)
         .set('Cookie', sessionCookie);
@@ -147,7 +137,7 @@ describe('DELETE /comments/:id/vote', () => {
         }),
       );
 
-      const prevRate = await RateModel.create(
+      await RateModel.create(
         generateRate({
           user: currentUser.id,
           target: otherUserComment._id,
@@ -155,11 +145,6 @@ describe('DELETE /comments/:id/vote', () => {
           targetModel: RateTargetModel.COMMENT,
         }),
       );
-
-      await UserModel.findByIdAndUpdate(currentUser.id, {
-        $push: { rates: prevRate._id },
-      });
-
       await request(global.app)
         .delete(`/api/comments/${otherUserComment._id}/vote`)
         .set('Cookie', sessionCookie);
@@ -185,7 +170,7 @@ describe('DELETE /comments/:id/vote', () => {
       }),
     );
 
-    const prevRate = await RateModel.create(
+    await RateModel.create(
       generateRate({
         user: currentUser.id,
         target: otherUserComment._id,
@@ -193,11 +178,6 @@ describe('DELETE /comments/:id/vote', () => {
         targetModel: RateTargetModel.COMMENT,
       }),
     );
-
-    await UserModel.findByIdAndUpdate(currentUser.id, {
-      $push: { rates: prevRate._id },
-    });
-
     const response = await request(global.app)
       .delete(`/api/comments/${otherUserComment._id}/vote`)
       .set('Cookie', sessionCookie);

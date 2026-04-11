@@ -71,10 +71,6 @@ export async function voteById(
       { _id: targetComment.author },
       { $inc: { rating: rateChange.ratingDelta } },
     ),
-    UserModel.updateOne(
-      { _id: userId },
-      { $addToSet: { rates: rateChange.rate._id } },
-    ),
   ]);
 
   sendSuccess(res, updatedComment! as Comment);

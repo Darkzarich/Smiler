@@ -4,12 +4,9 @@ import {
   type Ref,
   index,
   modelOptions,
-  type DocumentType,
-  isDocumentArray,
   Severity,
 } from '@typegoose/typegoose';
-import mongoose, { ObjectId } from 'mongoose';
-import { Rate } from '@models/Rate';
+import mongoose from 'mongoose';
 import type { PostSection } from '@models/Post';
 import { USER_MAX_AVATAR_LENGTH, USER_MAX_BIO_LENGTH } from '@constants/index';
 
@@ -18,8 +15,6 @@ export interface UserTemplate {
   tags: string[];
   title: string;
 }
-
-export type UserDocument = DocumentType<User>;
 
 @index({ login: 1, email: 1 }, { unique: true, background: true })
 @modelOptions({
@@ -57,9 +52,6 @@ export class User {
   @prop({ default: 0 })
   public rating!: number;
 
-  @prop({ ref: () => Rate, default: [] })
-  public rates!: Ref<Rate>[];
-
   @prop({ default: 0 })
   public followersAmount!: number;
 
@@ -82,30 +74,6 @@ export class User {
 
   @prop()
   public createdAt!: Date;
-
-  public isRated(this: UserDocument, id: string | ObjectId) {
-    if (!isDocumentArray(this.rates)) {
-      return {
-        result: false,
-      };
-    }
-
-    const rated = this.rates.find(
-      (el) => el.target.toString() === id.toString(),
-    );
-
-    if (!rated) {
-      return {
-        result: false,
-      };
-    }
-
-    return {
-      result: true,
-      rated,
-      negative: rated.negative,
-    };
-  }
 
   public isFollowed(id: string) {
     return Boolean(

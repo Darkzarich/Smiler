@@ -195,7 +195,7 @@ describe('GET /posts/categories/blowing', () => {
       }),
     );
 
-    const rate1 = await RateModel.create(
+    await RateModel.create(
       generateRate({
         user: currentUser.id,
         target: post1._id,
@@ -204,7 +204,7 @@ describe('GET /posts/categories/blowing', () => {
       }),
     );
 
-    const rate2 = await RateModel.create(
+    await RateModel.create(
       generateRate({
         user: currentUser.id,
         target: post2._id,
@@ -212,11 +212,6 @@ describe('GET /posts/categories/blowing', () => {
         targetModel: RateTargetModel.POST,
       }),
     );
-
-    await UserModel.findByIdAndUpdate(currentUser.id, {
-      $push: { rates: { $each: [rate1._id, rate2._id] } },
-    });
-
     const response = await request(global.app)
       .get('/api/posts/categories/blowing')
       .set('Cookie', sessionCookie);

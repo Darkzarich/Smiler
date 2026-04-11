@@ -53,7 +53,6 @@ export async function deleteById(
     return sendSuccess(res, updateComment?.toJSON());
   }
 
-  // TODO: Remove rates from users as well
   await Promise.all([
     CommentModel.updateOne(
       { _id: comment.parent },

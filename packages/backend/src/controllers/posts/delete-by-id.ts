@@ -52,8 +52,6 @@ export async function deleteById(
     throw new ForbiddenError(ERRORS.POST_CANT_DELETE_WITH_COMMENTS);
   }
 
-  // TODO: Remove rates from users as well
-
   await Promise.all([
     PostModel.deleteOne({ _id: id }),
     UserModel.updateOne(
