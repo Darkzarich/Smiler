@@ -83,6 +83,40 @@ const router = express.Router();
 */
 router.get('/current', apiRateLimiter, asyncControllerErrorHandler(current));
 
+/**
+@swagger
+{
+  "/auth/csrf": {
+    "get": {
+      "summary": "Get a CSRF token",
+      "description": "Creates or returns the CSRF token for the current session. Unsafe authenticated requests and sign-in/sign-up requests must send it in the X-CSRF-Token header.",
+      "tags": [
+        "Auth"
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "csrfToken"
+                ],
+                "properties": {
+                  "csrfToken": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+*/
 router.get('/csrf', apiRateLimiter, (req, res) => {
   res.json({
     csrfToken: getOrCreateCsrfToken(req),

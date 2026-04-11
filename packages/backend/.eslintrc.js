@@ -18,7 +18,7 @@ module.exports = {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
   },
-  ignorePatterns: ['dist', 'node_modules', '.eslintrc.js'],
+  ignorePatterns: ['dist', 'node_modules', 'migrations', '.eslintrc.js'],
   parserOptions: {
     ecmaVersion: 2022,
     sourceType: 'module',
