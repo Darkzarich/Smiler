@@ -8,11 +8,11 @@ export interface RateLimiterOptions {
   message?: string;
 }
 
-const createStore = (uri: string) =>
+const createStore = (uri: string, windowMs: number) =>
   new MongoStore({
     uri,
     collectionName: 'rate_limits',
-    expireTimeMs: 60 * 1000,
+    expireTimeMs: windowMs,
   });
 
 export function createRateLimiter(options: RateLimiterOptions) {
@@ -24,7 +24,7 @@ export function createRateLimiter(options: RateLimiterOptions) {
     standardHeaders: true,
     legacyHeaders: false,
     skip: () => Config.IS_JEST || !Config.RATE_LIMIT_ENABLED,
-    store: Config.RATE_LIMIT_ENABLED ? createStore(Config.DB_URL) : undefined,
+    store: Config.RATE_LIMIT_ENABLED ? createStore(Config.DB_URL, windowMs) : undefined,
     keyGenerator: (req) => {
       if (req.session?.userId) {
         return `user:${req.session.userId}`;
