@@ -62,6 +62,7 @@ describe('DELETE /comments/:id/vote', () => {
 
     const prevRate = await RateModel.create(
       generateRate({
+        user: currentUser.id,
         target: otherUserComment._id,
         negative: true,
         targetModel: RateTargetModel.COMMENT,
@@ -100,6 +101,7 @@ describe('DELETE /comments/:id/vote', () => {
 
       const prevRate = await RateModel.create(
         generateRate({
+          user: currentUser.id,
           target: otherUserComment._id,
           negative: isNegative,
           targetModel: RateTargetModel.COMMENT,
@@ -147,6 +149,7 @@ describe('DELETE /comments/:id/vote', () => {
 
       const prevRate = await RateModel.create(
         generateRate({
+          user: currentUser.id,
           target: otherUserComment._id,
           negative: isNegative,
           targetModel: RateTargetModel.COMMENT,
@@ -184,6 +187,7 @@ describe('DELETE /comments/:id/vote', () => {
 
     const prevRate = await RateModel.create(
       generateRate({
+        user: currentUser.id,
         target: otherUserComment._id,
         negative: false,
         targetModel: RateTargetModel.COMMENT,

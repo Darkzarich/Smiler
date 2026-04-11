@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import crypto from 'node:crypto';
 import { UserModel } from '@models/User';
-import { ValidationError, ConflictError, AbstractError, ERRORS } from '@errors';
+import { ValidationError, ConflictError, ERRORS } from '@errors';
 import { isDuplicateKeyError } from '@utils/check-mongo-db-error';
 import { sendSuccess } from '@utils/response-utils';
 import { CurrentUserResponse } from './current';
@@ -81,7 +81,7 @@ export async function signUp(
 
     sendSuccess(res, userAuth);
   } catch (error) {
-    if (isDuplicateKeyError(error as AbstractError)) {
+    if (isDuplicateKeyError(error)) {
       throw new ConflictError(ERRORS.AUTH_CONFLICT);
     }
 

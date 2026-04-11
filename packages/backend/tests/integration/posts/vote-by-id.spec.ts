@@ -32,6 +32,7 @@ async function createVotedOtherUserPost(
 
   const rate = await RateModel.create(
     generateRate({
+      user: currentUser.id,
       target: otherUserPost._id,
       negative: isNegative,
       targetModel: RateTargetModel.POST,

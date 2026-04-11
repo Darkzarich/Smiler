@@ -1,13 +1,16 @@
-import { AbstractError } from '@errors';
-
-export function isDuplicateKeyError(error: AbstractError) {
-  return error.name === 'MongoServerError' && error.code === 11000;
+export function isDuplicateKeyError(error: unknown) {
+  return (
+    error instanceof Error &&
+    error.name === 'MongoServerError' &&
+    'code' in error &&
+    error.code === 11000
+  );
 }
 
-export function isCastError(error: AbstractError) {
-  return error.name === 'CastError';
+export function isCastError(error: unknown) {
+  return error instanceof Error && error.name === 'CastError';
 }
 
-export function isValidationError(error: AbstractError) {
-  return error.name === 'ValidationError';
+export function isValidationError(error: unknown) {
+  return error instanceof Error && error.name === 'ValidationError';
 }

@@ -65,6 +65,7 @@ describe('GET /posts/:slug', () => {
 
     const rate = await RateModel.create(
       generateRate({
+        user: currentUser.id,
         target: post._id,
         negative: true,
       }),

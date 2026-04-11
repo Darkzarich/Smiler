@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
 import { PostModel, Post } from '@models/Post';
-import { RateModel } from '@models/Rate';
+import { RateModel, RateTargetModel } from '@models/Rate';
 import { POST_RATE_VALUE } from '@constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
@@ -25,25 +25,26 @@ export async function unvoteById(
     throw new NotFoundError(ERRORS.POST_NOT_FOUND);
   }
 
-  const currentUser = await UserModel.findById(userId)
-    .select({ rates: 1 })
-    .populate('rates');
+  const currentUser = await UserModel.exists({ _id: userId });
 
   if (!currentUser) {
     throw new NotFoundError(ERRORS.USER_NOT_FOUND);
   }
 
-  const ratedForCurrentUser = currentUser.isRated(targetPost.id);
+  const rate = await RateModel.removeForUser({
+    userId: userId!,
+    targetId: targetPost.id,
+    targetModel: RateTargetModel.POST,
+  });
 
-  if (!ratedForCurrentUser.result) {
+  if (!rate) {
     throw new ForbiddenError(ERRORS.TARGET_IS_NOT_RATED);
   }
 
-  const rateValue = ratedForCurrentUser.negative
+  const rateValue = rate.negative
     ? POST_RATE_VALUE
     : -POST_RATE_VALUE;
 
-  // TODO: Use transaction here
   const [updatedPost] = await Promise.all([
     PostModel.findByIdAndUpdate(
       targetPost.id,
@@ -55,10 +56,9 @@ export async function unvoteById(
       { $inc: { rating: rateValue } },
     ),
     UserModel.updateOne(
-      { _id: currentUser.id },
-      { $pull: { rates: ratedForCurrentUser.rated?._id } },
+      { _id: userId },
+      { $pull: { rates: rate._id } },
     ),
-    RateModel.deleteOne({ target: targetPost.id }),
   ]);
 
   sendSuccess(res, updatedPost!);

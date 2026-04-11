@@ -339,6 +339,7 @@ describe('GET /comments', () => {
 
     const rate = await RateModel.create(
       generateRate({
+        user: currentUser.id,
         target: otherUserComment._id,
         negative: true,
         targetModel: RateTargetModel.COMMENT,

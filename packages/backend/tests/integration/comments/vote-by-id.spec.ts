@@ -31,6 +31,7 @@ async function createVotedOtherUserComment(
 
   const rate = await RateModel.create(
     generateRate({
+      user: currentUser.id,
       target: otherUserComment._id,
       negative: isNegative,
       targetModel: RateTargetModel.COMMENT,

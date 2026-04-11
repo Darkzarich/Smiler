@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
-import { RateModel } from '@models/Rate';
+import { RateModel, RateTargetModel } from '@models/Rate';
 import { Comment, CommentModel } from '@models/Comment';
 import { COMMENT_RATE_VALUE } from '@constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
@@ -30,26 +30,27 @@ export async function unvoteById(
     throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
   }
 
-  const currentUser = await UserModel.findById(userId)
-    .select({ rates: 1 })
-    .populate('rates');
+  const currentUser = await UserModel.exists({ _id: userId });
 
   if (!currentUser) {
     throw new ForbiddenError(ERRORS.USER_NOT_FOUND);
   }
 
-  const ratedForCurrentUser = currentUser.isRated(targetComment._id.toString());
+  const rate = await RateModel.removeForUser({
+    userId: userId!,
+    targetId: targetComment._id.toString(),
+    targetModel: RateTargetModel.COMMENT,
+  });
 
-  if (!ratedForCurrentUser.result) {
+  if (!rate) {
     throw new ForbiddenError(ERRORS.TARGET_IS_NOT_RATED);
   }
 
   // If the rate was negative increase the rating after removing the rate
-  const rateValue = ratedForCurrentUser.negative
+  const rateValue = rate.negative
     ? COMMENT_RATE_VALUE
     : -COMMENT_RATE_VALUE;
 
-  // TODO: Use transaction here
   const [updatedComment] = await Promise.all([
     CommentModel.findByIdAndUpdate(
       targetComment._id,
@@ -60,10 +61,9 @@ export async function unvoteById(
       { _id: targetComment.author },
       { $inc: { rating: rateValue } },
     ),
-    RateModel.deleteOne({ target: targetComment._id }),
     UserModel.updateOne(
-      { _id: targetComment.author },
-      { $pull: { rates: ratedForCurrentUser.rated!._id } },
+      { _id: userId },
+      { $pull: { rates: rate._id } },
     ),
   ]);
 
