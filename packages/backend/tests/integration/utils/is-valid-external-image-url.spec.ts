@@ -3,7 +3,7 @@ import { isValidExternalImageUrl } from '@utils/is-valid-external-image-url';
 
 describe('isValidExternalImageUrl', () => {
   it('Should accept external HTTP and HTTPS urls with allowed image extensions', () => {
-    for (const extension of ALLOWED_PICTURE_EXTENSIONS) {
+    ALLOWED_PICTURE_EXTENSIONS.forEach((extension) => {
       expect(
         isValidExternalImageUrl(
           `https://cdn.example.com/uploads/picture.${extension}`,
@@ -14,7 +14,7 @@ describe('isValidExternalImageUrl', () => {
           `http://images.example.com/uploads/picture.${extension}`,
         ),
       ).toBe(true);
-    }
+    });
   });
 
   it('Should accept uppercase allowed image extensions and urls with query params', () => {
