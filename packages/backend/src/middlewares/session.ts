@@ -2,9 +2,11 @@ import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import type { Connection } from 'mongoose';
 import Config from '@config/index';
+import { SESSION_COOKIE_NAME } from '@constants/index';
 
 export default (db: Connection) =>
   session({
+    name: SESSION_COOKIE_NAME,
     secret: Config.SESSION_SECRET,
     resave: true,
     cookie: {

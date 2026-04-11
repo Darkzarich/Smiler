@@ -135,7 +135,7 @@ router.get('/csrf', apiRateLimiter, (req, res) => {
             "Set-Cookie": {
               "schema": {
                 "type": "string",
-                "example": "JSESSIONID=abcde12345; Path=/; HttpOnly"
+                "example": "smiler.sid=abcde12345; Path=/; HttpOnly"
               }
             }
           }
@@ -165,7 +165,7 @@ router.post('/signin', authRateLimiter, asyncControllerErrorHandler(signIn));
       "tags": [
         "Auth"
       ],
-      "description": "Sign up a new user and return its cookie token (connect.sid)",
+      "description": "Sign up a new user and return its cookie token (smiler.sid)",
       "requestBody": {
         "content": {
           "application/json": {
@@ -212,7 +212,7 @@ router.post('/signin', authRateLimiter, asyncControllerErrorHandler(signIn));
             "Set-Cookie": {
               "schema": {
                 "type": "string",
-                "example": "JSESSIONID=abcde12345; Path=/; HttpOnly"
+                "example": "smiler.sid=abcde12345; Path=/; HttpOnly"
               }
             }
           }

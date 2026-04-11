@@ -1,6 +1,7 @@
 import { minutesToMilliseconds } from 'date-fns';
 
 export const BASE_UPLOAD_FOLDER = '/uploads';
+export const SESSION_COOKIE_NAME = 'smiler.sid';
 
 export const ALLOWED_PICTURE_EXTENSIONS = [
   'jpg',

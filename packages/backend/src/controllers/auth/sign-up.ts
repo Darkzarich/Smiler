@@ -5,6 +5,7 @@ import { ValidationError, ConflictError, ERRORS } from '@errors';
 import { isDuplicateKeyError } from '@utils/check-mongo-db-error';
 import { sendSuccess } from '@utils/response-utils';
 import { CurrentUserResponse } from './current';
+import { authenticateSession } from './session';
 
 interface SignUpBody {
   email?: string;
@@ -66,7 +67,7 @@ export async function signUp(
       salt,
     });
 
-    req.session.userId = newUser._id.toString();
+    await authenticateSession(req, newUser._id.toString());
 
     const userAuth = {
       id: newUser._id.toString(),

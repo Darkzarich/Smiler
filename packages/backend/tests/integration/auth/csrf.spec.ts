@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { ERRORS } from '@errors';
-import { signUpRequest } from '@test-utils/request-auth';
+import { SESSION_COOKIE_NAME } from '@constants/index';
+import { findSessionCookie, signUpRequest } from '@test-utils/request-auth';
 import Config from '@config/index';
 
 describe('CSRF protection', () => {
@@ -9,7 +10,9 @@ describe('CSRF protection', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.csrfToken).toEqual(expect.any(String));
-    expect(response.headers['set-cookie']).toBeDefined();
+    expect(findSessionCookie(response.headers['set-cookie'])).toContain(
+      `${SESSION_COOKIE_NAME}=`,
+    );
   });
 
   it('Rejects an authenticated write request without a CSRF token', async () => {

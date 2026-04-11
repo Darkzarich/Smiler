@@ -2,7 +2,12 @@ import crypto from 'node:crypto';
 import request from 'supertest';
 import { ERRORS } from '@errors';
 import { UserModel } from '@models/User';
-import { csrfRequest } from '@test-utils/request-auth';
+import { SESSION_COOKIE_NAME } from '@constants/index';
+import {
+  csrfRequest,
+  findSessionCookie,
+  getCookieValue,
+} from '@test-utils/request-auth';
 
 describe('POST api/auth/signup', () => {
   function generateSignUpCredentials() {
@@ -162,9 +167,19 @@ describe('POST api/auth/signup', () => {
     });
   });
 
-  it('Sets session cookies', async () => {
-    const response = await signUp(generateSignUpCredentials());
+  it('Regenerates the session and sets the custom session cookie', async () => {
+    const { csrfCookie, csrfToken } = await csrfRequest(global.app);
 
-    expect(response.headers['set-cookie']).toBeDefined();
+    const response = await request(global.app)
+      .post('/api/auth/signup')
+      .set('Cookie', csrfCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send(generateSignUpCredentials());
+
+    const sessionCookie = findSessionCookie(response.headers['set-cookie']);
+
+    expect(sessionCookie).toBeDefined();
+    expect(sessionCookie).toContain(`${SESSION_COOKIE_NAME}=`);
+    expect(getCookieValue(sessionCookie!)).not.toBe(getCookieValue(csrfCookie));
   });
 });

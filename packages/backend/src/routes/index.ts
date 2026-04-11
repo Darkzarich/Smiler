@@ -48,7 +48,7 @@ export default router;
         
         "type": "apiKey",
         "in": "cookie",
-        "name": "connect.sid"
+        "name": "smiler.sid"
       }
     },
     "schemas": {

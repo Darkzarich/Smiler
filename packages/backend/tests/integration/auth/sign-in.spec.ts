@@ -1,5 +1,11 @@
 import request from 'supertest';
-import { csrfRequest, signUpRequest } from '@test-utils/request-auth';
+import { SESSION_COOKIE_NAME } from '@constants/index';
+import {
+  csrfRequest,
+  findSessionCookie,
+  getCookieValue,
+  signUpRequest,
+} from '@test-utils/request-auth';
 import { ERRORS } from '@errors';
 
 describe('POST api/auth/signin', () => {
@@ -96,14 +102,23 @@ describe('POST api/auth/signin', () => {
     });
   });
 
-  it('Sets session cookies', async () => {
+  it('Regenerates the session and sets the custom session cookie', async () => {
     const { currentUser } = await signUpRequest(global.app);
+    const { csrfCookie, csrfToken } = await csrfRequest(global.app);
 
-    const response = await signIn({
-      email: currentUser.email,
-      password: '123456',
-    });
+    const response = await request(global.app)
+      .post('/api/auth/signin')
+      .set('Cookie', csrfCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send({
+        email: currentUser.email,
+        password: '123456',
+      });
 
-    expect(response.headers['set-cookie']).toBeDefined();
+    const sessionCookie = findSessionCookie(response.headers['set-cookie']);
+
+    expect(sessionCookie).toBeDefined();
+    expect(sessionCookie).toContain(`${SESSION_COOKIE_NAME}=`);
+    expect(getCookieValue(sessionCookie!)).not.toBe(getCookieValue(csrfCookie));
   });
 });

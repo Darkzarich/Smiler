@@ -1,31 +1,21 @@
-declare namespace Express {
-  export interface Request {
-    id: string;
-    session: {
-      userId?: string;
-      csrfToken?: string;
-      destroy?(): void;
-    };
-    file?: Express.Multer.File;
-  }
+import 'express-session';
 
-  export interface Response {
-    response: Record<string, unknown>;
+declare module 'express-session' {
+  interface SessionData {
+    userId?: string;
+    csrfToken?: string;
   }
 }
 
-declare module 'rate-limit-mongo' {
-  import type { Store } from 'express-rate-limit';
+declare global {
+  namespace Express {
+    export interface Request {
+      id: string;
+      file?: Express.Multer.File;
+    }
 
-  interface MongoStoreOptions {
-    uri: string;
-    collectionName?: string;
-    expireTimeMs?: number;
+    export interface Response {
+      response: Record<string, unknown>;
+    }
   }
-
-  const MongoStore: {
-    new (options: MongoStoreOptions): Store;
-  };
-
-  export = MongoStore;
 }

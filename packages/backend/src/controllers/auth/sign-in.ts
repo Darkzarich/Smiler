@@ -4,6 +4,7 @@ import { UserModel } from '@models/User';
 import { ValidationError, UnauthorizedError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { CurrentUserResponse } from './current';
+import { authenticateSession } from './session';
 
 interface SignInBody {
   email?: string;
@@ -60,7 +61,7 @@ export async function signIn(
     throw new UnauthorizedError(ERRORS.AUTH_INVALID_CREDENTIALS);
   }
 
-  req.session.userId = foundUser._id.toString();
+  await authenticateSession(req, foundUser._id.toString());
 
   // TODO: Maybe move to getters of the model
   const userAuth = {

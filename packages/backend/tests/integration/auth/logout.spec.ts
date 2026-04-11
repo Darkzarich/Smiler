@@ -1,5 +1,6 @@
 import request from 'supertest';
-import { signUpRequest } from '@test-utils/request-auth';
+import { SESSION_COOKIE_NAME } from '@constants/index';
+import { findSessionCookie, signUpRequest } from '@test-utils/request-auth';
 import { ERRORS } from '@errors';
 
 describe('POST api/auth/logout', () => {
@@ -17,6 +18,9 @@ describe('POST api/auth/logout', () => {
       .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
+    expect(findSessionCookie(response.headers['set-cookie'])).toContain(
+      `${SESSION_COOKIE_NAME}=;`,
+    );
     expect(anotherResponse.status).toBe(401);
     expect(anotherResponse.body.error.message).toBe(ERRORS.UNAUTHORIZED);
   });
