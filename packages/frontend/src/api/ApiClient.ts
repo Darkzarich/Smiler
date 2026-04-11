@@ -14,11 +14,64 @@ interface RequestError {
   };
 }
 
+interface CsrfResponse {
+  csrfToken: string;
+}
+
 class ApiClient {
   private axiosClient = axios.create({
     baseURL: `${config.VUE_APP_API_URL}/api`,
     withCredentials: true,
   });
+
+  private csrfToken?: string;
+
+  private csrfTokenRequest?: Promise<string>;
+
+  private async getCsrfToken() {
+    if (this.csrfToken) {
+      return this.csrfToken;
+    }
+
+    if (!this.csrfTokenRequest) {
+      this.csrfTokenRequest = this.axiosClient
+        .get<CsrfResponse>('auth/csrf')
+        .then((res) => {
+          this.csrfToken = res.data.csrfToken;
+
+          return res.data.csrfToken;
+        })
+        .finally(() => {
+          this.csrfTokenRequest = undefined;
+        });
+    }
+
+    return this.csrfTokenRequest;
+  }
+
+  private async addCsrfHeader(requestData: AxiosRequestConfig) {
+    const method = requestData.method?.toLowerCase();
+
+    if (!method || ['get', 'head', 'options'].includes(method)) {
+      return requestData;
+    }
+
+    return {
+      ...requestData,
+      headers: {
+        ...requestData.headers,
+        'X-CSRF-Token': await this.getCsrfToken(),
+      },
+    };
+  }
+
+  private isCsrfError(error: unknown) {
+    return (
+      axios.isAxiosError<RequestError>(error) &&
+      error.response?.status === 403 &&
+      error.response.data.error.message === 'Invalid or missing CSRF token'
+    );
+  }
 
   private async request<Response = OkResponse>(
     requestData: AxiosRequestConfig,
@@ -27,12 +80,30 @@ class ApiClient {
     const userStore = useUserStore();
 
     try {
-      const res = await this.axiosClient.request<Response>(requestData);
+      const res = await this.axiosClient.request<Response>(
+        await this.addCsrfHeader(requestData),
+      );
 
       return res.data;
     } catch (error) {
-      if (axios.isAxiosError<RequestError>(error)) {
-        const { response } = error;
+      let requestError = error;
+
+      if (this.isCsrfError(requestError)) {
+        this.csrfToken = undefined;
+
+        try {
+          const res = await this.axiosClient.request<Response>(
+            await this.addCsrfHeader(requestData),
+          );
+
+          return res.data;
+        } catch (retryError) {
+          requestError = retryError;
+        }
+      }
+
+      if (axios.isAxiosError<RequestError>(requestError)) {
+        const { response } = requestError;
 
         if (!response || !response.data || !response.data.error.message) {
           notificationsStore.showErrorNotification({
@@ -40,7 +111,7 @@ class ApiClient {
               'Oops! Something went wrong. Please try to reload the page and try again.',
           });
 
-          throw error;
+          throw requestError;
         }
 
         notificationsStore.showErrorNotification({
@@ -52,7 +123,7 @@ class ApiClient {
         }
       }
 
-      throw error;
+      throw requestError;
     }
   }
 
