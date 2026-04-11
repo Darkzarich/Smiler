@@ -3,6 +3,7 @@ declare namespace Express {
     id: string;
     session: {
       userId?: string;
+      csrfToken?: string;
       destroy?(): void;
     };
     file?: Express.Multer.File;

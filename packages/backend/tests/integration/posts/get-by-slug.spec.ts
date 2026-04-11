@@ -53,7 +53,9 @@ describe('GET /posts/:slug', () => {
   });
 
   it('Should return that a post is rated if the current user has rated it', async () => {
-    const { currentUser, sessionCookie } = await signUpRequest(global.app);
+    const { currentUser, sessionCookie, csrfToken } = await signUpRequest(
+      global.app,
+    );
 
     const otherUser = await UserModel.create(generateRandomUser());
 
@@ -72,7 +74,8 @@ describe('GET /posts/:slug', () => {
     );
     const response = await request(global.app)
       .get(`/api/posts/${post.slug}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body.rated).toMatchObject({

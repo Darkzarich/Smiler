@@ -12,7 +12,9 @@ describe('GET /users/me/template', () => {
   });
 
   it('Should return status 200 and the template', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const template = {
       title: 'test-title',
@@ -29,7 +31,8 @@ describe('GET /users/me/template', () => {
 
     const response = await request(global.app)
       .get(`/api/users/me/template`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(template);

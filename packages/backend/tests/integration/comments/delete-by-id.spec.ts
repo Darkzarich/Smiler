@@ -23,18 +23,19 @@ describe('DELETE /comments/:id', () => {
   });
 
   it('Should return status 404 and an expected message if comment was not found', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .delete('/api/comments/5d5467b4c17806706f3df347')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.COMMENT_NOT_FOUND);
     expect(response.status).toBe(404);
   });
 
   it('Should return status 403 and an expected message if comment does not belong to the user', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const comment = await CommentModel.create(
       generateRandomComment({
@@ -44,7 +45,8 @@ describe('DELETE /comments/:id', () => {
 
     const response = await request(global.app)
       .delete(`/api/comments/${comment.id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(
       ERRORS.COMMENT_CANT_DELETE_NOT_OWN,
@@ -53,7 +55,9 @@ describe('DELETE /comments/:id', () => {
   });
 
   it('Should return status 403 and an expected message if comment is older than 10 min', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const comment = await CommentModel.create(
       generateRandomComment({
@@ -64,7 +68,8 @@ describe('DELETE /comments/:id', () => {
 
     const response = await request(global.app)
       .delete(`/api/comments/${comment.id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(
       ERRORS.COMMENT_CAN_DELETE_WITHIN_TIME,
@@ -74,7 +79,9 @@ describe('DELETE /comments/:id', () => {
 
   describe('Has no replies', () => {
     it('Should remove comment from the database if it had no replies before being deleted', async () => {
-      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
 
       const comment = await CommentModel.create(
         generateRandomComment({
@@ -84,7 +91,8 @@ describe('DELETE /comments/:id', () => {
 
       const response = await request(global.app)
         .delete(`/api/comments/${comment.id}`)
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       const updatedComment = await CommentModel.findById(comment.id).lean();
 
@@ -93,7 +101,9 @@ describe('DELETE /comments/:id', () => {
     });
 
     it("Should remove comment from parent's children if it had a parent and no replies before being deleted", async () => {
-      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
 
       const parentComment = await CommentModel.create(
         generateRandomComment({
@@ -113,7 +123,8 @@ describe('DELETE /comments/:id', () => {
 
       const response = await request(global.app)
         .delete(`/api/comments/${comment.id}`)
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       const updatedParentComment = await CommentModel.findById(
         parentComment.id,
@@ -124,7 +135,9 @@ describe('DELETE /comments/:id', () => {
     });
 
     it('Should decrease post comments count if a comment of the post was deleted', async () => {
-      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
 
       const post = await PostModel.create(generateRandomPost());
 
@@ -137,7 +150,8 @@ describe('DELETE /comments/:id', () => {
 
       await request(global.app)
         .delete(`/api/comments/${comment.id}`)
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       const updatedPost = await PostModel.findById(post.id).lean();
 
@@ -145,7 +159,9 @@ describe('DELETE /comments/:id', () => {
     });
 
     it('Should decrease user rating after the comment is deleted', async () => {
-      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
 
       const comment = await CommentModel.create(
         generateRandomComment({
@@ -155,7 +171,8 @@ describe('DELETE /comments/:id', () => {
 
       await request(global.app)
         .delete(`/api/comments/${comment.id}`)
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       const updatedUser = await UserModel.findById(currentUser.id).lean();
 
@@ -163,7 +180,9 @@ describe('DELETE /comments/:id', () => {
     });
 
     it('Should delete all rates for the comment after the comment is deleted', async () => {
-      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
 
       const comment = await CommentModel.create(
         generateRandomComment({
@@ -183,7 +202,8 @@ describe('DELETE /comments/:id', () => {
 
       await request(global.app)
         .delete(`/api/comments/${comment.id}`)
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       const rates = await RateModel.find({ target: comment._id }).lean();
 
@@ -193,7 +213,9 @@ describe('DELETE /comments/:id', () => {
 
   describe('Has replies', () => {
     it('Should set "deleted" flag to true if comment had replies before being deleted', async () => {
-      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
 
       const comment = await CommentModel.create(
         generateRandomComment({
@@ -205,7 +227,8 @@ describe('DELETE /comments/:id', () => {
 
       const response = await request(global.app)
         .delete(`/api/comments/${comment.id}`)
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       const updatedComment = await CommentModel.findById(comment.id).lean();
 
@@ -214,7 +237,9 @@ describe('DELETE /comments/:id', () => {
     });
 
     it('Should decrease user rating after the comment is deleted', async () => {
-      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
 
       const comment = await CommentModel.create(
         generateRandomComment({
@@ -226,7 +251,8 @@ describe('DELETE /comments/:id', () => {
 
       await request(global.app)
         .delete(`/api/comments/${comment.id}`)
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       const updatedUser = await UserModel.findById(currentUser.id).lean();
 
@@ -234,7 +260,9 @@ describe('DELETE /comments/:id', () => {
     });
 
     it('Should delete all rates for the comment after the comment is deleted', async () => {
-      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
 
       const comment = await CommentModel.create(
         generateRandomComment({
@@ -256,7 +284,8 @@ describe('DELETE /comments/:id', () => {
 
       await request(global.app)
         .delete(`/api/comments/${comment.id}`)
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       const rates = await RateModel.find({ target: comment._id }).lean();
 

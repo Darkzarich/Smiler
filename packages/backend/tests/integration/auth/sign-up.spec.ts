@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import request from 'supertest';
 import { ERRORS } from '@errors';
 import { UserModel } from '@models/User';
+import { csrfRequest } from '@test-utils/request-auth';
 
 describe('POST api/auth/signup', () => {
   function generateSignUpCredentials() {
@@ -13,8 +14,18 @@ describe('POST api/auth/signup', () => {
     };
   }
 
+  async function signUp(data: Record<string, unknown>) {
+    const { csrfCookie, csrfToken } = await csrfRequest(global.app);
+
+    return request(global.app)
+      .post('/api/auth/signup')
+      .set('Cookie', csrfCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send(data);
+  }
+
   it('Returns status 422 and an expected message for not filled all fields (only email)', async () => {
-    const response = await request(global.app).post('/api/auth/signup').send({
+    const response = await signUp({
       email: 'test-user@test.com',
     });
 
@@ -23,7 +34,7 @@ describe('POST api/auth/signup', () => {
   });
 
   it('Returns status 422 and an expected message for not filled all fields (only password)', async () => {
-    const response = await request(global.app).post('/api/auth/signup').send({
+    const response = await signUp({
       password: '123456',
     });
 
@@ -32,7 +43,7 @@ describe('POST api/auth/signup', () => {
   });
 
   it('Returns status 422 and an expected message for not filled all fields (only login)', async () => {
-    const response = await request(global.app).post('/api/auth/signup').send({
+    const response = await signUp({
       login: 'test',
     });
 
@@ -41,7 +52,7 @@ describe('POST api/auth/signup', () => {
   });
 
   it('Returns status 422 and an expected message for not filled all fields (only confirm)', async () => {
-    const response = await request(global.app).post('/api/auth/signup').send({
+    const response = await signUp({
       confirm: '123456',
     });
 
@@ -50,60 +61,50 @@ describe('POST api/auth/signup', () => {
   });
 
   it('Returns status 422 and an expected message for login length less than 3', async () => {
-    const response = await request(global.app)
-      .post('/api/auth/signup')
-      .send({
-        ...generateSignUpCredentials(),
-        login: 'te',
-      });
+    const response = await signUp({
+      ...generateSignUpCredentials(),
+      login: 'te',
+    });
 
     expect(response.status).toBe(422);
     expect(response.body.error.message).toBe(ERRORS.AUTH_LOGIN_WRONG_LENGTH);
   });
 
   it('Returns status 422 and an expected message for login length more than 15', async () => {
-    const response = await request(global.app)
-      .post('/api/auth/signup')
-      .send({
-        ...generateSignUpCredentials(),
-        login: 'test-test-test-test',
-      });
+    const response = await signUp({
+      ...generateSignUpCredentials(),
+      login: 'test-test-test-test',
+    });
 
     expect(response.status).toBe(422);
     expect(response.body.error.message).toBe(ERRORS.AUTH_LOGIN_WRONG_LENGTH);
   });
 
   it('Returns status 422 and an expected message for password length less than 6', async () => {
-    const response = await request(global.app)
-      .post('/api/auth/signup')
-      .send({
-        ...generateSignUpCredentials(),
-        password: '12345',
-      });
+    const response = await signUp({
+      ...generateSignUpCredentials(),
+      password: '12345',
+    });
 
     expect(response.status).toBe(422);
     expect(response.body.error.message).toBe(ERRORS.AUTH_PASSWORD_TOO_SHORT);
   });
 
   it('Returns status 422 and an expected message if password and confirm not equal', async () => {
-    const response = await request(global.app)
-      .post('/api/auth/signup')
-      .send({
-        ...generateSignUpCredentials(),
-        confirm: 'wrong-pass',
-      });
+    const response = await signUp({
+      ...generateSignUpCredentials(),
+      confirm: 'wrong-pass',
+    });
 
     expect(response.status).toBe(422);
     expect(response.body.error.message).toBe(ERRORS.AUTH_PASSWORDS_NOT_EQUAL);
   });
 
   it('Returns status 422 and an expected message for email not valid', async () => {
-    const response = await request(global.app)
-      .post('/api/auth/signup')
-      .send({
-        ...generateSignUpCredentials(),
-        email: 'current-user@gmail',
-      });
+    const response = await signUp({
+      ...generateSignUpCredentials(),
+      email: 'current-user@gmail',
+    });
 
     expect(response.status).toBe(422);
     expect(response.body.error.message).toBe(ERRORS.AUTH_INVALID_EMAIL);
@@ -112,9 +113,7 @@ describe('POST api/auth/signup', () => {
   it('Creates a user document in the database with hashed password and salt', async () => {
     const credentials = generateSignUpCredentials();
 
-    const response = await request(global.app)
-      .post('/api/auth/signup')
-      .send(credentials);
+    const response = await signUp(credentials);
 
     const user = await UserModel.findOne({ _id: response.body.id }).lean();
 
@@ -137,11 +136,9 @@ describe('POST api/auth/signup', () => {
 
     const credentials = generateSignUpCredentials();
 
-    await request(global.app).post('/api/auth/signup').send(credentials);
+    await signUp(credentials);
 
-    const response = await request(global.app)
-      .post('/api/auth/signup')
-      .send(credentials);
+    const response = await signUp(credentials);
 
     expect(response.status).toBe(409);
     expect(response.body.error.message).toBe(ERRORS.AUTH_CONFLICT);
@@ -150,9 +147,7 @@ describe('POST api/auth/signup', () => {
   it('Returns status 200 and isAuth=true with the user data after successful sign up', async () => {
     const credentials = generateSignUpCredentials();
 
-    const response = await request(global.app)
-      .post('/api/auth/signup')
-      .send(credentials);
+    const response = await signUp(credentials);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -168,9 +163,7 @@ describe('POST api/auth/signup', () => {
   });
 
   it('Sets session cookies', async () => {
-    const response = await request(global.app)
-      .post('/api/auth/signup')
-      .send(generateSignUpCredentials());
+    const response = await signUp(generateSignUpCredentials());
 
     expect(response.headers['set-cookie']).toBeDefined();
   });

@@ -3,6 +3,7 @@ import { asyncControllerErrorHandler } from '@utils/async-controller-error-handl
 import { current, signIn, signUp, logout } from '@controllers/auth';
 import authRequiredMiddleware from '@middlewares/auth-required';
 import { authRateLimiter, apiRateLimiter } from '@middlewares/rate-limiter';
+import { getOrCreateCsrfToken } from '@middlewares/csrf';
 
 const router = express.Router();
 
@@ -82,6 +83,12 @@ const router = express.Router();
 */
 router.get('/current', apiRateLimiter, asyncControllerErrorHandler(current));
 
+router.get('/csrf', apiRateLimiter, (req, res) => {
+  res.json({
+    csrfToken: getOrCreateCsrfToken(req),
+  });
+});
+
 /**
 @swagger
 {
@@ -147,11 +154,7 @@ router.get('/current', apiRateLimiter, asyncControllerErrorHandler(current));
   }
 }
 */
-router.post(
-  '/signin',
-  authRateLimiter,
-  asyncControllerErrorHandler(signIn),
-);
+router.post('/signin', authRateLimiter, asyncControllerErrorHandler(signIn));
 
 /**
 @swagger
@@ -222,11 +225,7 @@ router.post(
   }
 }
 */
-router.post(
-  '/signup',
-  authRateLimiter,
-  asyncControllerErrorHandler(signUp),
-);
+router.post('/signup', authRateLimiter, asyncControllerErrorHandler(signUp));
 
 /**
 @swagger

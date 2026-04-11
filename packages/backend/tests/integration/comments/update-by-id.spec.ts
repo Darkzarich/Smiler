@@ -1,5 +1,8 @@
 import request from 'supertest';
-import { COMMENT_TIME_TO_UPDATE, COMMENT_MAX_BODY_LENGTH } from '@constants/index';
+import {
+  COMMENT_TIME_TO_UPDATE,
+  COMMENT_MAX_BODY_LENGTH,
+} from '@constants/index';
 import { signUpRequest } from '@test-utils/request-auth';
 import { CommentModel } from '@models/Comment';
 import { UserModel } from '@models/User';
@@ -19,18 +22,19 @@ describe('PUT /comments/:id', () => {
   });
 
   it('Should return status 404 and an expected message if comment was not found', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/comments/5d5467b4c17806706f3df347')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.COMMENT_NOT_FOUND);
     expect(response.status).toBe(404);
   });
 
   it('Should return status 403 and an expected message if comment does not belong to the user', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const otherUser = await UserModel.create(generateRandomUser());
 
@@ -42,14 +46,17 @@ describe('PUT /comments/:id', () => {
 
     const response = await request(global.app)
       .put(`/api/comments/${comment.id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.COMMENT_CANT_EDIT_NOT_OWN);
     expect(response.status).toBe(403);
   });
 
   it('Should return status 403 and an expected message if comment is older than 10 min', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const comment = await CommentModel.create(
       generateRandomComment({
@@ -60,7 +67,8 @@ describe('PUT /comments/:id', () => {
 
     const response = await request(global.app)
       .put(`/api/comments/${comment.id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(
       ERRORS.COMMENT_CAN_EDIT_WITHIN_TIME,
@@ -71,7 +79,9 @@ describe('PUT /comments/:id', () => {
   it("Should return status 200 and update the comment's body in the database", async () => {
     const body = 'test test test';
 
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const comment = await CommentModel.create(
       generateRandomComment({
@@ -82,7 +92,8 @@ describe('PUT /comments/:id', () => {
     const response = await request(global.app)
       .put(`/api/comments/${comment.id}`)
       .send({ body })
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     const updatedComment = await CommentModel.findById(comment.id).lean();
 
@@ -91,7 +102,9 @@ describe('PUT /comments/:id', () => {
   });
 
   it("Should return status 422 and an expected message if comment's body exceeds max length", async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const comment = await CommentModel.create(
       generateRandomComment({
@@ -102,7 +115,8 @@ describe('PUT /comments/:id', () => {
     const response = await request(global.app)
       .put(`/api/comments/${comment.id}`)
       .send({ body: 'a'.repeat(COMMENT_MAX_BODY_LENGTH + 1) })
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(
       ERRORS.COMMENT_BODY_MAX_LENGTH_EXCEEDED,
@@ -113,7 +127,9 @@ describe('PUT /comments/:id', () => {
   it('Should return status 200 and the updated comment', async () => {
     const body = 'test test test';
 
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const comment = await CommentModel.create(
       generateRandomComment({
@@ -124,7 +140,8 @@ describe('PUT /comments/:id', () => {
     const response = await request(global.app)
       .put(`/api/comments/${comment.id}`)
       .send({ body })
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body).toEqual({
       _id: comment.id,

@@ -26,11 +26,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if title is not provided', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send(omit(requiredPostFields, 'title'));
 
     expect(response.body.error.message).toBe(ERRORS.POST_TITLE_REQUIRED);
@@ -38,11 +39,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if sections are not provided', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send(omit(requiredPostFields, 'sections'));
 
     expect(response.body.error.message).toBe(ERRORS.POST_SECTIONS_REQUIRED);
@@ -50,11 +52,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if too many sections', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: Array(POST_SECTIONS_MAX + 1).fill(
@@ -67,11 +70,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if title is too long', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         title: 'a'.repeat(POST_TITLE_MAX_LENGTH + 1),
@@ -84,11 +88,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if too many tags', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         tags: Array(POST_MAX_TAGS + 1).fill(post.tags[0]),
@@ -99,11 +104,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if too long tag', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         tags: ['a'.repeat(POST_MAX_TAG_LEN + 1)],
@@ -114,11 +120,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if at least one section is unknown type', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -136,11 +143,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if text section is empty', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -158,11 +166,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if text section content is too long', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -185,11 +194,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if pic section url is empty', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -207,11 +217,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if pic section url is not an URL', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -229,11 +240,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if pic section file url is not a valid URL', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -252,11 +264,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if video section url is empty', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -274,11 +287,12 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 422 and an expected message if video section url is not an URL', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -296,11 +310,12 @@ describe('POST /posts', () => {
   });
 
   it('Should add the post to the database', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         tags: post.tags,
@@ -317,11 +332,14 @@ describe('POST /posts', () => {
   });
 
   it('Should return status 200 and the post after successful creation', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const response = await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         tags: post.tags,
@@ -353,7 +371,9 @@ describe('POST /posts', () => {
   });
 
   it('Should clear user template after successful creation', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     await UserModel.updateOne(
       { _id: currentUser.id },
@@ -369,6 +389,7 @@ describe('POST /posts', () => {
     await request(global.app)
       .post('/api/posts')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send(requiredPostFields);
 
     const userFromDb = await UserModel.findById(currentUser.id).lean();

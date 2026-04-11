@@ -14,14 +14,15 @@ describe('PUT /users/me', () => {
   });
 
   it('Should return status 422 and an expected db validation message for a too long bio', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/users/me')
       .send({
         bio: 'a'.repeat(USER_MAX_BIO_LENGTH + 1),
       })
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toContain(
       'longer than the maximum allowed length',
@@ -30,28 +31,30 @@ describe('PUT /users/me', () => {
   });
 
   it('Should return status 422 and an expected db validation message if avatar is not an url', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/users/me')
       .send({
         avatar: 'a',
       })
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.USER_AVATAR_INVALID);
     expect(response.status).toBe(422);
   });
 
   it('Should return status 422 and an expected db validation message for too long avatar', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/users/me')
       .send({
         avatar: `https://example.com/${'a'.repeat(USER_MAX_AVATAR_LENGTH)}.jpg`,
       })
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toContain(
       'longer than the maximum allowed length',
@@ -60,7 +63,9 @@ describe('PUT /users/me', () => {
   });
 
   it('Should ignore protected user fields', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const response = await request(global.app)
       .put('/api/users/me')
@@ -69,7 +74,8 @@ describe('PUT /users/me', () => {
         rating: 100,
         email: 'attacker@example.com',
       })
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     const user = await UserModel.findById(currentUser.id).lean();
 
@@ -81,28 +87,32 @@ describe('PUT /users/me', () => {
   });
 
   it('Should return status 422 and an expected message if an update field is not a string', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/users/me')
       .send({
         bio: ['updated bio'],
       })
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.USER_UPDATE_FIELD_INVALID);
     expect(response.status).toBe(422);
   });
 
   it("Should return status 404 and an expected message if didn't find the user", async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     await UserModel.deleteOne({ _id: currentUser.id });
 
     const response = await request(global.app)
       .put('/api/users/me')
       .send({ bio: 'a' })
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.USER_NOT_FOUND);
     expect(response.status).toBe(404);
@@ -112,12 +122,13 @@ describe('PUT /users/me', () => {
     const bio = 'a';
     const avatar = 'https://example.com/avatar.jpg';
 
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/users/me')
       .send({ bio, avatar })
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body.bio).toBe(bio);

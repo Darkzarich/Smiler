@@ -10,6 +10,7 @@ import {
 export const ERRORS = {
   NOT_FOUND: 'Not Found',
   UNAUTHORIZED: 'Auth is required for this operation. Please sign in.',
+  CSRF_INVALID: 'Invalid or missing CSRF token',
 
   AUTH_INVALID_CREDENTIALS: 'Invalid email or password',
   AUTH_FIELDS_REQUIRED: 'All fields must be filled.',

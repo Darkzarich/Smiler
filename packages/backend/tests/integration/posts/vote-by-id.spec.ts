@@ -56,18 +56,21 @@ describe('PUT /posts/:id/vote', () => {
   });
 
   it('Should return status 404 and a message for non-existing slug', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/posts/5d5467b4c17806706f3df347/vote')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.POST_NOT_FOUND);
     expect(response.status).toBe(404);
   });
 
   it('Should return status 403 and an expected message when user tries to vote for their own post', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -78,7 +81,8 @@ describe('PUT /posts/:id/vote', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}/vote`)
       .send({ negative: false })
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(403);
     expect(response.body.error.message).toBe(ERRORS.POST_CANT_RATE_OWN);
@@ -87,7 +91,9 @@ describe('PUT /posts/:id/vote', () => {
   it.each([true, false])(
     'Should return status 403 and an expected message when user tries to vote for a post in the same direction (negative: %s) which they have already voted',
     async (isNegative) => {
-      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
 
       const { otherUserPost } = await createVotedOtherUserPost(
         currentUser,
@@ -97,7 +103,8 @@ describe('PUT /posts/:id/vote', () => {
       const response = await request(global.app)
         .put(`/api/posts/${otherUserPost._id}/vote`)
         .send({ negative: isNegative })
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       expect(response.status).toBe(403);
       expect(response.body.error.message).toBe(
@@ -108,7 +115,7 @@ describe('PUT /posts/:id/vote', () => {
 
   describe('The post has not been rated by the current user yet', () => {
     it('Should create a new "Post" rate in the database', async () => {
-      const { sessionCookie } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
       const otherUser = await UserModel.create(generateRandomUser());
 
@@ -121,7 +128,8 @@ describe('PUT /posts/:id/vote', () => {
       const response = await request(global.app)
         .put(`/api/posts/${post._id}/vote`)
         .send({ negative: true })
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       const rate = await RateModel.findOne({ target: post._id });
 
@@ -138,7 +146,7 @@ describe('PUT /posts/:id/vote', () => {
     ])(
       'Should %s the post rating after the post is rated (negative: %s)',
       async (_, isNegative) => {
-        const { sessionCookie } = await signUpRequest(global.app);
+        const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
         const otherUser = await UserModel.create(generateRandomUser());
 
@@ -151,7 +159,8 @@ describe('PUT /posts/:id/vote', () => {
         await request(global.app)
           .put(`/api/posts/${otherUserPost._id}/vote`)
           .send({ negative: isNegative })
-          .set('Cookie', sessionCookie);
+          .set('Cookie', sessionCookie)
+          .set('X-CSRF-Token', csrfToken);
 
         const votedPost = await PostModel.findById(otherUserPost._id);
 
@@ -167,7 +176,7 @@ describe('PUT /posts/:id/vote', () => {
     ])(
       "Should %s author's rating after the post is rated (negative: %s)",
       async (_, isNegative) => {
-        const { sessionCookie } = await signUpRequest(global.app);
+        const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
         const otherUser = await UserModel.create(generateRandomUser());
 
@@ -180,7 +189,8 @@ describe('PUT /posts/:id/vote', () => {
         await request(global.app)
           .put(`/api/posts/${otherUserPost._id}/vote`)
           .send({ negative: isNegative })
-          .set('Cookie', sessionCookie);
+          .set('Cookie', sessionCookie)
+          .set('X-CSRF-Token', csrfToken);
 
         const updatedOtherUser = await UserModel.findById(otherUser._id);
 
@@ -191,7 +201,7 @@ describe('PUT /posts/:id/vote', () => {
     );
 
     it('Should return the updated post with changed rating after vote', async () => {
-      const { sessionCookie } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
       const otherUser = await UserModel.create(generateRandomUser());
 
@@ -204,10 +214,13 @@ describe('PUT /posts/:id/vote', () => {
       const response = await request(global.app)
         .put(`/api/posts/${otherUserPost._id}/vote`)
         .send({ negative: true })
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       expect(response.status).toBe(200);
-      expect(response.body.rating).toBe(otherUserPost.rating + -POST_RATE_VALUE);
+      expect(response.body.rating).toBe(
+        otherUserPost.rating + -POST_RATE_VALUE,
+      );
     });
   });
 
@@ -215,7 +228,9 @@ describe('PUT /posts/:id/vote', () => {
     it.each([true, false])(
       'Should update the existing post rate in the database (negative: %s)',
       async (isNegative) => {
-        const { sessionCookie, currentUser } = await signUpRequest(global.app);
+        const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+          global.app,
+        );
 
         const { otherUserPost } = await createVotedOtherUserPost(
           currentUser,
@@ -225,7 +240,8 @@ describe('PUT /posts/:id/vote', () => {
         const response = await request(global.app)
           .put(`/api/posts/${otherUserPost._id}/vote`)
           .send({ negative: isNegative })
-          .set('Cookie', sessionCookie);
+          .set('Cookie', sessionCookie)
+          .set('X-CSRF-Token', csrfToken);
 
         const updatedRate = await RateModel.findOne({
           target: otherUserPost._id,
@@ -243,7 +259,9 @@ describe('PUT /posts/:id/vote', () => {
     ])(
       'Should twice %s the post rating after the post is rate is updated (negative: %s)',
       async (_, isNegative) => {
-        const { sessionCookie, currentUser } = await signUpRequest(global.app);
+        const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+          global.app,
+        );
 
         const { otherUserPost } = await createVotedOtherUserPost(
           currentUser,
@@ -253,7 +271,8 @@ describe('PUT /posts/:id/vote', () => {
         await request(global.app)
           .put(`/api/posts/${otherUserPost._id}/vote`)
           .send({ negative: isNegative })
-          .set('Cookie', sessionCookie);
+          .set('Cookie', sessionCookie)
+          .set('X-CSRF-Token', csrfToken);
 
         const ratedPost = await PostModel.findById(otherUserPost._id);
 
@@ -269,7 +288,9 @@ describe('PUT /posts/:id/vote', () => {
     ])(
       "Should twice %s author's rating after the post is rated",
       async (_, isNegative) => {
-        const { sessionCookie, currentUser } = await signUpRequest(global.app);
+        const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+          global.app,
+        );
 
         const { otherUserPost, otherUser } = await createVotedOtherUserPost(
           currentUser,
@@ -279,7 +300,8 @@ describe('PUT /posts/:id/vote', () => {
         await request(global.app)
           .put(`/api/posts/${otherUserPost._id}/vote`)
           .send({ negative: isNegative })
-          .set('Cookie', sessionCookie);
+          .set('Cookie', sessionCookie)
+          .set('X-CSRF-Token', csrfToken);
 
         const updatedOtherUser = await UserModel.findById(otherUser._id);
 
@@ -290,7 +312,9 @@ describe('PUT /posts/:id/vote', () => {
     );
 
     it('Should return the updated post with changed rating after vote', async () => {
-      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
 
       const isNegative = true;
 
@@ -302,7 +326,8 @@ describe('PUT /posts/:id/vote', () => {
       const response = await request(global.app)
         .put(`/api/posts/${otherUserPost._id}/vote`)
         .send({ negative: isNegative })
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       expect(response.status).toBe(200);
       expect(response.body.rating).toBe(

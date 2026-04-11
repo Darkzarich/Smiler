@@ -42,13 +42,14 @@ describe('GET /comments', () => {
   });
 
   it('Should return empty list of comments if there are no comments', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const post = await PostModel.create(generateRandomPost());
 
     const response = await request(global.app)
       .get(`/api/comments?post=${post.id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -146,7 +147,9 @@ describe('GET /comments', () => {
   });
 
   it('Should return a comment with an expected structure', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(generateRandomPost());
 
@@ -159,7 +162,8 @@ describe('GET /comments', () => {
 
     const response = await request(global.app)
       .get(`/api/comments?post=${post.id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -187,7 +191,9 @@ describe('GET /comments', () => {
   });
 
   it('Should return a comment with expected structure with its children (comment tree)', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(generateRandomPost());
 
@@ -227,7 +233,8 @@ describe('GET /comments', () => {
 
     const response = await request(global.app)
       .get(`/api/comments?post=${post.id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -324,7 +331,9 @@ describe('GET /comments', () => {
   });
 
   it('Should return rated comment if the current user rated it', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(generateRandomPost());
 
@@ -347,7 +356,8 @@ describe('GET /comments', () => {
     );
     const response = await request(global.app)
       .get(`/api/comments?post=${post.id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body.comments[0]).toMatchObject({

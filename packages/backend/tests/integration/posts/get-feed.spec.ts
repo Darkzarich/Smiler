@@ -15,31 +15,35 @@ describe('GET /posts/feed', () => {
   });
 
   it(`Should return status 422 and an expected message for limit greater than ${POST_MAX_LIMIT}`, async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .get(`/api/posts/feed?limit=${POST_MAX_LIMIT + 1}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
     expect(response.status).toBe(422);
   });
 
   it('Should return status 401 and an expected message if session was provided but user for some reason is not found', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     await UserModel.deleteOne({ _id: currentUser.id });
 
     const response = await request(global.app)
       .get('/api/posts/feed')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.UNAUTHORIZED);
     expect(response.status).toBe(401);
   });
 
   it('Should an empty list of posts (no subscriptions)', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     /* Creating a post just to make sure response.posts
     is empty not because there are no posts at all */
@@ -47,7 +51,8 @@ describe('GET /posts/feed', () => {
 
     const response = await request(global.app)
       .get('/api/posts/feed')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -59,7 +64,9 @@ describe('GET /posts/feed', () => {
   });
 
   it('Should a list of posts if user is subscribed to any of the post tags', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(generateRandomPost());
 
@@ -69,7 +76,8 @@ describe('GET /posts/feed', () => {
 
     const response = await request(global.app)
       .get('/api/posts/feed')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body.posts).toHaveLength(1);
@@ -81,7 +89,9 @@ describe('GET /posts/feed', () => {
   });
 
   it('Should return a list of posts if user is subscribed to the post author', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const otherUser = await UserModel.create(generateRandomUser());
 
@@ -97,7 +107,8 @@ describe('GET /posts/feed', () => {
 
     const response = await request(global.app)
       .get('/api/posts/feed')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body.posts).toHaveLength(1);
@@ -109,7 +120,9 @@ describe('GET /posts/feed', () => {
   });
 
   it('Should not return a post if user is subscribed to any of the post tags but also is the author of the post (users should not see their own posts in their feed)', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -123,7 +136,8 @@ describe('GET /posts/feed', () => {
 
     const response = await request(global.app)
       .get('/api/posts/feed')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body.posts).toHaveLength(0);
@@ -135,7 +149,9 @@ describe('GET /posts/feed', () => {
   });
 
   it('Should return a post in the response with an expected structure', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const otherUser = await UserModel.create(generateRandomUser());
 
@@ -153,7 +169,8 @@ describe('GET /posts/feed', () => {
 
     const response = await request(global.app)
       .get('/api/posts/feed')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body.posts[0]).toEqual({
@@ -175,7 +192,9 @@ describe('GET /posts/feed', () => {
   });
 
   it('Should return more than one page in pagination if there are more than limit posts existing', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const otherUser = await UserModel.create(generateRandomUser());
 
@@ -196,11 +215,13 @@ describe('GET /posts/feed', () => {
 
     const response = await request(global.app)
       .get('/api/posts/feed?limit=10')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     const responseWithOffset = await request(global.app)
       .get('/api/posts/feed?limit=10&offset=10')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     // Request with only limit
     expect(response.status).toBe(200);

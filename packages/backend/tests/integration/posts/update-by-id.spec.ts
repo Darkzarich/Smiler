@@ -32,11 +32,12 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 404 and an expected message if post does not exist', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put(`/api/posts/5d5467b4c17806706f3df347`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send(requiredPostFields);
 
     expect(response.body.error.message).toBe(ERRORS.POST_NOT_FOUND);
@@ -44,7 +45,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 403 and an expected message if comment is older than 10 min', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -55,14 +58,17 @@ describe('PUT /posts/:id', () => {
 
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.POST_CAN_EDIT_WITHIN_TIME);
     expect(response.status).toBe(403);
   });
 
   it('Should return status 422 and an expected message if too many sections', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -73,6 +79,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: Array(POST_SECTIONS_MAX + 1).fill(
@@ -85,7 +92,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 422 and an expected message if title is too long', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -96,6 +105,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         title: 'a'.repeat(POST_TITLE_MAX_LENGTH + 1),
@@ -108,7 +118,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 422 and an expected message if too many tags', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -119,6 +131,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         tags: Array(POST_MAX_TAGS + 1).fill(post.tags[0]),
@@ -129,7 +142,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 422 and an expected message if too long tag', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -140,6 +155,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         tags: ['a'.repeat(POST_MAX_TAG_LEN + 1)],
@@ -150,7 +166,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 422 and an expected message if at least one section is unknown type', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -161,6 +179,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -178,7 +197,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 422 and an expected message if text section is empty', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -189,6 +210,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -206,7 +228,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 422 and an expected message if text section content is too long', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -217,6 +241,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -239,7 +264,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 422 and an expected message if pic section url is empty', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -250,6 +277,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -267,7 +295,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 422 and an expected message if pic section url is not an URL', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -278,6 +308,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -295,7 +326,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 422 and an expected message if pic section file url is not a valid URL', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -306,6 +339,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -324,7 +358,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 422 and an expected message if video section url is empty', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -335,6 +371,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -352,7 +389,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 422 and an expected message if video section url is not an URL', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -363,6 +402,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: [
@@ -380,7 +420,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should edit the post in the database', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -400,6 +442,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         title,
         sections: newSections,
@@ -416,7 +459,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 200 and the updated post', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -436,6 +481,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         title,
         sections: newSections,
@@ -468,7 +514,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should return status 200 and fields that were not passed retaining their previous value', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -481,6 +529,7 @@ describe('PUT /posts/:id', () => {
     const response = await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         title,
       });
@@ -494,7 +543,9 @@ describe('PUT /posts/:id', () => {
   });
 
   it('Should delete picture files corresponding to the deleted post picture sections that have isFile=true', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -519,6 +570,7 @@ describe('PUT /posts/:id', () => {
     await request(global.app)
       .put(`/api/posts/${post._id}`)
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         sections: [
           {

@@ -24,11 +24,12 @@ describe('PUT /users/me/template', () => {
   });
 
   it('Should return status 422 and an expected message if title is too long', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         title: 'a'.repeat(POST_TITLE_MAX_LENGTH + 1),
@@ -41,11 +42,12 @@ describe('PUT /users/me/template', () => {
   });
 
   it('Should return status 422 and an expected message if too many tags', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         tags: Array(POST_MAX_TAGS + 1).fill(post.tags[0]),
@@ -56,11 +58,12 @@ describe('PUT /users/me/template', () => {
   });
 
   it('Should return status 422 and an expected message if too long tag', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         tags: ['a'.repeat(POST_MAX_TAG_LEN + 1)],
@@ -71,11 +74,12 @@ describe('PUT /users/me/template', () => {
   });
 
   it('Should return status 422 and an expected message if too many sections', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         sections: Array(POST_SECTIONS_MAX + 1).fill(
@@ -88,11 +92,12 @@ describe('PUT /users/me/template', () => {
   });
 
   it('Should return status 200 and the updated template after a successful update', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send({
         ...requiredPostFields,
         tags: post.tags,
@@ -110,7 +115,9 @@ describe('PUT /users/me/template', () => {
   });
 
   it('Should update title in user.template in the database', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const template = {
       title: 'new title',
@@ -119,6 +126,7 @@ describe('PUT /users/me/template', () => {
     await request(global.app)
       .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send(template);
 
     const userFromDb = await UserModel.findById(currentUser.id).lean();
@@ -127,7 +135,9 @@ describe('PUT /users/me/template', () => {
   });
 
   it('Should update tags in user.template in the database', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const template = {
       tags: ['new tag'],
@@ -136,6 +146,7 @@ describe('PUT /users/me/template', () => {
     await request(global.app)
       .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send(template);
 
     const userFromDb = await UserModel.findById(currentUser.id).lean();
@@ -144,7 +155,9 @@ describe('PUT /users/me/template', () => {
   });
 
   it('Should update sections in user.template in the database', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const template = {
       sections: [
@@ -158,6 +171,7 @@ describe('PUT /users/me/template', () => {
     await request(global.app)
       .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send(template);
 
     const userFromDb = await UserModel.findById(currentUser.id).lean();
@@ -171,7 +185,9 @@ describe('PUT /users/me/template', () => {
   });
 
   it('Should update all: title, tags and sections in user.template in the database', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const template = {
       title: 'new title',
@@ -187,6 +203,7 @@ describe('PUT /users/me/template', () => {
     await request(global.app)
       .put('/api/users/me/template')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .send(template);
 
     const userFromDb = await UserModel.findById(currentUser.id).lean();

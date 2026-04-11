@@ -14,22 +14,24 @@ import { POST_MAX_LIMIT } from '@constants/index';
 
 describe('GET /posts/categories/recent', () => {
   it(`Should return status 422 and an expected message for limit greater than ${POST_MAX_LIMIT}`, async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .get(`/api/posts/categories/recent?limit=${POST_MAX_LIMIT + 1}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
     expect(response.status).toBe(422);
   });
 
   it('Should return empty list of posts if there are no posts', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .get('/api/posts/categories/recent')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -41,7 +43,7 @@ describe('GET /posts/categories/recent', () => {
   });
 
   it('Should return empty list of posts if are posts but posted not today', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     await PostModel.create(
       generateRandomPost({
@@ -51,7 +53,8 @@ describe('GET /posts/categories/recent', () => {
 
     const response = await request(global.app)
       .get('/api/posts/categories/recent')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -150,7 +153,9 @@ describe('GET /posts/categories/recent', () => {
   });
 
   it('Should return posts as rated if user rated them', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const otherUser = await UserModel.create(generateRandomUser());
 
@@ -185,7 +190,8 @@ describe('GET /posts/categories/recent', () => {
     );
     const response = await request(global.app)
       .get('/api/posts/categories/recent')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     // Sorted by createdAt descending

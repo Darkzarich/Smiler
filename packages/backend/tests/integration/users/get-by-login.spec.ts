@@ -39,11 +39,14 @@ describe('GET /users/:login', () => {
   });
 
   it('Should return status 200 and the current user profile with all expected fields', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const response = await request(global.app)
       .get(`/api/users/${currentUser.login}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -58,7 +61,9 @@ describe('GET /users/:login', () => {
   });
 
   it('Should return isFollowed=true if requested other user is followed by the current user', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const otherUser = await UserModel.create(generateRandomUser());
 
@@ -68,7 +73,8 @@ describe('GET /users/:login', () => {
 
     const response = await request(global.app)
       .get(`/api/users/${otherUser.login}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body.isFollowed).toBe(true);

@@ -22,18 +22,21 @@ describe('DELETE /comments/:id/vote', () => {
   });
 
   it('Should return status 404 and a message for a non-existing comment', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .delete('/api/comments/5f8d9f4d2d4c2c001d0e1e2e/vote')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.COMMENT_NOT_FOUND);
     expect(response.status).toBe(404);
   });
 
   it('Should return status 403 and an expected message when user tries to unvote a comment that has not been rated', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const comment = await CommentModel.create(
       generateRandomComment({
@@ -43,14 +46,17 @@ describe('DELETE /comments/:id/vote', () => {
 
     const response = await request(global.app)
       .delete(`/api/comments/${comment._id}/vote`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(403);
     expect(response.body.error.message).toBe(ERRORS.TARGET_IS_NOT_RATED);
   });
 
   it('Should delete a comment rate from the database', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const otherUser = await UserModel.create(generateRandomUser());
 
@@ -70,7 +76,8 @@ describe('DELETE /comments/:id/vote', () => {
     );
     await request(global.app)
       .delete(`/api/comments/${otherUserComment._id}/vote`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     const rate = await RateModel.findOne({ target: otherUserComment._id });
 
@@ -83,7 +90,9 @@ describe('DELETE /comments/:id/vote', () => {
   ])(
     'Should %s the comment rating after the comment is unrated after being voted for',
     async (_, isNegative) => {
-      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
 
       const otherUser = await UserModel.create(generateRandomUser());
 
@@ -104,7 +113,8 @@ describe('DELETE /comments/:id/vote', () => {
       );
       await request(global.app)
         .delete(`/api/comments/${otherUserComment._id}/vote`)
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       const commentVotedFor = await CommentModel.findById(otherUserComment._id);
 
@@ -123,7 +133,9 @@ describe('DELETE /comments/:id/vote', () => {
   ])(
     "Should %s author's rating after the comment is unrated",
     async (_, isNegative) => {
-      const { sessionCookie, currentUser } = await signUpRequest(global.app);
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
 
       const otherUser = await UserModel.create(
         generateRandomUser({
@@ -147,7 +159,8 @@ describe('DELETE /comments/:id/vote', () => {
       );
       await request(global.app)
         .delete(`/api/comments/${otherUserComment._id}/vote`)
-        .set('Cookie', sessionCookie);
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
 
       const commentVotedFor = await UserModel.findById(otherUser._id);
 
@@ -160,7 +173,9 @@ describe('DELETE /comments/:id/vote', () => {
   );
 
   it('Should return the updated comment with changed rating after vote', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const otherUser = await UserModel.create(generateRandomUser());
 
@@ -180,7 +195,8 @@ describe('DELETE /comments/:id/vote', () => {
     );
     const response = await request(global.app)
       .delete(`/api/comments/${otherUserComment._id}/vote`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body.rating).toBe(

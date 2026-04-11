@@ -1,19 +1,14 @@
 import cors from 'cors';
 import { logger } from '@libs/logger';
 import Config from '@config/index';
-
-const whitelist = [
-  Config.FRONT_ORIGIN_LOCAL,
-  Config.FRONT_ORIGIN_REMOTE,
-  `http://localhost:${Config.PORT}`,
-];
+import { isAllowedOrigin } from '@utils/allowed-origins';
 
 export default cors({
   credentials: true,
   origin(origin, callback) {
     if (
       origin === undefined ||
-      whitelist.indexOf(origin) !== -1 ||
+      isAllowedOrigin(origin) ||
       !Config.IS_PRODUCTION
     ) {
       callback(null, true);

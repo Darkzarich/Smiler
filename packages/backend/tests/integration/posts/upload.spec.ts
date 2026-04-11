@@ -44,20 +44,25 @@ describe('POST /posts/upload', () => {
   });
 
   it("Should return status 404 and an expected message if didn't find the user", async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     await UserModel.deleteOne({ _id: currentUser.id });
 
     const response = await request(global.app)
       .post('/api/posts/upload')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.USER_NOT_FOUND);
     expect(response.status).toBe(404);
   });
 
   it('Should return status 413 and an expected message if the post has too many sections', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     await UserModel.updateOne(
       { _id: currentUser.id },
@@ -72,20 +77,24 @@ describe('POST /posts/upload', () => {
 
     const response = await request(global.app)
       .post('/api/posts/upload')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.POST_SECTIONS_MAX_EXCEEDED);
     expect(response.status).toBe(413);
   });
 
   it('Should return status 422 and reject uploading image file with not supported extension', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const testImage = await createTestImage(Sharp.format.jp2);
 
     const response = await request(global.app)
       .post('/api/posts/upload')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .attach('picture', testImage, 'test.jp2');
 
     expect(response.status).toBe(422);
@@ -99,11 +108,14 @@ describe('POST /posts/upload', () => {
   it('Should return status 413 and reject uploading too big image file', async () => {
     const largeFile = Buffer.alloc(POST_MAX_UPLOAD_IMAGE_SIZE + 1);
 
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const response = await request(global.app)
       .post('/api/posts/upload')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .attach('picture', largeFile, 'test.png');
 
     expect(response.status).toBe(413);
@@ -120,13 +132,16 @@ describe('POST /posts/upload', () => {
     { ...Sharp.format.jpeg, id: 'jpg' },
     Sharp.format.gif,
   ])('Should upload valid image file with extension ".$id"', async (format) => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const testImage = await createTestImage(format);
 
     const response = await request(global.app)
       .post('/api/posts/upload')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .attach('picture', testImage, `test.${format.id}`);
 
     const uploadPath = path.join(TEST_UPLOAD_DIR, currentUser.id);
@@ -168,13 +183,16 @@ describe('POST /posts/upload', () => {
 
     const originalFileSize = buffer.byteLength;
 
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const uploadPath = path.join(TEST_UPLOAD_DIR, currentUser.id);
 
     await request(global.app)
       .post('/api/posts/upload')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .attach('picture', buffer, `test.png`);
 
     const files = await fs.readdir(uploadPath);
@@ -192,13 +210,16 @@ describe('POST /posts/upload', () => {
   it('Should return status 200 and a new section with isFile=true and add section to user template', async () => {
     const testImage = await createTestImage(Sharp.format.jpg);
 
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const uploadPath = path.join(TEST_UPLOAD_DIR, currentUser.id);
 
     const response = await request(global.app)
       .post('/api/posts/upload')
       .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
       .attach('picture', testImage, 'test.png');
 
     const files = await fs.readdir(uploadPath);

@@ -15,6 +15,7 @@ import {
   isCastError,
   isValidationError,
 } from '@utils/check-mongo-db-error';
+import { csrfProtectionMiddleware } from '@middlewares/csrf';
 import usersRouter from '@routes/api/users';
 import authRouter from '@routes/api/auth';
 import postsRouter from '@routes/api/posts';
@@ -22,6 +23,8 @@ import commentsRouter from '@routes/api/comments';
 import tagsRouter from '@routes/api/tags';
 
 const router = express.Router();
+
+router.use(csrfProtectionMiddleware);
 
 router.use('/users', usersRouter);
 router.use('/auth', authRouter);

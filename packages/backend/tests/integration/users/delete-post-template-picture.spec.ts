@@ -21,24 +21,28 @@ describe('DELETE /users/me/template/:hash', () => {
   });
 
   it('Should return status 404 and an expected message when user is not found, been deleted for unknown reason', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     await UserModel.deleteOne({ _id: currentUser.id });
 
     const response = await request(global.app)
       .delete(`/api/users/me/template/1234`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.USER_NOT_FOUND);
     expect(response.status).toBe(404);
   });
 
   it('Should return status 404 and an expected message when section is not found', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .delete(`/api/users/me/template/1234`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.SECTION_NOT_FOUND);
     expect(response.status).toBe(404);
@@ -46,7 +50,9 @@ describe('DELETE /users/me/template/:hash', () => {
 
   it('Should return status 400 and an expected message if section is not a file', async () => {
     const hash = '1234';
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     await UserModel.updateOne(
       { _id: currentUser.id },
@@ -63,7 +69,8 @@ describe('DELETE /users/me/template/:hash', () => {
 
     const response = await request(global.app)
       .delete(`/api/users/me/template/${hash}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.SECTION_NOT_FILE);
     expect(response.status).toBe(400);
@@ -71,7 +78,9 @@ describe('DELETE /users/me/template/:hash', () => {
 
   it('Should return status 400 and an expected message if section is not a file', async () => {
     const hash = '1234';
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     await UserModel.updateOne(
       { _id: currentUser.id },
@@ -88,7 +97,8 @@ describe('DELETE /users/me/template/:hash', () => {
 
     const response = await request(global.app)
       .delete(`/api/users/me/template/${hash}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.SECTION_NOT_FILE);
     expect(response.status).toBe(400);
@@ -96,7 +106,9 @@ describe('DELETE /users/me/template/:hash', () => {
 
   it('Should return status 400 and an expected message if section is not a picture type', async () => {
     const hash = '1234';
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     await UserModel.updateOne(
       { _id: currentUser.id },
@@ -111,7 +123,8 @@ describe('DELETE /users/me/template/:hash', () => {
 
     const response = await request(global.app)
       .delete(`/api/users/me/template/${hash}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.SECTION_NOT_FILE);
     expect(response.status).toBe(400);
@@ -120,7 +133,9 @@ describe('DELETE /users/me/template/:hash', () => {
   it('Should delete picture file corresponding to the deleted post picture sections with isFile=true', async () => {
     const hash = '1234';
     const path = '/uploads/currentUser/1234.jpg';
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     await UserModel.updateOne(
       { _id: currentUser.id },
@@ -135,7 +150,8 @@ describe('DELETE /users/me/template/:hash', () => {
 
     const response = await request(global.app)
       .delete(`/api/users/me/template/${hash}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(mockRemoveFileByPath).toHaveBeenCalledWith(path);
     expect(response.status).toBe(200);

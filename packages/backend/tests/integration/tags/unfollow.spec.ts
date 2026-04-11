@@ -18,29 +18,33 @@ describe('DELETE /tags/:tag/follow', () => {
   });
 
   it('Should return status 422 and an expected message for a too long tag', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .delete(`/api/tags/${'a'.repeat(POST_MAX_TAG_LEN + 1)}/follow`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.POST_TAG_MAX_LEN_EXCEEDED);
     expect(response.status).toBe(422);
   });
 
   it('Should return status 200 and an expected message for a valid tag', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .delete(`/api/tags/${tag}/follow`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body.ok).toBe(true);
   });
 
   it('Should add the tag to the user tags', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     // Making sure a tag is added before unfollowing
     await UserModel.findByIdAndUpdate(currentUser.id, {
@@ -49,7 +53,8 @@ describe('DELETE /tags/:tag/follow', () => {
 
     await request(global.app)
       .delete(`/api/tags/${tag}/follow`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     const user = await UserModel.findById(currentUser.id);
 

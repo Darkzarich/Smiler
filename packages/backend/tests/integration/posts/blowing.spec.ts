@@ -26,11 +26,12 @@ describe('GET /posts/categories/blowing', () => {
   });
 
   it('Should return empty list of posts if there are no posts', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .get('/api/posts/categories/blowing')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -42,7 +43,7 @@ describe('GET /posts/categories/blowing', () => {
   });
 
   it('Should return empty list of posts if are posts but do not have enough rating', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     await PostModel.create(
       generateRandomPost({
@@ -52,7 +53,8 @@ describe('GET /posts/categories/blowing', () => {
 
     const response = await request(global.app)
       .get('/api/posts/categories/blowing')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -64,7 +66,7 @@ describe('GET /posts/categories/blowing', () => {
   });
 
   it('Should return empty list of posts if are posts but it was created more than an hour ago', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     await PostModel.create(
       generateRandomPost({
@@ -75,7 +77,8 @@ describe('GET /posts/categories/blowing', () => {
 
     const response = await request(global.app)
       .get('/api/posts/categories/blowing')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -177,7 +180,9 @@ describe('GET /posts/categories/blowing', () => {
   });
 
   it('Should return posts as rated if user rated them', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const otherUser = await UserModel.create(generateRandomUser());
 
@@ -214,7 +219,8 @@ describe('GET /posts/categories/blowing', () => {
     );
     const response = await request(global.app)
       .get('/api/posts/categories/blowing')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body.posts).toEqual(

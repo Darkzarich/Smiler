@@ -13,7 +13,7 @@ describe('PUT /users/:id/follow', () => {
   });
 
   it('Should return status 404 and an expected message when user is not found', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const otherUser = await UserModel.create(generateRandomUser());
 
@@ -21,25 +21,31 @@ describe('PUT /users/:id/follow', () => {
 
     const response = await request(global.app)
       .put(`/api/users/6766ab495b84f675bbbbfdcd/follow`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.USER_NOT_FOUND);
     expect(response.status).toBe(404);
   });
 
   it('Should return status 403 and an expected message when user tries to follow their own', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const response = await request(global.app)
       .put(`/api/users/${currentUser.id}/follow`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(403);
     expect(response.body.error.message).toBe(ERRORS.USER_CANT_FOLLOW_OWN);
   });
 
   it('Should return status 403 and an expected message when user tries to follow a user that they have already followed', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const otherUser = await UserModel.create(generateRandomUser());
 
@@ -49,7 +55,8 @@ describe('PUT /users/:id/follow', () => {
 
     const response = await request(global.app)
       .put(`/api/users/${otherUser.id}/follow`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(403);
     expect(response.body.error.message).toBe(
@@ -58,13 +65,16 @@ describe('PUT /users/:id/follow', () => {
   });
 
   it('Should add followed user to usersFollowed field of the current user in the database', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const otherUser = await UserModel.create(generateRandomUser());
 
     const response = await request(global.app)
       .put(`/api/users/${otherUser.id}/follow`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     const updatedUser = await UserModel.findOne(
       { _id: currentUser.id },
@@ -79,13 +89,14 @@ describe('PUT /users/:id/follow', () => {
   });
 
   it("Should increase user's followersAmount after being followed", async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const otherUser = await UserModel.create(generateRandomUser());
 
     await request(global.app)
       .put(`/api/users/${otherUser.id}/follow`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     const updatedOtherUser = await UserModel.findOne(
       { _id: otherUser.id },

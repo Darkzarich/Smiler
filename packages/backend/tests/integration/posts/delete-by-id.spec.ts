@@ -25,18 +25,19 @@ describe('DELETE /posts/:id', () => {
   });
 
   it('Should return status 404 and an expected message if post was not found', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .delete('/api/posts/5d5467b4c17806706f3df347')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.POST_NOT_FOUND);
     expect(response.status).toBe(404);
   });
 
   it('Should return status 403 and an expected message if post does not belong to the user', async () => {
-    const { sessionCookie } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -46,7 +47,8 @@ describe('DELETE /posts/:id', () => {
 
     const response = await request(global.app)
       .delete(`/api/posts/${post.id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(
       ERRORS.POST_CANT_DELETE_NOT_OWN_POST,
@@ -55,7 +57,9 @@ describe('DELETE /posts/:id', () => {
   });
 
   it('Should return status 403 and an expected message if post is older than 10 min', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -66,7 +70,8 @@ describe('DELETE /posts/:id', () => {
 
     const response = await request(global.app)
       .delete(`/api/posts/${post.id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(
       ERRORS.POST_CAN_DELETE_WITHIN_TIME,
@@ -75,7 +80,9 @@ describe('DELETE /posts/:id', () => {
   });
 
   it('Should return status 403 and an expected message if post has comments', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -86,7 +93,8 @@ describe('DELETE /posts/:id', () => {
 
     const response = await request(global.app)
       .delete(`/api/posts/${post.id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(
       ERRORS.POST_CANT_DELETE_WITH_COMMENTS,
@@ -95,7 +103,9 @@ describe('DELETE /posts/:id', () => {
   });
 
   it('Should remove the post from the database', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -106,7 +116,8 @@ describe('DELETE /posts/:id', () => {
 
     const response = await request(global.app)
       .delete(`/api/posts/${post._id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     const updatedPost = await PostModel.findById(post._id).lean();
 
@@ -115,7 +126,9 @@ describe('DELETE /posts/:id', () => {
   });
 
   it('Should decrease user rating after the post is deleted', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -126,7 +139,8 @@ describe('DELETE /posts/:id', () => {
 
     await request(global.app)
       .delete(`/api/posts/${post._id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     const updatedUser = await UserModel.findById(currentUser.id).lean();
 
@@ -134,7 +148,9 @@ describe('DELETE /posts/:id', () => {
   });
 
   it('Should delete all rates for the post after the post is deleted', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -155,7 +171,8 @@ describe('DELETE /posts/:id', () => {
 
     await request(global.app)
       .delete(`/api/posts/${post._id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     const rates = await RateModel.find({ target: post._id }).lean();
 
@@ -163,7 +180,9 @@ describe('DELETE /posts/:id', () => {
   });
 
   it('Should delete picture files corresponding to the deleted post picture sections with isFile=true', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     const post = await PostModel.create(
       generateRandomPost({
@@ -188,7 +207,8 @@ describe('DELETE /posts/:id', () => {
 
     await request(global.app)
       .delete(`/api/posts/${post.id}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(mockRemoveFileByPath.mock.calls[0][0]).toBe(
       `/uploads/${currentUser.id}/1724110246594.jpg`,

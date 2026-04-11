@@ -12,20 +12,25 @@ describe('GET /users/me/settings', () => {
   });
 
   it('Should return status 404 and en expected message for not found user', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     await UserModel.deleteOne({ _id: currentUser.id });
 
     const response = await request(global.app)
       .get('/api/users/me/settings')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.body.error.message).toBe(ERRORS.USER_NOT_FOUND);
     expect(response.status).toBe(404);
   });
 
   it('Returns status 200 and current user settings', async () => {
-    const { sessionCookie, currentUser } = await signUpRequest(global.app);
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
 
     await UserModel.findByIdAndUpdate(currentUser.id, {
       $push: { tagsFollowed: 'test-tag', usersFollowed: currentUser.id },
@@ -34,7 +39,8 @@ describe('GET /users/me/settings', () => {
 
     const response = await request(global.app)
       .get('/api/users/me/settings')
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
