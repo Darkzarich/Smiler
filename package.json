@@ -5,14 +5,20 @@
   "description": "Smiler project monorepository.",
   "packageManager": "pnpm@8.6.0",
   "engines": {
-    "node": ">=v20.16.0",
+    "node": ">=v20.17.0",
     "pnpm": ">=8.6.0"
   },
   "scripts": {
     "dev": "concurrently --kill-others \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
-    "build": "pnpm --filter backend build; pnpm --filter frontend build",
+    "build": "pnpm --filter backend build && pnpm --filter frontend build",
+    "prepare": "husky",
+    "precommit": "lint-staged",
+    "prepush": "pnpm run lint:spell && pnpm run lint:code && pnpm run lint:types && pnpm run test:prepush",
+    "lint:code": "pnpm --filter backend lint:code && pnpm --filter frontend lint:ts && pnpm --filter frontend lint:css",
     "lint:spell": "cspell --no-progress .",
-    "test": "pnpm --filter \"backend\" test; pnpm --filter \"frontend\" test:e2e:ci",
+    "lint:types": "pnpm --filter backend lint:types && pnpm --filter frontend lint:types",
+    "test": "pnpm --filter \"backend\" test && pnpm --filter \"frontend\" test:e2e:ci",
+    "test:prepush": "pnpm --filter backend test && pnpm --filter frontend test:unit:ci",
     "knip": "knip"
   },
   "license": "MIT",
@@ -23,7 +29,9 @@
   "devDependencies": {
     "concurrently": "^9.2.1",
     "cspell": "^8.19.4",
-    "knip": "^5.88.1"
+    "husky": "^9.1.7",
+    "knip": "^5.88.1",
+    "lint-staged": "^16.4.0"
   },
   "pnpm": {
     "patchedDependencies": {
