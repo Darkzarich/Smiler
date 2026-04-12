@@ -61,6 +61,17 @@ function handleSendError(error: AbstractError, res: Response) {
   res.status(status).json(response);
 }
 
+function logHandledError(error: AbstractError, req: Request) {
+  logger.warn('handled_request_error', {
+    requestId: req.id,
+    method: req.method,
+    path: req.route ? `${req.baseUrl}${req.route.path}` : '[unmatched]',
+    status: error.status,
+    code: error.code,
+    message: error.message,
+  });
+}
+
 // ! Specifying four parameters is a must for global error handling
 router.use(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -68,6 +79,7 @@ router.use(
     // Handle errors from user's input such as ValidationError etc
     // these are "operational" errors and should be handled by the client
     if (error.status && error.isOperational) {
+      logHandledError(error, req);
       handleSendError(error, res);
 
       return;

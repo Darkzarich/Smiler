@@ -4,3 +4,4 @@ node_modules
 .cursor
 .claude
 packages/backend/backups
+packages/backend/logs
