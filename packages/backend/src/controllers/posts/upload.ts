@@ -1,7 +1,8 @@
 import type { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import Sharp from 'sharp';
-import { join, extname } from 'path';
+import { randomUUID } from 'crypto';
+import { join } from 'path';
 import { mkdir } from 'fs/promises';
 import DiskStorage from '@libs/DiskStorage';
 import { UserModel } from '@models/User';
@@ -12,6 +13,7 @@ import {
   POST_MAX_IMAGE_HEIGHT,
   POST_MAX_IMAGE_WIDTH,
   BASE_UPLOAD_FOLDER,
+  ALLOWED_PICTURE_EXTENSIONS,
 } from '@constants/index';
 import {
   ContentTooLargeError,
@@ -25,6 +27,14 @@ import { nanoid } from 'nanoid';
 
 type UploadResponse = PostPictureSection;
 
+const ALLOWED_UPLOAD_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/avif',
+]);
+
 const postMulter = multer({
   storage: new DiskStorage({
     destination(req) {
@@ -33,14 +43,33 @@ const postMulter = multer({
         value: join(process.cwd(), BASE_UPLOAD_FOLDER, req.session.userId!),
       };
     },
-    filename(req, file) {
+    filename() {
       return {
         error: null,
-        value: `${Date.now()}${extname(file.originalname)}`,
+        value: `${randomUUID()}.jpg`,
       };
     },
-    sharp() {
-      const resizer = Sharp()
+    metadata(_req, _file, metadata) {
+      if (
+        !metadata.format ||
+        !ALLOWED_PICTURE_EXTENSIONS.includes(metadata.format) ||
+        !metadata.width ||
+        !metadata.height
+      ) {
+        return {
+          error: new ValidationError(ERRORS.POST_INVALID_ATTACHMENT_EXTENSION),
+        };
+      }
+
+      return {
+        error: null,
+      };
+    },
+    metadataError() {
+      return new ValidationError(ERRORS.POST_INVALID_ATTACHMENT_EXTENSION);
+    },
+    sharp(_req, _file, input) {
+      const resizer = Sharp(input, { failOn: 'error' })
         .resize(POST_MAX_IMAGE_WIDTH, POST_MAX_IMAGE_HEIGHT, {
           fit: 'cover',
           withoutEnlargement: true,
@@ -61,7 +90,7 @@ const postMulter = multer({
     fileSize: POST_MAX_UPLOAD_IMAGE_SIZE,
   },
   fileFilter: (_, file, callback) => {
-    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
+    if (!ALLOWED_UPLOAD_MIME_TYPES.has(file.mimetype)) {
       callback(new ValidationError(ERRORS.POST_INVALID_ATTACHMENT_EXTENSION));
 
       return;

@@ -9,6 +9,7 @@ import corsMiddleware from '@middlewares/cors';
 import sessionMiddleware from '@middlewares/session';
 import router from '@routes/index';
 import { requestIdMiddleware } from '@middlewares/request-id';
+import { BASE_UPLOAD_FOLDER } from '@constants/index';
 
 logger.info(
   `[pid: ${process.pid}] Worker is running in ${Config.IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode.`,
@@ -54,7 +55,19 @@ export async function startApp() {
 
   // TODO: make it conditional, make static only for dev
   // Set files folder
-  app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
+  app.use(
+    BASE_UPLOAD_FOLDER,
+    express.static(join(process.cwd(), BASE_UPLOAD_FOLDER), {
+      dotfiles: 'deny',
+      index: false,
+      setHeaders(res) {
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.setHeader('Content-Security-Policy', "default-src 'none'");
+        res.setHeader('Cross-Origin-Resource-Policy', 'same-site');
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      },
+    }),
+  );
 
   if (!Config.IS_JEST) {
     app.listen(Config.PORT, () => {

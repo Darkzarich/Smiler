@@ -26,6 +26,9 @@ const createTestImage = async (extension = Sharp.format.png) =>
     .toFormat(extension)
     .toBuffer();
 
+const RANDOM_JPG_FILENAME_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.jpg$/i;
+
 describe('POST /posts/upload', () => {
   const TEST_UPLOAD_DIR = path.join(process.cwd(), BASE_UPLOAD_FOLDER);
 
@@ -126,6 +129,28 @@ describe('POST /posts/upload', () => {
     await cleanTestUploadDir(currentUser.id);
   });
 
+  it('Should return status 422 and reject invalid image content before writing a file', async () => {
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
+
+    const response = await request(global.app)
+      .post('/api/posts/upload')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .attach('picture', Buffer.from('not an image'), 'test.png');
+
+    const uploadPath = path.join(TEST_UPLOAD_DIR, currentUser.id);
+
+    expect(response.status).toBe(422);
+    expect(response.body.error.message).toBe(
+      ERRORS.POST_INVALID_ATTACHMENT_EXTENSION,
+    );
+    await expect(fs.readdir(uploadPath)).resolves.toEqual([]);
+
+    await cleanTestUploadDir(currentUser.id);
+  });
+
   it.each([
     Sharp.format.png,
     Sharp.format.jpeg,
@@ -150,7 +175,7 @@ describe('POST /posts/upload', () => {
 
     expect(response.status).toBe(200);
     expect(files.length).toBe(1);
-    expect(files[0]).toMatch(/^\d+\.\w+$/);
+    expect(files[0]).toMatch(RANDOM_JPG_FILENAME_REGEX);
     await expect(fs.access(uploadPath)).resolves.toBeUndefined();
 
     await cleanTestUploadDir(currentUser.id);

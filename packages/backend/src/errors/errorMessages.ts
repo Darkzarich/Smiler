@@ -75,7 +75,7 @@ export const ERRORS = {
   POST_MAX_UPLOAD_IMAGE_SIZE_EXCEEDED: `Uploaded image is too large. Max allowed size is ${POST_MAX_UPLOAD_IMAGE_SIZE / 1024 / 1024}MB`,
   POST_SEARCH_INVALID_DATE: 'Invalid date',
   POST_INVALID_ATTACHMENT_EXTENSION:
-    'Invalid file extension. Only jpg, jpeg, png, gif are allowed.',
+    'Invalid image attachment. Only jpg, jpeg, png, gif, webp, and avif are allowed.',
 
   SECTION_NOT_FOUND: 'Section with given hash is not found',
   SECTION_NOT_FILE:
