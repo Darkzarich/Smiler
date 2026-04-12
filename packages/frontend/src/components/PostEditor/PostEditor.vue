@@ -31,6 +31,7 @@
               :id="section.hash"
               v-model="section.content"
               data-testid="text-section"
+              :features="TextEditorFeatures.Post"
             />
           </template>
 
@@ -133,6 +134,7 @@ import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
+import { TextEditorFeatures } from '@common/text-editor-features';
 import CloseIcon from '@icons/IconExit.vue';
 
 const router = useRouter();
@@ -379,6 +381,11 @@ const saveDraft = async () => {
       .post-editor-picture,
       .post-editor-video {
         border: 1px solid var(--color-primary);
+
+        @include mixins.for-size(phone-only) {
+          border-right: none;
+          border-left: none;
+        }
       }
     }
 

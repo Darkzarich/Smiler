@@ -56,13 +56,80 @@
 
       <button
         class="base-text-editor__style-button"
-        :class="{ 'base-text-editor__style-button--active': isActive('cite') }"
+        :class="{
+          'base-text-editor__style-button--active': isActive('blockquote'),
+        }"
         type="button"
-        title="quote"
-        @pointerdown.prevent="formatSelectionFromPointer('cite')"
-        @click.prevent="formatSelectionFromClick('cite')"
+        title="blockquote"
+        @pointerdown.prevent="formatSelectionFromPointer('blockquote')"
+        @click.prevent="formatSelectionFromClick('blockquote')"
       >
         Q
+      </button>
+
+      <button
+        class="base-text-editor__style-button"
+        :class="{ 'base-text-editor__style-button--active': isActive('code') }"
+        type="button"
+        title="code"
+        @pointerdown.prevent="formatSelectionFromPointer('code')"
+        @click.prevent="formatSelectionFromClick('code')"
+      >
+        Code
+      </button>
+
+      <template v-if="features === TextEditorFeatures.Post">
+        <button
+          v-for="level in headingLevels"
+          :key="level"
+          class="base-text-editor__style-button"
+          :class="{
+            'base-text-editor__style-button--active': isHeadingActive(level),
+          }"
+          type="button"
+          :title="`heading ${level}`"
+          @pointerdown.prevent="formatSelectionFromPointer(`heading-${level}`)"
+          @click.prevent="formatSelectionFromClick(`heading-${level}`)"
+        >
+          H{{ level }}
+        </button>
+      </template>
+
+      <button
+        class="base-text-editor__style-button"
+        :class="{
+          'base-text-editor__style-button--active': isActive('bulletList'),
+        }"
+        type="button"
+        title="bullet list"
+        @pointerdown.prevent="formatSelectionFromPointer('bulletList')"
+        @click.prevent="formatSelectionFromClick('bulletList')"
+      >
+        UL
+      </button>
+
+      <button
+        class="base-text-editor__style-button"
+        :class="{
+          'base-text-editor__style-button--active': isActive('orderedList'),
+        }"
+        type="button"
+        title="ordered list"
+        @pointerdown.prevent="formatSelectionFromPointer('orderedList')"
+        @click.prevent="formatSelectionFromClick('orderedList')"
+      >
+        OL
+      </button>
+
+      <button
+        v-if="features === TextEditorFeatures.Post"
+        class="base-text-editor__style-button"
+        type="button"
+        title="horizontal rule"
+        @pointerdown.prevent="formatSelectionFromPointer('horizontalRule')"
+        @click.prevent="formatSelectionFromClick('horizontalRule')"
+      >
+        HR
       </button>
     </div>
 
@@ -74,27 +141,67 @@
 </template>
 
 <script setup lang="ts">
-import { Extension, Mark, mergeAttributes } from '@tiptap/core';
+import { mergeAttributes, type AnyExtension } from '@tiptap/core';
+import { Blockquote } from '@tiptap/extension-blockquote';
 import { Bold } from '@tiptap/extension-bold';
+import { BulletList } from '@tiptap/extension-bullet-list';
+import { Code } from '@tiptap/extension-code';
 import { Document } from '@tiptap/extension-document';
 import { HardBreak } from '@tiptap/extension-hard-break';
+import { Heading, type Level } from '@tiptap/extension-heading';
+import { HorizontalRule } from '@tiptap/extension-horizontal-rule';
 import { Italic } from '@tiptap/extension-italic';
+import { Link } from '@tiptap/extension-link';
+import { ListItem } from '@tiptap/extension-list-item';
+import { OrderedList } from '@tiptap/extension-ordered-list';
+import { Paragraph } from '@tiptap/extension-paragraph';
 import { Strike } from '@tiptap/extension-strike';
 import { Text } from '@tiptap/extension-text';
 import { Underline } from '@tiptap/extension-underline';
 import { EditorContent, useEditor } from '@tiptap/vue-3';
 import { watch } from 'vue';
+import { TextEditorFeatures } from './text-editor-features';
 
-type Format = 'bold' | 'italic' | 'strike' | 'underline' | 'cite';
-type AllowedTag = 'b' | 'i' | 's' | 'u' | 'cite';
+type InlineFormat = 'bold' | 'italic' | 'strike' | 'underline' | 'code';
+type BlockFormat =
+  | 'blockquote'
+  | 'bulletList'
+  | 'orderedList'
+  | 'horizontalRule';
+type HeadingFormat = `heading-${Level}`;
+type Format = InlineFormat | BlockFormat | HeadingFormat;
+type ActiveFormat = InlineFormat | Exclude<BlockFormat, 'horizontalRule'>;
+type AllowedTag =
+  | 'a'
+  | 'b'
+  | 'blockquote'
+  | 'br'
+  | 'cite'
+  | 'code'
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'h5'
+  | 'h6'
+  | 'hr'
+  | 'i'
+  | 'li'
+  | 'ol'
+  | 'p'
+  | 's'
+  | 'u'
+  | 'ul';
 
 interface Props {
   dataTestid?: string;
+  features?: TextEditorFeatures;
   id?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   dataTestid: 'input',
+  features: TextEditorFeatures.Comment,
   id: undefined,
 });
 
@@ -107,11 +214,49 @@ const editorId = props.id ?? crypto.randomUUID();
 let skipNextToolbarClick = false;
 let isUpdatingFromEditor = false;
 
-const allowedTags: AllowedTag[] = ['b', 'i', 's', 'u', 'cite'];
-
-const InlineDocument = Document.extend({
-  content: 'inline*',
-});
+const headingLevels = [1, 2, 3, 4, 5, 6] as const;
+const commonAllowedTags: AllowedTag[] = [
+  'a',
+  'b',
+  'blockquote',
+  'br',
+  'cite',
+  'code',
+  'i',
+  'li',
+  'ol',
+  'p',
+  's',
+  'u',
+  'ul',
+];
+const postOnlyAllowedTags: AllowedTag[] = [
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'hr',
+];
+const allowedTags = new Set<AllowedTag>(
+  props.features === TextEditorFeatures.Post
+    ? [...commonAllowedTags, ...postOnlyAllowedTags]
+    : commonAllowedTags,
+);
+const blockTags = new Set<AllowedTag>([
+  'blockquote',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'li',
+  'ol',
+  'p',
+  'ul',
+]);
 
 const BoldTag = Bold.extend({
   renderHTML({ HTMLAttributes }) {
@@ -133,35 +278,6 @@ const ItalicTag = Italic.extend({
   },
 });
 
-const Cite = Mark.create({
-  name: 'cite',
-  inclusive: false,
-
-  parseHTML() {
-    return [{ tag: 'cite' }];
-  },
-
-  renderHTML() {
-    return ['cite', 0];
-  },
-
-  addKeyboardShortcuts() {
-    return {
-      'Mod->': () => this.editor.commands.toggleMark(this.name),
-    };
-  },
-});
-
-const EnterAsHardBreak = Extension.create({
-  name: 'enterAsHardBreak',
-
-  addKeyboardShortcuts() {
-    return {
-      Enter: () => this.editor.commands.setHardBreak(),
-    };
-  },
-});
-
 const escapeHtml = (text: string) => {
   const div = document.createElement('div');
   div.textContent = text;
@@ -169,14 +285,55 @@ const escapeHtml = (text: string) => {
   return div.innerHTML;
 };
 
+const escapeAttribute = (text: string) =>
+  text
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+const isAllowedHref = (href: string) => {
+  try {
+    const url = new URL(href, window.location.origin);
+
+    return ['http:', 'https:', 'mailto:'].includes(url.protocol);
+  } catch {
+    return false;
+  }
+};
+
 const normalizeTag = (tagName: string): AllowedTag | null => {
   switch (tagName) {
+    case 'a':
+      return 'a';
     case 'b':
     case 'strong':
       return 'b';
+    case 'blockquote':
+    case 'cite':
+      return 'blockquote';
+    case 'br':
+      return 'br';
+    case 'code':
+      return 'code';
+    case 'h1':
+    case 'h2':
+    case 'h3':
+    case 'h4':
+    case 'h5':
+    case 'h6':
+      return tagName;
+    case 'hr':
+      return 'hr';
     case 'i':
     case 'em':
       return 'i';
+    case 'li':
+      return 'li';
+    case 'ol':
+      return 'ol';
+    case 'p':
+      return 'p';
     case 's':
     case 'strike':
     case 'del':
@@ -184,11 +341,30 @@ const normalizeTag = (tagName: string): AllowedTag | null => {
     case 'u':
     case 'ins':
       return 'u';
-    case 'cite':
-      return 'cite';
+    case 'ul':
+      return 'ul';
     default:
       return null;
   }
+};
+
+const hasBlockHtml = (html: string) => {
+  const template = document.createElement('template');
+  template.innerHTML = html;
+
+  return Array.from(template.content.childNodes).some(
+    (node) =>
+      node.nodeType === Node.ELEMENT_NODE &&
+      blockTags.has((node as HTMLElement).tagName.toLowerCase() as AllowedTag),
+  );
+};
+
+const ensureBlockHtml = (html: string) => {
+  if (!html || hasBlockHtml(html)) {
+    return html;
+  }
+
+  return `<p>${html}</p>`;
 };
 
 const renderAllowedHtml = (node: Node): string => {
@@ -202,35 +378,67 @@ const renderAllowedHtml = (node: Node): string => {
 
   const element = node as HTMLElement;
   const tagName = element.tagName.toLowerCase();
+  const normalizedTag = normalizeTag(tagName);
 
-  if (tagName === 'br') {
+  if (normalizedTag === 'br') {
     return '<br>';
+  }
+
+  if (normalizedTag === 'hr') {
+    return allowedTags.has('hr') ? '<hr>' : '';
   }
 
   const childrenHtml = Array.from(element.childNodes)
     .map((child) => renderAllowedHtml(child))
     .join('');
-  const normalizedTag = normalizeTag(tagName);
 
-  if (normalizedTag && allowedTags.includes(normalizedTag)) {
+  if (normalizedTag === 'a' && allowedTags.has('a')) {
+    const href = element.getAttribute('href') ?? '';
+
+    if (href && isAllowedHref(href)) {
+      return `<a href="${escapeAttribute(
+        href,
+      )}" target="_blank" rel="noopener noreferrer">${childrenHtml}</a>`;
+    }
+
+    return childrenHtml;
+  }
+
+  if (normalizedTag === 'blockquote' && allowedTags.has('blockquote')) {
+    return `<blockquote>${ensureBlockHtml(childrenHtml)}</blockquote>`;
+  }
+
+  if (normalizedTag === 'li' && allowedTags.has('li')) {
+    return `<li>${ensureBlockHtml(childrenHtml)}</li>`;
+  }
+
+  if (normalizedTag && allowedTags.has(normalizedTag)) {
     return `<${normalizedTag}>${childrenHtml}</${normalizedTag}>`;
   }
 
-  if (['div', 'p', 'li', 'blockquote'].includes(tagName)) {
-    return `${childrenHtml}<br>`;
-  }
-
   return childrenHtml;
+};
+
+const hasMeaningfulHtml = (html: string) => {
+  const template = document.createElement('template');
+  template.innerHTML = html;
+  const text = template.content.textContent?.replace(/\u00a0/g, ' ').trim();
+
+  return Boolean(
+    text ||
+      (props.features === TextEditorFeatures.Post && html.includes('<hr')),
+  );
 };
 
 const sanitizeEditorHtml = (html: string) => {
   const template = document.createElement('template');
   template.innerHTML = html;
 
-  return Array.from(template.content.childNodes)
+  const sanitizedHtml = Array.from(template.content.childNodes)
     .map((node) => renderAllowedHtml(node))
-    .join('')
-    .replace(/(<br>){3,}/g, '<br><br>');
+    .join('');
+
+  return hasMeaningfulHtml(sanitizedHtml) ? sanitizedHtml : '';
 };
 
 const updateModelValue = (html: string) => {
@@ -246,7 +454,8 @@ const updateModelValue = (html: string) => {
 const editor = useEditor({
   content: sanitizeEditorHtml(textEditorValue.value),
   extensions: [
-    InlineDocument,
+    Document,
+    Paragraph,
     Text,
     HardBreak.configure({
       keepMarks: false,
@@ -255,9 +464,29 @@ const editor = useEditor({
     ItalicTag,
     Strike,
     Underline,
-    Cite,
-    EnterAsHardBreak,
-  ],
+    Code,
+    Link.configure({
+      autolink: true,
+      linkOnPaste: true,
+      openOnClick: false,
+      HTMLAttributes: {
+        target: '_blank',
+        rel: 'noopener noreferrer',
+      },
+    }),
+    Blockquote,
+    BulletList,
+    OrderedList,
+    ListItem,
+    ...(props.features === TextEditorFeatures.Post
+      ? [
+          Heading.configure({
+            levels: [...headingLevels],
+          }),
+          HorizontalRule,
+        ]
+      : []),
+  ] satisfies AnyExtension[],
   editorProps: {
     attributes: {
       id: editorId,
@@ -267,14 +496,17 @@ const editor = useEditor({
       tabindex: '0',
     },
     transformPastedHTML: sanitizeEditorHtml,
-    transformPastedText: (text) => escapeHtml(text).replace(/\r?\n/g, '<br>'),
   },
   onUpdate: ({ editor }) => {
     updateModelValue(editor.getHTML());
   },
 });
 
-const isActive = (format: Format) => editor.value?.isActive(format) ?? false;
+const isActive = (format: ActiveFormat) =>
+  editor.value?.isActive(format) ?? false;
+
+const isHeadingActive = (level: Level) =>
+  editor.value?.isActive('heading', { level }) ?? false;
 
 const toggleFormat = (format: Format) => {
   const chain = editor.value?.chain().focus();
@@ -296,9 +528,33 @@ const toggleFormat = (format: Format) => {
     case 'underline':
       chain.toggleUnderline().run();
       break;
-    case 'cite':
-      chain.toggleMark('cite').run();
+    case 'code':
+      chain.toggleCode().run();
       break;
+    case 'blockquote':
+      chain.toggleBlockquote().run();
+      break;
+    case 'bulletList':
+      chain.toggleBulletList().run();
+      break;
+    case 'orderedList':
+      chain.toggleOrderedList().run();
+      break;
+    case 'horizontalRule':
+      if (props.features === TextEditorFeatures.Post) {
+        chain.setHorizontalRule().run();
+      }
+      break;
+    default: {
+      const level = Number(format.replace('heading-', '')) as Level;
+
+      if (
+        props.features === TextEditorFeatures.Post &&
+        headingLevels.includes(level)
+      ) {
+        chain.toggleHeading({ level }).run();
+      }
+    }
   }
 };
 
@@ -347,11 +603,10 @@ watch(textEditorValue, (value) => {
   @include mixins.for-size(phone-only) {
     padding-right: 0;
     padding-left: 0;
-    border-right: 1px solid transparent;
-    border-left: 1px solid transparent;
   }
 
   &__style-buttons {
+    flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 1rem;
 
@@ -390,19 +645,63 @@ watch(textEditorValue, (value) => {
     color: var(--color-text-primary);
     cursor: text;
 
-    br {
-      display: block;
+    p,
+    blockquote,
+    ul,
+    ol,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin-top: 0;
       margin-bottom: 1rem;
-      content: '';
     }
 
+    ul,
+    ol {
+      padding-left: 1.5rem;
+    }
+
+    code {
+      padding: 0.1rem 0.25rem;
+      border-radius: 4px;
+      background: var(--color-surface-secondary);
+      font-family: monospace;
+    }
+
+    blockquote,
     cite {
       display: block;
       margin-top: 8px;
       margin-bottom: 8px;
       padding: 16px;
-      border: var(--color-gray-500) solid 1px;
+      border-left: var(--color-gray-500) solid 3px;
       background-color: var(--color-surface-secondary);
+    }
+
+    p:last-child,
+    blockquote:last-child,
+    ul:last-child,
+    ol:last-child,
+    h1:last-child,
+    h2:last-child,
+    h3:last-child,
+    h4:last-child,
+    h5:last-child,
+    h6:last-child {
+      margin-bottom: 0;
+    }
+
+    hr {
+      margin: 1rem 0;
+      border: none;
+      border-top: 1px solid var(--color-text-secondary);
+    }
+
+    a {
+      color: var(--color-primary);
     }
 
     @include mixins.for-size(phone-only) {

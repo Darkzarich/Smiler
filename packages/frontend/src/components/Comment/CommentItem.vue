@@ -558,6 +558,47 @@ const downvote = async () => {
 
   &__body {
     line-height: 1.5rem;
+
+    p,
+    blockquote,
+    ul,
+    ol {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+
+    ul,
+    ol {
+      padding-left: 1.5rem;
+    }
+
+    code {
+      padding: 0.1rem 0.25rem;
+      border-radius: 4px;
+      background: var(--color-surface-primary);
+      font-family: monospace;
+    }
+
+    blockquote,
+    cite {
+      display: block;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      padding-left: 1rem;
+      border-left: 3px solid var(--color-text-secondary);
+      background: var(--color-surface-primary);
+    }
+
+    p:last-child,
+    blockquote:last-child,
+    ul:last-child,
+    ol:last-child {
+      margin-bottom: 0;
+    }
+
+    a {
+      color: var(--color-primary);
+    }
   }
 
   &__comment-form {
