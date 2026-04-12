@@ -68,7 +68,7 @@ function logHandledError(error: AbstractError, req: Request) {
     path: req.route ? `${req.baseUrl}${req.route.path}` : '[unmatched]',
     status: error.status,
     code: error.code,
-    message: error.message,
+    error_message: error.message,
   });
 }
 

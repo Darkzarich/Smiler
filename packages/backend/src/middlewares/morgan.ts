@@ -28,14 +28,31 @@ function getRouteTemplate(req: Request): string {
   return `${req.baseUrl}${stringifyRoutePath(req.route.path)}`;
 }
 
+function getContentLength(
+  contentLength: string | undefined,
+): number | undefined {
+  if (contentLength === undefined) {
+    return undefined;
+  }
+
+  const parsedContentLength = Number.parseInt(String(contentLength), 10);
+
+  if (Number.isNaN(parsedContentLength)) {
+    return undefined;
+  }
+
+  return parsedContentLength;
+}
+
 export default morgan(
   (tokens, req: Request, res: Response) =>
     JSON.stringify({
       requestId: req.id,
       method: tokens.method(req, res),
       route: getRouteTemplate(req),
+      path: req.path,
       status: Number.parseFloat(tokens.status(req, res)!) || 0,
-      content_length: tokens.res(req, res, 'content-length'),
+      content_length: getContentLength(tokens.res(req, res, 'content-length')),
       response_time_ms:
         Number.parseFloat(tokens['response-time'](req, res)!) || 0,
     }),
