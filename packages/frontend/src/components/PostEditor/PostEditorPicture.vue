@@ -166,11 +166,17 @@ const resetFormState = () => {
   &__image {
     display: flex;
     flex-flow: row nowrap;
+    justify-content: center;
+    max-height: min(520px, 70vh);
+    border-radius: 8px;
+    background: var(--color-surface-primary);
+    overflow: hidden;
 
     img {
       width: 100%;
-      height: 100%;
-      border-radius: 8px;
+      height: auto;
+      max-height: min(520px, 70vh);
+      object-fit: contain;
     }
   }
 }
