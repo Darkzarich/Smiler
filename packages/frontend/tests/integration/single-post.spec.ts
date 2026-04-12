@@ -15,6 +15,7 @@ const auth = createRandomAuth({
   isAuth: true,
 });
 const post = createRandomPost();
+const asParagraph = (text: string) => `<p>${text}</p>`;
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
@@ -441,7 +442,9 @@ test.describe('Post edit', () => {
       sections: [
         {
           ...currentUserNewerPost.sections[0],
-          content: `edited${currentUserNewerPost.sections[0].content}`,
+          content: asParagraph(
+            `edited${currentUserNewerPost.sections[0].content}`,
+          ),
         },
       ],
     });

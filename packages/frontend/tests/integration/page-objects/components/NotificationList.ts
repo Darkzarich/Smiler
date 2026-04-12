@@ -1,4 +1,4 @@
-import { type Locator, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import AbstractComponent from './AbstractComponent';
 
 export default class NotificationList extends AbstractComponent {
@@ -28,8 +28,7 @@ export default class NotificationList extends AbstractComponent {
   }
 
   async waitForNoNotifications() {
-    await this.page.waitForSelector('.notification-list__item', {
-      state: 'hidden',
+    await expect(this.root.locator('.notification-list__item')).toBeHidden({
       timeout: 2000,
     });
   }

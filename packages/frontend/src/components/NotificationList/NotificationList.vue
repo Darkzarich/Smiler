@@ -14,12 +14,14 @@
           {{ notification.message }}
         </div>
 
-        <div
-          class="notification-list__close"
+        <button
+          class="notification-list__close notification-list__item-close-btn"
+          type="button"
+          aria-label="Close notification"
           @click="notificationsStore.removeNotification(notification.id)"
         >
           <IconExit />
-        </div>
+        </button>
       </div>
     </TransitionGroup>
   </div>
@@ -88,6 +90,9 @@ const { notifications } = storeToRefs(notificationsStore);
     position: absolute;
     top: 2px;
     right: 5px;
+    padding: 0;
+    border: 0;
+    background: transparent;
     cursor: pointer;
 
     svg {

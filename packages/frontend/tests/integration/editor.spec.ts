@@ -15,6 +15,7 @@ const authUser = createRandomAuth({
 const title = 'Test post';
 const picSection = createRandomSection(postTypes.POST_SECTION_TYPES.PICTURE);
 const vidCode = 'dQw4w9WgXcQ';
+const asParagraph = (text: string) => `<p>${text}</p>`;
 
 const createdPost = createRandomPost();
 
@@ -106,7 +107,7 @@ test('Creates a post with title, tags and content', async ({
     sections: [
       {
         type: 'text',
-        content: 'test text',
+        content: asParagraph('test text'),
       },
       {
         type: 'pic',
@@ -187,9 +188,7 @@ test('D&D post sections to change order of sections', async ({
   const assertNewOrderOfSections =
     await PostCreatePage.assertOldOrderOfSections();
 
-  await PostCreatePage.getTextSection().dragTo(
-    PostCreatePage.getPictureSection(),
-  );
+  await PostCreatePage.dragFirstSectionAfterSecond();
 
   await assertNewOrderOfSections();
 
@@ -293,7 +292,7 @@ test('Saves draft template', async ({
     sections: [
       {
         type: 'text',
-        content: 'test text',
+        content: asParagraph('test text'),
       },
       {
         type: 'pic',

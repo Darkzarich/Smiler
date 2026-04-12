@@ -1,7 +1,7 @@
 <template>
   <div class="user-profile u-flex-row">
     <div class="user-profile__avatar">
-      <img :src="resolveAvatar(user.avatar)" :alt="user.avatar" />
+      <img :src="resolveAvatar(profileUser.avatar)" :alt="profileUser.avatar" />
     </div>
 
     <div class="user-profile__info">
@@ -9,7 +9,7 @@
         class="user-profile__login u-flex-row"
         data-testid="user-profile-login"
       >
-        {{ user.login }}
+        {{ profileUser.login }}
 
         <BaseButton
           v-if="currentUser && !isSameUser"
@@ -26,25 +26,25 @@
       </div>
 
       <div class="user-profile__date">
-        Became an author {{ formatFromNow(user.createdAt) }}
+        Became an author {{ formatFromNow(profileUser.createdAt) }}
       </div>
 
       <div
-        v-if="user.bio"
+        v-if="profileUser.bio"
         class="user-profile__bio"
         data-testid="user-profile-bio"
       >
-        <i>{{ user.bio }}</i>
+        <i>{{ profileUser.bio }}</i>
       </div>
 
-      <UserStats :stats="user" />
+      <UserStats :stats="profileUser" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { ref, computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { api } from '@/api';
 import type { userTypes } from '@/api/users';
 import { useUserStore } from '@/store/user';
@@ -59,14 +59,25 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const profileUser = ref({ ...props.user });
+
 const isRequesting = ref(false);
 
 const userStore = useUserStore();
 
 const { user: currentUser } = storeToRefs(userStore);
 
-const isSameUser = computed(() => currentUser.value?.id === props.user.id);
-const isFollowed = computed(() => props.user.isFollowed);
+const isSameUser = computed(
+  () => currentUser.value?.id === profileUser.value.id,
+);
+const isFollowed = computed(() => profileUser.value.isFollowed);
+
+watch(
+  () => props.user,
+  (user) => {
+    profileUser.value = { ...user };
+  },
+);
 
 async function follow() {
   if (isRequesting.value) {
@@ -76,10 +87,10 @@ async function follow() {
   try {
     isRequesting.value = true;
 
-    await api.users.followUser(props.user.id);
+    await api.users.followUser(profileUser.value.id);
 
-    props.user.followersAmount = props.user.followersAmount + 1;
-    props.user.isFollowed = true;
+    profileUser.value.followersAmount = profileUser.value.followersAmount + 1;
+    profileUser.value.isFollowed = true;
   } finally {
     isRequesting.value = false;
   }
@@ -93,10 +104,10 @@ async function unfollow() {
   try {
     isRequesting.value = true;
 
-    await api.users.unfollowUser(props.user.id);
+    await api.users.unfollowUser(profileUser.value.id);
 
-    props.user.followersAmount = props.user.followersAmount - 1;
-    props.user.isFollowed = false;
+    profileUser.value.followersAmount = profileUser.value.followersAmount - 1;
+    profileUser.value.isFollowed = false;
   } finally {
     isRequesting.value = false;
   }

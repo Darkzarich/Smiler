@@ -1,6 +1,13 @@
 <template>
   <div class="mobile-menu">
-    <div class="mobile-menu__close-btn" @click="closeMenu()">
+    <div
+      class="mobile-menu__close-btn"
+      role="button"
+      tabindex="0"
+      @click="closeMenu()"
+      @keydown.enter="closeMenu()"
+      @keydown.space.prevent="closeMenu()"
+    >
       <IconExit />
     </div>
 

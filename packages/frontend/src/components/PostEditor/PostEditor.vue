@@ -13,6 +13,7 @@
     <Draggable
       :list="sections"
       :animation="200"
+      :force-fallback="true"
       ghost-class="post-editor__section--moving"
       chosen-class="post-editor__section--chosen"
       :component-data="{

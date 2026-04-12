@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { api } from '@/api';
 import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
@@ -65,8 +65,6 @@ const validation = computed(() => {
     validation.email = requestError.value;
     validation.password = requestError.value;
   } else {
-    requestError.value = '';
-
     if (email.value.length === 0) {
       validation.email = "Email can't be empty";
     } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(email.value)) {
@@ -86,6 +84,10 @@ const validation = computed(() => {
 const isSubmitDisabled = computed(
   () => !!(validation.value.email || validation.value.password),
 );
+
+watch([email, password], () => {
+  requestError.value = '';
+});
 
 async function signIn() {
   if (isSubmitDisabled.value || isLoading.value) {

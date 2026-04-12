@@ -64,7 +64,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { ref, computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { api } from '@/api';
 import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
@@ -92,9 +92,6 @@ const validation = computed(() => {
     validation.email = requestError.value;
     validation.login = requestError.value;
   } else {
-    // email
-    requestError.value = '';
-
     if (email.value.length === 0) {
       validation.email = "Email can't be empty";
     } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(email.value)) {
@@ -138,6 +135,10 @@ const isSubmitDisabled = computed(() => {
       validation.value.confirm ||
       validation.value.login,
   );
+});
+
+watch([email, password], () => {
+  requestError.value = '';
 });
 
 async function signUp() {

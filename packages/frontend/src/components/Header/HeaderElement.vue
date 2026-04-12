@@ -5,7 +5,11 @@
         data-testid="mobile-menu"
         class="header__mobile-menu"
         :class="isMobileMenuOpen ? 'header__mobile--active' : ''"
+        role="button"
+        tabindex="0"
         @click="toggleMobileMenu()"
+        @keydown.enter="toggleMobileMenu()"
+        @keydown.space.prevent="toggleMobileMenu()"
       >
         <IconMenuMobile />
       </div>

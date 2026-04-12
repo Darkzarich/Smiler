@@ -36,7 +36,11 @@
       <div
         v-if="!isFetchingComments && hasCommentsNextPage"
         class="comments__fetch-more u-widget"
+        role="button"
+        tabindex="0"
         @click="fetchMoreComments()"
+        @keydown.enter="fetchMoreComments()"
+        @keydown.space.prevent="fetchMoreComments()"
       >
         <template v-if="isFetchingComments">
           <CircularLoader />

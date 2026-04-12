@@ -23,7 +23,11 @@
                 ? 'comment-item__upvote-btn--active'
                 : ''
             "
+            role="button"
+            tabindex="0"
             @click="upvote()"
+            @keydown.enter="upvote()"
+            @keydown.space.prevent="upvote()"
           >
             <IconPlus />
           </div>
@@ -36,7 +40,11 @@
                 ? 'comment-item__downvote-btn--active'
                 : ''
             "
+            role="button"
+            tabindex="0"
             @click="downvote()"
+            @keydown.enter="downvote()"
+            @keydown.space.prevent="downvote()"
           >
             <IconMinus />
           </div>
@@ -65,7 +73,11 @@
             <div
               class="comment-item__edit-btn"
               :data-testid="`comment-${comment.id}-edit`"
+              role="button"
+              tabindex="0"
               @click="toggleEdit()"
+              @keydown.enter="toggleEdit()"
+              @keydown.space.prevent="toggleEdit()"
             >
               <IconEdit />
             </div>
@@ -73,7 +85,11 @@
             <div
               class="comment-item__delete-btn"
               :data-testid="`comment-${comment.id}-delete`"
+              role="button"
+              tabindex="0"
               @click="handleDeleteComment()"
+              @keydown.enter="handleDeleteComment()"
+              @keydown.space.prevent="handleDeleteComment()"
             >
               <IconDelete />
             </div>
@@ -108,6 +124,7 @@
         />
 
         <template v-else>
+          <!-- eslint-disable-next-line vue/no-v-html -->
           <div v-html="comment.body" />
 
           <div class="comment-item__reply">
@@ -128,7 +145,11 @@
                 }"
                 class="comment-item__reply-toggler"
                 :data-testid="`comment-${comment.id}-toggle-reply`"
+                role="button"
+                tabindex="0"
                 @click="toggleReply()"
+                @keydown.enter="toggleReply()"
+                @keydown.space.prevent="toggleReply()"
               >
                 Reply
               </div>
@@ -141,7 +162,11 @@
         v-if="comment.children.length > 0"
         :data-testid="`comment-${comment.id}-expander`"
         :is-expanded="isChildrenExpanded"
+        role="button"
+        tabindex="0"
         @click="isChildrenExpanded = !isChildrenExpanded"
+        @keydown.enter="isChildrenExpanded = !isChildrenExpanded"
+        @keydown.space.prevent="isChildrenExpanded = !isChildrenExpanded"
       />
     </div>
 

@@ -90,11 +90,13 @@
           :key="section.hash"
           class="post__sections"
         >
+          <!-- eslint-disable vue/no-v-html -->
           <div
             v-if="isTextSection(section)"
             :data-testid="`post-${post.id}-text-${section.hash}`"
             v-html="section.content"
           />
+          <!-- eslint-enable vue/no-v-html -->
 
           <div
             v-if="isPictureSection(section)"

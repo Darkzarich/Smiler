@@ -47,6 +47,10 @@ export default class PostCreatePage extends AbstractPage {
     return this.page.getByTestId('post-sections');
   }
 
+  getPostSection(index: number) {
+    return this.page.getByTestId('post-section').nth(index);
+  }
+
   async addTag(tag = '') {
     await this.postTagInput.fill(tag);
     await this.page.keyboard.press('Enter');
@@ -130,6 +134,25 @@ export default class PostCreatePage extends AbstractPage {
         computedStyle.opacity === '1' && computedStyle.transform === 'none'
       );
     });
+  }
+
+  async dragFirstSectionAfterSecond() {
+    const sourceBox = await this.getPostSection(0).boundingBox();
+    const targetBox = await this.getPostSection(1).boundingBox();
+
+    if (!sourceBox || !targetBox) {
+      throw new Error('Post section boxes are not available');
+    }
+
+    await this.page.mouse.move(sourceBox.x + 8, sourceBox.y + 8);
+    await this.page.mouse.down();
+    await this.page.mouse.move(
+      targetBox.x + 8,
+      targetBox.y + targetBox.height - 8,
+      { steps: 20 },
+    );
+    await this.page.mouse.up();
+    await this.awaitDragAndDropAnimation();
   }
 
   async assertOldOrderOfSections() {

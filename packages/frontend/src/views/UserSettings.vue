@@ -23,7 +23,11 @@
               <span
                 class="user-settings__unfollow"
                 :data-testid="`user-settings-author-${author._id}-unfollow`"
+                role="button"
+                tabindex="0"
                 @click="handleUnfollowUser(author._id)"
+                @keydown.enter="handleUnfollowUser(author._id)"
+                @keydown.space.prevent="handleUnfollowUser(author._id)"
               >
                 x
               </span>
@@ -46,7 +50,11 @@
               <span
                 class="user-settings__unfollow"
                 :data-testid="`user-settings-tag-${tag}-unfollow`"
+                role="button"
+                tabindex="0"
                 @click="handleUnfollowTag(tag)"
+                @keydown.enter="handleUnfollowTag(tag)"
+                @keydown.space.prevent="handleUnfollowTag(tag)"
               >
                 x
               </span>

@@ -10,7 +10,11 @@
         v-for="item in items"
         :key="item.value"
         class="base-context-menu__item"
+        role="button"
+        tabindex="0"
         @click="$emit('action', item.value)"
+        @keydown.enter="$emit('action', item.value)"
+        @keydown.space.prevent="$emit('action', item.value)"
       >
         {{ item.label }}
       </li>

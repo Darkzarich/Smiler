@@ -22,7 +22,11 @@
     <li
       class="current-user-navigation__item"
       data-testid="logout-btn"
+      role="button"
+      tabindex="0"
       @click="logout()"
+      @keydown.enter="logout()"
+      @keydown.space.prevent="logout()"
     >
       <IconExit class="current-user-navigation__item-icon" /> Logout
     </li>

@@ -14,7 +14,7 @@ export default class Menu extends AbstractComponent {
 
   async openIfMobile() {
     if (this.isMobile) {
-      await this.page.getByTestId('mobile-menu').click({ force: true });
+      await this.page.getByTestId('mobile-menu').click();
     }
   }
 

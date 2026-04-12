@@ -12,6 +12,7 @@ const auth = createRandomAuth({
 });
 const post = createRandomPost();
 const comment = createRandomComment({}, true);
+const asParagraph = (text: string) => `<p>${text}</p>`;
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
@@ -111,7 +112,7 @@ test('Posts a new comment to a post', async ({
 
   expect(createCommentResponse.postDataJSON()).toEqual({
     post: post.id,
-    body: 'new comment',
+    body: asParagraph('new comment'),
   });
 
   await expect(Comments.getCommentById(newComment.id)).toContainText(
@@ -171,7 +172,7 @@ test.describe('Replies', () => {
     expect(replyResponse.postDataJSON()).toEqual({
       post: post.id,
       parent: comment.id,
-      body: newReplyText,
+      body: asParagraph(newReplyText),
     });
 
     await expect(Comments.getCommentById(newReplyId)).toContainText(
@@ -670,7 +671,7 @@ test.describe('Editing or deleting a comment', () => {
       });
 
     expect(editCommentResponse.postDataJSON()).toEqual({
-      body: editCommentText,
+      body: asParagraph(editCommentText),
     });
     await expect(Comments.getCommentById(currentUserComment.id)).toContainText(
       editCommentText,
