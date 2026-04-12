@@ -23,6 +23,7 @@ export const routes = {
     removeRateById: new Route('/posts/*/vote', Method.DELETE),
   },
   auth: {
+    csrf: new Route('/auth/csrf', Method.GET),
     getAuth: new Route('/current', Method.GET),
     signIn: new Route('/signin', Method.POST),
     signUp: new Route('/signup', Method.POST),

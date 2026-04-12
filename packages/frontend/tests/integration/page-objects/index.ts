@@ -42,7 +42,15 @@ export interface TestFixtures {
 // Extend base test by providing common page objects
 const test = base.extend<TestFixtures>({
   Api: async ({ page, context }, use) => {
-    await use(new Api(page, context));
+    const api = new Api(page, context);
+
+    await api.routes.auth.csrf.mock({
+      body: {
+        csrfToken: 'test-csrf-token',
+      },
+    });
+
+    await use(api);
   },
   PostsPage: async ({ page, isMobile }, use) => {
     await use(new PostsPage(page, isMobile));

@@ -30,6 +30,15 @@
     "prettier": "prettier \"**/*.{js,ts,scss,css,html,json,vue}\" --write"
   },
   "dependencies": {
+    "@tiptap/core": "^3.22.3",
+    "@tiptap/extension-bold": "^3.22.3",
+    "@tiptap/extension-document": "^3.22.3",
+    "@tiptap/extension-hard-break": "^3.22.3",
+    "@tiptap/extension-italic": "^3.22.3",
+    "@tiptap/extension-strike": "^3.22.3",
+    "@tiptap/extension-text": "^3.22.3",
+    "@tiptap/extension-underline": "^3.22.3",
+    "@tiptap/vue-3": "^3.22.3",
     "@vueuse/components": "^14.2.0",
     "@vueuse/core": "^14.2.0",
     "axios": "^1.15.0",
