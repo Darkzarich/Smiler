@@ -151,7 +151,7 @@ describe('PUT /users/me/template', () => {
 
     const userFromDb = await UserModel.findById(currentUser.id).lean();
 
-    expect(userFromDb!.template.tags).toEqual(template.tags);
+    expect(userFromDb!.template.tags).toEqual(['new tag']);
   });
 
   it('Should update sections in user.template in the database', async () => {
@@ -210,6 +210,7 @@ describe('PUT /users/me/template', () => {
 
     expect(userFromDb!.template).toEqual({
       ...template,
+      tags: ['new tag'],
       sections: template.sections.map((section) => ({
         ...section,
         hash: expect.any(String),

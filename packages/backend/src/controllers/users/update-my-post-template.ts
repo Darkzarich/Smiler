@@ -14,9 +14,7 @@ export async function updateMyPostTemplate(
   res: Response<UpdateMyPostTemplateResponse>,
 ) {
   const { userId } = req.session;
-  const { title, sections, tags } = req.body;
-
-  PostValidator.validateTemplate({ title, sections, tags });
+  const { title, sections, tags } = PostValidator.validateTemplate(req.body);
 
   const updatedUser = await UserModel.findByIdAndUpdate(
     userId,

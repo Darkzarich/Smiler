@@ -16,6 +16,12 @@ import { isValidExternalImageUrl } from '@utils/is-valid-external-image-url';
 
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 
+type PostValidationInput = Partial<{
+  title: string;
+  sections: Post['sections'];
+  tags: unknown;
+}>;
+
 export class PostValidator {
   static LOCAL_HOST_NAMES = ['localhost', '127.0.0.1', '::1'];
   static PROTOCOLS = ['http:', 'https:'];
@@ -30,15 +36,43 @@ export class PostValidator {
     }
   }
 
-  /** Validate tags count and length */
-  private static validateTags(tags: string[]) {
+  private static normalizeTag(tag: string) {
+    return tag
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]+/g, '')
+      .replace(/\s+/g, ' ');
+  }
+
+  /** Validate tags count and return normalized unique tags */
+  private static validateAndPrepareTags(tags: unknown) {
+    if (!Array.isArray(tags)) {
+      throw new ValidationError(ERRORS.POST_TAG_INVALID);
+    }
+
     if (tags.length > POST_MAX_TAGS) {
       throw new ValidationError(ERRORS.POST_MAX_TAGS_EXCEEDED);
     }
 
-    if (tags.some((tag) => tag.length > POST_MAX_TAG_LEN)) {
+    const normalizedTags = tags.map((tag) => {
+      if (typeof tag !== 'string') {
+        throw new ValidationError(ERRORS.POST_TAG_INVALID);
+      }
+
+      const normalizedTag = PostValidator.normalizeTag(tag);
+
+      if (!normalizedTag) {
+        throw new ValidationError(ERRORS.POST_TAG_INVALID);
+      }
+
+      return normalizedTag;
+    });
+
+    if (normalizedTags.some((tag) => tag.length > POST_MAX_TAG_LEN)) {
       throw new ValidationError(ERRORS.POST_TAG_MAX_LEN_EXCEEDED);
     }
+
+    return Array.from(new Set(normalizedTags));
   }
 
   private static isValidVideoUrl(urlString: string): boolean {
@@ -152,7 +186,7 @@ export class PostValidator {
    * throw ValidationError if validation fails
    */
   static validateAndPrepare(
-    post: Partial<Pick<Post, 'title' | 'sections' | 'tags'>>,
+    post: PostValidationInput,
   ) {
     const { title, sections, tags } = post;
 
@@ -166,16 +200,16 @@ export class PostValidator {
 
     PostValidator.validateTitle(title);
 
-    if (tags) {
-      PostValidator.validateTags(tags);
-    }
+    const preparedTags = tags !== undefined
+      ? PostValidator.validateAndPrepareTags(tags)
+      : undefined;
 
     PostValidator.validateAndPrepareSections(sections);
 
     return {
       title,
       sections,
-      tags,
+      tags: preparedTags,
     };
   }
 
@@ -183,7 +217,7 @@ export class PostValidator {
    * Returns validated fields with sanitized sections.
    */
   static validateTemplate(
-    template: Partial<Pick<Post, 'title' | 'sections' | 'tags'>>,
+    template: PostValidationInput,
   ) {
     const { title, sections, tags } = template;
 
@@ -191,9 +225,9 @@ export class PostValidator {
       PostValidator.validateTitle(title);
     }
 
-    if (tags) {
-      PostValidator.validateTags(tags);
-    }
+    const preparedTags = tags !== undefined
+      ? PostValidator.validateAndPrepareTags(tags)
+      : undefined;
 
     if (sections) {
       PostValidator.validateAndPrepareSections(sections, {
@@ -204,7 +238,7 @@ export class PostValidator {
     return {
       title,
       sections,
-      tags,
+      tags: preparedTags,
     };
   }
 }

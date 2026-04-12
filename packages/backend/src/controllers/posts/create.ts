@@ -25,7 +25,7 @@ export async function create(
   const { title, sections, tags } = PostValidator.validateAndPrepare({
     title: req.body.title,
     sections: req.body.sections,
-    tags: req.body.tags || [],
+    tags: req.body.tags ?? [],
   });
 
   const [post] = await Promise.all([

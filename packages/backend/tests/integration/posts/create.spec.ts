@@ -119,6 +119,54 @@ describe('POST /posts', () => {
     expect(response.status).toBe(422);
   });
 
+  it('Should return status 422 and an expected message if a tag is empty after normalization', async () => {
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+    const response = await request(global.app)
+      .post('/api/posts')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send({
+        ...requiredPostFields,
+        tags: ['<><>'],
+      });
+
+    expect(response.body.error.message).toBe(ERRORS.POST_TAG_INVALID);
+    expect(response.status).toBe(422);
+  });
+
+  it('Should return status 422 and an expected message if a tag is not a string', async () => {
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+    const response = await request(global.app)
+      .post('/api/posts')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send({
+        ...requiredPostFields,
+        tags: ['tag', 1],
+      });
+
+    expect(response.body.error.message).toBe(ERRORS.POST_TAG_INVALID);
+    expect(response.status).toBe(422);
+  });
+
+  it('Should return status 422 and an expected message if tags are not an array', async () => {
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+    const response = await request(global.app)
+      .post('/api/posts')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send({
+        ...requiredPostFields,
+        tags: 'tag',
+      });
+
+    expect(response.body.error.message).toBe(ERRORS.POST_TAG_INVALID);
+    expect(response.status).toBe(422);
+  });
+
   it('Should return status 422 and an expected message if at least one section is unknown type', async () => {
     const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
@@ -329,6 +377,23 @@ describe('POST /posts', () => {
       sections: post.sections,
       tags: post.tags,
     });
+  });
+
+  it('Should normalize tags before adding the post to the database', async () => {
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+    const response = await request(global.app)
+      .post('/api/posts')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send({
+        ...requiredPostFields,
+        tags: [' JavaScript ', 'javascript', 'Vue.js', 'front   end'],
+      });
+
+    const postFromDb = await PostModel.findById(response.body.id).lean();
+
+    expect(postFromDb!.tags).toEqual(['javascript', 'vuejs', 'front end']);
   });
 
   it('Should return status 200 and the post after successful creation', async () => {

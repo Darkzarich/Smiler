@@ -60,6 +60,7 @@ export const ERRORS = {
   POST_TITLE_MAX_LENGTH_EXCEEDED: `Title can't be longer than ${POST_TITLE_MAX_LENGTH} characters`,
   POST_SECTIONS_REQUIRED: 'At least one section is required',
   POST_TAGS_REQUIRED: 'At least one tag is required',
+  POST_TAG_INVALID: 'Tag must contain at least one letter or number',
   POST_MAX_TAGS_EXCEEDED: 'Exceeded max amount of tags',
   POST_TAG_MAX_LEN_EXCEEDED: 'Exceeded max length of a tag',
   POST_SECTIONS_MAX_EXCEEDED: 'Exceeded max amount of sections',

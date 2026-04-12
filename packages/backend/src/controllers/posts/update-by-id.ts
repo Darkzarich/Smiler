@@ -49,7 +49,7 @@ export async function updateById(
   } = PostValidator.validateAndPrepare({
     title: req.body.title || targetPost.title,
     sections: req.body.sections || targetPost.sections,
-    tags: req.body.tags || targetPost.tags,
+    tags: req.body.tags ?? targetPost.tags,
   });
 
   const filePathsToDelete: string[] = [];
