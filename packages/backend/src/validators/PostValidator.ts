@@ -10,7 +10,10 @@ import {
   ALLOWED_VIDEO_EXTENSIONS,
 } from '@constants/index';
 import { ValidationError, ERRORS } from '@errors';
-import sanitizeHtml from '@libs/sanitize-html';
+import sanitizeHtml, {
+  hasSanitizedHtmlContent,
+  SanitizeHtmlProfile,
+} from '@libs/sanitize-html';
 import { nanoid } from 'nanoid';
 import { isValidExternalImageUrl } from '@utils/is-valid-external-image-url';
 
@@ -134,12 +137,23 @@ export class PostValidator {
             throw new ValidationError(ERRORS.POST_SECTIONS_MAX_LENGTH_EXCEEDED);
           }
 
-          section.content = sanitizeHtml(section.content);
+          section.content = sanitizeHtml(
+            section.content,
+            SanitizeHtmlProfile.Post,
+          );
 
-          if (!section.content) {
-            throw new ValidationError(
-              ERRORS.POST_TEXT_SECTION_CONTENT_REQUIRED,
-            );
+          const hasContent = hasSanitizedHtmlContent(section.content, {
+            allowHorizontalRule: true,
+          });
+
+          if (!hasContent) {
+            if (requireContent) {
+              throw new ValidationError(
+                ERRORS.POST_TEXT_SECTION_CONTENT_REQUIRED,
+              );
+            }
+
+            section.content = '';
           }
         }
       }
@@ -185,9 +199,7 @@ export class PostValidator {
   /** Validate a post and return it with sanitized sections
    * throw ValidationError if validation fails
    */
-  static validateAndPrepare(
-    post: PostValidationInput,
-  ) {
+  static validateAndPrepare(post: PostValidationInput) {
     const { title, sections, tags } = post;
 
     if (!title) {
@@ -200,9 +212,10 @@ export class PostValidator {
 
     PostValidator.validateTitle(title);
 
-    const preparedTags = tags !== undefined
-      ? PostValidator.validateAndPrepareTags(tags)
-      : undefined;
+    const preparedTags =
+      tags !== undefined
+        ? PostValidator.validateAndPrepareTags(tags)
+        : undefined;
 
     PostValidator.validateAndPrepareSections(sections);
 
@@ -216,18 +229,17 @@ export class PostValidator {
   /** Validate template fields when present, without requiring them.
    * Returns validated fields with sanitized sections.
    */
-  static validateTemplate(
-    template: PostValidationInput,
-  ) {
+  static validateTemplate(template: PostValidationInput) {
     const { title, sections, tags } = template;
 
     if (title !== undefined) {
       PostValidator.validateTitle(title);
     }
 
-    const preparedTags = tags !== undefined
-      ? PostValidator.validateAndPrepareTags(tags)
-      : undefined;
+    const preparedTags =
+      tags !== undefined
+        ? PostValidator.validateAndPrepareTags(tags)
+        : undefined;
 
     if (sections) {
       PostValidator.validateAndPrepareSections(sections, {

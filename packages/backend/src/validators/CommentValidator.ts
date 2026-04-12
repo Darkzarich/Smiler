@@ -1,6 +1,9 @@
 import { COMMENT_MAX_BODY_LENGTH } from '@constants/index';
 import { ValidationError, ERRORS } from '@errors';
-import sanitizeHtml from '@libs/sanitize-html';
+import sanitizeHtml, {
+  hasSanitizedHtmlContent,
+  SanitizeHtmlProfile,
+} from '@libs/sanitize-html';
 
 export class CommentValidator {
   static validateAndPrepareBody(body: string | undefined) {
@@ -10,9 +13,9 @@ export class CommentValidator {
 
     CommentValidator.validateBodyLength(body);
 
-    const sanitizedBody = sanitizeHtml(body);
+    const sanitizedBody = sanitizeHtml(body, SanitizeHtmlProfile.Comment);
 
-    if (!sanitizedBody) {
+    if (!hasSanitizedHtmlContent(sanitizedBody)) {
       throw new ValidationError(ERRORS.COMMENT_SHOULD_NOT_BE_EMPTY);
     }
 
