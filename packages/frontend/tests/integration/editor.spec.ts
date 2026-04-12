@@ -208,6 +208,50 @@ test('D&D post sections to change order of sections', async ({
   });
 });
 
+test('Formatting buttons keep editor focus and do not start section D&D', async ({
+  PostCreatePage,
+  page,
+  isMobile,
+}) => {
+  // TODO: D&D test doesn't pass for mobile but the feature works
+  if (isMobile) {
+    return;
+  }
+
+  await PostCreatePage.goto();
+
+  await PostCreatePage.addTextSection();
+  await PostCreatePage.addPictureSection();
+  await PostCreatePage.fillTextSection('test text');
+  await PostCreatePage.awaitDragAndDropAnimation();
+
+  expect(await PostCreatePage.getPostSectionsContainer().innerHTML()).toMatch(
+    /text-section[\s\S]*pic-section/,
+  );
+  const boldButtonBox = await page.getByTitle('bold').boundingBox();
+  const targetBox = await PostCreatePage.getPostSection(1).boundingBox();
+
+  if (!boldButtonBox || !targetBox) {
+    throw new Error('Formatting button or target section box is not available');
+  }
+
+  await page.mouse.move(
+    boldButtonBox.x + boldButtonBox.width / 2,
+    boldButtonBox.y + boldButtonBox.height / 2,
+  );
+  await page.mouse.down();
+  await page.mouse.move(targetBox.x + 8, targetBox.y + targetBox.height - 8, {
+    steps: 20,
+  });
+  await page.mouse.up();
+  await PostCreatePage.awaitDragAndDropAnimation();
+
+  expect(await PostCreatePage.getPostSectionsContainer().innerHTML()).toMatch(
+    /text-section[\s\S]*pic-section/,
+  );
+  await expect(page.getByTestId('text-section-input')).toBeFocused();
+});
+
 test('Fetch and show draft template', async ({ Api, page, PostCreatePage }) => {
   const savedTitle = 'Saved title';
   const savedSections = [

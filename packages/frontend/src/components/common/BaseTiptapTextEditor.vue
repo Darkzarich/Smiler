@@ -9,8 +9,8 @@
         :class="{ 'base-text-editor__style-button--active': isActive('bold') }"
         type="button"
         title="bold"
-        @pointerdown.prevent="formatSelectionFromPointer('bold')"
-        @click.prevent="formatSelectionFromClick('bold')"
+        @pointerdown.prevent.stop="formatSelectionFromPointer('bold')"
+        @click.prevent.stop="formatSelectionFromClick('bold')"
       >
         B
       </button>
@@ -22,8 +22,8 @@
         }"
         type="button"
         title="italic"
-        @pointerdown.prevent="formatSelectionFromPointer('italic')"
-        @click.prevent="formatSelectionFromClick('italic')"
+        @pointerdown.prevent.stop="formatSelectionFromPointer('italic')"
+        @click.prevent.stop="formatSelectionFromClick('italic')"
       >
         I
       </button>
@@ -35,8 +35,8 @@
         }"
         type="button"
         title="strike"
-        @pointerdown.prevent="formatSelectionFromPointer('strike')"
-        @click.prevent="formatSelectionFromClick('strike')"
+        @pointerdown.prevent.stop="formatSelectionFromPointer('strike')"
+        @click.prevent.stop="formatSelectionFromClick('strike')"
       >
         S
       </button>
@@ -48,8 +48,8 @@
         }"
         type="button"
         title="underline"
-        @pointerdown.prevent="formatSelectionFromPointer('underline')"
-        @click.prevent="formatSelectionFromClick('underline')"
+        @pointerdown.prevent.stop="formatSelectionFromPointer('underline')"
+        @click.prevent.stop="formatSelectionFromClick('underline')"
       >
         U
       </button>
@@ -61,8 +61,8 @@
         }"
         type="button"
         title="blockquote"
-        @pointerdown.prevent="formatSelectionFromPointer('blockquote')"
-        @click.prevent="formatSelectionFromClick('blockquote')"
+        @pointerdown.prevent.stop="formatSelectionFromPointer('blockquote')"
+        @click.prevent.stop="formatSelectionFromClick('blockquote')"
       >
         Q
       </button>
@@ -72,8 +72,8 @@
         :class="{ 'base-text-editor__style-button--active': isActive('code') }"
         type="button"
         title="code"
-        @pointerdown.prevent="formatSelectionFromPointer('code')"
-        @click.prevent="formatSelectionFromClick('code')"
+        @pointerdown.prevent.stop="formatSelectionFromPointer('code')"
+        @click.prevent.stop="formatSelectionFromClick('code')"
       >
         Code
       </button>
@@ -88,8 +88,10 @@
           }"
           type="button"
           :title="`heading ${level}`"
-          @pointerdown.prevent="formatSelectionFromPointer(`heading-${level}`)"
-          @click.prevent="formatSelectionFromClick(`heading-${level}`)"
+          @pointerdown.prevent.stop="
+            formatSelectionFromPointer(`heading-${level}`)
+          "
+          @click.prevent.stop="formatSelectionFromClick(`heading-${level}`)"
         >
           H{{ level }}
         </button>
@@ -102,8 +104,8 @@
         }"
         type="button"
         title="bullet list"
-        @pointerdown.prevent="formatSelectionFromPointer('bulletList')"
-        @click.prevent="formatSelectionFromClick('bulletList')"
+        @pointerdown.prevent.stop="formatSelectionFromPointer('bulletList')"
+        @click.prevent.stop="formatSelectionFromClick('bulletList')"
       >
         UL
       </button>
@@ -115,8 +117,8 @@
         }"
         type="button"
         title="ordered list"
-        @pointerdown.prevent="formatSelectionFromPointer('orderedList')"
-        @click.prevent="formatSelectionFromClick('orderedList')"
+        @pointerdown.prevent.stop="formatSelectionFromPointer('orderedList')"
+        @click.prevent.stop="formatSelectionFromClick('orderedList')"
       >
         OL
       </button>
@@ -126,8 +128,8 @@
         class="base-text-editor__style-button"
         type="button"
         title="horizontal rule"
-        @pointerdown.prevent="formatSelectionFromPointer('horizontalRule')"
-        @click.prevent="formatSelectionFromClick('horizontalRule')"
+        @pointerdown.prevent.stop="formatSelectionFromPointer('horizontalRule')"
+        @click.prevent.stop="formatSelectionFromClick('horizontalRule')"
       >
         HR
       </button>
