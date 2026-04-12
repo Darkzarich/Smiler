@@ -678,6 +678,7 @@ watch(textEditorValue, (value) => {
       display: block;
       margin-top: 8px;
       margin-bottom: 8px;
+      margin-left: 0;
       padding: 16px;
       border-left: var(--color-gray-500) solid 3px;
       background-color: var(--color-surface-secondary);

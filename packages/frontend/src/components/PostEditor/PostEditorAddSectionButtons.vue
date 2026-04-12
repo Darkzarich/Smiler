@@ -5,6 +5,8 @@
       class="post-editor-add-section-buttons__button"
       data-testid="add-text-button"
       tabindex="0"
+      @focus="preloadTextEditor"
+      @pointerenter="preloadTextEditor"
       @click="$emit('add-section', postTypes.POST_SECTION_TYPES.TEXT)"
     >
       <IconText />
@@ -33,7 +35,9 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import { postTypes } from '@/api/posts';
+import { loadBaseTiptapTextEditor } from '@common/base-tiptap-text-editor-loader';
 import IconPicture from '@icons/IconPicture.vue';
 import IconText from '@icons/IconText.vue';
 import IconVideo from '@icons/IconVideo.vue';
@@ -41,6 +45,12 @@ import IconVideo from '@icons/IconVideo.vue';
 defineEmits<{
   'add-section': [postTypes.POST_SECTION_TYPES];
 }>();
+
+const preloadTextEditor = () => {
+  void loadBaseTiptapTextEditor();
+};
+
+onMounted(preloadTextEditor);
 </script>
 
 <style lang="scss">

@@ -11,6 +11,7 @@
 
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue';
+import { loadBaseTiptapTextEditor } from './base-tiptap-text-editor-loader';
 import { TextEditorFeatures } from './text-editor-features';
 
 interface Props {
@@ -29,7 +30,5 @@ const textEditorValue = defineModel<string>({
   default: '',
 });
 
-const AsyncTextEditor = defineAsyncComponent(
-  () => import('./BaseTiptapTextEditor.vue'),
-);
+const AsyncTextEditor = defineAsyncComponent(loadBaseTiptapTextEditor);
 </script>
