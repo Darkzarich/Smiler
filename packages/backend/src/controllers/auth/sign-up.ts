@@ -2,7 +2,10 @@ import type { Request, Response } from 'express';
 import crypto from 'node:crypto';
 import { UserModel } from '@models/User';
 import { ValidationError, ConflictError, ERRORS } from '@errors';
-import { isDuplicateKeyError } from '@utils/check-mongo-db-error';
+import {
+  isDuplicateKeyError,
+  getDuplicateKeyField,
+} from '@utils/check-mongo-db-error';
 import { sendSuccess } from '@utils/response-utils';
 import { CurrentUserResponse } from './current';
 import { authenticateSession } from './session';
@@ -42,8 +45,8 @@ export async function signUp(
   res: Response<CurrentUserResponse>,
 ) {
   const user = {
-    email: req.body.email,
-    login: req.body.login,
+    email: req.body.email?.trim(),
+    login: req.body.login?.trim().toLowerCase(),
     password: req.body.password,
     confirm: req.body.confirm,
   };
@@ -83,6 +86,16 @@ export async function signUp(
     sendSuccess(res, userAuth);
   } catch (error) {
     if (isDuplicateKeyError(error)) {
+      const duplicateField = getDuplicateKeyField(error);
+
+      if (duplicateField === 'email') {
+        throw new ConflictError(ERRORS.AUTH_EMAIL_ALREADY_EXISTS);
+      }
+
+      if (duplicateField === 'login') {
+        throw new ConflictError(ERRORS.AUTH_LOGIN_ALREADY_EXISTS);
+      }
+
       throw new ConflictError(ERRORS.AUTH_CONFLICT);
     }
 

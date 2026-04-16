@@ -19,6 +19,8 @@ export const ERRORS = {
   AUTH_INVALID_EMAIL: 'Email must be valid',
   AUTH_PASSWORDS_NOT_EQUAL: 'Password and password confirm must be equal',
   AUTH_CONFLICT: 'This email or login is already associated with an account',
+  AUTH_EMAIL_ALREADY_EXISTS: 'This email is already registered',
+  AUTH_LOGIN_ALREADY_EXISTS: 'This login is already taken',
 
   USER_NOT_FOUND: 'User is not found',
   USER_CANT_FOLLOW_OWN: 'You cannot follow yourself',

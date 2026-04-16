@@ -3,6 +3,7 @@ import {
   getModelForClass,
   type Ref,
   index,
+  pre,
   modelOptions,
   Severity,
 } from '@typegoose/typegoose';
@@ -16,7 +17,16 @@ export interface UserTemplate {
   title: string;
 }
 
-@index({ login: 1, email: 1 }, { unique: true, background: true })
+@index({ login: 1 }, { unique: true, background: true })
+@index({ email: 1 }, { unique: true, background: true })
+@pre<User>('save', function normalizeUserFields() {
+  if (this.login) {
+    this.login = this.login.trim();
+  }
+  if (this.email) {
+    this.email = this.email.trim().toLowerCase();
+  }
+})
 @modelOptions({
   schemaOptions: {
     timestamps: true,

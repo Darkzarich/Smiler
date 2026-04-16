@@ -20,7 +20,7 @@ export async function getByLogin(
   const { userId: currentUserId } = req.session;
 
   const requestedUser = await UserModel.findOne({
-    login,
+    login: login.trim(),
   }).select({
     login: 1,
     rating: 1,

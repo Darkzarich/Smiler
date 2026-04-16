@@ -22,7 +22,8 @@
     "dev:debug": "node --inspect -r ts-node/register index.ts",
     "lint:code": "eslint --ext .js --ext .ts --ignore-path .gitignore .",
     "lint:types": "tsc --noEmit",
-    "prettier": "prettier . --write"
+    "prettier": "prettier . --write",
+    "migrate:users": "ts-node scripts/migrate-user-data.ts"
   },
   "keywords": [
     "express",

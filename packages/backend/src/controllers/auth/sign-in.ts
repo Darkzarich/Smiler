@@ -30,7 +30,7 @@ export async function signIn(
   res: Response<CurrentUserResponse>,
 ) {
   const fields = {
-    email: req.body.email,
+    email: req.body.email?.trim(),
     password: req.body.password,
   };
 
