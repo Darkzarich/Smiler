@@ -132,7 +132,35 @@ describe('DELETE /users/me/template/:hash', () => {
 
   it('Should delete picture file corresponding to the deleted post picture sections with isFile=true', async () => {
     const hash = '1234';
-    const path = '/uploads/currentUser/1234.jpg';
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
+
+    const path = `/uploads/${currentUser.id}/1234.jpg`;
+
+    await UserModel.updateOne(
+      { _id: currentUser.id },
+      {
+        $set: {
+          template: {
+            sections: [{ hash, type: 'pic', isFile: true, url: path }],
+          },
+        },
+      },
+    );
+
+    const response = await request(global.app)
+      .delete(`/api/users/me/template/${hash}`)
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
+
+    expect(mockRemoveFileByPath).toHaveBeenCalledWith(path);
+    expect(response.status).toBe(200);
+  });
+
+  it('Should remove section without deleting file when file does not belong to the current user', async () => {
+    const hash = '1234';
+    const path = '/uploads/anotherUser/1234.jpg';
     const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
       global.app,
     );
@@ -153,7 +181,12 @@ describe('DELETE /users/me/template/:hash', () => {
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken);
 
-    expect(mockRemoveFileByPath).toHaveBeenCalledWith(path);
     expect(response.status).toBe(200);
+    expect(mockRemoveFileByPath).not.toHaveBeenCalled();
+
+    const updatedUser = await UserModel.findById(currentUser.id).select(
+      'template',
+    );
+    expect(updatedUser!.template.sections).toHaveLength(0);
   });
 });

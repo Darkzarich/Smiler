@@ -39,7 +39,11 @@ export async function deletePostTemplatePicture(
 
   // Delete the file and update the user's template
 
-  await removeFileByPath((targetSection as PostPictureSection).url);
+  const fileUrl = (targetSection as PostPictureSection).url;
+
+  if (fileUrl.startsWith(`/uploads/${userId}/`)) {
+    await removeFileByPath(fileUrl);
+  }
 
   await UserModel.updateOne(
     { _id: userId },
