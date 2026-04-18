@@ -14,7 +14,6 @@ Smiler is a Reddit-style social platform where users share posts with text, imag
   - [Common Features](#common-features)
   - [Backend Key Features](#backend-key-features)
   - [Frontend Key Features](#frontend-key-features)
-- [Why This Project?](#why-this-project)
 - [Motivation](#motivation)
 - [Contribution](#contribution)
 - [How to Run It](#how-to-run-it)
@@ -102,13 +101,9 @@ This project is built on the MEVN stack (MongoDB, Express, Vue.js, Node.js) and 
   - **Rich Text Editor**: For creating and updating comments.
   - **Delete and Update Comments**: Users can delete or update their comments within a specific time frame.
 
-## Why This Project?
-
-This project gave me the chance to work with the full MEVN stack, implement clustering for better reliability, and build a robust testing setup with both integration tests on the backend and E2E tests on the frontend. I also explored different ways to handle file uploads, implemented a hierarchical comment system, and figured out how to structure a multi-section post format.
-
 ## Motivation
 
-I built Smiler to practice building a full-stack application from scratch, experimenting with different architectural patterns and testing strategies along the way. It's a playground for trying out new ideas and seeing what works (and what doesn't) in a real project context.
+I built Smiler to practice building a full-stack application from scratch, working with the full MEVN stack, experimenting with different architectural patterns and testing strategies along the way. It's a playground for trying out new ideas and seeing what works (and what doesn't) in a real project context — from clustering and file uploads to hierarchical comments and multi-section posts. Starting from February 2026, I also use this project to learn and get comfortable working with agentic coding tools (vibecoding).
 
 ## How to Run It
 
