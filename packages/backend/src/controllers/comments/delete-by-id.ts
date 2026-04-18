@@ -21,7 +21,7 @@ export async function deleteById(
 
   const comment = await CommentModel.findById(id).lean();
 
-  if (!comment) {
+  if (!comment || comment.deleted) {
     throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
   }
 

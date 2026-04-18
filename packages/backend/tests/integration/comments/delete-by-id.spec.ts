@@ -291,5 +291,40 @@ describe('DELETE /comments/:id', () => {
 
       expect(rates.length).toBe(0);
     });
+
+    it('Should return 404 and not change author rating on repeated delete of a soft-deleted comment', async () => {
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
+
+      const comment = await CommentModel.create(
+        generateRandomComment({
+          author: currentUser.id,
+          children: [new Types.ObjectId('5d5467b4c17806706f3df347')],
+        }),
+      );
+
+      await request(global.app)
+        .delete(`/api/comments/${comment.id}`)
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      const userAfterFirstDelete = await UserModel.findById(
+        currentUser.id,
+      ).lean();
+
+      const response = await request(global.app)
+        .delete(`/api/comments/${comment.id}`)
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      const userAfterSecondDelete = await UserModel.findById(
+        currentUser.id,
+      ).lean();
+
+      expect(response.status).toBe(404);
+      expect(response.body.error.message).toBe(ERRORS.COMMENT_NOT_FOUND);
+      expect(userAfterSecondDelete!.rating).toBe(userAfterFirstDelete!.rating);
+    });
   });
 });

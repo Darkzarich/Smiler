@@ -15,7 +15,7 @@ describe('POST api/auth/signup', () => {
       email: 'test-user@test.com',
       password: '123456',
       confirm: '123456',
-      login: 'Test123',
+      login: 'test123',
     };
   }
 
@@ -146,7 +146,7 @@ describe('POST api/auth/signup', () => {
     const response = await signUp(credentials);
 
     expect(response.status).toBe(409);
-    expect(response.body.error.message).toBe(ERRORS.AUTH_CONFLICT);
+    expect(response.body.error.message).toBe(ERRORS.AUTH_EMAIL_ALREADY_EXISTS);
   });
 
   it('Returns status 200 and isAuth=true with the user data after successful sign up', async () => {
