@@ -132,8 +132,8 @@ export class Post {
     this: ReturnModelType<typeof Post>,
     postId: string,
   ) {
-    return this.findByIdAndUpdate(
-      postId,
+    return this.findOneAndUpdate(
+      { _id: postId, commentCount: { $gt: 0 } },
       {
         $inc: { commentCount: -1 },
       },
