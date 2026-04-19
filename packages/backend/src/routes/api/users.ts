@@ -89,7 +89,7 @@ const router = express.Router();
             "type": "string"
           },
           "avatar": {
-            "type": string
+            "type": "string"
           }
         }
       },

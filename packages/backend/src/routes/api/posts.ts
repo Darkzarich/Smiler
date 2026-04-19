@@ -804,7 +804,7 @@ router.delete(
         "Posts"
       ],
       "summary": "upload picture",
-      "description": "Upload the picture to template. Allowed extensions: `jpg|jpeg|png|gif`",
+      "description": "Upload the picture to template. Allowed extensions: `jpg|jpeg|png|gif|webp|avif`",
       "security": [
         {
           "cookieAuth": []

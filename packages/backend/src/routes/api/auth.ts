@@ -33,6 +33,9 @@ const router = express.Router();
           "avatar": {
             "type": "string"
           },
+          "email": {
+            "type": "string"
+          },
           "isAuth": {
             "type": "boolean"
           },

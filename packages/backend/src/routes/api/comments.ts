@@ -34,9 +34,6 @@ const router = express.Router();
           "id": {
             "type": "string"
           },
-          "post": {
-            "type": "string"
-          },
           "body": {
             "type": "string"
           },
@@ -68,6 +65,10 @@ const router = express.Router();
           },
           "rated": {
             "$ref": "#/components/schemas/UserRate"
+          },
+          "deleted": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -75,9 +76,6 @@ const router = express.Router();
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
-          },
-          "post": {
             "type": "string"
           },
           "deleted": {
