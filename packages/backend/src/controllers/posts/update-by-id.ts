@@ -81,9 +81,7 @@ export async function updateById(
   sendSuccess(res, targetPost.toResponse());
 
   // Remove all deleted files
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const filePath of filePathsToDelete) {
-    removeFileByPath(filePath);
-  }
+  await Promise.all(
+    filePathsToDelete.map((filePath) => removeFileByPath(filePath)),
+  );
 }

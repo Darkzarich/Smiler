@@ -70,8 +70,7 @@ export async function deleteById(
       sec.url.startsWith(`/uploads/${userId}/`),
   ) as PostPictureSection[];
 
-  // eslint-disable-next-line no-restricted-syntax
-  for (const section of filePictureSections) {
-    removeFileByPath(section.url);
-  }
+  await Promise.all(
+    filePictureSections.map((section) => removeFileByPath(section.url)),
+  );
 }
