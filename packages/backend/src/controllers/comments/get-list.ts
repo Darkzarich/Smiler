@@ -1,14 +1,11 @@
 import type { Request, Response } from 'express';
 import { CommentModel, CommentDocument, Comment } from '@models/Comment';
 import { UserModel } from '@models/User';
-import {
-  RateModel,
-  RateTargetModel,
-  type RatedTargets,
-} from '@models/Rate';
+import { RateModel, RateTargetModel, type RatedTargets } from '@models/Rate';
 import { NotFoundError, ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { COMMENT_MAX_LIMIT } from '@constants/index';
+import { PaginationValidator } from '@validators/PaginationValidator';
 import { PaginationRequest, PaginationResponse } from '@type/pagination';
 
 interface GetListQuery extends PaginationRequest {
@@ -62,12 +59,11 @@ export async function getList(
   const { post } = req.query;
   const { author } = req.query;
 
-  const limit = Number(req.query.limit) || 10;
-  const offset = Number(req.query.offset) || 0;
-
-  if (limit > COMMENT_MAX_LIMIT) {
-    throw new ValidationError(ERRORS.COMMENT_LIMIT_PARAM_EXCEEDED);
-  }
+  const { limit, offset } = PaginationValidator.validate(req.query, {
+    maxLimit: COMMENT_MAX_LIMIT,
+    defaultLimit: 10,
+    maxLimitError: ERRORS.COMMENT_LIMIT_PARAM_EXCEEDED,
+  });
   if (!post) {
     throw new ValidationError(ERRORS.POST_ID_REQUIRED);
   }

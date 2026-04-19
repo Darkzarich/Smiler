@@ -76,6 +76,9 @@ export const ERRORS = {
   POST_PIC_SECTION_URL_INVALID: 'Invalid image section url',
   POST_VIDEO_SECTION_URL_REQUIRED: 'Video section url is required',
   POST_MAX_UPLOAD_IMAGE_SIZE_EXCEEDED: `Uploaded image is too large. Max allowed size is ${POST_MAX_UPLOAD_IMAGE_SIZE / 1024 / 1024}MB`,
+  PAGINATION_INVALID_LIMIT: 'Limit must be a positive integer',
+  PAGINATION_INVALID_OFFSET: 'Offset must be a non-negative integer',
+  RATING_INVALID: 'Rating must be a valid number',
   POST_SEARCH_INVALID_DATE: 'Invalid date',
   POST_INVALID_ATTACHMENT_EXTENSION:
     'Invalid image attachment. Only jpg, jpeg, png, gif, webp, and avif are allowed.',

@@ -2,9 +2,10 @@ import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
 import { Post, PostModel } from '@models/Post';
 import { RateModel, RateTargetModel } from '@models/Rate';
-import { ValidationError, NotFoundError, ERRORS } from '@errors';
+import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { POST_MAX_LIMIT } from '@constants/index';
+import { PaginationValidator } from '@validators/PaginationValidator';
 import { PaginationRequest, PaginationResponse } from '@type/pagination';
 
 interface GetListByAuthorQuery extends PaginationRequest {
@@ -22,13 +23,10 @@ export async function getListByAuthor(
 ) {
   const { userId } = req.session;
 
-  const limit = Number(req.query.limit) || POST_MAX_LIMIT;
-  const offset = Number(req.query.offset) || 0;
+  const { limit, offset } = PaginationValidator.validate(req.query, {
+    maxLimit: POST_MAX_LIMIT,
+  });
   const author = req.query.author || '';
-
-  if (limit > POST_MAX_LIMIT) {
-    throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
-  }
 
   const foundAuthor = await UserModel.findOne({
     login: author,

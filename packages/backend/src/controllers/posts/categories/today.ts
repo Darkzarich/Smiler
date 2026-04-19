@@ -2,9 +2,9 @@ import type { Request, Response } from 'express';
 import { startOfToday } from 'date-fns';
 import { Post, PostModel } from '@models/Post';
 import { RateModel, RateTargetModel } from '@models/Rate';
-import { ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { POST_MAX_LIMIT } from '@constants/index';
+import { PaginationValidator } from '@validators/PaginationValidator';
 import { PaginationRequest, PaginationResponse } from '@type/pagination';
 
 interface GetTodayResponse extends PaginationResponse {
@@ -16,14 +16,11 @@ export async function today(
   req: Request<unknown, unknown, unknown, PaginationRequest>,
   res: Response<GetTodayResponse>,
 ) {
-  const limit = +req.query.limit || POST_MAX_LIMIT;
-  const offset = +req.query.offset || 0;
+  const { limit, offset } = PaginationValidator.validate(req.query, {
+    maxLimit: POST_MAX_LIMIT,
+  });
 
   const { userId } = req.session;
-
-  if (limit > POST_MAX_LIMIT) {
-    throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
-  }
 
   const query = {
     createdAt: {

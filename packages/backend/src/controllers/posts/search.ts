@@ -5,6 +5,7 @@ import { RateModel, RateTargetModel } from '@models/Rate';
 import { POST_TITLE_MAX_LENGTH, POST_MAX_LIMIT } from '@constants/index';
 import { ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
+import { PaginationValidator } from '@validators/PaginationValidator';
 import { PaginationRequest, PaginationResponse } from '@type/pagination';
 
 interface SearchQuery extends PaginationRequest {
@@ -21,13 +22,28 @@ interface SearchResponse extends PaginationResponse {
   posts: ReturnType<Post['toResponse']>[];
 }
 
+function parseRating(raw: string): number | undefined {
+  if (!raw) {
+    return undefined;
+  }
+
+  const value = Number(raw);
+
+  if (!Number.isFinite(value)) {
+    throw new ValidationError(ERRORS.RATING_INVALID);
+  }
+
+  return value;
+}
+
 export async function search(
   req: Request<unknown, unknown, unknown, SearchQuery>,
   res: Response<SearchResponse>,
 ) {
   const { userId } = req.session;
-  const limit = +req.query.limit || POST_MAX_LIMIT;
-  const offset = +req.query.offset || 0;
+  const { limit, offset } = PaginationValidator.validate(req.query, {
+    maxLimit: POST_MAX_LIMIT,
+  });
 
   const {
     title = '',
@@ -39,10 +55,6 @@ export async function search(
 
   // TODO: Fix how frontend sends tags, maybe with QS library
   const tags = req.query['tags[]'] || [];
-
-  if (limit > POST_MAX_LIMIT) {
-    throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
-  }
 
   const query: RootFilterQuery<Post> = {};
 
@@ -82,13 +94,15 @@ export async function search(
   }
 
   if (ratingTo || ratingFrom) {
+    const parsedRatingFrom = parseRating(ratingFrom);
+    const parsedRatingTo = parseRating(ratingTo);
     query.rating = {};
 
-    if (ratingFrom) {
-      query.rating.$gte = +ratingFrom;
+    if (parsedRatingFrom !== undefined) {
+      query.rating.$gte = parsedRatingFrom;
     }
-    if (ratingTo) {
-      query.rating.$lte = +ratingTo;
+    if (parsedRatingTo !== undefined) {
+      query.rating.$lte = parsedRatingTo;
     }
   }
 

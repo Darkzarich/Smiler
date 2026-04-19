@@ -2,9 +2,10 @@ import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
 import { Post, PostModel } from '@models/Post';
 import { RateModel, RateTargetModel } from '@models/Rate';
-import { UnauthorizedError, ValidationError, ERRORS } from '@errors';
+import { UnauthorizedError, ERRORS } from '@errors';
 import { POST_MAX_LIMIT } from '@constants/index';
 import { sendSuccess } from '@utils/response-utils';
+import { PaginationValidator } from '@validators/PaginationValidator';
 import {
   PaginationRequest as PaginationQuery,
   PaginationResponse,
@@ -19,13 +20,10 @@ export async function getFeed(
   req: Request<unknown, unknown, unknown, PaginationQuery>,
   res: Response<GetFeedResponse>,
 ) {
-  const limit = Number(req.query.limit) || POST_MAX_LIMIT;
-  const offset = Number(req.query.offset) || 0;
+  const { limit, offset } = PaginationValidator.validate(req.query, {
+    maxLimit: POST_MAX_LIMIT,
+  });
   const { userId } = req.session;
-
-  if (limit > POST_MAX_LIMIT) {
-    throw new ValidationError(ERRORS.POST_LIMIT_PARAM_EXCEEDED);
-  }
 
   const user = await UserModel.findById(userId);
 
