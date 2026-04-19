@@ -58,7 +58,6 @@ export class Comment {
   public toResponse(this: CommentDocument, ratedTargets?: RatedTargets) {
     if (this.deleted) {
       return {
-        author: this.author,
         children: this.children,
         id: this._id,
         deleted: true,
@@ -77,14 +76,15 @@ export class Comment {
       parent: this.parent,
       rating: this.rating,
       createdAt: this.createdAt,
-      rated: rated !== undefined
-        ? {
-            isRated: true,
-            negative: rated,
-          }
-        : {
-            isRated: false,
-          },
+      rated:
+        rated !== undefined
+          ? {
+              isRated: true,
+              negative: rated,
+            }
+          : {
+              isRated: false,
+            },
       deleted: false,
     };
   }
