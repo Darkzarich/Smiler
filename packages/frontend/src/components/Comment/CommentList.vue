@@ -2,7 +2,7 @@
   <div class="comment-list">
     <div
       v-for="comment in comments"
-      :key="comment.id"
+      :key="comment._id"
       class="comment-list__comment"
     >
       <CommentItem
@@ -33,7 +33,9 @@ const props = withDefaults(defineProps<Props>(), {
 const comments = ref(props.data);
 
 const handleRemoveComment = (id: string) => {
-  const commentIndex = comments.value.findIndex((comment) => comment.id === id);
+  const commentIndex = comments.value.findIndex(
+    (comment) => comment._id === id,
+  );
 
   if (commentIndex === -1) {
     return;

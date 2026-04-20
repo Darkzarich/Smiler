@@ -32,7 +32,7 @@ export type PostSection =
   | PostTextSection;
 
 interface PostAuthor {
-  id: string;
+  _id: string;
   login: string;
   avatar: string;
 }
@@ -43,7 +43,7 @@ interface PostRate {
 }
 
 export interface Post {
-  id: string;
+  _id: string;
   author: PostAuthor;
   title: string;
   sections: PostSection[];

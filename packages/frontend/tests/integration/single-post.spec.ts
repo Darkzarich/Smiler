@@ -62,7 +62,7 @@ test.describe('Fetches a post by the slug of the post after clicking it in the l
 
     const postBySlugResponse =
       await Api.routes.posts.getPostBySlug.waitForRequest({
-        preRequestAction: Post.openPostById.bind(Post, post.id),
+        preRequestAction: Post.openPostById.bind(Post, post._id),
       });
 
     expect(postBySlugResponse.url()).toContain(post.slug);
@@ -70,7 +70,7 @@ test.describe('Fetches a post by the slug of the post after clicking it in the l
       SinglePostPage.getUrlWithSlug(post.slug),
     );
     await expect(currentPage).toHaveTitle(SinglePostPage.getTitle(post.title));
-    await expect(Post.getTitleById(post.id)).toHaveText(post.title);
+    await expect(Post.getTitleById(post._id)).toHaveText(post.title);
   });
 
   test('Desktop', async ({ Api, SinglePostPage, Post, isMobile }) => {
@@ -79,7 +79,7 @@ test.describe('Fetches a post by the slug of the post after clicking it in the l
       return;
     }
 
-    const newPage = await Post.openPostByIdInNewTab(post.id);
+    const newPage = await Post.openPostByIdInNewTab(post._id);
 
     const postBySlugResponse =
       await Api.routes.posts.getPostBySlug.waitForRequest({
@@ -92,7 +92,7 @@ test.describe('Fetches a post by the slug of the post after clicking it in the l
     expect(postBySlugResponse.url()).toContain(post.slug);
     await expect(newPage).toHaveURL(SinglePostPage.getUrlWithSlug(post.slug));
     await expect(newPage).toHaveTitle(SinglePostPage.getTitle(post.title));
-    await expect(Post.getTitleById(post.id)).toHaveText(post.title);
+    await expect(Post.getTitleById(post._id)).toHaveText(post.title);
   });
 });
 
@@ -103,7 +103,7 @@ test('Opens a post by its link', async ({ SinglePostPage, Post, Api }) => {
     });
 
   expect(postBySlugResponse.url()).toContain(post.slug);
-  await expect(Post.getTitleById(post.id)).toContainText(post.title);
+  await expect(Post.getTitleById(post._id)).toContainText(post.title);
 });
 
 test('Redirect to 404 if the post is not found', async ({
@@ -138,8 +138,8 @@ test('Fetches post comments by post id', async ({ SinglePostPage, Api }) => {
 
   const requestUrl = commentsResponse.url();
 
-  expect(requestUrl).toContain(post.id);
-  expect(requestUrl).toContain(`limit=10&post=${post.id}`);
+  expect(requestUrl).toContain(post._id);
+  expect(requestUrl).toContain(`limit=10&post=${post._id}`);
 });
 
 test('Opens user profile after clicking on the author of the post', async ({
@@ -157,7 +157,7 @@ test('Opens user profile after clicking on the author of the post', async ({
 
   const getUserProfileResponse =
     await Api.routes.users.getUserProfile.waitForRequest({
-      preRequestAction: Post.openPostAuthorProfile.bind(Post, post.id),
+      preRequestAction: Post.openPostAuthorProfile.bind(Post, post._id),
     });
 
   expect(getUserProfileResponse.url()).toContain(post.author.login);
@@ -184,7 +184,7 @@ test.describe('Sections', () => {
     await SinglePostPage.goto(postWithSections.slug);
 
     await expect(
-      Post.getTextSectionByHash(postWithSections.id, section.hash),
+      Post.getTextSectionByHash(postWithSections._id, section.hash),
     ).toContainText(section.content);
   });
 
@@ -202,10 +202,10 @@ test.describe('Sections', () => {
     await SinglePostPage.goto(postWithSections.slug);
 
     await expect(
-      Post.getPicSectionByHash(postWithSections.id, section.hash),
+      Post.getPicSectionByHash(postWithSections._id, section.hash),
     ).toBeVisible();
     await expect(
-      Post.getPicSectionByHash(postWithSections.id, section.hash),
+      Post.getPicSectionByHash(postWithSections._id, section.hash),
     ).toHaveAttribute('alt', section.url);
   });
 
@@ -223,10 +223,10 @@ test.describe('Sections', () => {
     await SinglePostPage.goto(postWithSections.slug);
 
     await expect(
-      Post.getVideoSectionByHash(postWithSections.id, section.hash),
+      Post.getVideoSectionByHash(postWithSections._id, section.hash),
     ).toBeVisible();
     await expect(
-      Post.getVideoSectionByHash(postWithSections.id, section.hash),
+      Post.getVideoSectionByHash(postWithSections._id, section.hash),
     ).toHaveAttribute('src', section.url);
   });
 
@@ -256,21 +256,21 @@ test.describe('Sections', () => {
     await SinglePostPage.goto(postWithSections.slug);
 
     await expect(
-      Post.getPicSectionByHash(postWithSections.id, sections[0].hash),
+      Post.getPicSectionByHash(postWithSections._id, sections[0].hash),
     ).toHaveAttribute('alt', sections[0].url);
 
     await expect(
-      Post.getTextSectionByHash(postWithSections.id, sections[1].hash),
+      Post.getTextSectionByHash(postWithSections._id, sections[1].hash),
     ).toBeVisible();
     await expect(
-      Post.getTextSectionByHash(postWithSections.id, sections[1].hash),
+      Post.getTextSectionByHash(postWithSections._id, sections[1].hash),
     ).toContainText(sections[1].content);
 
     await expect(
-      Post.getVideoSectionByHash(postWithSections.id, sections[2].hash),
+      Post.getVideoSectionByHash(postWithSections._id, sections[2].hash),
     ).toBeVisible();
     await expect(
-      Post.getVideoSectionByHash(postWithSections.id, sections[2].hash),
+      Post.getVideoSectionByHash(postWithSections._id, sections[2].hash),
     ).toHaveAttribute('src', sections[2].url);
   });
 });
@@ -281,7 +281,7 @@ test.describe('Post edit', () => {
   const currentUserNewerPost = createRandomPost({
     createdAt: subMinutes(nowISOString, 9).toISOString(),
     author: {
-      id: auth.id,
+      _id: auth._id,
     },
   }) as postTypes.Post & {
     sections: [
@@ -314,7 +314,7 @@ test.describe('Post edit', () => {
       // Posted 11 minutes ago from now
       createdAt: subMinutes(nowISOString, 11).toISOString(),
       author: {
-        id: auth.id,
+        _id: auth._id,
       },
     });
 
@@ -342,7 +342,7 @@ test.describe('Post edit', () => {
       // Posted 11 minutes ago from now
       createdAt: subMinutes(nowISOString, 11).toISOString(),
       author: {
-        id: auth.id,
+        _id: auth._id,
       },
     });
 
@@ -437,7 +437,7 @@ test.describe('Post edit', () => {
         preRequestAction: PostEditor.submitEditedPost.bind(PostEditor),
       });
 
-    expect(editPostResponse.url()).toContain(currentUserNewerPost.id);
+    expect(editPostResponse.url()).toContain(currentUserNewerPost._id);
     expect(editPostResponse.postDataJSON()).toMatchObject({
       sections: [
         {
@@ -478,7 +478,7 @@ test.describe('Post edit', () => {
         preRequestAction: Post.deletePost.bind(Post),
       });
 
-    expect(deletePostByIdResponse.url()).toContain(currentUserNewerPost.id);
+    expect(deletePostByIdResponse.url()).toContain(currentUserNewerPost._id);
     await expect(currentPage).toHaveURL(PostsPage.urls.today);
     await expect(currentPage).toHaveTitle(PostsPage.titles.today);
     await expect(NotificationList.root).toHaveText(

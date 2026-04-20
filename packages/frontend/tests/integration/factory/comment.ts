@@ -21,10 +21,10 @@ export default function createRandomComment(
     body: faker.lorem.sentence(3),
     author: {
       login: faker.internet.userName(),
-      id: faker.string.uuid(),
+      _id: faker.string.uuid(),
       avatar: faker.image.avatar(),
     },
-    id,
+    _id: id,
     rating: faker.number.int({ min: 0, max: 5 }),
     createdAt: faker.date.past().toISOString(),
     rated: {
@@ -41,9 +41,8 @@ export default function createRandomComment(
     comment.children = times(faker.number.int({ min: 1, max: 3 }), () => {
       const childrenComment = createRandomComment({ parent: id });
 
-      // Add children to the children comment creating 3 levels tree structure
       childrenComment.children = [
-        createRandomComment({ parent: childrenComment.id }),
+        createRandomComment({ parent: childrenComment._id }),
       ];
 
       return childrenComment;

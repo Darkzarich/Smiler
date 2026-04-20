@@ -2,7 +2,6 @@ import type { PostSection } from '@/api/posts/types';
 
 export interface GetUserProfileResponse {
   _id: string;
-  id: string;
   login: string;
   rating: number;
   bio: string;

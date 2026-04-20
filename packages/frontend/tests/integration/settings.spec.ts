@@ -68,7 +68,7 @@ test('Open settings page, shows expected authors and tags the user is following'
 
   for (const author of authors) {
     // eslint-disable-next-line no-await-in-loop
-    await expect(SettingsPage.getAuthorById(author.id)).toContainText(
+    await expect(SettingsPage.getAuthorById(author._id)).toContainText(
       author.login,
     );
   }
@@ -116,11 +116,11 @@ test('Unfollows an author, removes that author from the list of following', asyn
 
   await Api.routes.users.unfollowUser.waitForRequest({
     preRequestAction: async () => {
-      await SettingsPage.unfollowAuthor(author1.id);
+      await SettingsPage.unfollowAuthor(author1._id);
     },
   });
 
-  await expect(SettingsPage.getAuthorById(author1.id)).toBeHidden();
+  await expect(SettingsPage.getAuthorById(author1._id)).toBeHidden();
   await expect(NotificationList.root).toHaveText(
     'This author was successfully unfollowed!',
   );

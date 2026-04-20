@@ -294,7 +294,7 @@ const saveEdited = async () => {
     return;
   }
 
-  await api.posts.updatePostById(props.post.id, {
+  await api.posts.updatePostById(props.post._id, {
     title: title.value,
     sections: sections.value,
     tags: tags.value,

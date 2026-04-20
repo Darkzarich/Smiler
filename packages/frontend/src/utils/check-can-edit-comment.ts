@@ -8,7 +8,7 @@ export function checkCanEditComment(
   if (
     !currentUserId ||
     !comment.author ||
-    comment.author.id !== currentUserId
+    comment.author._id !== currentUserId
   ) {
     return false;
   }

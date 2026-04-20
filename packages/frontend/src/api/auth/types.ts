@@ -1,6 +1,6 @@
 interface CurrentUser {
   isAuth: boolean;
-  id: string;
+  _id: string;
   email: string;
   login: string;
   avatar: string;

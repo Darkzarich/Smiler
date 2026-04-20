@@ -16,7 +16,6 @@ export default function createRandomProfile(
 
   const profile: userTypes.GetUserProfileResponse = {
     _id: id,
-    id,
     avatar: faker.image.avatar(),
     bio: faker.lorem.sentence(),
     rating: faker.number.int({ min: 0, max: 5 }),

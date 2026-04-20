@@ -23,7 +23,7 @@ export default function createRandomAuth(
           'fox',
         ]),
         login: faker.internet.userName(),
-        id: faker.string.uuid(),
+        _id: faker.string.uuid(),
         rating: faker.number.int({ min: 0, max: 5 }),
         avatar: faker.image.avatar(),
         email: faker.internet.email(),

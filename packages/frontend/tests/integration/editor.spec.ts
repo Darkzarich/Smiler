@@ -100,7 +100,9 @@ test('Creates a post with title, tags and content', async ({
   await expect(currentPage).toHaveTitle(
     SinglePostPage.getTitle(createdPost.title),
   );
-  await expect(Post.getTitleById(createdPost.id)).toHaveText(createdPost.title);
+  await expect(Post.getTitleById(createdPost._id)).toHaveText(
+    createdPost.title,
+  );
   expect(createPostResponse.postDataJSON()).toMatchObject({
     title,
     tags,

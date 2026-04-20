@@ -68,7 +68,7 @@ const userStore = useUserStore();
 const { user: currentUser } = storeToRefs(userStore);
 
 const isSameUser = computed(
-  () => currentUser.value?.id === profileUser.value.id,
+  () => currentUser.value?._id === profileUser.value._id,
 );
 const isFollowed = computed(() => profileUser.value.isFollowed);
 
@@ -87,7 +87,7 @@ async function follow() {
   try {
     isRequesting.value = true;
 
-    await api.users.followUser(profileUser.value.id);
+    await api.users.followUser(profileUser.value._id);
 
     profileUser.value.followersAmount = profileUser.value.followersAmount + 1;
     profileUser.value.isFollowed = true;
@@ -104,7 +104,7 @@ async function unfollow() {
   try {
     isRequesting.value = true;
 
-    await api.users.unfollowUser(profileUser.value.id);
+    await api.users.unfollowUser(profileUser.value._id);
 
     profileUser.value.followersAmount = profileUser.value.followersAmount - 1;
     profileUser.value.isFollowed = false;

@@ -82,7 +82,7 @@ const createComment = async () => {
         negative: false,
       },
       author: {
-        id: user.id,
+        _id: user._id,
         avatar: user.avatar,
         login: user.login,
       },
