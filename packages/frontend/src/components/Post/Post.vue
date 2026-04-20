@@ -70,7 +70,7 @@
         </template>
       </div>
 
-      <div v-if="post.tags.length > 0" class="post__tags u-flex-row">
+      <div v-if="post.tags?.length > 0" class="post__tags u-flex-row">
         <button
           v-for="tag in post.tags"
           :key="tag"
