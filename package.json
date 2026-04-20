@@ -13,11 +13,11 @@
     "build": "pnpm --filter backend build && pnpm --filter frontend build",
     "prepare": "husky",
     "precommit": "lint-staged",
-    "prepush": "pnpm run lint:spell && pnpm run lint:code && pnpm run lint:types && pnpm run test:prepush",
+    "prepush": "pnpm lint:spell && pnpm lint:code && pnpm lint:types && pnpm test:prepush",
     "lint:code": "pnpm --filter backend lint:code && pnpm --filter frontend lint:ts && pnpm --filter frontend lint:css",
     "lint:spell": "cspell --no-progress .",
     "lint:types": "pnpm --filter backend lint:types && pnpm --filter frontend lint:types",
-    "test": "pnpm --filter \"backend\" test && pnpm --filter \"frontend\" test:e2e:ci",
+    "test": "pnpm --filter \"backend\" test && pnpm --filter \"frontend\" test:e2e:ci && pnpm --filter \"frontend\" test:unit:ci",
     "test:prepush": "pnpm --filter backend test && pnpm --filter frontend test:unit:ci",
     "knip": "knip"
   },

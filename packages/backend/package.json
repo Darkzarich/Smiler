@@ -14,7 +14,6 @@
     "tsconfig.json"
   ],
   "scripts": {
-    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand --forceExit --detectOpenHandles",
     "build": "tsc && tsc-alias -p tsconfig.json",
     "start": "node dist/index.js",
     "dev": "ts-node index.ts",
@@ -23,7 +22,7 @@
     "lint:code": "eslint --ext .js --ext .ts --ignore-path .gitignore .",
     "lint:types": "tsc --noEmit",
     "prettier": "prettier . --write",
-    "migrate:users": "ts-node scripts/migrate-user-data.ts"
+    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand --forceExit --detectOpenHandles"
   },
   "keywords": [
     "express",

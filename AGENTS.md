@@ -42,9 +42,9 @@ Pre-push hook runs: `lint:spell → lint:code → lint:types → test:prepush`.
 - **Dev server**: `pnpm --filter frontend dev` (Vite, port 8080)
 - **Build**: `vite build`
 - **Unit tests**: Vitest with jsdom — files matching `src/**/*.spec.ts` or `src/**/*.test.ts`
-  - Run single: `pnpm --filter frontend test -- src/path/to/test.spec.ts`
+  - Run single: `pnpm --filter frontend test:unit:ci -- src/path/to/test.spec.ts`
 - **E2E tests**: Playwright against the built app (`vite preview` on port 4173). Files in `tests/integration/`.
-  - Run: `pnpm --filter frontend test:e2e`
+  - Run: `pnpm --filter frontend test:e2e:ci`
 - **Path aliases**: `@/*`, `@components/*`, `@common/*`, `@icons/*`, `@utils/*`
 - **Linting**: separate ESLint (`.js/.ts/.vue`) and Stylelint (`.css/.scss/.vue`) passes
 - Vue component style: PascalCase component names in templates; blank lines between `<template>`/`<script>`/`<style>` blocks.
