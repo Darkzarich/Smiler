@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { RootFilterQuery } from 'mongoose';
-import { Post, PostModel } from '@models/Post';
+import { PostModel, Post, postToResponse, PostResponse } from '@models/Post';
 import { RateModel, RateTargetModel } from '@models/Rate';
 import { POST_TITLE_MAX_LENGTH, POST_MAX_LIMIT } from '@constants/index';
 import { ValidationError, ERRORS } from '@errors';
@@ -18,8 +18,7 @@ interface SearchQuery extends PaginationRequest {
 }
 
 interface SearchResponse extends PaginationResponse {
-  // TODO: think of something better
-  posts: ReturnType<Post['toResponse']>[];
+  posts: PostResponse[];
 }
 
 function parseRating(raw: string): number | undefined {
@@ -117,17 +116,20 @@ export async function search(
       .sort({ rating: -1 })
       .populate('author', 'login avatar')
       .limit(limit)
-      .skip(offset),
+      .skip(offset)
+      .lean(),
     PostModel.countDocuments(query),
   ]);
 
   const ratedTargets = await RateModel.findRatedTargets({
     userId,
-    targetIds: posts.map((post) => post.id),
+    targetIds: posts.map((post) => post._id.toString()),
     targetModel: RateTargetModel.POST,
   });
 
-  const postsWithRated = posts.map((post) => post.toResponse(ratedTargets));
+  const postsWithRated = posts.map((post) =>
+    postToResponse(post, ratedTargets),
+  );
 
   sendSuccess(res, {
     posts: postsWithRated,

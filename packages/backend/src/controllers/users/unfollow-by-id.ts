@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express';
-import { isRefTypeArray, mongoose } from '@typegoose/typegoose';
 import { UserModel } from '@models/User';
-import { ForbiddenError, NotFoundError, AppError, ERRORS } from '@errors';
+import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
 interface Params {
@@ -17,16 +16,12 @@ export async function unfollowById(req: Request<Params>, res: Response) {
   }
 
   const [userUnfollowing, userUnfollowed] = await Promise.all([
-    UserModel.findById(userId),
-    UserModel.findById(id),
+    UserModel.findById(userId).select('usersFollowed').lean(),
+    UserModel.findById(id).lean(),
   ]);
 
   if (!userUnfollowed || !userUnfollowing) {
     throw new NotFoundError(ERRORS.USER_NOT_FOUND);
-  }
-
-  if (!isRefTypeArray(userUnfollowing.usersFollowed, mongoose.Types.ObjectId)) {
-    throw new AppError();
   }
 
   if (!userUnfollowing.usersFollowed.some((el) => el.toString() === id)) {
@@ -34,16 +29,22 @@ export async function unfollowById(req: Request<Params>, res: Response) {
   }
 
   await Promise.all([
-    userUnfollowing.updateOne({
-      $pull: {
-        usersFollowed: id,
+    UserModel.updateOne(
+      { _id: userId },
+      {
+        $pull: {
+          usersFollowed: id,
+        },
       },
-    }),
-    userUnfollowed.updateOne({
-      $inc: {
-        followersAmount: -1,
+    ),
+    UserModel.updateOne(
+      { _id: id },
+      {
+        $inc: {
+          followersAmount: -1,
+        },
       },
-    }),
+    ),
   ]);
 
   sendSuccess(res);

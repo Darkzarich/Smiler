@@ -48,7 +48,7 @@ describe('PUT /tags/:tag/follow', () => {
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken);
 
-    const user = await UserModel.findById(currentUser.id);
+    const user = await UserModel.findById(currentUser._id);
 
     expect(user!.tagsFollowed).toContain(tag);
   });

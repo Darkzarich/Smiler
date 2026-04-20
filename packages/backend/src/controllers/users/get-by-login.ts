@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import { omit } from 'lodash';
-import { UserModel, User } from '@models/User';
+import { Types } from 'mongoose';
+import { UserModel, User, isUserFollowed } from '@models/User';
 import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
@@ -8,9 +8,10 @@ interface GetByLoginParams {
   login: string;
 }
 
-interface GetByLoginResponse extends Omit<User, 'isFollowed' | '_id'> {
-  isFollowed?: boolean;
-}
+type GetByLoginResponse = Pick<
+  User,
+  'login' | 'rating' | 'bio' | 'avatar' | 'createdAt' | 'followersAmount'
+> & { _id: Types.ObjectId; isFollowed?: boolean };
 
 export async function getByLogin(
   req: Request<GetByLoginParams>,
@@ -21,35 +22,62 @@ export async function getByLogin(
 
   const requestedUser = await UserModel.findOne({
     login: login.trim(),
-  }).select({
-    login: 1,
-    rating: 1,
-    bio: 1,
-    avatar: 1,
-    createdAt: 1,
-    followersAmount: 1,
-  });
+  })
+    .select({
+      login: 1,
+      rating: 1,
+      bio: 1,
+      avatar: 1,
+      createdAt: 1,
+      followersAmount: 1,
+    })
+    .lean();
 
   if (!requestedUser) {
     throw new NotFoundError(ERRORS.USER_NOT_FOUND);
   }
 
-  if (currentUserId === requestedUser._id.toString()) {
-    sendSuccess(res, omit(requestedUser.toJSON(), ['_id', 'isFollowed']));
+  const {
+    login: userLogin,
+    rating,
+    bio,
+    avatar,
+    createdAt,
+    followersAmount,
+  } = requestedUser;
+  const userId = requestedUser._id;
+
+  if (currentUserId === userId.toString()) {
+    sendSuccess(res, {
+      _id: userId,
+      login: userLogin,
+      rating,
+      bio,
+      avatar,
+      createdAt,
+      followersAmount,
+    });
 
     return;
   }
 
-  const currentUser = await UserModel.findById(currentUserId).select({
-    usersFollowed: 1,
+  const currentUser = await UserModel.findById(currentUserId)
+    .select({
+      usersFollowed: 1,
+    })
+    .lean();
+
+  sendSuccess(res, {
+    _id: userId,
+    login: userLogin,
+    rating,
+    bio,
+    avatar,
+    createdAt,
+    followersAmount,
+    isFollowed: isUserFollowed(
+      (currentUser?.usersFollowed as Types.ObjectId[]) ?? undefined,
+      userId.toString(),
+    ),
   });
-
-  const response = {
-    ...omit(requestedUser.toJSON(), '_id'),
-    isFollowed: currentUser
-      ? currentUser.isFollowed(requestedUser._id.toString())
-      : false,
-  };
-
-  sendSuccess(res, response);
 }

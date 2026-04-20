@@ -1,5 +1,10 @@
 import type { Request, Response } from 'express';
-import { CommentModel, CommentDocument, Comment } from '@models/Comment';
+import {
+  CommentModel,
+  LeanComment,
+  commentToResponse,
+  CommentResponse,
+} from '@models/Comment';
 import { UserModel } from '@models/User';
 import { RateModel, RateTargetModel, type RatedTargets } from '@models/Rate';
 import { NotFoundError, ValidationError, ERRORS } from '@errors';
@@ -14,16 +19,14 @@ interface GetListQuery extends PaginationRequest {
 }
 
 interface GetListResponse extends PaginationResponse {
-  // TODO: think of something better
-  comments: ReturnType<Comment['toResponse']>[];
+  comments: CommentResponse[];
 }
 
-// TODO: Rewrite from recursion to iteration
 function fillWithRatedRecursive({
   comments,
   ratedTargets,
 }: {
-  comments: CommentDocument[];
+  comments: LeanComment[];
   ratedTargets?: RatedTargets;
 }) {
   if (!comments) {
@@ -31,23 +34,23 @@ function fillWithRatedRecursive({
   }
 
   return comments.map((comment) => {
-    const commentWithUser = comment.toResponse(ratedTargets);
+    const commentWithUser = commentToResponse(comment, ratedTargets);
 
     if (commentWithUser.children && commentWithUser.children.length > 0) {
       commentWithUser.children = fillWithRatedRecursive({
-        comments: comment.children as CommentDocument[],
+        comments: comment.children ?? [],
         ratedTargets,
-      }) as unknown as CommentDocument[];
+      }) as unknown as typeof commentWithUser.children;
     }
 
     return commentWithUser;
   });
 }
 
-function collectCommentIds(comments: CommentDocument[]): string[] {
+function collectCommentIds(comments: LeanComment[]): string[] {
   return comments.flatMap((comment) => [
-    comment.id,
-    ...collectCommentIds(comment.children as CommentDocument[]),
+    comment._id.toString(),
+    ...collectCommentIds(comment.children ?? []),
   ]);
 }
 
@@ -88,18 +91,24 @@ export async function getList(
   }
 
   const [comments, total] = await Promise.all([
-    CommentModel.find(query).sort({ rating: -1 }).skip(offset).limit(limit),
+    CommentModel.find(query)
+      .sort({ rating: -1 })
+      .skip(offset)
+      .limit(limit)
+      .lean({ autopopulate: true }),
     CommentModel.countDocuments(query),
   ]);
 
+  const leanComments = comments as LeanComment[];
+
   const ratedTargets = await RateModel.findRatedTargets({
     userId,
-    targetIds: collectCommentIds(comments),
+    targetIds: collectCommentIds(leanComments),
     targetModel: RateTargetModel.COMMENT,
   });
 
   sendSuccess(res, {
-    comments: fillWithRatedRecursive({ comments, ratedTargets }),
+    comments: fillWithRatedRecursive({ comments: leanComments, ratedTargets }),
     total,
     pages: Math.ceil(total / limit),
     hasNextPage: offset + limit < total,

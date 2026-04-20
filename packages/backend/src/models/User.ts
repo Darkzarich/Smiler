@@ -7,7 +7,7 @@ import {
   modelOptions,
   Severity,
 } from '@typegoose/typegoose';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import type { PostSection } from '@models/Post';
 import { USER_MAX_AVATAR_LENGTH, USER_MAX_BIO_LENGTH } from '@constants/index';
 
@@ -15,6 +15,10 @@ export interface UserTemplate {
   sections: PostSection[];
   tags: string[];
   title: string;
+}
+
+export interface PopulatedAuthor extends Pick<User, 'login' | 'avatar'> {
+  _id: Types.ObjectId;
 }
 
 @index({ login: 1 }, { unique: true, background: true })
@@ -31,7 +35,6 @@ export interface UserTemplate {
   schemaOptions: {
     timestamps: true,
     toJSON: {
-      virtuals: true,
       versionKey: false,
     },
   },
@@ -84,12 +87,27 @@ export class User {
 
   @prop()
   public createdAt!: Date;
+}
 
-  public isFollowed(id: string) {
-    return Boolean(
-      this.usersFollowed.find((el) => el.toString() === id.toString()),
-    );
+export function isUserFollowed(
+  usersFollowed: Types.ObjectId[] | undefined,
+  id: string,
+): boolean {
+  if (!usersFollowed) {
+    return false;
   }
+
+  return usersFollowed.some((el) => el.toString() === id);
+}
+
+export function isAuthorPopulated(
+  author: Types.ObjectId | PopulatedAuthor,
+): author is PopulatedAuthor {
+  return (
+    author != null &&
+    typeof author === 'object' &&
+    !(author instanceof Types.ObjectId)
+  );
 }
 
 export const UserModel = getModelForClass(User);

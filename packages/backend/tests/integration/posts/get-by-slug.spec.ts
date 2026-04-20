@@ -35,11 +35,11 @@ describe('GET /posts/:slug', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
-      id: post._id.toString(),
+      _id: post._id.toString(),
       title: post.title,
       slug: post.slug,
       author: {
-        id: user._id.toString(),
+        _id: user._id.toString(),
         login: user.login,
         avatar: user.avatar,
       },
@@ -67,7 +67,7 @@ describe('GET /posts/:slug', () => {
 
     await RateModel.create(
       generateRate({
-        user: currentUser.id,
+        user: currentUser._id,
         target: post._id,
         negative: true,
       }),

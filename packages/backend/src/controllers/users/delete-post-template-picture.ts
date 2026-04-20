@@ -16,7 +16,9 @@ export async function deletePostTemplatePicture(
   const { hash } = req.params;
   const { userId } = req.session!;
 
-  const userTemplate = await UserModel.findById(userId).select('template');
+  const userTemplate = await UserModel.findById(userId)
+    .select('template')
+    .lean();
 
   if (!userTemplate) {
     throw new NotFoundError(ERRORS.USER_NOT_FOUND);

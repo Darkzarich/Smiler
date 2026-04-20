@@ -65,7 +65,7 @@ export async function signIn(
 
   // TODO: Maybe move to getters of the model
   const userAuth = {
-    id: foundUser._id.toString(),
+    _id: foundUser._id.toString(),
     login: foundUser.login,
     isAuth: true,
     rating: foundUser.rating || 0,

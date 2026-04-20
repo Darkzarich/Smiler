@@ -88,12 +88,10 @@ describe('POST /comments', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       _id: expect.any(String),
-      id: expect.any(String),
       post: post.id,
       body: 'test',
       author: {
-        _id: currentUser.id,
-        id: currentUser.id,
+        _id: currentUser._id,
         login: currentUser.login,
         avatar: currentUser.avatar,
       },
@@ -168,7 +166,7 @@ describe('POST /comments', () => {
 
     const parentComment = await CommentModel.create(
       generateRandomComment({
-        author: currentUser.id,
+        author: currentUser._id,
         post: post.id,
       }),
     );
@@ -186,13 +184,11 @@ describe('POST /comments', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       _id: expect.any(String),
-      id: expect.any(String),
       parent: parentComment._id.toString(),
       post: post.id,
       body: 'test',
       author: {
-        _id: currentUser.id,
-        id: currentUser.id,
+        _id: currentUser._id,
         login: currentUser.login,
         avatar: currentUser.avatar,
       },
@@ -212,7 +208,7 @@ describe('POST /comments', () => {
 
     const parentComment = await CommentModel.create(
       generateRandomComment({
-        author: currentUser.id,
+        author: currentUser._id,
         post: post.id,
       }),
     );
@@ -233,7 +229,7 @@ describe('POST /comments', () => {
 
     expect(
       updatedParentComment!.children.map((comment) => comment.toString()),
-    ).toEqual([newComment.body.id]);
+    ).toEqual([newComment.body._id]);
   });
 
   it('Should increase post comment count (after a comment without a parent)', async () => {
@@ -264,7 +260,7 @@ describe('POST /comments', () => {
 
     const parentComment = await CommentModel.create(
       generateRandomComment({
-        author: currentUser.id,
+        author: currentUser._id,
         post: post.id,
       }),
     );

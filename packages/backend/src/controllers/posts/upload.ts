@@ -108,7 +108,7 @@ export async function upload(
 ) {
   const { userId } = req.session;
 
-  const user = await UserModel.findById(userId).select('template');
+  const user = await UserModel.findById(userId).select('template').lean();
 
   if (!user) {
     throw new NotFoundError(ERRORS.USER_NOT_FOUND);
@@ -158,11 +158,10 @@ export async function upload(
       isFile: true,
     };
 
-    user.template.sections.push(newSection);
-
-    user.markModified('template');
-
-    await user.save();
+    await UserModel.updateOne(
+      { _id: userId },
+      { $push: { 'template.sections': newSection } },
+    );
 
     sendSuccess(res, newSection);
   });

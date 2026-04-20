@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
-import { Comment, CommentModel } from '@models/Comment';
+import { CommentModel } from '@models/Comment';
 import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
 import { CommentValidator } from '@validators/CommentValidator';
 import {
@@ -19,11 +19,9 @@ interface UpdateByIdBody {
   body: string;
 }
 
-type UpdateByIdResponse = Comment;
-
 export async function updateById(
   req: Request<UpdateByIdParams, unknown, UpdateByIdBody>,
-  res: Response<UpdateByIdResponse>,
+  res: Response,
 ) {
   const { userId } = req.session;
   const { id } = req.params;
@@ -63,7 +61,7 @@ export async function updateById(
       },
     },
     {
-      // lean: true,
+      lean: { autopopulate: true },
       populate: { path: 'author', select: { login: 1, avatar: 1 } },
       new: true,
     },
@@ -73,5 +71,5 @@ export async function updateById(
     throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
   }
 
-  sendSuccess(res, updatedComment.toJSON());
+  sendSuccess(res, updatedComment);
 }

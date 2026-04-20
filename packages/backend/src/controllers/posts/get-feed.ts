@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
-import { Post, PostModel } from '@models/Post';
+import { PostModel, postToResponse, PostResponse } from '@models/Post';
 import { RateModel, RateTargetModel } from '@models/Rate';
 import { UnauthorizedError, ERRORS } from '@errors';
 import { POST_MAX_LIMIT } from '@constants/index';
@@ -12,8 +12,7 @@ import {
 } from '@type/pagination';
 
 interface GetFeedResponse extends PaginationResponse {
-  // TODO: think of something better
-  posts: ReturnType<Post['toResponse']>[];
+  posts: PostResponse[];
 }
 
 export async function getFeed(
@@ -25,7 +24,7 @@ export async function getFeed(
   });
   const { userId } = req.session;
 
-  const user = await UserModel.findById(userId);
+  const user = await UserModel.findById(userId).lean();
 
   if (!user) {
     throw new UnauthorizedError(ERRORS.UNAUTHORIZED);
@@ -60,17 +59,18 @@ export async function getFeed(
       .sort('-createdAt')
       .populate('author', 'login avatar')
       .limit(limit)
-      .skip(offset),
+      .skip(offset)
+      .lean(),
     PostModel.countDocuments(query),
   ]);
 
   const ratedTargets = await RateModel.findRatedTargets({
     userId,
-    targetIds: posts.map((post) => post.id),
+    targetIds: posts.map((post) => post._id.toString()),
     targetModel: RateTargetModel.POST,
   });
 
-  const transPosts = posts.map((post) => post.toResponse(ratedTargets));
+  const transPosts = posts.map((post) => postToResponse(post, ratedTargets));
 
   sendSuccess(res, {
     posts: transPosts,

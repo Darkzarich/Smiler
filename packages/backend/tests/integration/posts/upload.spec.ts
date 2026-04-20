@@ -51,7 +51,7 @@ describe('POST /posts/upload', () => {
       global.app,
     );
 
-    await UserModel.deleteOne({ _id: currentUser.id });
+    await UserModel.deleteOne({ _id: currentUser._id });
 
     const response = await request(global.app)
       .post('/api/posts/upload')
@@ -68,7 +68,7 @@ describe('POST /posts/upload', () => {
     );
 
     await UserModel.updateOne(
-      { _id: currentUser.id },
+      { _id: currentUser._id },
       {
         $set: {
           template: {
@@ -105,7 +105,7 @@ describe('POST /posts/upload', () => {
       ERRORS.POST_INVALID_ATTACHMENT_EXTENSION,
     );
 
-    await cleanTestUploadDir(currentUser.id);
+    await cleanTestUploadDir(currentUser._id);
   });
 
   it('Should return status 413 and reject uploading too big image file', async () => {
@@ -126,7 +126,7 @@ describe('POST /posts/upload', () => {
       ERRORS.POST_MAX_UPLOAD_IMAGE_SIZE_EXCEEDED,
     );
 
-    await cleanTestUploadDir(currentUser.id);
+    await cleanTestUploadDir(currentUser._id);
   });
 
   it('Should return status 422 and reject invalid image content before writing a file', async () => {
@@ -140,7 +140,7 @@ describe('POST /posts/upload', () => {
       .set('X-CSRF-Token', csrfToken)
       .attach('picture', Buffer.from('not an image'), 'test.png');
 
-    const uploadPath = path.join(TEST_UPLOAD_DIR, currentUser.id);
+    const uploadPath = path.join(TEST_UPLOAD_DIR, currentUser._id);
 
     expect(response.status).toBe(422);
     expect(response.body.error.message).toBe(
@@ -148,7 +148,7 @@ describe('POST /posts/upload', () => {
     );
     await expect(fs.readdir(uploadPath)).resolves.toEqual([]);
 
-    await cleanTestUploadDir(currentUser.id);
+    await cleanTestUploadDir(currentUser._id);
   });
 
   it.each([
@@ -169,7 +169,7 @@ describe('POST /posts/upload', () => {
       .set('X-CSRF-Token', csrfToken)
       .attach('picture', testImage, `test.${format.id}`);
 
-    const uploadPath = path.join(TEST_UPLOAD_DIR, currentUser.id);
+    const uploadPath = path.join(TEST_UPLOAD_DIR, currentUser._id);
 
     const files = await fs.readdir(uploadPath);
 
@@ -178,7 +178,7 @@ describe('POST /posts/upload', () => {
     expect(files[0]).toMatch(RANDOM_JPG_FILENAME_REGEX);
     await expect(fs.access(uploadPath)).resolves.toBeUndefined();
 
-    await cleanTestUploadDir(currentUser.id);
+    await cleanTestUploadDir(currentUser._id);
   });
 
   it('Should resize original uploaded image', async () => {
@@ -212,7 +212,7 @@ describe('POST /posts/upload', () => {
       global.app,
     );
 
-    const uploadPath = path.join(TEST_UPLOAD_DIR, currentUser.id);
+    const uploadPath = path.join(TEST_UPLOAD_DIR, currentUser._id);
 
     await request(global.app)
       .post('/api/posts/upload')
@@ -229,7 +229,7 @@ describe('POST /posts/upload', () => {
     expect(newImageSize.width).toBe(POST_MAX_IMAGE_WIDTH);
     expect(newImageSize.height).toBe(POST_MAX_IMAGE_HEIGHT);
 
-    await cleanTestUploadDir(currentUser.id);
+    await cleanTestUploadDir(currentUser._id);
   });
 
   it('Should return status 200 and a new section with isFile=true and add section to user template', async () => {
@@ -239,7 +239,7 @@ describe('POST /posts/upload', () => {
       global.app,
     );
 
-    const uploadPath = path.join(TEST_UPLOAD_DIR, currentUser.id);
+    const uploadPath = path.join(TEST_UPLOAD_DIR, currentUser._id);
 
     const response = await request(global.app)
       .post('/api/posts/upload')
@@ -249,14 +249,14 @@ describe('POST /posts/upload', () => {
 
     const files = await fs.readdir(uploadPath);
 
-    const user = await UserModel.findById(currentUser.id)
+    const user = await UserModel.findById(currentUser._id)
       .select({ template: 1 })
       .lean();
 
     const section = {
       hash: expect.any(String),
       type: 'pic',
-      url: `${BASE_UPLOAD_FOLDER}/${currentUser.id}/${files[0]}`,
+      url: `${BASE_UPLOAD_FOLDER}/${currentUser._id}/${files[0]}`,
       isFile: true,
     };
 
@@ -264,6 +264,6 @@ describe('POST /posts/upload', () => {
     expect(response.body).toEqual(section);
     expect(user!.template.sections).toEqual([section]);
 
-    await cleanTestUploadDir(currentUser.id);
+    await cleanTestUploadDir(currentUser._id);
   });
 });

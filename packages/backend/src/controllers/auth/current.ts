@@ -8,7 +8,7 @@ interface CurrentUser
     User,
     'login' | 'rating' | 'followersAmount' | 'tagsFollowed' | 'avatar' | 'email'
   > {
-  id: string;
+  _id: string;
   isAuth: boolean;
 }
 
@@ -37,7 +37,7 @@ export async function current(
   }
 
   return sendSuccess(res, {
-    id: user._id.toString(),
+    _id: user._id.toString(),
     login: user.login,
     isAuth: true,
     rating: user.rating || 0,

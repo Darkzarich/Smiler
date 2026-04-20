@@ -129,7 +129,7 @@ describe('PUT /users/me/template', () => {
       .set('X-CSRF-Token', csrfToken)
       .send(template);
 
-    const userFromDb = await UserModel.findById(currentUser.id).lean();
+    const userFromDb = await UserModel.findById(currentUser._id).lean();
 
     expect(userFromDb!.template.title).toBe(template.title);
   });
@@ -149,7 +149,7 @@ describe('PUT /users/me/template', () => {
       .set('X-CSRF-Token', csrfToken)
       .send(template);
 
-    const userFromDb = await UserModel.findById(currentUser.id).lean();
+    const userFromDb = await UserModel.findById(currentUser._id).lean();
 
     expect(userFromDb!.template.tags).toEqual(['new tag']);
   });
@@ -174,7 +174,7 @@ describe('PUT /users/me/template', () => {
       .set('X-CSRF-Token', csrfToken)
       .send(template);
 
-    const userFromDb = await UserModel.findById(currentUser.id).lean();
+    const userFromDb = await UserModel.findById(currentUser._id).lean();
 
     expect(userFromDb!.template.sections).toEqual(
       template.sections.map((section) => ({
@@ -206,7 +206,7 @@ describe('PUT /users/me/template', () => {
       .set('X-CSRF-Token', csrfToken)
       .send(template);
 
-    const userFromDb = await UserModel.findById(currentUser.id).lean();
+    const userFromDb = await UserModel.findById(currentUser._id).lean();
 
     expect(userFromDb!.template).toEqual({
       ...template,

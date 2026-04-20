@@ -370,7 +370,7 @@ describe('POST /posts', () => {
         sections: post.sections,
       });
 
-    const postFromDb = await PostModel.findById(response.body.id).lean();
+    const postFromDb = await PostModel.findById(response.body._id).lean();
 
     expect(postFromDb).toMatchObject({
       title: requiredPostFields.title,
@@ -391,7 +391,7 @@ describe('POST /posts', () => {
         tags: [' JavaScript ', 'javascript', 'Vue.js', 'front   end'],
       });
 
-    const postFromDb = await PostModel.findById(response.body.id).lean();
+    const postFromDb = await PostModel.findById(response.body._id).lean();
 
     expect(postFromDb!.tags).toEqual(['javascript', 'vuejs', 'front end']);
   });
@@ -412,7 +412,7 @@ describe('POST /posts', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
-      id: expect.any(String),
+      _id: expect.any(String),
       slug: expect.stringMatching(/^.+-.+$/),
       title: requiredPostFields.title,
       sections: requiredPostFields.sections.map((section) => ({
@@ -420,7 +420,7 @@ describe('POST /posts', () => {
         hash: expect.any(String),
       })),
       author: {
-        id: currentUser.id.toString(),
+        _id: currentUser._id.toString(),
         login: expect.any(String),
         avatar: expect.any(String),
       },
@@ -441,7 +441,7 @@ describe('POST /posts', () => {
     );
 
     await UserModel.updateOne(
-      { _id: currentUser.id },
+      { _id: currentUser._id },
       {
         $set: {
           'template.title': requiredPostFields.title,
@@ -457,7 +457,7 @@ describe('POST /posts', () => {
       .set('X-CSRF-Token', csrfToken)
       .send(requiredPostFields);
 
-    const userFromDb = await UserModel.findById(currentUser.id).lean();
+    const userFromDb = await UserModel.findById(currentUser._id).lean();
 
     expect(userFromDb!.template).toEqual({
       title: '',

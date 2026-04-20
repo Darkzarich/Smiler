@@ -1,6 +1,12 @@
 import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
-import { PostModel, POST_SECTION_TYPES, Post } from '@models/Post';
+import {
+  PostModel,
+  POST_SECTION_TYPES,
+  Post,
+  postToResponse,
+  PostResponse,
+} from '@models/Post';
 import { POST_TIME_TO_UPDATE } from '@constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '@errors';
 import { removeFileByPath } from '@utils/remove-file-by-path';
@@ -13,8 +19,7 @@ interface UpdateByIdParams {
 
 type UpdateByIdBody = Partial<Pick<Post, 'title' | 'sections' | 'tags'>>;
 
-// TODO: think of something better
-type UpdateByIdResponse = ReturnType<Post['toResponse']>;
+type UpdateByIdResponse = PostResponse;
 
 export async function updateById(
   req: Request<UpdateByIdParams, unknown, UpdateByIdBody>,
@@ -25,13 +30,13 @@ export async function updateById(
 
   const targetPost = await PostModel.findById(postId, null, {
     populate: { path: 'author', select: { login: 1, avatar: 1 } },
-  });
+  }).lean();
 
   if (!targetPost) {
     throw new NotFoundError(ERRORS.POST_NOT_FOUND);
   }
 
-  if (targetPost.author._id.toString() !== userId) {
+  if (targetPost?.author?._id?.toString() !== userId) {
     throw new ForbiddenError(ERRORS.POST_CANT_EDIT_NOT_OWN);
   }
 
@@ -54,8 +59,6 @@ export async function updateById(
 
   const filePathsToDelete: string[] = [];
 
-  // Looking for sections with "picture" type that were uploaded as a file
-  // and that got removed from the post in the update
   targetPost.sections.forEach((section) => {
     if (section.type !== POST_SECTION_TYPES.PICTURE || !section.isFile) {
       return;
@@ -72,15 +75,18 @@ export async function updateById(
     }
   });
 
-  targetPost.title = title;
-  targetPost.tags = tags || [];
-  targetPost.sections = newSections;
+  const updatedPost = await PostModel.findByIdAndUpdate(
+    postId,
+    { $set: { title, tags: tags || [], sections: newSections } },
+    {
+      new: true,
+      lean: true,
+      populate: { path: 'author', select: { login: 1, avatar: 1 } },
+    },
+  );
 
-  await targetPost.save();
+  sendSuccess(res, postToResponse(updatedPost!));
 
-  sendSuccess(res, targetPost.toResponse());
-
-  // Remove all deleted files
   await Promise.all(
     filePathsToDelete.map((filePath) => removeFileByPath(filePath)),
   );

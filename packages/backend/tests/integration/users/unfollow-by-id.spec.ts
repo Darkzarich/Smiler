@@ -34,7 +34,7 @@ describe('DELETE /users/:id/follow', () => {
     );
 
     const response = await request(global.app)
-      .delete(`/api/users/${currentUser.id}/follow`)
+      .delete(`/api/users/${currentUser._id}/follow`)
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken);
 
@@ -65,7 +65,7 @@ describe('DELETE /users/:id/follow', () => {
 
     const otherUser = await UserModel.create(generateRandomUser());
 
-    await UserModel.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser._id, {
       $push: { usersFollowed: otherUser.id },
     });
 
@@ -75,7 +75,7 @@ describe('DELETE /users/:id/follow', () => {
       .set('X-CSRF-Token', csrfToken);
 
     const updatedUser = await UserModel.findOne(
-      { _id: currentUser.id },
+      { _id: currentUser._id },
       { usersFollowed: 1 },
     ).lean();
 
@@ -91,7 +91,7 @@ describe('DELETE /users/:id/follow', () => {
 
     const otherUser = await UserModel.create(generateRandomUser());
 
-    await UserModel.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser._id, {
       $push: { usersFollowed: otherUser.id },
     });
 

@@ -77,7 +77,7 @@ describe('PUT /users/me', () => {
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken);
 
-    const user = await UserModel.findById(currentUser.id).lean();
+    const user = await UserModel.findById(currentUser._id).lean();
 
     expect(response.status).toBe(200);
     expect(response.body.bio).toBe('updated bio');
@@ -106,7 +106,7 @@ describe('PUT /users/me', () => {
       global.app,
     );
 
-    await UserModel.deleteOne({ _id: currentUser.id });
+    await UserModel.deleteOne({ _id: currentUser._id });
 
     const response = await request(global.app)
       .put('/api/users/me')
@@ -134,7 +134,7 @@ describe('PUT /users/me', () => {
     expect(response.body.bio).toBe(bio);
     expect(response.body.avatar).toBe(avatar);
     expect(response.body).toEqual({
-      id: expect.any(String),
+      _id: expect.any(String),
       login: expect.any(String),
       rating: expect.any(Number),
       bio,
@@ -142,7 +142,7 @@ describe('PUT /users/me', () => {
       followersAmount: expect.any(Number),
       createdAt: expect.any(String),
     });
-    expect(response.body).not.toHaveProperty('_id');
+    expect(response.body).not.toHaveProperty('password');
     expect(response.body).not.toHaveProperty('email');
     expect(response.body).not.toHaveProperty('hash');
     expect(response.body).not.toHaveProperty('salt');

@@ -27,7 +27,7 @@ describe('GET /users/me/template', () => {
       ],
     };
 
-    await UserModel.updateOne({ _id: currentUser.id }, { $set: { template } });
+    await UserModel.updateOne({ _id: currentUser._id }, { $set: { template } });
 
     const response = await request(global.app)
       .get(`/api/users/me/template`)

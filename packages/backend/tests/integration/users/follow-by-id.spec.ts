@@ -34,7 +34,7 @@ describe('PUT /users/:id/follow', () => {
     );
 
     const response = await request(global.app)
-      .put(`/api/users/${currentUser.id}/follow`)
+      .put(`/api/users/${currentUser._id}/follow`)
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken);
 
@@ -49,7 +49,7 @@ describe('PUT /users/:id/follow', () => {
 
     const otherUser = await UserModel.create(generateRandomUser());
 
-    await UserModel.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser._id, {
       $push: { usersFollowed: otherUser.id },
     });
 
@@ -77,7 +77,7 @@ describe('PUT /users/:id/follow', () => {
       .set('X-CSRF-Token', csrfToken);
 
     const updatedUser = await UserModel.findOne(
-      { _id: currentUser.id },
+      { _id: currentUser._id },
       { usersFollowed: 1 },
     ).lean();
 

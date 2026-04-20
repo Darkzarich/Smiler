@@ -27,7 +27,7 @@ describe('GET /users/:login', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
-      id: user._id.toString(),
+      _id: user._id.toString(),
       login: user.login,
       bio: user.bio,
       avatar: user.avatar,
@@ -50,7 +50,7 @@ describe('GET /users/:login', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
-      id: response.body.id.toString(),
+      _id: response.body._id,
       login: response.body.login,
       bio: response.body.bio,
       avatar: response.body.avatar,
@@ -67,7 +67,7 @@ describe('GET /users/:login', () => {
 
     const otherUser = await UserModel.create(generateRandomUser());
 
-    await UserModel.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser._id, {
       $push: { usersFollowed: otherUser.id },
     });
 

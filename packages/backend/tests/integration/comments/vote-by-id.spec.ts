@@ -33,7 +33,7 @@ async function createVotedOtherUserComment(
 
   await RateModel.create(
     generateRate({
-      user: currentUser.id,
+      user: currentUser._id,
       target: otherUserComment._id,
       negative: isNegative,
       targetModel: RateTargetModel.COMMENT,
@@ -73,7 +73,7 @@ describe('PUT /comments/:id/vote', () => {
 
     const comment = await CommentModel.create(
       generateRandomComment({
-        author: currentUser.id,
+        author: currentUser._id,
       }),
     );
 

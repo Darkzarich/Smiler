@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { Comment, CommentModel } from '@models/Comment';
+import { CommentModel } from '@models/Comment';
 import { PostModel } from '@models/Post';
 import { CommentValidator } from '@validators/CommentValidator';
 
@@ -12,11 +12,9 @@ interface CreateBody {
   post: string;
 }
 
-type CreateResponse = Comment;
-
 export async function create(
   req: Request<unknown, unknown, CreateBody>,
-  res: Response<CreateResponse>,
+  res: Response,
 ) {
   const { userId } = req.session;
   const { parent, post: postId } = req.body;
@@ -26,7 +24,7 @@ export async function create(
     throw new ValidationError(ERRORS.POST_ID_REQUIRED);
   }
 
-  const post = await PostModel.findById(postId);
+  const post = await PostModel.findById(postId).lean();
 
   if (!post) {
     throw new NotFoundError(ERRORS.POST_NOT_FOUND);
@@ -44,7 +42,7 @@ export async function create(
       PostModel.increaseCommentCount(postId),
     ]);
 
-    sendSuccess(res, comment.toJSON());
+    sendSuccess(res, comment.toObject({ versionKey: false }));
 
     return;
   }
@@ -52,7 +50,7 @@ export async function create(
   const parentCommentary = await CommentModel.findOne({
     _id: parent,
     post: postId,
-  });
+  }).lean();
 
   if (!parentCommentary) {
     throw new NotFoundError(ERRORS.COMMENT_PARENT_COMMENT_NOT_FOUND);
@@ -68,10 +66,10 @@ export async function create(
   await Promise.all([
     CommentModel.updateOne(
       { _id: parent },
-      { $push: { children: comment.id.toString() } },
+      { $push: { children: comment._id.toString() } },
     ),
     PostModel.increaseCommentCount(postId),
   ]);
 
-  sendSuccess(res, comment.toJSON());
+  sendSuccess(res, comment.toObject({ versionKey: false }));
 }

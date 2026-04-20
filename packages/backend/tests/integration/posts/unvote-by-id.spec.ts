@@ -39,7 +39,7 @@ describe('DELETE /posts/:id/vote', () => {
 
     const post = await PostModel.create(
       generateRandomPost({
-        author: currentUser.id,
+        author: currentUser._id,
       }),
     );
 
@@ -67,7 +67,7 @@ describe('DELETE /posts/:id/vote', () => {
 
     await RateModel.create(
       generateRate({
-        user: currentUser.id,
+        user: currentUser._id,
         target: otherUserPost._id,
         negative: true,
         targetModel: RateTargetModel.POST,
@@ -104,7 +104,7 @@ describe('DELETE /posts/:id/vote', () => {
 
       await RateModel.create(
         generateRate({
-          user: currentUser.id,
+          user: currentUser._id,
           target: otherUserPost._id,
           negative: isNegative,
           targetModel: RateTargetModel.POST,
@@ -150,7 +150,7 @@ describe('DELETE /posts/:id/vote', () => {
 
       await RateModel.create(
         generateRate({
-          user: currentUser.id,
+          user: currentUser._id,
           target: otherUserPost._id,
           negative: isNegative,
           targetModel: RateTargetModel.POST,
@@ -186,7 +186,7 @@ describe('DELETE /posts/:id/vote', () => {
 
     await RateModel.create(
       generateRate({
-        user: currentUser.id,
+        user: currentUser._id,
         target: otherUserPost._id,
         negative: false,
         targetModel: RateTargetModel.POST,
