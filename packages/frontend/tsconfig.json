@@ -28,5 +28,5 @@
       "@utils/*": ["./src/utils/*"]
     }
   },
-  "exclude": ["node_modules", "dist", "tests"]
+  "exclude": ["node_modules", "dist", "tests", "playwright-report"]
 }

@@ -65,15 +65,17 @@ const root = (files) => {
 const backend = (files) => {
   const codeFiles = filterByExtension(files, ['.js', '.ts']);
   const tasks = [prettier('packages/backend', files)];
+  const fromDir = path.join(process.cwd(), 'packages/backend');
 
   if (codeFiles.length > 0) {
     tasks.push(
       command(
-        'pnpm --dir packages/backend exec eslint --fix --ext .js --ext .ts --ignore-path .gitignore',
+        'pnpm --filter backend exec eslint --fix --ext .js --ext .ts --ignore-path .gitignore',
         codeFiles,
-        path.join(process.cwd(), 'packages/backend'),
+        fromDir,
       ),
     );
+    tasks.push('pnpm --filter backend lint:types');
   }
 
   tasks.push(...spellcheckTasks(files));
@@ -84,29 +86,32 @@ const backend = (files) => {
 const frontend = (files) => {
   const codeFiles = filterByExtension(files, ['.js', '.ts', '.vue']);
   const styleFiles = filterByExtension(files, ['.css', '.scss', '.vue']);
-  const tasks = [];
+  const tasks = [
+    prettier('packages/frontend', files),
+    ...spellcheckTasks(files),
+  ];
+  const fromDir = path.join(process.cwd(), 'packages/frontend');
 
   if (codeFiles.length > 0) {
     tasks.push(
       command(
-        'pnpm --dir packages/frontend exec eslint --fix --ext .js,.ts,.vue --ignore-path .gitignore',
+        'pnpm --filter frontend exec eslint --fix --ext .js,.ts,.vue --ignore-path .gitignore',
         codeFiles,
-        path.join(process.cwd(), 'packages/frontend'),
+        fromDir,
       ),
     );
+    tasks.push('pnpm --filter frontend lint:types');
   }
 
   if (styleFiles.length > 0) {
     tasks.push(
       command(
-        'pnpm --dir packages/frontend exec stylelint --fix',
+        'pnpm --filter frontend exec stylelint --fix',
         styleFiles,
-        path.join(process.cwd(), 'packages/frontend'),
+        fromDir,
       ),
     );
   }
-
-  tasks.push(prettier('packages/frontend', files), ...spellcheckTasks(files));
 
   return tasks;
 };
