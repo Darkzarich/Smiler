@@ -1,5 +1,5 @@
 module.exports = {
-  ignoreFiles: ['dist/**/*'],
+  ignoreFiles: ['dist/**/*', 'node_modules/**/*', 'playwright-report/**/*'],
   plugins: ['stylelint-scss', 'stylelint-order'],
   extends: [
     'stylelint-config-standard',

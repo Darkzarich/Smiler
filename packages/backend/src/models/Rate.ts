@@ -61,7 +61,6 @@ type ApplyChangeResult =
   schemaOptions: {
     timestamps: true,
     toJSON: {
-      virtuals: true,
       versionKey: false,
     },
   },
@@ -182,7 +181,7 @@ export class Rate {
       user: userId,
       target: targetId,
       targetModel,
-    });
+    }).lean();
   }
 
   public static async findRatedTargets(

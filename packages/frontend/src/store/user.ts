@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { api } from '@/api';
 
 interface User {
-  id: string;
+  _id: string;
   login: string;
   avatar: string;
   rating: number;
@@ -21,7 +21,7 @@ export const useUserStore = defineStore('user', {
   }),
   getters: {
     userId(state) {
-      return state.user?.id;
+      return state.user?._id;
     },
     isTagFollowed(state) {
       const result: Record<string, string> = {};

@@ -1,14 +1,13 @@
 import type { Request, Response } from 'express';
 import { POST_MAX_LIMIT } from '@constants/index';
-import { PostModel, Post } from '@models/Post';
+import { PostModel, postToResponse, PostResponse } from '@models/Post';
 import { RateModel, RateTargetModel } from '@models/Rate';
 import { sendSuccess } from '@utils/response-utils';
 import { PaginationValidator } from '@validators/PaginationValidator';
 import { PaginationRequest, PaginationResponse } from '@type/pagination';
 
 interface GetAllResponse extends PaginationResponse {
-  // TODO: think of something better
-  posts: ReturnType<Post['toResponse']>[];
+  posts: PostResponse[];
 }
 
 export async function all(
@@ -26,17 +25,20 @@ export async function all(
       .sort({ rating: -1 })
       .populate('author', 'login avatar')
       .limit(limit)
-      .skip(offset),
+      .skip(offset)
+      .lean(),
     PostModel.countDocuments(),
   ]);
 
   const ratedTargets = await RateModel.findRatedTargets({
     userId,
-    targetIds: posts.map((post) => post.id),
+    targetIds: posts.map((post) => post._id.toString()),
     targetModel: RateTargetModel.POST,
   });
 
-  const postsWithRated = posts.map((post) => post.toResponse(ratedTargets));
+  const postsWithRated = posts.map((post) =>
+    postToResponse(post, ratedTargets),
+  );
 
   sendSuccess(res, {
     posts: postsWithRated,

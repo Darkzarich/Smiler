@@ -60,7 +60,7 @@ describe('PUT /comments/:id', () => {
 
     const comment = await CommentModel.create(
       generateRandomComment({
-        author: currentUser.id,
+        author: currentUser._id,
         createdAt: subMinutes(Date.now(), COMMENT_TIME_TO_UPDATE - 1),
       }),
     );
@@ -85,7 +85,7 @@ describe('PUT /comments/:id', () => {
 
     const comment = await CommentModel.create(
       generateRandomComment({
-        author: currentUser.id,
+        author: currentUser._id,
       }),
     );
 
@@ -108,7 +108,7 @@ describe('PUT /comments/:id', () => {
 
     const comment = await CommentModel.create(
       generateRandomComment({
-        author: currentUser.id,
+        author: currentUser._id,
       }),
     );
 
@@ -133,7 +133,7 @@ describe('PUT /comments/:id', () => {
 
     const comment = await CommentModel.create(
       generateRandomComment({
-        author: currentUser.id,
+        author: currentUser._id,
       }),
     );
 
@@ -145,11 +145,9 @@ describe('PUT /comments/:id', () => {
 
     expect(response.body).toEqual({
       _id: comment.id,
-      id: comment.id,
       body,
       author: {
-        _id: currentUser.id,
-        id: currentUser.id,
+        _id: currentUser._id,
         avatar: currentUser.avatar,
         login: currentUser.login,
       },

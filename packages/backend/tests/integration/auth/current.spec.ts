@@ -20,7 +20,7 @@ describe('GET api/auth/current', () => {
     );
 
     // Imitating the deletion of the user for whatever reason
-    await UserModel.deleteOne({ _id: currentUser.id });
+    await UserModel.deleteOne({ _id: currentUser._id });
 
     const response = await request(global.app)
       .get('/api/auth/current')
@@ -44,7 +44,7 @@ describe('GET api/auth/current', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       isAuth: true,
-      id: currentUser.id.toString(),
+      _id: currentUser._id.toString(),
       login: currentUser.login,
       avatar: currentUser.avatar,
       email: currentUser.email,

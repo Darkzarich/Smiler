@@ -16,7 +16,7 @@ describe('GET /users/me/settings', () => {
       global.app,
     );
 
-    await UserModel.deleteOne({ _id: currentUser.id });
+    await UserModel.deleteOne({ _id: currentUser._id });
 
     const response = await request(global.app)
       .get('/api/users/me/settings')
@@ -32,8 +32,8 @@ describe('GET /users/me/settings', () => {
       global.app,
     );
 
-    await UserModel.findByIdAndUpdate(currentUser.id, {
-      $push: { tagsFollowed: 'test-tag', usersFollowed: currentUser.id },
+    await UserModel.findByIdAndUpdate(currentUser._id, {
+      $push: { tagsFollowed: 'test-tag', usersFollowed: currentUser._id },
       $set: { bio: 'test-bio', avatar: 'test-avatar' },
     });
 
@@ -47,7 +47,7 @@ describe('GET /users/me/settings', () => {
       tags: ['test-tag'],
       authors: [
         {
-          _id: currentUser.id,
+          _id: currentUser._id,
           login: currentUser.login,
           avatar: 'test-avatar',
         },

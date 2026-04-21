@@ -49,7 +49,7 @@ test('Fetches posts with expected filters', async ({
   });
 
   for (const post of posts) {
-    await expect(Post.getTitleById(post.id)).toContainText(post.title);
+    await expect(Post.getTitleById(post._id)).toContainText(post.title);
   }
 });
 
@@ -109,7 +109,7 @@ test.describe('Post groups', () => {
       await expect(currentPage).toHaveTitle(PostsPage.titles.all);
       await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
-        await expect(Post.getTitleById(post.id)).toContainText(post.title);
+        await expect(Post.getTitleById(post._id)).toContainText(post.title);
       }
     });
 
@@ -139,7 +139,7 @@ test.describe('Post groups', () => {
       await expect(currentPage).toHaveTitle(PostsPage.titles.blowing);
       await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
-        await expect(Post.getTitleById(post.id)).toContainText(post.title);
+        await expect(Post.getTitleById(post._id)).toContainText(post.title);
       }
     });
 
@@ -169,7 +169,7 @@ test.describe('Post groups', () => {
       await expect(currentPage).toHaveTitle(PostsPage.titles.topThisWeek);
       await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
-        await expect(Post.getTitleById(post.id)).toContainText(post.title);
+        await expect(Post.getTitleById(post._id)).toContainText(post.title);
       }
     });
 
@@ -199,7 +199,7 @@ test.describe('Post groups', () => {
       await expect(currentPage).toHaveTitle(PostsPage.titles.new);
       await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
-        await expect(Post.getTitleById(post.id)).toContainText(post.title);
+        await expect(Post.getTitleById(post._id)).toContainText(post.title);
       }
     });
 
@@ -217,7 +217,7 @@ test.describe('Post groups', () => {
       await expect(currentPage).toHaveTitle(PostsPage.titles.today);
       await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
-        await expect(Post.getTitleById(post.id)).toContainText(post.title);
+        await expect(Post.getTitleById(post._id)).toContainText(post.title);
       }
     });
 
@@ -276,7 +276,7 @@ test.describe('Post groups', () => {
       await expect(currentPage).toHaveTitle(PostsPage.titles.feed);
       await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
-        await expect(Post.getTitleById(post.id)).toContainText(post.title);
+        await expect(Post.getTitleById(post._id)).toContainText(post.title);
       }
     });
   });
@@ -308,20 +308,20 @@ test.describe('Post votes', () => {
     });
 
     await PostsPage.goto(PostsPage.urls.today);
-    await Post.getTitleById(post1.id).isVisible();
+    await Post.getTitleById(post1._id).isVisible();
 
     const upvoteResponse = await Api.routes.posts.updateRateById.waitForRequest(
       {
-        preRequestAction: Post.upvotePostById.bind(Post, post1.id),
+        preRequestAction: Post.upvotePostById.bind(Post, post1._id),
       },
     );
 
-    expect(upvoteResponse.url()).toContain(post1.id);
+    expect(upvoteResponse.url()).toContain(post1._id);
     expect(upvoteResponse.postDataJSON()).toEqual({
       negative: false,
     });
-    expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(true);
-    await expect(Post.getRatingById(post1.id)).toContainText(
+    expect(await Post.getIsPostByIdUpvoted(post1._id)).toBe(true);
+    await expect(Post.getRatingById(post1._id)).toContainText(
       String(post1.rating + 2),
     );
   });
@@ -341,19 +341,19 @@ test.describe('Post votes', () => {
     });
 
     await PostsPage.goto(PostsPage.urls.today);
-    await Post.getTitleById(post1.id).isVisible();
+    await Post.getTitleById(post1._id).isVisible();
 
     const downvoteResponse =
       await Api.routes.posts.updateRateById.waitForRequest({
-        preRequestAction: Post.downvotePostById.bind(Post, post1.id),
+        preRequestAction: Post.downvotePostById.bind(Post, post1._id),
       });
 
-    expect(downvoteResponse.url()).toContain(post1.id);
+    expect(downvoteResponse.url()).toContain(post1._id);
     expect(downvoteResponse.postDataJSON()).toEqual({
       negative: true,
     });
-    expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(true);
-    await expect(Post.getRatingById(post1.id)).toContainText(
+    expect(await Post.getIsPostByIdDownvoted(post1._id)).toBe(true);
+    await expect(Post.getRatingById(post1._id)).toContainText(
       String(post1.rating - 2),
     );
   });
@@ -394,20 +394,20 @@ test.describe('Post votes', () => {
     });
 
     await PostsPage.goto(PostsPage.urls.today);
-    await Post.getTitleById(post1.id).isVisible();
+    await Post.getTitleById(post1._id).isVisible();
 
     const upvoteResponse = await Api.routes.posts.updateRateById.waitForRequest(
       {
-        preRequestAction: Post.upvotePostById.bind(Post, post1.id),
+        preRequestAction: Post.upvotePostById.bind(Post, post1._id),
       },
     );
 
-    expect(upvoteResponse.url()).toContain(post1.id);
+    expect(upvoteResponse.url()).toContain(post1._id);
     expect(upvoteResponse.postDataJSON()).toEqual({
       negative: false,
     });
-    expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(true);
-    await expect(Post.getRatingById(post1.id)).toContainText(
+    expect(await Post.getIsPostByIdUpvoted(post1._id)).toBe(true);
+    await expect(Post.getRatingById(post1._id)).toContainText(
       String(post1.rating + 2),
     );
   });
@@ -448,19 +448,19 @@ test.describe('Post votes', () => {
     });
 
     await PostsPage.goto(PostsPage.urls.today);
-    await Post.getTitleById(post1.id).isVisible();
+    await Post.getTitleById(post1._id).isVisible();
 
     const downvoteResponse =
       await Api.routes.posts.updateRateById.waitForRequest({
-        preRequestAction: Post.downvotePostById.bind(Post, post1.id),
+        preRequestAction: Post.downvotePostById.bind(Post, post1._id),
       });
 
-    expect(downvoteResponse.url()).toContain(post1.id);
+    expect(downvoteResponse.url()).toContain(post1._id);
     expect(downvoteResponse.postDataJSON()).toEqual({
       negative: true,
     });
-    expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(true);
-    await expect(Post.getRatingById(post1.id)).toContainText(
+    expect(await Post.getIsPostByIdDownvoted(post1._id)).toBe(true);
+    await expect(Post.getRatingById(post1._id)).toContainText(
       String(post1.rating + 2),
     );
   });
@@ -502,16 +502,16 @@ test.describe('Post votes', () => {
 
     await PostsPage.goto(PostsPage.urls.today);
 
-    expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(true);
+    expect(await Post.getIsPostByIdUpvoted(post1._id)).toBe(true);
 
     const removeUpvoteResponse =
       await Api.routes.posts.removeRateById.waitForRequest({
-        preRequestAction: Post.upvotePostById.bind(Post, post1.id),
+        preRequestAction: Post.upvotePostById.bind(Post, post1._id),
       });
 
-    expect(removeUpvoteResponse.url()).toContain(post1.id);
-    expect(await Post.getIsPostByIdUpvoted(post1.id)).toBe(false);
-    await expect(Post.getRatingById(post1.id)).toContainText(
+    expect(removeUpvoteResponse.url()).toContain(post1._id);
+    expect(await Post.getIsPostByIdUpvoted(post1._id)).toBe(false);
+    await expect(Post.getRatingById(post1._id)).toContainText(
       String(post1.rating - 2),
     );
   });
@@ -553,16 +553,16 @@ test.describe('Post votes', () => {
 
     await PostsPage.goto(PostsPage.urls.today);
 
-    expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(true);
+    expect(await Post.getIsPostByIdDownvoted(post1._id)).toBe(true);
 
     const removeDownvoteResponse =
       await Api.routes.posts.removeRateById.waitForRequest({
-        preRequestAction: Post.downvotePostById.bind(Post, post1.id),
+        preRequestAction: Post.downvotePostById.bind(Post, post1._id),
       });
 
-    expect(removeDownvoteResponse.url()).toContain(post1.id);
-    expect(await Post.getIsPostByIdDownvoted(post1.id)).toBe(false);
-    await expect(Post.getRatingById(post1.id)).toContainText(
+    expect(removeDownvoteResponse.url()).toContain(post1._id);
+    expect(await Post.getIsPostByIdDownvoted(post1._id)).toBe(false);
+    await expect(Post.getRatingById(post1._id)).toContainText(
       String(post1.rating + 2),
     );
   });
@@ -588,7 +588,7 @@ test.describe('Sections', () => {
     await PostsPage.goto(PostsPage.urls.today);
 
     await expect(
-      Post.getTextSectionByHash(post.id, section.hash),
+      Post.getTextSectionByHash(post._id, section.hash),
     ).toContainText(section.content);
   });
 
@@ -610,9 +610,11 @@ test.describe('Sections', () => {
 
     await PostsPage.goto(PostsPage.urls.today);
 
-    await expect(Post.getPicSectionByHash(post.id, section.hash)).toBeVisible();
     await expect(
-      Post.getPicSectionByHash(post.id, section.hash),
+      Post.getPicSectionByHash(post._id, section.hash),
+    ).toBeVisible();
+    await expect(
+      Post.getPicSectionByHash(post._id, section.hash),
     ).toHaveAttribute('alt', section.url);
   });
 
@@ -635,10 +637,10 @@ test.describe('Sections', () => {
     await PostsPage.goto(PostsPage.urls.today);
 
     await expect(
-      Post.getVideoSectionByHash(post.id, section.hash),
+      Post.getVideoSectionByHash(post._id, section.hash),
     ).toBeVisible();
     await expect(
-      Post.getVideoSectionByHash(post.id, section.hash),
+      Post.getVideoSectionByHash(post._id, section.hash),
     ).toHaveAttribute('src', section.url);
   });
 
@@ -669,21 +671,21 @@ test.describe('Sections', () => {
     await PostsPage.goto(PostsPage.urls.today);
 
     await expect(
-      Post.getPicSectionByHash(post.id, sections[0].hash),
+      Post.getPicSectionByHash(post._id, sections[0].hash),
     ).toBeVisible();
     await expect(
-      Post.getPicSectionByHash(post.id, sections[0].hash),
+      Post.getPicSectionByHash(post._id, sections[0].hash),
     ).toHaveAttribute('alt', sections[0].url);
 
     await expect(
-      Post.getTextSectionByHash(post.id, sections[1].hash),
+      Post.getTextSectionByHash(post._id, sections[1].hash),
     ).toContainText(sections[1].content);
 
     await expect(
-      Post.getVideoSectionByHash(post.id, sections[2].hash),
+      Post.getVideoSectionByHash(post._id, sections[2].hash),
     ).toBeVisible();
     await expect(
-      Post.getVideoSectionByHash(post.id, sections[2].hash),
+      Post.getVideoSectionByHash(post._id, sections[2].hash),
     ).toHaveAttribute('src', sections[2].url);
   });
 });

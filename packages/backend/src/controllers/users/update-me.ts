@@ -11,7 +11,7 @@ interface UpdateMeResponse
     User,
     'login' | 'rating' | 'bio' | 'avatar' | 'createdAt' | 'followersAmount'
   > {
-  id: string;
+  _id: string;
 }
 
 function validateAndPickUpdateMeBody(
@@ -55,6 +55,7 @@ export async function updateMe(
     {
       runValidators: true,
       new: true,
+      lean: true,
     },
   ).select({
     login: 1,
@@ -70,7 +71,7 @@ export async function updateMe(
   }
 
   sendSuccess(res, {
-    id: updatedUser._id.toString(),
+    _id: updatedUser._id.toString(),
     login: updatedUser.login,
     rating: updatedUser.rating,
     bio: updatedUser.bio,

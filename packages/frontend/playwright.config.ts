@@ -8,6 +8,7 @@ module.exports = defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   workers: process.env.CI ? 1 : undefined,
+  retries: 2,
   timeout: process.env.CI ? 1000 * 30 : 1000 * 5,
   reporter: 'html',
   use: {

@@ -24,7 +24,9 @@ export async function voteById(
   const { id: postId } = req.params;
   const { negative: shouldRateNegative } = req.body;
 
-  const targetPost = await PostModel.findById(postId).select({ author: 1 });
+  const targetPost = await PostModel.findById(postId)
+    .select({ author: 1 })
+    .lean();
 
   if (!targetPost) {
     throw new NotFoundError(ERRORS.POST_NOT_FOUND);
@@ -46,7 +48,7 @@ export async function voteById(
 
   const rateChange = await RateModel.applyChange({
     userId: userId!,
-    targetId: targetPost.id,
+    targetId: targetPost._id.toString(),
     targetModel: RateTargetModel.POST,
     negative: shouldRateNegative,
     rateValue: directionValue,
@@ -58,7 +60,7 @@ export async function voteById(
 
   const [updatedPost] = await Promise.all([
     PostModel.findByIdAndUpdate(
-      targetPost.id,
+      targetPost._id,
       { $inc: { rating: rateChange.ratingDelta } },
       { new: true, lean: true },
     ),

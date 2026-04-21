@@ -5,12 +5,11 @@ import {
   index,
   modelOptions,
   type ReturnModelType,
-  type DocumentType,
-  isDocument,
   mongoose,
   Severity,
 } from '@typegoose/typegoose';
-import { User } from '@models/User';
+import { Types } from 'mongoose';
+import { isAuthorPopulated, PopulatedAuthor, User } from '@models/User';
 import type { RatedTargets } from '@models/Rate';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -52,7 +51,6 @@ export type PostSection =
   schemaOptions: {
     timestamps: true,
     toJSON: {
-      virtuals: true,
       versionKey: false,
     },
   },
@@ -86,33 +84,6 @@ export class Post {
   public createdAt!: Date;
   public updatedAt!: Date;
 
-  public toResponse(this: DocumentType<Post>, ratedTargets?: RatedTargets) {
-    const postId = this._id.toString();
-    const isRated = ratedTargets?.has(postId) ?? false;
-
-    return {
-      title: this.title,
-      sections: this.sections,
-      slug: this.slug,
-      author: isDocument(this.author)
-        ? {
-            id: this.author._id,
-            login: this.author.login,
-            avatar: this.author.avatar,
-          }
-        : null,
-      id: this._id,
-      commentCount: this.commentCount,
-      rating: this.rating,
-      createdAt: this.createdAt,
-      tags: this.tags,
-      rated: {
-        isRated,
-        negative: ratedTargets?.get(postId) ?? false,
-      },
-    };
-  }
-
   public static increaseCommentCount(
     this: ReturnModelType<typeof Post>,
     postId: string,
@@ -124,6 +95,7 @@ export class Post {
       },
       {
         new: true,
+        lean: true,
       },
     );
   }
@@ -139,9 +111,49 @@ export class Post {
       },
       {
         new: true,
+        lean: true,
       },
     );
   }
 }
+
+interface LeanPost
+  extends Pick<
+    Post,
+    | 'title'
+    | 'slug'
+    | 'sections'
+    | 'rating'
+    | 'tags'
+    | 'commentCount'
+    | 'createdAt'
+    | 'updatedAt'
+  > {
+  _id: Types.ObjectId;
+  author: Types.ObjectId | PopulatedAuthor;
+}
+
+export function postToResponse(post: LeanPost, ratedTargets?: RatedTargets) {
+  const postId = post._id.toString();
+  const isRated = ratedTargets?.has(postId) ?? false;
+
+  return {
+    _id: post._id,
+    title: post.title,
+    sections: post.sections,
+    slug: post.slug,
+    author: isAuthorPopulated(post.author) ? post.author : null,
+    commentCount: post.commentCount,
+    rating: post.rating,
+    createdAt: post.createdAt,
+    tags: post.tags,
+    rated: {
+      isRated,
+      negative: ratedTargets?.get(postId) ?? false,
+    },
+  };
+}
+
+export type PostResponse = ReturnType<typeof postToResponse>;
 
 export const PostModel = getModelForClass(Post);

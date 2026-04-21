@@ -47,7 +47,7 @@ describe('DELETE /tags/:tag/follow', () => {
     );
 
     // Making sure a tag is added before unfollowing
-    await UserModel.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser._id, {
       $push: { tagsFollowed: tag },
     });
 
@@ -56,7 +56,7 @@ describe('DELETE /tags/:tag/follow', () => {
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken);
 
-    const user = await UserModel.findById(currentUser.id);
+    const user = await UserModel.findById(currentUser._id);
 
     expect(user!.tagsFollowed).not.toContain(tag);
   });

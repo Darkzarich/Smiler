@@ -10,14 +10,14 @@
         <template v-if="!comment.deleted">
           <div
             class="comment-item__rating"
-            :data-testid="`comment-${comment.id}-rating`"
+            :data-testid="`comment-${comment._id}-rating`"
           >
             {{ comment.rating }}
           </div>
 
           <div
             class="comment-item__upvote-btn"
-            :data-testid="`comment-${comment.id}-upvote`"
+            :data-testid="`comment-${comment._id}-upvote`"
             :class="
               comment.rated.isRated && !comment.rated.negative
                 ? 'comment-item__upvote-btn--active'
@@ -33,7 +33,7 @@
           </div>
 
           <div
-            :data-testid="`comment-${comment.id}-downvote`"
+            :data-testid="`comment-${comment._id}-downvote`"
             class="comment-item__downvote-btn"
             :class="
               comment.rated.isRated && comment.rated.negative
@@ -69,10 +69,10 @@
             </div>
           </RouterLink>
 
-          <template v-if="checkCanEditComment(comment, userStore.user?.id)">
+          <template v-if="checkCanEditComment(comment, userStore.user?._id)">
             <div
               class="comment-item__edit-btn"
-              :data-testid="`comment-${comment.id}-edit`"
+              :data-testid="`comment-${comment._id}-edit`"
               role="button"
               tabindex="0"
               @click="toggleEdit()"
@@ -84,7 +84,7 @@
 
             <div
               class="comment-item__delete-btn"
-              :data-testid="`comment-${comment.id}-delete`"
+              :data-testid="`comment-${comment._id}-delete`"
               role="button"
               tabindex="0"
               @click="handleDeleteComment()"
@@ -98,7 +98,7 @@
 
         <div
           class="comment-item__created-at"
-          :data-testid="`comment-${comment.id}-date`"
+          :data-testid="`comment-${comment._id}-date`"
         >
           {{ formatFromNow(comment.createdAt) }}
         </div>
@@ -106,7 +106,7 @@
 
       <div
         class="comment-item__body"
-        :data-testid="`comment-${comment.id}-body`"
+        :data-testid="`comment-${comment._id}-body`"
       >
         <template v-if="comment.deleted">
           <i>This comment has been deleted</i>
@@ -144,7 +144,7 @@
                   'comment-item__reply-toggler--disabled': !userStore.user,
                 }"
                 class="comment-item__reply-toggler"
-                :data-testid="`comment-${comment.id}-toggle-reply`"
+                :data-testid="`comment-${comment._id}-toggle-reply`"
                 role="button"
                 tabindex="0"
                 @click="toggleReply()"
@@ -160,7 +160,7 @@
 
       <CommentChildExpander
         v-if="comment.children.length > 0"
-        :data-testid="`comment-${comment.id}-expander`"
+        :data-testid="`comment-${comment._id}-expander`"
         :is-expanded="isChildrenExpanded"
         role="button"
         tabindex="0"
@@ -173,7 +173,7 @@
     <div v-if="isChildrenExpanded" class="comment-item__replies">
       <CommentItem
         v-for="childComment in comment.children"
-        :key="childComment.id"
+        :key="childComment._id"
         :comment="childComment"
         :post-id="postId"
         :level="level + 1"
@@ -264,7 +264,7 @@ const handleReply = async () => {
 
     const data = await api.comments.createComment({
       post: props.postId,
-      parent: comment.value.id,
+      parent: comment.value._id,
       body: replyBody.value,
     });
 
@@ -275,7 +275,7 @@ const handleReply = async () => {
         negative: false,
       },
       author: {
-        id: user.id,
+        _id: user._id,
         avatar: user.avatar,
         login: user.login,
       },
@@ -303,7 +303,7 @@ const handleEdit = async () => {
   try {
     isRequesting.value = true;
 
-    const data = await api.comments.updateComment(comment.value.id, {
+    const data = await api.comments.updateComment(comment.value._id, {
       body: editBody.value,
     });
 
@@ -327,12 +327,12 @@ const handleDeleteComment = async () => {
   try {
     isRequesting.value = true;
 
-    const { id } = comment.value;
+    const { _id } = comment.value;
 
-    await api.comments.deleteComment(id);
+    await api.comments.deleteComment(_id);
 
     if (!comment.value.children?.length) {
-      emit('remove', id);
+      emit('remove', _id);
 
       return;
     }
@@ -345,7 +345,7 @@ const handleDeleteComment = async () => {
 
 const handleRemoveComment = (id: string) => {
   const commentIndex = comment.value.children.findIndex(
-    (comment) => comment.id === id,
+    (comment) => comment._id === id,
   );
 
   if (commentIndex === -1) {
@@ -375,7 +375,7 @@ const handleRemoveVote = async () => {
       rating: comment.value.rating + rateValue,
     };
 
-    const data = await api.comments.removeRate(comment.value.id);
+    const data = await api.comments.removeRate(comment.value._id);
 
     comment.value = {
       ...comment.value,
@@ -417,7 +417,7 @@ const upvote = async () => {
       rating: comment.value.rating + rateValue,
     };
 
-    const data = await api.comments.updateRateById(comment.value.id, {
+    const data = await api.comments.updateRateById(comment.value._id, {
       negative: false,
     });
 
@@ -461,7 +461,7 @@ const downvote = async () => {
       rating: comment.value.rating - rateValue,
     };
 
-    const data = await api.comments.updateRateById(comment.value.id, {
+    const data = await api.comments.updateRateById(comment.value._id, {
       negative: true,
     });
 

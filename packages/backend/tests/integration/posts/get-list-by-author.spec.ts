@@ -59,11 +59,11 @@ describe('GET /posts?author=', () => {
     expect(response.body).toMatchObject({
       posts: [
         {
-          id: post._id.toString(),
+          _id: post._id.toString(),
           title: post.title,
           slug: post.slug,
           author: {
-            id: otherUser._id.toString(),
+            _id: otherUser._id.toString(),
             login: otherUser.login,
             avatar: otherUser.avatar,
           },

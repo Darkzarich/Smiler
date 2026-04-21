@@ -233,7 +233,7 @@ test('Searches posts by clicking on a tag name and then "Search tag" option in t
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
     preRequestAction: Post.searchTag.bind(
       Post,
-      postWithSpecificTags.id,
+      postWithSpecificTags._id,
       tags[0],
     ),
   });

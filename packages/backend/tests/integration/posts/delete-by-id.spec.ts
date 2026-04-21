@@ -63,7 +63,7 @@ describe('DELETE /posts/:id', () => {
 
     const post = await PostModel.create(
       generateRandomPost({
-        author: currentUser.id,
+        author: currentUser._id,
         createdAt: subMinutes(Date.now(), COMMENT_TIME_TO_UPDATE - 1),
       }),
     );
@@ -86,7 +86,7 @@ describe('DELETE /posts/:id', () => {
 
     const post = await PostModel.create(
       generateRandomPost({
-        author: currentUser.id,
+        author: currentUser._id,
         commentCount: 1,
       }),
     );
@@ -109,7 +109,7 @@ describe('DELETE /posts/:id', () => {
 
     const post = await PostModel.create(
       generateRandomPost({
-        author: currentUser.id,
+        author: currentUser._id,
         commentCount: 0,
       }),
     );
@@ -132,7 +132,7 @@ describe('DELETE /posts/:id', () => {
 
     const post = await PostModel.create(
       generateRandomPost({
-        author: currentUser.id,
+        author: currentUser._id,
         commentCount: 0,
       }),
     );
@@ -142,7 +142,7 @@ describe('DELETE /posts/:id', () => {
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken);
 
-    const updatedUser = await UserModel.findById(currentUser.id).lean();
+    const updatedUser = await UserModel.findById(currentUser._id).lean();
 
     expect(updatedUser!.rating).toBe(currentUser.rating - post.rating);
   });
@@ -154,7 +154,7 @@ describe('DELETE /posts/:id', () => {
 
     const post = await PostModel.create(
       generateRandomPost({
-        author: currentUser.id,
+        author: currentUser._id,
         commentCount: 0,
       }),
     );
@@ -186,19 +186,19 @@ describe('DELETE /posts/:id', () => {
 
     const post = await PostModel.create(
       generateRandomPost({
-        author: currentUser.id,
+        author: currentUser._id,
         commentCount: 0,
         sections: [
           {
             type: POST_SECTION_TYPES.PICTURE,
             isFile: true,
-            url: `/uploads/${currentUser.id}/1724110246594.jpg`,
+            url: `/uploads/${currentUser._id}/1724110246594.jpg`,
             hash: '1234',
           },
           {
             type: POST_SECTION_TYPES.PICTURE,
             isFile: true,
-            url: `/uploads/${currentUser.id}/1724110246595.jpg`,
+            url: `/uploads/${currentUser._id}/1724110246595.jpg`,
             hash: '4321',
           },
         ],
@@ -211,10 +211,10 @@ describe('DELETE /posts/:id', () => {
       .set('X-CSRF-Token', csrfToken);
 
     expect(mockRemoveFileByPath.mock.calls[0][0]).toBe(
-      `/uploads/${currentUser.id}/1724110246594.jpg`,
+      `/uploads/${currentUser._id}/1724110246594.jpg`,
     );
     expect(mockRemoveFileByPath.mock.calls[1][0]).toBe(
-      `/uploads/${currentUser.id}/1724110246595.jpg`,
+      `/uploads/${currentUser._id}/1724110246595.jpg`,
     );
   });
 });

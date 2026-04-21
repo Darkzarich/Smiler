@@ -155,7 +155,7 @@ describe('GET /comments', () => {
 
     const comment = await CommentModel.create(
       generateRandomComment({
-        author: currentUser.id,
+        author: currentUser._id,
         post: post.id,
       }),
     );
@@ -169,11 +169,10 @@ describe('GET /comments', () => {
     expect(response.body).toEqual({
       comments: [
         {
-          id: comment._id.toString(),
+          _id: comment._id.toString(),
           body: comment.body,
           author: {
-            _id: currentUser.id,
-            id: currentUser.id,
+            _id: currentUser._id,
             login: currentUser.login,
             avatar: currentUser.avatar,
           },
@@ -199,14 +198,14 @@ describe('GET /comments', () => {
 
     const comment = await CommentModel.create(
       generateRandomComment({
-        author: currentUser.id,
+        author: currentUser._id,
         post: post.id,
       }),
     );
 
     const childComment = await CommentModel.create(
       generateRandomComment({
-        author: currentUser.id,
+        author: currentUser._id,
         post: post.id,
         parent: comment._id,
       }),
@@ -214,7 +213,7 @@ describe('GET /comments', () => {
 
     const childOfChildComment = await CommentModel.create(
       generateRandomComment({
-        author: currentUser.id,
+        author: currentUser._id,
         post: post.id,
         parent: childComment._id,
       }),
@@ -240,33 +239,30 @@ describe('GET /comments', () => {
     expect(response.body).toEqual({
       comments: [
         {
-          id: comment._id.toString(),
+          _id: comment._id.toString(),
           body: comment.body,
           author: {
-            _id: currentUser.id,
-            id: currentUser.id,
+            _id: currentUser._id,
             login: currentUser.login,
             avatar: currentUser.avatar,
           },
           children: [
             {
-              id: childComment._id.toString(),
+              _id: childComment._id.toString(),
               body: childComment.body,
               parent: comment._id.toString(),
               author: {
-                _id: currentUser.id,
-                id: currentUser.id,
+                _id: currentUser._id,
                 login: currentUser.login,
                 avatar: currentUser.avatar,
               },
               children: [
                 {
-                  id: childOfChildComment._id.toString(),
+                  _id: childOfChildComment._id.toString(),
                   body: childOfChildComment.body,
                   parent: childComment._id.toString(),
                   author: {
-                    _id: currentUser.id,
-                    id: currentUser.id,
+                    _id: currentUser._id,
                     login: currentUser.login,
                     avatar: currentUser.avatar,
                   },
@@ -348,7 +344,7 @@ describe('GET /comments', () => {
 
     await RateModel.create(
       generateRate({
-        user: currentUser.id,
+        user: currentUser._id,
         target: otherUserComment._id,
         negative: true,
         targetModel: RateTargetModel.COMMENT,

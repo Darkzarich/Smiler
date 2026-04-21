@@ -5,23 +5,18 @@ import {
   index,
   modelOptions,
   plugin,
-  type DocumentType,
 } from '@typegoose/typegoose';
+import { Types } from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
 import { Post } from '@models/Post';
-import { User } from '@models/User';
+import { isAuthorPopulated, PopulatedAuthor, User } from '@models/User';
 import type { RatedTargets } from '@models/Rate';
-
-export type CommentDocument = DocumentType<Comment>;
 
 @index({ post: 1 })
 @modelOptions({
   schemaOptions: {
     timestamps: true,
-    toJSON: {
-      virtuals: true,
-      versionKey: false,
-    },
+    versionKey: false,
   },
 })
 @plugin(mongooseAutoPopulate)
@@ -54,40 +49,57 @@ export class Comment {
 
   public createdAt!: Date;
   public updatedAt!: Date;
+}
 
-  public toResponse(this: CommentDocument, ratedTargets?: RatedTargets) {
-    if (this.deleted) {
-      return {
-        children: this.children,
-        id: this._id,
-        deleted: true,
-        parent: this.parent,
-        createdAt: this.createdAt,
-      };
-    }
+export interface LeanComment
+  extends Pick<
+    Comment,
+    'body' | 'rating' | 'deleted' | 'createdAt' | 'updatedAt'
+  > {
+  _id: Types.ObjectId;
+  post: Types.ObjectId;
+  children: LeanComment[];
+  parent?: Types.ObjectId;
+  author: Types.ObjectId | PopulatedAuthor;
+}
 
-    const rated = ratedTargets?.get(this._id.toString());
-
+export function commentToResponse(
+  comment: LeanComment,
+  ratedTargets?: RatedTargets,
+) {
+  if (comment.deleted) {
     return {
-      body: this.body,
-      author: this.author,
-      children: this.children,
-      id: this._id,
-      parent: this.parent,
-      rating: this.rating,
-      createdAt: this.createdAt,
-      rated:
-        rated !== undefined
-          ? {
-              isRated: true,
-              negative: rated,
-            }
-          : {
-              isRated: false,
-            },
-      deleted: false,
+      _id: comment._id,
+      children: comment.children ?? [],
+      deleted: true,
+      parent: comment.parent,
+      createdAt: comment.createdAt,
     };
   }
+
+  const rated = ratedTargets?.get(comment._id.toString());
+
+  return {
+    _id: comment._id,
+    body: comment.body,
+    author: isAuthorPopulated(comment.author) ? comment.author : null,
+    children: comment.children ?? [],
+    parent: comment.parent,
+    rating: comment.rating,
+    createdAt: comment.createdAt,
+    rated:
+      rated !== undefined
+        ? {
+            isRated: true,
+            negative: rated,
+          }
+        : {
+            isRated: false,
+          },
+    deleted: false,
+  };
 }
+
+export type CommentResponse = ReturnType<typeof commentToResponse>;
 
 export const CommentModel = getModelForClass(Comment);

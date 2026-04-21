@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express';
-import { isRefTypeArray, mongoose } from '@typegoose/typegoose';
 import { UserModel } from '@models/User';
-import { ForbiddenError, NotFoundError, AppError, ERRORS } from '@errors';
+import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
 interface FollowByIdParams {
@@ -20,16 +19,12 @@ export async function followById(
   }
 
   const [userFollowing, userFollowed] = await Promise.all([
-    UserModel.findById(userId),
-    UserModel.findById(id),
+    UserModel.findById(userId).select('usersFollowed').lean(),
+    UserModel.findById(id).lean(),
   ]);
 
   if (!userFollowed || !userFollowing) {
     throw new NotFoundError(ERRORS.USER_NOT_FOUND);
-  }
-
-  if (!isRefTypeArray(userFollowing.usersFollowed, mongoose.Types.ObjectId)) {
-    throw new AppError();
   }
 
   if (userFollowing.usersFollowed.some((el) => el.toString() === id)) {
@@ -37,8 +32,8 @@ export async function followById(
   }
 
   await Promise.all([
-    userFollowing.updateOne({ $push: { usersFollowed: id } }),
-    userFollowed.updateOne({ $inc: { followersAmount: 1 } }),
+    UserModel.updateOne({ _id: userId }, { $push: { usersFollowed: id } }),
+    UserModel.updateOne({ _id: id }, { $inc: { followersAmount: 1 } }),
   ]);
 
   sendSuccess(res);

@@ -4,14 +4,14 @@
       <div class="post-container">
         <Post
           v-model:post="post"
-          :can-edit="checkCanEditPost(post, userStore.user?.id)"
+          :can-edit="checkCanEditPost(post, userStore.user?._id)"
         />
       </div>
 
       <div id="comments" class="comments">
         <NewCommentForm
           v-if="!isFetchingComments"
-          :post-id="post.id"
+          :post-id="post._id"
           @new-comment="handleAddNewComment"
         />
 
@@ -19,7 +19,7 @@
           v-if="!isFetchingComments && comments.length > 0"
           :data="comments"
           :indent-level="1"
-          :post-id="post.id"
+          :post-id="post._id"
           :level="0"
           :is-first="true"
         />
@@ -96,7 +96,7 @@ const fetchComments = async ({ isCombine = false } = {}) => {
 
     const data = await api.comments.getComments({
       limit: consts.COMMENTS_INITIAL_COUNT,
-      post: post.value.id,
+      post: post.value._id,
       offset: 0 + commentsCurrentPage.value * consts.COMMENTS_INITIAL_COUNT,
     });
 

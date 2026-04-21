@@ -61,7 +61,7 @@ describe('DELETE /comments/:id', () => {
 
     const comment = await CommentModel.create(
       generateRandomComment({
-        author: currentUser.id,
+        author: currentUser._id,
         createdAt: subMinutes(Date.now(), COMMENT_TIME_TO_UPDATE - 1),
       }),
     );
@@ -85,7 +85,7 @@ describe('DELETE /comments/:id', () => {
 
       const comment = await CommentModel.create(
         generateRandomComment({
-          author: currentUser.id,
+          author: currentUser._id,
         }),
       );
 
@@ -107,13 +107,13 @@ describe('DELETE /comments/:id', () => {
 
       const parentComment = await CommentModel.create(
         generateRandomComment({
-          author: currentUser.id,
+          author: currentUser._id,
         }),
       );
 
       const comment = await CommentModel.create(
         generateRandomComment({
-          author: currentUser.id,
+          author: currentUser._id,
           parent: parentComment.id,
         }),
       );
@@ -143,7 +143,7 @@ describe('DELETE /comments/:id', () => {
 
       const comment = await CommentModel.create(
         generateRandomComment({
-          author: currentUser.id,
+          author: currentUser._id,
           post: post.id,
         }),
       );
@@ -165,7 +165,7 @@ describe('DELETE /comments/:id', () => {
 
       const comment = await CommentModel.create(
         generateRandomComment({
-          author: currentUser.id,
+          author: currentUser._id,
         }),
       );
 
@@ -174,7 +174,7 @@ describe('DELETE /comments/:id', () => {
         .set('Cookie', sessionCookie)
         .set('X-CSRF-Token', csrfToken);
 
-      const updatedUser = await UserModel.findById(currentUser.id).lean();
+      const updatedUser = await UserModel.findById(currentUser._id).lean();
 
       expect(updatedUser!.rating).toBe(currentUser.rating - comment.rating);
     });
@@ -186,7 +186,7 @@ describe('DELETE /comments/:id', () => {
 
       const comment = await CommentModel.create(
         generateRandomComment({
-          author: currentUser.id,
+          author: currentUser._id,
         }),
       );
 
@@ -219,7 +219,7 @@ describe('DELETE /comments/:id', () => {
 
       const comment = await CommentModel.create(
         generateRandomComment({
-          author: currentUser.id,
+          author: currentUser._id,
           // random id
           children: [new Types.ObjectId('5d5467b4c17806706f3df347')],
         }),
@@ -243,7 +243,7 @@ describe('DELETE /comments/:id', () => {
 
       const comment = await CommentModel.create(
         generateRandomComment({
-          author: currentUser.id,
+          author: currentUser._id,
           // random id
           children: [new Types.ObjectId('5d5467b4c17806706f3df347')],
         }),
@@ -254,7 +254,7 @@ describe('DELETE /comments/:id', () => {
         .set('Cookie', sessionCookie)
         .set('X-CSRF-Token', csrfToken);
 
-      const updatedUser = await UserModel.findById(currentUser.id).lean();
+      const updatedUser = await UserModel.findById(currentUser._id).lean();
 
       expect(updatedUser!.rating).toBe(currentUser.rating - comment.rating);
     });
@@ -266,7 +266,7 @@ describe('DELETE /comments/:id', () => {
 
       const comment = await CommentModel.create(
         generateRandomComment({
-          author: currentUser.id,
+          author: currentUser._id,
           // random id
           children: [new Types.ObjectId('5d5467b4c17806706f3df347')],
         }),
@@ -299,7 +299,7 @@ describe('DELETE /comments/:id', () => {
 
       const comment = await CommentModel.create(
         generateRandomComment({
-          author: currentUser.id,
+          author: currentUser._id,
           children: [new Types.ObjectId('5d5467b4c17806706f3df347')],
         }),
       );
@@ -310,7 +310,7 @@ describe('DELETE /comments/:id', () => {
         .set('X-CSRF-Token', csrfToken);
 
       const userAfterFirstDelete = await UserModel.findById(
-        currentUser.id,
+        currentUser._id,
       ).lean();
 
       const response = await request(global.app)
@@ -319,7 +319,7 @@ describe('DELETE /comments/:id', () => {
         .set('X-CSRF-Token', csrfToken);
 
       const userAfterSecondDelete = await UserModel.findById(
-        currentUser.id,
+        currentUser._id,
       ).lean();
 
       expect(response.status).toBe(404);

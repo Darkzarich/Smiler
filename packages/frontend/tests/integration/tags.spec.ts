@@ -51,10 +51,10 @@ test('Follows a tag', async ({
   await SinglePostPage.goto(post.slug);
 
   const followResponse = await Api.routes.tags.follow.waitForRequest({
-    preRequestAction: Post.followTag.bind(Post, post.id, tagToClick),
+    preRequestAction: Post.followTag.bind(Post, post._id, tagToClick),
   });
 
-  await Post.clickTag(post.id, tagToClick);
+  await Post.clickTag(post._id, tagToClick);
 
   await expect(Post.getUnfollowTagBtn()).toBeVisible();
   expect(followResponse.url()).toContain(tagToClick);
@@ -79,10 +79,10 @@ test('Unfollows a tag', async ({
   await SinglePostPage.goto(post.slug);
 
   const unfollowResponse = await Api.routes.tags.unfollow.waitForRequest({
-    preRequestAction: Post.unfollowTag.bind(Post, post.id, tagToClick),
+    preRequestAction: Post.unfollowTag.bind(Post, post._id, tagToClick),
   });
 
-  await Post.clickTag(post.id, tagToClick);
+  await Post.clickTag(post._id, tagToClick);
 
   await expect(Post.getFollowTagBtn()).toBeVisible();
   expect(unfollowResponse.url()).toContain(tagToClick);
@@ -102,7 +102,7 @@ test('Cannot follow or unfollow a tag if not logged in', async ({
 
   await SinglePostPage.goto(post.slug);
 
-  await Post.clickTag(post.id, tagToClick);
+  await Post.clickTag(post._id, tagToClick);
 
   await expect(Post.getFollowTagBtn()).toBeHidden();
   await expect(Post.getUnfollowTagBtn()).toBeHidden();

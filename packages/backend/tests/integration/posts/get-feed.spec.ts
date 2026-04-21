@@ -31,7 +31,7 @@ describe('GET /posts/feed', () => {
       global.app,
     );
 
-    await UserModel.deleteOne({ _id: currentUser.id });
+    await UserModel.deleteOne({ _id: currentUser._id });
 
     const response = await request(global.app)
       .get('/api/posts/feed')
@@ -70,7 +70,7 @@ describe('GET /posts/feed', () => {
 
     const post = await PostModel.create(generateRandomPost());
 
-    await UserModel.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser._id, {
       $push: { tagsFollowed: post.tags[0] },
     });
 
@@ -101,7 +101,7 @@ describe('GET /posts/feed', () => {
       }),
     );
 
-    await UserModel.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser._id, {
       $push: { usersFollowed: post.author },
     });
 
@@ -126,11 +126,11 @@ describe('GET /posts/feed', () => {
 
     const post = await PostModel.create(
       generateRandomPost({
-        author: currentUser.id,
+        author: currentUser._id,
       }),
     );
 
-    await UserModel.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser._id, {
       $push: { tagsFollowed: post.tags[0] },
     });
 
@@ -163,7 +163,7 @@ describe('GET /posts/feed', () => {
       )
     ).toJSON();
 
-    await UserModel.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser._id, {
       $push: { tagsFollowed: post.tags[0] },
     });
 
@@ -174,11 +174,11 @@ describe('GET /posts/feed', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.posts[0]).toEqual({
-      id: post._id.toString(),
+      _id: post._id.toString(),
       title: post.title,
       slug: post.slug,
       author: {
-        id: otherUser._id.toString(),
+        _id: otherUser._id.toString(),
         login: otherUser.login,
         avatar: otherUser.avatar,
       },
@@ -209,7 +209,7 @@ describe('GET /posts/feed', () => {
 
     await PostModel.insertMany(posts);
 
-    await UserModel.findByIdAndUpdate(currentUser.id, {
+    await UserModel.findByIdAndUpdate(currentUser._id, {
       $push: { tagsFollowed: posts[0].tags[0] },
     });
 

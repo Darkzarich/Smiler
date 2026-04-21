@@ -2,7 +2,7 @@
   <div ref="postRef" class="post">
     <div class="post__left">
       <div
-        :data-testid="`post-${post.id}-upvote`"
+        :data-testid="`post-${post._id}-upvote`"
         class="post__upvote"
         :class="
           post.rated.isRated && !post.rated.negative
@@ -11,19 +11,19 @@
         "
         role="button"
         tabindex="0"
-        @click="upvote(post.id)"
-        @keydown.enter="upvote(post.id)"
-        @keydown.space="upvote(post.id)"
+        @click="upvote(post._id)"
+        @keydown.enter="upvote(post._id)"
+        @keydown.space="upvote(post._id)"
       >
         <IconPlus />
       </div>
 
-      <div class="post__rating" :data-testid="`post-${post.id}-rating`">
+      <div class="post__rating" :data-testid="`post-${post._id}-rating`">
         {{ post.rating }}
       </div>
 
       <div
-        :data-testid="`post-${post.id}-downvote`"
+        :data-testid="`post-${post._id}-downvote`"
         class="post__downvote"
         :class="
           post.rated.isRated && post.rated.negative
@@ -32,9 +32,9 @@
         "
         role="button"
         tabindex="0"
-        @click="downvote(post.id)"
-        @keydown.enter="downvote(post.id)"
-        @keydown.space="downvote(post.id)"
+        @click="downvote(post._id)"
+        @keydown.enter="downvote(post._id)"
+        @keydown.space="downvote(post._id)"
       >
         <IconMinus />
       </div>
@@ -51,7 +51,7 @@
             },
           }"
           :target="isMobile() ? '' : '_blank'"
-          :data-testid="`post-${post.id}-title`"
+          :data-testid="`post-${post._id}-title`"
         >
           {{ post.title }}
         </RouterLink>
@@ -64,17 +64,17 @@
             <IconEdit data-testid="post-edit-icon" />
           </RouterLink>
 
-          <button class="post__delete-button" @click="deletePost(post.id)">
+          <button class="post__delete-button" @click="deletePost(post._id)">
             <IconDelete data-testid="post-delete-icon" />
           </button>
         </template>
       </div>
 
-      <div v-if="post.tags.length > 0" class="post__tags u-flex-row">
+      <div v-if="post.tags?.length > 0" class="post__tags u-flex-row">
         <button
           v-for="tag in post.tags"
           :key="tag"
-          :data-testid="`post-${post.id}-tag-${tag}`"
+          :data-testid="`post-${post._id}-tag-${tag}`"
           class="post__tags-item"
           @click.prevent.stop="openContextMenu($event, tag)"
           @keydown.enter.prevent.stop="openContextMenu($event, tag)"
@@ -93,7 +93,7 @@
           <!-- eslint-disable vue/no-v-html -->
           <div
             v-if="isTextSection(section)"
-            :data-testid="`post-${post.id}-text-${section.hash}`"
+            :data-testid="`post-${post._id}-text-${section.hash}`"
             v-html="section.content"
           />
           <!-- eslint-enable vue/no-v-html -->
@@ -106,7 +106,7 @@
               class="post__section-image"
               :src="resolveImage(section.url)"
               :alt="section.url"
-              :data-testid="`post-${post.id}-pic-${section.hash}`"
+              :data-testid="`post-${post._id}-pic-${section.hash}`"
               @error="resolveImageError"
             />
           </div>
@@ -119,7 +119,7 @@
               class="post__section-video"
               controls
               :src="section.url"
-              :data-testid="`post-${post.id}-vid-${section.hash}`"
+              :data-testid="`post-${post._id}-vid-${section.hash}`"
             >
               <track kind="captions" />
             </video>
@@ -131,13 +131,13 @@
       <div class="post__rate-mobile">
         <button
           class="post__upvote"
-          :data-testid="`m-post-${post.id}-upvote`"
+          :data-testid="`m-post-${post._id}-upvote`"
           :class="
             post.rated.isRated && !post.rated.negative
               ? 'post__upvote--active'
               : ''
           "
-          @click="upvote(post.id)"
+          @click="upvote(post._id)"
         >
           <IconPlus />
         </button>
@@ -146,13 +146,13 @@
         </div>
         <button
           class="post__downvote"
-          :data-testid="`m-post-${post.id}-downvote`"
+          :data-testid="`m-post-${post._id}-downvote`"
           :class="
             post.rated.isRated && post.rated.negative
               ? 'post__downvote--active'
               : ''
           "
-          @click="downvote(post.id)"
+          @click="downvote(post._id)"
         >
           <IconMinus />
         </button>
@@ -187,7 +187,7 @@
                 login: post.author.login,
               },
             }"
-            :data-testid="`post-${post.id}-author`"
+            :data-testid="`post-${post._id}-author`"
             class="post__author-container"
           >
             <span class="post__author-login">

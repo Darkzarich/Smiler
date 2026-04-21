@@ -39,14 +39,16 @@ test('Shows a comment with its replies', async ({
 }) => {
   await SinglePostPage.goto(post.slug);
 
-  await expect(Comments.getCommentById(comment.id)).toContainText(comment.body);
+  await expect(Comments.getCommentById(comment._id)).toContainText(
+    comment.body,
+  );
 
-  await expect(Comments.getCommentById(comment.children[0].id)).toContainText(
+  await expect(Comments.getCommentById(comment.children[0]._id)).toContainText(
     comment.children[0].body,
   );
 
   await expect(
-    Comments.getCommentById(comment.children[0].children[0].id),
+    Comments.getCommentById(comment.children[0].children[0]._id),
   ).toContainText(comment.children[0].children[0].body);
 });
 
@@ -56,11 +58,11 @@ test('Hides replies to a comments if root comment is collapsed', async ({
 }) => {
   await SinglePostPage.goto(post.slug);
 
-  await Comments.toggleRepliesExpanderById(comment.id);
+  await Comments.toggleRepliesExpanderById(comment._id);
 
-  await expect(Comments.getCommentById(comment.children[0].id)).toBeHidden();
+  await expect(Comments.getCommentById(comment.children[0]._id)).toBeHidden();
   await expect(
-    Comments.getCommentById(comment.children[0].children[0].id),
+    Comments.getCommentById(comment.children[0].children[0]._id),
   ).toBeHidden();
 });
 
@@ -84,10 +86,10 @@ test('Shows a deleted comment with different text and no reply button', async ({
 
   await SinglePostPage.goto(post.slug);
 
-  await expect(Comments.getCommentById(deletedComment.id)).toContainText(
+  await expect(Comments.getCommentById(deletedComment._id)).toContainText(
     'This comment has been deleted',
   );
-  await expect(Comments.getCommentReplyTogglerById(comment.id)).toBeHidden();
+  await expect(Comments.getCommentReplyTogglerById(comment._id)).toBeHidden();
 });
 
 test('Posts a new comment to a post', async ({
@@ -111,11 +113,11 @@ test('Posts a new comment to a post', async ({
     });
 
   expect(createCommentResponse.postDataJSON()).toEqual({
-    post: post.id,
+    post: post._id,
     body: asParagraph('new comment'),
   });
 
-  await expect(Comments.getCommentById(newComment.id)).toContainText(
+  await expect(Comments.getCommentById(newComment._id)).toContainText(
     newComment.body,
   );
 });
@@ -152,7 +154,7 @@ test.describe('Replies', () => {
       body: {
         body: newReplyText,
         children: [],
-        id: newReplyId,
+        _id: newReplyId,
       },
     });
   });
@@ -160,7 +162,7 @@ test.describe('Replies', () => {
   test('Replies to a comment', async ({ SinglePostPage, Comments, Api }) => {
     await SinglePostPage.goto(post.slug);
 
-    await Comments.clickCommentReplyTogglerById(comment.id);
+    await Comments.clickCommentReplyTogglerById(comment._id);
 
     await Comments.fillCommentReplyInput(newReplyText);
 
@@ -170,8 +172,8 @@ test.describe('Replies', () => {
       });
 
     expect(replyResponse.postDataJSON()).toEqual({
-      post: post.id,
-      parent: comment.id,
+      post: post._id,
+      parent: comment._id,
       body: asParagraph(newReplyText),
     });
 
@@ -192,7 +194,7 @@ test.describe('Replies', () => {
 
     await SinglePostPage.goto(post.slug);
 
-    await Comments.clickCommentReplyTogglerById(comment.id);
+    await Comments.clickCommentReplyTogglerById(comment._id);
 
     await expect(NotificationList.root).toHaveText(
       'Please sign in or create an account to leave a reply.',
@@ -203,7 +205,7 @@ test.describe('Replies', () => {
   test('Closes the reply form', async ({ SinglePostPage, Comments }) => {
     await SinglePostPage.goto(post.slug);
 
-    await Comments.clickCommentReplyTogglerById(comment.id);
+    await Comments.clickCommentReplyTogglerById(comment._id);
     await Comments.closeCommentReplyForm();
 
     await expect(Comments.getCommentReplyInput()).toBeHidden();
@@ -213,9 +215,9 @@ test.describe('Replies', () => {
   // test('Only one reply form exists', async ({ page }) => {
   //   await SinglePostPage.goto(post.slug);
 
-  //   await page.getByTestId(`comment-${comment.id}-toggle-reply`).click();
+  //   await page.getByTestId(`comment-${comment._id}-toggle-reply`).click();
   //   await page
-  //     .getByTestId(`comment-${comment.children[0].id}-toggle-reply`)
+  //     .getByTestId(`comment-${comment.children[0]._id}-toggle-reply`)
   //     .click();
 
   //   await expect(page.getByTestId(`comment-reply-input`)).toHaveCount(1);
@@ -257,7 +259,7 @@ test.describe('Votes', () => {
     const upvoteResponse = await Api.routes.comments.updateRate.waitForRequest({
       preRequestAction: Comments.upvoteCommentById.bind(
         Comments,
-        notRatedComment.id,
+        notRatedComment._id,
       ),
     });
 
@@ -265,12 +267,12 @@ test.describe('Votes', () => {
       negative: false,
     });
 
-    expect(await Comments.getIsCommentByIdUpvoted(notRatedComment.id)).toBe(
+    expect(await Comments.getIsCommentByIdUpvoted(notRatedComment._id)).toBe(
       true,
     );
 
     await expect(
-      Comments.getCommentRatingById(notRatedComment.id),
+      Comments.getCommentRatingById(notRatedComment._id),
     ).toContainText(String(notRatedComment.rating + 2));
   });
 
@@ -294,7 +296,7 @@ test.describe('Votes', () => {
       await Api.routes.comments.updateRate.waitForRequest({
         preRequestAction: Comments.downvoteCommentById.bind(
           Comments,
-          notRatedComment.id,
+          notRatedComment._id,
         ),
       });
 
@@ -302,12 +304,12 @@ test.describe('Votes', () => {
       negative: true,
     });
 
-    expect(await Comments.getIsCommentByIdDownvoted(notRatedComment.id)).toBe(
+    expect(await Comments.getIsCommentByIdDownvoted(notRatedComment._id)).toBe(
       true,
     );
 
     await expect(
-      Comments.getCommentRatingById(notRatedComment.id),
+      Comments.getCommentRatingById(notRatedComment._id),
     ).toContainText(String(notRatedComment.rating - 10));
   });
 
@@ -349,15 +351,15 @@ test.describe('Votes', () => {
     await SinglePostPage.goto(post.slug);
 
     const upvoteResponse = await Api.routes.comments.updateRate.waitForRequest({
-      preRequestAction: Comments.upvoteCommentById.bind(Comments, comment.id),
+      preRequestAction: Comments.upvoteCommentById.bind(Comments, comment._id),
     });
 
-    expect(upvoteResponse.url()).toContain(comment.id);
+    expect(upvoteResponse.url()).toContain(comment._id);
     expect(upvoteResponse.postDataJSON()).toEqual({
       negative: false,
     });
-    expect(await Comments.getIsCommentByIdUpvoted(comment.id)).toBe(true);
-    await expect(Comments.getCommentRatingById(comment.id)).toContainText(
+    expect(await Comments.getIsCommentByIdUpvoted(comment._id)).toBe(true);
+    await expect(Comments.getCommentRatingById(comment._id)).toContainText(
       String(comment.rating + 10),
     );
   });
@@ -403,16 +405,16 @@ test.describe('Votes', () => {
       await Api.routes.comments.updateRate.waitForRequest({
         preRequestAction: Comments.downvoteCommentById.bind(
           Comments,
-          comment.id,
+          comment._id,
         ),
       });
 
-    expect(downvoteResponse.url()).toContain(comment.id);
+    expect(downvoteResponse.url()).toContain(comment._id);
     expect(downvoteResponse.postDataJSON()).toEqual({
       negative: true,
     });
-    expect(await Comments.getIsCommentByIdDownvoted(comment.id)).toBe(true);
-    await expect(Comments.getCommentRatingById(comment.id)).toContainText(
+    expect(await Comments.getIsCommentByIdDownvoted(comment._id)).toBe(true);
+    await expect(Comments.getCommentRatingById(comment._id)).toContainText(
       String(comment.rating + 10),
     );
   });
@@ -453,19 +455,21 @@ test.describe('Votes', () => {
 
     await SinglePostPage.goto(post.slug);
 
-    expect(await Comments.getIsCommentByIdUpvoted(ratedComment.id)).toBe(true);
+    expect(await Comments.getIsCommentByIdUpvoted(ratedComment._id)).toBe(true);
 
     const removeUpvoteResponse =
       await Api.routes.comments.removeRate.waitForRequest({
         preRequestAction: Comments.upvoteCommentById.bind(
           Comments,
-          ratedComment.id,
+          ratedComment._id,
         ),
       });
 
-    expect(removeUpvoteResponse.url()).toContain(ratedComment.id);
-    expect(await Comments.getIsCommentByIdUpvoted(ratedComment.id)).toBe(false);
-    await expect(Comments.getCommentRatingById(ratedComment.id)).toContainText(
+    expect(removeUpvoteResponse.url()).toContain(ratedComment._id);
+    expect(await Comments.getIsCommentByIdUpvoted(ratedComment._id)).toBe(
+      false,
+    );
+    await expect(Comments.getCommentRatingById(ratedComment._id)).toContainText(
       String(ratedComment.rating - 10),
     );
   });
@@ -506,7 +510,7 @@ test.describe('Votes', () => {
 
     await SinglePostPage.goto(post.slug);
 
-    expect(await Comments.getIsCommentByIdDownvoted(downvotedComment.id)).toBe(
+    expect(await Comments.getIsCommentByIdDownvoted(downvotedComment._id)).toBe(
       true,
     );
 
@@ -514,16 +518,16 @@ test.describe('Votes', () => {
       await Api.routes.comments.removeRate.waitForRequest({
         preRequestAction: Comments.downvoteCommentById.bind(
           Comments,
-          downvotedComment.id,
+          downvotedComment._id,
         ),
       });
 
-    expect(removeDownvoteResponse.url()).toContain(downvotedComment.id);
-    expect(await Comments.getIsCommentByIdUpvoted(downvotedComment.id)).toBe(
+    expect(removeDownvoteResponse.url()).toContain(downvotedComment._id);
+    expect(await Comments.getIsCommentByIdUpvoted(downvotedComment._id)).toBe(
       false,
     );
     await expect(
-      Comments.getCommentRatingById(downvotedComment.id),
+      Comments.getCommentRatingById(downvotedComment._id),
     ).toContainText(String(downvotedComment.rating + 10));
   });
 });
@@ -532,7 +536,7 @@ test.describe('Editing or deleting a comment', () => {
   const currentUserComment = createRandomComment(
     {
       author: {
-        id: auth.id,
+        _id: auth._id,
       },
     },
     false,
@@ -561,7 +565,7 @@ test.describe('Editing or deleting a comment', () => {
       // Posted 11 minutes ago from now
       createdAt: subMinutes(nowISOString, 11).toISOString(),
       author: {
-        id: auth.id,
+        _id: auth._id,
       },
     });
 
@@ -578,8 +582,8 @@ test.describe('Editing or deleting a comment', () => {
 
     await SinglePostPage.goto(post.slug);
 
-    await expect(Comments.getEditBtnById(oldComment.id)).toBeHidden();
-    await expect(Comments.getDeleteBtnById(oldComment.id)).toBeHidden();
+    await expect(Comments.getEditBtnById(oldComment._id)).toBeHidden();
+    await expect(Comments.getDeleteBtnById(oldComment._id)).toBeHidden();
   });
 
   test('The current user cannot edit or delete not their comment even if it is not older than 10 mins', async ({
@@ -611,10 +615,10 @@ test.describe('Editing or deleting a comment', () => {
     await SinglePostPage.goto(post.slug);
 
     await expect(
-      Comments.getEditBtnById(notCurrentUserComment.id),
+      Comments.getEditBtnById(notCurrentUserComment._id),
     ).toBeHidden();
     await expect(
-      Comments.getDeleteBtnById(notCurrentUserComment.id),
+      Comments.getDeleteBtnById(notCurrentUserComment._id),
     ).toBeHidden();
   });
 
@@ -635,11 +639,11 @@ test.describe('Editing or deleting a comment', () => {
     await Api.routes.comments.deleteComment.waitForRequest({
       preRequestAction: Comments.deleteCommentById.bind(
         Comments,
-        currentUserComment.id,
+        currentUserComment._id,
       ),
     });
 
-    await expect(Comments.getCommentById(currentUserComment.id)).toBeHidden();
+    await expect(Comments.getCommentById(currentUserComment._id)).toBeHidden();
   });
 
   test('The current user edits a comment that is not older than 10 mins, sends the edit request', async ({
@@ -662,7 +666,7 @@ test.describe('Editing or deleting a comment', () => {
 
     await SinglePostPage.goto(post.slug);
 
-    await Comments.toggleCommentEditById(currentUserComment.id);
+    await Comments.toggleCommentEditById(currentUserComment._id);
     await Comments.getCommentEditInput().fill(editCommentText);
 
     const editCommentResponse =
@@ -673,7 +677,7 @@ test.describe('Editing or deleting a comment', () => {
     expect(editCommentResponse.postDataJSON()).toEqual({
       body: asParagraph(editCommentText),
     });
-    await expect(Comments.getCommentById(currentUserComment.id)).toContainText(
+    await expect(Comments.getCommentById(currentUserComment._id)).toContainText(
       editCommentText,
     );
   });
@@ -687,7 +691,7 @@ test.describe('Editing or deleting a comment', () => {
     const currentUserCommentWithReplies = createRandomComment(
       {
         author: {
-          id: auth.id,
+          _id: auth._id,
         },
       },
       true,
@@ -714,12 +718,12 @@ test.describe('Editing or deleting a comment', () => {
     await Api.routes.comments.deleteComment.waitForRequest({
       preRequestAction: Comments.deleteCommentById.bind(
         Comments,
-        currentUserCommentWithReplies.id,
+        currentUserCommentWithReplies._id,
       ),
     });
 
     await expect(
-      Comments.getCommentById(currentUserCommentWithReplies.id),
+      Comments.getCommentById(currentUserCommentWithReplies._id),
     ).toContainText('This comment has been deleted');
   });
 });
@@ -734,53 +738,53 @@ test('Formate different dates with relation to the current time correctly', asyn
 
   const comments = [
     createRandomComment({
-      id: '0',
+      _id: '0',
       // 7 seconds ago ~ a few seconds ago
       createdAt: '2024-06-02T23:59:53Z',
     }),
     createRandomComment({
-      id: '1',
+      _id: '1',
       // ~35 minutes ago
       createdAt: '2024-06-02T23:24:53Z',
     }),
     createRandomComment({
-      id: '2',
+      _id: '2',
       // ~ an hour ago
       createdAt: '2024-06-02T22:59:53Z',
     }),
     createRandomComment({
-      id: '3',
+      _id: '3',
       children: [],
       // ~3 hours ago
       createdAt: '2024-06-02T20:59:53Z',
     }),
     createRandomComment({
-      id: '4',
+      _id: '4',
       // ~ a day ago
       createdAt: '2024-06-01T20:59:53Z',
     }),
     createRandomComment({
-      id: '5',
+      _id: '5',
       // ~ 14 days ago
       createdAt: '2024-05-19T20:59:53Z',
     }),
     createRandomComment({
-      id: '6',
+      _id: '6',
       // ~ a month ago
       createdAt: '2024-04-23T00:00:00Z',
     }),
     createRandomComment({
-      id: '7',
+      _id: '7',
       // ~ 5 months ago
       createdAt: '2023-12-20T00:00:00Z',
     }),
     createRandomComment({
-      id: '8',
+      _id: '8',
       // ~ a year ago
       createdAt: '2022-12-20T00:00:00Z',
     }),
     createRandomComment({
-      id: '9',
+      _id: '9',
       // ~ 2 years ago
       createdAt: '2021-12-20T00:00:00Z',
     }),
@@ -797,34 +801,34 @@ test('Formate different dates with relation to the current time correctly', asyn
 
   await SinglePostPage.goto(post.slug);
 
-  await expect(Comments.getCommentDateById(comments[0].id)).toContainText(
+  await expect(Comments.getCommentDateById(comments[0]._id)).toContainText(
     '7 seconds ago',
   );
-  await expect(Comments.getCommentDateById(comments[1].id)).toContainText(
+  await expect(Comments.getCommentDateById(comments[1]._id)).toContainText(
     '35 minutes ago',
   );
-  await expect(Comments.getCommentDateById(comments[2].id)).toContainText(
+  await expect(Comments.getCommentDateById(comments[2]._id)).toContainText(
     '1 hour ago',
   );
-  await expect(Comments.getCommentDateById(comments[3].id)).toContainText(
+  await expect(Comments.getCommentDateById(comments[3]._id)).toContainText(
     '3 hours ago',
   );
-  await expect(Comments.getCommentDateById(comments[4].id)).toContainText(
+  await expect(Comments.getCommentDateById(comments[4]._id)).toContainText(
     '1 day ago',
   );
-  await expect(Comments.getCommentDateById(comments[5].id)).toContainText(
+  await expect(Comments.getCommentDateById(comments[5]._id)).toContainText(
     '14 days ago',
   );
-  await expect(Comments.getCommentDateById(comments[6].id)).toContainText(
+  await expect(Comments.getCommentDateById(comments[6]._id)).toContainText(
     '1 month ago',
   );
-  await expect(Comments.getCommentDateById(comments[7].id)).toContainText(
+  await expect(Comments.getCommentDateById(comments[7]._id)).toContainText(
     '5 months ago',
   );
-  await expect(Comments.getCommentDateById(comments[8].id)).toContainText(
+  await expect(Comments.getCommentDateById(comments[8]._id)).toContainText(
     '1 year ago',
   );
-  await expect(Comments.getCommentDateById(comments[9].id)).toContainText(
+  await expect(Comments.getCommentDateById(comments[9]._id)).toContainText(
     '2 years ago',
   );
 });

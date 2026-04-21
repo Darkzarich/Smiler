@@ -1,7 +1,7 @@
 import type { PaginationRequest, PaginationResponse } from '../types';
 
 interface CommentAuthor {
-  id: string;
+  _id: string;
   login: string;
   avatar: string;
 }
@@ -12,7 +12,7 @@ interface CommentRate {
 }
 
 export interface Comment {
-  id: string;
+  _id: string;
   parent?: string; // parent comment id
   author: CommentAuthor;
   body: string;

@@ -23,10 +23,10 @@ export default function createRandomPost(
     slug: faker.lorem.slug(),
     author: {
       login: faker.internet.userName(),
-      id: faker.string.uuid(),
+      _id: faker.string.uuid(),
       avatar: faker.image.avatar(),
     },
-    id: faker.string.uuid(),
+    _id: faker.string.uuid(),
     commentCount: faker.number.int({ min: 0, max: 10 }),
     rating: faker.number.int({ min: 0, max: 5 }),
     createdAt: faker.date.past().toISOString(),

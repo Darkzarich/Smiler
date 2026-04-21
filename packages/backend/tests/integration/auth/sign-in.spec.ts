@@ -92,7 +92,7 @@ describe('POST api/auth/signin', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       isAuth: true,
-      id: currentUser.id.toString(),
+      _id: currentUser._id.toString(),
       login: currentUser.login,
       avatar: currentUser.avatar,
       email: currentUser.email,

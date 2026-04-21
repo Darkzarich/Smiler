@@ -73,7 +73,7 @@ export async function signUp(
     await authenticateSession(req, newUser._id.toString());
 
     const userAuth = {
-      id: newUser._id.toString(),
+      _id: newUser._id.toString(),
       login: newUser.login,
       isAuth: true,
       rating: newUser.rating,

@@ -5,7 +5,7 @@ export function checkCanEditPost(
   post: postTypes.Post,
   currentUserId: string | undefined | null,
 ): boolean {
-  if (!currentUserId || !post.author || post.author.id !== currentUserId) {
+  if (!currentUserId || !post.author || post.author._id !== currentUserId) {
     return false;
   }
 

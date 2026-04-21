@@ -120,7 +120,7 @@ describe('POST api/auth/signup', () => {
 
     const response = await signUp(credentials);
 
-    const user = await UserModel.findOne({ _id: response.body.id }).lean();
+    const user = await UserModel.findOne({ _id: response.body._id }).lean();
 
     const hash = crypto
       .pbkdf2Sync(credentials.password, user!.salt, 10000, 512, 'sha512')
@@ -157,7 +157,7 @@ describe('POST api/auth/signup', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       isAuth: true,
-      id: expect.any(String),
+      _id: expect.any(String),
       login: credentials.login,
       avatar: '',
       email: credentials.email,

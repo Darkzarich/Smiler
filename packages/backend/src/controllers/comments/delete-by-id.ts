@@ -42,7 +42,7 @@ export async function deleteById(
     const [updateComment] = await Promise.all([
       CommentModel.findByIdAndUpdate(comment._id, {
         deleted: true,
-      }),
+      }).lean({ autopopulate: true }),
       UserModel.updateOne(
         { _id: comment.author },
         { $inc: { rating: -comment.rating } },
@@ -50,7 +50,7 @@ export async function deleteById(
       RateModel.deleteMany({ target: id }),
     ]);
 
-    return sendSuccess(res, updateComment?.toJSON());
+    return sendSuccess(res, updateComment ?? null);
   }
 
   await Promise.all([

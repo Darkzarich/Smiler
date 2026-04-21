@@ -91,7 +91,7 @@ test('Fetches user posts with expected filters', async ({
     `author=${testUser.login}&limit=15&offset=0`,
   );
 
-  await expect(Post.getTitleById(post.id)).toContainText(post.title);
+  await expect(Post.getTitleById(post._id)).toContainText(post.title);
 });
 
 test.describe('Follows and unfollow', () => {
@@ -99,7 +99,7 @@ test.describe('Follows and unfollow', () => {
     Api.routes.auth.getAuth.mock({
       body: createRandomAuth({
         isAuth: true,
-        id: `_${testUser.id}`,
+        _id: `_${testUser._id}`,
       }),
     });
 
@@ -131,13 +131,13 @@ test.describe('Follows and unfollow', () => {
 
     await ProfilePage.goto(notFollowedUser.login);
 
-    await Post.getTitleById(post.id);
+    await Post.getTitleById(post._id);
 
     const followResponse = await Api.routes.users.followUser.waitForRequest({
       preRequestAction: ProfilePage.follow.bind(ProfilePage),
     });
 
-    expect(followResponse.url()).toContain(notFollowedUser.id);
+    expect(followResponse.url()).toContain(notFollowedUser._id);
     await expect(ProfilePage.unfollowBtn).toBeVisible();
     await expect(ProfilePage.followersCount).toContainText(
       (notFollowedUser.followersAmount + 1).toString(),
@@ -164,7 +164,7 @@ test.describe('Follows and unfollow', () => {
       },
     );
 
-    expect(unfollowResponse.url()).toContain(followedUser.id);
+    expect(unfollowResponse.url()).toContain(followedUser._id);
     await expect(ProfilePage.followBtn).toBeVisible();
     await expect(ProfilePage.followersCount).toContainText(
       (followedUser.followersAmount - 1).toString(),
@@ -178,7 +178,7 @@ test.describe('Follows and unfollow', () => {
 
     Api.routes.users.getUserProfile.mock({
       body: createRandomProfile({
-        id: auth.id,
+        _id: auth._id,
       }),
     });
 

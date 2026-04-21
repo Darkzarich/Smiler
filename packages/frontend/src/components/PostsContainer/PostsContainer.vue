@@ -3,7 +3,7 @@
     <div v-if="posts.length > 0">
       <Post
         v-for="(post, index) in posts"
-        :key="post.id"
+        :key="post._id"
         v-model:post="posts[index]"
         class="posts-container__post"
         :can-edit="checkCanEditPost(post, userStore.userId)"

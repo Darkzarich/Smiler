@@ -45,9 +45,9 @@ const handleSetPost = (fetchedPost: postTypes.Post) => {
   isShow.value = false;
   key.value = 'edit';
 
-  const userId = userStore.user?.id;
+  const userId = userStore.user?._id;
 
-  if (fetchedPost.author.id !== userId) {
+  if (fetchedPost.author._id !== userId) {
     showErrorNotification({
       message: "Only post's author can edit this post",
     });

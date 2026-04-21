@@ -2,7 +2,12 @@ import type { Request, Response } from 'express';
 import slugLib from 'slug';
 import { nanoid } from 'nanoid';
 import { UserModel } from '@models/User';
-import { Post, PostModel, PostSection } from '@models/Post';
+import {
+  PostModel,
+  PostSection,
+  postToResponse,
+  PostResponse,
+} from '@models/Post';
 import { sendSuccess } from '@utils/response-utils';
 import { PostValidator } from '@validators/PostValidator';
 
@@ -12,14 +17,12 @@ interface CreateBody {
   tags?: string[];
 }
 
-type CreateResponse = ReturnType<Post['toResponse']>;
+type CreateResponse = PostResponse;
 
 export async function create(
   req: Request<unknown, unknown, CreateBody>,
   res: Response<CreateResponse>,
 ) {
-  // TODO: frontend sends hash should think about avoiding that anyhow
-
   const { userId } = req.session;
 
   const { title, sections, tags } = PostValidator.validateAndPrepare({
@@ -36,7 +39,6 @@ export async function create(
       slug: `${slugLib(title)}-${nanoid(3)}`,
       author: userId,
     }),
-    // Clear user template
     UserModel.updateOne(
       { _id: userId },
       {
@@ -49,7 +51,9 @@ export async function create(
     ),
   ]);
 
-  const populatedPost = await post.populate('author', 'login avatar');
+  const populatedPost = await PostModel.findById(post._id)
+    .populate('author', 'login avatar')
+    .lean();
 
-  sendSuccess(res, populatedPost.toResponse());
+  sendSuccess(res, postToResponse(populatedPost!));
 }

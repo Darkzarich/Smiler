@@ -19,7 +19,9 @@ export async function unvoteById(
   const { userId } = req.session;
   const { id: postId } = req.params;
 
-  const targetPost = await PostModel.findById(postId).select({ author: 1 });
+  const targetPost = await PostModel.findById(postId)
+    .select({ author: 1 })
+    .lean();
 
   if (!targetPost) {
     throw new NotFoundError(ERRORS.POST_NOT_FOUND);
@@ -33,7 +35,7 @@ export async function unvoteById(
 
   const rate = await RateModel.removeForUser({
     userId: userId!,
-    targetId: targetPost.id,
+    targetId: targetPost._id.toString(),
     targetModel: RateTargetModel.POST,
   });
 
@@ -41,13 +43,11 @@ export async function unvoteById(
     throw new ForbiddenError(ERRORS.TARGET_IS_NOT_RATED);
   }
 
-  const rateValue = rate.negative
-    ? POST_RATE_VALUE
-    : -POST_RATE_VALUE;
+  const rateValue = rate.negative ? POST_RATE_VALUE : -POST_RATE_VALUE;
 
   const [updatedPost] = await Promise.all([
     PostModel.findByIdAndUpdate(
-      targetPost.id,
+      targetPost._id,
       { $inc: { rating: rateValue } },
       { new: true, lean: true },
     ),

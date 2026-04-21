@@ -72,6 +72,6 @@ describe('CSRF protection', () => {
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(200);
-    expect(response.body.id).toBe(currentUser.id);
+    expect(response.body._id).toBe(currentUser._id);
   });
 });

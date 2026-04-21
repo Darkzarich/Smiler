@@ -25,7 +25,7 @@ describe('DELETE /users/me/template/:hash', () => {
       global.app,
     );
 
-    await UserModel.deleteOne({ _id: currentUser.id });
+    await UserModel.deleteOne({ _id: currentUser._id });
 
     const response = await request(global.app)
       .delete(`/api/users/me/template/1234`)
@@ -55,7 +55,7 @@ describe('DELETE /users/me/template/:hash', () => {
     );
 
     await UserModel.updateOne(
-      { _id: currentUser.id },
+      { _id: currentUser._id },
       {
         $set: {
           template: {
@@ -83,7 +83,7 @@ describe('DELETE /users/me/template/:hash', () => {
     );
 
     await UserModel.updateOne(
-      { _id: currentUser.id },
+      { _id: currentUser._id },
       {
         $set: {
           template: {
@@ -111,7 +111,7 @@ describe('DELETE /users/me/template/:hash', () => {
     );
 
     await UserModel.updateOne(
-      { _id: currentUser.id },
+      { _id: currentUser._id },
       {
         $set: {
           template: {
@@ -136,10 +136,10 @@ describe('DELETE /users/me/template/:hash', () => {
       global.app,
     );
 
-    const path = `/uploads/${currentUser.id}/1234.jpg`;
+    const path = `/uploads/${currentUser._id}/1234.jpg`;
 
     await UserModel.updateOne(
-      { _id: currentUser.id },
+      { _id: currentUser._id },
       {
         $set: {
           template: {
@@ -166,7 +166,7 @@ describe('DELETE /users/me/template/:hash', () => {
     );
 
     await UserModel.updateOne(
-      { _id: currentUser.id },
+      { _id: currentUser._id },
       {
         $set: {
           template: {
@@ -184,7 +184,7 @@ describe('DELETE /users/me/template/:hash', () => {
     expect(response.status).toBe(200);
     expect(mockRemoveFileByPath).not.toHaveBeenCalled();
 
-    const updatedUser = await UserModel.findById(currentUser.id).select(
+    const updatedUser = await UserModel.findById(currentUser._id).select(
       'template',
     );
     expect(updatedUser!.template.sections).toHaveLength(0);
