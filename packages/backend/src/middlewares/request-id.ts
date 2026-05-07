@@ -1,5 +1,5 @@
 /* eslint-disable func-names */
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import type { RequestHandler } from 'express';
 
 const REQUEST_PROPERTY = 'id';
@@ -21,7 +21,9 @@ export function requestIdMiddleware(): RequestHandler {
   return function (request, response, next) {
     const oldValue = request.get(REQUEST_HEADER);
     const id =
-      oldValue !== undefined && isValidRequestId(oldValue) ? oldValue : uuidv4();
+      oldValue !== undefined && isValidRequestId(oldValue)
+        ? oldValue
+        : randomUUID();
 
     response.set(REQUEST_HEADER, id);
 
