@@ -5,6 +5,7 @@
         <Post
           v-model:post="post"
           :can-edit="checkCanEditPost(post, userStore.user?._id)"
+          :collapsible="false"
         />
       </div>
 

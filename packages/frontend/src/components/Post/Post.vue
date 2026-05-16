@@ -84,48 +84,50 @@
         </button>
       </div>
 
-      <div class="post__body">
-        <div
-          v-for="section in post.sections"
-          :key="section.hash"
-          class="post__sections"
-        >
-          <!-- eslint-disable vue/no-v-html -->
+      <CollapsibleContent :max-height="400" :disabled="!collapsible">
+        <div class="post__body">
           <div
-            v-if="isTextSection(section)"
-            :data-testid="`post-${post._id}-text-${section.hash}`"
-            v-html="section.content"
-          />
-          <!-- eslint-enable vue/no-v-html -->
-
-          <div
-            v-if="isPictureSection(section)"
-            class="post__section-attachment post__section-attachment--image"
+            v-for="section in post.sections"
+            :key="section.hash"
+            class="post__sections"
           >
-            <img
-              class="post__section-image"
-              :src="resolveImage(section.url)"
-              :alt="section.url"
-              :data-testid="`post-${post._id}-pic-${section.hash}`"
-              @error="resolveImageError"
+            <!-- eslint-disable vue/no-v-html -->
+            <div
+              v-if="isTextSection(section)"
+              :data-testid="`post-${post._id}-text-${section.hash}`"
+              v-html="section.content"
             />
-          </div>
+            <!-- eslint-enable vue/no-v-html -->
 
-          <div
-            v-if="isVideoSection(section)"
-            class="post__section-attachment post__section-attachment--video"
-          >
-            <video
-              class="post__section-video"
-              controls
-              :src="section.url"
-              :data-testid="`post-${post._id}-vid-${section.hash}`"
+            <div
+              v-if="isPictureSection(section)"
+              class="post__section-attachment post__section-attachment--image"
             >
-              <track kind="captions" />
-            </video>
+              <img
+                class="post__section-image"
+                :src="resolveImage(section.url)"
+                :alt="section.url"
+                :data-testid="`post-${post._id}-pic-${section.hash}`"
+                @error="resolveImageError"
+              />
+            </div>
+
+            <div
+              v-if="isVideoSection(section)"
+              class="post__section-attachment post__section-attachment--video"
+            >
+              <video
+                class="post__section-video"
+                controls
+                :src="section.url"
+                :data-testid="`post-${post._id}-vid-${section.hash}`"
+              >
+                <track kind="captions" />
+              </video>
+            </div>
           </div>
         </div>
-      </div>
+      </CollapsibleContent>
 
       <!-- for mobile -->
       <div class="post__rate-mobile">
@@ -238,6 +240,7 @@ import { resolveAvatar } from '@/utils/resolve-avatar';
 import { resolveImage } from '@/utils/resolve-image';
 import { resolveImageError } from '@/utils/resolve-image-error';
 import BaseContextMenu from '@common/BaseContextMenu.vue';
+import CollapsibleContent from '@common/CollapsibleContent.vue';
 import IconComments from '@icons/IconComments.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
@@ -247,9 +250,13 @@ import { isMobile } from '@utils/is-mobile';
 
 interface Props {
   canEdit?: boolean;
+  collapsible?: boolean;
 }
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), {
+  canEdit: false,
+  collapsible: true,
+});
 
 const post = defineModel<postTypes.Post>('post', {
   required: true,
