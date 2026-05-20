@@ -24,9 +24,6 @@ const router = express.Router();
           "id": {
             "type": "string"
           },
-          "email": {
-            "type": "string"
-          },
           "login": {
             "type": "string"
           },
