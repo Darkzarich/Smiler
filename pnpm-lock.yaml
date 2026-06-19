@@ -24,7 +24,7 @@ importers:
         version: 9.1.7
       knip:
         specifier: ^5.88.1
-        version: 5.88.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@20.19.9)(typescript@5.9.2)
+        version: 5.88.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@20.19.9)(typescript@5.9.2)
       lint-staged:
         specifier: ^16.4.0
         version: 16.4.0
@@ -71,8 +71,8 @@ importers:
         specifier: ^1.9.1
         version: 1.9.1
       multer:
-        specifier: ^2.1.1
-        version: 2.1.1
+        specifier: ^2.2.0
+        version: 2.2.0
       nanoid:
         specifier: ^3.3.11
         version: 3.3.11
@@ -211,7 +211,7 @@ importers:
     dependencies:
       '@tiptap/core':
         specifier: ^3.22.3
-        version: 3.22.3(@tiptap/pm@3.23.6)
+        version: 3.22.3(@tiptap/pm@3.27.1)
       '@tiptap/extension-blockquote':
         specifier: ^3.22.3
         version: 3.22.3(@tiptap/core@3.22.3)
@@ -220,7 +220,7 @@ importers:
         version: 3.22.3(@tiptap/core@3.22.3)
       '@tiptap/extension-bullet-list':
         specifier: ^3.22.3
-        version: 3.22.3(@tiptap/extension-list@3.23.6)
+        version: 3.22.3(@tiptap/extension-list@3.27.1)
       '@tiptap/extension-code':
         specifier: ^3.22.3
         version: 3.22.3(@tiptap/core@3.22.3)
@@ -235,19 +235,19 @@ importers:
         version: 3.22.3(@tiptap/core@3.22.3)
       '@tiptap/extension-horizontal-rule':
         specifier: ^3.22.3
-        version: 3.22.3(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6)
+        version: 3.22.3(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1)
       '@tiptap/extension-italic':
         specifier: ^3.22.3
         version: 3.22.3(@tiptap/core@3.22.3)
       '@tiptap/extension-link':
         specifier: ^3.22.3
-        version: 3.22.3(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6)
+        version: 3.22.3(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1)
       '@tiptap/extension-list-item':
         specifier: ^3.22.3
-        version: 3.22.3(@tiptap/extension-list@3.23.6)
+        version: 3.22.3(@tiptap/extension-list@3.27.1)
       '@tiptap/extension-ordered-list':
         specifier: ^3.22.3
-        version: 3.22.3(@tiptap/extension-list@3.23.6)
+        version: 3.22.3(@tiptap/extension-list@3.27.1)
       '@tiptap/extension-paragraph':
         specifier: ^3.22.3
         version: 3.22.3(@tiptap/core@3.22.3)
@@ -262,7 +262,7 @@ importers:
         version: 3.22.3(@tiptap/core@3.22.3)
       '@tiptap/vue-3':
         specifier: ^3.22.3
-        version: 3.22.3(@floating-ui/dom@1.7.6)(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6)(vue@3.5.18)
+        version: 3.22.3(@floating-ui/dom@1.7.6)(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1)(vue@3.5.18)
       '@vueuse/components':
         specifier: ^14.2.0
         version: 14.2.0(vue@3.5.18)
@@ -332,7 +332,7 @@ importers:
         version: 13.0.0(eslint-plugin-vue@10.4.0)(eslint@8.57.1)(typescript@5.9.2)
       '@vue/test-utils':
         specifier: ^2.4.10
-        version: 2.4.10(@vue/compiler-dom@3.5.35)(vue@3.5.18)
+        version: 2.4.10(@vue/compiler-dom@3.5.38)(vue@3.5.18)
       eslint:
         specifier: ^8.57.1
         version: 8.57.1
@@ -1261,24 +1261,24 @@ packages:
     resolution: {integrity: sha512-+nxncfwHM5SgAtrVzgpzJOI1ol0PkumhVo469KCf9lUi21IGcY90G98VuHm9VRrUypmAzawAHO9bs6hqeADaVg==}
     dev: true
 
-  /@emnapi/core@1.10.0:
-    resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
+  /@emnapi/core@1.11.1:
+    resolution: {integrity: sha512-RSvbQmHzdKzNsLYa/wHrbc3KN4sYLKAdPZxqiM2HATqv/SBk2/ENSHpvXGaLOMcsAyz0poEGqkmmKYG3OWiJEQ==}
     requiresBuild: true
     dependencies:
-      '@emnapi/wasi-threads': 1.2.1
+      '@emnapi/wasi-threads': 1.2.2
       tslib: 2.8.1
     dev: true
     optional: true
 
-  /@emnapi/runtime@1.10.0:
-    resolution: {integrity: sha512-ewvYlk86xUoGI0zQRNq/mC+16R1QeDlKQy21Ki3oSYXNgLb45GV1P6A0M+/s6nyCuNDqe5VpaY84BzXGwVbwFA==}
+  /@emnapi/runtime@1.11.1:
+    resolution: {integrity: sha512-vgj7R3y3Wgx24IQaGPA/R6YFXLHVMOZ0uVEyIQPaWs+rd1AzfEMXlAC22FYwO1XkKR6NPsq7mUandH8oIRdZFw==}
     requiresBuild: true
     dependencies:
       tslib: 2.8.1
     optional: true
 
-  /@emnapi/wasi-threads@1.2.1:
-    resolution: {integrity: sha512-uTII7OYF+/Mes/MrcIOYp5yOtSMLBWSIoLPpcgwipoiKbli6k322tcoFsxoIIxPDqW01SQGAgko4EzZi2BNv2w==}
+  /@emnapi/wasi-threads@1.2.2:
+    resolution: {integrity: sha512-c95qOXkHdydNKhscBTebqEC1CVAZpyqOfVfBzQ1qgzyl3gfeldUjIggDbIZgDKsHLgnsM+igH7TJ/eAasaVuMA==}
     requiresBuild: true
     dependencies:
       tslib: 2.8.1
@@ -1766,7 +1766,7 @@ packages:
     cpu: [wasm32]
     requiresBuild: true
     dependencies:
-      '@emnapi/runtime': 1.10.0
+      '@emnapi/runtime': 1.11.1
     dev: false
     optional: true
 
@@ -2122,21 +2122,21 @@ packages:
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
     requiresBuild: true
     dependencies:
-      '@emnapi/core': 1.10.0
-      '@emnapi/runtime': 1.10.0
+      '@emnapi/core': 1.11.1
+      '@emnapi/runtime': 1.11.1
       '@tybys/wasm-util': 0.10.2
     dev: true
     optional: true
 
-  /@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0):
-    resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
+  /@napi-rs/wasm-runtime@1.1.5(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1):
+    resolution: {integrity: sha512-AWPoBRJ9tsnVhor4sjO7rkni+7p+2IAEFj6cx06UgP10jkQHqay/36uRV/bFkgrh18D9vb4cr8Q0Pthskgzy+Q==}
     requiresBuild: true
     peerDependencies:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
     dependencies:
-      '@emnapi/core': 1.10.0
-      '@emnapi/runtime': 1.10.0
+      '@emnapi/core': 1.11.1
+      '@emnapi/runtime': 1.11.1
       '@tybys/wasm-util': 0.10.2
     dev: true
     optional: true
@@ -2301,13 +2301,13 @@ packages:
     dev: true
     optional: true
 
-  /@oxc-resolver/binding-wasm32-wasi@11.19.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0):
+  /@oxc-resolver/binding-wasm32-wasi@11.19.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1):
     resolution: {integrity: sha512-w8UCKhX826cP/ZLokXDS6+milN8y4X7zidsAttEdWlVoamTNf6lhBJldaWr3ukTDiye7s4HRcuPEPOXNC432Vg==}
     engines: {node: '>=14.0.0'}
     cpu: [wasm32]
     requiresBuild: true
     dependencies:
-      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      '@napi-rs/wasm-runtime': 1.1.5(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -2864,12 +2864,12 @@ packages:
       '@swc/counter': 0.1.3
     dev: true
 
-  /@tiptap/core@3.22.3(@tiptap/pm@3.23.6):
+  /@tiptap/core@3.22.3(@tiptap/pm@3.27.1):
     resolution: {integrity: sha512-Dv9MKK5BDWCF0N2l6/Pxv3JNCce2kwuWf2cKMBc2bEetx0Pn6o7zlFmSxMvYK4UtG1Tw9Yg/ZHi6QOFWK0Zm9Q==}
     peerDependencies:
       '@tiptap/pm': ^3.22.3
     dependencies:
-      '@tiptap/pm': 3.23.6
+      '@tiptap/pm': 3.27.1
     dev: false
 
   /@tiptap/extension-blockquote@3.22.3(@tiptap/core@3.22.3):
@@ -2877,7 +2877,7 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.22.3
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
     dev: false
 
   /@tiptap/extension-bold@3.22.3(@tiptap/core@3.22.3):
@@ -2885,28 +2885,28 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.22.3
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
     dev: false
 
-  /@tiptap/extension-bubble-menu@3.23.6(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6):
-    resolution: {integrity: sha512-Mwkyp9LkDHFbqmWRIkp63FinRxFu3ajC4qSb9t4mnHsb4kAdbNLLsGtbFg+le0SWk4CxGwAOwM7SzeJ+6UGqCA==}
+  /@tiptap/extension-bubble-menu@3.27.1(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1):
+    resolution: {integrity: sha512-j/j8Qp9Z5nViade2m7zjrO/CYH/Ca80Qj7aqo0eUaei6FZQ5izlF9o4XQU5EFMAutV6mwynsPUp8FVo5sCuYfw==}
     requiresBuild: true
     peerDependencies:
-      '@tiptap/core': 3.23.6
-      '@tiptap/pm': 3.23.6
+      '@tiptap/core': 3.27.1
+      '@tiptap/pm': 3.27.1
     dependencies:
       '@floating-ui/dom': 1.7.6
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
-      '@tiptap/pm': 3.23.6
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
+      '@tiptap/pm': 3.27.1
     dev: false
     optional: true
 
-  /@tiptap/extension-bullet-list@3.22.3(@tiptap/extension-list@3.23.6):
+  /@tiptap/extension-bullet-list@3.22.3(@tiptap/extension-list@3.27.1):
     resolution: {integrity: sha512-xOmW/b1hgECIE6r3IeZvKn4VVlG3+dfTjCWE6lnnyLaqdNkNhKS1CwUmDZdYNLUS2ryIUtgz5ID1W/8A3PhbiA==}
     peerDependencies:
       '@tiptap/extension-list': ^3.22.3
     dependencies:
-      '@tiptap/extension-list': 3.23.6(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6)
+      '@tiptap/extension-list': 3.27.1(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1)
     dev: false
 
   /@tiptap/extension-code@3.22.3(@tiptap/core@3.22.3):
@@ -2914,7 +2914,7 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.22.3
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
     dev: false
 
   /@tiptap/extension-document@3.22.3(@tiptap/core@3.22.3):
@@ -2922,20 +2922,20 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.22.3
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
     dev: false
 
-  /@tiptap/extension-floating-menu@3.23.6(@floating-ui/dom@1.7.6)(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6):
-    resolution: {integrity: sha512-2kjuDcEq69lEcECl75xqY5MyzUSh2zcC5aLrpwP1WwhJz5bxsIFHiaps5AP6h9R4A+ZBj5b2haay2Y1wDUU3VA==}
+  /@tiptap/extension-floating-menu@3.27.1(@floating-ui/dom@1.7.6)(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1):
+    resolution: {integrity: sha512-BmJF1VqB7dSJkgAalrpVFj88WLhxKjcWPuWHOqf2ITrUU2832BhKLXKmxjWUy1gqV8PfNNVWtGfIERy7I0y0+Q==}
     requiresBuild: true
     peerDependencies:
       '@floating-ui/dom': ^1.0.0
-      '@tiptap/core': 3.23.6
-      '@tiptap/pm': 3.23.6
+      '@tiptap/core': 3.27.1
+      '@tiptap/pm': 3.27.1
     dependencies:
       '@floating-ui/dom': 1.7.6
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
-      '@tiptap/pm': 3.23.6
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
+      '@tiptap/pm': 3.27.1
     dev: false
     optional: true
 
@@ -2944,7 +2944,7 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.22.3
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
     dev: false
 
   /@tiptap/extension-heading@3.22.3(@tiptap/core@3.22.3):
@@ -2952,17 +2952,17 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.22.3
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
     dev: false
 
-  /@tiptap/extension-horizontal-rule@3.22.3(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6):
+  /@tiptap/extension-horizontal-rule@3.22.3(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1):
     resolution: {integrity: sha512-wI2bFzScs+KgWeBH/BtypcVKeYelCyqV0RG8nxsZMWtPrBhqixzNd0Oi3gEKtjSjKUqMQ/kjJAIRuESr5UzlHA==}
     peerDependencies:
       '@tiptap/core': ^3.22.3
       '@tiptap/pm': ^3.22.3
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
-      '@tiptap/pm': 3.23.6
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
+      '@tiptap/pm': 3.27.1
     dev: false
 
   /@tiptap/extension-italic@3.22.3(@tiptap/core@3.22.3):
@@ -2970,44 +2970,44 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.22.3
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
     dev: false
 
-  /@tiptap/extension-link@3.22.3(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6):
+  /@tiptap/extension-link@3.22.3(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1):
     resolution: {integrity: sha512-S8/P2o9pv6B3kqLjH2TRWwSAximGbciNc6R8/QcN6HWLYxp0N0JoqN3rZHl9VWIBAGRWc4zkt80dhqrl2xmgfQ==}
     peerDependencies:
       '@tiptap/core': ^3.22.3
       '@tiptap/pm': ^3.22.3
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
-      '@tiptap/pm': 3.23.6
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
+      '@tiptap/pm': 3.27.1
       linkifyjs: 4.3.2
     dev: false
 
-  /@tiptap/extension-list-item@3.22.3(@tiptap/extension-list@3.23.6):
+  /@tiptap/extension-list-item@3.22.3(@tiptap/extension-list@3.27.1):
     resolution: {integrity: sha512-80CNf4oO5y8+LdckT4CyMe1t01EyhpRrQC9H45JW20P7559Nrchp5my3vvMtIAJbpTPPZtcB7LwdzWGKsG5drg==}
     peerDependencies:
       '@tiptap/extension-list': ^3.22.3
     dependencies:
-      '@tiptap/extension-list': 3.23.6(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6)
+      '@tiptap/extension-list': 3.27.1(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1)
     dev: false
 
-  /@tiptap/extension-list@3.23.6(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6):
-    resolution: {integrity: sha512-z6vj9+Qht2sjdQkyyHcUpsC/yCIZqTrQiyHDhs/HGKrfvoANyAZGpqdNeKf1wSyjIso+27tQuIH5NDfk8ygyNw==}
+  /@tiptap/extension-list@3.27.1(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1):
+    resolution: {integrity: sha512-c2Upru7lj0/ZV/Ibww6cNz6sUS8m6Dp/9uygFhYcZOd3X8M0xBIEk42c6m6SQehkPziVA8QOgNJz7sMqsbz1OQ==}
     peerDependencies:
-      '@tiptap/core': 3.23.6
-      '@tiptap/pm': 3.23.6
+      '@tiptap/core': 3.27.1
+      '@tiptap/pm': 3.27.1
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
-      '@tiptap/pm': 3.23.6
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
+      '@tiptap/pm': 3.27.1
     dev: false
 
-  /@tiptap/extension-ordered-list@3.22.3(@tiptap/extension-list@3.23.6):
+  /@tiptap/extension-ordered-list@3.22.3(@tiptap/extension-list@3.27.1):
     resolution: {integrity: sha512-orAghtmd+K4Euu4BgI1hG+iZDXBYOyl5YTwiLBc2mQn+pqtZ9LqaH2us4ETwEwNP3/IWXGSAimUZ19nuL+eM2w==}
     peerDependencies:
       '@tiptap/extension-list': ^3.22.3
     dependencies:
-      '@tiptap/extension-list': 3.23.6(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6)
+      '@tiptap/extension-list': 3.27.1(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1)
     dev: false
 
   /@tiptap/extension-paragraph@3.22.3(@tiptap/core@3.22.3):
@@ -3015,7 +3015,7 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.22.3
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
     dev: false
 
   /@tiptap/extension-strike@3.22.3(@tiptap/core@3.22.3):
@@ -3023,7 +3023,7 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.22.3
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
     dev: false
 
   /@tiptap/extension-text@3.22.3(@tiptap/core@3.22.3):
@@ -3031,7 +3031,7 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.22.3
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
     dev: false
 
   /@tiptap/extension-underline@3.22.3(@tiptap/core@3.22.3):
@@ -3039,27 +3039,28 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.22.3
     dependencies:
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
     dev: false
 
-  /@tiptap/pm@3.23.6:
-    resolution: {integrity: sha512-in5CaMaWlJcH2A1q6GJKFtrodE8WLS3M9tIi/f89jPmIVHJShpodC0KZDNyJkrVBQomYk0DEh86Utm6ASXzQww==}
+  /@tiptap/pm@3.27.1:
+    resolution: {integrity: sha512-Ffjx+vimmBU7zH/KrpXzJid3+pziCe/VL2aexSTP63cyQwKQ65LkFkCKaIsSpFdQQuakVZBGWjCA5RoBV852pw==}
     dependencies:
       prosemirror-changeset: 2.4.1
       prosemirror-commands: 1.7.1
       prosemirror-dropcursor: 1.8.2
       prosemirror-gapcursor: 1.4.1
       prosemirror-history: 1.5.0
+      prosemirror-inputrules: 1.5.1
       prosemirror-keymap: 1.2.3
-      prosemirror-model: 1.25.7
+      prosemirror-model: 1.25.9
       prosemirror-schema-list: 1.5.1
       prosemirror-state: 1.4.4
       prosemirror-tables: 1.8.5
       prosemirror-transform: 1.12.0
-      prosemirror-view: 1.41.8
+      prosemirror-view: 1.41.9
     dev: false
 
-  /@tiptap/vue-3@3.22.3(@floating-ui/dom@1.7.6)(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6)(vue@3.5.18):
+  /@tiptap/vue-3@3.22.3(@floating-ui/dom@1.7.6)(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1)(vue@3.5.18):
     resolution: {integrity: sha512-wOGZiBwIJYCZXts5VWWGgseGCRMc8tO46tgaOXNyMLVl2h2cO6/CNEcPO2pgtuoLIHoV4KYvfpw6n+XqR9cqbA==}
     peerDependencies:
       '@floating-ui/dom': ^1.0.0
@@ -3068,12 +3069,12 @@ packages:
       vue: ^3.0.0
     dependencies:
       '@floating-ui/dom': 1.7.6
-      '@tiptap/core': 3.22.3(@tiptap/pm@3.23.6)
-      '@tiptap/pm': 3.23.6
+      '@tiptap/core': 3.22.3(@tiptap/pm@3.27.1)
+      '@tiptap/pm': 3.27.1
       vue: 3.5.18(typescript@5.9.2)
     optionalDependencies:
-      '@tiptap/extension-bubble-menu': 3.23.6(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6)
-      '@tiptap/extension-floating-menu': 3.23.6(@floating-ui/dom@1.7.6)(@tiptap/core@3.22.3)(@tiptap/pm@3.23.6)
+      '@tiptap/extension-bubble-menu': 3.27.1(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1)
+      '@tiptap/extension-floating-menu': 3.27.1(@floating-ui/dom@1.7.6)(@tiptap/core@3.22.3)(@tiptap/pm@3.27.1)
     dev: false
 
   /@tsconfig/node10@1.0.11:
@@ -3939,11 +3940,11 @@ packages:
       source-map-js: 1.2.1
     dev: true
 
-  /@vue/compiler-core@3.5.35:
-    resolution: {integrity: sha512-BUmHaR1J+O+CKZ9uJucdVTEr1LHsdyvv7vG3eNRhK3CczEHeMd/LtsHAuD7PbrxvI2envCY2v7HI1vC1aBRzKw==}
+  /@vue/compiler-core@3.5.38:
+    resolution: {integrity: sha512-s99aGxWYig9ErHbct27KXEGhrBYlRI6c4MwAgXErOAbX9xiW37/uMa+XUDO69zLz83dng8UUZ70CTOJrLrYrEQ==}
     dependencies:
       '@babel/parser': 7.29.7
-      '@vue/shared': 3.5.35
+      '@vue/shared': 3.5.38
       entities: 7.0.1
       estree-walker: 2.0.2
       source-map-js: 1.2.1
@@ -3962,11 +3963,11 @@ packages:
       '@vue/shared': 3.5.20
     dev: true
 
-  /@vue/compiler-dom@3.5.35:
-    resolution: {integrity: sha512-k+bprkXxuqhVajgTx5mUHuir7TwQzUKOWR40ng1ncAqQRPnrLngGGgqVEEhOnTMlc8btHYVKmrP8s5Qyg0hvYA==}
+  /@vue/compiler-dom@3.5.38:
+    resolution: {integrity: sha512-JTqp25l8aFfJYF7/KmsXZjAxJz7T+SjmTJLoXVjHtc2BrSgSiW2n9Aem/cWq1OPe68A8JL06B3eVdhlP0H4TVw==}
     dependencies:
-      '@vue/compiler-core': 3.5.35
-      '@vue/shared': 3.5.35
+      '@vue/compiler-core': 3.5.38
+      '@vue/shared': 3.5.38
     dev: true
 
   /@vue/compiler-sfc@3.5.18:
@@ -4098,11 +4099,11 @@ packages:
     resolution: {integrity: sha512-SoRGP596KU/ig6TfgkCMbXkr4YJ91n/QSdMuqeP5r3hVIYA3CPHUBCc7Skak0EAKV+5lL4KyIh61VA/pK1CIAA==}
     dev: true
 
-  /@vue/shared@3.5.35:
-    resolution: {integrity: sha512-zSbjL7gRXwks2ZQLRGCajBtBXEOXW9Ddhn/HvSdrGkE2dqGnumzW8XtusRrxrE9LvqtiqDXQ+A60Hp6mvdYxfA==}
+  /@vue/shared@3.5.38:
+    resolution: {integrity: sha512-FTW0AFZNaK5/mOqvGBwVfUlNLU38TiQn4+DQgIFUnrBBJQ1crMJ82yeGQLV5jyKFsO8yRukpbuP7x+nRbH6aug==}
     dev: true
 
-  /@vue/test-utils@2.4.10(@vue/compiler-dom@3.5.35)(vue@3.5.18):
+  /@vue/test-utils@2.4.10(@vue/compiler-dom@3.5.38)(vue@3.5.18):
     resolution: {integrity: sha512-SmoZ5EA1kYiAFs9NkYdiFFQF+cSnUwnvlYEbY+DogWQZUiqOm/Y29eSbc5T6yi75SgSF9863SBeXniIEoPajCA==}
     peerDependencies:
       '@vue/compiler-dom': 3.x
@@ -4112,7 +4113,7 @@ packages:
       '@vue/server-renderer':
         optional: true
     dependencies:
-      '@vue/compiler-dom': 3.5.35
+      '@vue/compiler-dom': 3.5.38
       js-beautify: 1.15.4
       vue: 3.5.18(typescript@5.9.2)
       vue-component-type-helpers: 3.2.9
@@ -4513,8 +4514,8 @@ packages:
     resolution: {integrity: sha512-1ugUSr8BHXRnK23KfuYS+gVMC3LB8QGH9W1iGtDPsNWoQbgtXSExkBu2aDR4epiGWZOjZsj6lDl/N/AqqTC3UA==}
     dev: true
 
-  /bare-events@2.8.3:
-    resolution: {integrity: sha512-HdUm8EMQBLaJvGUdidNNbqpA1kYkwNcb+MYxkxCLAPJGQzlv9J0C24h8V65Z4c5GLd/JEALDvpFCQgpLJqc0zw==}
+  /bare-events@2.9.1:
+    resolution: {integrity: sha512-Z0oHEHAFDZkffN8Qc39zNZjQlMDkPJRyyyZieU1VH7u8c5S+qHZ2S8ixdKIAxEjfHO7FJxXmJWgteOghVanIsg==}
     requiresBuild: true
     peerDependencies:
       bare-abort-controller: '*'
@@ -7775,7 +7776,7 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /knip@5.88.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@20.19.9)(typescript@5.9.2):
+  /knip@5.88.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@20.19.9)(typescript@5.9.2):
     resolution: {integrity: sha512-tpy5o7zu1MjawVkLPuahymVJekYY3kYjvzcoInhIchgePxTlo+api90tBv2KfhAIe5uXh+mez1tAfmbv8/TiZg==}
     engines: {node: '>=18.18.0'}
     hasBin: true
@@ -7789,7 +7790,7 @@ packages:
       formatly: 0.3.0
       jiti: 2.6.1
       minimist: 1.2.8
-      oxc-resolver: 11.19.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      oxc-resolver: 11.19.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
       picocolors: 1.1.1
       picomatch: 4.0.3
       smol-toml: 1.6.1
@@ -8347,8 +8348,8 @@ packages:
     resolution: {integrity: sha512-VNTrAak/KhO2i8dqqnqnAHOa3cYBwXEZe9h+D5h/1ZqFSTEFHdM65lR7RoIqq3tBBYavsOXV84NoHXZ0AkPyqQ==}
     dev: true
 
-  /multer@2.1.1:
-    resolution: {integrity: sha512-mo+QTzKlx8R7E5ylSXxWzGoXoZbOsRMpyitcht8By2KHvMbf3tjwosZ/Mu/XYU6UuJ3VZnODIrak5ZrPiPyB6A==}
+  /multer@2.2.0:
+    resolution: {integrity: sha512-6rdyFg2kLrMh9Jee7/BMPuV9lEAd7lLW2YUpF9/YxR7njyoUwwQ0ZPh3TaIY50Sw6vlyD2HW3wGOkTS4P79xrQ==}
     engines: {node: '>= 10.16.0'}
     dependencies:
       append-field: 1.0.0
@@ -8367,8 +8368,8 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  /nanoid@3.3.12:
-    resolution: {integrity: sha512-ZB9RH/39qpq5Vu6Y+NmUaFhQR6pp+M2Xt76XBnEwDaGcVAqhlvxrl3B2bKS5D3NH3QR76v3aSrKaF/Kiy7lEtQ==}
+  /nanoid@3.3.13:
+    resolution: {integrity: sha512-sPdqC6ByMVVGvF1ynvvMo0/o+oD1VX7DaHhijt1bFgjvBkHBib4t49GoNDhf2NDta4oeUNlaGbSt5K7qjZ955Q==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
     dev: true
@@ -8612,7 +8613,7 @@ packages:
       safe-push-apply: 1.0.0
     dev: true
 
-  /oxc-resolver@11.19.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0):
+  /oxc-resolver@11.19.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1):
     resolution: {integrity: sha512-qE/CIg/spwrTBFt5aKmwe3ifeDdLfA2NESN30E42X/lII5ClF8V7Wt6WIJhcGZjp0/Q+nQ+9vgxGk//xZNX2hg==}
     optionalDependencies:
       '@oxc-resolver/binding-android-arm-eabi': 11.19.1
@@ -8631,7 +8632,7 @@ packages:
       '@oxc-resolver/binding-linux-x64-gnu': 11.19.1
       '@oxc-resolver/binding-linux-x64-musl': 11.19.1
       '@oxc-resolver/binding-openharmony-arm64': 11.19.1
-      '@oxc-resolver/binding-wasm32-wasi': 11.19.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      '@oxc-resolver/binding-wasm32-wasi': 11.19.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
       '@oxc-resolver/binding-win32-arm64-msvc': 11.19.1
       '@oxc-resolver/binding-win32-ia32-msvc': 11.19.1
       '@oxc-resolver/binding-win32-x64-msvc': 11.19.1
@@ -8914,7 +8915,7 @@ packages:
     resolution: {integrity: sha512-FfR8sjd4em2T6fb3I2MwAJU7HWVMr9zba+enmQeeWFfCbm+UOC/0X4DS8XtpUTMwWMGbjKYP7xjfNekzyGmB3A==}
     engines: {node: ^10 || ^12 || >=14}
     dependencies:
-      nanoid: 3.3.12
+      nanoid: 3.3.13
       picocolors: 1.1.1
       source-map-js: 1.2.1
     dev: true
@@ -8975,7 +8976,7 @@ packages:
   /prosemirror-commands@1.7.1:
     resolution: {integrity: sha512-rT7qZnQtx5c0/y/KlYaGvtG411S97UaL6gdp6RIZ23DLHanMYLyfGBV5DtSnZdthQql7W+lEVbpSfwtO8T+L2w==}
     dependencies:
-      prosemirror-model: 1.25.7
+      prosemirror-model: 1.25.9
       prosemirror-state: 1.4.4
       prosemirror-transform: 1.12.0
     dev: false
@@ -8985,16 +8986,16 @@ packages:
     dependencies:
       prosemirror-state: 1.4.4
       prosemirror-transform: 1.12.0
-      prosemirror-view: 1.41.8
+      prosemirror-view: 1.41.9
     dev: false
 
   /prosemirror-gapcursor@1.4.1:
     resolution: {integrity: sha512-pMdYaEnjNMSwl11yjEGtgTmLkR08m/Vl+Jj443167p9eB3HVQKhYCc4gmHVDsLPODfZfjr/MmirsdyZziXbQKw==}
     dependencies:
       prosemirror-keymap: 1.2.3
-      prosemirror-model: 1.25.7
+      prosemirror-model: 1.25.9
       prosemirror-state: 1.4.4
-      prosemirror-view: 1.41.8
+      prosemirror-view: 1.41.9
     dev: false
 
   /prosemirror-history@1.5.0:
@@ -9002,8 +9003,15 @@ packages:
     dependencies:
       prosemirror-state: 1.4.4
       prosemirror-transform: 1.12.0
-      prosemirror-view: 1.41.8
+      prosemirror-view: 1.41.9
       rope-sequence: 1.3.4
+    dev: false
+
+  /prosemirror-inputrules@1.5.1:
+    resolution: {integrity: sha512-7wj4uMjKaXWAQ1CDgxNzNtR9AlsuwzHfdFH1ygEHA2KHF2DOEaXl1CJfNPAKCg9qNEh4rum975QLaCiQPyY6Fw==}
+    dependencies:
+      prosemirror-state: 1.4.4
+      prosemirror-transform: 1.12.0
     dev: false
 
   /prosemirror-keymap@1.2.3:
@@ -9013,8 +9021,8 @@ packages:
       w3c-keyname: 2.2.8
     dev: false
 
-  /prosemirror-model@1.25.7:
-    resolution: {integrity: sha512-A79aN8QEFUwI6cax8Yq4Rpcx1TJZ3Kagn+ii7qLo4/V8H3mMiHrhFyhTyHHvpSnOgMPpWiDGSwM3etwrxE50ug==}
+  /prosemirror-model@1.25.9:
+    resolution: {integrity: sha512-pRTklkDDMMRopyoAcrr9wV/8g/RYgrLHBuJAb5hlEuYZRdm5yqmPjWId83fpBwPpSFqEdja0H7Dfd7z1X/npcA==}
     dependencies:
       orderedmap: 2.1.1
     dev: false
@@ -9022,7 +9030,7 @@ packages:
   /prosemirror-schema-list@1.5.1:
     resolution: {integrity: sha512-927lFx/uwyQaGwJxLWCZRkjXG0p48KpMj6ueoYiu4JX05GGuGcgzAy62dfiV8eFZftgyBUvLx76RsMe20fJl+Q==}
     dependencies:
-      prosemirror-model: 1.25.7
+      prosemirror-model: 1.25.9
       prosemirror-state: 1.4.4
       prosemirror-transform: 1.12.0
     dev: false
@@ -9030,31 +9038,31 @@ packages:
   /prosemirror-state@1.4.4:
     resolution: {integrity: sha512-6jiYHH2CIGbCfnxdHbXZ12gySFY/fz/ulZE333G6bPqIZ4F+TXo9ifiR86nAHpWnfoNjOb3o5ESi7J8Uz1jXHw==}
     dependencies:
-      prosemirror-model: 1.25.7
+      prosemirror-model: 1.25.9
       prosemirror-transform: 1.12.0
-      prosemirror-view: 1.41.8
+      prosemirror-view: 1.41.9
     dev: false
 
   /prosemirror-tables@1.8.5:
     resolution: {integrity: sha512-V/0cDCsHKHe/tfWkeCmthNUcEp1IVO3p6vwN8XtwE9PZQLAZJigbw3QoraAdfJPir4NKJtNvOB8oYGKRl+t0Dw==}
     dependencies:
       prosemirror-keymap: 1.2.3
-      prosemirror-model: 1.25.7
+      prosemirror-model: 1.25.9
       prosemirror-state: 1.4.4
       prosemirror-transform: 1.12.0
-      prosemirror-view: 1.41.8
+      prosemirror-view: 1.41.9
     dev: false
 
   /prosemirror-transform@1.12.0:
     resolution: {integrity: sha512-GxboyN4AMIsoHNtz5uf2r2Ru551i5hWeCMD6E2Ib4Eogqoub0NflniaBPVQ4MrGE5yZ8JV9tUHg9qcZTTrcN4w==}
     dependencies:
-      prosemirror-model: 1.25.7
+      prosemirror-model: 1.25.9
     dev: false
 
-  /prosemirror-view@1.41.8:
-    resolution: {integrity: sha512-TnKDdohEatgyZNGCDWIdccOHXhYloJwbwU+phw/a23KBvJIR9lWQWW7WHHK3vBdOLDNuF7TaX98GObUZOWkOnA==}
+  /prosemirror-view@1.41.9:
+    resolution: {integrity: sha512-clTunTX+eaLbr87L1V1QPheRlEQJyTlL3gXe9x3jQIk3rL0RVWxviDGz8tFaydwIVm+hKhYCyr+R/zBtWr9s6A==}
     dependencies:
-      prosemirror-model: 1.25.7
+      prosemirror-model: 1.25.9
       prosemirror-state: 1.4.4
       prosemirror-transform: 1.12.0
     dev: false
@@ -9780,7 +9788,7 @@ packages:
       fast-fifo: 1.3.2
       text-decoder: 1.2.3
     optionalDependencies:
-      bare-events: 2.8.3
+      bare-events: 2.9.1
     transitivePeerDependencies:
       - bare-abort-controller
     dev: true
