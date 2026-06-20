@@ -51,9 +51,7 @@ export async function create(
     ),
   ]);
 
-  const populatedPost = await PostModel.findById(post._id)
-    .populate('author', 'login avatar')
-    .lean();
+  const populatedPost = await post.populate('author', 'login avatar');
 
-  sendSuccess(res, postToResponse(populatedPost!));
+  sendSuccess(res, postToResponse(populatedPost));
 }

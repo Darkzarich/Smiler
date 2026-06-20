@@ -47,9 +47,7 @@ export async function unvoteById(
   }
 
   // If the rate was negative increase the rating after removing the rate
-  const rateValue = rate.negative
-    ? COMMENT_RATE_VALUE
-    : -COMMENT_RATE_VALUE;
+  const rateValue = rate.negative ? COMMENT_RATE_VALUE : -COMMENT_RATE_VALUE;
 
   const [updatedComment] = await Promise.all([
     CommentModel.findByIdAndUpdate(

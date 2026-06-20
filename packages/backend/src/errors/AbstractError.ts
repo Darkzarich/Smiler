@@ -15,4 +15,3 @@ export default class AbstractError extends Error {
     this.isOperational = isOperational;
   }
 }
-

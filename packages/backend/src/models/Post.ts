@@ -117,18 +117,7 @@ export class Post {
   }
 }
 
-interface LeanPost
-  extends Pick<
-    Post,
-    | 'title'
-    | 'slug'
-    | 'sections'
-    | 'rating'
-    | 'tags'
-    | 'commentCount'
-    | 'createdAt'
-    | 'updatedAt'
-  > {
+interface LeanPost extends Omit<Post, 'author'> {
   _id: Types.ObjectId;
   author: Types.ObjectId | PopulatedAuthor;
 }

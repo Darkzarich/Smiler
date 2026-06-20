@@ -24,7 +24,9 @@ export function createRateLimiter(options: RateLimiterOptions) {
     standardHeaders: true,
     legacyHeaders: false,
     skip: () => Config.IS_JEST || !Config.RATE_LIMIT_ENABLED,
-    store: Config.RATE_LIMIT_ENABLED ? createStore(Config.DB_URL, windowMs) : undefined,
+    store: Config.RATE_LIMIT_ENABLED
+      ? createStore(Config.DB_URL, windowMs)
+      : undefined,
     keyGenerator: (req) => {
       if (req.session?.userId) {
         return `user:${req.session.userId}`;
