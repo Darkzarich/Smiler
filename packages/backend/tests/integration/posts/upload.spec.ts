@@ -92,13 +92,13 @@ describe('POST /posts/upload', () => {
       global.app,
     );
 
-    const testImage = await createTestImage(Sharp.format.jp2);
+    const testImage = await createTestImage(Sharp.format.exr);
 
     const response = await request(global.app)
       .post('/api/posts/upload')
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken)
-      .attach('picture', testImage, 'test.jp2');
+      .attach('picture', testImage, 'test.exr');
 
     expect(response.status).toBe(422);
     expect(response.body.error.message).toBe(
@@ -233,7 +233,7 @@ describe('POST /posts/upload', () => {
   });
 
   it('Should return status 200 and a new section with isFile=true and add section to user template', async () => {
-    const testImage = await createTestImage(Sharp.format.jpg);
+    const testImage = await createTestImage(Sharp.format.jpeg);
 
     const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
       global.app,
