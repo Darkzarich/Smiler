@@ -95,6 +95,7 @@ test('Shows a deleted comment with different text and no reply button', async ({
 test('Posts a new comment to a post', async ({
   SinglePostPage,
   Comments,
+  Post,
   Api,
 }) => {
   const newComment = createRandomComment();
@@ -119,6 +120,10 @@ test('Posts a new comment to a post', async ({
 
   await expect(Comments.getCommentById(newComment._id)).toContainText(
     newComment.body,
+  );
+
+  await expect(Post.getCommentsCountById(post._id)).toHaveText(
+    String(post.commentCount + 1),
   );
 });
 
@@ -159,7 +164,12 @@ test.describe('Replies', () => {
     });
   });
 
-  test('Replies to a comment', async ({ SinglePostPage, Comments, Api }) => {
+  test('Replies to a comment', async ({
+    SinglePostPage,
+    Comments,
+    Post,
+    Api,
+  }) => {
     await SinglePostPage.goto(post.slug);
 
     await Comments.clickCommentReplyTogglerById(comment._id);
@@ -179,6 +189,10 @@ test.describe('Replies', () => {
 
     await expect(Comments.getCommentById(newReplyId)).toContainText(
       newReplyText,
+    );
+
+    await expect(Post.getCommentsCountById(post._id)).toHaveText(
+      String(post.commentCount + 1),
     );
   });
 
@@ -625,6 +639,7 @@ test.describe('Editing or deleting a comment', () => {
   test('The current user deletes a comment that is not older than 10 mins, sends the delete request', async ({
     SinglePostPage,
     Comments,
+    Post,
     context,
     Api,
   }) => {
@@ -644,6 +659,10 @@ test.describe('Editing or deleting a comment', () => {
     });
 
     await expect(Comments.getCommentById(currentUserComment._id)).toBeHidden();
+
+    await expect(Post.getCommentsCountById(post._id)).toHaveText(
+      String(post.commentCount - 1),
+    );
   });
 
   test('The current user edits a comment that is not older than 10 mins, sends the edit request', async ({
@@ -685,6 +704,7 @@ test.describe('Editing or deleting a comment', () => {
   test('The current user deletes a comment that has replies', async ({
     SinglePostPage,
     Comments,
+    Post,
     context,
     Api,
   }) => {
@@ -725,6 +745,10 @@ test.describe('Editing or deleting a comment', () => {
     await expect(
       Comments.getCommentById(currentUserCommentWithReplies._id),
     ).toContainText('This comment has been deleted');
+
+    await expect(Post.getCommentsCountById(post._id)).toHaveText(
+      String(post.commentCount),
+    );
   });
 });
 

@@ -10,6 +10,7 @@
         :post-id="postId"
         :level="level"
         @remove="handleRemoveComment"
+        @reply-created="emit('reply-created')"
       />
     </div>
   </div>
@@ -26,9 +27,16 @@ interface Props {
   level?: number;
 }
 
+interface Emits {
+  remove: [id: string];
+  'reply-created': [];
+}
+
 const props = withDefaults(defineProps<Props>(), {
   level: 0,
 });
+
+const emit = defineEmits<Emits>();
 
 const comments = ref(props.data);
 
@@ -42,6 +50,8 @@ const handleRemoveComment = (id: string) => {
   }
 
   comments.value.splice(commentIndex, 1);
+
+  emit('remove', id);
 };
 </script>
 

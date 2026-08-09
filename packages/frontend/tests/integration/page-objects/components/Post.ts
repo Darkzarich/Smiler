@@ -31,6 +31,10 @@ export default class Post extends AbstractComponent {
     return this.page.getByTestId(`post-${id}-title`);
   }
 
+  getCommentsCountById(id = '') {
+    return this.page.getByTestId(`post-${id}-comments-count`);
+  }
+
   getUpvoteBtnById(postId = '') {
     const selector = this.isMobile
       ? `m-post-${postId}-upvote`

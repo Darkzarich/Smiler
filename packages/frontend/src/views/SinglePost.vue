@@ -23,6 +23,8 @@
           :post-id="post._id"
           :level="0"
           :is-first="true"
+          @remove="incrementCommentCount(-1)"
+          @reply-created="incrementCommentCount(1)"
         />
 
         <div v-else-if="!isFetchingComments" class="comments__no-comments">
@@ -145,6 +147,14 @@ const handleAddNewComment = (newComment: commentTypes.Comment) => {
 
   post.value.commentCount = post.value.commentCount + 1;
   comments.value.unshift(newComment);
+};
+
+const incrementCommentCount = (value: number) => {
+  if (!post.value) {
+    return;
+  }
+
+  post.value.commentCount = post.value.commentCount + value;
 };
 
 onBeforeMount(async () => {

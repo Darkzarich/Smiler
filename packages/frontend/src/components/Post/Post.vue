@@ -169,6 +169,7 @@
 
           <RouterLink
             class="post__comments-count"
+            :data-testid="`post-${post._id}-comments-count`"
             :target="isMobile() ? '' : '_blank'"
             :to="{
               name: 'Single',

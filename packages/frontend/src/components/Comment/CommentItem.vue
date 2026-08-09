@@ -178,6 +178,7 @@
         :post-id="postId"
         :level="level + 1"
         @remove="handleRemoveComment"
+        @reply-created="emit('reply-created')"
       />
     </div>
   </div>
@@ -217,6 +218,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 interface Emits {
   remove: [id: string];
+  'reply-created': [];
 }
 
 const emit = defineEmits<Emits>();
@@ -283,6 +285,8 @@ const handleReply = async () => {
     };
 
     comment.value.children.unshift(newComment);
+
+    emit('reply-created');
 
     replyBody.value = '';
     toggleReply();
@@ -353,6 +357,8 @@ const handleRemoveComment = (id: string) => {
   }
 
   comment.value.children.splice(commentIndex, 1);
+
+  emit('remove', id);
 };
 
 const handleRemoveVote = async () => {
