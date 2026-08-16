@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import ConfirmModal from '../components/ConfirmModal';
 import AbstractPage from './AbstractPage';
 
 export default class PostCreatePage extends AbstractPage {
@@ -10,6 +11,8 @@ export default class PostCreatePage extends AbstractPage {
 
   readonly title = AbstractPage.formatTitle('Edit Post');
 
+  readonly confirmDeleteModal: ConfirmModal;
+
   constructor(page: Page) {
     super(page);
 
@@ -17,6 +20,7 @@ export default class PostCreatePage extends AbstractPage {
 
     this.postTitleInput = page.getByTestId('post-title-input');
     this.postTagInput = page.getByTestId('post-tag-input');
+    this.confirmDeleteModal = new ConfirmModal(page, 'confirm-delete-modal');
   }
 
   async goto() {

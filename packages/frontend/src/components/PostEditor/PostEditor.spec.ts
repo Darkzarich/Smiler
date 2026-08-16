@@ -28,7 +28,7 @@ vi.mock('@/api', () => ({
 
 const testElements = {
   // After stub data-testid becomes datatestid
-  confirmModal: '[datatestid="delete-confirm-modal"]',
+  confirmModal: '[datatestid="confirm-delete-modal"]',
   deleteTextSection: '[data-testid="delete-section-text-1"]',
   deletePicSection: '[data-testid="delete-section-pic-1"]',
 };

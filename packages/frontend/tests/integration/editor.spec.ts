@@ -168,6 +168,43 @@ test('Deletes sections in a post', async ({ PostCreatePage }) => {
   await expect(PostCreatePage.getVideoSection()).toBeHidden();
 });
 
+test.describe('Delete section warning', () => {
+  test.beforeEach(async ({ PostCreatePage }) => {
+    await PostCreatePage.goto();
+    await PostCreatePage.addTextSection();
+    await PostCreatePage.fillTextSection('test text');
+  });
+
+  test('Shows a warning before deleting a section with content', async ({
+    PostCreatePage,
+  }) => {
+    await PostCreatePage.removeFirstSection();
+
+    await PostCreatePage.confirmDeleteModal.expectVisible();
+    await expect(PostCreatePage.getTextSection()).toBeVisible();
+  });
+
+  test('Keeps the section when the deletion is declined', async ({
+    PostCreatePage,
+  }) => {
+    await PostCreatePage.removeFirstSection();
+    await PostCreatePage.confirmDeleteModal.cancel();
+
+    await PostCreatePage.confirmDeleteModal.expectVisible();
+    await expect(PostCreatePage.getTextSection()).toBeVisible();
+  });
+
+  test('Deletes the section when the deletion is confirmed', async ({
+    PostCreatePage,
+  }) => {
+    await PostCreatePage.removeFirstSection();
+    await PostCreatePage.confirmDeleteModal.confirm();
+
+    await PostCreatePage.confirmDeleteModal.expectHidden();
+    await expect(PostCreatePage.getTextSection()).toBeHidden();
+  });
+});
+
 test('D&D post sections to change order of sections', async ({
   PostCreatePage,
   Api,

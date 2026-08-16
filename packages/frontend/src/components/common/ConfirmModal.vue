@@ -15,7 +15,7 @@
     <template #footer>
       <BaseButton
         size="medium"
-        data-testid="confirm-modal-cancel"
+        :data-testid="`${dataTestid}-cancel`"
         @click="$emit('cancel')"
       >
         {{ cancelLabel }}
@@ -23,7 +23,7 @@
 
       <BaseButton
         size="medium"
-        data-testid="confirm-modal-confirm"
+        :data-testid="`${dataTestid}-confirm`"
         :type="confirmType"
         @click="$emit('confirm')"
       >

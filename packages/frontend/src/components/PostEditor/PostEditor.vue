@@ -76,7 +76,7 @@
     />
 
     <ConfirmModal
-      data-testid="delete-confirm-modal"
+      data-testid="confirm-delete-modal"
       :is-open="Boolean(sectionPendingDeletion)"
       :title="'Delete section?'"
       :message="'This section has content and will be permanently removed. Are you sure?'"
