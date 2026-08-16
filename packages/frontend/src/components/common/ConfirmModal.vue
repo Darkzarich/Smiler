@@ -1,7 +1,7 @@
 <template>
   <BaseModal
     :is-open="isOpen"
-    data-testid="confirm-modal"
+    :data-testid="dataTestid"
     :close-on-backdrop="closeOnBackdrop"
     :close-on-esc="closeOnEsc"
     @close="$emit('cancel')"
@@ -38,6 +38,7 @@ import BaseButton from './BaseButton.vue';
 import BaseModal from './BaseModal.vue';
 
 interface Props {
+  dataTestid?: string;
   isOpen?: boolean;
   title?: string;
   message?: string;
@@ -54,6 +55,7 @@ interface Emits {
 }
 
 withDefaults(defineProps<Props>(), {
+  dataTestid: 'confirm-modal',
   isOpen: false,
   title: '',
   message: '',
