@@ -17,3 +17,11 @@ export function isVideoSection(
 ): section is postTypes.PostVideoSection {
   return section.type === postTypes.POST_SECTION_TYPES.VIDEO;
 }
+
+export function hasSectionContent(section: postTypes.PostSection): boolean {
+  if (isTextSection(section)) {
+    return section.content.trim().length > 0;
+  }
+
+  return section.url.trim().length > 0;
+}

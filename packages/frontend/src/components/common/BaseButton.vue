@@ -5,6 +5,7 @@
     class="base-button"
     :class="{
       [`base-button--${type}`]: Boolean(type),
+      [`base-button--${size}`]: Boolean(size),
       'base-button--stretched': stretched,
       'base-button--loading': loading,
     }"
@@ -25,6 +26,7 @@ interface Props {
   dataTestid?: string;
   attrType?: 'button' | 'submit' | 'reset';
   type?: 'primary' | 'danger' | 'icon';
+  size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   loading?: boolean;
   stretched?: boolean;
@@ -34,6 +36,7 @@ withDefaults(defineProps<Props>(), {
   dataTestid: 'button',
   attrType: 'button',
   type: 'primary',
+  size: 'small',
   disabled: false,
   loading: false,
   stretched: false,
@@ -99,6 +102,16 @@ withDefaults(defineProps<Props>(), {
       width: 20px;
       height: 20px;
     }
+  }
+
+  &--medium {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  &--large {
+    padding: 12px 24px;
+    font-size: 16px;
   }
 
   &--loading {

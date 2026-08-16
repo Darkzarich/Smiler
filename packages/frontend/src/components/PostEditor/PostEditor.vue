@@ -58,7 +58,7 @@
           <button
             type="button"
             class="post-editor__delete-btn"
-            @click="deleteSection(section)"
+            @click="requestDeleteSection(section)"
           >
             <CloseIcon
               title="Delete"
@@ -73,6 +73,16 @@
       v-if="sections.length < consts.POST_MAX_SECTIONS"
       class="post-editor__add-section-buttons"
       @add-section="createSection"
+    />
+
+    <ConfirmModal
+      :is-open="Boolean(sectionPendingDeletion)"
+      :title="'Delete section?'"
+      :message="'This section has content and will be permanently removed. Are you sure?'"
+      confirm-label="Delete"
+      cancel-label="Cancel"
+      @confirm="confirmDeleteSection"
+      @cancel="cancelDeleteSection"
     />
 
     <div class="post-editor__submit-form">
@@ -119,6 +129,7 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Draggable from 'vuedraggable';
 import {
+  hasSectionContent,
   isPictureSection,
   isTextSection,
   isVideoSection,
@@ -135,6 +146,7 @@ import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
+import ConfirmModal from '@common/ConfirmModal.vue';
 import { TextEditorFeatures } from '@common/text-editor-features';
 import CloseIcon from '@icons/IconExit.vue';
 
@@ -161,6 +173,8 @@ const tags = ref<string[]>([]);
 const sections = ref<postTypes.PostSection[]>([]);
 
 const isDirty = ref(false);
+
+const sectionPendingDeletion = ref<postTypes.PostSection | null>(null);
 
 const validation = computed(() => {
   const validation = {
@@ -231,6 +245,28 @@ const updatePictureSection = (data: postTypes.PostPictureSection) => {
   const currentSectionIndex = sections.value.indexOf(currentSection);
 
   sections.value[currentSectionIndex] = data;
+};
+
+const requestDeleteSection = (section: postTypes.PostSection) => {
+  if (hasSectionContent(section)) {
+    sectionPendingDeletion.value = section;
+
+    return;
+  }
+
+  deleteSection(section);
+};
+
+const confirmDeleteSection = () => {
+  if (sectionPendingDeletion.value) {
+    deleteSection(sectionPendingDeletion.value);
+  }
+
+  sectionPendingDeletion.value = null;
+};
+
+const cancelDeleteSection = () => {
+  sectionPendingDeletion.value = null;
 };
 
 const deleteSection = (section: postTypes.PostSection) => {
