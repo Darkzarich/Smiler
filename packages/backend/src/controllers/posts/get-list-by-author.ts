@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { UserModel } from '@models/User';
+import { UserModel, normalizeLogin } from '@models/User';
 import { PostModel, postToResponse, PostResponse } from '@models/Post';
 import { RateModel, RateTargetModel } from '@models/Rate';
 import { NotFoundError, ERRORS } from '@errors';
@@ -28,7 +28,7 @@ export async function getListByAuthor(
   const author = req.query.author || '';
 
   const foundAuthor = await UserModel.findOne({
-    login: author,
+    login: normalizeLogin(author),
   }).lean();
 
   if (!foundAuthor) {

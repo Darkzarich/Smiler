@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import crypto from 'node:crypto';
-import { UserModel } from '@models/User';
+import { UserModel, normalizeEmail, normalizeLogin } from '@models/User';
 import { ValidationError, ConflictError, ERRORS } from '@errors';
 import {
   isDuplicateKeyError,
@@ -45,8 +45,8 @@ export async function signUp(
   res: Response<CurrentUserResponse>,
 ) {
   const user = {
-    email: req.body.email?.trim(),
-    login: req.body.login?.trim().toLowerCase(),
+    email: req.body.email ? normalizeEmail(req.body.email) : undefined,
+    login: req.body.login ? normalizeLogin(req.body.login) : undefined,
     password: req.body.password,
     confirm: req.body.confirm,
   };

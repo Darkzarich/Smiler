@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import crypto from 'node:crypto';
-import { UserModel } from '@models/User';
+import { UserModel, normalizeEmail } from '@models/User';
 import { ValidationError, UnauthorizedError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { CurrentUserResponse } from './current';
@@ -30,7 +30,7 @@ export async function signIn(
   res: Response<CurrentUserResponse>,
 ) {
   const fields = {
-    email: req.body.email?.trim(),
+    email: req.body.email ? normalizeEmail(req.body.email) : undefined,
     password: req.body.password,
   };
 

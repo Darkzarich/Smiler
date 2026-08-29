@@ -21,14 +21,23 @@ export interface PopulatedAuthor extends Pick<User, 'login' | 'avatar'> {
   _id: Types.ObjectId;
 }
 
+/** Logins and emails are stored normalized, so every lookup must normalize too */
+export function normalizeLogin(login: string) {
+  return login.trim().toLowerCase();
+}
+
+export function normalizeEmail(email: string) {
+  return email.trim().toLowerCase();
+}
+
 @index({ login: 1 }, { unique: true, background: true })
 @index({ email: 1 }, { unique: true, background: true })
 @pre<User>('save', function normalizeUserFields() {
   if (this.login) {
-    this.login = this.login.trim();
+    this.login = normalizeLogin(this.login);
   }
   if (this.email) {
-    this.email = this.email.trim().toLowerCase();
+    this.email = normalizeEmail(this.email);
   }
 })
 @modelOptions({

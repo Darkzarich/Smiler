@@ -102,6 +102,19 @@ describe('POST api/auth/signin', () => {
     });
   });
 
+  it('Returns status 200 if the email casing differs from the stored one', async () => {
+    const { currentUser } = await signUpRequest(global.app);
+
+    const response = await signIn({
+      email: currentUser.email.toUpperCase(),
+      password: '123456',
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.isAuth).toBe(true);
+    expect(response.body._id).toBe(currentUser._id.toString());
+  });
+
   it('Regenerates the session and sets the custom session cookie', async () => {
     const { currentUser } = await signUpRequest(global.app);
     const { csrfCookie, csrfToken } = await csrfRequest(global.app);

@@ -38,6 +38,17 @@ describe('GET /users/:login', () => {
     });
   });
 
+  it('Should return status 200 when the login casing differs from the stored one', async () => {
+    const user = await UserModel.create(generateRandomUser());
+
+    const response = await request(global.app).get(
+      `/api/users/${user.login.toUpperCase()}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.login).toBe(user.login);
+  });
+
   it('Should return status 200 and the current user profile with all expected fields', async () => {
     const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
       global.app,

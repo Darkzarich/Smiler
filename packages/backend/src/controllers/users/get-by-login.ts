@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { Types } from 'mongoose';
-import { UserModel, User, isUserFollowed } from '@models/User';
+import { UserModel, User, isUserFollowed, normalizeLogin } from '@models/User';
 import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 
@@ -21,7 +21,7 @@ export async function getByLogin(
   const { userId: currentUserId } = req.session;
 
   const requestedUser = await UserModel.findOne({
-    login: login.trim(),
+    login: normalizeLogin(login),
   })
     .select({
       login: 1,
