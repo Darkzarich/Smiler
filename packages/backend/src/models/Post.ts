@@ -47,6 +47,8 @@ export type PostSection =
 @index({ createdAt: -1, rating: -1 })
 @index({ rating: -1 })
 @index({ createdAt: -1 })
+@index({ author: 1, createdAt: -1 })
+@index({ tags: 1, createdAt: -1 })
 @modelOptions({
   schemaOptions: {
     timestamps: true,
