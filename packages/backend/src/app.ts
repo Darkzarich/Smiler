@@ -1,4 +1,5 @@
 import { join } from 'path';
+import type { Server } from 'node:http';
 import express from 'express';
 import helmet from 'helmet';
 import Config from '@config/index';
@@ -17,6 +18,8 @@ logger.info(
 
 export async function startApp() {
   logger.info(`[pid: ${process.pid}] App is starting...`);
+
+  let server: Server | undefined;
 
   const db = await connectDB();
 
@@ -70,7 +73,7 @@ export async function startApp() {
   );
 
   if (!Config.IS_JEST) {
-    app.listen(Config.PORT, () => {
+    server = app.listen(Config.PORT, () => {
       logger.info(
         `[pid: ${process.pid}] Server is listening on the port ${Config.PORT}`,
       );
@@ -81,5 +84,5 @@ export async function startApp() {
     `[pid: ${process.pid}] App has successfully started in ${Config.IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode`,
   );
 
-  return app;
+  return { app, server };
 }
