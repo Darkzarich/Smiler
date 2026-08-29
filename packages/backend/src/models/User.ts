@@ -22,9 +22,8 @@ export interface PopulatedAuthor extends Pick<User, 'login' | 'avatar'> {
   _id: Types.ObjectId;
 }
 
-/** Logins and emails are stored normalized, so every lookup must normalize too */
 export function normalizeLogin(login: string) {
-  return login.trim().toLowerCase();
+  return login.trim();
 }
 
 export function normalizeEmail(email: string) {

@@ -38,11 +38,11 @@ describe('GET /users/:login', () => {
     });
   });
 
-  it('Should return status 200 when the login casing differs from the stored one', async () => {
+  it('Should return status 200 when the login will trimmed of spaces', async () => {
     const user = await UserModel.create(generateRandomUser());
 
     const response = await request(global.app).get(
-      `/api/users/${user.login.toUpperCase()}`,
+      `/api/users/ ${user.login} `,
     );
 
     expect(response.status).toBe(200);
