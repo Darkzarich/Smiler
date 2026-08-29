@@ -9,6 +9,7 @@ import {
 } from '@typegoose/typegoose';
 import mongoose, { Types } from 'mongoose';
 import type { PostSection } from '@models/Post';
+import type { PasswordHashParams } from '@utils/password';
 import { USER_MAX_AVATAR_LENGTH, USER_MAX_BIO_LENGTH } from '@constants/index';
 
 export interface UserTemplate {
@@ -70,6 +71,15 @@ export class User {
 
   @prop({ required: true })
   public salt!: string;
+
+  /** How `hash` was derived, absent on users created before it was stored
+   * This allows users to gradually migrate to the new hashParams
+   */
+  @prop({
+    allowMixed: Severity.ALLOW,
+    type: () => mongoose.Schema.Types.Mixed,
+  })
+  public hashParams?: PasswordHashParams;
 
   @prop({ default: 0 })
   public rating!: number;

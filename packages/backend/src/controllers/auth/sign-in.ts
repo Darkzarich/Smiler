@@ -1,7 +1,9 @@
 import type { Request, Response } from 'express';
-import crypto from 'node:crypto';
+import type { Types } from 'mongoose';
 import { UserModel, normalizeEmail } from '@models/User';
 import { ValidationError, UnauthorizedError, ERRORS } from '@errors';
+import { logger } from '@libs/logger';
+import { hashPassword, needsRehash, verifyPassword } from '@utils/password';
 import { sendSuccess } from '@utils/response-utils';
 import { CurrentUserResponse } from './current';
 import { authenticateSession } from './session';
@@ -24,6 +26,26 @@ const validate = (fields: SignInBody) => {
     return ERRORS.AUTH_INVALID_EMAIL;
   }
 };
+
+/**
+ * Move a password hashed with outdated parameters onto the current ones. Runs
+ * only right after the password was verified, since that's the only moment it
+ * is known. Never fails the sign in: the old hash stays valid either way.
+ */
+async function upgradeStoredPassword(userId: Types.ObjectId, password: string) {
+  try {
+    const { hash, salt, hashParams } = await hashPassword(password);
+
+    await UserModel.updateOne(
+      { _id: userId },
+      { $set: { hash, salt, hashParams } },
+    );
+  } catch (error) {
+    logger.error('Could not re-hash the password of a signing in user', {
+      error,
+    });
+  }
+}
 
 export async function signIn(
   req: Request<unknown, unknown, SignInBody>,
@@ -48,17 +70,14 @@ export async function signIn(
     throw new UnauthorizedError(ERRORS.AUTH_INVALID_CREDENTIALS);
   }
 
-  const hash = crypto
-    .pbkdf2Sync(fields.password!, foundUser.salt, 10000, 512, 'sha512')
-    .toString('hex');
-
-  const isEqual = crypto.timingSafeEqual(
-    Buffer.from(hash),
-    Buffer.from(foundUser.hash),
-  );
+  const isEqual = await verifyPassword(fields.password!, foundUser);
 
   if (!isEqual) {
     throw new UnauthorizedError(ERRORS.AUTH_INVALID_CREDENTIALS);
+  }
+
+  if (needsRehash(foundUser.hashParams)) {
+    await upgradeStoredPassword(foundUser._id, fields.password!);
   }
 
   await authenticateSession(req, foundUser._id.toString());

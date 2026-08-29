@@ -1,11 +1,11 @@
 import type { Request, Response } from 'express';
-import crypto from 'node:crypto';
 import { UserModel, normalizeEmail, normalizeLogin } from '@models/User';
 import { ValidationError, ConflictError, ERRORS } from '@errors';
 import {
   isDuplicateKeyError,
   getDuplicateKeyField,
 } from '@utils/check-mongo-db-error';
+import { hashPassword } from '@utils/password';
 import { sendSuccess } from '@utils/response-utils';
 import { CurrentUserResponse } from './current';
 import { authenticateSession } from './session';
@@ -57,10 +57,7 @@ export async function signUp(
     throw new ValidationError(errorMessage);
   }
 
-  const salt = crypto.randomBytes(16).toString('hex');
-  const hash = crypto
-    .pbkdf2Sync(user.password!, salt, 10000, 512, 'sha512')
-    .toString('hex');
+  const { hash, salt, hashParams } = await hashPassword(user.password!);
 
   try {
     const newUser = await UserModel.create({
@@ -68,6 +65,7 @@ export async function signUp(
       email: user.email,
       hash,
       salt,
+      hashParams,
     });
 
     await authenticateSession(req, newUser._id.toString());

@@ -1,5 +1,8 @@
+import crypto from 'node:crypto';
 import request from 'supertest';
 import { SESSION_COOKIE_NAME } from '@constants/index';
+import { UserModel } from '@models/User';
+import { CURRENT_HASH_PARAMS, LEGACY_HASH_PARAMS } from '@utils/password';
 import {
   csrfRequest,
   findSessionCookie,
@@ -17,6 +20,27 @@ describe('POST api/auth/signin', () => {
       .set('Cookie', csrfCookie)
       .set('X-CSRF-Token', csrfToken)
       .send(data);
+  }
+
+  /** Rewrites a user's password the way it was stored before `hashParams` */
+  async function storeLegacyPassword(userId: string, password: string) {
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = crypto
+      .pbkdf2Sync(
+        password,
+        salt,
+        LEGACY_HASH_PARAMS.iterations,
+        LEGACY_HASH_PARAMS.keyLength,
+        LEGACY_HASH_PARAMS.digest,
+      )
+      .toString('hex');
+
+    await UserModel.updateOne(
+      { _id: userId },
+      { $set: { hash, salt }, $unset: { hashParams: '' } },
+    );
+
+    return { hash, salt };
   }
 
   it('Returns status 422 and an expected message for not filled all fields (only email)', async () => {
@@ -113,6 +137,69 @@ describe('POST api/auth/signin', () => {
     expect(response.status).toBe(200);
     expect(response.body.isAuth).toBe(true);
     expect(response.body._id).toBe(currentUser._id.toString());
+  });
+
+  it('Returns status 200 for a password hashed before hashParams existed', async () => {
+    const { currentUser } = await signUpRequest(global.app);
+
+    await storeLegacyPassword(currentUser._id, '123456');
+
+    const response = await signIn({
+      email: currentUser.email,
+      password: '123456',
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.isAuth).toBe(true);
+  });
+
+  it('Returns status 401 for a wrong password of a legacy hashed user', async () => {
+    const { currentUser } = await signUpRequest(global.app);
+
+    const legacy = await storeLegacyPassword(currentUser._id, '123456');
+
+    const response = await signIn({
+      email: currentUser.email,
+      password: '123456-wrong',
+    });
+
+    expect(response.status).toBe(401);
+
+    const user = await UserModel.findOne({ _id: currentUser._id }).lean();
+
+    expect(user!.hash).toBe(legacy.hash);
+    expect(user!.hashParams).toBeUndefined();
+  });
+
+  it('Re-hashes a legacy password with the current params on a successful sign in', async () => {
+    const { currentUser } = await signUpRequest(global.app);
+
+    const legacy = await storeLegacyPassword(currentUser._id, '123456');
+
+    await signIn({ email: currentUser.email, password: '123456' });
+
+    const user = await UserModel.findOne({ _id: currentUser._id }).lean();
+
+    expect(user!.hashParams).toMatchObject(CURRENT_HASH_PARAMS);
+    expect(user!.salt).not.toBe(legacy.salt);
+    expect(user!.hash).toBe(
+      crypto
+        .pbkdf2Sync(
+          '123456',
+          user!.salt,
+          CURRENT_HASH_PARAMS.iterations,
+          CURRENT_HASH_PARAMS.keyLength,
+          CURRENT_HASH_PARAMS.digest,
+        )
+        .toString('hex'),
+    );
+
+    const response = await signIn({
+      email: currentUser.email,
+      password: '123456',
+    });
+
+    expect(response.status).toBe(200);
   });
 
   it('Regenerates the session and sets the custom session cookie', async () => {

@@ -3,6 +3,7 @@ import request from 'supertest';
 import { ERRORS } from '@errors';
 import { UserModel } from '@models/User';
 import { SESSION_COOKIE_NAME } from '@constants/index';
+import { CURRENT_HASH_PARAMS } from '@utils/password';
 import {
   csrfRequest,
   findSessionCookie,
@@ -123,7 +124,13 @@ describe('POST api/auth/signup', () => {
     const user = await UserModel.findOne({ _id: response.body._id }).lean();
 
     const hash = crypto
-      .pbkdf2Sync(credentials.password, user!.salt, 10000, 512, 'sha512')
+      .pbkdf2Sync(
+        credentials.password,
+        user!.salt,
+        CURRENT_HASH_PARAMS.iterations,
+        CURRENT_HASH_PARAMS.keyLength,
+        CURRENT_HASH_PARAMS.digest,
+      )
       .toString('hex');
 
     expect(user).toMatchObject({
@@ -131,6 +138,7 @@ describe('POST api/auth/signup', () => {
       email: credentials.email,
       hash,
       salt: expect.any(String),
+      hashParams: expect.objectContaining(CURRENT_HASH_PARAMS),
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((user as any).password).not.toBeDefined();
