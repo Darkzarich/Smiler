@@ -20,6 +20,8 @@
     "9gag",
     "agentic",
     "autopopulate",
+    "autopopulates",
+    "CGNAT",
     "concats",
     "consts",
     "dailymotion",
@@ -30,6 +32,9 @@
     "downvote",
     "downvoted",
     "downvotes",
+    "EXIF",
+    "GHSA",
+    "hotlinking",
     "INITDB",
     "JSESSIONID",
     "matched",
@@ -51,11 +56,13 @@
     "signup",
     "stylelint",
     "Testid",
+    "thumbnailing",
     "tiptap",
     "unfollow",
     "unfollowed",
     "unfollowing",
     "unfollows",
+    "unindexed",
     "unvote",
     "unvoted",
     "Unvotes",
@@ -71,5 +78,6 @@
     "vuex",
     "Vuex",
     "youtu"
-  ]
+  ],
+  "ignoreRegExpList": ["GHSA(-[0-9a-z]+)+"]
 }
