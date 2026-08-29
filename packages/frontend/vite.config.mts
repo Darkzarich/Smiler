@@ -4,8 +4,6 @@ import { defineConfig } from 'vite';
 
 const apiRoute = process.env.API_URL;
 
-console.log(path.resolve(__dirname, './src'));
-
 /** @type {import('vite').UserConfig} */
 export default defineConfig({
   server: {

@@ -7,9 +7,10 @@ module.exports = defineConfig({
   tsconfig: './tests/integration/tsconfig.json',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  workers: process.env.CI ? 1 : undefined,
+  // Each project spins up a full browser, so keep the local fan-out modest
+  workers: process.env.CI ? 1 : 2,
   retries: 2,
-  timeout: process.env.CI ? 1000 * 30 : 1000 * 5,
+  timeout: 1000 * 30,
   reporter: 'html',
   use: {
     baseURL: BASE_URL,

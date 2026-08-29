@@ -4,7 +4,7 @@ import { startApp } from '@app';
 jest.mock('@utils/remove-file-by-path');
 
 beforeAll(async () => {
-  global.app = await startApp();
+  ({ app: global.app } = await startApp());
 });
 
 beforeEach(async () => {
