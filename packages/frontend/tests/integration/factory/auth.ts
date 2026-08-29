@@ -10,6 +10,12 @@ import { authTypes } from '@api/auth';
  * @returns The newly created authentication fixture.
  */
 export default function createRandomAuth(
+  overrides: Partial<authTypes.CurrentUser> & { isAuth: true },
+): authTypes.CurrentUser;
+export default function createRandomAuth(
+  overrides?: Partial<authTypes.CurrentUserResponse>,
+): authTypes.CurrentUserResponse;
+export default function createRandomAuth(
   overrides: Partial<authTypes.CurrentUserResponse> = {},
 ): authTypes.CurrentUserResponse {
   const auth: Partial<authTypes.CurrentUserResponse> = overrides.isAuth

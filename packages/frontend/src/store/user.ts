@@ -48,6 +48,8 @@ export const useUserStore = defineStore('user', {
 
         if (user.isAuth) {
           this.user = user;
+        } else {
+          this.user = null;
         }
       } catch {
         this.user = null;

@@ -1,5 +1,5 @@
-interface CurrentUser {
-  isAuth: boolean;
+export interface CurrentUser {
+  isAuth: true;
   _id: string;
   email: string;
   login: string;
@@ -9,7 +9,13 @@ interface CurrentUser {
   tagsFollowed: string[];
 }
 
-export type CurrentUserResponse = CurrentUser;
+interface NotLoggedInUser {
+  isAuth: false;
+}
+
+/** `/auth/current` answers 200 with `{ isAuth: false }` when there is no
+ * session, so callers must narrow on `isAuth` before reading user fields */
+export type CurrentUserResponse = CurrentUser | NotLoggedInUser;
 
 export interface SignInRequest {
   email: string;
