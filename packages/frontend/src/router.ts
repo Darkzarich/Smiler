@@ -44,7 +44,7 @@ export const router = createRouter({
   history: createWebHistory('/'),
   scrollBehavior(to) {
     if (to.hash) {
-      return { selector: to.hash };
+      return { el: to.hash };
     }
     return { x: 0, top: 0 };
   },
