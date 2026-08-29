@@ -3,15 +3,17 @@ import {
   createWebHistory,
   type NavigationGuard,
 } from 'vue-router';
-import NotFound from './views/NotFound.vue';
-import PostCreate from './views/PostCreate.vue';
-import PostsCategory from './views/PostsCategory.vue';
-import Search from './views/Search.vue';
-import SinglePost from './views/SinglePost.vue';
-import UserPage from './views/UserPage.vue';
-import UserSettings from './views/UserSettings.vue';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
+
+// Views are loaded on demand so a visitor only downloads the one they land on.
+const NotFound = () => import('./views/NotFound.vue');
+const PostCreate = () => import('./views/PostCreate.vue');
+const PostsCategory = () => import('./views/PostsCategory.vue');
+const Search = () => import('./views/Search.vue');
+const SinglePost = () => import('./views/SinglePost.vue');
+const UserPage = () => import('./views/UserPage.vue');
+const UserSettings = () => import('./views/UserSettings.vue');
 
 declare module 'vue-router' {
   interface RouteMeta {
