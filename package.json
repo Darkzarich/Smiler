@@ -27,13 +27,16 @@
   },
   "homepage": "https://github.com/Darkzarich/Smiler#readme",
   "devDependencies": {
-    "concurrently": "^9.2.1",
+    "concurrently": "^9.2.4",
     "cspell": "^8.19.4",
     "husky": "^9.1.7",
     "knip": "^5.88.1",
     "lint-staged": "^16.4.0"
   },
   "pnpm": {
+    "overrides": {
+      "underscore": "^1.13.8"
+    },
     "patchedDependencies": {
       "vuedraggable@4.1.0": "patches/vuedraggable@4.1.0.patch"
     }
