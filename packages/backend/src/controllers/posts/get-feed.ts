@@ -1,28 +1,18 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
-import { PostModel, postToResponse, PostResponse } from '@models/Post';
-import { RateModel, RateTargetModel } from '@models/Rate';
 import { UnauthorizedError, ERRORS } from '@errors';
-import { POST_MAX_LIMIT } from '@constants/index';
-import { sendSuccess } from '@utils/response-utils';
-import { PaginationValidator } from '@validators/PaginationValidator';
+import { PaginationRequest as PaginationQuery } from '@type/pagination';
 import {
-  PaginationRequest as PaginationQuery,
-  PaginationResponse,
-} from '@type/pagination';
-import { PAGE_LOOKAHEAD, toPage } from '@utils/pagination';
-
-interface GetFeedResponse extends PaginationResponse {
-  posts: PostResponse[];
-}
+  respondWithPostList,
+  validatePostPagination,
+  PostListResponse,
+} from './respond-with-post-list';
 
 export async function getFeed(
   req: Request<unknown, unknown, unknown, PaginationQuery>,
-  res: Response<GetFeedResponse>,
+  res: Response<PostListResponse>,
 ) {
-  const { limit, offset } = PaginationValidator.validate(req.query, {
-    maxLimit: POST_MAX_LIMIT,
-  });
+  const pagination = validatePostPagination(req.query);
   const { userId } = req.session;
 
   const user = await UserModel.findById(userId).lean();
@@ -31,49 +21,31 @@ export async function getFeed(
     throw new UnauthorizedError(ERRORS.UNAUTHORIZED);
   }
 
-  const query = {
-    $and: [
-      {
-        $or: [
-          {
-            tags: {
-              $in: user.tagsFollowed,
+  await respondWithPostList(req, res, {
+    query: {
+      $and: [
+        {
+          $or: [
+            {
+              tags: {
+                $in: user.tagsFollowed,
+              },
             },
-          },
-          {
-            author: {
-              $in: user.usersFollowed,
+            {
+              author: {
+                $in: user.usersFollowed,
+              },
             },
-          },
-        ],
-      },
-      {
-        author: {
-          $ne: userId,
+          ],
         },
-      },
-    ],
-  };
-
-  const foundPosts = await PostModel.find(query)
-    .sort('-createdAt')
-    .populate('author', 'login avatar')
-    .limit(limit + PAGE_LOOKAHEAD)
-    .skip(offset)
-    .lean();
-
-  const { items: posts, hasNextPage } = toPage(foundPosts, limit);
-
-  const ratedTargets = await RateModel.findRatedTargets({
-    userId,
-    targetIds: posts.map((post) => post._id.toString()),
-    targetModel: RateTargetModel.POST,
-  });
-
-  const transPosts = posts.map((post) => postToResponse(post, ratedTargets));
-
-  sendSuccess(res, {
-    posts: transPosts,
-    hasNextPage,
+        {
+          author: {
+            $ne: userId,
+          },
+        },
+      ],
+    },
+    sort: { createdAt: -1 },
+    pagination,
   });
 }

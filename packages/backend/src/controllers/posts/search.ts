@@ -1,13 +1,14 @@
 import type { Request, Response } from 'express';
 import { RootFilterQuery } from 'mongoose';
-import { PostModel, Post, postToResponse, PostResponse } from '@models/Post';
-import { RateModel, RateTargetModel } from '@models/Rate';
-import { POST_TITLE_MAX_LENGTH, POST_MAX_LIMIT } from '@constants/index';
+import { Post } from '@models/Post';
+import { POST_TITLE_MAX_LENGTH } from '@constants/index';
 import { ValidationError, ERRORS } from '@errors';
-import { sendSuccess } from '@utils/response-utils';
-import { PaginationValidator } from '@validators/PaginationValidator';
-import { PaginationRequest, PaginationResponse } from '@type/pagination';
-import { PAGE_LOOKAHEAD, toPage } from '@utils/pagination';
+import { PaginationRequest } from '@type/pagination';
+import {
+  respondWithPostList,
+  validatePostPagination,
+  PostListResponse,
+} from './respond-with-post-list';
 
 interface SearchQuery extends PaginationRequest {
   title?: string;
@@ -16,10 +17,6 @@ interface SearchQuery extends PaginationRequest {
   ratingFrom?: string;
   ratingTo?: string;
   'tags[]'?: string[];
-}
-
-interface SearchResponse extends PaginationResponse {
-  posts: PostResponse[];
 }
 
 function parseRating(raw: string): number | undefined {
@@ -38,12 +35,9 @@ function parseRating(raw: string): number | undefined {
 
 export async function search(
   req: Request<unknown, unknown, unknown, SearchQuery>,
-  res: Response<SearchResponse>,
+  res: Response<PostListResponse>,
 ) {
-  const { userId } = req.session;
-  const { limit, offset } = PaginationValidator.validate(req.query, {
-    maxLimit: POST_MAX_LIMIT,
-  });
+  const pagination = validatePostPagination(req.query);
 
   const {
     title = '',
@@ -112,27 +106,9 @@ export async function search(
     };
   }
 
-  const foundPosts = await PostModel.find(query)
-    .sort({ rating: -1 })
-    .populate('author', 'login avatar')
-    .limit(limit + PAGE_LOOKAHEAD)
-    .skip(offset)
-    .lean();
-
-  const { items: posts, hasNextPage } = toPage(foundPosts, limit);
-
-  const ratedTargets = await RateModel.findRatedTargets({
-    userId,
-    targetIds: posts.map((post) => post._id.toString()),
-    targetModel: RateTargetModel.POST,
-  });
-
-  const postsWithRated = posts.map((post) =>
-    postToResponse(post, ratedTargets),
-  );
-
-  sendSuccess(res, {
-    posts: postsWithRated,
-    hasNextPage,
+  await respondWithPostList(req, res, {
+    query,
+    sort: { rating: -1 },
+    pagination,
   });
 }
