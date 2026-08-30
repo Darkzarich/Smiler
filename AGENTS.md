@@ -52,17 +52,37 @@ Pre-push hook runs: `lint:spell → lint:code → lint:types → test:prepush`.
 
 ## Commit style
 
-Format: `<scope> <imperative-verb> <short description>` — lowercase, no trailing period, no conventional-commits prefixes.
-Scope is the package name (`backend` / `frontend`) when changes are scoped to one package; omitted for repo-wide changes.
+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) (the Angular convention), enforced by [commitlint](https://github.com/conventional-changelog/commitlint) with `@commitlint/config-conventional` in the `commit-msg` hook.
+
+```
+<type>(<scope>)<!>: <description>
+
+[optional body]
+
+[optional footer]
+```
+
+- **type** — one of `feat`, `fix`, `perf`, `refactor`, `test`, `docs`, `style`, `build`, `ci`, `chore`, `revert`. Lowercase.
+  - `feat` / `fix` describe user-facing behavior; `refactor` keeps behavior identical; `perf` makes it faster.
+  - `build` covers the toolchain and deps, `chore(deps)` a plain dependency bump, `style` formatting-only churn.
+- **scope** — optional, and limited to `backend`, `frontend` or `deps` by the `scope-enum` rule in `commitlint.config.cjs`. Omit it entirely for repo-wide changes (tooling, docs, Docker, root config). Add new scopes to that rule, not ad hoc.
+- **description** — imperative mood, lowercase, no trailing period. The header (type + scope + description) is capped at 100 characters.
+- **breaking changes** — `!` before the colon and/or a `BREAKING CHANGE: <what broke>` footer.
+- Body and footers are separated by blank lines and wrapped at 100 characters.
 
 Examples:
 
 ```
-backend enforce unique email and login constraints with separate indexes and normalization
-frontend fix tiptap formatting toolbar after click starts d&d for the section
-add git hooks with husky and lint-staged
-align eslint and prettier versions across packages
+feat(backend): enforce unique email and login constraints with separate indexes
+fix(frontend): keep the tiptap toolbar open when a drag starts on the section
+perf(backend): search post titles through a text index instead of a regex scan
+refactor(backend): extract a shared post list responder for category, feed and search
+build: add commitlint and validate messages in the commit-msg hook
+chore(deps): align eslint and prettier versions across packages
+docs: document the conventional commit format
 ```
+
+History before Aug 2026 uses the old `<scope> <imperative verb> <description>` format (`backend fix user login lookup`). It is kept as-is — don't imitate it in new commits.
 
 ## Project timeline
 
