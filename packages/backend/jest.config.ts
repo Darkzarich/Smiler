@@ -1,3 +1,10 @@
+/**
+ * Node 22.18+ can strip types from this file natively, but Jest's native path
+ * then loads it as ESM, which rejects both the `tsconfig.json` import and
+ * `module.exports`. Pinning the loader keeps Jest compiling it with ts-node.
+ *
+ * @jest-config-loader ts-node
+ */
 import { createDefaultPreset, pathsToModuleNameMapper } from 'ts-jest';
 import { compilerOptions } from './tsconfig.json';
 

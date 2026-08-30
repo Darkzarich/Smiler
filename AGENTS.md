@@ -82,10 +82,12 @@ How to add one:
 
 ## Gotchas
 
-- **Node version**: >=v20.17.0. `.nvmrc` says `v20.18.3`.
+- **Node version**: >=v24.0.0. `.nvmrc` says `v24.20.0`.
 - **pnpm version**: >=8.6.0.
 - Backend uses `module: "NodeNext"` / `moduleResolution: "nodenext"` — use proper file extensions in imports where required.
-- Backend Jest config uses `module.exports` in a `.ts` file — this is intentional (ts-jest handles it).
+- Backend Jest config uses `module.exports` in a `.ts` file — this is intentional. It also carries a
+  `@jest-config-loader ts-node` docblock: without it, Node's native type stripping makes Jest load
+  `jest.config.ts` as ESM, which rejects both the `tsconfig.json` import and `module.exports`.
 - Frontend `tsconfig.json` has `verbatimModuleSyntax: true` — use `import type` for type-only imports.
 - `packages/backend/logs/` and `packages/backend/uploads/` are generated at runtime, gitignored.
 - `cspell.json` has a project-specific dictionary — add project terms there, don't disable spellcheck.

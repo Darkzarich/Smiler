@@ -172,6 +172,7 @@ Smiler has been in development since 2019 and has been through several full-stac
 - **May–Aug 2026** — Collapsible post content in feeds, a reusable **modal/confirm-dialog system** with unit and E2E coverage, and steady dependency upkeep.
 - **Aug 2026 — security & performance** — **Stronger password hashing with gradual migration** of existing hashes, case-normalized email/login lookups, faster tag and user filters, **lazy-loaded route components** for a much smaller bundle, and a reworked graceful shutdown. A follow-up **hardening pass** widens the SSRF denylist behind one shared host check, ties uploaded pictures to their own author, forces a hardened `rel` on sanitized links, requires a browser origin for every state-changing request, and adds a **Content Security Policy** and the other security headers to the nginx config. List endpoints drop their per-request `countDocuments` in favour of fetching one document past the page, and the lists sorted by the date of creation — the feed, new posts, and a user's posts — gain **cursor-based pagination**, so infinite scroll no longer repeats posts when new ones land mid-scroll.
 - **Aug 2026 — database** — **MongoDB upgraded 5.0 → 8.0** one major at a time, with the test suite switched to clearing collections instead of dropping the database between runs.
+- **Aug 2026 — runtime** — **Node.js upgraded 20 → 24 LTS** across the dev environment, the `engines` fields, and the Docker images, with `@types/node` moved to the matching major. Jest's config loader is pinned to **[ts-node](https://github.com/TypeStrong/ts-node)** so the new native type stripping in Node doesn't try to load `jest.config.ts` as ESM.
 
 </details>
 
@@ -181,7 +182,7 @@ This project can be run in multiple ways, depending on your preferences and setu
 
 ### Prerequisites
 
-- **Node.js** (>=20.17.0 — see `.nvmrc` for the exact version used in development)
+- **Node.js** (>=24.0.0 — see `.nvmrc` for the exact version used in development)
 - **[pnpm](https://pnpm.io/)** (>=8.6.0)
 - **Docker** and **Docker Compose** (optional, for containerized setups)
 - **MongoDB** (can be set up locally, remotely, or via Docker)

@@ -5,7 +5,7 @@
   "main": "index.js",
   "packageManager": "pnpm@8.6.0",
   "engines": {
-    "node": ">=v20.16.0",
+    "node": ">=v24.0.0",
     "pnpm": ">=8.6.0"
   },
   "files": [
@@ -46,7 +46,7 @@
     "@types/lodash": "^4.17.25",
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.2.0",
-    "@types/node": "^20.19.43",
+    "@types/node": "^24.10.1",
     "@types/sanitize-html": "^2.16.1",
     "@types/slug": "^5.0.9",
     "@types/supertest": "^6.0.3",

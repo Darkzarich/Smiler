@@ -5,7 +5,7 @@
   "private": true,
   "packageManager": "pnpm@8.6.0",
   "engines": {
-    "node": ">=v20.16.0",
+    "node": ">=v24.0.0",
     "pnpm": ">=8.6.0"
   },
   "files": [
@@ -66,7 +66,7 @@
     "@playwright/test": "^1.62.1",
     "@types/lodash": "^4.17.25",
     "@types/lodash-es": "^4.17.12",
-    "@types/node": "^20.19.43",
+    "@types/node": "^24.10.1",
     "@typescript-eslint/eslint-plugin": "^8.68.0",
     "@typescript-eslint/parser": "^8.68.0",
     "@vitejs/plugin-vue": "^5.2.4",
