@@ -4,6 +4,8 @@ import { ForbiddenError, ERRORS } from '@errors';
 import { isAllowedOrigin } from '@utils/allowed-origins';
 
 const CSRF_HEADER = 'x-csrf-token';
+// Kept stable on purpose: the client retries on this code, not on the message
+export const CSRF_ERROR_CODE = 'CSRF_INVALID';
 const CSRF_TOKEN_BYTES = 32;
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 const AUTH_TOKEN_REQUIRED_PATHS = new Set([
@@ -112,7 +114,7 @@ export function csrfProtectionMiddleware(
   // CSRF token checks are needed because this API authenticates browser users
   // with cookies/session, which browsers attach automatically to cross-site requests.
   if (!requestHasAllowedBrowserOrigin(req) || !isValidToken(req)) {
-    next(new ForbiddenError(ERRORS.CSRF_INVALID));
+    next(new ForbiddenError(ERRORS.CSRF_INVALID, CSRF_ERROR_CODE));
 
     return;
   }

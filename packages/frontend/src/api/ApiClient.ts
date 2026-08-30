@@ -3,6 +3,9 @@ import config from '@/config/config';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 
+// Matches the backend error code, which is stable unlike the error message
+const CSRF_ERROR_CODE = 'CSRF_INVALID';
+
 interface OkResponse {
   ok: true;
 }
@@ -69,7 +72,7 @@ class ApiClient {
     return (
       axios.isAxiosError<RequestError>(error) &&
       error.response?.status === 403 &&
-      error.response.data.error.message === 'Invalid or missing CSRF token'
+      error.response.data.error.code === CSRF_ERROR_CODE
     );
   }
 

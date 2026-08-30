@@ -2,6 +2,7 @@ import request from 'supertest';
 import { ERRORS } from '@errors';
 import { SESSION_COOKIE_NAME } from '@constants/index';
 import { findSessionCookie, signUpRequest } from '@test-utils/request-auth';
+import { CSRF_ERROR_CODE } from '@middlewares/csrf';
 import { withoutBrowserOrigin } from '@test-utils/browser-origin';
 import Config from '@config/index';
 
@@ -24,6 +25,7 @@ describe('CSRF protection', () => {
       .set('Cookie', sessionCookie);
 
     expect(response.status).toBe(403);
+    expect(response.body.error.code).toBe(CSRF_ERROR_CODE);
     expect(response.body.error.message).toBe(ERRORS.CSRF_INVALID);
   });
 
@@ -36,6 +38,7 @@ describe('CSRF protection', () => {
       .set('X-CSRF-Token', 'invalid-token');
 
     expect(response.status).toBe(403);
+    expect(response.body.error.code).toBe(CSRF_ERROR_CODE);
     expect(response.body.error.message).toBe(ERRORS.CSRF_INVALID);
   });
 
@@ -49,6 +52,7 @@ describe('CSRF protection', () => {
       .set('Origin', 'https://evil.example');
 
     expect(response.status).toBe(403);
+    expect(response.body.error.code).toBe(CSRF_ERROR_CODE);
     expect(response.body.error.message).toBe(ERRORS.CSRF_INVALID);
   });
 
@@ -62,6 +66,7 @@ describe('CSRF protection', () => {
       .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(403);
+    expect(response.body.error.code).toBe(CSRF_ERROR_CODE);
     expect(response.body.error.message).toBe(ERRORS.CSRF_INVALID);
   });
 
