@@ -54,6 +54,7 @@
     "printjson",
     "resave",
     "resizer",
+    "SAMEORIGIN",
     "signin",
     "signup",
     "stylelint",
