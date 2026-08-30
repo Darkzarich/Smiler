@@ -277,7 +277,7 @@ const router = express.Router();
         {
           "in": "query",
           "name": "title",
-          "description": "Search post by title",
+          "description": "Search posts by whole words of their title, case-insensitive",
           "schema": {
             "type": "string"
           }

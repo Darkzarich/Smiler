@@ -259,6 +259,48 @@ describe('GET /posts', () => {
     expect(response.body.posts).toHaveLength(0);
   });
 
+  it('Should filter posts by any word of the title, whatever the case', async () => {
+    await PostModel.create(
+      generateRandomPost({
+        title: 'A very funny cat story',
+      }),
+    );
+
+    const response = await request(global.app).get('/api/posts?title=CAT');
+
+    expect(response.status).toBe(200);
+    expect(response.body.posts).toHaveLength(1);
+    expect(response.body.posts[0].title).toBe('A very funny cat story');
+  });
+
+  it('Should not match a title on part of a word', async () => {
+    await PostModel.create(
+      generateRandomPost({
+        title: 'A very funny cat story',
+      }),
+    );
+
+    const response = await request(global.app).get('/api/posts?title=fun');
+
+    expect(response.status).toBe(200);
+    expect(response.body.posts).toHaveLength(0);
+  });
+
+  it('Should ignore a title made up entirely of punctuation', async () => {
+    await PostModel.create(
+      generateRandomPost({
+        title: 'title1',
+      }),
+    );
+
+    const response = await request(global.app).get(
+      `/api/posts?title=${encodeURIComponent('!!!')}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.posts).toHaveLength(1);
+  });
+
   it('Should filter posts by dateFrom (found)', async () => {
     const dateFrom = new Date();
     const futureDate = addMilliseconds(dateFrom, 1);

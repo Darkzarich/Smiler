@@ -57,10 +57,15 @@ export async function search(
       throw new ValidationError(ERRORS.POST_TITLE_MAX_LENGTH_EXCEEDED);
     }
 
+    // Dropping punctuation also keeps the words clear of the `$text` operators
+    // — `"` around a phrase, a leading `-` for negation.
     const sanitizedTitle = title.trim().replace(/[^0-9A-Za-z\s]/g, '');
 
-    // eslint-disable-next-line security/detect-non-literal-regexp
-    query.title = new RegExp(sanitizedTitle, 'gi');
+    // A title of punctuation alone leaves nothing to match on, and an empty
+    // `$search` is an error, so the filter is left off entirely.
+    if (sanitizedTitle) {
+      query.$text = { $search: sanitizedTitle };
+    }
   }
 
   if (dateFrom || dateTo) {

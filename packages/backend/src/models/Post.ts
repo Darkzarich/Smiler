@@ -44,6 +44,7 @@ export type PostSection =
   | PostTextSection;
 
 @index({ slug: 1 }, { unique: true })
+@index({ title: 'text' })
 @index({ createdAt: -1, rating: -1 })
 @index({ rating: -1 })
 @index({ createdAt: -1, _id: -1 })
