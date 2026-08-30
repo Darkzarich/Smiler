@@ -33,7 +33,33 @@ const isFetching = ref(false);
 const posts = ref<postTypes.Post[]>([]);
 
 const curPage = ref(0);
+const nextCursor = ref<string | null>(null);
 const hasNextPage = ref(false);
+
+/** Sorted by the date of creation, so they page by cursor: an offset would
+ * repeat posts that new ones had pushed down between two pages. */
+const cursorPagedRequests = {
+  New: api.posts.getRecent,
+  Feed: api.posts.getFeed,
+};
+
+/** Sorted by rating, which changes as votes land, so a cursor over it would be
+ * no more stable than an offset. */
+const offsetPagedRequests = {
+  Home: api.posts.getToday,
+  All: api.posts.getAll,
+  Blowing: api.posts.getBlowing,
+  TopThisWeek: api.posts.getTopThisWeek,
+};
+
+type CursorPagedRoute = keyof typeof cursorPagedRequests;
+type OffsetPagedRoute = keyof typeof offsetPagedRequests;
+
+const isCursorPagedRoute = (name: string): name is CursorPagedRoute =>
+  name in cursorPagedRequests;
+
+const isOffsetPagedRoute = (name: string): name is OffsetPagedRoute =>
+  name in offsetPagedRequests;
 
 /**
  *
@@ -41,36 +67,34 @@ const hasNextPage = ref(false);
  * @param options.isCombine - if true, posts are concatenated to the existing array
  */
 const fetchPosts = async ({ isCombine = false } = {}) => {
-  const pageApiRequestsMap = {
-    Home: api.posts.getToday,
-    All: api.posts.getAll,
-    Blowing: api.posts.getBlowing,
-    TopThisWeek: api.posts.getTopThisWeek,
-    New: api.posts.getRecent,
-    Feed: api.posts.getFeed,
-  };
-
-  const apiRequestByPageName =
-    pageApiRequestsMap[route.name as keyof typeof pageApiRequestsMap];
-
-  if (!apiRequestByPageName) {
-    return;
-  }
+  const routeName = String(route.name ?? '');
 
   try {
     isFetching.value = true;
 
-    const data = await apiRequestByPageName({
-      limit: consts.POSTS_INITIAL_COUNT,
-      offset: curPage.value * consts.POSTS_INITIAL_COUNT,
-    });
+    if (isCursorPagedRoute(routeName)) {
+      const cursor = isCombine ? nextCursor.value : null;
 
-    hasNextPage.value = data.hasNextPage;
+      const data = await cursorPagedRequests[routeName]({
+        limit: consts.POSTS_INITIAL_COUNT,
+        ...(cursor && { cursor }),
+      });
 
-    if (isCombine) {
-      posts.value = posts.value.concat(data.posts);
-    } else {
-      posts.value = data.posts;
+      nextCursor.value = data.nextCursor;
+      hasNextPage.value = data.hasNextPage;
+      posts.value = isCombine ? posts.value.concat(data.posts) : data.posts;
+
+      return;
+    }
+
+    if (isOffsetPagedRoute(routeName)) {
+      const data = await offsetPagedRequests[routeName]({
+        limit: consts.POSTS_INITIAL_COUNT,
+        offset: curPage.value * consts.POSTS_INITIAL_COUNT,
+      });
+
+      hasNextPage.value = data.hasNextPage;
+      posts.value = isCombine ? posts.value.concat(data.posts) : data.posts;
     }
   } finally {
     isFetching.value = false;
@@ -88,6 +112,7 @@ watch(
     posts.value = [];
     isFetching.value = false;
     curPage.value = 0;
+    nextCursor.value = null;
     hasNextPage.value = false;
     fetchPosts();
   },

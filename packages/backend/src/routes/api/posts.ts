@@ -59,6 +59,15 @@ const router = express.Router();
           "type": "number",
           "default": 0
         }
+      },
+      "post-cursor": {
+        "description": "`nextCursor` of the previous page. Opaque, and mutually exclusive with `offset`. Omit it to get the first page",
+        "in": "query",
+        "name": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
       }
     },
     "schemas": {
@@ -123,6 +132,23 @@ const router = express.Router();
             "type": "boolean"
           }
         }
+      },
+      "PostListWithCursor": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PostList"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "nextCursor": {
+                "description": "Pass as `cursor` to get the next page. `null` on the last page",
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
       },
       "UserRate": {
         "type": "object",
@@ -217,7 +243,7 @@ const router = express.Router();
       "tags": [
         "Posts"
       ],
-      "description": "Get all posts",
+      "description": "Get all posts. Sorted by rating, or by the date of creation when `author` is given — only the latter accepts a `cursor`",
       "summary": "Get all posts",
       "parameters": [
         {
@@ -225,6 +251,9 @@ const router = express.Router();
         },
         {
           "$ref": "#/components/parameters/post-offset"
+        },
+        {
+          "$ref": "#/components/parameters/post-cursor"
         },
         {
           "in": "query",
@@ -294,7 +323,7 @@ const router = express.Router();
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PostList"
+                "$ref": "#/components/schemas/PostListWithCursor"
               }
             }
           }
@@ -519,6 +548,9 @@ router.get(
         {
           "$ref": "#/components/parameters/post-offset"
         },
+        {
+          "$ref": "#/components/parameters/post-cursor"
+        },
       ],
       "responses": {
         "200": {
@@ -526,7 +558,7 @@ router.get(
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PostList"
+                "$ref": "#/components/schemas/PostListWithCursor"
               }
             }
           }
@@ -601,6 +633,9 @@ router.get(
         {
           "$ref": "#/components/parameters/post-offset"
         },
+        {
+          "$ref": "#/components/parameters/post-cursor"
+        },
       ],
       "responses": {
         "200": {
@@ -608,7 +643,7 @@ router.get(
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PostList"
+                "$ref": "#/components/schemas/PostListWithCursor"
               }
             }
           }

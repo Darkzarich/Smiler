@@ -39,7 +39,7 @@ const user = ref<userTypes.GetUserProfileResponse | null>(null);
 
 const isLoading = ref(false);
 
-const curPage = ref(0);
+const nextCursor = ref<string | null>(null);
 const hasNextPage = ref(false);
 
 const handleFetchUser = async () => {
@@ -65,12 +65,15 @@ const handleFetchPosts = async ({ isCombine = false } = {}) => {
   try {
     isLoading.value = true;
 
-    const data = await api.posts.search({
+    const cursor = isCombine ? nextCursor.value : null;
+
+    const data = await api.posts.getPostsByAuthor({
       author: user.value?.login || (route.params.login as string),
       limit: consts.POSTS_INITIAL_COUNT,
-      offset: curPage.value * consts.POSTS_INITIAL_COUNT,
+      ...(cursor && { cursor }),
     });
 
+    nextCursor.value = data.nextCursor;
     hasNextPage.value = data.hasNextPage;
 
     if (isCombine) {
@@ -84,7 +87,6 @@ const handleFetchPosts = async ({ isCombine = false } = {}) => {
 };
 
 const handleNextPage = () => {
-  curPage.value = curPage.value + 1;
   handleFetchPosts({ isCombine: true });
 };
 

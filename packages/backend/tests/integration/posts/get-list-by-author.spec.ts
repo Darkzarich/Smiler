@@ -1,4 +1,5 @@
 import request from 'supertest';
+import { subSeconds } from 'date-fns';
 import { PostModel } from '@models/Post';
 import { UserModel } from '@models/User';
 import { generateRandomPost, generateRandomUser } from '@test-data-generators';
@@ -74,6 +75,44 @@ describe('GET /posts?author=', () => {
         },
       ],
       hasNextPage: false,
+    });
+  });
+
+  it("Should page the author's posts by cursor", async () => {
+    const otherUser = await UserModel.create(generateRandomUser());
+
+    const posts = await PostModel.insertMany(
+      Array(3)
+        .fill({})
+        .map((_, index) =>
+          generateRandomPost({
+            author: otherUser._id,
+            createdAt: subSeconds(new Date(), index),
+          }),
+        ),
+    );
+
+    const firstPage = await request(global.app).get(
+      `/api/posts?author=${otherUser.login}&limit=2`,
+    );
+
+    expect(firstPage.status).toBe(200);
+    expect(
+      firstPage.body.posts.map((post: { _id: string }) => post._id),
+    ).toEqual([posts[0]._id.toString(), posts[1]._id.toString()]);
+    expect(firstPage.body.hasNextPage).toBe(true);
+
+    const secondPage = await request(global.app).get(
+      `/api/posts?author=${otherUser.login}&limit=2&cursor=${firstPage.body.nextCursor}`,
+    );
+
+    expect(secondPage.status).toBe(200);
+    expect(
+      secondPage.body.posts.map((post: { _id: string }) => post._id),
+    ).toEqual([posts[2]._id.toString()]);
+    expect(secondPage.body).toMatchObject({
+      hasNextPage: false,
+      nextCursor: null,
     });
   });
 });

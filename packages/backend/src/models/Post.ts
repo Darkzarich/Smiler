@@ -46,8 +46,8 @@ export type PostSection =
 @index({ slug: 1 }, { unique: true })
 @index({ createdAt: -1, rating: -1 })
 @index({ rating: -1 })
-@index({ createdAt: -1 })
-@index({ author: 1, createdAt: -1 })
+@index({ createdAt: -1, _id: -1 })
+@index({ author: 1, createdAt: -1, _id: -1 })
 @index({ tags: 1, createdAt: -1 })
 @modelOptions({
   schemaOptions: {

@@ -1,4 +1,5 @@
 import request from 'supertest';
+import { subSeconds } from 'date-fns';
 import { signUpRequest } from '@test-utils/request-auth';
 import { PostModel } from '@models/Post';
 import { UserModel } from '@models/User';
@@ -58,6 +59,7 @@ describe('GET /posts/feed', () => {
     expect(response.body).toEqual({
       posts: [],
       hasNextPage: false,
+      nextCursor: null,
     });
   });
 
@@ -226,6 +228,49 @@ describe('GET /posts/feed', () => {
     expect(responseWithOffset.body.posts).toHaveLength(1);
     expect(responseWithOffset.body).toMatchObject({
       hasNextPage: false,
+    });
+  });
+
+  it('Should page the feed by cursor', async () => {
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
+
+    const posts = await PostModel.insertMany(
+      Array(3)
+        .fill({})
+        .map((_, index) =>
+          generateRandomPost({ createdAt: subSeconds(new Date(), index) }),
+        ),
+    );
+
+    await UserModel.findByIdAndUpdate(currentUser._id, {
+      $push: { tagsFollowed: posts[0].tags[0] },
+    });
+
+    const firstPage = await request(global.app)
+      .get('/api/posts/feed?limit=2')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
+
+    expect(firstPage.status).toBe(200);
+    expect(
+      firstPage.body.posts.map((post: { _id: string }) => post._id),
+    ).toEqual([posts[0]._id.toString(), posts[1]._id.toString()]);
+    expect(firstPage.body.hasNextPage).toBe(true);
+
+    const secondPage = await request(global.app)
+      .get(`/api/posts/feed?limit=2&cursor=${firstPage.body.nextCursor}`)
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
+
+    expect(secondPage.status).toBe(200);
+    expect(
+      secondPage.body.posts.map((post: { _id: string }) => post._id),
+    ).toEqual([posts[2]._id.toString()]);
+    expect(secondPage.body).toMatchObject({
+      hasNextPage: false,
+      nextCursor: null,
     });
   });
 });

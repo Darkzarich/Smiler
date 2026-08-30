@@ -78,6 +78,10 @@ export const ERRORS = {
   POST_MAX_UPLOAD_IMAGE_SIZE_EXCEEDED: `Uploaded image is too large. Max allowed size is ${POST_MAX_UPLOAD_IMAGE_SIZE / 1024 / 1024}MB`,
   PAGINATION_INVALID_LIMIT: 'Limit must be a positive integer',
   PAGINATION_INVALID_OFFSET: 'Offset must be a non-negative integer',
+  PAGINATION_INVALID_CURSOR: 'Cursor is malformed',
+  PAGINATION_CURSOR_NOT_SUPPORTED:
+    'This list cannot be paginated by cursor, use offset instead',
+  PAGINATION_CURSOR_WITH_OFFSET: "Cursor and offset can't be used together",
   RATING_INVALID: 'Rating must be a valid number',
   POST_SEARCH_INVALID_DATE: 'Invalid date',
   POST_INVALID_ATTACHMENT_EXTENSION:

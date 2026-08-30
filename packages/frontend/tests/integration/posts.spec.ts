@@ -247,7 +247,6 @@ test.describe('Post groups', () => {
     }) => {
       const searchParams = new URLSearchParams({
         limit: '15',
-        offset: '0',
       });
 
       const feedResponse = await Api.routes.posts.getFeed.waitForRequest({
@@ -257,7 +256,11 @@ test.describe('Post groups', () => {
         ),
       });
 
+      // The feed pages by cursor, so the first page carries neither an offset
+      // nor a cursor
       expect(feedResponse.url()).toContain(searchParams.toString());
+      expect(feedResponse.url()).not.toContain('offset');
+      expect(feedResponse.url()).not.toContain('cursor');
       await expect(currentPage).toHaveURL(PostsPage.urls.feed);
       await expect(currentPage).toHaveTitle(PostsPage.titles.feed);
       await expect(Post.postsList).toBeVisible();

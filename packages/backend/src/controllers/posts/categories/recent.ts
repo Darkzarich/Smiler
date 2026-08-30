@@ -1,13 +1,13 @@
 import type { Request, Response } from 'express';
 import { subHours } from 'date-fns';
-import { PaginationRequest } from '@type/pagination';
+import { CursorPaginationRequest } from '@type/pagination';
 import {
   respondWithPostList,
   PostListResponse,
 } from '../respond-with-post-list';
 
 export async function recent(
-  req: Request<unknown, unknown, unknown, PaginationRequest>,
+  req: Request<unknown, unknown, unknown, CursorPaginationRequest>,
   res: Response<PostListResponse>,
 ) {
   await respondWithPostList(req, res, {
@@ -17,5 +17,6 @@ export async function recent(
       },
     },
     sort: { createdAt: -1 },
+    supportsCursor: true,
   });
 }

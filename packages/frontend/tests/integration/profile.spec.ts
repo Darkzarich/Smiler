@@ -85,9 +85,11 @@ test('Fetches user posts with expected filters', async ({
     },
   });
 
-  expect(postResponse.url()).toContain(
-    `author=${testUser.login}&limit=15&offset=0`,
-  );
+  // The author's posts page by cursor, so the first page carries neither an
+  // offset nor a cursor
+  expect(postResponse.url()).toContain(`author=${testUser.login}&limit=15`);
+  expect(postResponse.url()).not.toContain('offset');
+  expect(postResponse.url()).not.toContain('cursor');
 
   await expect(Post.getTitleById(post._id)).toContainText(post.title);
 });

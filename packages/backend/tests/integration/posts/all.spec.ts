@@ -227,4 +227,15 @@ describe('GET /posts/categories/all', () => {
     expect(response.body.posts[1].rating).toBe(10);
     expect(response.body.posts[2].rating).toBe(5);
   });
+
+  it('Should return status 422 and an expected message for a cursor, which this list does not support', async () => {
+    const response = await request(global.app).get(
+      '/api/posts/categories/all?cursor=some-cursor',
+    );
+
+    expect(response.body.error.message).toBe(
+      ERRORS.PAGINATION_CURSOR_NOT_SUPPORTED,
+    );
+    expect(response.status).toBe(422);
+  });
 });

@@ -1,4 +1,9 @@
-import type { PaginationRequest, PaginationResponse } from '../types';
+import type {
+  CursorPaginationRequest,
+  CursorPaginationResponse,
+  PaginationRequest,
+  PaginationResponse,
+} from '../types';
 
 /** TODO: Think about sharing these types with backend */
 export enum POST_SECTION_TYPES {
@@ -57,7 +62,6 @@ export interface Post {
 }
 
 export interface PostsSearchRequest extends PaginationRequest {
-  author?: string;
   title?: string;
   dateFrom?: string | null;
   dateTo?: string | null;
@@ -73,6 +77,11 @@ interface GetCommonListResponse extends PaginationResponse {
   posts: Post[];
 }
 
+/** Lists the backend sorts by the date of creation, so they page by cursor. */
+interface GetCursorListResponse extends CursorPaginationResponse {
+  posts: Post[];
+}
+
 export type GetAllRequest = PaginationRequest;
 export type GetAllResponse = GetCommonListResponse;
 
@@ -82,14 +91,20 @@ export type GetTodayResponse = GetCommonListResponse;
 export type GetBlowingRequest = PaginationRequest;
 export type GetBlowingResponse = GetCommonListResponse;
 
-export type GetRecentRequest = PaginationRequest;
-export type GetRecentResponse = GetCommonListResponse;
+export type GetRecentRequest = CursorPaginationRequest;
+export type GetRecentResponse = GetCursorListResponse;
 
 export type GetTopThisWeekRequest = PaginationRequest;
 export type GetTopThisWeekResponse = GetCommonListResponse;
 
-export type GetFeedRequest = PaginationRequest;
-export type GetFeedResponse = GetCommonListResponse;
+export type GetFeedRequest = CursorPaginationRequest;
+export type GetFeedResponse = GetCursorListResponse;
+
+export interface GetPostsByAuthorRequest extends CursorPaginationRequest {
+  author: string;
+}
+
+export type GetPostsByAuthorResponse = GetCursorListResponse;
 
 export interface GetPostBySlugRequest {
   slug: string;

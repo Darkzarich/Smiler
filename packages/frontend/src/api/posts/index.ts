@@ -7,6 +7,14 @@ export default {
   search(params: postTypes.PostsSearchRequest) {
     return apiClient.get<postTypes.PostsSearchResponse>(CONTROLLER_URL, params);
   },
+  /** Same endpoint as `search`, but filtering by author switches the backend to
+   * a list sorted by the date of creation, which pages by cursor. */
+  getPostsByAuthor(params: postTypes.GetPostsByAuthorRequest) {
+    return apiClient.get<postTypes.GetPostsByAuthorResponse>(
+      CONTROLLER_URL,
+      params,
+    );
+  },
   getAll(params: postTypes.GetAllRequest) {
     return apiClient.get<postTypes.GetAllResponse>(
       `${CONTROLLER_URL}/categories/all`,
