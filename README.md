@@ -160,7 +160,7 @@ If you prefer to use Docker, follow these steps:
      Run a MongoDB container using Docker:
 
      ```bash
-     docker run -d -v /usr/src/smiler/db:/data/db -p 27017:27017 --name smiler-mongo mongo:5.0.10
+     docker run -d -v /usr/src/smiler/db:/data/db -p 27017:27017 --name smiler-mongo mongo:6.0.28
      ```
 
      Update the `DB_URL` in `.env` to `mongodb://smiler-mongo:27017/smiler`.
