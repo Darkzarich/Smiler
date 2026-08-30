@@ -12,17 +12,16 @@ pnpm install                # install all workspace deps
 pnpm dev                    # runs backend + frontend concurrently
 pnpm build                  # builds backend, then frontend
 
-# Linting (run all three before committing)
+# Linting (the pre-commit hook only lints staged files, this is the whole repo)
+pnpm lint                   # all three passes below, in order
 pnpm lint:spell             # cspell spellcheck (root)
 pnpm lint:code              # eslint on backend + eslint+stylelint on frontend
 pnpm lint:types             # tsc --noEmit on both packages
 
 # Testing
-pnpm test                   # backend jest + frontend playwright e2e
-pnpm test:prepush           # backend jest + frontend vitest unit
+pnpm test                   # backend jest + frontend playwright e2e + frontend vitest
+pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push runs)
 ```
-
-Pre-push hook runs: `lint:spell → lint:code → lint:types → test:prepush`.
 
 ## Backend (`packages/backend`)
 
@@ -49,6 +48,18 @@ Pre-push hook runs: `lint:spell → lint:code → lint:types → test:prepush`.
 - **Linting**: separate ESLint (`.js/.ts/.vue`) and Stylelint (`.css/.scss/.vue`) passes
 - Vue component style: PascalCase component names in templates; blank lines between `<template>`/`<script>`/`<style>` blocks.
 - `vuedraggable@4.1.0` is patched — see `patches/` directory.
+
+## Git hooks
+
+Managed by [husky](https://github.com/typicode/husky) in `.husky/`; every hook delegates to a root `package.json` script:
+
+- **`pre-commit`** → `pnpm precommit` → `lint-staged` (see `lint-staged.config.cjs`): Prettier, ESLint/Stylelint `--fix` and cspell over the _staged_ files, plus a full-package `lint:types` for any package with staged code.
+- **`commit-msg`** → `pnpm commitmsg` → `commitlint --edit` against `commitlint.config.cjs`.
+- **`pre-push`** → `pnpm prepush` → `pnpm test:prepush` (backend Jest + frontend Vitest).
+
+The split is deliberate: **linting at commit time, tests at push time**. Commits stay fast and mechanical, while every push carries a green suite. Do **not** move the test suites into `pre-commit` — they take minutes and are memory-heavy, and they would run on every WIP commit. Nor should the repo-wide lint passes go back into `pre-push`: `lint-staged` already covers those files at commit time, so re-running them on push only added waiting. Run `pnpm lint` by hand (or in CI) when a whole-repo sweep is wanted.
+
+`--no-verify` skips the hooks; use it only for local scratch commits that get rewritten before pushing.
 
 ## Commit style
 
