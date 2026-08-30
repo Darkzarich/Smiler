@@ -120,6 +120,26 @@ describe('POST /comments', () => {
     expect(response.body.body).toBe(' test');
   });
 
+  it('Should force a hardened rel on links in the body', async () => {
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+    const post = await PostModel.create(generateRandomPost());
+
+    const response = await request(global.app)
+      .post('/api/comments')
+      .send({
+        body: '<a href="https://example.com" target="_blank" rel="dofollow">link</a>',
+        post: post.id,
+      })
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
+
+    expect(response.status).toBe(200);
+    expect(response.body.body).toBe(
+      '<a href="https://example.com" target="_blank" rel="noopener noreferrer nofollow ugc">link</a>',
+    );
+  });
+
   it('Should return status 404 and an expected message if parent comment was provided but not found', async () => {
     const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 

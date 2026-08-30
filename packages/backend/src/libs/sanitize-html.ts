@@ -38,7 +38,12 @@ const transformTags = {
   strike: 's',
   del: 's',
   ins: 'u',
-} as const;
+  // User content is never an endorsement and never a trusted opener,
+  // so every surviving link gets a hardened rel regardless of what was sent
+  a: sanitizeHtml.simpleTransform('a', {
+    rel: 'noopener noreferrer nofollow ugc',
+  }),
+};
 
 const sanitizeAppHtml = (
   html = '',
