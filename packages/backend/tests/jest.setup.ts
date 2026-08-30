@@ -10,7 +10,7 @@ export default async () => {
       port: 27018,
     },
     binary: {
-      version: '7.0.40',
+      version: '8.0.29',
     },
   });
 

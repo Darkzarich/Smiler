@@ -47,7 +47,7 @@ services:
       smiler-db:
         condition: service_healthy
   smiler-db:
-    image: mongo:7.0.40
+    image: mongo:8.0.29
     restart: always
     container_name: smiler-db
     volumes:
