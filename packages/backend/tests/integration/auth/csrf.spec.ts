@@ -2,6 +2,7 @@ import request from 'supertest';
 import { ERRORS } from '@errors';
 import { SESSION_COOKIE_NAME } from '@constants/index';
 import { findSessionCookie, signUpRequest } from '@test-utils/request-auth';
+import { withoutBrowserOrigin } from '@test-utils/browser-origin';
 import Config from '@config/index';
 
 describe('CSRF protection', () => {
@@ -49,6 +50,33 @@ describe('CSRF protection', () => {
 
     expect(response.status).toBe(403);
     expect(response.body.error.message).toBe(ERRORS.CSRF_INVALID);
+  });
+
+  it('Rejects a valid CSRF token sent with neither Origin nor Referer', async () => {
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+    const response = await withoutBrowserOrigin(
+      request(global.app).post('/api/posts'),
+    )
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
+
+    expect(response.status).toBe(403);
+    expect(response.body.error.message).toBe(ERRORS.CSRF_INVALID);
+  });
+
+  it('Allows an authenticated write request with a valid token and an allowed Referer', async () => {
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+    const response = await withoutBrowserOrigin(
+      request(global.app).post('/api/posts'),
+    )
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .set('Referer', `${Config.FRONT_ORIGIN_LOCAL}/post/create`);
+
+    expect(response.status).toBe(422);
+    expect(response.body.error.message).toBe(ERRORS.POST_TITLE_REQUIRED);
   });
 
   it('Allows an authenticated write request with a valid token and allowed origin', async () => {

@@ -70,7 +70,9 @@ function requestHasAllowedBrowserOrigin(req: Request) {
     return isAllowedOrigin(refererOrigin);
   }
 
-  return true;
+  // Browsers always send Origin on state-changing requests, so a request with
+  // neither header is not the browser client this check exists to protect
+  return false;
 }
 
 function isValidToken(req: Request) {

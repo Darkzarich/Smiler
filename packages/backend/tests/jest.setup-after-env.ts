@@ -1,7 +1,10 @@
 import mongoose from 'mongoose';
 import { startApp } from '@app';
+import { useBrowserOriginByDefault } from '@test-utils/browser-origin';
 
 jest.mock('@utils/remove-file-by-path');
+
+useBrowserOriginByDefault();
 
 beforeAll(async () => {
   ({ app: global.app } = await startApp());
