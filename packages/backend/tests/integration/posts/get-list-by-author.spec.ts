@@ -34,8 +34,6 @@ describe('GET /posts?author=', () => {
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
       posts: [],
-      total: 0,
-      pages: 0,
       hasNextPage: false,
     });
   });
@@ -75,8 +73,6 @@ describe('GET /posts?author=', () => {
           createdAt: post.createdAt.toISOString(),
         },
       ],
-      total: 1,
-      pages: 1,
       hasNextPage: false,
     });
   });

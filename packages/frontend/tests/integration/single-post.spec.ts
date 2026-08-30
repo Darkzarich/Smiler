@@ -28,16 +28,13 @@ test.beforeEach(async ({ Api }) => {
 
   Api.routes.posts.getToday.mock({
     body: {
-      pages: 1,
       posts: [post],
       hasNextPage: false,
-      total: 1,
     },
   });
 
   Api.routes.comments.getComments.mock({
     body: {
-      pages: 0,
       comments: [createRandomComment()],
     },
   });

@@ -54,8 +54,6 @@ describe('GET /comments', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       comments: [],
-      pages: 0,
-      total: 0,
       hasNextPage: false,
     });
   });
@@ -80,8 +78,6 @@ describe('GET /comments', () => {
     expect(response.status).toBe(200);
     expect(response.body.comments).toHaveLength(10);
     expect(response.body).toMatchObject({
-      total: 11,
-      pages: 2,
       hasNextPage: true,
     });
   });
@@ -106,8 +102,6 @@ describe('GET /comments', () => {
     expect(response.status).toBe(200);
     expect(response.body.comments).toHaveLength(1);
     expect(response.body).toMatchObject({
-      total: 11,
-      pages: 2,
       hasNextPage: false,
     });
   });
@@ -183,8 +177,6 @@ describe('GET /comments', () => {
           rated: { isRated: false },
         },
       ],
-      pages: 1,
-      total: 1,
       hasNextPage: false,
     });
   });
@@ -285,8 +277,6 @@ describe('GET /comments', () => {
           rated: { isRated: false },
         },
       ],
-      pages: 1,
-      total: 1,
       hasNextPage: false,
     });
   });

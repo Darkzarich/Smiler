@@ -170,15 +170,8 @@ const router = express.Router();
                       "$ref": "#/components/schemas/Comment"
                     }
                   },
-                  "pages": {
-                    "type": "number",
-                    "default": 1
-                  },
                   "hasNextPage": {
                     "type": "boolean"
-                  },
-                  "total": {
-                    "type": "number"
                   }
                 }
               }

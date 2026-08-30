@@ -32,8 +32,6 @@ describe('GET /posts/categories/all', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       posts: [],
-      total: 0,
-      pages: 0,
       hasNextPage: false,
     });
   });
@@ -69,8 +67,6 @@ describe('GET /posts/categories/all', () => {
           createdAt: post.createdAt.toISOString(),
         },
       ],
-      total: 1,
-      pages: 1,
       hasNextPage: false,
     });
   });
@@ -93,9 +89,29 @@ describe('GET /posts/categories/all', () => {
     expect(response.status).toBe(200);
     expect(response.body.posts).toHaveLength(10);
     expect(response.body).toMatchObject({
-      total: 11,
-      pages: 2,
       hasNextPage: true,
+    });
+  });
+
+  it('Should not report a next page when the last page is exactly full', async () => {
+    const posts = Array(10)
+      .fill({})
+      .map((_, index) =>
+        generateRandomPost({
+          slug: `slug${index}`,
+        }),
+      );
+
+    await PostModel.insertMany(posts);
+
+    const response = await request(global.app).get(
+      '/api/posts/categories/all?limit=10',
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.posts).toHaveLength(10);
+    expect(response.body).toMatchObject({
+      hasNextPage: false,
     });
   });
 
@@ -117,8 +133,6 @@ describe('GET /posts/categories/all', () => {
     expect(response.status).toBe(200);
     expect(response.body.posts).toHaveLength(1);
     expect(response.body).toMatchObject({
-      total: 11,
-      pages: 2,
       hasNextPage: false,
     });
   });

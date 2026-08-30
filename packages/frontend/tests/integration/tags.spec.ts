@@ -24,7 +24,6 @@ test.beforeEach(async ({ Api }) => {
 
   Api.routes.comments.getComments.mock({
     body: {
-      pages: 0,
       comments: [],
     },
   });

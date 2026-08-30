@@ -12,10 +12,8 @@ test.beforeEach(async ({ Api }) => {
 
   Api.routes.posts.getToday.mock({
     body: {
-      pages: 0,
       posts: [],
       hasNextPage: false,
-      total: 0,
     },
   });
 });

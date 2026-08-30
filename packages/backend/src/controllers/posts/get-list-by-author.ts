@@ -7,6 +7,7 @@ import { sendSuccess } from '@utils/response-utils';
 import { POST_MAX_LIMIT } from '@constants/index';
 import { PaginationValidator } from '@validators/PaginationValidator';
 import { PaginationRequest, PaginationResponse } from '@type/pagination';
+import { PAGE_LOOKAHEAD, toPage } from '@utils/pagination';
 
 interface GetListByAuthorQuery extends PaginationRequest {
   author: string;
@@ -39,15 +40,14 @@ export async function getListByAuthor(
     author: foundAuthor._id,
   };
 
-  const [posts, total] = await Promise.all([
-    PostModel.find(query)
-      .sort({ createdAt: -1 })
-      .populate('author', 'login avatar')
-      .limit(limit)
-      .skip(offset)
-      .lean(),
-    PostModel.countDocuments(query),
-  ]);
+  const foundPosts = await PostModel.find(query)
+    .sort({ createdAt: -1 })
+    .populate('author', 'login avatar')
+    .limit(limit + PAGE_LOOKAHEAD)
+    .skip(offset)
+    .lean();
+
+  const { items: posts, hasNextPage } = toPage(foundPosts, limit);
 
   const ratedTargets = await RateModel.findRatedTargets({
     userId,
@@ -61,8 +61,6 @@ export async function getListByAuthor(
 
   sendSuccess(res, {
     posts: postsWithRated,
-    total,
-    pages: Math.ceil(total / limit),
-    hasNextPage: offset + limit < total,
+    hasNextPage,
   });
 }

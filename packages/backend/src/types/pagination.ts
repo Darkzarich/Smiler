@@ -4,7 +4,5 @@ export interface PaginationRequest {
 }
 
 export interface PaginationResponse {
-  total: number;
-  pages: number;
   hasNextPage: boolean;
 }

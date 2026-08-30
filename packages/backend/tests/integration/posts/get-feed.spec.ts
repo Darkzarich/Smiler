@@ -57,8 +57,6 @@ describe('GET /posts/feed', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       posts: [],
-      total: 0,
-      pages: 0,
       hasNextPage: false,
     });
   });
@@ -82,8 +80,6 @@ describe('GET /posts/feed', () => {
     expect(response.status).toBe(200);
     expect(response.body.posts).toHaveLength(1);
     expect(response.body).toMatchObject({
-      total: 1,
-      pages: 1,
       hasNextPage: false,
     });
   });
@@ -113,8 +109,6 @@ describe('GET /posts/feed', () => {
     expect(response.status).toBe(200);
     expect(response.body.posts).toHaveLength(1);
     expect(response.body).toMatchObject({
-      total: 1,
-      pages: 1,
       hasNextPage: false,
     });
   });
@@ -142,8 +136,6 @@ describe('GET /posts/feed', () => {
     expect(response.status).toBe(200);
     expect(response.body.posts).toHaveLength(0);
     expect(response.body).toMatchObject({
-      total: 0,
-      pages: 0,
       hasNextPage: false,
     });
   });
@@ -227,16 +219,12 @@ describe('GET /posts/feed', () => {
     expect(response.status).toBe(200);
     expect(response.body.posts).toHaveLength(10);
     expect(response.body).toMatchObject({
-      total: 11,
-      pages: 2,
       hasNextPage: true,
     });
     // Request with offset
     expect(responseWithOffset.status).toBe(200);
     expect(responseWithOffset.body.posts).toHaveLength(1);
     expect(responseWithOffset.body).toMatchObject({
-      total: 11,
-      pages: 2,
       hasNextPage: false,
     });
   });

@@ -12,6 +12,7 @@ import { sendSuccess } from '@utils/response-utils';
 import { COMMENT_MAX_LIMIT } from '@constants/index';
 import { PaginationValidator } from '@validators/PaginationValidator';
 import { PaginationRequest, PaginationResponse } from '@type/pagination';
+import { PAGE_LOOKAHEAD, toPage } from '@utils/pagination';
 
 interface GetListQuery extends PaginationRequest {
   post: string;
@@ -90,14 +91,13 @@ export async function getList(
     query.author = foundAuthor._id.toString();
   }
 
-  const [comments, total] = await Promise.all([
-    CommentModel.find(query)
-      .sort({ rating: -1 })
-      .skip(offset)
-      .limit(limit)
-      .lean({ autopopulate: true }),
-    CommentModel.countDocuments(query),
-  ]);
+  const foundComments = await CommentModel.find(query)
+    .sort({ rating: -1 })
+    .skip(offset)
+    .limit(limit + PAGE_LOOKAHEAD)
+    .lean({ autopopulate: true });
+
+  const { items: comments, hasNextPage } = toPage(foundComments, limit);
 
   const leanComments = comments as LeanComment[];
 
@@ -109,8 +109,6 @@ export async function getList(
 
   sendSuccess(res, {
     comments: fillWithRatedRecursive({ comments: leanComments, ratedTargets }),
-    total,
-    pages: Math.ceil(total / limit),
-    hasNextPage: offset + limit < total,
+    hasNextPage,
   });
 }
