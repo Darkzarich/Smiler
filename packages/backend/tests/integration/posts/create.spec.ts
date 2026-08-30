@@ -311,6 +311,56 @@ describe('POST /posts', () => {
     expect(response.status).toBe(422);
   });
 
+  it("Should return status 422 and an expected message if pic section file url points to another user's uploads", async () => {
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+    const response = await request(global.app)
+      .post('/api/posts')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send({
+        ...requiredPostFields,
+        sections: [
+          {
+            type: POST_SECTION_TYPES.PICTURE,
+            isFile: true,
+            url: '/uploads/5d5467b4c17806706f3df347/1234.jpg',
+          },
+        ],
+      });
+
+    expect(response.body.error.message).toBe(
+      ERRORS.POST_PIC_SECTION_URL_INVALID,
+    );
+    expect(response.status).toBe(422);
+  });
+
+  it('Should return status 200 if pic section file url points to the current user uploads', async () => {
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
+
+    const response = await request(global.app)
+      .post('/api/posts')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send({
+        ...requiredPostFields,
+        sections: [
+          {
+            type: POST_SECTION_TYPES.PICTURE,
+            isFile: true,
+            url: `/uploads/${currentUser._id}/1234.jpg`,
+          },
+        ],
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.sections[0].url).toBe(
+      `/uploads/${currentUser._id}/1234.jpg`,
+    );
+  });
+
   it('Should return status 422 and an expected message if video section url is empty', async () => {
     const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 

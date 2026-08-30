@@ -25,11 +25,14 @@ export async function create(
 ) {
   const { userId } = req.session;
 
-  const { title, sections, tags } = PostValidator.validateAndPrepare({
-    title: req.body.title,
-    sections: req.body.sections,
-    tags: req.body.tags ?? [],
-  });
+  const { title, sections, tags } = PostValidator.validateAndPrepare(
+    {
+      title: req.body.title,
+      sections: req.body.sections,
+      tags: req.body.tags ?? [],
+    },
+    userId!,
+  );
 
   const [post] = await Promise.all([
     PostModel.create({

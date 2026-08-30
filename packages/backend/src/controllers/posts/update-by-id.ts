@@ -51,11 +51,14 @@ export async function updateById(
     title,
     sections: newSections,
     tags,
-  } = PostValidator.validateAndPrepare({
-    title: req.body.title || targetPost.title,
-    sections: req.body.sections || targetPost.sections,
-    tags: req.body.tags ?? targetPost.tags,
-  });
+  } = PostValidator.validateAndPrepare(
+    {
+      title: req.body.title || targetPost.title,
+      sections: req.body.sections || targetPost.sections,
+      tags: req.body.tags ?? targetPost.tags,
+    },
+    userId!,
+  );
 
   const filePathsToDelete: string[] = [];
 

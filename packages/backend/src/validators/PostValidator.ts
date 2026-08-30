@@ -8,6 +8,7 @@ import {
   ALLOWED_PICTURE_EXTENSIONS,
   ALLOWED_VIDEO_EMBEDS,
   ALLOWED_VIDEO_EXTENSIONS,
+  BASE_UPLOAD_FOLDER,
 } from '@constants/index';
 import { ValidationError, ERRORS } from '@errors';
 import sanitizeHtml, {
@@ -20,6 +21,12 @@ import { ALLOWED_URL_PROTOCOLS, isPrivateHost } from '@utils/is-private-host';
 
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 
+// eslint-disable-next-line security/detect-non-literal-regexp
+const UPLOADED_FILE_NAME_REGEXP = new RegExp(
+  `^[\\w.-]+\\.(${ALLOWED_PICTURE_EXTENSIONS.join('|')})$`,
+  'i',
+);
+
 type PostValidationInput = Partial<{
   title: string;
   sections: Post['sections'];
@@ -27,9 +34,6 @@ type PostValidationInput = Partial<{
 }>;
 
 export class PostValidator {
-  static ALLOWED_PICTURE_EXTENSIONS_FOR_REGEXP =
-    ALLOWED_PICTURE_EXTENSIONS.join('|');
-
   /** Validate title length */
   private static validateTitle(title: string) {
     if (title.length > POST_TITLE_MAX_LENGTH) {
@@ -76,6 +80,19 @@ export class PostValidator {
     return Array.from(new Set(normalizedTags));
   }
 
+  /** An uploaded picture must live in the uploads folder of the user the post
+   * belongs to, otherwise a post could claim (and hotlink) someone else's file.
+   */
+  private static isValidUploadedFileUrl(url: string, userId: string) {
+    const userUploadFolder = `${BASE_UPLOAD_FOLDER}/${userId}/`;
+
+    if (!url.startsWith(userUploadFolder) || url.includes('..')) {
+      return false;
+    }
+
+    return UPLOADED_FILE_NAME_REGEXP.test(url.slice(userUploadFolder.length));
+  }
+
   private static isValidVideoUrl(urlString: string): boolean {
     try {
       const url = new URL(urlString);
@@ -108,6 +125,7 @@ export class PostValidator {
    */
   private static validateAndPrepareSections(
     sections: Post['sections'],
+    userId: string,
     { requireContent = true }: { requireContent?: boolean } = {},
   ) {
     if (sections.length > POST_SECTIONS_MAX) {
@@ -165,15 +183,9 @@ export class PostValidator {
           throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_INVALID);
         }
 
-        // eslint-disable-next-line security/detect-non-literal-regexp
-        const internalUrlRegex = new RegExp(
-          `^\\/uploads\\/[\\w/-]{1,100}\\/[\\w.-]+\\.(${PostValidator.ALLOWED_PICTURE_EXTENSIONS_FOR_REGEXP})$`,
-          'i',
-        );
-
         if (
           section.isFile &&
-          (!section.url.match(internalUrlRegex) || section.url.includes('..'))
+          !PostValidator.isValidUploadedFileUrl(section.url, userId)
         ) {
           throw new ValidationError(ERRORS.POST_PIC_SECTION_URL_INVALID);
         }
@@ -196,7 +208,7 @@ export class PostValidator {
   /** Validate a post and return it with sanitized sections
    * throw ValidationError if validation fails
    */
-  static validateAndPrepare(post: PostValidationInput) {
+  static validateAndPrepare(post: PostValidationInput, userId: string) {
     const { title, sections, tags } = post;
 
     if (!title) {
@@ -214,7 +226,7 @@ export class PostValidator {
         ? PostValidator.validateAndPrepareTags(tags)
         : undefined;
 
-    PostValidator.validateAndPrepareSections(sections);
+    PostValidator.validateAndPrepareSections(sections, userId);
 
     return {
       title,
@@ -226,7 +238,7 @@ export class PostValidator {
   /** Validate template fields when present, without requiring them.
    * Returns validated fields with sanitized sections.
    */
-  static validateTemplate(template: PostValidationInput) {
+  static validateTemplate(template: PostValidationInput, userId: string) {
     const { title, sections, tags } = template;
 
     if (title !== undefined) {
@@ -239,7 +251,7 @@ export class PostValidator {
         : undefined;
 
     if (sections) {
-      PostValidator.validateAndPrepareSections(sections, {
+      PostValidator.validateAndPrepareSections(sections, userId, {
         requireContent: false,
       });
     }

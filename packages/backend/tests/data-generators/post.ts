@@ -17,11 +17,6 @@ export function generateRandomPost(overrides: Partial<Post> = {}) {
         url: 'https://fastly.picsum.photos/id/4/200/300.jpg?hmac=y6_DgDO4ccUuOHUJcEWirdjxlpPwMcEZo7fz1MpuaWg',
       },
       {
-        type: 'pic',
-        isFile: true,
-        url: '/uploads/1234/1234.jpg',
-      },
-      {
         type: 'vid',
         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       },

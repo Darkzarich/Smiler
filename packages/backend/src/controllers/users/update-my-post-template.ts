@@ -14,7 +14,10 @@ export async function updateMyPostTemplate(
   res: Response<UpdateMyPostTemplateResponse>,
 ) {
   const { userId } = req.session;
-  const { title, sections, tags } = PostValidator.validateTemplate(req.body);
+  const { title, sections, tags } = PostValidator.validateTemplate(
+    req.body,
+    userId!,
+  );
 
   const updatedUser = await UserModel.findByIdAndUpdate(
     userId,
