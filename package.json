@@ -13,7 +13,7 @@
     "build": "pnpm --filter backend build && pnpm --filter frontend build",
     "prepare": "husky",
     "precommit": "lint-staged",
-    "commitmsg": "commitlint --edit",
+    "commitmsg": "sh scripts/lint-commit-msg.sh",
     "prepush": "pnpm test:prepush",
     "lint": "pnpm lint:spell && pnpm lint:code && pnpm lint:types",
     "lint:code": "pnpm --filter backend lint:code && pnpm --filter frontend lint:ts && pnpm --filter frontend lint:css",

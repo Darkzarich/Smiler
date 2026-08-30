@@ -54,7 +54,7 @@ pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push
 Managed by [husky](https://github.com/typicode/husky) in `.husky/`; every hook delegates to a root `package.json` script:
 
 - **`pre-commit`** → `pnpm precommit` → `lint-staged` (see `lint-staged.config.cjs`): Prettier, ESLint/Stylelint `--fix` and cspell over the _staged_ files, plus a full-package `lint:types` for any package with staged code.
-- **`commit-msg`** → `pnpm commitmsg` → `commitlint --edit` against `commitlint.config.cjs`.
+- **`commit-msg`** → `pnpm commitmsg` → `scripts/lint-commit-msg.sh`: `commitlint --edit` against `commitlint.config.cjs`, then cspell over the message text. Git's own comment block and the diff `git commit -v` appends are stripped before spellchecking, so only what the author wrote is checked.
 - **`pre-push`** → `pnpm prepush` → `pnpm test:prepush` (backend Jest + frontend Vitest).
 
 The split is deliberate: **linting at commit time, tests at push time**. Commits stay fast and mechanical, while every push carries a green suite. Do **not** move the test suites into `pre-commit` — they take minutes and are memory-heavy, and they would run on every WIP commit. Nor should the repo-wide lint passes go back into `pre-push`: `lint-staged` already covers those files at commit time, so re-running them on push only added waiting. Run `pnpm lint` by hand (or in CI) when a whole-repo sweep is wanted.
@@ -78,6 +78,7 @@ The split is deliberate: **linting at commit time, tests at push time**. Commits
   - `build` covers the toolchain and deps, `chore(deps)` a plain dependency bump, `style` formatting-only churn.
 - **scope** — optional, and limited to `backend`, `frontend` or `deps` by the `scope-enum` rule in `commitlint.config.cjs`. Omit it entirely for repo-wide changes (tooling, docs, Docker, root config). Add new scopes to that rule, not ad hoc.
 - **description** — imperative mood, lowercase, no trailing period. The header (type + scope + description) is capped at 100 characters.
+- **spelling** — the whole message goes through cspell with the project dictionary. Add project terms to the `words` list in `cspell.json` instead of rewording around them.
 - **breaking changes** — `!` before the colon and/or a `BREAKING CHANGE: <what broke>` footer.
 - Body and footers are separated by blank lines and wrapped at 100 characters.
 
