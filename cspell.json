@@ -37,6 +37,7 @@
     "hotlinking",
     "INITDB",
     "JSESSIONID",
+    "localdomain",
     "matched",
     "MEVN",
     "mongosh",

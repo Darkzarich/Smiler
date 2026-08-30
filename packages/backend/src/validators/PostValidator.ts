@@ -16,6 +16,7 @@ import sanitizeHtml, {
 } from '@libs/sanitize-html';
 import { nanoid } from 'nanoid';
 import { isValidExternalImageUrl } from '@utils/is-valid-external-image-url';
+import { ALLOWED_URL_PROTOCOLS, isPrivateHost } from '@utils/is-private-host';
 
 const allowedSectionTypes = Object.values(POST_SECTION_TYPES);
 
@@ -26,9 +27,6 @@ type PostValidationInput = Partial<{
 }>;
 
 export class PostValidator {
-  static LOCAL_HOST_NAMES = ['localhost', '127.0.0.1', '::1'];
-  static PROTOCOLS = ['http:', 'https:'];
-  static PRIVATE_IP_REGEXP = /^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\.|^192\.168\./;
   static ALLOWED_PICTURE_EXTENSIONS_FOR_REGEXP =
     ALLOWED_PICTURE_EXTENSIONS.join('|');
 
@@ -81,12 +79,11 @@ export class PostValidator {
   private static isValidVideoUrl(urlString: string): boolean {
     try {
       const url = new URL(urlString);
-      if (!PostValidator.PROTOCOLS.includes(url.protocol)) return false;
+      if (!ALLOWED_URL_PROTOCOLS.includes(url.protocol)) return false;
 
       // Block localhost, private IPs (SSRF protection)
       const { hostname } = url;
-      if (PostValidator.LOCAL_HOST_NAMES.includes(hostname)) return false;
-      if (PostValidator.PRIVATE_IP_REGEXP.test(hostname)) return false;
+      if (isPrivateHost(hostname)) return false;
 
       // Direct video file URLs
       const { pathname } = url;

@@ -51,6 +51,31 @@ describe('isValidExternalImageUrl', () => {
     );
   });
 
+  it('Should reject cloud metadata, CGNAT and IPv6 private urls', () => {
+    expect(
+      isValidExternalImageUrl('http://169.254.169.254/latest/picture.jpg'),
+    ).toBe(false);
+    expect(isValidExternalImageUrl('http://100.64.0.1/picture.jpg')).toBe(
+      false,
+    );
+    expect(isValidExternalImageUrl('http://[fc00::1]/picture.jpg')).toBe(false);
+    expect(
+      isValidExternalImageUrl('http://[::ffff:127.0.0.1]/picture.jpg'),
+    ).toBe(false);
+  });
+
+  it('Should reject private IPs written in decimal, octal or hex notation', () => {
+    expect(isValidExternalImageUrl('http://2130706433/picture.jpg')).toBe(
+      false,
+    );
+    expect(isValidExternalImageUrl('http://0x7f000001/picture.jpg')).toBe(
+      false,
+    );
+    expect(isValidExternalImageUrl('http://017700000001/picture.jpg')).toBe(
+      false,
+    );
+  });
+
   it('Should reject urls without allowed image extensions', () => {
     expect(isValidExternalImageUrl('https://cdn.example.com/picture.txt')).toBe(
       false,
