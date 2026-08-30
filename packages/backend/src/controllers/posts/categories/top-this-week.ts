@@ -16,6 +16,6 @@ export async function topThisWeek(
         $gte: startOfWeek(Date.now()),
       },
     },
-    sort: { createdAt: -1 },
+    sort: { rating: -1 },
   });
 }

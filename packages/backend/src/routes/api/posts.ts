@@ -551,7 +551,7 @@ router.get(
       "tags": [
         "Posts"
       ],
-      "description": "Get posts posted from the start of the week, sorted by the date of creation",
+      "description": "Get posts posted from the start of the week, sorted by rating",
       "summary": "Get top posts",
       "parameters": [
         {

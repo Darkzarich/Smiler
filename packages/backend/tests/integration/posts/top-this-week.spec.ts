@@ -181,7 +181,6 @@ describe('GET /posts/categories/top-this-week', () => {
       .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
-    // Sorted by createdAt descending
     expect(response.body.posts).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -204,27 +203,30 @@ describe('GET /posts/categories/top-this-week', () => {
     );
   });
 
-  it('Should sort posts by createdAt descending', async () => {
+  it('Should sort posts by rating descending', async () => {
     const dates = [
-      subSeconds(new Date(), 2),
       subSeconds(new Date(), 1),
-      new Date(),
+      subSeconds(new Date(), 2),
+      subSeconds(new Date(), 3),
     ];
 
     await Promise.all([
       PostModel.create(
         generateRandomPost({
           createdAt: dates[2],
+          rating: 1,
         }),
       ),
       PostModel.create(
         generateRandomPost({
           createdAt: dates[1],
+          rating: 0,
         }),
       ),
       PostModel.create(
         generateRandomPost({
           createdAt: dates[0],
+          rating: 2,
         }),
       ),
     ]);
@@ -234,8 +236,8 @@ describe('GET /posts/categories/top-this-week', () => {
     );
 
     expect(response.status).toBe(200);
-    expect(response.body.posts[0].createdAt).toBe(dates[2].toISOString());
-    expect(response.body.posts[1].createdAt).toBe(dates[1].toISOString());
-    expect(response.body.posts[2].createdAt).toBe(dates[0].toISOString());
+    expect(response.body.posts[0].rating).toBe(2);
+    expect(response.body.posts[1].rating).toBe(1);
+    expect(response.body.posts[2].rating).toBe(0);
   });
 });
