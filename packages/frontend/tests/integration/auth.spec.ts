@@ -156,6 +156,70 @@ test.describe('Sign In and Sign Up requests', () => {
       confirm: formData.password,
     });
   });
+
+  test('Submits the Sign In form on Enter, keeping the credentials out of the URL', async ({
+    Api,
+    PostsPage,
+    Menu,
+    AuthForm,
+    page,
+  }) => {
+    await PostsPage.goto();
+
+    const formData = {
+      email: 'test@gmail.com',
+      password: '123456',
+    };
+
+    await Menu.openIfMobile();
+
+    await AuthForm.signInEmail.fill(formData.email);
+    await AuthForm.signInPassword.fill(formData.password);
+
+    const authResponse = await Api.routes.auth.signIn.waitForRequest({
+      preRequestAction: AuthForm.pressEnterInSignInPassword.bind(AuthForm),
+    });
+
+    expect(authResponse.postDataJSON()).toEqual(formData);
+    // Submission has to stay handled: a form left to submit natively reloads
+    // the page with every field, the password included, in the query string
+    expect(page.url()).not.toContain(formData.password);
+  });
+
+  test('Submits the Sign Up form on Enter, keeping the credentials out of the URL', async ({
+    Api,
+    PostsPage,
+    Menu,
+    AuthForm,
+    page,
+  }) => {
+    await PostsPage.goto();
+
+    const formData = {
+      email: 'test@gmail.com',
+      login: 'test',
+      password: '123456',
+    };
+
+    await Menu.openIfMobile();
+
+    await AuthForm.toggleAuthFormMode();
+
+    await AuthForm.signUpEmail.fill(formData.email);
+    await AuthForm.signUpLogin.fill(formData.login);
+    await AuthForm.signUpPassword.fill(formData.password);
+    await AuthForm.signUpConfirm.fill(formData.password);
+
+    const createUserResponse = await Api.routes.auth.signUp.waitForRequest({
+      preRequestAction: AuthForm.pressEnterInSignUpConfirm.bind(AuthForm),
+    });
+
+    expect(createUserResponse.postDataJSON()).toEqual({
+      ...formData,
+      confirm: formData.password,
+    });
+    expect(page.url()).not.toContain(formData.password);
+  });
 });
 
 test.describe('Sign In validation', () => {

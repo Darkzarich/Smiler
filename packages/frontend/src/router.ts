@@ -98,9 +98,7 @@ export const router = createRouter({
       path: '/posts/feed',
       component: PostsCategory,
       name: 'Feed',
-      beforeEnter(to, from, next) {
-        authGuard(to, from, next);
-      },
+      beforeEnter: authGuard,
       meta: {
         title: 'My Feed',
       },
@@ -117,9 +115,7 @@ export const router = createRouter({
       path: '/user/settings',
       name: 'UserSettings',
       component: UserSettings,
-      beforeEnter(to, from, next) {
-        authGuard(to, from, next);
-      },
+      beforeEnter: authGuard,
       meta: {
         title: 'Settings',
       },
@@ -128,9 +124,7 @@ export const router = createRouter({
       path: '/post/create',
       name: 'PostCreate',
       component: PostCreate,
-      beforeEnter(to, from, next) {
-        authGuard(to, from, next);
-      },
+      beforeEnter: authGuard,
       meta: {
         title: 'Make New Post',
       },
@@ -144,9 +138,7 @@ export const router = createRouter({
       path: '/post/:slug/edit',
       name: 'PostEdit',
       component: PostCreate,
-      beforeEnter(to, from, next) {
-        authGuard(to, from, next);
-      },
+      beforeEnter: authGuard,
       meta: {
         mode: 'edit',
         title: 'Edit Post',

@@ -1,19 +1,16 @@
 import { defineStore } from 'pinia';
 import { api } from '@/api';
+import type { authTypes } from '@/api/auth';
 
-interface User {
-  _id: string;
-  login: string;
-  avatar: string;
-  rating: number;
-  email: string;
-  followersAmount: number;
-  tagsFollowed: string[];
-}
+type User = Omit<authTypes.CurrentUser, 'isAuth'>;
 
 interface State {
   user: User | null;
 }
+
+/** The app shell and the route guards both ask for the auth state as the page
+ * loads; one request answers all of them */
+let authStateRequest: Promise<void> | null = null;
 
 export const useUserStore = defineStore('user', {
   state: (): State => ({
@@ -39,21 +36,34 @@ export const useUserStore = defineStore('user', {
     },
   },
   actions: {
+    setUser(user: User) {
+      this.user = user;
+    },
     clearUser() {
       this.user = null;
     },
-    async userFetchAuthState() {
+    /** Bypasses the sharing above — go through `userFetchAuthState` instead */
+    async loadAuthState() {
       try {
         const user = await api.auth.getAuth();
 
         if (user.isAuth) {
-          this.user = user;
+          this.setUser(user);
         } else {
-          this.user = null;
+          this.clearUser();
         }
       } catch {
-        this.user = null;
+        this.clearUser();
       }
+    },
+    async userFetchAuthState() {
+      if (!authStateRequest) {
+        authStateRequest = this.loadAuthState().finally(() => {
+          authStateRequest = null;
+        });
+      }
+
+      return authStateRequest;
     },
     followTag(tag: string) {
       if (this.user) {

@@ -42,6 +42,25 @@ describe('User Store', () => {
     expect(store.user).toBeNull();
   });
 
+  it('sends a single request when the auth state is asked for concurrently', async () => {
+    // The app shell and the route guard of the landing route both ask on load
+    const getAuth = vi
+      .spyOn(api.auth, 'getAuth')
+      .mockResolvedValue(authenticatedUser);
+
+    const store = useUserStore();
+
+    await Promise.all([store.userFetchAuthState(), store.userFetchAuthState()]);
+
+    expect(getAuth).toHaveBeenCalledTimes(1);
+    expect(store.user).toEqual(authenticatedUser);
+
+    // The next ask is a fresh request, the previous one having settled
+    await store.userFetchAuthState();
+
+    expect(getAuth).toHaveBeenCalledTimes(2);
+  });
+
   it('clears the user when the request fails', async () => {
     const store = useUserStore();
     store.user = authenticatedUser;

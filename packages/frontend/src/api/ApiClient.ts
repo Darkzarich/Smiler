@@ -6,13 +6,19 @@ import { useUserStore } from '@/store/user';
 // Matches the backend error code, which is stable unlike the error message
 const CSRF_ERROR_CODE = 'CSRF_INVALID';
 
+const GENERIC_ERROR_MESSAGE =
+  'Oops! Something went wrong. Please try to reload the page and try again.';
+
 interface OkResponse {
   ok: true;
 }
 
+/** Every failure the API itself writes carries this body, but a failure can
+ * also come from anything else standing between the client and the API — a
+ * proxy error page, an offline browser — so nothing here can be relied on */
 interface RequestError {
-  error: {
-    code: string;
+  error?: {
+    code?: string;
     message?: string;
   };
 }
@@ -72,8 +78,14 @@ class ApiClient {
     return (
       axios.isAxiosError<RequestError>(error) &&
       error.response?.status === 403 &&
-      error.response.data.error.code === CSRF_ERROR_CODE
+      error.response.data?.error?.code === CSRF_ERROR_CODE
     );
+  }
+
+  /** The session the token belongs to is gone, so the cached one is dead
+   * weight: keeping it only buys a guaranteed 403 on the next request */
+  public resetCsrfToken() {
+    this.csrfToken = undefined;
   }
 
   private async request<Response = OkResponse>(
@@ -92,7 +104,7 @@ class ApiClient {
       let requestError = error;
 
       if (this.isCsrfError(requestError)) {
-        this.csrfToken = undefined;
+        this.resetCsrfToken();
 
         try {
           const res = await this.axiosClient.request<Response>(
@@ -106,22 +118,12 @@ class ApiClient {
       }
 
       if (axios.isAxiosError<RequestError>(requestError)) {
-        const { response } = requestError;
-
-        if (!response || !response.data || !response.data.error.message) {
-          notificationsStore.showErrorNotification({
-            message:
-              'Oops! Something went wrong. Please try to reload the page and try again.',
-          });
-
-          throw requestError;
-        }
-
         notificationsStore.showErrorNotification({
-          message: response.data.error.message,
+          message:
+            getRequestErrorMessage(requestError) ?? GENERIC_ERROR_MESSAGE,
         });
 
-        if (response.status === 401) {
+        if (requestError.response?.status === 401) {
           userStore.clearUser();
         }
       }
@@ -182,3 +184,14 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+
+/** The message the API sent for a failed request, or `undefined` when the
+ * failure carries none. Callers that show the reason next to a form field need
+ * it: an Axios error only says "Request failed with status code 401". */
+export function getRequestErrorMessage(error: unknown) {
+  if (!axios.isAxiosError<RequestError>(error)) {
+    return undefined;
+  }
+
+  return error.response?.data?.error?.message;
+}

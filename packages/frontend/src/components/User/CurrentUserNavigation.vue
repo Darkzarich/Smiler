@@ -48,11 +48,15 @@ const userStore = useUserStore();
 const logout = async () => {
   try {
     await api.auth.logout();
-
-    router.push({ name: 'Home' });
-  } finally {
-    userStore.clearUser();
+  } catch {
+    // The API client already told the user why; the session is still alive on
+    // the server, so the app must keep showing them as signed in
+    return;
   }
+
+  userStore.clearUser();
+
+  router.push({ name: 'Home' });
 };
 </script>
 

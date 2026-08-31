@@ -1,5 +1,5 @@
 <template>
-  <form class="signin-form u-flex-col">
+  <form class="signin-form u-flex-col" @submit.prevent="signIn">
     <div class="signin-form__header" data-testid="signin-form">Sign In</div>
 
     <div class="signin-form__input">
@@ -32,7 +32,6 @@
       data-testid="signin-form-submit"
       :loading="isLoading"
       :disabled="isSubmitDisabled"
-      @click.prevent="signIn"
     >
       SIGN IN
     </BaseButton>
@@ -41,7 +40,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { api } from '@/api';
+import { api, getRequestErrorMessage } from '@/api';
 import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
@@ -102,13 +101,12 @@ async function signIn() {
       password: password.value,
     });
 
-    userStore.user = data;
-  } catch (e) {
-    const error = e as Error;
-
+    userStore.setUser(data);
+  } catch (error) {
     email.value = '';
     password.value = '';
-    requestError.value = error.message;
+    requestError.value =
+      getRequestErrorMessage(error) ?? 'Could not sign in. Please try again.';
   } finally {
     isLoading.value = false;
   }

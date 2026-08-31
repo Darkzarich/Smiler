@@ -54,6 +54,14 @@ export default class AuthForm extends AbstractComponent {
     await this.signUpSubmitBtn.click();
   }
 
+  async pressEnterInSignInPassword() {
+    await this.signInPassword.press('Enter');
+  }
+
+  async pressEnterInSignUpConfirm() {
+    await this.signUpConfirm.press('Enter');
+  }
+
   async toggleAuthFormMode() {
     await this.authFormModeToggler.click();
   }

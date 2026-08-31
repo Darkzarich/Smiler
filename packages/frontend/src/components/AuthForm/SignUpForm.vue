@@ -1,5 +1,5 @@
 <template>
-  <form class="signup-form u-flex-col" @submit="signUp">
+  <form class="signup-form u-flex-col" @submit.prevent="signUp">
     <div class="signup-form__header" data-testid="signup-form">Sign Up</div>
 
     <div class="signup-form__input">
@@ -55,7 +55,6 @@
       data-testid="signup-form-submit"
       :loading="isLoading"
       :disabled="isSubmitDisabled"
-      @click.prevent="signUp"
     >
       FINISH
     </BaseButton>
@@ -63,15 +62,14 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
 import { computed, ref, watch } from 'vue';
-import { api } from '@/api';
+import { api, getRequestErrorMessage } from '@/api';
 import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 
-const { user } = storeToRefs(useUserStore());
+const userStore = useUserStore();
 
 const email = ref('');
 const login = ref('');
@@ -137,7 +135,7 @@ const isSubmitDisabled = computed(() => {
   );
 });
 
-watch([email, password], () => {
+watch([email, login, password, confirm], () => {
   requestError.value = '';
 });
 
@@ -156,15 +154,14 @@ async function signUp() {
       confirm: confirm.value,
     });
 
-    user.value = data;
-  } catch (e) {
-    const error = e as Error;
-
+    userStore.setUser(data);
+  } catch (error) {
     email.value = '';
     password.value = '';
     confirm.value = '';
     login.value = '';
-    requestError.value = error.message;
+    requestError.value =
+      getRequestErrorMessage(error) ?? 'Could not sign up. Please try again.';
   } finally {
     isLoading.value = false;
   }

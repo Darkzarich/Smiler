@@ -4,6 +4,8 @@ import posts from './posts';
 import tags from './tags';
 import users from './users';
 
+export { getRequestErrorMessage } from './ApiClient';
+
 export const api = {
   users,
   auth,

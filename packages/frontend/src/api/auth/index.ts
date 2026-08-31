@@ -21,8 +21,13 @@ export default {
       data,
     );
   },
-  logout() {
-    return apiClient.post(`${CONTROLLER_URL}/logout`);
+  async logout() {
+    const response = await apiClient.post(`${CONTROLLER_URL}/logout`);
+
+    // Logging out destroys the session the CSRF token was issued for
+    apiClient.resetCsrfToken();
+
+    return response;
   },
 };
 
