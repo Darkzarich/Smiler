@@ -322,7 +322,6 @@ const handleEdit = async () => {
   }
 };
 
-// TODO: Changing post comment count on delete
 const handleDeleteComment = async () => {
   if (isRequesting.value) {
     return;
