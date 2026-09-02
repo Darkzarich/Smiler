@@ -38,6 +38,26 @@ describe('GET /users/:login', () => {
     });
   });
 
+  it('Should return the last login date of the requested user', async () => {
+    const lastLoginAt = new Date('2026-01-02T03:04:05.000Z');
+
+    const user = await UserModel.create(generateRandomUser({ lastLoginAt }));
+
+    const response = await request(global.app).get(`/api/users/${user.login}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.lastLoginAt).toBe(lastLoginAt.toJSON());
+  });
+
+  it('Should omit the last login date for a user who never signed in', async () => {
+    const user = await UserModel.create(generateRandomUser());
+
+    const response = await request(global.app).get(`/api/users/${user.login}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).not.toHaveProperty('lastLoginAt');
+  });
+
   it('Should return status 200 when the login will trimmed of spaces', async () => {
     const user = await UserModel.create(generateRandomUser());
 
@@ -68,6 +88,7 @@ describe('GET /users/:login', () => {
       followersAmount: response.body.followersAmount,
       rating: response.body.rating,
       createdAt: response.body.createdAt,
+      lastLoginAt: response.body.lastLoginAt,
     });
   });
 

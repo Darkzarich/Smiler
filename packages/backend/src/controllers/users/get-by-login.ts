@@ -10,7 +10,13 @@ interface GetByLoginParams {
 
 type GetByLoginResponse = Pick<
   User,
-  'login' | 'rating' | 'bio' | 'avatar' | 'createdAt' | 'followersAmount'
+  | 'login'
+  | 'rating'
+  | 'bio'
+  | 'avatar'
+  | 'createdAt'
+  | 'followersAmount'
+  | 'lastLoginAt'
 > & { _id: Types.ObjectId; isFollowed?: boolean };
 
 export async function getByLogin(
@@ -30,6 +36,7 @@ export async function getByLogin(
       avatar: 1,
       createdAt: 1,
       followersAmount: 1,
+      lastLoginAt: 1,
     })
     .lean();
 
@@ -44,6 +51,7 @@ export async function getByLogin(
     avatar,
     createdAt,
     followersAmount,
+    lastLoginAt,
   } = requestedUser;
   const userId = requestedUser._id;
 
@@ -56,6 +64,7 @@ export async function getByLogin(
       avatar,
       createdAt,
       followersAmount,
+      lastLoginAt,
     });
 
     return;
@@ -75,6 +84,7 @@ export async function getByLogin(
     avatar,
     createdAt,
     followersAmount,
+    lastLoginAt,
     isFollowed: isUserFollowed(
       (currentUser?.usersFollowed as Types.ObjectId[]) ?? undefined,
       userId.toString(),

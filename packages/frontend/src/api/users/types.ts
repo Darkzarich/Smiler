@@ -7,6 +7,8 @@ export interface GetUserProfileResponse {
   bio: string;
   avatar: string;
   createdAt: string;
+  /** Absent for users who never signed in since it started being tracked */
+  lastLoginAt?: string;
   followersAmount: number;
   isFollowed: boolean;
 }

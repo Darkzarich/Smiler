@@ -29,6 +29,8 @@
         Became an author {{ formatFromNow(profileUser.createdAt) }}
       </div>
 
+      <UserOfflineBadge :last-login-at="profileUser.lastLoginAt" />
+
       <div
         v-if="profileUser.bio"
         class="user-profile__bio"
@@ -51,6 +53,7 @@ import { useUserStore } from '@/store/user';
 import { formatFromNow } from '@/utils/format-from-now';
 import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseButton from '@common/BaseButton.vue';
+import UserOfflineBadge from '@components/User/UserOfflineBadge.vue';
 import UserStats from '@components/User/UserStats.vue';
 
 interface Props {

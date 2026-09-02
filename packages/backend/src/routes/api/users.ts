@@ -61,6 +61,10 @@ const router = express.Router();
           "createdAt": {
             "type": "string"
           },
+          "lastLoginAt": {
+            "type": "string",
+            "description": "When the user last signed in, absent if they never signed in since it started being tracked"
+          },
           "followersAmount": {
             "type": "number"
           },

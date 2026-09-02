@@ -2,6 +2,7 @@
 /* eslint-disable no-shadow */
 
 import { expect } from '@playwright/test';
+import { subDays } from 'date-fns';
 import test from './page-objects';
 import createRandomAuth from '@factory/auth';
 import createRandomPost from '@factory/post';
@@ -72,6 +73,54 @@ test('Fetches and shows user profile', async ({ ProfilePage, Api }) => {
   await expect(ProfilePage.bio).toContainText(testUser.bio);
   await expect(ProfilePage.unfollowBtn).toBeHidden();
   await expect(ProfilePage.followBtn).toBeHidden();
+});
+
+test.describe('Long offline indicator', () => {
+  test('Shows how long the user has been away when they have not signed in for a long time', async ({
+    ProfilePage,
+    Api,
+  }) => {
+    const awayUser = createRandomProfile({
+      lastLoginAt: subDays(new Date(), 90).toISOString(),
+    });
+
+    Api.routes.users.getUserProfile.mock({
+      body: awayUser,
+    });
+
+    await ProfilePage.goto(awayUser.login);
+
+    await expect(ProfilePage.offlineBadge).toContainText(
+      'Away · last seen 3 months ago',
+    );
+  });
+
+  test('Hides the indicator for a user who signed in recently', async ({
+    ProfilePage,
+    Api,
+  }) => {
+    const activeUser = createRandomProfile({
+      lastLoginAt: subDays(new Date(), 1).toISOString(),
+    });
+
+    Api.routes.users.getUserProfile.mock({
+      body: activeUser,
+    });
+
+    await ProfilePage.goto(activeUser.login);
+
+    await expect(ProfilePage.login).toContainText(activeUser.login);
+    await expect(ProfilePage.offlineBadge).toBeHidden();
+  });
+
+  test('Hides the indicator for a user with no last login date stored', async ({
+    ProfilePage,
+  }) => {
+    await ProfilePage.goto(testUser.login);
+
+    await expect(ProfilePage.login).toContainText(testUser.login);
+    await expect(ProfilePage.offlineBadge).toBeHidden();
+  });
 });
 
 test('Fetches user posts with expected filters', async ({

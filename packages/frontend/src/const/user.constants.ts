@@ -5,3 +5,6 @@ export const PASSWORD_MIN_LENGTH = 6;
 
 export const LOGIN_MIN_LENGTH = 3;
 export const LOGIN_MAX_LENGTH = 10;
+
+/** How long a user has to be away before their profile says so */
+export const USER_LONG_OFFLINE_DAYS = 30;
