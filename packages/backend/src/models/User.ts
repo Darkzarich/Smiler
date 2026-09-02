@@ -105,6 +105,11 @@ export class User {
 
   @prop()
   public createdAt!: Date;
+
+  /** When the user last signed in, absent for users who never signed in since
+   * it started being tracked */
+  @prop()
+  public lastLoginAt?: Date;
 }
 
 export function isUserFollowed(

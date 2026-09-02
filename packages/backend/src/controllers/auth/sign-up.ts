@@ -66,6 +66,7 @@ export async function signUp(
       hash,
       salt,
       hashParams,
+      lastLoginAt: new Date(),
     });
 
     await authenticateSession(req, newUser._id.toString());

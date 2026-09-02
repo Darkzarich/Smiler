@@ -144,6 +144,18 @@ describe('POST api/auth/signup', () => {
     expect((user as any).password).not.toBeDefined();
   });
 
+  it('Stores the last login date of the newly created user', async () => {
+    const before = Date.now();
+
+    const response = await signUp(generateSignUpCredentials());
+
+    const user = await UserModel.findOne({ _id: response.body._id }).lean();
+
+    expect(user!.lastLoginAt).toBeInstanceOf(Date);
+    expect(user!.lastLoginAt!.getTime()).toBeGreaterThanOrEqual(before);
+    expect(user!.lastLoginAt!.getTime()).toBeLessThanOrEqual(Date.now());
+  });
+
   it('Returns status 409 and an expected message if user already exists', async () => {
     await UserModel.syncIndexes();
 

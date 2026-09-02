@@ -47,6 +47,23 @@ async function upgradeStoredPassword(userId: Types.ObjectId, password: string) {
   }
 }
 
+/**
+ * Record when the user signed in. Never fails the sign in: the timestamp is
+ * bookkeeping, losing it is not a reason to deny an authenticated user.
+ */
+async function recordLogin(userId: Types.ObjectId) {
+  try {
+    await UserModel.updateOne(
+      { _id: userId },
+      { $set: { lastLoginAt: new Date() } },
+    );
+  } catch (error) {
+    logger.error('Could not store the last login date of a signing in user', {
+      error,
+    });
+  }
+}
+
 export async function signIn(
   req: Request<unknown, unknown, SignInBody>,
   res: Response<CurrentUserResponse>,
@@ -79,6 +96,8 @@ export async function signIn(
   if (needsRehash(foundUser.hashParams)) {
     await upgradeStoredPassword(foundUser._id, fields.password!);
   }
+
+  await recordLogin(foundUser._id);
 
   await authenticateSession(req, foundUser._id.toString());
 

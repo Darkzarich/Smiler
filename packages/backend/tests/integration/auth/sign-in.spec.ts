@@ -202,6 +202,39 @@ describe('POST api/auth/signin', () => {
     expect(response.status).toBe(200);
   });
 
+  it('Stores the last login date on a successful sign in', async () => {
+    const { currentUser } = await signUpRequest(global.app);
+
+    const before = Date.now();
+
+    const response = await signIn({
+      email: currentUser.email,
+      password: '123456',
+    });
+
+    expect(response.status).toBe(200);
+
+    const user = await UserModel.findOne({ _id: currentUser._id }).lean();
+
+    expect(user!.lastLoginAt!.getTime()).toBeGreaterThanOrEqual(before);
+    expect(user!.lastLoginAt!.getTime()).toBeLessThanOrEqual(Date.now());
+  });
+
+  it('Keeps the last login date untouched when the credentials are wrong', async () => {
+    const { currentUser } = await signUpRequest(global.app);
+
+    const before = await UserModel.findOne({ _id: currentUser._id }).lean();
+
+    await signIn({
+      email: currentUser.email,
+      password: '123456-wrong',
+    });
+
+    const after = await UserModel.findOne({ _id: currentUser._id }).lean();
+
+    expect(after!.lastLoginAt).toEqual(before!.lastLoginAt);
+  });
+
   it('Regenerates the session and sets the custom session cookie', async () => {
     const { currentUser } = await signUpRequest(global.app);
     const { csrfCookie, csrfToken } = await csrfRequest(global.app);
