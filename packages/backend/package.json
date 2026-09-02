@@ -90,7 +90,7 @@
     "multer": "^2.3.0",
     "nanoid": "^3.3.18",
     "rate-limit-mongo": "^2.3.2",
-    "sanitize-html": "2.17.5",
+    "sanitize-html": "2.17.7",
     "sharp": "^0.35.4",
     "slug": "^1.1.0",
     "swagger-jsdoc": "^6.3.0",
