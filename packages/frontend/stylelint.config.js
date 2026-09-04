@@ -1,16 +1,18 @@
 module.exports = {
   ignoreFiles: ['dist/**/*', 'node_modules/**/*', 'playwright-report/**/*'],
-  plugins: ['stylelint-scss', 'stylelint-order'],
+  plugins: ['stylelint-order'],
   extends: [
     'stylelint-config-standard',
-    'stylelint-config-standard-scss',
-    'stylelint-config-recommended-vue/scss',
+    'stylelint-config-recommended-vue',
     'stylelint-prettier/recommended',
     'stylelint-config-two-dash-bem',
   ],
   rules: {
-    'at-rule-no-unknown': null,
-    'scss/at-rule-no-unknown': true,
+    // @custom-media is a Media Queries Level 5 at-rule that postcss resolves
+    // at build time; stylelint's known-at-rule list predates it.
+    'at-rule-no-unknown': [true, { ignoreAtRules: ['custom-media'] }],
+    // Vite resolves the '@/' alias in a string @import, but not inside url().
+    'import-notation': 'string',
     // According to Concentric CSS
     'order/properties-order': [
       [

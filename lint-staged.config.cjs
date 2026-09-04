@@ -85,7 +85,7 @@ const backend = (files) => {
 
 const frontend = (files) => {
   const codeFiles = filterByExtension(files, ['.js', '.ts', '.vue']);
-  const styleFiles = filterByExtension(files, ['.css', '.scss', '.vue']);
+  const styleFiles = filterByExtension(files, ['.css', '.vue']);
   const tasks = [
     prettier('packages/frontend', files),
     ...spellcheckTasks(files),
@@ -119,5 +119,5 @@ const frontend = (files) => {
 module.exports = {
   '*.{js,cjs,json,md,yml,yaml}': root,
   'packages/backend/**/*.{js,ts,json,md,yml,yaml}': backend,
-  'packages/frontend/**/*.{js,ts,vue,css,scss,html,json,md,yml,yaml}': frontend,
+  'packages/frontend/**/*.{js,ts,vue,css,html,json,md,yml,yaml}': frontend,
 };

@@ -13,7 +13,7 @@
       "pattern": "./packages/*"
     }
   ],
-  "stylelint.validate": ["css", "less", "postcss", "vue", "scss"],
+  "stylelint.validate": ["css", "less", "postcss", "vue"],
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },

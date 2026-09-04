@@ -45,7 +45,8 @@ pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push
 - **E2E tests**: Playwright against the built app (`vite preview` on port 4173). Files in `tests/integration/`.
   - Run: `pnpm --filter frontend test:e2e:ci`
 - **Path aliases**: `@/*`, `@components/*`, `@common/*`, `@icons/*`, `@utils/*`
-- **Linting**: separate ESLint (`.js/.ts/.vue`) and Stylelint (`.css/.scss/.vue`) passes
+- **Linting**: separate ESLint (`.js/.ts/.vue`) and Stylelint (`.css/.vue`) passes
+- **Styles**: plain CSS through PostCSS (`postcss.config.mjs`) — there is no Sass. `postcss-nested` gives Sass-style nesting including `&__element` BEM concatenation, which the CSS spec's own nesting cannot do. Breakpoints are `@custom-media` in `src/styles/media.css`, injected into every file by `@csstools/postcss-global-data`, so a component writes `@media (--phone-only)` with no import. Add a breakpoint there, not inline.
 - Vue component style: PascalCase component names in templates; blank lines between `<template>`/`<script>`/`<style>` blocks.
 - `vuedraggable@4.1.0` is patched — see `patches/` directory.
 
