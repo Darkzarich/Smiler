@@ -1,0 +1,11 @@
+/* Breakpoints shared by every stylesheet and Vue SFC style block.
+
+   Injected into each file by @csstools/postcss-global-data, so nothing has to
+   import this. Definitions that go unused emit no CSS, so the full scale is kept
+   here as the single place a breakpoint is defined. */
+
+@custom-media --phone-only (max-width: 599px);
+@custom-media --tablet-portrait-up (min-width: 600px);
+@custom-media --tablet-landscape-up (min-width: 900px);
+@custom-media --desktop-up (min-width: 1200px);
+@custom-media --big-desktop-up (min-width: 1800px);
