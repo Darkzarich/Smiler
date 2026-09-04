@@ -43,11 +43,10 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-@use '@/styles/utilities';
-@use '@/styles/themes/dark';
-@use '@/styles/themes/light';
+<style>
+@import '@/styles/utilities.css';
+@import '@/styles/themes/dark.css';
+@import '@/styles/themes/light.css';
 
 :root {
   --variable-widget-margin: 24px;
@@ -115,7 +114,7 @@ h6 {
     flex: 1;
     margin-right: var(--variable-widget-margin);
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       width: 100%;
       margin-right: 0;
     }
@@ -124,7 +123,7 @@ h6 {
   &__sidebar {
     width: 26%;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       display: none;
     }
   }
