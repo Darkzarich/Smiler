@@ -18,8 +18,7 @@ export default (db: Connection) =>
     },
     saveUninitialized: false,
     store: MongoStore.create({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      client: db.getClient() as any,
+      client: db.getClient(),
       // Cookies aren't rolling, so touching only refreshes the store TTL,
       // no need to do it more often than once an hour
       touchAfter: 60 * 60,
