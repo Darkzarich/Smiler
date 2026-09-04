@@ -37,9 +37,7 @@ const notificationsStore = useNotificationsStore();
 const { notifications } = storeToRefs(notificationsStore);
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .notification-list {
   position: fixed;
   top: 0;
@@ -76,7 +74,7 @@ const { notifications } = storeToRefs(notificationsStore);
       opacity: 0;
       transform: translateY(15px);
 
-      @include mixins.for-size(phone-only) {
+      @media (--phone-only) {
         transform: translateY(-15px);
       }
     }

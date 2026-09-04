@@ -83,16 +83,14 @@ const handleError = () => {
 };
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .post-editor-video {
   width: 100%;
   padding: 1rem;
   border: 1px solid var(--color-text-secondary);
   border-radius: 8px;
 
-  @include mixins.for-size(phone-only) {
+  @media (--phone-only) {
     border-right: none;
     border-left: none;
     border-radius: 0;

@@ -51,9 +51,7 @@ const modelValue = defineModel<string>({
 });
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .comment-form {
   &__actions {
     gap: 16px;

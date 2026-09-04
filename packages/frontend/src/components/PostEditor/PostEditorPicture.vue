@@ -129,16 +129,14 @@ const resetFormState = () => {
 };
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .post-editor-picture {
   width: 100%;
   padding: 16px;
   border: 1px solid var(--color-text-secondary);
   border-radius: 8px;
 
-  @include mixins.for-size(phone-only) {
+  @media (--phone-only) {
     border-right: none;
     border-left: none;
     border-radius: 0;

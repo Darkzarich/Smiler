@@ -27,9 +27,7 @@ defineProps<{
 }>();
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .user-stats {
   gap: 2rem;
   color: var(--color-text-primary);

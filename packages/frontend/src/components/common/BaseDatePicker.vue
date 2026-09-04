@@ -39,9 +39,7 @@ const handleInput = (event: Event) => {
 };
 </script>
 
-<style lang="scss" scoped>
-@use '@/styles/mixins';
-
+<style scoped>
 .base-date-picker {
   &__label {
     display: inline-block;

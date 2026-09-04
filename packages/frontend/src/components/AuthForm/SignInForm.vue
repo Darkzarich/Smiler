@@ -113,9 +113,7 @@ async function signIn() {
 }
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .signin-form {
   align-items: center;
 

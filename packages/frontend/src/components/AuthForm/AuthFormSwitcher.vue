@@ -25,7 +25,7 @@ const toggleMode = () => {
 };
 </script>
 
-<style lang="scss">
+<style>
 .auth-form-switcher {
   padding: 16px;
 

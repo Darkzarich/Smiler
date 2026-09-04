@@ -125,9 +125,7 @@ async function handleFollow() {
 }
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .user-profile {
   position: relative;
   margin-bottom: var(--variable-widget-margin);
@@ -137,7 +135,7 @@ async function handleFollow() {
   background: var(--color-surface-secondary);
   color: var(--color-text-primary);
 
-  @include mixins.for-size(phone-only) {
+  @media (--phone-only) {
     width: 100%;
     margin-left: 0;
     border: none;
@@ -159,12 +157,12 @@ async function handleFollow() {
     filter: grayscale(1);
     pointer-events: none;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       display: none;
     }
   }
 
-  // TODO: Move avatar to its own component
+  /* TODO: Move avatar to its own component */
   &__avatar {
     margin-right: 1rem;
 

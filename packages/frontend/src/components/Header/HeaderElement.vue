@@ -119,9 +119,7 @@ watch(
 );
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .header {
   display: flex;
   justify-content: center;
@@ -133,7 +131,7 @@ watch(
   padding: 0.5rem;
   background-color: var(--color-surface-elevated);
 
-  @include mixins.for-size(phone-only) {
+  @media (--phone-only) {
     height: 46px;
   }
 
@@ -147,7 +145,7 @@ watch(
     max-width: 1110px;
     padding-left: 40px;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       padding-right: 0;
       padding-left: 0;
     }
@@ -158,7 +156,7 @@ watch(
     margin-right: 1rem;
     cursor: pointer;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       display: block;
 
       svg {
@@ -177,7 +175,7 @@ watch(
       opacity: 0;
       transform: translateY(15px);
 
-      @include mixins.for-size(phone-only) {
+      @media (--phone-only) {
         transform: translateY(-15px);
       }
     }
@@ -194,7 +192,7 @@ watch(
     gap: 16px;
     margin-left: 4rem;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       margin-left: 0;
     }
   }
@@ -222,7 +220,7 @@ watch(
     align-items: center;
     margin-left: auto;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       width: 70%;
     }
   }
@@ -243,7 +241,7 @@ watch(
       border-radius: 50%;
       cursor: pointer;
 
-      @include mixins.for-size(phone-only) {
+      @media (--phone-only) {
         width: 2rem;
         height: 2rem;
       }

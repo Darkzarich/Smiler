@@ -60,7 +60,7 @@ const logout = async () => {
 };
 </script>
 
-<style lang="scss">
+<style>
 .current-user-navigation {
   margin-left: 0;
   text-align: center;

@@ -376,9 +376,7 @@ const saveDraft = async () => {
 };
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .post-editor {
   &__title {
     margin-bottom: 12px;
@@ -399,7 +397,7 @@ const saveDraft = async () => {
       border: 1px solid var(--color-text-secondary);
       border-radius: 8px;
 
-      @include mixins.for-size(phone-only) {
+      @media (--phone-only) {
         border-right: none;
         border-left: none;
         border-radius: 0;
@@ -420,7 +418,7 @@ const saveDraft = async () => {
       .post-editor-video {
         border: 1px solid var(--color-primary);
 
-        @include mixins.for-size(phone-only) {
+        @media (--phone-only) {
           border-right: none;
           border-left: none;
         }
@@ -446,7 +444,7 @@ const saveDraft = async () => {
     border: none;
     background-color: transparent;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       top: -14px;
       right: 12px;
       width: 10px;

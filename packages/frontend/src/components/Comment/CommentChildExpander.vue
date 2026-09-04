@@ -19,7 +19,7 @@ withDefaults(defineProps<Props>(), {
 });
 </script>
 
-<style lang="scss">
+<style>
 .comment-child-expander {
   display: flex;
   justify-content: center;

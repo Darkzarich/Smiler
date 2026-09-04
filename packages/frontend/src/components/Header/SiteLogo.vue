@@ -9,14 +9,12 @@
   </div>
 </template>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .site-logo {
   &__desktop {
     height: 100%;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       display: none;
     }
   }
@@ -25,7 +23,7 @@
     display: none;
     height: 100%;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       display: inline-block;
     }
   }

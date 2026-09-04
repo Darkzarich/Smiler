@@ -276,11 +276,9 @@ onBeforeMount(() => {
 });
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .user-settings {
-  @include mixins.for-size(phone-only) {
+  @media (--phone-only) {
     border-right: none;
     border-left: none;
     border-radius: 0;
@@ -315,7 +313,7 @@ onBeforeMount(() => {
   }
 
   &__bio-edit {
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       margin-left: 0;
     }
 
@@ -324,7 +322,7 @@ onBeforeMount(() => {
       height: 5rem;
       resize: none;
 
-      @include mixins.for-size(phone-only) {
+      @media (--phone-only) {
         width: 100%;
       }
     }
@@ -333,7 +331,7 @@ onBeforeMount(() => {
   &__avatar-edit {
     width: 60%;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       width: 80%;
       margin-left: 0;
     }
@@ -367,7 +365,7 @@ onBeforeMount(() => {
     margin-bottom: 16px;
     padding-left: 16px;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       padding-left: 0;
     }
   }

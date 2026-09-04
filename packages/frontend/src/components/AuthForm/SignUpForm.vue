@@ -168,9 +168,7 @@ async function signUp() {
 }
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .signup-form {
   align-items: center;
 

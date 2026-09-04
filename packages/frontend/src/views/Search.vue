@@ -127,15 +127,13 @@ onBeforeMount(() => {
 });
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .search {
   &__form {
     margin-bottom: var(--variable-widget-margin);
     margin-left: 10%;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       margin-left: 0;
       border: none;
     }

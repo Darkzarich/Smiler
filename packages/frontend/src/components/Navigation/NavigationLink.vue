@@ -21,7 +21,7 @@ withDefaults(defineProps<Props>(), {
 });
 </script>
 
-<style lang="scss">
+<style>
 .nav-link {
   color: var(--color-text-primary);
   text-decoration: none;

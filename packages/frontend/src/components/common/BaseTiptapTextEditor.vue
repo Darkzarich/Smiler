@@ -594,15 +594,13 @@ watch(textEditorValue, (value) => {
 });
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .base-text-editor {
   width: 100%;
   padding: 1rem;
   transition: border 200ms ease-out;
 
-  @include mixins.for-size(phone-only) {
+  @media (--phone-only) {
     padding-right: 0;
     padding-left: 0;
   }
@@ -612,7 +610,7 @@ watch(textEditorValue, (value) => {
     gap: 8px;
     margin-bottom: 1rem;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       margin-left: 1rem;
     }
   }
@@ -707,7 +705,7 @@ watch(textEditorValue, (value) => {
       color: var(--color-primary);
     }
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       min-height: 9rem;
       border-right: none;
       border-left: none;

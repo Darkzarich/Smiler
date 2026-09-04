@@ -53,7 +53,7 @@ const preloadTextEditor = () => {
 onMounted(preloadTextEditor);
 </script>
 
-<style lang="scss">
+<style>
 .post-editor-add-section-buttons {
   display: flex;
   justify-content: center;

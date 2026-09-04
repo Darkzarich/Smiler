@@ -94,9 +94,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .base-modal {
   &__backdrop {
     position: fixed;
@@ -161,7 +159,7 @@ onBeforeUnmount(() => {
     }
   }
 
-  @include mixins.for-size(phone-only) {
+  @media (--phone-only) {
     &__panel {
       top: auto;
       bottom: 0;

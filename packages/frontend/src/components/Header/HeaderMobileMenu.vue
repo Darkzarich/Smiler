@@ -54,9 +54,7 @@ const closeMenu = () => {
 };
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .mobile-menu {
   position: fixed;
   top: 0;

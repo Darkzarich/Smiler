@@ -482,9 +482,7 @@ const downvote = async () => {
 };
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .comment-item {
   color: var(--color-text-primary);
 
@@ -494,7 +492,7 @@ const downvote = async () => {
     border-radius: 8px;
     background: var(--color-surface-secondary);
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       margin-right: 0;
     }
 

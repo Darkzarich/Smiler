@@ -98,14 +98,12 @@ const createComment = async () => {
 };
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .new-comment-form {
   padding: 1rem;
   padding-top: 0;
 
-  @include mixins.for-size(phone-only) {
+  @media (--phone-only) {
     padding: 0;
   }
 

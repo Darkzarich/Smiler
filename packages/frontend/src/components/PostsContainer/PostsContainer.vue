@@ -67,9 +67,7 @@ useInfiniteScroll(
 );
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .posts-container {
   &__loading,
   &__no-more,
@@ -77,7 +75,7 @@ useInfiniteScroll(
     margin-left: 10%;
     text-align: center;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       margin-left: 0% !important;
       border: none !important;
       border-radius: 0 !important;

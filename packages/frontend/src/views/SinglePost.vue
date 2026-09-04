@@ -162,9 +162,7 @@ onBeforeMount(async () => {
 });
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .post-container {
   margin-bottom: 1.5rem;
 }
@@ -173,7 +171,7 @@ onBeforeMount(async () => {
   margin-bottom: 2rem;
   padding: 1rem;
 
-  @include mixins.for-size(phone-only) {
+  @media (--phone-only) {
     padding: 0;
     border: none;
   }
@@ -186,7 +184,7 @@ onBeforeMount(async () => {
   &__no-comments {
     margin-top: 0.5rem;
 
-    // TODO: Set this text for <body> and remove everywhere else
+    /* TODO: Set this text for <body> and remove everywhere else */
     color: var(--color-text-primary);
     text-align: center;
     font-size: 1.2rem;

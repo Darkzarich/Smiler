@@ -50,9 +50,7 @@ const handleInput = (event: Event) => {
 };
 </script>
 
-<style lang="scss" scoped>
-@use '@/styles/mixins';
-
+<style scoped>
 .base-slider {
   &__label {
     display: inline-block;

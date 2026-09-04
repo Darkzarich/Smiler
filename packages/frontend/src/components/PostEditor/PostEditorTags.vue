@@ -93,9 +93,7 @@ const removeTag = (tag: string) => {
 };
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .post-editor-tags {
   flex-wrap: wrap;
   align-items: center;

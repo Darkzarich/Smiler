@@ -47,9 +47,7 @@ const userStore = useUserStore();
 const user = computed(() => userStore.user);
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .current-user {
   padding: 0 !important;
 
@@ -64,7 +62,7 @@ const user = computed(() => userStore.user);
     background: var(--color-surface-elevated);
     user-select: none;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       padding: 0.5rem;
     }
   }
@@ -84,7 +82,7 @@ const user = computed(() => userStore.user);
     text-align: center;
     font-size: 1rem;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       margin: 0.5rem;
     }
   }

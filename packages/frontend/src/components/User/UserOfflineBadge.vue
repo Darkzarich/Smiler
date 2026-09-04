@@ -45,7 +45,7 @@ const signedInOn = computed(() =>
 );
 </script>
 
-<style lang="scss">
+<style>
 .user-offline-badge {
   display: inline-flex;
   align-items: center;

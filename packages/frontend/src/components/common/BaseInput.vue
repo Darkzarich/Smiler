@@ -79,11 +79,9 @@ const setValue = (event: Event) => {
 };
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .base-input {
-  // TODO: Width 100%?
+  /* TODO: Width 100%? */
 
   position: relative;
 

@@ -13,9 +13,7 @@
   </footer>
 </template>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 footer {
   align-items: center;
   width: 100%;
@@ -23,7 +21,7 @@ footer {
   margin-top: 1.5rem;
   background: var(--color-surface-elevated);
 
-  @include mixins.for-size(phone-only) {
+  @media (--phone-only) {
     height: 2rem;
   }
 

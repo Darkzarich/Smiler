@@ -65,9 +65,7 @@ const setValue = (event: Event) => {
 };
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .base-textarea {
   &__label {
     margin-bottom: 4px;

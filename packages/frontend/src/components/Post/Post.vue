@@ -536,9 +536,7 @@ const searchByTag = (tag: string) => {
 };
 </script>
 
-<style lang="scss" scoped>
-@use '@/styles/mixins';
-
+<style scoped>
 .post {
   display: flex;
   flex-flow: row nowrap;
@@ -552,7 +550,7 @@ const searchByTag = (tag: string) => {
     align-items: center;
     width: 10%;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       display: none;
     }
   }
@@ -597,7 +595,7 @@ const searchByTag = (tag: string) => {
       fill: var(--color-text-secondary);
       transition: all 200ms ease-out;
 
-      @include mixins.for-size(phone-only) {
+      @media (--phone-only) {
         width: 3rem;
       }
     }
@@ -648,7 +646,7 @@ const searchByTag = (tag: string) => {
     width: 90%;
     color: var(--color-text-primary);
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       width: 100%;
       border: none;
       border-radius: 0;
@@ -658,7 +656,7 @@ const searchByTag = (tag: string) => {
   &__rate-mobile {
     display: none;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -738,7 +736,7 @@ const searchByTag = (tag: string) => {
     background: var(--color-surface-primary);
     overflow: hidden;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       margin-right: calc(-1 * var(--post-padding-inline));
       margin-left: calc(-1 * var(--post-padding-inline));
       border-radius: 0;
@@ -768,7 +766,7 @@ const searchByTag = (tag: string) => {
   }
 
   &__footer {
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       margin-top: -1rem;
     }
   }
@@ -785,7 +783,7 @@ const searchByTag = (tag: string) => {
     border-bottom-left-radius: 8px;
     background: var(--color-surface-elevated);
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       border-top: none;
     }
   }

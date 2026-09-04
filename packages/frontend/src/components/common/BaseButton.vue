@@ -43,9 +43,7 @@ withDefaults(defineProps<Props>(), {
 });
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .base-button {
   display: flex;
   justify-content: center;

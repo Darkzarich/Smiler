@@ -121,9 +121,7 @@ const applyFiltersToRoute = () => {
 };
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .search-form {
   &__title {
     margin-bottom: 12px;

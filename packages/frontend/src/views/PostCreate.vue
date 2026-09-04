@@ -93,11 +93,9 @@ onBeforeMount(async () => {
 });
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .post-create {
-  @include mixins.for-size(phone-only) {
+  @media (--phone-only) {
     padding-right: 0;
     padding-left: 0;
     border: none;

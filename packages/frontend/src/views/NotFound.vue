@@ -23,9 +23,7 @@ const goHome = () => {
 };
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .not-found {
   align-items: center;
 
@@ -40,7 +38,7 @@ const goHome = () => {
     color: var(--color-text-primary);
     font-size: 48px;
 
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       font-size: 32px;
     }
   }

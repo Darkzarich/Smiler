@@ -98,7 +98,7 @@ onUnmounted(() => {
 defineExpose({ measure });
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .collapsible-content {
   &__body--collapsed {
     overflow: hidden;

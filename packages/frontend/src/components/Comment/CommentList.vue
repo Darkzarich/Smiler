@@ -55,12 +55,10 @@ const handleRemoveComment = (id: string) => {
 };
 </script>
 
-<style lang="scss">
-@use '@/styles/mixins';
-
+<style>
 .comment-list {
   &__comment {
-    @include mixins.for-size(phone-only) {
+    @media (--phone-only) {
       margin-left: -1rem;
     }
   }
