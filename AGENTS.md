@@ -122,5 +122,13 @@ How to add one:
   `@jest-config-loader ts-node` docblock: without it, Node's native type stripping makes Jest load
   `jest.config.ts` as ESM, which rejects both the `tsconfig.json` import and `module.exports`.
 - Frontend `tsconfig.json` has `verbatimModuleSyntax: true` — use `import type` for type-only imports.
-- `packages/backend/logs/` and `packages/backend/uploads/` are generated at runtime, gitignored.
+- `packages/backend/uploads/` is generated at runtime, gitignored.
+- **Logging**: one Winston logger (`src/libs/logger.ts`) writing to stdout only — no log files. The app
+  runs several cluster workers and Winston's file rotation counts bytes per process, so pointing them
+  all at one file loses lines; collection and rotation belong to Docker (see the `logging:` block in
+  `docker-compose.yml`). `LOG_LEVEL` and `LOG_FORMAT` (`json` / `pretty`) override the `NODE_ENV`
+  defaults. Log a **constant event name** as the message (`db_connected`, `http_request`) and put every
+  variable in the metadata object — never interpolate values into the message, or the lines cannot be
+  grouped. Errors go in the metadata as real `Error` objects; the logger serializes them (a plain
+  `JSON.stringify` on an Error yields `{}`).
 - `cspell.json` has a project-specific dictionary — add project terms there, don't disable spellcheck.
