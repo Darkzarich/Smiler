@@ -13,7 +13,7 @@ describe('PUT /users/me', () => {
     expect(response.status).toBe(401);
   });
 
-  it('Should return status 422 and an expected db validation message for a too long bio', async () => {
+  it('Should return status 422 and a generic validation message for a too long bio', async () => {
     const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
@@ -24,9 +24,7 @@ describe('PUT /users/me', () => {
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken);
 
-    expect(response.body.error.message).toContain(
-      'longer than the maximum allowed length',
-    );
+    expect(response.body.error.message).toBe(ERRORS.INVALID_REQUEST_DATA);
     expect(response.status).toBe(422);
   });
 
@@ -45,7 +43,7 @@ describe('PUT /users/me', () => {
     expect(response.status).toBe(422);
   });
 
-  it('Should return status 422 and an expected db validation message for too long avatar', async () => {
+  it('Should return status 422 and a generic validation message for too long avatar', async () => {
     const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
@@ -56,9 +54,7 @@ describe('PUT /users/me', () => {
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken);
 
-    expect(response.body.error.message).toContain(
-      'longer than the maximum allowed length',
-    );
+    expect(response.body.error.message).toBe(ERRORS.INVALID_REQUEST_DATA);
     expect(response.status).toBe(422);
   });
 
