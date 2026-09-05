@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import type { NextFunction, Request, Response } from 'express';
 import {
   AppError,
@@ -6,6 +7,7 @@ import {
   ValidationError,
   ConflictError,
   AbstractError,
+  ERRORS,
 } from '@errors';
 import { asyncControllerErrorHandler } from '@utils/async-controller-error-handler';
 import Config from '@config/index';
@@ -32,12 +34,31 @@ router.use('/posts', postsRouter);
 router.use('/comments', commentsRouter);
 router.use('/tags', tagsRouter);
 
-// Special endpoint to test global error handling middleware in Jest environment
+// Special endpoints to test global error handling middleware in Jest environment
 if (Config.IS_JEST) {
   router.get(
     '/error-endpoint',
     asyncControllerErrorHandler(() => {
       throw new Error('Some error');
+    }),
+  );
+
+  router.get(
+    '/cast-error-endpoint',
+    asyncControllerErrorHandler(() => {
+      throw new mongoose.Error.CastError('ObjectId', 'not-an-id', '_id');
+    }),
+  );
+
+  router.get(
+    '/duplicate-key-error-endpoint',
+    asyncControllerErrorHandler(() => {
+      throw Object.assign(
+        new Error(
+          'E11000 duplicate key error collection: smiler.users index: email_1 dup key: { email: "taken@example.com" }',
+        ),
+        { name: 'MongoServerError', code: 11000 },
+      );
     }),
   );
 }
@@ -89,16 +110,18 @@ router.use(
       requestId: req.id,
     });
 
-    // Handle MongoDB errors
+    // Handle MongoDB errors. The driver messages name collections, indexes and
+    // the offending values, so only a generic message goes to the client — the
+    // original one is already in the log line above.
     if (isCastError(error) || isValidationError(error)) {
-      handleSendError(new ValidationError(error.message), res);
+      handleSendError(new ValidationError(ERRORS.INVALID_REQUEST_DATA), res);
 
       return;
     }
 
     // Handle MongoDB duplicate document error, when unique index is violated
     if (isDuplicateKeyError(error)) {
-      handleSendError(new ConflictError(error.message), res);
+      handleSendError(new ConflictError(ERRORS.RESOURCE_CONFLICT), res);
 
       return;
     }

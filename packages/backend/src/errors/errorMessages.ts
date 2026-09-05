@@ -9,6 +9,8 @@ import {
 
 export const ERRORS = {
   NOT_FOUND: 'Not Found',
+  INVALID_REQUEST_DATA: 'The request contains invalid or malformed data',
+  RESOURCE_CONFLICT: 'This operation conflicts with an existing resource',
   UNAUTHORIZED: 'Auth is required for this operation. Please sign in.',
   CSRF_INVALID: 'Invalid or missing CSRF token',
 
