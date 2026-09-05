@@ -3,6 +3,12 @@ export const ALLOWED_URL_PROTOCOLS = ['http:', 'https:'];
 
 const LOCAL_HOST_NAMES = ['localhost', 'localhost.localdomain'];
 
+/** Suffixes that never belong to a public address: `.localhost` is reserved for
+ * loopback by RFC 6761, `.local` is mDNS on the local link, and `.localdomain`
+ * is what a stock resolver appends to an unqualified name.
+ */
+const LOCAL_HOST_SUFFIXES = ['.localhost', '.local', '.localdomain'];
+
 const IPV4_REGEXP = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
 
 /** Ranges that must never be reachable from a user supplied URL:
@@ -94,9 +100,16 @@ function isPrivateIpv6(groups: number[]) {
  * thumbnailing, an image proxy).
  */
 export function isPrivateHost(hostname: string) {
-  const host = hostname.toLowerCase();
+  // A trailing dot makes a name fully qualified and resolves to exactly the
+  // same address, but `URL` keeps it on names (it does normalize it away on
+  // IPv4 literals), so `localhost.` would walk straight past an equality check.
+  const host = hostname.toLowerCase().replace(/\.+$/, '');
 
   if (LOCAL_HOST_NAMES.includes(host)) {
+    return true;
+  }
+
+  if (LOCAL_HOST_SUFFIXES.some((suffix) => host.endsWith(suffix))) {
     return true;
   }
 
