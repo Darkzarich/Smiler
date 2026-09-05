@@ -28,7 +28,7 @@ export default function createRandomAuth(
           'fish',
           'fox',
         ]),
-        login: faker.internet.userName(),
+        login: faker.internet.username(),
         _id: faker.string.uuid(),
         rating: faker.number.int({ min: 0, max: 5 }),
         avatar: faker.image.avatar(),
