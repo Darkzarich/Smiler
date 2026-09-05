@@ -64,7 +64,8 @@
             <div class="comment-item__avatar">
               <img
                 :src="resolveAvatar(comment.author.avatar)"
-                :alt="comment.author.avatar"
+                alt="avatar"
+                referrerpolicy="no-referrer"
               />
             </div>
           </RouterLink>

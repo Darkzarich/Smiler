@@ -103,10 +103,15 @@
               v-if="isPictureSection(section)"
               class="post__section-attachment post__section-attachment--image"
             >
+              <!-- Sections stored before pictures were downloaded server side
+                   still point at a third party host, so the request must not
+                   carry a referrer and must not fire until it is on screen. -->
               <img
                 class="post__section-image"
                 :src="resolveImage(section.url)"
-                :alt="section.url"
+                alt="Post attachment"
+                loading="lazy"
+                referrerpolicy="no-referrer"
                 :data-testid="`post-${post._id}-pic-${section.hash}`"
                 @error="resolveImageError"
               />
@@ -199,7 +204,8 @@
             <img
               class="post__author-avatar"
               :src="resolveAvatar(post.author.avatar)"
-              :alt="post.author.avatar"
+              alt="avatar"
+              referrerpolicy="no-referrer"
             />
           </RouterLink>
           <span v-else class="post__author-container">

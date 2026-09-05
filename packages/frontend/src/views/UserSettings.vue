@@ -18,6 +18,7 @@
                 class="user-settings__following-avatar"
                 :src="resolveAvatar(author.avatar)"
                 alt="avatar"
+                referrerpolicy="no-referrer"
               />
               {{ author.login }}
               <span
@@ -98,7 +99,11 @@
         <h3 class="user-settings__block-title">Avatar</h3>
 
         <div class="user-settings__current-avatar">
-          <img :src="resolveAvatar(avatarEditInput)" alt="current avatar" />
+          <img
+            :src="resolveAvatar(avatarEditInput)"
+            alt="current avatar"
+            referrerpolicy="no-referrer"
+          />
         </div>
 
         <BaseInput
