@@ -60,6 +60,14 @@ export default {
       formData,
     );
   },
+  /** Hands the backend a url to download the picture from. What comes back is
+   * a section pointing at our own uploads, exactly like a file upload. */
+  uploadAttachmentByUrl(data: postTypes.UploadAttachmentByUrlRequest) {
+    return apiClient.post<postTypes.UploadAttachmentResponse>(
+      `${CONTROLLER_URL}/upload/url`,
+      data,
+    );
+  },
   getPostBySlug(params: postTypes.GetPostBySlugRequest) {
     return apiClient.get<postTypes.GetPostBySlugResponse>(
       `${CONTROLLER_URL}/${params.slug}`,

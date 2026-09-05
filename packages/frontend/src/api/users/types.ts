@@ -14,10 +14,16 @@ export interface GetUserProfileResponse {
 }
 
 export type UpdateUserProfileRequest = Partial<
-  Pick<GetUserProfileResponse, 'bio' | 'avatar'>
+  Pick<GetUserProfileResponse, 'bio'>
 >;
 
 export type UpdateUserProfileResponse = GetUserProfileResponse;
+
+export interface UpdateMyAvatarRequest {
+  url: string;
+}
+
+export type UpdateMyAvatarResponse = Pick<GetUserProfileResponse, 'avatar'>;
 
 export interface GetUserTemplateResponse {
   title: string;

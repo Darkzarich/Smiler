@@ -13,7 +13,13 @@ const authUser = createRandomAuth({
 });
 
 const title = 'Test post';
-const picSection = createRandomSection(postTypes.POST_SECTION_TYPES.PICTURE);
+/** The link a user pastes. It never reaches a post: the backend downloads it
+ * and answers with a section pointing at its own uploads. */
+const pastedPictureUrl = 'https://placehold.co/600x400';
+const storedPicSection = createRandomSection(
+  postTypes.POST_SECTION_TYPES.PICTURE,
+  { url: '/uploads/user-id/stored-picture.jpg', isFile: true },
+);
 const vidCode = 'dQw4w9WgXcQ';
 const asParagraph = (text: string) => `<p>${text}</p>`;
 
@@ -41,6 +47,10 @@ test.beforeEach(async ({ Api }) => {
 
   Api.routes.users.getMyTemplate.mock({
     body: { title: '', sections: [], tags: [] },
+  });
+
+  Api.routes.posts.uploadAttachmentByUrl.mock({
+    body: storedPicSection,
   });
 });
 
@@ -83,7 +93,18 @@ test('Creates a post with title, tags and content', async ({
   await PostCreatePage.fillTextSection('test text');
 
   await PostCreatePage.addPictureSection();
-  await PostCreatePage.uploadPictureWithUrl(picSection.url);
+
+  const uploadByUrlResponse =
+    await Api.routes.posts.uploadAttachmentByUrl.waitForRequest({
+      preRequestAction: () =>
+        PostCreatePage.uploadPictureWithUrl(pastedPictureUrl),
+    });
+
+  // The link goes to the backend to be downloaded, and the section that ends
+  // up in the post is the stored one.
+  expect(uploadByUrlResponse.postDataJSON()).toMatchObject({
+    url: pastedPictureUrl,
+  });
 
   await PostCreatePage.addVideoSection();
   await PostCreatePage.uploadVideoWithUrl(vidCode);
@@ -111,7 +132,7 @@ test('Creates a post with title, tags and content', async ({
       },
       {
         type: 'pic',
-        url: picSection.url,
+        url: storedPicSection.url,
       },
       {
         type: 'vid',
@@ -128,7 +149,7 @@ test('Uploads a picture in the picture section', async ({
   Api.routes.posts.uploadAttachment.mock({
     body: {
       type: 'pic',
-      url: picSection.url,
+      url: storedPicSection.url,
       hash: (Math.random() * Math.random()).toString(36),
       isFile: true,
     },
@@ -297,7 +318,7 @@ test('Fetch and show draft template', async ({ Api, page, PostCreatePage }) => {
       hash: '1',
     }),
     createRandomSection(postTypes.POST_SECTION_TYPES.PICTURE, {
-      url: picSection.url,
+      url: storedPicSection.url,
       hash: '2',
     }),
     createRandomSection(postTypes.POST_SECTION_TYPES.VIDEO, {
@@ -319,8 +340,13 @@ test('Fetch and show draft template', async ({ Api, page, PostCreatePage }) => {
     savedSections[0].content,
   );
 
+  // Asserting on the section rather than on the src: the stored path is served
+  // by the api, which is not running here, so the img falls back to the
+  // placeholder as soon as the request for it fails.
   await expect(
-    page.locator(`img[src="${savedSections[1].url}"]`),
+    page
+      .getByTestId('post-section')
+      .filter({ has: page.getByTestId('pic-section') }),
   ).toBeVisible();
 
   await expect(
@@ -354,7 +380,11 @@ test('Saves draft template', async ({
   await PostCreatePage.fillTextSection('test text');
 
   await PostCreatePage.addPictureSection();
-  await PostCreatePage.uploadPictureWithUrl(picSection.url);
+
+  await Api.routes.posts.uploadAttachmentByUrl.waitForRequest({
+    preRequestAction: () =>
+      PostCreatePage.uploadPictureWithUrl(pastedPictureUrl),
+  });
 
   await PostCreatePage.addVideoSection();
   await PostCreatePage.uploadVideoWithUrl(vidCode);
@@ -377,7 +407,7 @@ test('Saves draft template', async ({
       },
       {
         type: 'pic',
-        url: picSection.url,
+        url: storedPicSection.url,
       },
       {
         type: 'vid',

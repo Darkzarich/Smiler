@@ -100,27 +100,42 @@
 
         <div class="user-settings__current-avatar">
           <img
-            :src="resolveAvatar(avatarEditInput)"
+            :src="resolveAvatar(currentAvatar)"
             alt="current avatar"
             referrerpolicy="no-referrer"
           />
         </div>
 
         <BaseInput
-          v-model.lazy.trim="avatarEditInput"
+          v-model.lazy.trim="avatarUrlInput"
           class="user-settings__avatar-edit"
           data-testid="user-settings-avatar-input"
           placeholder="URL to avatar..."
         />
 
+        <div class="user-settings__avatar-hint">
+          The picture is downloaded and stored here, so the link only has to
+          work once.
+        </div>
+
         <BaseButton
           class="user-settings__submit-btn"
           data-testid="user-settings-avatar-submit"
           :is-fetching="avatarEditRequesting"
-          :disabled="avatarEditInput.length > consts.USER_MAX_AVATAR_LENGTH"
+          :disabled="!avatarUrlInput"
           @click="editAvatar"
         >
           Save
+        </BaseButton>
+
+        <BaseButton
+          v-if="currentAvatar"
+          class="user-settings__submit-btn"
+          data-testid="user-settings-avatar-remove"
+          :is-fetching="avatarRemoveRequesting"
+          @click="removeAvatar"
+        >
+          Remove
         </BaseButton>
       </div>
     </div>
@@ -238,26 +253,47 @@ const editBio = async () => {
   }
 };
 
-const avatarEditInput = ref('');
+/** What the backend stored, which is a path under its uploads folder — never
+ * the link that was pasted to get it there. */
+const currentAvatar = ref('');
+const avatarUrlInput = ref('');
 const avatarEditRequesting = ref(false);
+const avatarRemoveRequesting = ref(false);
 
 const editAvatar = async () => {
   try {
     avatarEditRequesting.value = true;
 
-    const data = await api.users.updateUserProfile({
-      avatar: avatarEditInput.value,
-    });
+    const data = await api.users.updateMyAvatar({ url: avatarUrlInput.value });
 
-    setAvatar(avatarEditInput.value);
+    currentAvatar.value = data.avatar;
+    avatarUrlInput.value = '';
+
+    setAvatar(data.avatar);
 
     showInfoNotification({
       message: 'Your avatar has been successfully updated!',
     });
-
-    avatarEditInput.value = data.avatar;
   } finally {
     avatarEditRequesting.value = false;
+  }
+};
+
+const removeAvatar = async () => {
+  try {
+    avatarRemoveRequesting.value = true;
+
+    await api.users.deleteMyAvatar();
+
+    currentAvatar.value = '';
+
+    setAvatar('');
+
+    showInfoNotification({
+      message: 'Your avatar has been removed.',
+    });
+  } finally {
+    avatarRemoveRequesting.value = false;
   }
 };
 
@@ -270,7 +306,7 @@ const fetchData = async () => {
     usersFollowed.value = data.authors;
     tagsFollowed.value = data.tags;
     bioEditInput.value = data.bio;
-    avatarEditInput.value = data.avatar;
+    currentAvatar.value = data.avatar;
   } finally {
     isFetching.value = false;
   }
@@ -331,6 +367,12 @@ onBeforeMount(() => {
         width: 100%;
       }
     }
+  }
+
+  &__avatar-hint {
+    margin-top: 8px;
+    color: var(--color-text-secondary);
+    font-size: 12px;
   }
 
   &__avatar-edit {

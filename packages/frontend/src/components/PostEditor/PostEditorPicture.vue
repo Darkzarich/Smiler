@@ -27,19 +27,15 @@
           Upload
         </BaseButton>
       </div>
-
-      <!-- A way to check if the image is inserted successfully -->
-      <img
-        v-if="!file && imageUrlInput"
-        hidden
-        :src="imageUrlInput"
-        alt="error"
-        @error="handleImgError()"
-      />
     </div>
 
     <div v-else class="post-editor-picture__image">
-      <img :src="resolveImage(value)" :alt="value" @error="resolveImageError" />
+      <img
+        :src="resolveImage(value)"
+        alt="Post attachment"
+        referrerpolicy="no-referrer"
+        @error="resolveImageError"
+      />
     </div>
   </div>
 </template>
@@ -48,7 +44,6 @@
 import { ref, watch } from 'vue';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
-import { useNotificationsStore } from '@/store/notifications';
 import { resolveImage } from '@/utils/resolve-image';
 import { resolveImageError } from '@/utils/resolve-image-error';
 import BaseButton from '@common/BaseButton.vue';
@@ -65,8 +60,6 @@ const value = defineModel<string>({
   default: '',
 });
 
-const notificationsStore = useNotificationsStore();
-
 const imageUrlInput = ref('');
 
 const isUploading = ref(false);
@@ -80,46 +73,39 @@ watch(file, (newFile) => {
   }
 });
 
+/** A pasted link is not an attachment yet — the backend downloads it, optimizes
+ * it and stores it, the same as it does for a file — so both ways of adding a
+ * picture end at the same section pointing at our own uploads.
+ */
 const createSectionWithAttachment = async () => {
-  if (!file.value) {
-    value.value = imageUrlInput.value;
-
-    return;
-  }
-
   isUploading.value = true;
 
   try {
-    const formData = new FormData();
+    let newSection: postTypes.PostPictureSection;
 
-    formData.append('picture', file.value);
+    if (file.value) {
+      const formData = new FormData();
 
-    const newSection = await api.posts.uploadAttachment(formData);
+      formData.append('picture', file.value);
+
+      newSection = await api.posts.uploadAttachment(formData);
+    } else {
+      newSection = await api.posts.uploadAttachmentByUrl({
+        url: imageUrlInput.value,
+      });
+    }
 
     value.value = newSection.url;
 
     emit('update-section', newSection);
   } catch {
-    notificationsStore.showErrorNotification({
-      message:
-        'Something went wrong during upload of this picture. Please try to upload the picture again.',
-    });
+    // The api client already showed the reason the backend gave — that a url
+    // did not return a picture, or that the file was too big — so there is
+    // nothing to add here beyond clearing the form.
   } finally {
     resetFormState();
 
     isUploading.value = false;
-  }
-};
-
-const handleImgError = () => {
-  // TODO: Do I need this?
-  if (!file.value) {
-    notificationsStore.showErrorNotification({
-      message:
-        'The image link you provided is invalid. Please try a different one.',
-    });
-
-    resetFormState();
   }
 };
 

@@ -128,6 +128,10 @@ export interface DeletePostByIdRequest {
   id: string;
 }
 
+export interface UploadAttachmentByUrlRequest {
+  url: string;
+}
+
 export type UploadAttachmentResponse = PostPictureSection;
 
 export interface UpdateRateByIdRequest {
