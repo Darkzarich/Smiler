@@ -313,8 +313,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0(postcss@8.5.28)
       '@faker-js/faker':
-        specifier: ^8.4.1
-        version: 8.4.1
+        specifier: ^10.5.0
+        version: 10.5.0
       '@playwright/test':
         specifier: ^1.62.1
         version: 1.62.1
@@ -1826,9 +1826,9 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
-  /@faker-js/faker@8.4.1:
-    resolution: {integrity: sha512-XQ3cU+Q8Uqmrbf2e0cIC/QN43sTBSC8KF12u29Mb47tWrt2hAgBXSgpZMj4Ao8Uk0iJcU99QsOCaIL8934obCg==}
-    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0, npm: '>=6.14.13'}
+  /@faker-js/faker@10.5.0:
+    resolution: {integrity: sha512-bsxD8WLS5lIj7aaoCx1YJkktqYj5vlBUE6HWzu2Q51ksrGJ0H737ECCKlFU7Yf8Br45z9t99frBp/J7kzbMPAg==}
+    engines: {node: ^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0, npm: '>=10'}
     dev: true
 
   /@floating-ui/core@1.8.0:
@@ -3268,12 +3268,12 @@ packages:
       '@tiptap/core': 3.30.5(@tiptap/pm@3.30.5)
     dev: false
 
-  /@tiptap/extension-bubble-menu@3.31.0(@tiptap/core@3.30.5)(@tiptap/pm@3.30.5):
-    resolution: {integrity: sha512-CNuyfYH2KfcREASRh280UkGqYTwuKlMNcyBR7KsZrpzAVwFVo9D6qMkE6/q7I8mNMt2+/Xebe9UFZIYnVccCJA==}
+  /@tiptap/extension-bubble-menu@3.31.3(@tiptap/core@3.30.5)(@tiptap/pm@3.30.5):
+    resolution: {integrity: sha512-EV6ZnwKc++2OM/OcD54n8s1B7C9LP7GKAtdEPwu0t3BYJf3sG8Ueoinf7SgGPO9oMPg96GneOkDNm1urMV167g==}
     requiresBuild: true
     peerDependencies:
-      '@tiptap/core': 3.31.0
-      '@tiptap/pm': 3.31.0
+      '@tiptap/core': 3.31.3
+      '@tiptap/pm': 3.31.3
     dependencies:
       '@floating-ui/dom': 1.8.0
       '@tiptap/core': 3.30.5(@tiptap/pm@3.30.5)
@@ -3305,13 +3305,13 @@ packages:
       '@tiptap/core': 3.30.5(@tiptap/pm@3.30.5)
     dev: false
 
-  /@tiptap/extension-floating-menu@3.31.0(@floating-ui/dom@1.8.0)(@tiptap/core@3.30.5)(@tiptap/pm@3.30.5):
-    resolution: {integrity: sha512-NFwv1Kah3zGLmjj53Z+pA2584GdgMDClgvebJPqSunsSdHwHlFwfu+Op1u73xuEYOd6wGgCgzzDZ3V4CKwkJqg==}
+  /@tiptap/extension-floating-menu@3.31.3(@floating-ui/dom@1.8.0)(@tiptap/core@3.30.5)(@tiptap/pm@3.30.5):
+    resolution: {integrity: sha512-rd4VJ9PGSP9Eop8ZTEwaLZcMzMXLuJKe3hUNf58rq+zANpwM+9fI+vB7g9MAc3eXwUNDxNDVACFIL2oeBqpQ3A==}
     requiresBuild: true
     peerDependencies:
       '@floating-ui/dom': ^1.0.0
-      '@tiptap/core': 3.31.0
-      '@tiptap/pm': 3.31.0
+      '@tiptap/core': 3.31.3
+      '@tiptap/pm': 3.31.3
     dependencies:
       '@floating-ui/dom': 1.8.0
       '@tiptap/core': 3.30.5(@tiptap/pm@3.30.5)
@@ -3436,7 +3436,7 @@ packages:
       prosemirror-schema-list: 1.5.1
       prosemirror-state: 1.4.4
       prosemirror-tables: 1.8.5
-      prosemirror-transform: 1.12.0
+      prosemirror-transform: 1.12.1
       prosemirror-view: 1.42.3
     dev: false
 
@@ -3453,8 +3453,8 @@ packages:
       '@tiptap/pm': 3.30.5
       vue: 3.5.42(typescript@5.9.3)
     optionalDependencies:
-      '@tiptap/extension-bubble-menu': 3.31.0(@tiptap/core@3.30.5)(@tiptap/pm@3.30.5)
-      '@tiptap/extension-floating-menu': 3.31.0(@floating-ui/dom@1.8.0)(@tiptap/core@3.30.5)(@tiptap/pm@3.30.5)
+      '@tiptap/extension-bubble-menu': 3.31.3(@tiptap/core@3.30.5)(@tiptap/pm@3.30.5)
+      '@tiptap/extension-floating-menu': 3.31.3(@floating-ui/dom@1.8.0)(@tiptap/core@3.30.5)(@tiptap/pm@3.30.5)
     dev: false
 
   /@tsconfig/node10@1.0.13:
@@ -9424,7 +9424,7 @@ packages:
   /prosemirror-changeset@2.4.2:
     resolution: {integrity: sha512-ViYrjMSg3YFiXwIhKaluu+/mi3Yrxt6AR8ri14ulTaGcZtXO1CThl7A2gv79qx5fQnOw8woKwyBU2u+9PVCm3w==}
     dependencies:
-      prosemirror-transform: 1.12.0
+      prosemirror-transform: 1.12.1
     dev: false
 
   /prosemirror-commands@1.7.2:
@@ -9432,14 +9432,14 @@ packages:
     dependencies:
       prosemirror-model: 1.25.11
       prosemirror-state: 1.4.4
-      prosemirror-transform: 1.12.0
+      prosemirror-transform: 1.12.1
     dev: false
 
   /prosemirror-dropcursor@1.8.3:
     resolution: {integrity: sha512-FoYbsJR8gK+DGlqhNoE29Loa38eIZPzQRIb1VMaDNBoo4OLP6vVof/jR8qFY/6XvUd6Dhug8MDCHl2a/h8RTfQ==}
     dependencies:
       prosemirror-state: 1.4.4
-      prosemirror-transform: 1.12.0
+      prosemirror-transform: 1.12.1
       prosemirror-view: 1.42.3
     dev: false
 
@@ -9456,7 +9456,7 @@ packages:
     resolution: {integrity: sha512-zlzTiH01eKA55UAf1MEjtssJeHnGxO0j4K4Dpx+gnmX9n+SHNlDqI2oO1Kv1iPN5B1dm5fsljCfqKF9nFL6HRg==}
     dependencies:
       prosemirror-state: 1.4.4
-      prosemirror-transform: 1.12.0
+      prosemirror-transform: 1.12.1
       prosemirror-view: 1.42.3
       rope-sequence: 1.3.4
     dev: false
@@ -9465,7 +9465,7 @@ packages:
     resolution: {integrity: sha512-7wj4uMjKaXWAQ1CDgxNzNtR9AlsuwzHfdFH1ygEHA2KHF2DOEaXl1CJfNPAKCg9qNEh4rum975QLaCiQPyY6Fw==}
     dependencies:
       prosemirror-state: 1.4.4
-      prosemirror-transform: 1.12.0
+      prosemirror-transform: 1.12.1
     dev: false
 
   /prosemirror-keymap@1.2.3:
@@ -9486,14 +9486,14 @@ packages:
     dependencies:
       prosemirror-model: 1.25.11
       prosemirror-state: 1.4.4
-      prosemirror-transform: 1.12.0
+      prosemirror-transform: 1.12.1
     dev: false
 
   /prosemirror-state@1.4.4:
     resolution: {integrity: sha512-6jiYHH2CIGbCfnxdHbXZ12gySFY/fz/ulZE333G6bPqIZ4F+TXo9ifiR86nAHpWnfoNjOb3o5ESi7J8Uz1jXHw==}
     dependencies:
       prosemirror-model: 1.25.11
-      prosemirror-transform: 1.12.0
+      prosemirror-transform: 1.12.1
       prosemirror-view: 1.42.3
     dev: false
 
@@ -9503,12 +9503,12 @@ packages:
       prosemirror-keymap: 1.2.3
       prosemirror-model: 1.25.11
       prosemirror-state: 1.4.4
-      prosemirror-transform: 1.12.0
+      prosemirror-transform: 1.12.1
       prosemirror-view: 1.42.3
     dev: false
 
-  /prosemirror-transform@1.12.0:
-    resolution: {integrity: sha512-GxboyN4AMIsoHNtz5uf2r2Ru551i5hWeCMD6E2Ib4Eogqoub0NflniaBPVQ4MrGE5yZ8JV9tUHg9qcZTTrcN4w==}
+  /prosemirror-transform@1.12.1:
+    resolution: {integrity: sha512-t4F5615FycnCqsX7ShTUs8+jfnwcf46kuFRvSl/3qFx2QTZ4DjgowesLHQXcFP7G//TjesqZG3WtgL7vdyVJyA==}
     dependencies:
       prosemirror-model: 1.25.11
     dev: false
@@ -9518,7 +9518,7 @@ packages:
     dependencies:
       prosemirror-model: 1.25.11
       prosemirror-state: 1.4.4
-      prosemirror-transform: 1.12.0
+      prosemirror-transform: 1.12.1
     dev: false
 
   /proto-list@1.2.4:
