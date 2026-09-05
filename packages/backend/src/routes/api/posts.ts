@@ -14,6 +14,7 @@ import {
   updateById,
   deleteById,
   upload,
+  uploadByUrl,
   voteById,
   unvoteById,
 } from '@controllers/posts';
@@ -890,6 +891,74 @@ router.post(
   authRequiredMiddleware,
   uploadRateLimiter,
   asyncControllerErrorHandler(upload),
+);
+
+/**
+@swagger
+{
+  "/posts/upload/url": {
+    "post": {
+      "tags": [
+        "Posts"
+      ],
+      "summary": "add a picture to the template from a url",
+      "description": "Downloads the picture at `url`, re-encodes it and stores it on this server, then appends it to the template. The section that comes back points at this server, never at the url that was sent. Allowed extensions: `jpg|jpeg|png|gif|webp|avif`",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "url"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "description": "Public http or https link to a picture"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostSectionImage"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "413": {
+          "$ref": "#/components/responses/RequestEntityTooLarge"
+        },
+        "422": {
+          "$ref": "#/components/responses/UnprocessableEntity"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalServerError"
+        }
+      }
+    }
+  }
+}
+ */
+router.post(
+  '/upload/url',
+  authRequiredMiddleware,
+  uploadRateLimiter,
+  asyncControllerErrorHandler(uploadByUrl),
 );
 
 /**

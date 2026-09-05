@@ -12,4 +12,5 @@ export { search } from './search';
 export { unvoteById } from './unvote-by-id';
 export { updateById } from './update-by-id';
 export { upload } from './upload';
+export { uploadByUrl } from './upload-by-url';
 export { voteById } from './vote-by-id';

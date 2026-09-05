@@ -58,8 +58,11 @@ export class User {
   @prop({ required: true })
   public hash!: string;
 
+  /** A path under `/uploads`, written by the avatar endpoint. Rows created
+   * before avatars were downloaded still hold an absolute third party url,
+   * which the pattern keeps accepting so they survive an unrelated update. */
   @prop({
-    match: [/^https?:\/\//, '{VALUE} is not an url'],
+    match: [/^(https?:\/\/|\/uploads\/)/, '{VALUE} is not an url'],
     maxlength: USER_MAX_AVATAR_LENGTH,
     default: '',
   })

@@ -3,6 +3,8 @@ import { asyncControllerErrorHandler } from '@utils/async-controller-error-handl
 import {
   getByLogin,
   updateMe,
+  updateMyAvatar,
+  deleteMyAvatar,
   getMyPostTemplate,
   updateMyPostTemplate,
   getSettings,
@@ -11,7 +13,7 @@ import {
   deletePostTemplatePicture,
 } from '@controllers/users';
 import authRequiredMiddleware from '@middlewares/auth-required';
-import { apiRateLimiter } from '@middlewares/rate-limiter';
+import { apiRateLimiter, uploadRateLimiter } from '@middlewares/rate-limiter';
 
 const router = express.Router();
 /**
@@ -180,11 +182,6 @@ const router = express.Router();
                 "bio": {
                   "type": "string",
                   "maxLength": 300
-                },
-                "avatar": {
-                  "type": "string",
-                  "maxLength": 150,
-                  "description": "URL"
                 }
               }
             }
@@ -225,6 +222,108 @@ router.put(
   authRequiredMiddleware,
   apiRateLimiter,
   asyncControllerErrorHandler(updateMe),
+);
+
+/**
+@swagger
+{
+  "/users/me/avatar": {
+    "put": {
+      "tags": [
+        "Users"
+      ],
+      "summary": "Set the current user's avatar from a url",
+      "description": "Downloads the picture at `url`, re-encodes it to a square jpeg and stores it on this server. The response holds the stored path, not the url that was sent.",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "url"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "description": "Public http or https link to a jpg, jpeg, png, gif, webp or avif picture"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "avatar": {
+                    "type": "string",
+                    "example": "/uploads/6242a0f5e1e1a1f5e1e1a1f5/3f1b0c2a-1e3d-4a5b-8c7d-9e0f1a2b3c4d.jpg"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "$ref": "#/components/responses/NotFound"
+        },
+        "413": {
+          "$ref": "#/components/responses/RequestEntityTooLarge"
+        },
+        "422": {
+          "$ref": "#/components/responses/UnprocessableEntity"
+        }
+      }
+    },
+    "delete": {
+      "tags": [
+        "Users"
+      ],
+      "summary": "Clear the current user's avatar",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK"
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "$ref": "#/components/responses/NotFound"
+        }
+      }
+    }
+  }
+}
+*/
+router.put(
+  '/me/avatar',
+  authRequiredMiddleware,
+  uploadRateLimiter,
+  asyncControllerErrorHandler(updateMyAvatar),
+);
+router.delete(
+  '/me/avatar',
+  authRequiredMiddleware,
+  apiRateLimiter,
+  asyncControllerErrorHandler(deleteMyAvatar),
 );
 
 /**

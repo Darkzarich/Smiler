@@ -1,4 +1,4 @@
-import { minutesToMilliseconds } from 'date-fns';
+import { minutesToMilliseconds, secondsToMilliseconds } from 'date-fns';
 
 export const BASE_UPLOAD_FOLDER = '/uploads';
 export const SESSION_COOKIE_NAME = 'smiler.sid';
@@ -48,3 +48,10 @@ export const COMMENT_MAX_BODY_LENGTH = 10000;
 
 export const USER_MAX_BIO_LENGTH = 300;
 export const USER_MAX_AVATAR_LENGTH = 150;
+export const USER_AVATAR_SIZE = 200;
+
+/** How long the server is willing to wait on a host it was pointed at, and how
+ * many hops it will follow before deciding the url is a redirect loop.
+ */
+export const EXTERNAL_IMAGE_TIMEOUT = secondsToMilliseconds(10);
+export const EXTERNAL_IMAGE_MAX_REDIRECTS = 3;

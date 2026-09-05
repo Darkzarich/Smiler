@@ -31,10 +31,27 @@ function isPrivateIpv4([a, b]: number[]) {
 }
 
 /** Expand an IPv6 address into its eight 16 bit groups, null if malformed.
- * The input comes from `URL.hostname`, so it is already normalized to
- * lowercase hex groups without an embedded dotted-quad tail.
+ * A trailing dotted-quad — `::ffff:127.0.0.1`, the form a DNS lookup hands
+ * back — is folded into the two groups it stands for before parsing.
  */
 function parseIpv6(address: string) {
+  const dottedQuad = address.match(/:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/);
+
+  if (dottedQuad) {
+    const octets = dottedQuad[1].split('.').map(Number);
+
+    if (octets.some((octet) => octet > 255)) {
+      return null;
+    }
+
+    const head = address.slice(0, address.length - dottedQuad[1].length);
+    const groups = [octets[0] * 256 + octets[1], octets[2] * 256 + octets[3]];
+
+    return parseIpv6(
+      `${head}${groups.map((group) => group.toString(16)).join(':')}`,
+    );
+  }
+
   const halves = address.split('::');
 
   if (halves.length > 2) {
@@ -92,12 +109,34 @@ function isPrivateIpv6(groups: number[]) {
   return groups[0] >= 0xfe80 && groups[0] <= 0xfebf;
 }
 
+/** Whether a bare IP address — no brackets, as a DNS lookup returns it — sits
+ * in a range the server must never open a connection to.
+ *
+ * Anything that does not parse as an address is reported private: the callers
+ * are deciding whether to dial it, and an address they cannot understand is
+ * not one they should be dialing.
+ */
+export function isPrivateIp(address: string) {
+  const ipv4Match = address.match(IPV4_REGEXP);
+
+  if (ipv4Match) {
+    const octets = ipv4Match.slice(1).map(Number);
+
+    return octets.some((octet) => octet > 255) || isPrivateIpv4(octets);
+  }
+
+  const groups = parseIpv6(address.toLowerCase());
+
+  return groups ? isPrivateIpv6(groups) : true;
+}
+
 /** Whether a `URL.hostname` points at the server itself or at a network that
  * is not reachable from the public internet.
  *
- * Nothing on the backend fetches user supplied URLs today, so this is
- * defense-in-depth against SSRF for whenever something does (link previews,
- * thumbnailing, an image proxy).
+ * This only ever sees the name, so it cannot say where that name will resolve
+ * to at connect time — `fetch-external-image` pins the resolved address with
+ * `isPrivateIp` for that. Use this to turn away a url before opening a socket,
+ * not as the only thing standing between a url and a request.
  */
 export function isPrivateHost(hostname: string) {
   // A trailing dot makes a name fully qualified and resolves to exactly the
@@ -113,16 +152,12 @@ export function isPrivateHost(hostname: string) {
     return true;
   }
 
-  const ipv4Match = host.match(IPV4_REGEXP);
-
-  if (ipv4Match) {
-    return isPrivateIpv4(ipv4Match.slice(1).map(Number));
+  if (host.startsWith('[') && host.endsWith(']')) {
+    return isPrivateIp(host.slice(1, -1));
   }
 
-  if (host.startsWith('[') && host.endsWith(']')) {
-    const groups = parseIpv6(host.slice(1, -1));
-
-    return groups ? isPrivateIpv6(groups) : true;
+  if (IPV4_REGEXP.test(host)) {
+    return isPrivateIp(host);
   }
 
   return false;
