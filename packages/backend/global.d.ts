@@ -12,10 +12,7 @@ declare global {
     export interface Request {
       id: string;
       file?: Express.Multer.File;
-    }
-
-    export interface Response {
-      response: Record<string, unknown>;
+      routeBaseUrl?: string;
     }
   }
 }

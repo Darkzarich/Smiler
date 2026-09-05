@@ -3,30 +3,7 @@
 import morgan from 'morgan';
 import type { Request, Response } from 'express';
 import { logger } from '@libs/logger';
-
-function stringifyRoutePath(path: unknown): string {
-  if (typeof path === 'string') {
-    return path;
-  }
-
-  if (path instanceof RegExp) {
-    return '[pattern]';
-  }
-
-  if (Array.isArray(path)) {
-    return path.map(stringifyRoutePath).join('|');
-  }
-
-  return '[unknown]';
-}
-
-function getRouteTemplate(req: Request): string {
-  if (!req.route) {
-    return '[unmatched]';
-  }
-
-  return `${req.baseUrl}${stringifyRoutePath(req.route.path)}`;
-}
+import { getRouteTemplate } from '@utils/route-template';
 
 function getContentLength(
   contentLength: string | undefined,
@@ -44,10 +21,21 @@ function getContentLength(
   return parsedContentLength;
 }
 
+/**
+ * A request that failed because the server broke is the only kind worth waking
+ * someone for. A 4xx means the client sent something the API rejected, which is
+ * ordinary traffic for a public endpoint — it stays at info and is found by
+ * filtering on `status`, not by its level.
+ */
+function getLevelForStatus(status: number): 'error' | 'info' {
+  return status >= 500 ? 'error' : 'info';
+}
+
 export default morgan(
   (tokens, req: Request, res: Response) =>
     JSON.stringify({
       requestId: req.id,
+      userId: req.session?.userId,
       method: tokens.method(req, res),
       route: getRouteTemplate(req),
       path: req.path,
@@ -59,7 +47,9 @@ export default morgan(
   {
     stream: {
       write: (message) => {
-        logger.info('http_request', JSON.parse(message));
+        const payload = JSON.parse(message) as { status: number };
+
+        logger.log(getLevelForStatus(payload.status), 'http_request', payload);
       },
     },
   },

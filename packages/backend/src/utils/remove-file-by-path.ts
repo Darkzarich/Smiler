@@ -12,14 +12,15 @@ export async function removeFileByPath(filePath: string) {
   const absolutePath = resolve(process.cwd(), filePath.replace(/^\//, ''));
 
   if (!absolutePath.startsWith(`${UPLOADS_DIR}/`)) {
-    logger.error(`Path traversal attempt detected: ${filePath}`);
+    logger.error('file_path_traversal_rejected', { filePath });
+
     return;
   }
 
   try {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await unlink(absolutePath);
-  } catch {
-    logger.error(`Error removing file ${filePath}`);
+  } catch (error) {
+    logger.error('file_removal_failed', { filePath, error });
   }
 }

@@ -19,9 +19,46 @@ const {
   RATE_LIMIT_WRITE_MAX,
   RATE_LIMIT_VOTE_MAX,
   RATE_LIMIT_UPLOAD_MAX,
+  LOG_LEVEL,
+  LOG_FORMAT,
 } = process.env;
 
 const IS_PRODUCTION = NODE_ENV === 'production';
+const IS_JEST = NODE_ENV === 'test';
+
+const LOG_LEVELS = [
+  'error',
+  'warn',
+  'info',
+  'http',
+  'verbose',
+  'debug',
+  'silly',
+];
+
+// `silent` is not a Winston level but a flag on the logger; it is accepted here
+// so that one variable turns logging off entirely (a quiet test run, mostly).
+function resolveLogLevel() {
+  if (LOG_LEVEL && [...LOG_LEVELS, 'silent'].includes(LOG_LEVEL)) {
+    return LOG_LEVEL;
+  }
+
+  // Tests only care about what went wrong, production about what happened,
+  // and development about everything.
+  if (IS_JEST) {
+    return 'error';
+  }
+
+  return IS_PRODUCTION ? 'info' : 'debug';
+}
+
+function resolveLogFormat() {
+  if (LOG_FORMAT === 'json' || LOG_FORMAT === 'pretty') {
+    return LOG_FORMAT;
+  }
+
+  return IS_PRODUCTION ? 'json' : 'pretty';
+}
 
 function validateProductionConfig() {
   if (!IS_PRODUCTION) {
@@ -41,7 +78,9 @@ export default {
     DB_URL ||
     `mongodb://localhost:${DB_PORT || 27017}/${MONGO_INITDB_DATABASE}?authSource=admin`,
   IS_PRODUCTION,
-  IS_JEST: NODE_ENV === 'test',
+  IS_JEST,
+  LOG_LEVEL: resolveLogLevel(),
+  LOG_FORMAT: resolveLogFormat(),
   SESSION_SECRET: SESSION_SECRET || 'no-secret',
   FRONT_ORIGIN_LOCAL:
     FRONT_ORIGIN_LOCAL || `http://localhost:${FRONTEND_PORT || 8000}`,

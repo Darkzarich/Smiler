@@ -13,7 +13,7 @@ export default cors({
     ) {
       callback(null, true);
     } else {
-      logger.warn(`"${origin}" is not allowed by CORS`);
+      logger.warn('cors_origin_rejected', { origin });
       callback(new Error('Not allowed by CORS'));
     }
   },

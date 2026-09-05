@@ -41,7 +41,8 @@ async function upgradeStoredPassword(userId: Types.ObjectId, password: string) {
       { $set: { hash, salt, hashParams } },
     );
   } catch (error) {
-    logger.error('Could not re-hash the password of a signing in user', {
+    logger.error('password_rehash_failed', {
+      userId: userId.toString(),
       error,
     });
   }
@@ -58,7 +59,8 @@ async function recordLogin(userId: Types.ObjectId) {
       { $set: { lastLoginAt: new Date() } },
     );
   } catch (error) {
-    logger.error('Could not store the last login date of a signing in user', {
+    logger.error('last_login_record_failed', {
+      userId: userId.toString(),
       error,
     });
   }

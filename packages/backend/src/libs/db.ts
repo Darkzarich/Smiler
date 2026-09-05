@@ -17,31 +17,29 @@ async function getDatabase() {
 
 export async function connectDB() {
   try {
-    logger.info(`[pid: ${process.pid}] Connecting to MongoDB database...`);
+    logger.info('db_connecting');
 
     const dbInstance = await getDatabase();
 
     const { connection } = dbInstance;
 
-    logger.info(
-      `[pid: ${process.pid}] Successfully connected to MongoDB database`,
-    );
+    logger.info('db_connected');
 
     connection.on('error', (error) => {
-      logger.error(error);
+      logger.error('db_connection_error', { error });
     });
 
     connection.once('disconnected', () => {
-      logger.warn(`[pid: ${process.pid}]: Disconnected from MongoDB database`);
+      logger.warn('db_disconnected');
     });
 
     connection.on('reconnected', () => {
-      logger.info(`[pid: ${process.pid}]: Reconnected to MongoDB database`);
+      logger.info('db_reconnected');
     });
 
     return connection;
   } catch (error) {
-    logger.error(error as Error);
+    logger.error('db_initial_connection_failed', { error });
 
     throw error;
   }

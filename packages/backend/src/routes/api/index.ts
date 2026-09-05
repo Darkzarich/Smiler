@@ -18,6 +18,7 @@ import {
   isValidationError,
 } from '@utils/check-mongo-db-error';
 import { csrfProtectionMiddleware } from '@middlewares/csrf';
+import { captureRouteBaseUrl, getRouteTemplate } from '@utils/route-template';
 import usersRouter from '@routes/api/users';
 import authRouter from '@routes/api/auth';
 import postsRouter from '@routes/api/posts';
@@ -28,11 +29,14 @@ const router = express.Router();
 
 router.use(csrfProtectionMiddleware);
 
-router.use('/users', usersRouter);
-router.use('/auth', authRouter);
-router.use('/posts', postsRouter);
-router.use('/comments', commentsRouter);
-router.use('/tags', tagsRouter);
+// `captureRouteBaseUrl` goes first in each mount so that the route a request
+// matched survives into the logs even when the request never reaches its
+// controller — see the note on the helper.
+router.use('/users', captureRouteBaseUrl(), usersRouter);
+router.use('/auth', captureRouteBaseUrl(), authRouter);
+router.use('/posts', captureRouteBaseUrl(), postsRouter);
+router.use('/comments', captureRouteBaseUrl(), commentsRouter);
+router.use('/tags', captureRouteBaseUrl(), tagsRouter);
 
 // Special endpoints to test global error handling middleware in Jest environment
 if (Config.IS_JEST) {
@@ -70,27 +74,26 @@ router.all(/(.*)/, (_, __, next) => {
 function handleSendError(error: AbstractError, res: Response) {
   const { code, status, message } = error;
 
-  const response = {
+  res.status(status).json({
     error: {
       code,
       message,
     },
-  };
-
-  // "response" is needed for morgan middleware for logging
-  res.response = response;
-  res.status(status).json(response);
+  });
 }
 
-function logHandledError(error: AbstractError, req: Request) {
-  logger.warn('handled_request_error', {
+/**
+ * The fields shared by every log line about a request, so an error can be
+ * lined up with its access log entry (and with the `X-Request-Id` the client
+ * was handed) without repeating the lookup at each call site.
+ */
+function getRequestContext(req: Request) {
+  return {
     requestId: req.id,
+    userId: req.session?.userId,
     method: req.method,
-    path: req.route ? `${req.baseUrl}${req.route.path}` : '[unmatched]',
-    status: error.status,
-    code: error.code,
-    error_message: error.message,
-  });
+    route: getRouteTemplate(req),
+  };
 }
 
 // ! Specifying four parameters is a must for global error handling
@@ -100,14 +103,23 @@ router.use(
     // Handle errors from user's input such as ValidationError etc
     // these are "operational" errors and should be handled by the client
     if (error.status && error.isOperational) {
-      logHandledError(error, req);
+      // Expected, client-caused, and already visible in the access log — this
+      // line only adds which error was picked, so it is not a warning.
+      logger.info('handled_request_error', {
+        ...getRequestContext(req),
+        status: error.status,
+        code: error.code,
+        error_message: error.message,
+      });
+
       handleSendError(error, res);
 
       return;
     }
 
-    logger.error(error.message, {
-      requestId: req.id,
+    logger.error('unhandled_request_error', {
+      ...getRequestContext(req),
+      error,
     });
 
     // Handle MongoDB errors. The driver messages name collections, indexes and

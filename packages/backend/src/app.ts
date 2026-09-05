@@ -12,12 +12,8 @@ import router from '@routes/index';
 import { requestIdMiddleware } from '@middlewares/request-id';
 import { BASE_UPLOAD_FOLDER } from '@constants/index';
 
-logger.info(
-  `[pid: ${process.pid}] Worker is running in ${Config.IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode.`,
-);
-
 export async function startApp() {
-  logger.info(`[pid: ${process.pid}] App is starting...`);
+  logger.info('app_starting');
 
   let server: Server | undefined;
 
@@ -74,15 +70,14 @@ export async function startApp() {
 
   if (!Config.IS_JEST) {
     server = app.listen(Config.PORT, () => {
-      logger.info(
-        `[pid: ${process.pid}] Server is listening on the port ${Config.PORT}`,
-      );
+      logger.info('app_listening', { port: Config.PORT });
     });
   }
 
-  logger.info(
-    `[pid: ${process.pid}] App has successfully started in ${Config.IS_PRODUCTION ? 'PRODUCTION' : 'DEV'} mode`,
-  );
+  logger.info('app_started', {
+    mode: Config.IS_PRODUCTION ? 'production' : 'development',
+    logLevel: Config.LOG_LEVEL,
+  });
 
   return { app, server };
 }

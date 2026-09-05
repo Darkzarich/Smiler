@@ -37,8 +37,15 @@ services:
       DB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@smiler-db:${DB_PORT}/${MONGO_INITDB_DATABASE}?authSource=admin
       <<: *common-variables
     restart: always
+    # The backend logs one JSON object per line to stdout and leaves collection
+    # and rotation to Docker. Without these limits the json-file driver grows
+    # until it fills the disk — it does not rotate on its own.
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '5'
     volumes:
-      - smiler-backend-logs:/prod/backend/logs
       - smiler-backend-uploads:/prod/backend/uploads
     networks:
       - app
@@ -69,5 +76,4 @@ networks:
 
 volumes:
   smiler-db:
-  smiler-backend-logs:
   smiler-backend-uploads:

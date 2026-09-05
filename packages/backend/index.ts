@@ -16,7 +16,7 @@ const FATAL_ERROR_SHUTDOWN_TIMEOUT = 10 * 1000;
 const amountOfWorkers = Config.IS_PRODUCTION ? numCPUs : 2;
 
 if (Cluster.isPrimary) {
-  logger.info(`Master cluster is setting up ${amountOfWorkers} workers...`);
+  logger.info('cluster_starting', { workers: amountOfWorkers });
 
   for (let i = 0; i < amountOfWorkers; i += 1) {
     // Start a new worker
@@ -24,15 +24,17 @@ if (Cluster.isPrimary) {
   }
 
   Cluster.on('online', (worker) => {
-    logger.info(`[pid: ${worker.process.pid}] Worker is online`);
+    logger.info('cluster_worker_online', { workerPid: worker.process.pid });
   });
 
   Cluster.on('exit', (worker, code, signal) => {
-    logger.error(
-      `Worker ${worker.process.pid} died with code [${code}] and signal [${signal}]`,
-    );
-
-    logger.info('Starting a new worker');
+    // `workerPid` rather than `pid`: the latter is stamped on every line by the
+    // logger and belongs to the primary that is reporting the death.
+    logger.error('cluster_worker_died', {
+      workerPid: worker.process.pid,
+      code,
+      signal,
+    });
 
     // Start a new worker after the current one dies
     Cluster.fork();
@@ -51,15 +53,15 @@ if (Cluster.isPrimary) {
 
     isShuttingDown = true;
 
-    logger.error(
-      `[pid: ${process.pid}] ${origin}, shutting down the worker: ${
-        error instanceof Error ? error.stack || error.message : String(error)
-      }`,
-    );
+    logger.error('worker_fatal_error', {
+      origin,
+      error: error instanceof Error ? error : new Error(String(error)),
+    });
 
     const exit = () => process.exit(1);
 
-    // Winston writes to files asynchronously, give it a chance to flush
+    // stdout is a pipe under Docker, so Winston's writes are asynchronous
+    // there — give them a chance to flush
     logger.on('finish', exit);
 
     // ... but never let a stuck connection or transport keep the worker alive
