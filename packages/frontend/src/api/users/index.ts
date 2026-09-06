@@ -15,6 +15,17 @@ export default {
       data,
     );
   },
+  /** Sets the avatar from a url the backend downloads; the response holds the
+   * stored path, not the url that was sent. */
+  updateMyAvatar(data: userTypes.UpdateMyAvatarRequest) {
+    return apiClient.put<userTypes.UpdateMyAvatarResponse>(
+      `${CONTROLLER_URL}/me/avatar`,
+      data,
+    );
+  },
+  deleteMyAvatar() {
+    return apiClient.delete(`${CONTROLLER_URL}/me/avatar`);
+  },
   removeFilePicSection(hash: string) {
     return apiClient.delete(`${CONTROLLER_URL}/me/template/${hash}`);
   },

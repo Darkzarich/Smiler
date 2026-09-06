@@ -157,14 +157,20 @@ test('Shows current bio and avatar', async ({ Api, SettingsPage }) => {
       authors: [],
       tags: [],
       bio: 'test bio',
-      avatar: 'test avatar',
+      avatar: '/uploads/user-id/stored-avatar.jpg',
     },
   });
 
   await SettingsPage.goto();
 
   await expect(SettingsPage.bioInput).toHaveValue('test bio');
-  await expect(SettingsPage.avatarInput).toHaveValue('test avatar');
+  // The stored avatar is shown, not put back in the input: the input asks for
+  // a link to download from, which is not what got saved.
+  await expect(SettingsPage.avatarPreview).toHaveAttribute(
+    'src',
+    /\/uploads\/user-id\/stored-avatar\.jpg$/,
+  );
+  await expect(SettingsPage.avatarInput).toHaveValue('');
 });
 
 test("Edits current user's bio with expected request body", async ({
@@ -186,25 +192,66 @@ test("Edits current user's bio with expected request body", async ({
   );
 });
 
-test("Edits current user's avatar with expected request body", async ({
+test('Sends the link to download the avatar from, and shows what was stored', async ({
   Api,
   SettingsPage,
   NotificationList,
 }) => {
+  Api.routes.users.updateMyAvatar.mock({
+    body: { avatar: '/uploads/user-id/downloaded-avatar.jpg' },
+  });
+
   await SettingsPage.goto();
 
   await SettingsPage.avatarInput.fill(SettingsPage.avatarPlaceholderUrl);
 
-  const editResponse = await Api.routes.users.updateUserProfile.waitForRequest({
+  const editResponse = await Api.routes.users.updateMyAvatar.waitForRequest({
     preRequestAction: SettingsPage.submitAvatar.bind(SettingsPage),
   });
 
   expect(editResponse.postDataJSON()).toMatchObject({
-    avatar: SettingsPage.avatarPlaceholderUrl,
+    url: SettingsPage.avatarPlaceholderUrl,
   });
   await expect(NotificationList.root).toHaveText(
     'Your avatar has been successfully updated!',
   );
+  await expect(SettingsPage.avatarPreview).toHaveAttribute(
+    'src',
+    /\/uploads\/user-id\/downloaded-avatar\.jpg$/,
+  );
+  await expect(SettingsPage.avatarInput).toHaveValue('');
+});
+
+test("Removes current user's avatar", async ({
+  Api,
+  SettingsPage,
+  NotificationList,
+}) => {
+  Api.routes.users.getCurrentUserSettings.mock({
+    body: {
+      authors: [],
+      tags: [],
+      bio: '',
+      avatar: '/uploads/user-id/stored-avatar.jpg',
+    },
+  });
+
+  Api.routes.users.deleteMyAvatar.mock({
+    body: {
+      ok: true,
+    },
+  });
+
+  await SettingsPage.goto();
+
+  await Api.routes.users.deleteMyAvatar.waitForRequest({
+    preRequestAction: SettingsPage.removeAvatar.bind(SettingsPage),
+  });
+
+  await expect(NotificationList.root).toHaveText(
+    'Your avatar has been removed.',
+  );
+  await expect(SettingsPage.avatarRemoveBtn).toBeHidden();
 });
 
 test('If typed more than 300 symbols in bio shows validation error and blocks submit', async ({

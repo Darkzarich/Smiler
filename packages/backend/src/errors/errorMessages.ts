@@ -30,6 +30,7 @@ export const ERRORS = {
   USER_CANT_UNFOLLOW_NOT_FOLLOWED: "You're not following this author",
   USER_CANT_UNFOLLOW_OWN: 'You cannot unfollow yourself',
   USER_AVATAR_INVALID: 'Invalid avatar image url',
+  USER_AVATAR_URL_REQUIRED: 'Avatar image url is required',
   USER_UPDATE_FIELD_INVALID: 'User update fields must be strings',
 
   TARGET_IS_NOT_RATED: "It's not yet rated by the current user",
@@ -88,6 +89,16 @@ export const ERRORS = {
   POST_SEARCH_INVALID_DATE: 'Invalid date',
   POST_INVALID_ATTACHMENT_EXTENSION:
     'Invalid image attachment. Only jpg, jpeg, png, gif, webp, and avif are allowed.',
+
+  EXTERNAL_IMAGE_URL_REQUIRED: 'An image url is required',
+  EXTERNAL_IMAGE_URL_INVALID:
+    'This image url cannot be downloaded. Use a public http or https link.',
+  EXTERNAL_IMAGE_UNREACHABLE:
+    'The image could not be downloaded from that url. Please try a different one.',
+  EXTERNAL_IMAGE_NOT_AN_IMAGE:
+    'That url did not return an image. Only jpg, jpeg, png, gif, webp, and avif are allowed.',
+  EXTERNAL_IMAGE_TOO_MANY_REDIRECTS:
+    'That url redirected too many times. Please use a direct link to the image.',
 
   SECTION_NOT_FOUND: 'Section with given hash is not found',
   SECTION_NOT_FILE:

@@ -50,6 +50,22 @@ describe('isPrivateHost', () => {
     expect(isPrivateHost(hostnameOf('http://127.1'))).toBe(true);
   });
 
+  it('Should reject local names that a trailing dot would otherwise hide', () => {
+    expect(isPrivateHost(hostnameOf('http://localhost./picture.jpg'))).toBe(
+      true,
+    );
+    expect(isPrivateHost('localhost.')).toBe(true);
+    expect(isPrivateHost('LOCALHOST...')).toBe(true);
+    expect(isPrivateHost('cdn.example.com.')).toBe(false);
+  });
+
+  it('Should reject suffixes reserved for loopback and the local link', () => {
+    expect(isPrivateHost('anything.localhost')).toBe(true);
+    expect(isPrivateHost('printer.local')).toBe(true);
+    expect(isPrivateHost('box.localdomain')).toBe(true);
+    expect(isPrivateHost('not-local.example.com')).toBe(false);
+  });
+
   it('Should reject malformed IPv6 literals instead of letting them through', () => {
     expect(isPrivateHost('[not:an:address]')).toBe(true);
     expect(isPrivateHost('[::1::2]')).toBe(true);

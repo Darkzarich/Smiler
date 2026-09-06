@@ -22,7 +22,7 @@ export default function createRandomPost(
     ],
     slug: faker.lorem.slug(),
     author: {
-      login: faker.internet.userName(),
+      login: faker.internet.username(),
       _id: faker.string.uuid(),
       avatar: faker.image.avatar(),
     },

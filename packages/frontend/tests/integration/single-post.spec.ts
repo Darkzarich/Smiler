@@ -203,7 +203,7 @@ test.describe('Sections', () => {
     ).toBeVisible();
     await expect(
       Post.getPicSectionByHash(postWithSections._id, section.hash),
-    ).toHaveAttribute('alt', section.url);
+    ).toHaveAttribute('src', section.url);
   });
 
   test('Shows video section', async ({ Api, SinglePostPage, Post }) => {
@@ -254,7 +254,7 @@ test.describe('Sections', () => {
 
     await expect(
       Post.getPicSectionByHash(postWithSections._id, sections[0].hash),
-    ).toHaveAttribute('alt', sections[0].url);
+    ).toHaveAttribute('src', sections[0].url);
 
     await expect(
       Post.getTextSectionByHash(postWithSections._id, sections[1].hash),

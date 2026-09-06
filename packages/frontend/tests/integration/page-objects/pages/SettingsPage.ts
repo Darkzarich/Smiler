@@ -6,6 +6,8 @@ export default class SettingsPage extends AbstractPage {
 
   readonly avatarInput: Locator;
   readonly avatarSubmitBtn: Locator;
+  readonly avatarRemoveBtn: Locator;
+  readonly avatarPreview: Locator;
   readonly bioInput: Locator;
   readonly bioError: Locator;
   readonly bioSubmitBtn: Locator;
@@ -20,6 +22,8 @@ export default class SettingsPage extends AbstractPage {
 
     this.avatarInput = page.getByTestId('user-settings-avatar-input');
     this.avatarSubmitBtn = page.getByTestId('user-settings-avatar-submit');
+    this.avatarRemoveBtn = page.getByTestId('user-settings-avatar-remove');
+    this.avatarPreview = page.locator('.user-settings__current-avatar img');
     this.bioInput = page.getByTestId('user-settings-bio-input');
     this.bioError = page.getByTestId('user-settings-bio-input-error');
     this.bioSubmitBtn = page.getByTestId('user-settings-bio-submit');
@@ -55,5 +59,9 @@ export default class SettingsPage extends AbstractPage {
 
   async submitAvatar() {
     await this.avatarSubmitBtn.click();
+  }
+
+  async removeAvatar() {
+    await this.avatarRemoveBtn.click();
   }
 }

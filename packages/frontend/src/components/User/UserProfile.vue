@@ -1,7 +1,11 @@
 <template>
   <div class="user-profile u-flex-row">
     <div class="user-profile__avatar">
-      <img :src="resolveAvatar(profileUser.avatar)" :alt="profileUser.avatar" />
+      <img
+        :src="resolveAvatar(profileUser.avatar)"
+        alt="avatar"
+        referrerpolicy="no-referrer"
+      />
     </div>
 
     <div class="user-profile__info">

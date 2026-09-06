@@ -16,6 +16,7 @@ export const routes = {
     getFeed: new Route('/posts/feed', Method.GET),
     createPost: new Route('/posts', Method.POST),
     uploadAttachment: new Route('/posts/upload', Method.POST),
+    uploadAttachmentByUrl: new Route('/posts/upload/url', Method.POST),
     getPostBySlug: new Route('/posts/*', Method.GET),
     updatePostById: new Route('/posts/*', Method.PUT),
     deletePostById: new Route('/posts/*', Method.DELETE),
@@ -32,6 +33,8 @@ export const routes = {
   users: {
     getUserProfile: new Route('/users/*', Method.GET),
     updateUserProfile: new Route('/users/me', Method.PUT),
+    updateMyAvatar: new Route('/users/me/avatar', Method.PUT),
+    deleteMyAvatar: new Route('/users/me/avatar', Method.DELETE),
     removeFilePicSection: new Route('/users/me/template/*', Method.DELETE),
     getMyTemplate: new Route('/users/me/template', Method.GET),
     updateMyTemplate: new Route('/users/me/template', Method.PUT),

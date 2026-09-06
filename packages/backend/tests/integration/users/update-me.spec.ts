@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { USER_MAX_AVATAR_LENGTH, USER_MAX_BIO_LENGTH } from '@constants/index';
+import { USER_MAX_BIO_LENGTH } from '@constants/index';
 import { UserModel } from '@models/User';
 
 import { signUpRequest } from '@test-utils/request-auth';
@@ -28,34 +28,20 @@ describe('PUT /users/me', () => {
     expect(response.status).toBe(422);
   });
 
-  it('Should return status 422 and an expected db validation message if avatar is not an url', async () => {
+  it('Should ignore an avatar sent here, which belongs to its own endpoint', async () => {
     const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/users/me')
       .send({
-        avatar: 'a',
+        bio: 'a',
+        avatar: 'https://cdn.example.com/somebody-elses-avatar.jpg',
       })
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken);
 
-    expect(response.body.error.message).toBe(ERRORS.USER_AVATAR_INVALID);
-    expect(response.status).toBe(422);
-  });
-
-  it('Should return status 422 and a generic validation message for too long avatar', async () => {
-    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
-
-    const response = await request(global.app)
-      .put('/api/users/me')
-      .send({
-        avatar: `https://example.com/${'a'.repeat(USER_MAX_AVATAR_LENGTH)}.jpg`,
-      })
-      .set('Cookie', sessionCookie)
-      .set('X-CSRF-Token', csrfToken);
-
-    expect(response.body.error.message).toBe(ERRORS.INVALID_REQUEST_DATA);
-    expect(response.status).toBe(422);
+    expect(response.status).toBe(200);
+    expect(response.body.avatar).toBe('');
   });
 
   it('Should ignore protected user fields', async () => {
@@ -116,25 +102,23 @@ describe('PUT /users/me', () => {
 
   it('Returns status 200 and the updated user after a successful update', async () => {
     const bio = 'a';
-    const avatar = 'https://example.com/avatar.jpg';
 
     const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
       .put('/api/users/me')
-      .send({ bio, avatar })
+      .send({ bio })
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(200);
     expect(response.body.bio).toBe(bio);
-    expect(response.body.avatar).toBe(avatar);
     expect(response.body).toEqual({
       _id: expect.any(String),
       login: expect.any(String),
       rating: expect.any(Number),
       bio,
-      avatar,
+      avatar: expect.any(String),
       followersAmount: expect.any(Number),
       createdAt: expect.any(String),
     });

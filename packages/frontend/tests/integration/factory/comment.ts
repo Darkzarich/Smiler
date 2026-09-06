@@ -20,7 +20,7 @@ export default function createRandomComment(
   const comment: commentTypes.Comment = {
     body: faker.lorem.sentence(3),
     author: {
-      login: faker.internet.userName(),
+      login: faker.internet.username(),
       _id: faker.string.uuid(),
       avatar: faker.image.avatar(),
     },

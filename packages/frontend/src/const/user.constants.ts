@@ -1,5 +1,4 @@
 export const USER_MAX_BIO_LENGTH = 300;
-export const USER_MAX_AVATAR_LENGTH = 150;
 
 export const PASSWORD_MIN_LENGTH = 6;
 

@@ -20,7 +20,7 @@ export default function createRandomProfile(
     bio: faker.lorem.sentence(),
     rating: faker.number.int({ min: 0, max: 5 }),
     followersAmount: faker.number.int({ min: 0, max: 100 }),
-    login: faker.internet.userName(),
+    login: faker.internet.username(),
     createdAt: faker.date.past().toISOString(),
     isFollowed: faker.datatype.boolean(),
   };

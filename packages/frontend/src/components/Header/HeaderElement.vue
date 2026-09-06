@@ -63,7 +63,11 @@
             },
           }"
         >
-          <img :src="resolveAvatar(user.avatar)" alt="avatar" />
+          <img
+            :src="resolveAvatar(user.avatar)"
+            alt="avatar"
+            referrerpolicy="no-referrer"
+          />
         </RouterLink>
       </div>
     </div>

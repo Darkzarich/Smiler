@@ -17,7 +17,8 @@
             <img
               class="current-user__avatar"
               :src="resolveAvatar(user.avatar)"
-              :alt="user.avatar"
+              alt="avatar"
+              referrerpolicy="no-referrer"
             />
 
             <div class="current-user__login" data-testid="user-login">

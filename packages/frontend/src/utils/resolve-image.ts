@@ -1,11 +1,12 @@
 import config from '@/config/config';
 
+/** Picture sections hold either an absolute third party URL — how pictures were
+ * stored before the backend started downloading them — or a path under the
+ * API's `/uploads` folder, which only becomes fetchable once the API origin is
+ * prepended.
+ */
 export function resolveImage(path: string): string {
-  if (
-    /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(
-      path,
-    )
-  ) {
+  if (/^https?:\/\//i.test(path)) {
     return path;
   }
 

@@ -2,9 +2,8 @@ import type { Request, Response } from 'express';
 import { User, UserModel } from '@models/User';
 import { NotFoundError, ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-import { isValidExternalImageUrl } from '@utils/is-valid-external-image-url';
 
-type UpdateMeBody = Partial<Pick<User, 'bio' | 'avatar'>>;
+type UpdateMeBody = Partial<Pick<User, 'bio'>>;
 
 interface UpdateMeResponse
   extends Pick<
@@ -27,17 +26,8 @@ function validateAndPickUpdateMeBody(
     update.bio = body.bio;
   }
 
-  if (body.avatar !== undefined) {
-    if (typeof body.avatar !== 'string') {
-      throw new ValidationError(ERRORS.USER_UPDATE_FIELD_INVALID);
-    }
-
-    if (body.avatar && !isValidExternalImageUrl(body.avatar)) {
-      throw new ValidationError(ERRORS.USER_AVATAR_INVALID);
-    }
-
-    update.avatar = body.avatar;
-  }
+  // The avatar is not a plain field any more: it names a file this server
+  // downloaded and stored, so it is set through `PUT /users/me/avatar`.
 
   return update;
 }
