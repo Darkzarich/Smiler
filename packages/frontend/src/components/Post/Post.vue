@@ -91,45 +91,53 @@
             :key="section.hash"
             class="post__sections"
           >
-            <!-- eslint-disable vue/no-v-html -->
-            <div
-              v-if="isTextSection(section)"
-              :data-testid="`post-${post._id}-text-${section.hash}`"
-              v-html="section.content"
-            />
-            <!-- eslint-enable vue/no-v-html -->
-
-            <div
-              v-if="isPictureSection(section)"
-              class="post__section-attachment post__section-attachment--image"
+            <PostSectionSpoiler
+              :class="{
+                'post__section-spoiler--bleed': !isTextSection(section),
+              }"
+              :is-spoiler="section.isSpoiler"
+              :test-id="`post-${post._id}-spoiler-${section.hash}`"
             >
-              <!-- Sections stored before pictures were downloaded server side
-                   still point at a third party host, so the request must not
-                   carry a referrer and must not fire until it is on screen. -->
-              <img
-                class="post__section-image"
-                :src="resolveImage(section.url)"
-                alt="Post attachment"
-                loading="lazy"
-                referrerpolicy="no-referrer"
-                :data-testid="`post-${post._id}-pic-${section.hash}`"
-                @error="resolveImageError"
+              <!-- eslint-disable vue/no-v-html -->
+              <div
+                v-if="isTextSection(section)"
+                :data-testid="`post-${post._id}-text-${section.hash}`"
+                v-html="section.content"
               />
-            </div>
+              <!-- eslint-enable vue/no-v-html -->
 
-            <div
-              v-if="isVideoSection(section)"
-              class="post__section-attachment post__section-attachment--video"
-            >
-              <video
-                class="post__section-video"
-                controls
-                :src="section.url"
-                :data-testid="`post-${post._id}-vid-${section.hash}`"
+              <div
+                v-if="isPictureSection(section)"
+                class="post__section-attachment post__section-attachment--image"
               >
-                <track kind="captions" />
-              </video>
-            </div>
+                <!-- Sections stored before pictures were downloaded server side
+                     still point at a third party host, so the request must not
+                     carry a referrer and must not fire until it is on screen. -->
+                <img
+                  class="post__section-image"
+                  :src="resolveImage(section.url)"
+                  alt="Post attachment"
+                  loading="lazy"
+                  referrerpolicy="no-referrer"
+                  :data-testid="`post-${post._id}-pic-${section.hash}`"
+                  @error="resolveImageError"
+                />
+              </div>
+
+              <div
+                v-if="isVideoSection(section)"
+                class="post__section-attachment post__section-attachment--video"
+              >
+                <video
+                  class="post__section-video"
+                  controls
+                  :src="section.url"
+                  :data-testid="`post-${post._id}-vid-${section.hash}`"
+                >
+                  <track kind="captions" />
+                </video>
+              </div>
+            </PostSectionSpoiler>
           </div>
         </div>
       </CollapsibleContent>
@@ -232,6 +240,7 @@ import { cloneDeep } from 'lodash-es';
 import { storeToRefs } from 'pinia';
 import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import PostSectionSpoiler from './PostSectionSpoiler.vue';
 import {
   isTextSection,
   isPictureSection,
@@ -743,9 +752,18 @@ const searchByTag = (tag: string) => {
     overflow: hidden;
 
     @media (--phone-only) {
+      border-radius: 0;
+    }
+  }
+
+  &__section-spoiler--bleed {
+    @media (--phone-only) {
       margin-right: calc(-1 * var(--post-padding-inline));
       margin-left: calc(-1 * var(--post-padding-inline));
-      border-radius: 0;
+
+      :deep(.post-spoiler__veil) {
+        border-radius: 0;
+      }
     }
   }
 

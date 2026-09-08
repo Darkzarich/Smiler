@@ -79,6 +79,14 @@ export default class Post extends AbstractComponent {
     return this.page.getByTestId(`post-${postId}-vid-${hash}`);
   }
 
+  getSpoilerVeilByHash(postId = '', hash = '') {
+    return this.page.getByTestId(`post-${postId}-spoiler-${hash}`);
+  }
+
+  async revealSpoilerByHash(postId = '', hash = '') {
+    await this.getSpoilerVeilByHash(postId, hash).click();
+  }
+
   async getIsPostByIdUpvoted(postId = '') {
     const postClass = await this.getUpvoteBtnById(postId).getAttribute('class');
 

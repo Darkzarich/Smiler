@@ -12,23 +12,25 @@ export enum POST_SECTION_TYPES {
   TEXT = 'text',
 }
 
-export interface PostPictureSection {
-  type: POST_SECTION_TYPES.PICTURE;
+interface PostSectionBase {
   hash: string;
+  isSpoiler?: boolean;
+}
+
+export interface PostPictureSection extends PostSectionBase {
+  type: POST_SECTION_TYPES.PICTURE;
   url: string;
   isFile?: boolean;
 }
 
-export interface PostVideoSection {
+export interface PostVideoSection extends PostSectionBase {
   type: POST_SECTION_TYPES.VIDEO;
-  hash: string;
   url: string;
 }
 
-export interface PostTextSection {
+export interface PostTextSection extends PostSectionBase {
   type: POST_SECTION_TYPES.TEXT;
   content: string;
-  hash: string;
 }
 
 export type PostSection =

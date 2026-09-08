@@ -227,6 +227,39 @@ test.describe('Sections', () => {
     ).toHaveAttribute('src', section.url);
   });
 
+  test('Hides a spoiler section until it is clicked', async ({
+    Api,
+    SinglePostPage,
+    Post,
+  }) => {
+    const section = createRandomSection(postTypes.POST_SECTION_TYPES.TEXT, {
+      isSpoiler: true,
+    });
+
+    const postWithSections = createRandomPost({
+      sections: [section],
+    });
+
+    Api.routes.posts.getPostBySlug.mock({
+      body: postWithSections,
+    });
+
+    await SinglePostPage.goto(postWithSections.slug);
+
+    await expect(
+      Post.getSpoilerVeilByHash(postWithSections._id, section.hash),
+    ).toBeVisible();
+
+    await Post.revealSpoilerByHash(postWithSections._id, section.hash);
+
+    await expect(
+      Post.getSpoilerVeilByHash(postWithSections._id, section.hash),
+    ).toBeHidden();
+    await expect(
+      Post.getTextSectionByHash(postWithSections._id, section.hash),
+    ).toContainText(section.content);
+  });
+
   test('Shows multiple sections at the same time', async ({
     Api,
     SinglePostPage,

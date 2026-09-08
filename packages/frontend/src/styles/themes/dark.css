@@ -20,6 +20,9 @@
   --color-surface-primary: #181c20;
   --color-surface-secondary: #212529;
   --color-surface-elevated: #1f2327;
+  --color-spoiler-veil: rgb(24 28 32 / 55%);
+  --color-spoiler-veil-hover: rgb(24 28 32 / 40%);
+  --color-spoiler-veil-solid: #181c20;
   --color-scrollbar-track: #212529;
   --color-scrollbar-thumb: #5c6064;
 }
