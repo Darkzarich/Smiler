@@ -1,6 +1,6 @@
 <template>
-  <div ref="postRef" class="post">
-    <div class="post__left">
+  <div ref="postRef" class="post" :class="{ 'post--inert': !interactive }">
+    <div class="post__left" :inert="!interactive || undefined">
       <div
         :data-testid="`post-${post._id}-upvote`"
         class="post__upvote"
@@ -43,6 +43,7 @@
     <div class="post__main u-widget">
       <div class="post__title">
         <RouterLink
+          v-if="interactive"
           class="post__title-link"
           :to="{
             name: 'Single',
@@ -55,6 +56,14 @@
         >
           {{ post.title }}
         </RouterLink>
+
+        <span
+          v-else
+          class="post__title-link"
+          :data-testid="`post-${post._id}-title`"
+        >
+          {{ post.title }}
+        </span>
 
         <template v-if="canEdit">
           <RouterLink
@@ -76,6 +85,7 @@
           :key="tag"
           :data-testid="`post-${post._id}-tag-${tag}`"
           class="post__tags-item"
+          :class="{ 'post__tags-item--inert': !interactive }"
           @click.prevent.stop="openContextMenu($event, tag)"
           @keydown.enter.prevent.stop="openContextMenu($event, tag)"
           @keydown.space.prevent.stop="openContextMenu($event, tag)"
@@ -143,7 +153,7 @@
       </CollapsibleContent>
 
       <!-- for mobile -->
-      <div class="post__rate-mobile">
+      <div class="post__rate-mobile" :inert="!interactive || undefined">
         <button
           class="post__upvote"
           :data-testid="`m-post-${post._id}-upvote`"
@@ -175,7 +185,7 @@
 
       <!-- for mobile -->
       <div class="post__footer">
-        <div class="post__meta-info">
+        <div class="post__meta-info" :inert="!interactive || undefined">
           <span class="post__date">
             {{ formatFromNow(post.createdAt) }}
           </span>
@@ -267,11 +277,15 @@ import { isMobile } from '@utils/is-mobile';
 interface Props {
   canEdit?: boolean;
   collapsible?: boolean;
+  /** Off for a post that isn't stored yet, like the editor preview: the chrome
+   * renders but voting, routing and following have nothing to point at. */
+  interactive?: boolean;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   canEdit: false,
   collapsible: true,
+  interactive: true,
 });
 
 const post = defineModel<postTypes.Post>('post', {
@@ -367,7 +381,7 @@ const handleRemoveVote = async (id: string) => {
 };
 
 const upvote = async (id: string) => {
-  if (isRequesting.value) {
+  if (isRequesting.value || !props.interactive) {
     return;
   }
 
@@ -412,7 +426,7 @@ const upvote = async (id: string) => {
 };
 
 const downvote = async (id: string) => {
-  if (isRequesting.value) {
+  if (isRequesting.value || !props.interactive) {
     return;
   }
 
@@ -471,6 +485,10 @@ const deletePost = async (id: string) => {
 const postRef = ref<HTMLElement | null>(null);
 
 const openContextMenu = (ev: MouseEvent | KeyboardEvent, tag: string) => {
+  if (!props.interactive) {
+    return;
+  }
+
   if (!contextMenuData.show && postRef.value) {
     const postRect = postRef.value.getBoundingClientRect();
 
@@ -860,6 +878,20 @@ const searchByTag = (tag: string) => {
   &__delete-button {
     border: none;
     background: transparent;
+  }
+
+  /* Keeps the layout honest while showing nothing here is clickable yet */
+  &--inert {
+    .post__left,
+    .post__rate-mobile,
+    .post__meta-info {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+
+  &__tags-item--inert {
+    cursor: default;
   }
 }
 </style>

@@ -8,6 +8,7 @@
       [`base-button--${size}`]: Boolean(size),
       'base-button--stretched': stretched,
       'base-button--loading': loading,
+      'base-button--active': active,
     }"
     :disabled="disabled"
   >
@@ -30,6 +31,8 @@ interface Props {
   disabled?: boolean;
   loading?: boolean;
   stretched?: boolean;
+  /** Renders the button as the currently chosen one, for toggles and switches */
+  active?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -40,6 +43,7 @@ withDefaults(defineProps<Props>(), {
   disabled: false,
   loading: false,
   stretched: false,
+  active: false,
 });
 </script>
 
@@ -110,6 +114,12 @@ withDefaults(defineProps<Props>(), {
   &--large {
     padding: 12px 24px;
     font-size: 16px;
+  }
+
+  /* Also on hover, which would otherwise win and hide the chosen state */
+  &--active,
+  &--active:hover {
+    background: var(--color-accent-transparent);
   }
 
   &--loading {

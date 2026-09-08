@@ -2,10 +2,12 @@ import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
+import Post from '../Post/Post.vue';
 import PostEditor from './PostEditor.vue';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import { useUserStore } from '@/store/user';
+import BaseSegmentedControl from '@common/BaseSegmentedControl.vue';
 import ConfirmModal from '@common/ConfirmModal.vue';
 
 vi.mock('vue-router', () => ({
@@ -34,7 +36,21 @@ const testElements = {
   toggleTextSectionSpoiler: '[data-testid="toggle-spoiler-text-1"]',
   textSectionSpoilerBadge: '[data-testid="spoiler-badge-text-1"]',
   saveDraftButton: '[datatestid="save-draft-button"]',
+  writeArea: '.post-editor__write',
+  preview: '[datatestid="post-preview"]',
+  previewEmpty: '[data-testid="post-preview-empty"]',
 };
+
+async function setMode(
+  wrapper: ReturnType<typeof createWrapper>,
+  mode: 'write' | 'preview',
+) {
+  await wrapper
+    .findComponent(BaseSegmentedControl)
+    .vm.$emit('update:modelValue', mode);
+
+  await nextTick();
+}
 
 function textSection(content: string): postTypes.PostTextSection {
   return {
@@ -251,5 +267,72 @@ describe('PostEditor spoiler flow', () => {
         sections: [expect.objectContaining({ isSpoiler: true })],
       }),
     );
+  });
+});
+
+describe('PostEditor preview', () => {
+  it('opens in write mode', async () => {
+    const wrapper = createWrapper([textSection('Some content')]);
+
+    await flushPromises();
+
+    expect(wrapper.find(testElements.writeArea).isVisible()).toBe(true);
+    expect(wrapper.find(testElements.preview).exists()).toBe(false);
+  });
+
+  it('renders the draft as a non-interactive post with nothing clipped', async () => {
+    const wrapper = createWrapper([textSection('Some content')]);
+
+    await flushPromises();
+
+    await setMode(wrapper, 'preview');
+
+    const preview = wrapper.findComponent(Post);
+
+    expect(wrapper.find(testElements.writeArea).isVisible()).toBe(false);
+    expect(preview.props()).toMatchObject({
+      interactive: false,
+      collapsible: false,
+    });
+    expect(preview.props('post')).toMatchObject({
+      sections: [expect.objectContaining({ content: 'Some content' })],
+    });
+  });
+
+  it('stands in a placeholder title for an untitled draft', async () => {
+    const wrapper = createWrapper([textSection('Some content')]);
+
+    await flushPromises();
+
+    await setMode(wrapper, 'preview');
+
+    expect(wrapper.findComponent(Post).props('post')).toMatchObject({
+      title: 'Untitled post',
+    });
+  });
+
+  it('shows an empty state instead of a post when there are no sections', async () => {
+    const wrapper = createWrapper([]);
+
+    await flushPromises();
+
+    await setMode(wrapper, 'preview');
+
+    expect(wrapper.find(testElements.preview).exists()).toBe(false);
+    expect(wrapper.find(testElements.previewEmpty).exists()).toBe(true);
+  });
+
+  it('returns to the editor without losing the sections', async () => {
+    const wrapper = createWrapper([textSection('Some content')]);
+
+    await flushPromises();
+
+    await setMode(wrapper, 'preview');
+
+    await setMode(wrapper, 'write');
+
+    expect(wrapper.find(testElements.writeArea).isVisible()).toBe(true);
+    expect(wrapper.find(testElements.preview).exists()).toBe(false);
+    expect(wrapper.findAll('[data-testid="post-section"]')).toHaveLength(1);
   });
 });

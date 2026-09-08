@@ -111,6 +111,7 @@ How to add one:
 - Use the existing bullet format: `- **<Mon Year>** — <what changed and why it mattered>`, with key technologies in bold.
 - If a month already has a bullet on a different theme, give both a theme label instead of repeating the bare month: `- **<Mon Year> — <theme>** — ...`.
 - If a bullet for that month already exists and the change belongs with it, extend that bullet instead of adding a near-duplicate.
+- Keep a bullet to one or two sentences. The timeline is a highlight reel, not a changelog: group a month's related work under one themed bullet rather than giving every feature its own, and leave the details to the code.
 - Link the first mention of a named library or tool to its GitHub repository, e.g. `**[Vitest](https://github.com/vitest-dev/vitest)**`. Link it once per timeline, not on every repeat. Databases, platforms, and specs (MongoDB, Docker, OpenAPI) are not linked.
 
 ## Gotchas

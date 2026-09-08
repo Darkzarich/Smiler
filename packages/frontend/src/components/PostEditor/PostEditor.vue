@@ -1,115 +1,147 @@
 <template>
   <div class="post-editor">
-    <BaseInput
-      v-model="title"
-      class="post-editor__title"
-      data-testid="post-title-input"
-      :placeholder="'Title'"
-      :error="validation.title"
+    <BaseSegmentedControl
+      v-model="mode"
+      class="post-editor__mode"
+      label="Editor mode"
+      :options="modeOptions"
     />
 
-    <PostEditorTags v-model:tags="tags" class="post-editor__tags" />
+    <!-- Hidden rather than unmounted so the tiptap instances survive a preview -->
+    <div v-show="!isPreview" class="post-editor__write">
+      <BaseInput
+        v-model="title"
+        class="post-editor__title"
+        data-testid="post-title-input"
+        :placeholder="'Title'"
+        :error="validation.title"
+      />
 
-    <Draggable
-      :list="sections"
-      :animation="200"
-      :force-fallback="true"
-      ghost-class="post-editor__section--moving"
-      chosen-class="post-editor__section--chosen"
-      :component-data="{
-        name: 'post-editor__section',
-        tag: 'div',
-        'data-testid': 'post-sections',
-      }"
-      item-key="hash"
-      tag="transition-group"
-    >
-      <template #item="{ element: section }">
-        <div
-          class="post-editor__section u-flex-row"
-          :class="{ 'post-editor__section--spoiler': section.isSpoiler }"
-          data-testid="post-section"
-        >
-          <span
-            v-if="section.isSpoiler"
-            class="post-editor__spoiler-badge"
-            :data-testid="`spoiler-badge-${section.hash}`"
+      <PostEditorTags v-model:tags="tags" class="post-editor__tags" />
+
+      <Draggable
+        :list="sections"
+        :animation="200"
+        :force-fallback="true"
+        ghost-class="post-editor__section--moving"
+        chosen-class="post-editor__section--chosen"
+        :component-data="{
+          name: 'post-editor__section',
+          tag: 'div',
+          'data-testid': 'post-sections',
+        }"
+        item-key="hash"
+        tag="transition-group"
+      >
+        <template #item="{ element: section }">
+          <div
+            class="post-editor__section u-flex-row"
+            :class="{ 'post-editor__section--spoiler': section.isSpoiler }"
+            data-testid="post-section"
           >
-            <IconEyeOff />
-            Spoiler
-          </span>
-
-          <!-- TODO: Refactor this part -->
-          <template v-if="section.type === postTypes.POST_SECTION_TYPES.TEXT">
-            <BaseTextEditor
-              :id="section.hash"
-              v-model="section.content"
-              data-testid="text-section"
-              :features="TextEditorFeatures.Post"
-            />
-          </template>
-
-          <template
-            v-else-if="section.type === postTypes.POST_SECTION_TYPES.PICTURE"
-          >
-            <PostEditorPicture
-              v-model="section.url"
-              data-testid="pic-section"
-              @update-section="updatePictureSection"
-            />
-          </template>
-
-          <template
-            v-else-if="section.type === postTypes.POST_SECTION_TYPES.VIDEO"
-          >
-            <PostEditorVideo
-              v-model="section.url"
-              data-testid="video-section"
-            />
-          </template>
-
-          <div class="post-editor__section-actions">
-            <button
-              type="button"
-              class="post-editor__spoiler-btn"
-              :class="{
-                'post-editor__spoiler-btn--active': section.isSpoiler,
-              }"
-              :title="
-                section.isSpoiler
-                  ? 'Show this section to everyone'
-                  : 'Hide this section behind a spoiler'
-              "
-              :aria-pressed="Boolean(section.isSpoiler)"
-              @click="toggleSpoiler(section)"
+            <span
+              v-if="section.isSpoiler"
+              class="post-editor__spoiler-badge"
+              :data-testid="`spoiler-badge-${section.hash}`"
             >
-              <IconEyeOff
-                v-if="section.isSpoiler"
-                :data-testid="`toggle-spoiler-${section.hash}`"
-              />
-              <IconEye v-else :data-testid="`toggle-spoiler-${section.hash}`" />
-            </button>
+              <IconEyeOff />
+              Spoiler
+            </span>
 
-            <button
-              type="button"
-              class="post-editor__delete-btn"
-              @click="requestDeleteSection(section)"
-            >
-              <CloseIcon
-                title="Delete"
-                :data-testid="`delete-section-${section.hash}`"
+            <!-- TODO: Refactor this part -->
+            <template v-if="section.type === postTypes.POST_SECTION_TYPES.TEXT">
+              <BaseTextEditor
+                :id="section.hash"
+                v-model="section.content"
+                data-testid="text-section"
+                :features="TextEditorFeatures.Post"
               />
-            </button>
+            </template>
+
+            <template
+              v-else-if="section.type === postTypes.POST_SECTION_TYPES.PICTURE"
+            >
+              <PostEditorPicture
+                v-model="section.url"
+                data-testid="pic-section"
+                @update-section="updatePictureSection"
+              />
+            </template>
+
+            <template
+              v-else-if="section.type === postTypes.POST_SECTION_TYPES.VIDEO"
+            >
+              <PostEditorVideo
+                v-model="section.url"
+                data-testid="video-section"
+              />
+            </template>
+
+            <div class="post-editor__section-actions">
+              <button
+                type="button"
+                class="post-editor__spoiler-btn"
+                :class="{
+                  'post-editor__spoiler-btn--active': section.isSpoiler,
+                }"
+                :title="
+                  section.isSpoiler
+                    ? 'Show this section to everyone'
+                    : 'Hide this section behind a spoiler'
+                "
+                :aria-pressed="Boolean(section.isSpoiler)"
+                @click="toggleSpoiler(section)"
+              >
+                <IconEyeOff
+                  v-if="section.isSpoiler"
+                  :data-testid="`toggle-spoiler-${section.hash}`"
+                />
+                <IconEye
+                  v-else
+                  :data-testid="`toggle-spoiler-${section.hash}`"
+                />
+              </button>
+
+              <button
+                type="button"
+                class="post-editor__delete-btn"
+                @click="requestDeleteSection(section)"
+              >
+                <CloseIcon
+                  title="Delete"
+                  :data-testid="`delete-section-${section.hash}`"
+                />
+              </button>
+            </div>
           </div>
-        </div>
-      </template>
-    </Draggable>
+        </template>
+      </Draggable>
 
-    <PostEditorAddSectionButtons
-      v-if="sections.length < consts.POST_MAX_SECTIONS"
-      class="post-editor__add-section-buttons"
-      @add-section="createSection"
-    />
+      <PostEditorAddSectionButtons
+        v-if="sections.length < consts.POST_MAX_SECTIONS"
+        class="post-editor__add-section-buttons"
+        @add-section="createSection"
+      />
+    </div>
+
+    <div v-if="isPreview" class="post-editor__preview">
+      <Post
+        v-if="sections.length"
+        v-model:post="previewPost"
+        data-testid="post-preview"
+        :collapsible="false"
+        :interactive="false"
+      />
+
+      <p
+        v-else
+        class="post-editor__preview-empty"
+        data-testid="post-preview-empty"
+      >
+        Nothing to preview yet. Add a section and it shows up here the way
+        readers will see it.
+      </p>
+    </div>
 
     <ConfirmModal
       data-testid="confirm-delete-modal"
@@ -165,6 +197,7 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Draggable from 'vuedraggable';
+import Post from '../Post/Post.vue';
 import {
   hasSectionContent,
   isPictureSection,
@@ -175,6 +208,7 @@ import PostEditorAddSectionButtons from './PostEditorAddSectionButtons.vue';
 import PostEditorPicture from './PostEditorPicture.vue';
 import PostEditorTags from './PostEditorTags.vue';
 import PostEditorVideo from './PostEditorVideo.vue';
+import { buildPreviewPost } from './build-preview-post';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import * as consts from '@/const';
@@ -182,6 +216,7 @@ import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
+import BaseSegmentedControl from '@common/BaseSegmentedControl.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 import ConfirmModal from '@common/ConfirmModal.vue';
 import { TextEditorFeatures } from '@common/text-editor-features';
@@ -214,6 +249,46 @@ const sections = ref<postTypes.PostSection[]>([]);
 const isDirty = ref(false);
 
 const sectionPendingDeletion = ref<postTypes.PostSection | null>(null);
+
+const isPreview = ref(false);
+
+const modeOptions = [
+  { value: 'write', label: 'Write', dataTestid: 'write-mode-button' },
+  { value: 'preview', label: 'Preview', dataTestid: 'preview-mode-button' },
+];
+
+// A snapshot rather than a computed, since Post takes its post as a model
+const previewPost = ref<postTypes.Post>(
+  buildPreviewPost({ title: '', tags: [], sections: [], author: null }),
+);
+
+const openPreview = () => {
+  const user = userStore.user;
+
+  previewPost.value = buildPreviewPost({
+    title: title.value,
+    tags: tags.value,
+    sections: sections.value,
+    author: user
+      ? { _id: user._id, login: user.login, avatar: user.avatar }
+      : null,
+  });
+
+  isPreview.value = true;
+};
+
+const mode = computed({
+  get: () => (isPreview.value ? 'preview' : 'write'),
+  set: (value) => {
+    if (value === 'preview') {
+      openPreview();
+
+      return;
+    }
+
+    isPreview.value = false;
+  },
+});
 
 const validation = computed(() => {
   const validation = {
@@ -421,6 +496,24 @@ const saveDraft = async () => {
 
 <style>
 .post-editor {
+  &__mode {
+    margin-right: auto;
+    margin-bottom: 20px;
+    margin-left: auto;
+  }
+
+  /* Matches the gap write mode gets from the add-section buttons. */
+  &__preview {
+    margin-bottom: 32px;
+  }
+
+  &__preview-empty {
+    margin: 0;
+    padding: 3rem 1rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+  }
+
   &__title {
     margin-bottom: 12px;
     font-size: 20px;
