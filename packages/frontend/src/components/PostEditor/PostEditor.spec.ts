@@ -31,6 +31,9 @@ const testElements = {
   confirmModal: '[datatestid="confirm-delete-modal"]',
   deleteTextSection: '[data-testid="delete-section-text-1"]',
   deletePicSection: '[data-testid="delete-section-pic-1"]',
+  toggleTextSectionSpoiler: '[data-testid="toggle-spoiler-text-1"]',
+  textSectionSpoilerBadge: '[data-testid="spoiler-badge-text-1"]',
+  saveDraftButton: '[datatestid="save-draft-button"]',
 };
 
 function textSection(content: string): postTypes.PostTextSection {
@@ -202,5 +205,51 @@ describe('PostEditor delete section flow', () => {
     await nextTick();
 
     expect(api.users.removeFilePicSection).toHaveBeenCalledWith('pic-1');
+  });
+});
+
+describe('PostEditor spoiler flow', () => {
+  it('marks a section as a spoiler and back', async () => {
+    const wrapper = createWrapper([textSection('Some content')]);
+
+    await flushPromises();
+
+    await wrapper.find(testElements.toggleTextSectionSpoiler).trigger('click');
+    await nextTick();
+
+    expect(wrapper.find(testElements.textSectionSpoilerBadge).exists()).toBe(
+      true,
+    );
+
+    await wrapper.find(testElements.toggleTextSectionSpoiler).trigger('click');
+    await nextTick();
+
+    expect(wrapper.find(testElements.textSectionSpoilerBadge).exists()).toBe(
+      false,
+    );
+  });
+
+  it('sends the spoiler flag along with the section', async () => {
+    const wrapper = createWrapper([textSection('Some content')]);
+
+    vi.mocked(api.users.updateMyTemplate).mockResolvedValue({
+      title: '',
+      sections: [],
+      tags: [],
+    });
+
+    await flushPromises();
+
+    await wrapper.find(testElements.toggleTextSectionSpoiler).trigger('click');
+    await nextTick();
+
+    await wrapper.find(testElements.saveDraftButton).trigger('click');
+    await flushPromises();
+
+    expect(api.users.updateMyTemplate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sections: [expect.objectContaining({ isSpoiler: true })],
+      }),
+    );
   });
 });

@@ -25,7 +25,20 @@
       tag="transition-group"
     >
       <template #item="{ element: section }">
-        <div class="post-editor__section u-flex-row" data-testid="post-section">
+        <div
+          class="post-editor__section u-flex-row"
+          :class="{ 'post-editor__section--spoiler': section.isSpoiler }"
+          data-testid="post-section"
+        >
+          <span
+            v-if="section.isSpoiler"
+            class="post-editor__spoiler-badge"
+            :data-testid="`spoiler-badge-${section.hash}`"
+          >
+            <IconEyeOff />
+            Spoiler
+          </span>
+
           <!-- TODO: Refactor this part -->
           <template v-if="section.type === postTypes.POST_SECTION_TYPES.TEXT">
             <BaseTextEditor
@@ -55,16 +68,39 @@
             />
           </template>
 
-          <button
-            type="button"
-            class="post-editor__delete-btn"
-            @click="requestDeleteSection(section)"
-          >
-            <CloseIcon
-              title="Delete"
-              :data-testid="`delete-section-${section.hash}`"
-            />
-          </button>
+          <div class="post-editor__section-actions">
+            <button
+              type="button"
+              class="post-editor__spoiler-btn"
+              :class="{
+                'post-editor__spoiler-btn--active': section.isSpoiler,
+              }"
+              :title="
+                section.isSpoiler
+                  ? 'Show this section to everyone'
+                  : 'Hide this section behind a spoiler'
+              "
+              :aria-pressed="Boolean(section.isSpoiler)"
+              @click="toggleSpoiler(section)"
+            >
+              <IconEyeOff
+                v-if="section.isSpoiler"
+                :data-testid="`toggle-spoiler-${section.hash}`"
+              />
+              <IconEye v-else :data-testid="`toggle-spoiler-${section.hash}`" />
+            </button>
+
+            <button
+              type="button"
+              class="post-editor__delete-btn"
+              @click="requestDeleteSection(section)"
+            >
+              <CloseIcon
+                title="Delete"
+                :data-testid="`delete-section-${section.hash}`"
+              />
+            </button>
+          </div>
         </div>
       </template>
     </Draggable>
@@ -150,6 +186,8 @@ import BaseTextEditor from '@common/BaseTextEditor.vue';
 import ConfirmModal from '@common/ConfirmModal.vue';
 import { TextEditorFeatures } from '@common/text-editor-features';
 import CloseIcon from '@icons/IconExit.vue';
+import IconEye from '@icons/IconEye.vue';
+import IconEyeOff from '@icons/IconEyeOff.vue';
 
 const router = useRouter();
 
@@ -235,17 +273,22 @@ const createSection = (type: postTypes.POST_SECTION_TYPES) => {
 };
 
 const updatePictureSection = (data: postTypes.PostPictureSection) => {
-  const currentSection = sections.value.find(
+  const currentSectionIndex = sections.value.findIndex(
     (section) => isPictureSection(section) && section.url === data.url,
   );
 
-  if (!currentSection) {
+  if (currentSectionIndex === -1) {
     return;
   }
 
-  const currentSectionIndex = sections.value.indexOf(currentSection);
+  sections.value[currentSectionIndex] = {
+    ...data,
+    isSpoiler: sections.value[currentSectionIndex].isSpoiler,
+  };
+};
 
-  sections.value[currentSectionIndex] = data;
+const toggleSpoiler = (section: postTypes.PostSection) => {
+  section.isSpoiler = !section.isSpoiler;
 };
 
 const requestDeleteSection = (section: postTypes.PostSection) => {
@@ -425,6 +468,34 @@ const saveDraft = async () => {
       }
     }
 
+    &--spoiler {
+      outline: 1px dashed var(--color-warning);
+      outline-offset: 4px;
+
+      @media (--phone-only) {
+        outline-offset: 0;
+      }
+
+      /* Shows the author what a reader sees, and lifts as soon as the section
+         is reached so it never stands in the way of editing. */
+      &::after {
+        position: absolute;
+        opacity: 1;
+        z-index: 1;
+        border-radius: 8px;
+        inset: 0;
+        content: '';
+        pointer-events: none;
+        transition: opacity 250ms ease-out;
+        backdrop-filter: blur(8px);
+      }
+
+      &:hover::after,
+      &:focus-within::after {
+        opacity: 0;
+      }
+    }
+
     &-enter-active,
     &-leave-active {
       transition: all 0.3s;
@@ -437,28 +508,76 @@ const saveDraft = async () => {
     }
   }
 
-  &__delete-btn {
+  &__spoiler-badge {
+    display: flex;
+    align-items: center;
     position: absolute;
+    top: -10px;
+    left: 16px;
+    z-index: 2;
+    gap: 4px;
+    padding: 2px 8px;
+    border: 1px dashed var(--color-warning);
+    border-radius: 999px;
+    background: var(--color-surface-secondary);
+    color: var(--color-warning);
+    font-size: 0.75rem;
+    font-weight: bold;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      fill: var(--color-warning);
+    }
+  }
+
+  &__section-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    top: 0;
     right: -20px;
+    z-index: 2;
+    gap: 12px;
+
+    @media (--phone-only) {
+      flex-direction: row;
+      top: -14px;
+      right: 12px;
+    }
+  }
+
+  &__spoiler-btn,
+  &__delete-btn {
+    display: flex;
     padding: 0;
     border: none;
     background-color: transparent;
-
-    @media (--phone-only) {
-      top: -14px;
-      right: 12px;
-      width: 10px;
-    }
 
     &:hover {
       filter: brightness(120%);
     }
 
     svg {
+      width: 18px;
+      height: 18px;
       cursor: pointer;
       transition: fill 0.3s ease-in-out;
-      fill: var(--color-danger);
     }
+  }
+
+  &__delete-btn svg {
+    fill: var(--color-danger);
+  }
+
+  &__spoiler-btn svg {
+    fill: var(--color-text-secondary);
+  }
+
+  &__spoiler-btn--active svg,
+  &__spoiler-btn:hover svg {
+    fill: var(--color-warning);
   }
 
   &__add-section-buttons {
