@@ -429,6 +429,58 @@ describe('POST /posts', () => {
     });
   });
 
+  it('Should keep the spoiler flag of a section', async () => {
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+    const response = await request(global.app)
+      .post('/api/posts')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send({
+        ...requiredPostFields,
+        sections: [
+          {
+            type: POST_SECTION_TYPES.TEXT,
+            content: 'A spoiler section',
+            isSpoiler: true,
+          },
+        ],
+      });
+
+    const postFromDb = await PostModel.findById(response.body._id).lean();
+
+    expect(postFromDb!.sections[0]).toMatchObject({ isSpoiler: true });
+  });
+
+  it('Should normalize the spoiler flag of a section to a boolean', async () => {
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+    const response = await request(global.app)
+      .post('/api/posts')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send({
+        ...requiredPostFields,
+        sections: [
+          {
+            type: POST_SECTION_TYPES.TEXT,
+            content: 'A section flagged with something truthy',
+            isSpoiler: 'yes',
+          },
+          {
+            type: POST_SECTION_TYPES.TEXT,
+            content: 'A section that is not a spoiler',
+            isSpoiler: false,
+          },
+        ],
+      });
+
+    const postFromDb = await PostModel.findById(response.body._id).lean();
+
+    expect(postFromDb!.sections[0]).toMatchObject({ isSpoiler: true });
+    expect(postFromDb!.sections[1]).not.toHaveProperty('isSpoiler');
+  });
+
   it('Should normalize tags before adding the post to the database', async () => {
     const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 

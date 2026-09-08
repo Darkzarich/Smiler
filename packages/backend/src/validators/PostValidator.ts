@@ -197,6 +197,12 @@ export class PostValidator {
         }
       }
 
+      if (section.isSpoiler) {
+        section.isSpoiler = true;
+      } else {
+        delete section.isSpoiler;
+      }
+
       if (section.hash?.length !== 4) {
         section.hash = nanoid(4);
       }

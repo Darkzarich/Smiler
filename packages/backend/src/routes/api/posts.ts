@@ -190,6 +190,11 @@ const router = express.Router();
           },
           "hash": {
             "type": "string"
+          },
+          "isSpoiler": {
+            "description": "Hides the section behind a blur the reader clicks to lift",
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -211,6 +216,11 @@ const router = express.Router();
           "isFile": {
             "type": "boolean",
             "default": false
+          },
+          "isSpoiler": {
+            "description": "Hides the section behind a blur the reader clicks to lift",
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -228,6 +238,11 @@ const router = express.Router();
           },
           "hash": {
             "type": "string"
+          },
+          "isSpoiler": {
+            "description": "Hides the section behind a blur the reader clicks to lift",
+            "type": "boolean",
+            "default": false
           }
         }
       }
