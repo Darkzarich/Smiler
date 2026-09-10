@@ -24,7 +24,7 @@
       </RouterLink>
 
       <Navigation
-        v-if="isDesktop()"
+        v-if="!isPhone"
         nav-link-class="header__nav-link"
         class="header__navigation u-flex-row"
       >
@@ -51,7 +51,7 @@
         </BaseInput>
       </div>
 
-      <ThemeToggle v-if="isDesktop()" class="header__theme-toggle" />
+      <ThemeToggle v-if="!isPhone" class="header__theme-toggle" />
 
       <div v-if="user" class="header__avatar">
         <!-- TODO: Move everything like that to its own component AvatarLink or something -->
@@ -80,6 +80,7 @@ import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import HeaderMobileMenu from './HeaderMobileMenu.vue';
 import SiteLogo from './SiteLogo.vue';
+import { useMediaQuery } from '@/composables/use-media-query';
 import { useUserStore } from '@/store/user';
 import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseInput from '@common/BaseInput.vue';
@@ -88,12 +89,13 @@ import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
 import ThemeToggle from '@components/Theme/ThemeToggle.vue';
 import IconMenuMobile from '@icons/IconMenuMobile.vue';
 import IconSearch from '@icons/IconSearch.vue';
-import { isDesktop } from '@utils/is-desktop';
 
 const route = useRoute();
 const router = useRouter();
 
 const { user } = storeToRefs(useUserStore());
+
+const isPhone = useMediaQuery('phone-only');
 
 const isMobileMenuOpen = ref(false);
 const searchInputValue = ref('');
@@ -195,10 +197,6 @@ watch(
     align-items: center;
     gap: 16px;
     margin-left: 4rem;
-
-    @media (--phone-only) {
-      margin-left: 0;
-    }
   }
 
   &__nav-link {

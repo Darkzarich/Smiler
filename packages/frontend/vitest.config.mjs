@@ -11,6 +11,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    // Vitest blanks out CSS imports, which would empty the `?raw` breakpoint
+    // source the media query composable parses.
+    css: { include: [/media\.css/] },
     include: ['src/**/*.spec.ts', 'src/**/*.test.ts'],
     coverage: {
       provider: 'v8',

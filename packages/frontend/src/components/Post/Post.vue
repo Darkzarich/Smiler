@@ -51,7 +51,7 @@
               slug: post.slug,
             },
           }"
-          :target="isMobile() ? '' : '_blank'"
+          :target="isPhone ? '' : '_blank'"
           :data-testid="`post-${post._id}-title`"
         >
           {{ post.title }}
@@ -193,7 +193,7 @@
           <RouterLink
             class="post__comments-count"
             :data-testid="`post-${post._id}-comments-count`"
-            :target="isMobile() ? '' : '_blank'"
+            :target="isPhone ? '' : '_blank'"
             :to="{
               name: 'Single',
               hash: '#comments',
@@ -258,6 +258,7 @@ import {
 } from './is-section-of-type';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
+import { useMediaQuery } from '@/composables/use-media-query';
 import { POST_RATE_VALUE } from '@/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
@@ -272,7 +273,6 @@ import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';
 import IconPlus from '@icons/IconPlus.vue';
-import { isMobile } from '@utils/is-mobile';
 
 interface Props {
   canEdit?: boolean;
@@ -293,6 +293,8 @@ const post = defineModel<postTypes.Post>('post', {
 });
 
 const router = useRouter();
+
+const isPhone = useMediaQuery('phone-only');
 
 const isRequesting = ref(false);
 

@@ -46,7 +46,7 @@ pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push
   - Run: `pnpm --filter frontend test:e2e:ci`
 - **Path aliases**: `@/*`, `@components/*`, `@common/*`, `@icons/*`, `@utils/*`
 - **Linting**: separate ESLint (`.js/.ts/.vue`) and Stylelint (`.css/.vue`) passes
-- **Styles**: plain CSS through PostCSS (`postcss.config.mjs`) — there is no Sass. `postcss-nested` gives Sass-style nesting including `&__element` BEM concatenation, which the CSS spec's own nesting cannot do. Breakpoints are `@custom-media` in `src/styles/media.css`, injected into every file by `@csstools/postcss-global-data`, so a component writes `@media (--phone-only)` with no import. Add a breakpoint there, not inline.
+- **Styles**: plain CSS through PostCSS (`postcss.config.mjs`) — there is no Sass. `postcss-nested` gives Sass-style nesting including `&__element` BEM concatenation, which the CSS spec's own nesting cannot do. Breakpoints are `@custom-media` in `src/styles/media.css`, injected into every file by `@csstools/postcss-global-data`, so a component writes `@media (--phone-only)` with no import. Add a breakpoint there, not inline. Responsive differences belong in CSS; reach for the `useMediaQuery('phone-only')` composable only when the DOM itself has to differ (an attribute, or a subtree that would otherwise be duplicated). It parses the same `media.css`, so there is one definition per breakpoint for both languages.
 - Vue component style: PascalCase component names in templates; blank lines between `<template>`/`<script>`/`<style>` blocks.
 - `vuedraggable@4.1.0` is patched — see `patches/` directory.
 

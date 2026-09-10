@@ -18,9 +18,6 @@ vi.mock('vue-router', async () => {
   };
 });
 
-// jsdom has no matchMedia, which is all this util reads
-vi.mock('@utils/is-mobile', () => ({ isMobile: () => false }));
-
 vi.mock('@/api', () => ({
   api: {
     posts: {

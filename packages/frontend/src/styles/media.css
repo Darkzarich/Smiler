@@ -2,10 +2,14 @@
 
    Injected into each file by @csstools/postcss-global-data, so nothing has to
    import this. Definitions that go unused emit no CSS, so the full scale is kept
-   here as the single place a breakpoint is defined. */
+   here as the single place a breakpoint is defined.
 
-@custom-media --phone-only (max-width: 599px);
-@custom-media --tablet-portrait-up (min-width: 600px);
-@custom-media --tablet-landscape-up (min-width: 900px);
-@custom-media --desktop-up (min-width: 1200px);
-@custom-media --big-desktop-up (min-width: 1800px);
+   Range syntax, so that neighboring breakpoints share one boundary literal and
+   no viewport width can fall between them. esbuild lowers it to the legacy
+   min-width form for build targets that predate it. */
+
+@custom-media --phone-only (width < 600px);
+@custom-media --tablet-portrait-up (width >= 600px);
+@custom-media --tablet-landscape-up (width >= 900px);
+@custom-media --desktop-up (width >= 1200px);
+@custom-media --big-desktop-up (width >= 1800px);

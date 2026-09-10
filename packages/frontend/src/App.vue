@@ -9,7 +9,7 @@
         <RouterView />
       </main>
 
-      <div v-if="isDesktop()" class="content__sidebar">
+      <div v-if="!isPhone" class="content__sidebar">
         <CurrentUser />
       </div>
     </div>
@@ -20,16 +20,18 @@
 
 <script setup lang="ts">
 import { onBeforeMount, onMounted, ref } from 'vue';
+import { useMediaQuery } from '@/composables/use-media-query';
 import { useThemeStore } from '@/store/theme';
 import { useUserStore } from '@/store/user';
 import FooterElement from '@components/FooterElement.vue';
 import HeaderElement from '@components/Header/HeaderElement.vue';
 import NotificationList from '@components/NotificationList/NotificationList.vue';
 import CurrentUser from '@components/User/CurrentUser.vue';
-import { isDesktop } from '@utils/is-desktop';
 
 const userStore = useUserStore();
 const themeStore = useThemeStore();
+
+const isPhone = useMediaQuery('phone-only');
 
 const isShow = ref(false);
 
@@ -122,10 +124,6 @@ h6 {
 
   &__sidebar {
     width: 26%;
-
-    @media (--phone-only) {
-      display: none;
-    }
   }
 }
 </style>
