@@ -3,7 +3,6 @@ import { differenceInMilliseconds } from 'date-fns';
 import {
   PostModel,
   POST_SECTION_TYPES,
-  Post,
   postToResponse,
   PostResponse,
 } from '@models/Post';
@@ -11,18 +10,16 @@ import { POST_TIME_TO_UPDATE } from '@constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '@errors';
 import { removeFileByPath } from '@utils/remove-file-by-path';
 import { sendSuccess } from '@utils/response-utils';
-import { PostValidator } from '@validators/PostValidator';
-
-interface UpdateByIdParams {
-  id: string;
-}
-
-type UpdateByIdBody = Partial<Pick<Post, 'title' | 'sections' | 'tags'>>;
+import {
+  assertOwnUploadedPictures,
+  type PostIdParams,
+  type PostUpdateBody,
+} from '@validators/posts';
 
 type UpdateByIdResponse = PostResponse;
 
 export async function updateById(
-  req: Request<UpdateByIdParams, unknown, UpdateByIdBody>,
+  req: Request<PostIdParams, unknown, PostUpdateBody>,
   res: Response<UpdateByIdResponse>,
 ) {
   const { userId } = req.session;
@@ -47,18 +44,14 @@ export async function updateById(
     throw new ForbiddenError(ERRORS.POST_CAN_EDIT_WITHIN_TIME);
   }
 
+  // What the request left out keeps the value the post already has.
   const {
-    title,
-    sections: newSections,
-    tags,
-  } = PostValidator.validateAndPrepare(
-    {
-      title: req.body.title || targetPost.title,
-      sections: req.body.sections || targetPost.sections,
-      tags: req.body.tags ?? targetPost.tags,
-    },
-    userId!,
-  );
+    title = targetPost.title,
+    sections: newSections = targetPost.sections,
+    tags = targetPost.tags,
+  } = req.body;
+
+  assertOwnUploadedPictures(newSections, userId!);
 
   const filePathsToDelete: string[] = [];
 
@@ -80,7 +73,7 @@ export async function updateById(
 
   const updatedPost = await PostModel.findByIdAndUpdate(
     postId,
-    { $set: { title, tags: tags || [], sections: newSections } },
+    { $set: { title, tags, sections: newSections } },
     {
       new: true,
       lean: true,

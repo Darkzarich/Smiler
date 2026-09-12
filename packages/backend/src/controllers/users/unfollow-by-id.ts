@@ -2,12 +2,9 @@ import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
 import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
+import type { UserIdParams } from '@validators/users';
 
-interface Params {
-  id: string;
-}
-
-export async function unfollowById(req: Request<Params>, res: Response) {
+export async function unfollowById(req: Request<UserIdParams>, res: Response) {
   const { id } = req.params;
   const { userId } = req.session;
 

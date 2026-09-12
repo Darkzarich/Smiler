@@ -5,11 +5,13 @@ import {
   POST_MAX_UPLOAD_IMAGE_SIZE,
   POST_TIME_TO_UPDATE,
   POST_TITLE_MAX_LENGTH,
+  USER_MAX_BIO_LENGTH,
 } from '@constants/index';
 
 export const ERRORS = {
   NOT_FOUND: 'Not Found',
   INVALID_REQUEST_DATA: 'The request contains invalid or malformed data',
+  INVALID_ID: 'Must be a valid id: 24 hexadecimal characters',
   RESOURCE_CONFLICT: 'This operation conflicts with an existing resource',
   UNAUTHORIZED: 'Auth is required for this operation. Please sign in.',
   CSRF_INVALID: 'Invalid or missing CSRF token',
@@ -32,6 +34,7 @@ export const ERRORS = {
   USER_AVATAR_INVALID: 'Invalid avatar image url',
   USER_AVATAR_URL_REQUIRED: 'Avatar image url is required',
   USER_UPDATE_FIELD_INVALID: 'User update fields must be strings',
+  USER_BIO_MAX_LENGTH_EXCEEDED: `Bio can't be longer than ${USER_MAX_BIO_LENGTH} characters`,
 
   TARGET_IS_NOT_RATED: "It's not yet rated by the current user",
   AUTHOR_NOT_FOUND: 'Author is not found',

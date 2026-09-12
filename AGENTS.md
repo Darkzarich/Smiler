@@ -32,7 +32,7 @@ pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push
   - Test files: `tests/**/*.spec.ts`
   - Global setup spins up an in-memory MongoDB on port 27018; sets `DB_URL` automatically.
   - Run single test: `pnpm --filter backend test -- tests/integration/some-file.spec.ts`
-- **Path aliases** (tsconfig + ts-node): `@config/*`, `@routes/*`, `@controllers/*`, `@middlewares/*`, `@libs/*`, `@models/*`, `@utils/*`, `@validators/*`, `@constants/*`, `@type/*`, `@errors`, `@test-utils/*`, `@test-data-generators`
+- **Path aliases** (tsconfig + ts-node): `@config/*`, `@routes/*`, `@controllers/*`, `@middlewares/*`, `@libs/*`, `@models/*`, `@utils/*`, `@validators/*`, `@constants/*`, `@type/*`, `@errors`, `@test-utils/*`, `@test-data-generators`. Jest's `moduleNameMapper` is derived from the tsconfig paths, so a new alias only has to be added there.
 - `.env` file required at repo root (copy from `.env.example`). Backend reads it via dotenv.
 - **Environment variables** are declared once, in `src/config/env.ts`, as a [zod](https://github.com/colinhacks/zod)
   schema that `src/config/index.ts` parses at boot. A bad or missing variable prints every problem at
@@ -40,7 +40,24 @@ pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push
   string. Read a new variable by adding it to that schema — never `process.env` at the point of use —
   and add it to `.env.example` in the same change. The schema cannot use the logger (the logger reads
   its level from the config), so failures go to `console.error`.
-- Swagger docs at `/api-docs/` when running.
+- **Request validation and the API docs are one declaration.** Every endpoint is registered through
+  `createApiRouter` (`src/libs/api-router.ts`) with its zod schemas for `params`, `query` and
+  `body`: the router mounts the validating middleware _and_ records the same schemas for the
+  OpenAPI document, so the two cannot drift. Schemas live in `src/validators/<resource>.ts`, and
+  `apiSchema('Name', schema)` gives one a name under `components/schemas`.
+  - The middleware (`src/middlewares/validate.ts`) replaces `req.params`, `req.query` and
+    `req.body` with the parsed values, so a controller reads typed data (`z.infer` of the same
+    schema) and does no shape checking of its own. A failure is a 422 carrying the first issue's
+    message, plus a `details` array naming every field that failed. Since the first issue is what
+    the UI shows, declare the fields of a body in the order the form fills them in.
+  - A schema covers shape, format and limits. Checks that need the session or the database — does
+    this uploaded picture belong to you, does this post exist — stay in the controller; see
+    `assertOwnUploadedPictures`.
+  - An empty query parameter (`?limit=`) is treated as absent, so schemas do not repeat that.
+  - `401`, `403`, `422`, `429` and `500` are added to the document from how the route is wired, so
+    a route declares only its success response and the failures peculiar to it.
+- Swagger UI at `/api-docs/`, and the document itself at `/api-docs/openapi.json` (**OpenAPI
+  3.1**, generated from the registered routes at boot). Both are off in production and under Jest.
 
 ## Frontend (`packages/frontend`)
 

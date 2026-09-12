@@ -2,7 +2,6 @@ import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
 import { CommentModel } from '@models/Comment';
 import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
-import { CommentValidator } from '@validators/CommentValidator';
 import {
   ForbiddenError,
   NotFoundError,
@@ -10,22 +9,15 @@ import {
   ERRORS,
 } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-
-interface UpdateByIdParams {
-  id: string;
-}
-
-interface UpdateByIdBody {
-  body: string;
-}
+import type { CommentIdParams, CommentUpdateBody } from '@validators/comments';
 
 export async function updateById(
-  req: Request<UpdateByIdParams, unknown, UpdateByIdBody>,
+  req: Request<CommentIdParams, unknown, CommentUpdateBody>,
   res: Response,
 ) {
   const { userId } = req.session;
   const { id } = req.params;
-  let { body } = req.body;
+  const { body } = req.body;
 
   const comment = await CommentModel.findOne({
     _id: id,
@@ -50,8 +42,6 @@ export async function updateById(
   ) {
     throw new ForbiddenError(ERRORS.COMMENT_CAN_EDIT_WITHIN_TIME);
   }
-
-  body = CommentValidator.validateAndPrepareBody(body);
 
   const updatedComment = await CommentModel.findByIdAndUpdate(
     comment._id,

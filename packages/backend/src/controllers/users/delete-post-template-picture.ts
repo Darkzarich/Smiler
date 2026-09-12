@@ -3,14 +3,11 @@ import { UserModel } from '@models/User';
 import { NotFoundError, BadRequestError, ERRORS } from '@errors';
 import { removeFileByPath } from '@utils/remove-file-by-path';
 import { sendSuccess } from '@utils/response-utils';
+import type { TemplateSectionParams } from '@validators/users';
 import { PostPictureSection, POST_SECTION_TYPES } from '@models/Post';
 
-interface DeletePostTemplatePictureParams {
-  hash?: string;
-}
-
 export async function deletePostTemplatePicture(
-  req: Request<DeletePostTemplatePictureParams>,
+  req: Request<TemplateSectionParams>,
   res: Response,
 ) {
   const { hash } = req.params;

@@ -5,15 +5,12 @@ import { RateModel, RateTargetModel } from '@models/Rate';
 import { POST_RATE_VALUE } from '@constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-
-interface UnvoteByIdParams {
-  id: string;
-}
+import type { PostIdParams } from '@validators/posts';
 
 type UnvoteByIdResponse = Post;
 
 export async function unvoteById(
-  req: Request<UnvoteByIdParams>,
+  req: Request<PostIdParams>,
   res: Response<UnvoteByIdResponse>,
 ) {
   const { userId } = req.session;

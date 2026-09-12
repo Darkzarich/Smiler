@@ -10,7 +10,7 @@ export function asyncControllerErrorHandler(
     req: Request<any, any, any, any>,
     res: Response,
     next: NextFunction,
-  ) => Promise<void>,
+  ) => Promise<void> | void,
 ) {
   return (
     req: Request<any, any, any, any>,
@@ -23,6 +23,8 @@ export function asyncControllerErrorHandler(
       req.body = {};
     }
 
-    fn(req, res, next).catch((e: Error) => next(e));
+    // Wrapped rather than called directly: a handler with nothing to await is
+    // written as a plain function and has no `catch` of its own.
+    Promise.resolve(fn(req, res, next)).catch((e: Error) => next(e));
   };
 }

@@ -1,1097 +1,296 @@
-import express from 'express';
-import { asyncControllerErrorHandler } from '@utils/async-controller-error-handler';
 import {
-  getListByAuthor,
-  search,
-  create,
   all,
-  today,
   blowing,
-  recent,
-  topThisWeek,
-  getFeed,
-  getBySlug,
-  updateById,
+  create,
   deleteById,
+  getBySlug,
+  getFeed,
+  getListByAuthor,
+  recent,
+  search,
+  today,
+  topThisWeek,
+  unvoteById,
   upload,
   uploadByUrl,
+  updateById,
   voteById,
-  unvoteById,
 } from '@controllers/posts';
-import authRequiredMiddleware from '@middlewares/auth-required';
+import { createApiRouter } from '@libs/api-router';
 import {
+  apiRateLimiter,
   uploadRateLimiter,
-  writeRateLimiter,
   voteRateLimiter,
-  apiRateLimiter,
+  writeRateLimiter,
 } from '@middlewares/rate-limiter';
+import { okResponseSchema, voteBodySchema } from '@validators/common';
+import {
+  cursorPostListSchema,
+  externalImageBodySchema,
+  postCreateBodySchema,
+  postFeedQuerySchema,
+  postIdParamsSchema,
+  postIndexQuerySchema,
+  postListQuerySchema,
+  postListSchema,
+  postPictureSectionSchema,
+  postSchema,
+  postSlugParamsSchema,
+  postUpdateBodySchema,
+  storedPostSchema,
+} from '@validators/posts';
 
-const router = express.Router();
+const api = createApiRouter({
+  prefix: '/posts',
+  tag: 'Posts',
+  tagDescription: 'Reading, writing and voting on posts',
+});
 
-/**
-@swagger
-{
-  "tags": [
-    {
-      "name": "Posts",
-      "description": "Actions with posts"
-    }
-  ],
-  "components": {
-    "parameters": {
-      "post-limit": {
-        "description": "posts per page",
-        "in": "query",
-        "name": "limit",
-        "required": true,
-        "schema": {
-          "type": "number",
-          "default": 15,
-          "maximum": 15,
-          "minimum": 1
-        }
-      },
-      "post-offset": {
-        "description": "offset from element",
-        "in": "query",
-        "name": "offset",
-        "required": true,
-        "schema": {
-          "type": "number",
-          "default": 0
-        }
-      },
-      "post-cursor": {
-        "description": "`nextCursor` of the previous page. Opaque, and mutually exclusive with `offset`. Omit it to get the first page",
-        "in": "query",
-        "name": "cursor",
-        "required": false,
-        "schema": {
-          "type": "string"
-        }
-      }
-    },
-    "schemas": {
-      "Post": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "commentCount": {
-            "description": "number of comments in a post",
-            "type": "number"
-          },
-          "title": {
-            "type": "string"
-          },
-          "sections": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PostSection"
-            }
-          },
-          "author": {
-            "$ref": "#/components/schemas/Author"
-          },
-          "slug": {
-            "type": "string",
-            "example": "My-post-title-d2k5g8"
-          },
-          "createdAt": {
-            "type": "string",
-            "example": "2019-08-21T22:05:44.788Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "example": "2019-09-22T14:02:14.532Z"
-          },
-          "rating": {
-            "type": "number"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "rated": {
-            "$ref": "#/components/schemas/UserRate"
-          }
-        }
-      },
-      "PostList": {
-        "type": "object",
-        "properties": {
-          "posts": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Post"
-            }
-          },
-          "hasNextPage": {
-            "type": "boolean"
-          }
-        }
-      },
-      "PostListWithCursor": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/PostList"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "nextCursor": {
-                "description": "Pass as `cursor` to get the next page. `null` on the last page",
-                "type": "string",
-                "nullable": true
-              }
-            }
-          }
-        ]
-      },
-      "UserRate": {
-        "type": "object",
-        "properties": {
-          "isRated": {
-            "type": "boolean"
-          },
-          "negative": {
-            "type": "boolean"
-          }
-        }
-      },
-      "PostSection": {
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/PostSectionText"
-          },
-          {
-            "$ref": "#/components/schemas/PostSectionImage"
-          },
-          {
-            "$ref": "#/components/schemas/PostSectionVideo"
-          }
-        ]
-      },
-      "PostSectionText": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "text"
-            ]
-          },
-          "content": {
-            "type": "string",
-            "maxLength": 4500
-          },
-          "hash": {
-            "type": "string"
-          },
-          "isSpoiler": {
-            "description": "Hides the section behind a blur the reader clicks to lift",
-            "type": "boolean",
-            "default": false
-          }
-        }
-      },
-      "PostSectionImage": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "pic"
-            ]
-          },
-          "url": {
-            "type": "string"
-          },
-          "hash": {
-            "type": "string"
-          },
-          "isFile": {
-            "type": "boolean",
-            "default": false
-          },
-          "isSpoiler": {
-            "description": "Hides the section behind a blur the reader clicks to lift",
-            "type": "boolean",
-            "default": false
-          }
-        }
-      },
-      "PostSectionVideo": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "vid"
-            ]
-          },
-          "url": {
-            "type": "string"
-          },
-          "hash": {
-            "type": "string"
-          },
-          "isSpoiler": {
-            "description": "Hides the section behind a blur the reader clicks to lift",
-            "type": "boolean",
-            "default": false
-          }
-        }
-      }
-    }
-  }
-}
-*/
+const postListResponse = {
+  200: { description: 'One page of posts', schema: postListSchema },
+};
 
-/**
-@swagger
-{
-  "/posts": {
-    "get": {
-      "tags": [
-        "Posts"
-      ],
-      "description": "Get all posts. Sorted by rating, or by the date of creation when `author` is given — only the latter accepts a `cursor`",
-      "summary": "Get all posts",
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/post-limit"
-        },
-        {
-          "$ref": "#/components/parameters/post-offset"
-        },
-        {
-          "$ref": "#/components/parameters/post-cursor"
-        },
-        {
-          "in": "query",
-          "name": "tags",
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "explode": true
-        },
-        {
-          "in": "query",
-          "name": "author",
-          "schema": {
-            "type": "string"
-          },
-          "description": "By author"
-        },
-        {
-          "in": "query",
-          "name": "title",
-          "description": "Search posts by whole words of their title, case-insensitive",
-          "schema": {
-            "type": "string"
-          }
-        },
-        {
-          "in": "query",
-          "name": "dateFrom",
-          "description": "Show posts posted after `dateFrom`",
-          "schema": {
-            "type": "string"
-          },
-          "example": "2019-08-21T22:05:44.788Z"
-        },
-        {
-          "in": "query",
-          "name": "dateTo",
-          "description": "Show posts posted before `dateTo`",
-          "schema": {
-            "type": "string"
-          },
-          "example": "2019-09-21T22:05:44.788Z"
-        },
-        {
-          "in": "query",
-          "name": "ratingFrom",
-          "description": "Show posts posted with rating above `ratingFrom`",
-          "schema": {
-            "type": "string"
-          }
-        },
-        {
-          "in": "query",
-          "name": "ratingTo",
-          "description": "Show posts posted with rating below `ratingTo`",
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostListWithCursor"
-              }
-            }
-          }
-        }
-      }
-    },
-    "post": {
-      "tags": [
-        "Posts"
-      ],
-      "description": "Create a post with `title` and `sections`. Creating a post clears the template.",
-      "summary": "create a post",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "requestBody": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "required": [
-                "title",
-                "sections"
-              ],
-              "properties": {
-                "title": {
-                  "type": "string"
-                },
-                "sections": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PostSection"
-                  }
-                },
-                "tags": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Post"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "422": {
-          "$ref": "#/components/responses/UnprocessableEntity"
-        }
-      }
-    }
-  }
-}
-*/
-router.get(
-  '/',
-  apiRateLimiter,
-  asyncControllerErrorHandler((req, res) => {
+const cursorPostListResponse = {
+  200: {
+    description: 'One page of posts, newest first',
+    schema: cursorPostListSchema,
+  },
+};
+
+const voteResponses = {
+  200: {
+    description: 'The post with its new rating',
+    schema: storedPostSchema,
+  },
+  403: {
+    description: 'Your own post, or one you have already voted on',
+  },
+  404: { description: 'No such post' },
+};
+
+api.get({
+  path: '/',
+  summary: "Search posts, or list one author's posts",
+  description:
+    "With `author`, lists that author's posts newest first. Without it, searches every post by title, date, rating and tags, highest rated first.",
+  rateLimiter: apiRateLimiter,
+  request: { query: postIndexQuerySchema },
+  responses: {
+    ...cursorPostListResponse,
+    404: { description: 'No author with that login' },
+  },
+  handler: (req, res) => {
     if (req.query.author) {
       return getListByAuthor(req, res);
     }
 
     return search(req, res);
-  }),
-);
-
-router.post(
-  '/',
-  authRequiredMiddleware,
-  writeRateLimiter,
-  asyncControllerErrorHandler(create),
-);
-
-/**
-@swagger
-{
-  "/posts/categories/all": {
-    "get": {
-      "tags": [
-        "Posts"
-      ],
-      "description": "Get all posts sorted by rating",
-      "summary": "Get posts",
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/post-limit"
-        },
-        {
-          "$ref": "#/components/parameters/post-offset"
-        },
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostList"
-              }
-            }
-          }
-        },
-      }
-    }
-  }
-}
-*/
-
-router.get('/categories/all', apiRateLimiter, asyncControllerErrorHandler(all));
-
-/**
-@swagger
-{
-  "/posts/categories/today": {
-    "get": {
-      "tags": [
-        "Posts"
-      ],
-      "description": "Get today's posts sorted by rating",
-      "summary": "Get today's posts",
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/post-limit"
-        },
-        {
-          "$ref": "#/components/parameters/post-offset"
-        },
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostList"
-              }
-            }
-          }
-        },
-      }
-    }
-  }
-}
-*/
-
-router.get(
-  '/categories/today',
-  apiRateLimiter,
-  asyncControllerErrorHandler(today),
-);
-
-/**
-@swagger
-{
-  "/posts/categories/blowing": {
-    "get": {
-      "tags": [
-        "Posts"
-      ],
-      "description": "Get posts posted in the last hour and with rating 50 or more, sorted by rating",
-      "summary": "Get blowing posts",
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/post-limit"
-        },
-        {
-          "$ref": "#/components/parameters/post-offset"
-        },
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostList"
-              }
-            }
-          }
-        },
-      }
-    }
-  }
-}
-*/
-
-router.get(
-  '/categories/blowing',
-  apiRateLimiter,
-  asyncControllerErrorHandler(blowing),
-);
-
-/**
-@swagger
-{
-  "/posts/categories/recent": {
-    "get": {
-      "tags": [
-        "Posts"
-      ],
-      "description": "Get posts posted in the last two hours, sorted by the date of creation",
-      "summary": "Get recent posts",
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/post-limit"
-        },
-        {
-          "$ref": "#/components/parameters/post-offset"
-        },
-        {
-          "$ref": "#/components/parameters/post-cursor"
-        },
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostListWithCursor"
-              }
-            }
-          }
-        },
-      }
-    }
-  }
-}
-*/
-
-router.get(
-  '/categories/recent',
-  apiRateLimiter,
-  asyncControllerErrorHandler(recent),
-);
-
-/**
-@swagger
-{
-  "/posts/categories/top-this-week": {
-    "get": {
-      "tags": [
-        "Posts"
-      ],
-      "description": "Get posts posted from the start of the week, sorted by rating",
-      "summary": "Get top posts",
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/post-limit"
-        },
-        {
-          "$ref": "#/components/parameters/post-offset"
-        },
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostList"
-              }
-            }
-          }
-        },
-      }
-    }
-  }
-}
-*/
-
-router.get(
-  '/categories/top-this-week',
-  apiRateLimiter,
-  asyncControllerErrorHandler(topThisWeek),
-);
-
-/**
-@swagger
-{
-  "/posts/feed": {
-    "get": {
-      "tags": [
-        "Posts"
-      ],
-      "description": "Get feed",
-      "summary": "Get feed",
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/post-limit"
-        },
-        {
-          "$ref": "#/components/parameters/post-offset"
-        },
-        {
-          "$ref": "#/components/parameters/post-cursor"
-        },
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostListWithCursor"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        }
-      }
-    }
-  }
-}
-*/
-
-router.get(
-  '/feed',
-  authRequiredMiddleware,
-  apiRateLimiter,
-  asyncControllerErrorHandler(getFeed),
-);
-
-/**
-@swagger
-{
-  "/posts/{id}": {
-    "put": {
-      "tags": [
-        "Posts"
-      ],
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "description": "Edit a post. You can edit a post only within certain time after it is created",
-      "summary": "edit a post",
-      "parameters": [
-        {
-          "in": "path",
-          "name": "id",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "requestBody": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "type": "string"
-                },
-                "tags": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "sections": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PostSection"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Post"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "403": {
-          "$ref": "#/components/responses/Forbidden"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        }
-      }
-    },
-    "delete": {
-      "tags": [
-        "Posts"
-      ],
-      "summary": "delete a post by its Id",
-      "description": "delete a post by its `Id`",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "parameters": [
-        {
-          "in": "path",
-          "name": "id",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "responses": {
-        "200": {
-          "$ref": "#/components/responses/OK"
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "403": {
-          "$ref": "#/components/responses/Forbidden"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        }
-      }
-    }
   },
-  "/posts/{slug}": {
-    "get": {
-      "tags": [
-        "Posts"
-      ],
-      "summary": "get a post by its slug",
-      "description": "Get a post by its `slug`",
-      "parameters": [
-        {
-          "in": "path",
-          "name": "slug",
-          "schema": {
-            "type": "string"
+});
+
+api.post({
+  path: '/',
+  summary: 'Create a post',
+  description:
+    "Clears the author's saved template: the post it was a draft of now exists.",
+  auth: true,
+  rateLimiter: writeRateLimiter,
+  request: { body: postCreateBodySchema },
+  responses: {
+    200: { description: 'The post that was created', schema: postSchema },
+  },
+  handler: create,
+});
+
+// The category paths are registered before `/:slug` so that a category is not
+// read as the slug of a post.
+api.get({
+  path: '/categories/all',
+  summary: 'Every post, highest rated first',
+  rateLimiter: apiRateLimiter,
+  request: { query: postListQuerySchema },
+  responses: postListResponse,
+  handler: all,
+});
+
+api.get({
+  path: '/categories/today',
+  summary: "Today's posts, highest rated first",
+  rateLimiter: apiRateLimiter,
+  request: { query: postListQuerySchema },
+  responses: postListResponse,
+  handler: today,
+});
+
+api.get({
+  path: '/categories/blowing',
+  summary: 'Posts gaining rating fast',
+  description:
+    'Posts from the last hour that have already passed the rating threshold.',
+  rateLimiter: apiRateLimiter,
+  request: { query: postListQuerySchema },
+  responses: postListResponse,
+  handler: blowing,
+});
+
+api.get({
+  path: '/categories/recent',
+  summary: 'Posts from the last two hours, newest first',
+  rateLimiter: apiRateLimiter,
+  request: { query: postFeedQuerySchema },
+  responses: cursorPostListResponse,
+  handler: recent,
+});
+
+api.get({
+  path: '/categories/top-this-week',
+  summary: 'This week’s posts, highest rated first',
+  rateLimiter: apiRateLimiter,
+  request: { query: postListQuerySchema },
+  responses: postListResponse,
+  handler: topThisWeek,
+});
+
+api.get({
+  path: '/feed',
+  summary: 'The current user’s feed',
+  description:
+    'Posts carrying a followed tag or written by a followed author, newest first, minus the reader’s own.',
+  auth: true,
+  rateLimiter: apiRateLimiter,
+  request: { query: postFeedQuerySchema },
+  responses: cursorPostListResponse,
+  handler: getFeed,
+});
+
+api.post({
+  path: '/upload',
+  summary: 'Add an uploaded picture to the post template',
+  description:
+    'The picture is re-encoded to a bounded jpeg and stored on this server. The section it returns is appended to the current user’s template, ready to be sent back with the post.',
+  auth: true,
+  rateLimiter: uploadRateLimiter,
+  requestBody: {
+    required: true,
+    content: {
+      'multipart/form-data': {
+        schema: {
+          type: 'object',
+          required: ['picture'],
+          properties: {
+            picture: {
+              type: 'string',
+              format: 'binary',
+              description: 'A jpg, jpeg, png, gif, webp or avif picture',
+            },
           },
-          "required": true
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Post"
-              }
-            }
-          }
         },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        }
-      }
-    }
-  }
-}
-*/
-router.get('/:slug', apiRateLimiter, asyncControllerErrorHandler(getBySlug));
-router.put(
-  '/:id',
-  authRequiredMiddleware,
-  writeRateLimiter,
-  asyncControllerErrorHandler(updateById),
-);
-router.delete(
-  '/:id',
-  authRequiredMiddleware,
-  writeRateLimiter,
-  asyncControllerErrorHandler(deleteById),
-);
-
-/**
-@swagger
-{
-  "/posts/upload": {
-    "post": {
-      "tags": [
-        "Posts"
-      ],
-      "summary": "upload picture",
-      "description": "Upload the picture to template. Allowed extensions: `jpg|jpeg|png|gif|webp|avif`",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "requestBody": {
-        "content": {
-          "multipart/form-data": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "picture": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
       },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostSectionImage"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "409": {
-          "$ref": "#/components/responses/Conflict"
-        },
-        "413": {
-          "$ref": "#/components/responses/RequestEntityTooLarge"
-        },
-        "422": {
-          "$ref": "#/components/responses/UnprocessableEntity"
-        },
-        "500": {
-          "$ref": "#/components/responses/InternalServerError"
-        }
-      }
-    }
-  }
-}
- */
-router.post(
-  '/upload',
-  authRequiredMiddleware,
-  uploadRateLimiter,
-  asyncControllerErrorHandler(upload),
-);
-
-/**
-@swagger
-{
-  "/posts/upload/url": {
-    "post": {
-      "tags": [
-        "Posts"
-      ],
-      "summary": "add a picture to the template from a url",
-      "description": "Downloads the picture at `url`, re-encodes it and stores it on this server, then appends it to the template. The section that comes back points at this server, never at the url that was sent. Allowed extensions: `jpg|jpeg|png|gif|webp|avif`",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "requestBody": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "required": [
-                "url"
-              ],
-              "properties": {
-                "url": {
-                  "type": "string",
-                  "description": "Public http or https link to a picture"
-                }
-              }
-            }
-          }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostSectionImage"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "413": {
-          "$ref": "#/components/responses/RequestEntityTooLarge"
-        },
-        "422": {
-          "$ref": "#/components/responses/UnprocessableEntity"
-        },
-        "500": {
-          "$ref": "#/components/responses/InternalServerError"
-        }
-      }
-    }
-  }
-}
- */
-router.post(
-  '/upload/url',
-  authRequiredMiddleware,
-  uploadRateLimiter,
-  asyncControllerErrorHandler(uploadByUrl),
-);
-
-/**
-@swagger
-{
-  "/posts/{id}/vote": {
-    "put": {
-      "summary": "Vote for a post", 
-      "description": "Changes vote for a post. Field `negative` decides the direction of the vote.",
-      "tags": [
-        "Posts"
-      ],
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "parameters": [
-        {
-          "in": "path",
-          "name": "id",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "requestBody": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "negative": {
-                  "type": "boolean",
-                  "default": false
-                }
-              }
-            }
-          }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Post"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        }
-      }
     },
-    "delete": {
-      "summary": "Unvote a post",
-      "description": "Delete already existing rate for user for post",
-      "tags": [
-        "Posts"
-      ],
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "parameters": [
-        {
-          "in": "path",
-          "name": "id",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Post"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "403": {
-          "$ref": "#/components/responses/Forbidden"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        }
-      }
-    }
-  }
-}
- */
-router.put(
-  '/:id/vote',
-  authRequiredMiddleware,
-  voteRateLimiter,
-  asyncControllerErrorHandler(voteById),
-);
-router.delete(
-  '/:id/vote',
-  authRequiredMiddleware,
-  voteRateLimiter,
-  asyncControllerErrorHandler(unvoteById),
-);
+  },
+  responses: {
+    200: {
+      description: 'The picture section that was added',
+      schema: postPictureSectionSchema,
+    },
+    404: { description: 'The session points at a user that no longer exists' },
+    413: { description: 'The picture is larger than the upload limit' },
+    422: { description: 'The file is not a picture of a supported type' },
+  },
+  handler: upload,
+});
 
-export default router;
+api.post({
+  path: '/upload/url',
+  summary: 'Add a picture from a url to the post template',
+  description:
+    'The url is only a source: the picture is downloaded, re-encoded and stored here, and the section that comes back points at this server. Addresses on the local network are refused.',
+  auth: true,
+  rateLimiter: uploadRateLimiter,
+  request: { body: externalImageBodySchema },
+  responses: {
+    200: {
+      description: 'The picture section that was added',
+      schema: postPictureSectionSchema,
+    },
+    404: { description: 'The session points at a user that no longer exists' },
+    413: {
+      description: 'The template already holds the most sections allowed',
+    },
+  },
+  handler: uploadByUrl,
+});
+
+api.get({
+  path: '/:slug',
+  summary: 'Read one post',
+  rateLimiter: apiRateLimiter,
+  request: { params: postSlugParamsSchema },
+  responses: {
+    200: { description: 'The post', schema: postSchema },
+    404: { description: 'No post with that slug' },
+  },
+  handler: getBySlug,
+});
+
+api.put({
+  path: '/:id',
+  summary: 'Edit a post',
+  description:
+    'Only the author, and only for a while after it was written. Pictures dropped from the post are deleted from the server.',
+  auth: true,
+  rateLimiter: writeRateLimiter,
+  request: { params: postIdParamsSchema, body: postUpdateBodySchema },
+  responses: {
+    200: { description: 'The post as it now stands', schema: postSchema },
+    403: { description: 'Not your post, or the edit window has closed' },
+    404: { description: 'No such post' },
+  },
+  handler: updateById,
+});
+
+api.delete({
+  path: '/:id',
+  summary: 'Delete a post',
+  description:
+    'Only the author, only within the same window as editing, and only while nobody has commented. The author’s rating is rolled back with it.',
+  auth: true,
+  rateLimiter: writeRateLimiter,
+  request: { params: postIdParamsSchema },
+  responses: {
+    200: { description: 'The post is gone', schema: okResponseSchema },
+    403: {
+      description:
+        'Not your post, the window has closed, or it already has comments',
+    },
+    404: { description: 'No such post' },
+  },
+  handler: deleteById,
+});
+
+api.put({
+  path: '/:id/vote',
+  summary: 'Vote on a post',
+  description:
+    'An existing vote can be flipped to the other direction, which moves the rating by twice the vote.',
+  auth: true,
+  rateLimiter: voteRateLimiter,
+  request: { params: postIdParamsSchema, body: voteBodySchema },
+  responses: voteResponses,
+  handler: voteById,
+});
+
+api.delete({
+  path: '/:id/vote',
+  summary: 'Take back a vote on a post',
+  auth: true,
+  rateLimiter: voteRateLimiter,
+  request: { params: postIdParamsSchema },
+  responses: {
+    ...voteResponses,
+    403: { description: 'You have not voted on this post' },
+  },
+  handler: unvoteById,
+});
+
+export default api.router;

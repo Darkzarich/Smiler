@@ -2,15 +2,9 @@ import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
 import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
+import type { UserIdParams } from '@validators/users';
 
-interface FollowByIdParams {
-  id: string;
-}
-
-export async function followById(
-  req: Request<FollowByIdParams>,
-  res: Response,
-) {
+export async function followById(req: Request<UserIdParams>, res: Response) {
   const { id } = req.params;
   const { userId } = req.session!;
 

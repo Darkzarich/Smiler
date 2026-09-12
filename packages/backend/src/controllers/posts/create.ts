@@ -2,37 +2,23 @@ import type { Request, Response } from 'express';
 import slugLib from 'slug';
 import { nanoid } from 'nanoid';
 import { UserModel } from '@models/User';
-import {
-  PostModel,
-  PostSection,
-  postToResponse,
-  PostResponse,
-} from '@models/Post';
+import { PostModel, postToResponse, PostResponse } from '@models/Post';
 import { sendSuccess } from '@utils/response-utils';
-import { PostValidator } from '@validators/PostValidator';
-
-interface CreateBody {
-  title: string;
-  sections: PostSection[];
-  tags?: string[];
-}
+import {
+  assertOwnUploadedPictures,
+  type PostCreateBody,
+} from '@validators/posts';
 
 type CreateResponse = PostResponse;
 
 export async function create(
-  req: Request<unknown, unknown, CreateBody>,
+  req: Request<unknown, unknown, PostCreateBody>,
   res: Response<CreateResponse>,
 ) {
   const { userId } = req.session;
+  const { title, sections, tags } = req.body;
 
-  const { title, sections, tags } = PostValidator.validateAndPrepare(
-    {
-      title: req.body.title,
-      sections: req.body.sections,
-      tags: req.body.tags ?? [],
-    },
-    userId!,
-  );
+  assertOwnUploadedPictures(sections, userId!);
 
   const [post] = await Promise.all([
     PostModel.create({

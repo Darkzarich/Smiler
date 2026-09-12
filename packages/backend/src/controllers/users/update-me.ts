@@ -1,9 +1,8 @@
 import type { Request, Response } from 'express';
 import { User, UserModel } from '@models/User';
-import { NotFoundError, ValidationError, ERRORS } from '@errors';
+import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-
-type UpdateMeBody = Partial<Pick<User, 'bio'>>;
+import type { UserUpdateBody } from '@validators/users';
 
 interface UpdateMeResponse
   extends Pick<
@@ -13,35 +12,18 @@ interface UpdateMeResponse
   _id: string;
 }
 
-function validateAndPickUpdateMeBody(
-  body: Record<string, unknown>,
-): UpdateMeBody {
-  const update: UpdateMeBody = {};
-
-  if (body.bio !== undefined) {
-    if (typeof body.bio !== 'string') {
-      throw new ValidationError(ERRORS.USER_UPDATE_FIELD_INVALID);
-    }
-
-    update.bio = body.bio;
-  }
-
-  // The avatar is not a plain field any more: it names a file this server
-  // downloaded and stored, so it is set through `PUT /users/me/avatar`.
-
-  return update;
-}
-
 export async function updateMe(
-  req: Request<unknown, unknown, UpdateMeBody>,
+  req: Request<unknown, unknown, UserUpdateBody>,
   res: Response<UpdateMeResponse>,
 ) {
   const { userId } = req.session!;
-  const update = validateAndPickUpdateMeBody(req.body);
+  // Named rather than passed through, so that adding a field to the schema
+  // cannot quietly make it settable here.
+  const { bio } = req.body;
 
   const updatedUser = await UserModel.findByIdAndUpdate(
     userId,
-    { $set: update },
+    { $set: { bio } },
     {
       runValidators: true,
       new: true,

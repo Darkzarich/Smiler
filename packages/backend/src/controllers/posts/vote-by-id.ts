@@ -5,19 +5,13 @@ import { RateModel, RateTargetModel } from '@models/Rate';
 import { POST_RATE_VALUE } from '@constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-
-interface VoteByIdParams {
-  id: string;
-}
-
-interface VoteByIdBody {
-  negative: boolean;
-}
+import type { VoteBody } from '@validators/common';
+import type { PostIdParams } from '@validators/posts';
 
 type VoteByIdResponse = Post;
 
 export async function voteById(
-  req: Request<VoteByIdParams, unknown, VoteByIdBody>,
+  req: Request<PostIdParams, unknown, VoteBody>,
   res: Response<VoteByIdResponse>,
 ) {
   const { userId } = req.session;

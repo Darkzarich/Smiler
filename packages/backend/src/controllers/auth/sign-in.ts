@@ -1,31 +1,13 @@
 import type { Request, Response } from 'express';
 import type { Types } from 'mongoose';
-import { UserModel, normalizeEmail } from '@models/User';
-import { ValidationError, UnauthorizedError, ERRORS } from '@errors';
+import { UserModel } from '@models/User';
+import { UnauthorizedError, ERRORS } from '@errors';
 import { logger } from '@libs/logger';
 import { hashPassword, needsRehash, verifyPassword } from '@utils/password';
 import { sendSuccess } from '@utils/response-utils';
+import type { SignInBody } from '@validators/auth';
 import { CurrentUserResponse } from './current';
 import { authenticateSession } from './session';
-
-interface SignInBody {
-  email?: string;
-  password?: string;
-}
-
-const validate = (fields: SignInBody) => {
-  if (!fields.email || !fields.password) {
-    return ERRORS.AUTH_FIELDS_REQUIRED;
-  }
-
-  if (fields.password.length < 6) {
-    return ERRORS.AUTH_PASSWORD_TOO_SHORT;
-  }
-
-  if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(fields.email)) {
-    return ERRORS.AUTH_INVALID_EMAIL;
-  }
-};
 
 /**
  * Move a password hashed with outdated parameters onto the current ones. Runs
@@ -70,33 +52,22 @@ export async function signIn(
   req: Request<unknown, unknown, SignInBody>,
   res: Response<CurrentUserResponse>,
 ) {
-  const fields = {
-    email: req.body.email ? normalizeEmail(req.body.email) : undefined,
-    password: req.body.password,
-  };
+  const { email, password } = req.body;
 
-  const errorMessage = validate(fields);
-
-  if (errorMessage) {
-    throw new ValidationError(errorMessage);
-  }
-
-  const foundUser = await UserModel.findOne({
-    email: fields.email!,
-  }).lean();
+  const foundUser = await UserModel.findOne({ email }).lean();
 
   if (!foundUser) {
     throw new UnauthorizedError(ERRORS.AUTH_INVALID_CREDENTIALS);
   }
 
-  const isEqual = await verifyPassword(fields.password!, foundUser);
+  const isEqual = await verifyPassword(password, foundUser);
 
   if (!isEqual) {
     throw new UnauthorizedError(ERRORS.AUTH_INVALID_CREDENTIALS);
   }
 
   if (needsRehash(foundUser.hashParams)) {
-    await upgradeStoredPassword(foundUser._id, fields.password!);
+    await upgradeStoredPassword(foundUser._id, password);
   }
 
   await recordLogin(foundUser._id);
