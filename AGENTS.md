@@ -34,6 +34,12 @@ pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push
   - Run single test: `pnpm --filter backend test -- tests/integration/some-file.spec.ts`
 - **Path aliases** (tsconfig + ts-node): `@config/*`, `@routes/*`, `@controllers/*`, `@middlewares/*`, `@libs/*`, `@models/*`, `@utils/*`, `@validators/*`, `@constants/*`, `@type/*`, `@errors`, `@test-utils/*`, `@test-data-generators`
 - `.env` file required at repo root (copy from `.env.example`). Backend reads it via dotenv.
+- **Environment variables** are declared once, in `src/config/env.ts`, as a [zod](https://github.com/colinhacks/zod)
+  schema that `src/config/index.ts` parses at boot. A bad or missing variable prints every problem at
+  once and exits 1 instead of surfacing later as a `NaN` rate limit or an `undefined` in a connection
+  string. Read a new variable by adding it to that schema — never `process.env` at the point of use —
+  and add it to `.env.example` in the same change. The schema cannot use the logger (the logger reads
+  its level from the config), so failures go to `console.error`.
 - Swagger docs at `/api-docs/` when running.
 
 ## Frontend (`packages/frontend`)
