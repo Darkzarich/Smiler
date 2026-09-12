@@ -27,7 +27,8 @@ describe('PUT /comments/:id', () => {
     const response = await request(global.app)
       .put('/api/comments/5d5467b4c17806706f3df347')
       .set('Cookie', sessionCookie)
-      .set('X-CSRF-Token', csrfToken);
+      .set('X-CSRF-Token', csrfToken)
+      .send({ body: 'an edit of a comment that is not there' });
 
     expect(response.body.error.message).toBe(ERRORS.COMMENT_NOT_FOUND);
     expect(response.status).toBe(404);
@@ -47,7 +48,8 @@ describe('PUT /comments/:id', () => {
     const response = await request(global.app)
       .put(`/api/comments/${comment.id}`)
       .set('Cookie', sessionCookie)
-      .set('X-CSRF-Token', csrfToken);
+      .set('X-CSRF-Token', csrfToken)
+      .send({ body: 'an edit of somebody else’s comment' });
 
     expect(response.body.error.message).toBe(ERRORS.COMMENT_CANT_EDIT_NOT_OWN);
     expect(response.status).toBe(403);
@@ -68,7 +70,8 @@ describe('PUT /comments/:id', () => {
     const response = await request(global.app)
       .put(`/api/comments/${comment.id}`)
       .set('Cookie', sessionCookie)
-      .set('X-CSRF-Token', csrfToken);
+      .set('X-CSRF-Token', csrfToken)
+      .send({ body: 'a late edit' });
 
     expect(response.body.error.message).toBe(
       ERRORS.COMMENT_CAN_EDIT_WITHIN_TIME,

@@ -1,14 +1,14 @@
 import type { Request, Response } from 'express';
 import { subHours } from 'date-fns';
 import { POST_BLOWING_RATING_THRESHOLD } from '@constants/index';
-import { PaginationRequest } from '@type/pagination';
+import type { PostListQuery } from '@validators/posts';
 import {
   respondWithPostList,
   PostListResponse,
 } from '../respond-with-post-list';
 
 export async function blowing(
-  req: Request<unknown, unknown, unknown, PaginationRequest>,
+  req: Request<unknown, unknown, unknown, PostListQuery>,
   res: Response<PostListResponse>,
 ) {
   await respondWithPostList(req, res, {

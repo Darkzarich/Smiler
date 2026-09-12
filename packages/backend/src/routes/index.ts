@@ -1,15 +1,25 @@
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
-import swaggerJSDoc from 'swagger-jsdoc';
 import Config from '@config/index';
+import { buildOpenApiDocument } from '@libs/openapi/document';
 import apiRoutes from '@routes/api';
 
 const router = express.Router();
 
+router.use('/api', apiRoutes);
+
 if (!Config.IS_JEST && !Config.IS_PRODUCTION) {
+  // Built after the routes are mounted above, which is what registers them.
+  const openApiDocument = buildOpenApiDocument();
+
   const swaggerOptions = {
     swaggerOptions: {
       withCredentials: true,
+      /**
+       * "Try it out" sends a real request, and every unsafe one needs the CSRF
+       * token of the session the browser already has. Fetching it here means
+       * the docs work without the reader pasting a token into a header by hand.
+       */
       requestInterceptor: async (request: {
         url?: string;
         method?: string;
@@ -62,170 +72,17 @@ if (!Config.IS_JEST && !Config.IS_PRODUCTION) {
     },
   };
 
-  const swaggerSpec = swaggerJSDoc({
-    apis: ['./src/routes/**/*.ts'],
-    definition: {
-      openapi: '3.0.0',
-      info: {
-        title: 'Smiler Api', // Title (required)
-        version: '1.0.0', // Version (required)
-        // Description (optional)
-        description:
-          'Smiler is my own MEVN (MongoDB, Express, Vue.js, Node.js) site similar to reddit.com or 9gag.com (mostly takes many known features) with many different and awesome features, open Swagger API docs, tests, interesting tools and more. Main reason of making this site is fun and learning new things while making it',
-      },
-      servers: [
-        {
-          url: 'https://smiler-api.darkzarich.com/api',
-          description: 'Production server',
-        },
-        {
-          url: 'http://localhost:3000/api',
-          description: 'Local server',
-        },
-      ],
-    },
+  // The document itself, for anything that reads a spec rather than a page:
+  // client generators, linters, diffing it against the last release.
+  router.get('/api-docs/openapi.json', (_req, res) => {
+    res.json(openApiDocument);
   });
 
   router.use(
     '/api-docs',
     swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec, swaggerOptions),
+    swaggerUi.setup(openApiDocument, swaggerOptions),
   );
 }
 
-router.use('/api', apiRoutes);
-
 export default router;
-
-/**
-# Descriptions of common responses
-@swagger
-{
-  "components": {
-    "securitySchemes": {
-      "cookieAuth": {
-        "type": "apiKey",
-        "in": "cookie",
-        "name": "smiler.sid"
-      },
-      "csrfToken": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "X-CSRF-Token"
-      }
-    },
-    "schemas": {
-      "Error": {
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "object",
-            "properties": {
-              "message": {
-                "type": "string"
-              },
-              "code": {
-                "type": "string"
-              },
-            }
-          }
-        },
-        "required": [
-          "message"
-        ]
-      },
-      "OK": {
-        "type": "object",
-        "properties": {
-          "ok": {
-            "type": "boolean",
-            "example": true
-          }
-        }
-      }
-    },
-    "responses": {
-      "NotFound": {
-        "description": "The specified resource was not found",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            }
-          }
-        }
-      },
-      "Unauthorized": {
-        "description": "Unauthorized",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            }
-          }
-        }
-      },
-      "Forbidden": {
-        "description": "Not enough rights",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            }
-          }
-        }
-      },
-      "UnprocessableEntity": {
-        "description": "Validation error",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            }
-          }
-        }
-      },
-      "Conflict": {
-        "description": "Conflict",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            }
-          }
-        }
-      },
-      "RequestEntityTooLarge": {
-        "description": "Request entity too large",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            }
-          }
-        }
-      },
-      "InternalServerError": {
-        "description": "Internal server error",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            }
-          }
-        }
-      },
-      "OK": {
-        "description": "Everything went alright",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/OK"
-            }
-          }
-        }
-      }
-    }
-  }
-}
-*/

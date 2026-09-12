@@ -1,28 +1,18 @@
 import type { Request, Response } from 'express';
 import { UserModel, normalizeLogin } from '@models/User';
 import { NotFoundError, ERRORS } from '@errors';
-import { CursorPaginationRequest } from '@type/pagination';
+import type { PostIndexQuery } from '@validators/posts';
 import {
   respondWithPostList,
-  validatePostPagination,
   PostListResponse,
 } from './respond-with-post-list';
 
-interface GetListByAuthorQuery extends CursorPaginationRequest {
-  author: string;
-}
-
 export async function getListByAuthor(
-  req: Request<unknown, unknown, unknown, GetListByAuthorQuery>,
+  req: Request<unknown, unknown, unknown, PostIndexQuery>,
   res: Response<PostListResponse>,
 ) {
-  const pagination = validatePostPagination(req.query, {
-    supportsCursor: true,
-  });
-  const author = req.query.author || '';
-
   const foundAuthor = await UserModel.findOne({
-    login: normalizeLogin(author),
+    login: normalizeLogin(req.query.author ?? ''),
   }).lean();
 
   if (!foundAuthor) {
@@ -34,7 +24,6 @@ export async function getListByAuthor(
       author: foundAuthor._id,
     },
     sort: { createdAt: -1 },
-    pagination,
     supportsCursor: true,
   });
 }

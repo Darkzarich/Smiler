@@ -1,15 +1,12 @@
 import type { Request, Response } from 'express';
 import { USER_AVATAR_SIZE, BASE_UPLOAD_FOLDER } from '@constants/index';
-import { NotFoundError, ValidationError, ERRORS } from '@errors';
+import { NotFoundError, ERRORS } from '@errors';
 import { fetchExternalImage } from '@libs/fetch-external-image';
 import { saveUserImage } from '@libs/save-user-image';
 import { UserModel } from '@models/User';
 import { removeFileByPath } from '@utils/remove-file-by-path';
 import { sendSuccess } from '@utils/response-utils';
-
-interface UpdateMyAvatarBody {
-  url?: unknown;
-}
+import type { AvatarBody } from '@validators/users';
 
 interface UpdateMyAvatarResponse {
   avatar: string;
@@ -23,15 +20,11 @@ interface UpdateMyAvatarResponse {
  * what the picture costs a reader to load.
  */
 export async function updateMyAvatar(
-  req: Request<unknown, unknown, UpdateMyAvatarBody>,
+  req: Request<unknown, unknown, AvatarBody>,
   res: Response<UpdateMyAvatarResponse>,
 ) {
   const { userId } = req.session!;
   const { url } = req.body;
-
-  if (typeof url !== 'string' || !url.trim()) {
-    throw new ValidationError(ERRORS.USER_AVATAR_URL_REQUIRED);
-  }
 
   const user = await UserModel.findById(userId).select('avatar').lean();
 
@@ -39,7 +32,7 @@ export async function updateMyAvatar(
     throw new NotFoundError(ERRORS.USER_NOT_FOUND);
   }
 
-  const downloaded = await fetchExternalImage(url.trim());
+  const downloaded = await fetchExternalImage(url);
 
   const avatar = await saveUserImage({
     userId: userId!,

@@ -5,15 +5,12 @@ import { Comment, CommentModel } from '@models/Comment';
 import { COMMENT_RATE_VALUE } from '@constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-
-interface UnvoteByIdParams {
-  id: string;
-}
+import type { CommentIdParams } from '@validators/comments';
 
 type UnvoteByIdResponse = Comment;
 
 export async function unvoteById(
-  req: Request<UnvoteByIdParams>,
+  req: Request<CommentIdParams>,
   res: Response<UnvoteByIdResponse>,
 ) {
   const { userId } = req.session;

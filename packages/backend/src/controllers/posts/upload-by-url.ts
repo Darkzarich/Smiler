@@ -5,21 +5,13 @@ import {
   POST_MAX_IMAGE_HEIGHT,
   POST_MAX_IMAGE_WIDTH,
 } from '@constants/index';
-import {
-  ContentTooLargeError,
-  NotFoundError,
-  ValidationError,
-  ERRORS,
-} from '@errors';
+import { ContentTooLargeError, NotFoundError, ERRORS } from '@errors';
 import { fetchExternalImage } from '@libs/fetch-external-image';
 import { saveUserImage } from '@libs/save-user-image';
 import { POST_SECTION_TYPES, PostPictureSection } from '@models/Post';
 import { UserModel } from '@models/User';
 import { sendSuccess } from '@utils/response-utils';
-
-interface UploadByUrlBody {
-  url?: unknown;
-}
+import type { ExternalImageBody } from '@validators/posts';
 
 type UploadByUrlResponse = PostPictureSection;
 
@@ -30,15 +22,11 @@ type UploadByUrlResponse = PostPictureSection;
  * points at this server. Nothing hands the third party host to a reader.
  */
 export async function uploadByUrl(
-  req: Request<unknown, unknown, UploadByUrlBody>,
+  req: Request<unknown, unknown, ExternalImageBody>,
   res: Response<UploadByUrlResponse>,
 ) {
   const { userId } = req.session;
   const { url } = req.body;
-
-  if (typeof url !== 'string' || !url.trim()) {
-    throw new ValidationError(ERRORS.EXTERNAL_IMAGE_URL_REQUIRED);
-  }
 
   const user = await UserModel.findById(userId).select('template').lean();
 
@@ -50,7 +38,7 @@ export async function uploadByUrl(
     throw new ContentTooLargeError(ERRORS.POST_SECTIONS_MAX_EXCEEDED);
   }
 
-  const downloaded = await fetchExternalImage(url.trim());
+  const downloaded = await fetchExternalImage(url);
 
   const storedUrl = await saveUserImage({
     userId: userId!,

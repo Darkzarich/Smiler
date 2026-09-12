@@ -7,17 +7,11 @@ import {
 } from '@models/Comment';
 import { UserModel } from '@models/User';
 import { RateModel, RateTargetModel, type RatedTargets } from '@models/Rate';
-import { NotFoundError, ValidationError, ERRORS } from '@errors';
+import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-import { COMMENT_MAX_LIMIT } from '@constants/index';
-import { PaginationValidator } from '@validators/PaginationValidator';
-import { PaginationRequest, PaginationResponse } from '@type/pagination';
+import { PaginationResponse } from '@type/pagination';
 import { PAGE_LOOKAHEAD, toPage } from '@utils/pagination';
-
-interface GetListQuery extends PaginationRequest {
-  post: string;
-  author?: string;
-}
+import type { CommentListQuery } from '@validators/comments';
 
 interface GetListResponse extends PaginationResponse {
   comments: CommentResponse[];
@@ -56,21 +50,11 @@ function collectCommentIds(comments: LeanComment[]): string[] {
 }
 
 export async function getList(
-  req: Request<unknown, unknown, unknown, GetListQuery>,
+  req: Request<unknown, unknown, unknown, CommentListQuery>,
   res: Response<GetListResponse>,
 ) {
   const { userId } = req.session;
-  const { post } = req.query;
-  const { author } = req.query;
-
-  const { limit, offset } = PaginationValidator.validate(req.query, {
-    maxLimit: COMMENT_MAX_LIMIT,
-    defaultLimit: 10,
-    maxLimitError: ERRORS.COMMENT_LIMIT_PARAM_EXCEEDED,
-  });
-  if (!post) {
-    throw new ValidationError(ERRORS.POST_ID_REQUIRED);
-  }
+  const { post, author, limit, offset } = req.query;
 
   const query: {
     parent: { $exists: false };

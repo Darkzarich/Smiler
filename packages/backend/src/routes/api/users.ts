@@ -1,635 +1,196 @@
-import express from 'express';
-import { asyncControllerErrorHandler } from '@utils/async-controller-error-handler';
 import {
+  deleteMyAvatar,
+  deletePostTemplatePicture,
+  followById,
   getByLogin,
+  getMyPostTemplate,
+  getSettings,
+  unfollowById,
   updateMe,
   updateMyAvatar,
-  deleteMyAvatar,
-  getMyPostTemplate,
   updateMyPostTemplate,
-  getSettings,
-  followById,
-  unfollowById,
-  deletePostTemplatePicture,
 } from '@controllers/users';
-import authRequiredMiddleware from '@middlewares/auth-required';
+import { createApiRouter } from '@libs/api-router';
 import { apiRateLimiter, uploadRateLimiter } from '@middlewares/rate-limiter';
+import { okResponseSchema } from '@validators/common';
+import { postTemplateBodySchema } from '@validators/posts';
+import {
+  avatarBodySchema,
+  avatarResponseSchema,
+  postTemplateSchema,
+  templateSectionParamsSchema,
+  userIdParamsSchema,
+  userLoginParamsSchema,
+  userProfileSchema,
+  userSettingsSchema,
+  userUpdateBodySchema,
+  userUpdateResponseSchema,
+} from '@validators/users';
 
-const router = express.Router();
-/**
-@swagger
-{
-  "tags": [
-    {
-      "name": "Users",
-      "description": "Actions with Users collection"
-    }
-  ],
-  "components": {
-    "schemas": {
-      "Author": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "login": {
-            "type": "string",
-            "example": "user123"
-          },
-          "avatar": {
-            "type": "string"
-          }
-        }
-      },
-      "UserProfile": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "login": {
-            "type": "string"
-          },
-          "rating": {
-            "type": "number"
-          },
-          "bio": {
-            "type": "string"
-          },
-          "avatar": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string"
-          },
-          "lastLoginAt": {
-            "type": "string",
-            "description": "When the user last signed in, absent if they never signed in since it started being tracked"
-          },
-          "followersAmount": {
-            "type": "number"
-          },
-          "isFollowed": {
-            "type": "boolean",
-            "default": false
-          }
-        }
-      },
-      "UserSettings": {
-        "type": "object",
-        "properties": {
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "authors": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Author"
-            }
-          },
-          "bio": {
-            "type": "string"
-          },
-          "avatar": {
-            "type": "string"
-          }
-        }
-      },
-      PostTemplate: {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "sections": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PostSection"
-            }
-          }
-        }
-      },
-    }
-  }
-}
-*/
+const api = createApiRouter({
+  prefix: '/users',
+  tag: 'Users',
+  tagDescription: 'Profiles, settings, avatars and the saved post template',
+});
 
-/**
-@swagger
-{
-  "/users/{login}": {
-    "get": {
-      "tags": [
-        "Users"
-      ],
-      "summary": "Get user profile",
-      "description": "Get user profile",
-      "parameters": [
-        {
-          "in": "path",
-          "name": "login",
-          "schema": {
-            "type": "string"
-          },
-          "required": true
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserProfile"
-              }
-            }
-          }
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        }
-      }
+api.get({
+  path: '/:login',
+  summary: 'Read a user profile',
+  description:
+    'Carries `isFollowed` when the profile belongs to somebody other than the reader.',
+  rateLimiter: apiRateLimiter,
+  request: { params: userLoginParamsSchema },
+  responses: {
+    200: { description: 'The profile', schema: userProfileSchema },
+    404: { description: 'No user with that login' },
+  },
+  handler: getByLogin,
+});
+
+api.put({
+  path: '/me',
+  summary: 'Update the current user',
+  description:
+    'Only the fields listed here can be set. The avatar has an endpoint of its own, because it names a file this server stores.',
+  auth: true,
+  rateLimiter: apiRateLimiter,
+  request: { body: userUpdateBodySchema },
+  responses: {
+    200: {
+      description: 'The user as it now stands',
+      schema: userUpdateResponseSchema,
     },
   },
-  "/users/me": {
-    "put": {
-      "tags": [
-        "Users"
-      ],
-      "summary": "Update user info",
-      "description": "Update user info with payload",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "requestBody": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "bio": {
-                  "type": "string",
-                  "maxLength": 300
-                }
-              }
-            }
-          }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserProfile"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "403": {
-          "$ref": "#/components/responses/Forbidden"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        },
-        "422": {
-          "$ref": "#/components/responses/UnprocessableEntity"
-        }
-      }
-    }
-  }
-}
-*/
-router.get('/:login', apiRateLimiter, asyncControllerErrorHandler(getByLogin));
-router.put(
-  '/me',
-  authRequiredMiddleware,
-  apiRateLimiter,
-  asyncControllerErrorHandler(updateMe),
-);
+  handler: updateMe,
+});
 
-/**
-@swagger
-{
-  "/users/me/avatar": {
-    "put": {
-      "tags": [
-        "Users"
-      ],
-      "summary": "Set the current user's avatar from a url",
-      "description": "Downloads the picture at `url`, re-encodes it to a square jpeg and stores it on this server. The response holds the stored path, not the url that was sent.",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "requestBody": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "required": [
-                "url"
-              ],
-              "properties": {
-                "url": {
-                  "type": "string",
-                  "description": "Public http or https link to a jpg, jpeg, png, gif, webp or avif picture"
-                }
-              }
-            }
-          }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "avatar": {
-                    "type": "string",
-                    "example": "/uploads/6242a0f5e1e1a1f5e1e1a1f5/3f1b0c2a-1e3d-4a5b-8c7d-9e0f1a2b3c4d.jpg"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        },
-        "413": {
-          "$ref": "#/components/responses/RequestEntityTooLarge"
-        },
-        "422": {
-          "$ref": "#/components/responses/UnprocessableEntity"
-        }
-      }
+api.put({
+  path: '/me/avatar',
+  summary: "Set the current user's avatar from a url",
+  description:
+    'Downloads the picture at `url`, re-encodes it to a square jpeg and stores it on this server. The response holds the stored path, not the url that was sent.',
+  auth: true,
+  rateLimiter: uploadRateLimiter,
+  request: { body: avatarBodySchema },
+  responses: {
+    200: {
+      description: 'Where the avatar now lives',
+      schema: avatarResponseSchema,
     },
-    "delete": {
-      "tags": [
-        "Users"
-      ],
-      "summary": "Clear the current user's avatar",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "OK"
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        }
-      }
-    }
-  }
-}
-*/
-router.put(
-  '/me/avatar',
-  authRequiredMiddleware,
-  uploadRateLimiter,
-  asyncControllerErrorHandler(updateMyAvatar),
-);
-router.delete(
-  '/me/avatar',
-  authRequiredMiddleware,
-  apiRateLimiter,
-  asyncControllerErrorHandler(deleteMyAvatar),
-);
+    404: { description: 'The session points at a user that no longer exists' },
+    413: { description: 'The picture is larger than the limit' },
+  },
+  handler: updateMyAvatar,
+});
 
-/**
-@swagger
-{
-  "/users/me/template": {
-    "get": {
-      "summary": "Get current user saved template",
-      "tags": [
-        "Users"
-      ],
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "description": "Returns current user's saved template for post with `title` and `sections`",
-      "responses": {
-        "200": {
-          "description": "ok",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostTemplate"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        }
-      }
+api.delete({
+  path: '/me/avatar',
+  summary: "Clear the current user's avatar",
+  description: 'Falls back to the default avatar and deletes the stored file.',
+  auth: true,
+  rateLimiter: apiRateLimiter,
+  responses: {
+    200: { description: 'The avatar was cleared', schema: okResponseSchema },
+    404: { description: 'The session points at a user that no longer exists' },
+  },
+  handler: deleteMyAvatar,
+});
+
+api.get({
+  path: '/me/template',
+  summary: 'Read the saved post template',
+  description:
+    'The post the current user is part way through writing, kept here so it survives a reload.',
+  auth: true,
+  rateLimiter: apiRateLimiter,
+  responses: {
+    200: { description: 'The saved template', schema: postTemplateSchema },
+    404: { description: 'The session points at a user that no longer exists' },
+  },
+  handler: getMyPostTemplate,
+});
+
+api.put({
+  path: '/me/template',
+  summary: 'Save the post template',
+  description:
+    'Every field is optional: what is left out keeps the value it already had. Text sections may be empty here — a draft is allowed to be unfinished.',
+  auth: true,
+  rateLimiter: apiRateLimiter,
+  request: { body: postTemplateBodySchema },
+  responses: {
+    200: {
+      description: 'The template as it now stands',
+      schema: postTemplateSchema,
     },
-    "put": {
-      "summary": "Update current user template",
-      "tags": [
-        "Users"
-      ],
-      "description": "Update current user post template `sections`, `title` and `tags`",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "requestBody": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "type": "string"
-                },
-                "tags": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "sections": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PostSection"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostTemplate"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        },
-        "422": {
-          "$ref": "#/components/responses/UnprocessableEntity"
-        }
-      }
-    }
-  }
-}
-*/
+  },
+  handler: updateMyPostTemplate,
+});
 
-router.get(
-  '/me/template',
-  authRequiredMiddleware,
-  apiRateLimiter,
-  asyncControllerErrorHandler(getMyPostTemplate),
-);
-router.put(
-  '/me/template',
-  authRequiredMiddleware,
-  apiRateLimiter,
-  asyncControllerErrorHandler(updateMyPostTemplate),
-);
-
-/**
-@swagger
-{
-  "/users/me/settings": {
-    "get": {
-      "tags": [
-        "Users"
-      ],
-      "summary": "Get the current user's settings",
-      "description": "Gets the current user's settings: bio, followed users, tags etc",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserSettings"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "403": {
-          "$ref": "#/components/responses/Forbidden"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        }
-      }
-    }
-  }
-}
- */
-
-router.get(
-  '/me/settings',
-  authRequiredMiddleware,
-  apiRateLimiter,
-  asyncControllerErrorHandler(getSettings),
-);
-
-/**
-@swagger
-{
-  "/users/{id}/follow": {
-    "put": {
-      "tags": [
-        "Users"
-      ],
-      "summary": "Follow a user",
-      "description": "Follow a user",
-      "parameters": [
-        {
-          "in": "path",
-          "name": "id",
-          "schema": {
-            "type": "string"
-          },
-          "required": true
-        }
-      ],
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "responses": {
-        "200": {
-          "$ref": "#/components/responses/OK"
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        },
-        "422": {
-          "$ref": "#/components/responses/UnprocessableEntity"
-        }
-      }
+api.get({
+  path: '/me/settings',
+  summary: "Read the current user's settings",
+  auth: true,
+  rateLimiter: apiRateLimiter,
+  responses: {
+    200: {
+      description: 'The bio, avatar, followed authors and followed tags',
+      schema: userSettingsSchema,
     },
-    "delete": {
-      "tags": [
-        "Users"
-      ],
-      "summary": "Unfollow a user",
-      "description": "Unfollow a user",
-      "parameters": [
-        {
-          "in": "path",
-          "name": "id",
-          "schema": {
-            "type": "string"
-          },
-          "required": true
-        }
-      ],
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "responses": {
-        "200": {
-          "$ref": "#/components/responses/OK"
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        },
-        "422": {
-          "$ref": "#/components/responses/UnprocessableEntity"
-        }
-      }
-    }
-  }
-}
- */
+    404: { description: 'The session points at a user that no longer exists' },
+  },
+  handler: getSettings,
+});
 
-router.put(
-  '/:id/follow',
-  authRequiredMiddleware,
-  apiRateLimiter,
-  asyncControllerErrorHandler(followById),
-);
-router.delete(
-  '/:id/follow',
-  authRequiredMiddleware,
-  apiRateLimiter,
-  asyncControllerErrorHandler(unfollowById),
-);
+api.put({
+  path: '/:id/follow',
+  summary: 'Follow a user',
+  description: 'Their posts start appearing in `GET /posts/feed`.',
+  auth: true,
+  rateLimiter: apiRateLimiter,
+  request: { params: userIdParamsSchema },
+  responses: {
+    200: { description: 'The user is now followed', schema: okResponseSchema },
+    403: { description: 'Yourself, or somebody you already follow' },
+    404: { description: 'No such user' },
+  },
+  handler: followById,
+});
 
-/**
-@swagger
-{
-  "/users/me/template/{hash}": {
-    "delete": {
-      "tags": [
-        "Users"
-      ],
-      "summary": "Delete section file picture",
-      "description": "Deletes file picture section and the image from the server. Works only for sections with `isFile` set as true",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "parameters": [
-        {
-          "in": "path",
-          "name": "hash",
-          "schema": {
-            "type": "string"
-          },
-          "required": true,
-          "description": "Section hash"
-        }
-      ],
-      "responses": {
-        "200": {
-          "$ref": "#/components/responses/OK"
-        },
-        "400": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        },
-        "422": {
-          "$ref": "#/components/responses/UnprocessableEntity"
-        }
-      }
-    }
-  }
-}
-*/
+api.delete({
+  path: '/:id/follow',
+  summary: 'Unfollow a user',
+  auth: true,
+  rateLimiter: apiRateLimiter,
+  request: { params: userIdParamsSchema },
+  responses: {
+    200: {
+      description: 'The user is no longer followed',
+      schema: okResponseSchema,
+    },
+    403: { description: 'Yourself, or somebody you do not follow' },
+    404: { description: 'No such user' },
+  },
+  handler: unfollowById,
+});
 
-router.delete(
-  '/me/template/:hash',
-  authRequiredMiddleware,
-  apiRateLimiter,
-  asyncControllerErrorHandler(deletePostTemplatePicture),
-);
+api.delete({
+  path: '/me/template/:hash',
+  summary: 'Remove an uploaded picture from the template',
+  description:
+    'Drops the section and deletes the stored file. Only for sections holding a picture uploaded here.',
+  auth: true,
+  rateLimiter: apiRateLimiter,
+  request: { params: templateSectionParamsSchema },
+  responses: {
+    200: {
+      description: 'The section and its file are gone',
+      schema: okResponseSchema,
+    },
+    400: { description: 'That section does not hold an uploaded picture' },
+    404: { description: 'No section with that hash' },
+  },
+  handler: deletePostTemplatePicture,
+});
 
-export default router;
+export default api.router;

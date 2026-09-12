@@ -1,12 +1,9 @@
 import type { Request, Response } from 'express';
 import { Types } from 'mongoose';
-import { UserModel, User, isUserFollowed, normalizeLogin } from '@models/User';
+import { UserModel, User, isUserFollowed } from '@models/User';
 import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-
-interface GetByLoginParams {
-  login: string;
-}
+import type { UserLoginParams } from '@validators/users';
 
 type GetByLoginResponse = Pick<
   User,
@@ -20,15 +17,13 @@ type GetByLoginResponse = Pick<
 > & { _id: Types.ObjectId; isFollowed?: boolean };
 
 export async function getByLogin(
-  req: Request<GetByLoginParams>,
+  req: Request<UserLoginParams>,
   res: Response<GetByLoginResponse>,
 ) {
   const { login } = req.params;
   const { userId: currentUserId } = req.session;
 
-  const requestedUser = await UserModel.findOne({
-    login: normalizeLogin(login),
-  })
+  const requestedUser = await UserModel.findOne({ login })
     .select({
       login: 1,
       rating: 1,

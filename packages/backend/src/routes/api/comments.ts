@@ -1,492 +1,133 @@
-import express from 'express';
-import { asyncControllerErrorHandler } from '@utils/async-controller-error-handler';
 import {
-  getList,
   create,
-  updateById,
   deleteById,
-  voteById,
+  getList,
   unvoteById,
+  updateById,
+  voteById,
 } from '@controllers/comments';
-import authRequiredMiddleware from '@middlewares/auth-required';
+import { createApiRouter } from '@libs/api-router';
 import {
-  writeRateLimiter,
-  voteRateLimiter,
   apiRateLimiter,
+  voteRateLimiter,
+  writeRateLimiter,
 } from '@middlewares/rate-limiter';
+import { voteBodySchema } from '@validators/common';
+import {
+  commentCreateBodySchema,
+  commentDeleteResultSchema,
+  commentIdParamsSchema,
+  commentListQuerySchema,
+  commentListSchema,
+  commentSchema,
+  commentUpdateBodySchema,
+  storedCommentSchema,
+} from '@validators/comments';
 
-const router = express.Router();
+const api = createApiRouter({
+  prefix: '/comments',
+  tag: 'Comments',
+  tagDescription: 'Reading, writing and voting on the comments of a post',
+});
 
-/**
-@swagger
-{
-  "tags": [
-    {
-      "name": "Comments",
-      "description": "Actions with comments"
-    }
-  ],
-  "components": {
-    "schemas": {
-      "Comment": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "body": {
-            "type": "string"
-          },
-          "parent": {
-            "type": "string"
-          },
-          "author": {
-            "$ref": "#/components/schemas/Author"
-          },
-          "createdAt": {
-            "type": "string",
-            "example": "2019-08-16T01:04:02.504Z"
-          },
-          "children": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/Comment"
-                },
-                {
-                  "$ref": "#/components/schemas/CommentDeleted"
-                }
-              ]
-            }
-          },
-          "rating": {
-            "type": "number"
-          },
-          "rated": {
-            "$ref": "#/components/schemas/UserRate"
-          },
-          "deleted": {
-            "type": "boolean",
-            "default": false
-          }
-        }
-      },
-      "CommentDeleted": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "deleted": {
-            "type": "boolean"
-          },
-          "parent": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "example": "2019-08-16T01:04:02.504Z"
-          },
-          "children": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/Comment"
-                },
-                {
-                  "$ref": "#/components/schemas/CommentDeleted"
-                }
-              ]
-            }
-          }
-        }
-      }
-    }
-  }
-}
-*/
+const voteResponses = {
+  200: {
+    description: 'The comment with its new rating',
+    schema: storedCommentSchema,
+  },
+  403: { description: 'Your own comment, or one you have already voted on' },
+  404: { description: 'No such comment' },
+};
 
-/**
-@swagger
-{
-  "/comments": {
-    "get": {
-      "summary": "Get user's comments or comments in a post",
-      "tags": [
-        "Comments"
-      ],
-      "parameters": [
-        {
-          "in": "query",
-          "name": "offset",
-          "schema": {
-            "default": 0,
-            "type": "number"
-          },
-          "description": "The number of items to skip before starting to collect the result set."
-        },
-        {
-          "in": "query",
-          "name": "limit",
-          "schema": {
-            "default": 10,
-            "maximum": 30,
-            "minimum": 1,
-            "type": "number"
-          },
-          "description": "The numbers of items to return."
-        },
-        {
-          "in": "query",
-          "name": "author",
-          "schema": {
-            "type": "string"
-          },
-          "description": "user id of the user which comments you want to see"
-        },
-        {
-          "in": "query",
-          "name": "post",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "description": "post id"
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "comments": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Comment"
-                    }
-                  },
-                  "hasNextPage": {
-                    "type": "boolean"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        },
-        "422": {
-          "$ref": "#/components/responses/UnprocessableEntity"
-        }
-      }
+api.get({
+  path: '/',
+  summary: 'List the comments of a post',
+  description:
+    'The comments come back as a tree: every comment carries its replies in `children`, so one request is enough to render a thread.',
+  rateLimiter: apiRateLimiter,
+  request: { query: commentListQuerySchema },
+  responses: {
+    200: {
+      description: 'One page of top level comments',
+      schema: commentListSchema,
     },
-    "post": {
-      "summary": "Create a comment",
-      "tags": [
-        "Comments"
-      ],
-      "description": "Create a comment to a post",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "requestBody": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "required": [
-                "post"
-              ],
-              "properties": {
-                "body": {
-                  "type": "string",
-                  "example": "My body is dry"
-                },
-                "post": {
-                  "type": "string",
-                  "example": "5d546c95c0f3a272b2062205"
-                },
-                "parent": {
-                  "type": "string",
-                  "example": "5d55daa034c1991762147c2b"
-                }
-              }
-            }
-          }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Comment"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        },
-        "422": {
-          "$ref": "#/components/responses/UnprocessableEntity"
-        }
-      }
-    }
-  }
-}
-*/
-router.get('/', apiRateLimiter, asyncControllerErrorHandler(getList));
+    404: { description: 'No user with that id, when `author` is given' },
+  },
+  handler: getList,
+});
 
-router.post(
-  '/',
-  authRequiredMiddleware,
-  writeRateLimiter,
-  asyncControllerErrorHandler(create),
-);
+api.post({
+  path: '/',
+  summary: 'Write a comment',
+  description: 'With `parent`, the comment is a reply to that comment.',
+  auth: true,
+  rateLimiter: writeRateLimiter,
+  request: { body: commentCreateBodySchema },
+  responses: {
+    200: { description: 'The comment that was written', schema: commentSchema },
+    404: { description: 'No such post, or no such parent comment in it' },
+  },
+  handler: create,
+});
 
-/**
-@swagger
-{
-  "/comments/{id}": {
-    "put": {
-      "summary": "Edit comment",
-      "tags": [
-        "Comments"
-      ],
-      "description": "Edit comment by its `id`",
-      "parameters": [
-        {
-          "in": "path",
-          "name": "id",
-          "schema": {
-            "type": "string"
-          },
-          "required": true
-        }
-      ],
-      "requestBody": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "body": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      },
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Comment"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "403": {
-          "$ref": "#/components/responses/Forbidden"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        },
-        "422": {
-          "$ref": "#/components/responses/UnprocessableEntity"
-        }
-      }
+api.put({
+  path: '/:id',
+  summary: 'Edit a comment',
+  description:
+    'Only the author, only for a while after writing it, and only while nobody has replied.',
+  auth: true,
+  rateLimiter: writeRateLimiter,
+  request: { params: commentIdParamsSchema, body: commentUpdateBodySchema },
+  responses: {
+    200: { description: 'The comment as it now stands', schema: commentSchema },
+    400: { description: 'Somebody has already replied to it' },
+    403: { description: 'Not your comment, or the edit window has closed' },
+    404: { description: 'No such comment' },
+  },
+  handler: updateById,
+});
+
+api.delete({
+  path: '/:id',
+  summary: 'Delete a comment',
+  description:
+    'A comment with replies is emptied rather than removed, so the replies under it keep their place in the tree.',
+  auth: true,
+  rateLimiter: writeRateLimiter,
+  request: { params: commentIdParamsSchema },
+  responses: {
+    200: {
+      description:
+        'The comment is gone — or, when it had replies, the emptied comment',
+      schema: commentDeleteResultSchema,
     },
-    "delete": {
-      "tags": [
-        "Comments"
-      ],
-      "summary": "Delete comment",
-      "description": "Delete comment by its `id`",
-      "parameters": [
-        {
-          "in": "path",
-          "name": "id",
-          "schema": {
-            "type": "string"
-          },
-          "required": true
-        }
-      ],
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "responses": {
-        "200": {
-          "$ref": "#/components/responses/OK"
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "403": {
-          "$ref": "#/components/responses/Forbidden"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        }
-      }
-    }
-  }
-}
-*/
+    403: { description: 'Not your comment, or the window has closed' },
+    404: { description: 'No such comment' },
+  },
+  handler: deleteById,
+});
 
-router.put(
-  '/:id',
-  authRequiredMiddleware,
-  writeRateLimiter,
-  asyncControllerErrorHandler(updateById),
-);
-router.delete(
-  '/:id',
-  authRequiredMiddleware,
-  writeRateLimiter,
-  asyncControllerErrorHandler(deleteById),
-);
+api.put({
+  path: '/:id/vote',
+  summary: 'Vote on a comment',
+  auth: true,
+  rateLimiter: voteRateLimiter,
+  request: { params: commentIdParamsSchema, body: voteBodySchema },
+  responses: voteResponses,
+  handler: voteById,
+});
 
-/**
-@swagger
-{
-  "/comments/{id}/vote": {
-    "put": {
-      "summary": "Change rate on comment",
-      "description": "Changes vote for a comment. Field `negative` decides the direction of the vote.",
-      "tags": [
-        "Comments"
-      ],
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "parameters": [
-        {
-          "in": "path",
-          "name": "id",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "requestBody": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "negative": {
-                  "type": "boolean",
-                  "default": false
-                }
-              }
-            }
-          }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Comment"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        }
-      }
-    },
-    "delete": {
-      "summary": "Unvote a comment",
-      "description": "Unvotes an already voted comment",
-      "tags": [
-        "Comments"
-      ],
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "parameters": [
-        {
-          "in": "path",
-          "name": "id",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Comment"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "#/components/responses/Unauthorized"
-        },
-        "404": {
-          "$ref": "#/components/responses/NotFound"
-        }
-      }
-    }
-  }
-}
- */
-router.put(
-  '/:id/vote',
-  authRequiredMiddleware,
-  voteRateLimiter,
-  asyncControllerErrorHandler(voteById),
-);
-router.delete(
-  '/:id/vote',
-  authRequiredMiddleware,
-  voteRateLimiter,
-  asyncControllerErrorHandler(unvoteById),
-);
+api.delete({
+  path: '/:id/vote',
+  summary: 'Take back a vote on a comment',
+  auth: true,
+  rateLimiter: voteRateLimiter,
+  request: { params: commentIdParamsSchema },
+  responses: {
+    ...voteResponses,
+    403: { description: 'You have not voted on this comment' },
+  },
+  handler: unvoteById,
+});
 
-export default router;
+export default api.router;

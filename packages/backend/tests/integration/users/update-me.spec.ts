@@ -13,7 +13,7 @@ describe('PUT /users/me', () => {
     expect(response.status).toBe(401);
   });
 
-  it('Should return status 422 and a generic validation message for a too long bio', async () => {
+  it('Should return status 422 and an expected message for a too long bio', async () => {
     const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
@@ -24,7 +24,12 @@ describe('PUT /users/me', () => {
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken);
 
-    expect(response.body.error.message).toBe(ERRORS.INVALID_REQUEST_DATA);
+    expect(response.body.error.message).toBe(
+      ERRORS.USER_BIO_MAX_LENGTH_EXCEEDED,
+    );
+    expect(response.body.error.details).toEqual([
+      { path: 'bio', message: ERRORS.USER_BIO_MAX_LENGTH_EXCEEDED },
+    ]);
     expect(response.status).toBe(422);
   });
 

@@ -5,19 +5,13 @@ import { CommentModel, Comment } from '@models/Comment';
 import { COMMENT_RATE_VALUE } from '@constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-
-interface VoteByIdParams {
-  id: string;
-}
-
-interface VoteByIdBody {
-  negative: boolean;
-}
+import type { VoteBody } from '@validators/common';
+import type { CommentIdParams } from '@validators/comments';
 
 type VoteByIdResponse = Comment;
 
 export async function voteById(
-  req: Request<VoteByIdParams, unknown, VoteByIdBody>,
+  req: Request<CommentIdParams, unknown, VoteBody>,
   res: Response<VoteByIdResponse>,
 ) {
   const { userId } = req.session;

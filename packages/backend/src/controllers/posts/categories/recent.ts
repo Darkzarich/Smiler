@@ -1,13 +1,13 @@
 import type { Request, Response } from 'express';
 import { subHours } from 'date-fns';
-import { CursorPaginationRequest } from '@type/pagination';
+import type { PostFeedQuery } from '@validators/posts';
 import {
   respondWithPostList,
   PostListResponse,
 } from '../respond-with-post-list';
 
 export async function recent(
-  req: Request<unknown, unknown, unknown, CursorPaginationRequest>,
+  req: Request<unknown, unknown, unknown, PostFeedQuery>,
   res: Response<PostListResponse>,
 ) {
   await respondWithPostList(req, res, {

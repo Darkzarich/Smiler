@@ -72,12 +72,13 @@ router.all(/(.*)/, (_, __, next) => {
 });
 
 function handleSendError(error: AbstractError, res: Response) {
-  const { code, status, message } = error;
+  const { code, status, message, details } = error;
 
   res.status(status).json({
     error: {
       code,
       message,
+      ...(details && { details }),
     },
   });
 }

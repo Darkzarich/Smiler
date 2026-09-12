@@ -1,36 +1,22 @@
 import type { Request, Response } from 'express';
 import { CommentModel } from '@models/Comment';
 import { PostModel } from '@models/Post';
-import { CommentValidator } from '@validators/CommentValidator';
-
-import { ValidationError, NotFoundError, ERRORS } from '@errors';
+import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-
-interface CreateBody {
-  body: string;
-  parent?: string;
-  post: string;
-}
+import type { CommentCreateBody } from '@validators/comments';
 
 export async function create(
-  req: Request<unknown, unknown, CreateBody>,
+  req: Request<unknown, unknown, CommentCreateBody>,
   res: Response,
 ) {
   const { userId } = req.session;
-  const { parent, post: postId } = req.body;
-  let { body } = req.body;
-
-  if (!postId) {
-    throw new ValidationError(ERRORS.POST_ID_REQUIRED);
-  }
+  const { body, parent, post: postId } = req.body;
 
   const post = await PostModel.findById(postId).lean();
 
   if (!post) {
     throw new NotFoundError(ERRORS.POST_NOT_FOUND);
   }
-
-  body = CommentValidator.validateAndPrepareBody(body);
 
   if (!parent) {
     const [comment] = await Promise.all([

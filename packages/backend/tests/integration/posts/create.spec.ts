@@ -452,7 +452,7 @@ describe('POST /posts', () => {
     expect(postFromDb!.sections[0]).toMatchObject({ isSpoiler: true });
   });
 
-  it('Should normalize the spoiler flag of a section to a boolean', async () => {
+  it('Should return status 422 if the spoiler flag of a section is not a boolean', async () => {
     const { sessionCookie, csrfToken } = await signUpRequest(global.app);
 
     const response = await request(global.app)
@@ -467,6 +467,25 @@ describe('POST /posts', () => {
             content: 'A section flagged with something truthy',
             isSpoiler: 'yes',
           },
+        ],
+      });
+
+    expect(response.status).toBe(422);
+    expect(response.body.error.details).toEqual([
+      { path: 'sections[0].isSpoiler', message: expect.any(String) },
+    ]);
+  });
+
+  it('Should not store a spoiler flag that is false', async () => {
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+    const response = await request(global.app)
+      .post('/api/posts')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send({
+        ...requiredPostFields,
+        sections: [
           {
             type: POST_SECTION_TYPES.TEXT,
             content: 'A section that is not a spoiler',
@@ -477,8 +496,7 @@ describe('POST /posts', () => {
 
     const postFromDb = await PostModel.findById(response.body._id).lean();
 
-    expect(postFromDb!.sections[0]).toMatchObject({ isSpoiler: true });
-    expect(postFromDb!.sections[1]).not.toHaveProperty('isSpoiler');
+    expect(postFromDb!.sections[0]).not.toHaveProperty('isSpoiler');
   });
 
   it('Should normalize tags before adding the post to the database', async () => {

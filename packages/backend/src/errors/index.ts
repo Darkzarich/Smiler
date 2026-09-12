@@ -1,4 +1,4 @@
-import AbstractError from './AbstractError';
+import AbstractError, { type ValidationIssue } from './AbstractError';
 import AppError from './ServerError';
 import NotFoundError from './NotFoundError';
 import UnauthorizedError from './UnauthorizedError';
@@ -21,3 +21,5 @@ export {
   ContentTooLargeError,
   ERRORS,
 };
+
+export type { ValidationIssue };

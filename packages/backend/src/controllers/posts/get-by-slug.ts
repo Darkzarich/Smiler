@@ -3,15 +3,12 @@ import { PostModel, postToResponse, PostResponse } from '@models/Post';
 import { RateModel, RateTargetModel } from '@models/Rate';
 import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-
-interface GetBySlugParams {
-  slug: string;
-}
+import type { PostSlugParams } from '@validators/posts';
 
 type GetBySlugResponse = PostResponse;
 
 export async function getBySlug(
-  req: Request<GetBySlugParams>,
+  req: Request<PostSlugParams>,
   res: Response<GetBySlugResponse>,
 ) {
   const { userId } = req.session;

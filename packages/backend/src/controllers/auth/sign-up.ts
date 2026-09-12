@@ -1,68 +1,28 @@
 import type { Request, Response } from 'express';
-import { UserModel, normalizeEmail, normalizeLogin } from '@models/User';
-import { ValidationError, ConflictError, ERRORS } from '@errors';
+import { UserModel } from '@models/User';
+import { ConflictError, ERRORS } from '@errors';
 import {
   isDuplicateKeyError,
   getDuplicateKeyField,
 } from '@utils/check-mongo-db-error';
 import { hashPassword } from '@utils/password';
 import { sendSuccess } from '@utils/response-utils';
+import type { SignUpBody } from '@validators/auth';
 import { CurrentUserResponse } from './current';
 import { authenticateSession } from './session';
-
-interface SignUpBody {
-  email?: string;
-  login?: string;
-  password?: string;
-  confirm?: string;
-}
-
-/** Validate user sign up, return error message or nothing */
-const validate = (fields: SignUpBody) => {
-  if (!fields.login || !fields.password || !fields.confirm || !fields.email) {
-    return ERRORS.AUTH_FIELDS_REQUIRED;
-  }
-
-  if (fields.login.length < 3 || fields.login.length > 15) {
-    return ERRORS.AUTH_LOGIN_WRONG_LENGTH;
-  }
-
-  if (fields.password.length < 6) {
-    return ERRORS.AUTH_PASSWORD_TOO_SHORT;
-  }
-
-  if (fields.password !== fields.confirm) {
-    return ERRORS.AUTH_PASSWORDS_NOT_EQUAL;
-  }
-
-  if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(fields.email)) {
-    return ERRORS.AUTH_INVALID_EMAIL;
-  }
-};
 
 export async function signUp(
   req: Request<unknown, unknown, SignUpBody>,
   res: Response<CurrentUserResponse>,
 ) {
-  const user = {
-    email: req.body.email ? normalizeEmail(req.body.email) : undefined,
-    login: req.body.login ? normalizeLogin(req.body.login) : undefined,
-    password: req.body.password,
-    confirm: req.body.confirm,
-  };
+  const { login, email, password } = req.body;
 
-  const errorMessage = validate(user);
-
-  if (errorMessage) {
-    throw new ValidationError(errorMessage);
-  }
-
-  const { hash, salt, hashParams } = await hashPassword(user.password!);
+  const { hash, salt, hashParams } = await hashPassword(password);
 
   try {
     const newUser = await UserModel.create({
-      login: user.login,
-      email: user.email,
+      login,
+      email,
       hash,
       salt,
       hashParams,
@@ -71,7 +31,7 @@ export async function signUp(
 
     await authenticateSession(req, newUser._id.toString());
 
-    const userAuth = {
+    sendSuccess(res, {
       _id: newUser._id.toString(),
       login: newUser.login,
       isAuth: true,
@@ -80,9 +40,7 @@ export async function signUp(
       email: newUser.email,
       tagsFollowed: newUser.tagsFollowed,
       followersAmount: newUser.followersAmount,
-    };
-
-    sendSuccess(res, userAuth);
+    });
   } catch (error) {
     if (isDuplicateKeyError(error)) {
       const duplicateField = getDuplicateKeyField(error);
