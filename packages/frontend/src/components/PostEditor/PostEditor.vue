@@ -194,6 +194,8 @@
 </template>
 
 <script setup lang="ts">
+import { useEventListener } from '@vueuse/core';
+import { isEqual } from 'lodash-es';
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Draggable from 'vuedraggable';
@@ -209,6 +211,7 @@ import PostEditorPicture from './PostEditorPicture.vue';
 import PostEditorTags from './PostEditorTags.vue';
 import PostEditorVideo from './PostEditorVideo.vue';
 import { buildPreviewPost } from './build-preview-post';
+import { pickNewerDraft, useLocalPostDraft } from './use-local-post-draft';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import * as consts from '@/const';
@@ -321,6 +324,30 @@ watch(
   { deep: true },
 );
 
+// The draft lives in two places: the account, written by the Save Draft button
+// so it can be picked up on another device, and this device's storage, written
+// as the writing happens so a closed tab costs nothing. Only the account's copy
+// is shared, so only that one counts as saved - which is what `isDirty` means
+// and what the editor warns about on the way out.
+const localDraft = useLocalPostDraft({
+  userId: () => userStore.userId,
+  title,
+  tags,
+  sections,
+});
+
+// Browsers show their own wording and ignore anything given here, so there is
+// nothing to say — only the prompt to ask for.
+useEventListener(window, 'beforeunload', (event: BeforeUnloadEvent) => {
+  if (!isDirty.value) {
+    return;
+  }
+
+  event.preventDefault();
+  // Safari still goes by the legacy property rather than the cancellation.
+  event.returnValue = '';
+});
+
 const isSubmitDisabled = computed(() => {
   return Boolean(validation.value.title || validation.value.sections);
 });
@@ -411,11 +438,35 @@ onMounted(async () => {
       return;
     }
 
-    const data = await api.users.getMyTemplate();
+    const template = await api.users.getMyTemplate();
+    const stored = localDraft.read();
+    const opened = pickNewerDraft(stored, template);
 
-    title.value = data.title;
-    sections.value = data.sections || [];
-    tags.value = data.tags || [];
+    title.value = opened.title;
+    sections.value = opened.sections;
+    tags.value = opened.tags;
+
+    localDraft.start();
+
+    if (opened.source === 'local') {
+      const isSameAsTemplate =
+        opened.title === template.title &&
+        isEqual(opened.tags, template.tags || []) &&
+        isEqual(opened.sections, template.sections || []);
+
+      // A local draft that only repeats the template is nothing to report, and
+      // nothing to save either. One that differs never reached the account, so
+      // the editor opens with changes still to save — and says where they came
+      // from, since they are not what the account would have served.
+      if (!isSameAsTemplate) {
+        notificationsStore.showInfoNotification({
+          message:
+            'Restored the unsaved draft from this device. It is newer than the one saved to your account',
+        });
+
+        return;
+      }
+    }
   }
 
   nextTick(() => {
@@ -432,6 +483,11 @@ const createPost = async () => {
       title: title.value,
       tags: tags.value,
     });
+
+    // The backend clears the account's template on publish; this device's copy
+    // would otherwise come back as the newer of the two.
+    localDraft.clear();
+    isDirty.value = false;
 
     router.push({
       name: 'Single',
@@ -480,6 +536,10 @@ const saveDraft = async () => {
     title.value = data.title;
     sections.value = data.sections;
     tags.value = data.tags;
+
+    // Both copies now hold the same thing, and the account's carries the newer
+    // stamp. Dropping this one keeps the next load off the comparison entirely.
+    localDraft.clear();
 
     notificationsStore.showInfoNotification({
       message: 'Draft post has been saved successfully!',

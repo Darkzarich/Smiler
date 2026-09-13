@@ -29,9 +29,17 @@ export interface GetUserTemplateResponse {
   title: string;
   tags: string[];
   sections: PostSection[];
+  /** When the server last saved the template, absent on templates last saved
+   * before it started being stamped. The editor compares it against the draft
+   * it keeps in localStorage to decide which of the two to open. */
+  updatedAt?: string;
 }
 
-export type UpdateUserTemplateRequest = GetUserTemplateResponse;
+/** The server stamps `updatedAt` itself, so it is never sent. */
+export type UpdateUserTemplateRequest = Omit<
+  GetUserTemplateResponse,
+  'updatedAt'
+>;
 
 export type UpdateUserTemplateResponse = GetUserTemplateResponse;
 

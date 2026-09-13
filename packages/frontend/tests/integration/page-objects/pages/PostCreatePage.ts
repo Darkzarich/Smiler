@@ -43,6 +43,11 @@ export default class PostCreatePage extends AbstractPage {
     return this.page.getByTestId('text-section');
   }
 
+  /** What the section holds, as opposed to the toolbar above it. */
+  getTextSectionInput() {
+    return this.page.getByTestId('text-section-input');
+  }
+
   getPictureSection() {
     return this.page.getByTestId('pic-section');
   }

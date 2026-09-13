@@ -6,7 +6,9 @@ import Post from '../Post/Post.vue';
 import PostEditor from './PostEditor.vue';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
+import type { userTypes } from '@/api/users';
 import { useUserStore } from '@/store/user';
+import BaseInput from '@common/BaseInput.vue';
 import BaseSegmentedControl from '@common/BaseSegmentedControl.vue';
 import ConfirmModal from '@common/ConfirmModal.vue';
 
@@ -36,6 +38,7 @@ const testElements = {
   toggleTextSectionSpoiler: '[data-testid="toggle-spoiler-text-1"]',
   textSectionSpoilerBadge: '[data-testid="spoiler-badge-text-1"]',
   saveDraftButton: '[datatestid="save-draft-button"]',
+  createPostButton: '[datatestid="create-post-button"]',
   writeArea: '.post-editor__write',
   preview: '[datatestid="post-preview"]',
   previewEmpty: '[data-testid="post-preview-empty"]',
@@ -72,7 +75,11 @@ function pictureSection(
   };
 }
 
-function createWrapper(sections: postTypes.PostSection[], isEdit = false) {
+function createWrapper(
+  sections: postTypes.PostSection[],
+  isEdit = false,
+  template: Partial<userTypes.GetUserTemplateResponse> = {},
+) {
   const pinia = createPinia();
   setActivePinia(pinia);
 
@@ -91,6 +98,7 @@ function createWrapper(sections: postTypes.PostSection[], isEdit = false) {
     title: '',
     sections,
     tags: [],
+    ...template,
   });
 
   return mount(PostEditor, {
@@ -122,13 +130,13 @@ function createWrapper(sections: postTypes.PostSection[], isEdit = false) {
   });
 }
 
+enableAutoUnmount(afterEach);
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
 
 describe('PostEditor delete section flow', () => {
-  enableAutoUnmount(afterEach);
-
   it('deletes an empty section immediately without showing the modal', async () => {
     const wrapper = createWrapper([textSection('')]);
 
@@ -334,5 +342,234 @@ describe('PostEditor preview', () => {
     expect(wrapper.find(testElements.writeArea).isVisible()).toBe(true);
     expect(wrapper.find(testElements.preview).exists()).toBe(false);
     expect(wrapper.findAll('[data-testid="post-section"]')).toHaveLength(1);
+  });
+});
+
+describe('PostEditor local draft', () => {
+  const storageKey = 'post-draft:user-1';
+
+  const storeLocalDraft = (draft: {
+    title?: string;
+    tags?: string[];
+    sections?: postTypes.PostSection[];
+    updatedAt: number;
+  }) => {
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify({ title: '', tags: [], sections: [], ...draft }),
+    );
+  };
+
+  const titleOf = (wrapper: ReturnType<typeof createWrapper>) =>
+    wrapper.findComponent(BaseInput).props('modelValue');
+
+  const readStoredDraft = () => {
+    const stored = localStorage.getItem(storageKey);
+
+    return stored ? JSON.parse(stored) : null;
+  };
+
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  it("opens the draft this device holds when it is newer than the account's", async () => {
+    storeLocalDraft({
+      title: 'Written here',
+      sections: [textSection('Local content')],
+      updatedAt: Date.parse('2026-09-13T12:00:00.000Z'),
+    });
+
+    const wrapper = createWrapper([textSection('Account content')], false, {
+      title: 'Saved to the account',
+      updatedAt: '2026-09-13T11:00:00.000Z',
+    });
+
+    await flushPromises();
+
+    expect(titleOf(wrapper)).toBe('Written here');
+    expect(wrapper.findAll('[data-testid="post-section"]')).toHaveLength(1);
+  });
+
+  it('opens the account template when it is the newer of the two', async () => {
+    storeLocalDraft({
+      title: 'Written here',
+      updatedAt: Date.parse('2026-09-13T10:00:00.000Z'),
+    });
+
+    const wrapper = createWrapper([textSection('Account content')], false, {
+      title: 'Saved to the account',
+      updatedAt: '2026-09-13T11:00:00.000Z',
+    });
+
+    await flushPromises();
+
+    expect(titleOf(wrapper)).toBe('Saved to the account');
+  });
+
+  it('leaves a restored local draft marked as not yet saved to the account', async () => {
+    storeLocalDraft({
+      title: 'Written here',
+      updatedAt: Date.parse('2026-09-13T12:00:00.000Z'),
+    });
+
+    const wrapper = createWrapper([], false, {
+      updatedAt: '2026-09-13T11:00:00.000Z',
+    });
+
+    await flushPromises();
+
+    expect(
+      wrapper.find(testElements.saveDraftButton).attributes('disabled'),
+    ).toBe('false');
+  });
+
+  it('counts a restored draft that only repeats the account copy as saved', async () => {
+    storeLocalDraft({
+      title: 'The same title',
+      sections: [textSection('The same content')],
+      updatedAt: Date.parse('2026-09-13T12:00:00.000Z'),
+    });
+
+    const wrapper = createWrapper([textSection('The same content')], false, {
+      title: 'The same title',
+      updatedAt: '2026-09-13T11:00:00.000Z',
+    });
+
+    await flushPromises();
+
+    expect(
+      wrapper.find(testElements.saveDraftButton).attributes('disabled'),
+    ).toBe('true');
+  });
+
+  it('writes the editor contents to this device as they change', async () => {
+    vi.useFakeTimers();
+
+    try {
+      const wrapper = createWrapper([textSection('Account content')]);
+
+      await flushPromises();
+
+      await wrapper
+        .findComponent(BaseInput)
+        .vm.$emit('update:modelValue', 'A title typed out');
+
+      vi.advanceTimersByTime(1000);
+      await flushPromises();
+
+      expect(readStoredDraft()).toMatchObject({
+        title: 'A title typed out',
+        sections: [expect.objectContaining({ content: 'Account content' })],
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('drops this device copy once the draft reaches the account', async () => {
+    storeLocalDraft({
+      title: 'Written here',
+      updatedAt: Date.parse('2026-09-13T12:00:00.000Z'),
+    });
+
+    const wrapper = createWrapper([textSection('Some content')], false, {
+      updatedAt: '2026-09-13T11:00:00.000Z',
+    });
+
+    vi.mocked(api.users.updateMyTemplate).mockResolvedValue({
+      title: 'Written here',
+      sections: [textSection('Some content')],
+      tags: [],
+      updatedAt: '2026-09-13T13:00:00.000Z',
+    });
+
+    await flushPromises();
+
+    await wrapper.find(testElements.saveDraftButton).trigger('click');
+    await flushPromises();
+
+    expect(readStoredDraft()).toBeNull();
+  });
+
+  it('drops this device copy once the post is published', async () => {
+    storeLocalDraft({
+      title: 'Written here',
+      updatedAt: Date.parse('2026-09-13T12:00:00.000Z'),
+    });
+
+    const wrapper = createWrapper([textSection('Some content')], false, {
+      title: 'A title',
+      updatedAt: '2026-09-13T11:00:00.000Z',
+    });
+
+    vi.mocked(api.posts.createPost).mockResolvedValue({
+      slug: 'a-post',
+    } as Awaited<ReturnType<typeof api.posts.createPost>>);
+
+    await flushPromises();
+
+    await wrapper.find(testElements.createPostButton).trigger('click');
+    await flushPromises();
+
+    expect(readStoredDraft()).toBeNull();
+  });
+});
+
+describe('PostEditor unsaved changes warning', () => {
+  const closeTab = () => {
+    const event = new Event('beforeunload', { cancelable: true });
+
+    window.dispatchEvent(event);
+
+    return event;
+  };
+
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  it('lets the tab close while everything is saved to the account', async () => {
+    createWrapper([textSection('Some content')]);
+
+    await flushPromises();
+
+    expect(closeTab().defaultPrevented).toBe(false);
+  });
+
+  it('asks before the tab closes on changes the account has not seen', async () => {
+    const wrapper = createWrapper([textSection('Some content')]);
+
+    await flushPromises();
+
+    await wrapper
+      .findComponent(BaseInput)
+      .vm.$emit('update:modelValue', 'A title typed out');
+    await nextTick();
+
+    expect(closeTab().defaultPrevented).toBe(true);
+  });
+
+  it('lets the tab close again once the draft reaches the account', async () => {
+    const wrapper = createWrapper([textSection('Some content')]);
+
+    vi.mocked(api.users.updateMyTemplate).mockResolvedValue({
+      title: 'A title typed out',
+      sections: [textSection('Some content')],
+      tags: [],
+    });
+
+    await flushPromises();
+
+    await wrapper
+      .findComponent(BaseInput)
+      .vm.$emit('update:modelValue', 'A title typed out');
+    await nextTick();
+
+    await wrapper.find(testElements.saveDraftButton).trigger('click');
+    await flushPromises();
+    await nextTick();
+
+    expect(closeTab().defaultPrevented).toBe(false);
   });
 });

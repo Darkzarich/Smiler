@@ -534,3 +534,31 @@ test('Cannot open the editor if the user is not logged in', async ({
   await expect(currentPage).toHaveURL(PostsPage.urls.today);
   await expect(currentPage).toHaveTitle(PostsPage.titles.today);
 });
+
+test('Keeps an unsaved draft on the device and restores it after a reload', async ({
+  PostCreatePage,
+  NotificationList,
+  page: currentPage,
+}) => {
+  await PostCreatePage.goto();
+
+  await PostCreatePage.postTitleInput.fill(title);
+  await PostCreatePage.addTextSection();
+  await PostCreatePage.fillTextSection('test text');
+
+  // The draft is written on a debounce, so the reload waits for it to land
+  // rather than racing it.
+  await currentPage.waitForFunction(() =>
+    Object.keys(localStorage).some((key) => key.startsWith('post-draft:')),
+  );
+
+  await currentPage.reload();
+
+  // The account still holds the empty template mocked above, so what comes back
+  // can only be the copy this device kept.
+  await expect(PostCreatePage.postTitleInput).toHaveValue(title);
+  await expect(PostCreatePage.getTextSectionInput()).toContainText('test text');
+  await expect(NotificationList.root).toContainText(
+    'Restored the unsaved draft from this device',
+  );
+});
