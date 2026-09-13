@@ -13,3 +13,9 @@
 @custom-media --tablet-landscape-up (width >= 900px);
 @custom-media --desktop-up (width >= 1200px);
 @custom-media --big-desktop-up (width >= 1800px);
+
+/* Not a width — a pointer capability. A drag-and-drop affordance is meaningless
+   on a touch screen, so the components that offer one ask for this instead of
+   guessing from the viewport: a narrow desktop window still has a mouse, and a
+   tablet does not. */
+@custom-media --pointer-coarse ((hover: none) and (pointer: coarse));

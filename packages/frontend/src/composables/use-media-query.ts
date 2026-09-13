@@ -8,7 +8,8 @@ export type Breakpoint =
   | 'tablet-portrait-up'
   | 'tablet-landscape-up'
   | 'desktop-up'
-  | 'big-desktop-up';
+  | 'big-desktop-up'
+  | 'pointer-coarse';
 
 function resolveQuery(breakpoint: Breakpoint) {
   const declaration = new RegExp(

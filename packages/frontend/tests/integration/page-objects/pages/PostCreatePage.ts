@@ -35,6 +35,10 @@ export default class PostCreatePage extends AbstractPage {
     return this.page.getByTestId('image-upload-button');
   }
 
+  getPictureUploadLabel() {
+    return this.page.getByTestId('picture-dropzone').locator('label');
+  }
+
   getTextSection() {
     return this.page.getByTestId('text-section');
   }
@@ -99,14 +103,30 @@ export default class PostCreatePage extends AbstractPage {
     await this.getImageUploadBtn().click();
   }
 
+  /** Choosing a file uploads it straight away — the Upload button next to it is
+   * for a pasted URL only. */
   async uploadPictureWithFile() {
     await this.page.getByLabel('Upload image').setInputFiles({
       name: 'test.jpeg',
       buffer: Buffer.from('test', 'utf-8'),
       mimeType: 'image/jpeg',
     });
+  }
 
-    await this.getImageUploadBtn().click();
+  /** Playwright cannot drag a file in from outside the page, so the drop is
+   * dispatched with a DataTransfer built in the page itself. */
+  async dropPictureFile() {
+    const dataTransfer = await this.page.evaluateHandle(() => {
+      const data = new DataTransfer();
+
+      data.items.add(new File(['test'], 'test.jpeg', { type: 'image/jpeg' }));
+
+      return data;
+    });
+
+    await this.page
+      .getByTestId('picture-dropzone')
+      .dispatchEvent('drop', { dataTransfer });
   }
 
   async uploadVideoWithUrl(vidCode: string) {

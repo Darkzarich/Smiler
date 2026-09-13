@@ -15,3 +15,17 @@ export const POST_SECTIONS_MAX_LENGTH = 10000;
 export const POST_TITLE_MAX_LENGTH = 100;
 export const POST_MAX_TAGS = 8;
 export const POST_MAX_TAG_LEN = 20;
+
+/* Both mirror the limits the upload endpoint enforces — ALLOWED_UPLOAD_MIME_TYPES
+   and POST_MAX_UPLOAD_IMAGE_SIZE in packages/backend/src/controllers/posts/upload.ts.
+   The file is already in the browser, so a rejection costs nothing here and an
+   upload there. */
+export const POST_PICTURE_ALLOWED_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/avif',
+];
+
+export const POST_PICTURE_MAX_SIZE = 3 * 1024 * 1024;

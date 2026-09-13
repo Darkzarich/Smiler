@@ -171,6 +171,55 @@ test('Uploads a picture in the picture section', async ({
   );
 });
 
+test('Uploads a picture dropped on the picture section', async ({
+  PostCreatePage,
+  Api,
+  isMobile,
+}) => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(isMobile, 'A touch screen is offered the file dialog instead');
+
+  Api.routes.posts.uploadAttachment.mock({
+    body: {
+      type: 'pic',
+      url: storedPicSection.url,
+      hash: (Math.random() * Math.random()).toString(36),
+      isFile: true,
+    },
+  });
+
+  await PostCreatePage.goto();
+
+  await PostCreatePage.addPictureSection();
+
+  const uploadResponse = await Api.routes.posts.uploadAttachment.waitForRequest(
+    {
+      preRequestAction: PostCreatePage.dropPictureFile.bind(PostCreatePage),
+    },
+  );
+
+  expect(uploadResponse.headers()['content-type']).toContain(
+    'multipart/form-data; boundary=',
+  );
+
+  await expect(
+    PostCreatePage.getPictureSection().getByAltText('Post attachment'),
+  ).toBeVisible();
+});
+
+test('Offers dragging a picture in only where it can be done', async ({
+  PostCreatePage,
+  isMobile,
+}) => {
+  await PostCreatePage.goto();
+
+  await PostCreatePage.addPictureSection();
+
+  await expect(PostCreatePage.getPictureUploadLabel()).toHaveText(
+    isMobile ? 'Upload image' : /Drag & drop an image here/,
+  );
+});
+
 test('Deletes sections in a post', async ({ PostCreatePage }) => {
   await PostCreatePage.goto();
 
