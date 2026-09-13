@@ -21,7 +21,8 @@
     "lint:types": "pnpm --filter backend lint:types && pnpm --filter frontend lint:types",
     "test": "pnpm --filter \"backend\" test && pnpm --filter \"frontend\" test:e2e:ci && pnpm --filter \"frontend\" test:unit:ci",
     "test:prepush": "pnpm --filter backend test && pnpm --filter frontend test:unit:ci",
-    "knip": "knip"
+    "knip": "knip",
+    "bench:stores": "k6 run scripts/benchmarks/stores.js"
   },
   "license": "MIT",
   "bugs": {

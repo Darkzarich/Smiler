@@ -62,6 +62,14 @@ const root = (files) => {
   ];
 };
 
+const scripts = (files) => [
+  command(
+    'pnpm exec prettier --write --config packages/frontend/prettier.config.js',
+    files,
+  ),
+  ...spellcheckTasks(files),
+];
+
 const backend = (files) => {
   const codeFiles = filterByExtension(files, ['.js', '.ts']);
   const tasks = [prettier('packages/backend', files)];
@@ -118,6 +126,7 @@ const frontend = (files) => {
 
 module.exports = {
   '*.{js,cjs,json,md,yml,yaml}': root,
+  'scripts/**/*.{js,cjs,json,md,yml,yaml}': scripts,
   'packages/backend/**/*.{js,ts,json,md,yml,yaml}': backend,
   'packages/frontend/**/*.{js,ts,vue,css,html,json,md,yml,yaml}': frontend,
 };

@@ -21,6 +21,9 @@ pnpm lint:types             # tsc --noEmit on both packages
 # Testing
 pnpm test                   # backend jest + frontend playwright e2e + frontend vitest
 pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push runs)
+
+# Benchmarks (needs k6 installed and a backend already running — see Benchmarks below)
+pnpm bench:stores           # what the session and rate limiter stores cost per request
 ```
 
 ## Backend (`packages/backend`)
@@ -87,6 +90,24 @@ pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push
 - **Styles**: plain CSS through PostCSS (`postcss.config.mjs`) — there is no Sass. `postcss-nested` gives Sass-style nesting including `&__element` BEM concatenation, which the CSS spec's own nesting cannot do. Breakpoints are `@custom-media` in `src/styles/media.css`, injected into every file by `@csstools/postcss-global-data`, so a component writes `@media (--phone-only)` with no import. Add a breakpoint there, not inline. Responsive differences belong in CSS; reach for the `useMediaQuery('phone-only')` composable only when the DOM itself has to differ (an attribute, or a subtree that would otherwise be duplicated). It parses the same `media.css`, so there is one definition per breakpoint for both languages.
 - Vue component style: PascalCase component names in templates; blank lines between `<template>`/`<script>`/`<style>` blocks.
 - `vuedraggable@4.1.0` is patched — see `patches/` directory.
+
+## Benchmarks
+
+`scripts/benchmarks/` holds the [k6](https://github.com/grafana/k6) load scripts. They are deliberately
+outside `pnpm test`: they need a backend that is already running, and they measure the machine as much
+as the code, so they are for comparing two revisions on one box — never a pass/fail gate in CI. Add a
+new script as `scripts/benchmarks/<subject>.js` with a `bench:<subject>` root script next to it.
+
+`stores.js` measures what the session store and the rate limiter add to a request. It drives
+`GET /api/auth/current`, the cheapest rate limited endpoint there is, in two scenarios: `anonymous`,
+which answers without touching the database and so is almost entirely the rate limiter's store, and
+`authenticated`, which reads the session and one user document on top. The endpoint is the same in both
+revisions, so the difference between two runs is the difference between two store backends.
+
+Start the backend with every `RATE_LIMIT_*_MAX` raised (a few million) first, or the limits are what
+gets measured — the script stops with that as its message if it sees a 429. Knobs, all optional:
+`BASE_URL` (default `http://localhost:3000`), `ORIGIN` (the allowed browser origin sign-up is sent
+with), `VUS` (50), `DURATION` (`30s`, per scenario) and `SCENARIO` to run only one of the two.
 
 ## Git hooks
 
