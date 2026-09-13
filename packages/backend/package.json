@@ -74,7 +74,7 @@
   },
   "dependencies": {
     "@typegoose/typegoose": "^12.21.1",
-    "connect-mongo": "^5.1.0",
+    "connect-redis": "^10.0.0",
     "cors": "^2.8.6",
     "date-fns": "^3.6.0",
     "dotenv": "^16.6.1",
@@ -89,7 +89,8 @@
     "morgan": "^1.12.0",
     "multer": "^2.3.0",
     "nanoid": "^3.3.18",
-    "rate-limit-mongo": "^2.3.2",
+    "rate-limit-redis": "^6.0.1",
+    "redis": "^6.2.1",
     "sanitize-html": "2.17.7",
     "sharp": "^0.35.4",
     "slug": "^1.1.0",

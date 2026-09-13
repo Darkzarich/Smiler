@@ -3,7 +3,7 @@
 ## Project overview
 
 pnpm monorepo — a Reddit-style social platform (MEVN stack).
-Two packages: `packages/backend` (Express 5 + TypeScript + MongoDB/Mongoose + sessions) and `packages/frontend` (Vue 3 + Vite + Pinia).
+Two packages: `packages/backend` (Express 5 + TypeScript + MongoDB/Mongoose, sessions and rate limits in Redis) and `packages/frontend` (Vue 3 + Vite + Pinia).
 
 ## Common commands
 
@@ -21,6 +21,9 @@ pnpm lint:types             # tsc --noEmit on both packages
 # Testing
 pnpm test                   # backend jest + frontend playwright e2e + frontend vitest
 pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push runs)
+
+# Benchmarks (needs k6 installed and a backend already running — see Benchmarks below)
+pnpm bench:stores           # what the session and rate limiter stores cost per request
 ```
 
 ## Backend (`packages/backend`)
@@ -33,6 +36,21 @@ pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push
   - Global setup spins up an in-memory MongoDB on port 27018; sets `DB_URL` automatically.
   - Run single test: `pnpm --filter backend test -- tests/integration/some-file.spec.ts`
 - **Path aliases** (tsconfig + ts-node): `@config/*`, `@routes/*`, `@controllers/*`, `@middlewares/*`, `@libs/*`, `@models/*`, `@utils/*`, `@validators/*`, `@constants/*`, `@type/*`, `@errors`, `@test-utils/*`, `@test-data-generators`. Jest's `moduleNameMapper` is derived from the tsconfig paths, so a new alias only has to be added there.
+- **Redis** holds the sessions (`connect-redis`) and the rate limiter counters (`rate-limit-redis`).
+  `src/libs/redis.ts` owns the one client each worker gets; `getRedisClient()` connects on the first
+  call and hands the same promise to everyone after that. Two consequences worth knowing:
+  - `startApp` awaits it, so a worker whose Redis is unreachable dies at boot instead of serving
+    traffic with no rate limiting: `rate-limit-redis` loads its Lua scripts when the middleware is
+    _created_ (at import), and a failure there leaves the limiter passing every request for the life
+    of the worker. Once connected, the client reconnects for as long as the worker lives.
+  - A limiter that cannot reach Redis lets the request through (`passOnStoreError`) and logs
+    `rate_limit_store_error`. A session that cannot be read is a 500 for the request that carries the
+    cookie — anonymous traffic is unaffected.
+  - Every limiter gets its own key prefix (`rate-limit:<name>:`), which is not decoration: with one
+    shared namespace the five limiters increment the same counter for a client, and the first window
+    to be created decides when it expires.
+- Jest runs **without Redis**: the rate limiter is skipped and the session store falls back to
+  express-session's in-memory one, so `tests/` still needs nothing but the in-memory MongoDB.
 - `.env` file required at repo root (copy from `.env.example`). Backend reads it via dotenv.
 - **Environment variables** are declared once, in `src/config/env.ts`, as a [zod](https://github.com/colinhacks/zod)
   schema that `src/config/index.ts` parses at boot. A bad or missing variable prints every problem at
@@ -72,6 +90,24 @@ pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push
 - **Styles**: plain CSS through PostCSS (`postcss.config.mjs`) — there is no Sass. `postcss-nested` gives Sass-style nesting including `&__element` BEM concatenation, which the CSS spec's own nesting cannot do. Breakpoints are `@custom-media` in `src/styles/media.css`, injected into every file by `@csstools/postcss-global-data`, so a component writes `@media (--phone-only)` with no import. Add a breakpoint there, not inline. Responsive differences belong in CSS; reach for the `useMediaQuery('phone-only')` composable only when the DOM itself has to differ (an attribute, or a subtree that would otherwise be duplicated). It parses the same `media.css`, so there is one definition per breakpoint for both languages.
 - Vue component style: PascalCase component names in templates; blank lines between `<template>`/`<script>`/`<style>` blocks.
 - `vuedraggable@4.1.0` is patched — see `patches/` directory.
+
+## Benchmarks
+
+`scripts/benchmarks/` holds the [k6](https://github.com/grafana/k6) load scripts. They are deliberately
+outside `pnpm test`: they need a backend that is already running, and they measure the machine as much
+as the code, so they are for comparing two revisions on one box — never a pass/fail gate in CI. Add a
+new script as `scripts/benchmarks/<subject>.js` with a `bench:<subject>` root script next to it.
+
+`stores.js` measures what the session store and the rate limiter add to a request. It drives
+`GET /api/auth/current`, the cheapest rate limited endpoint there is, in two scenarios: `anonymous`,
+which answers without touching the database and so is almost entirely the rate limiter's store, and
+`authenticated`, which reads the session and one user document on top. The endpoint is the same in both
+revisions, so the difference between two runs is the difference between two store backends.
+
+Start the backend with every `RATE_LIMIT_*_MAX` raised (a few million) first, or the limits are what
+gets measured — the script stops with that as its message if it sees a 429. Knobs, all optional:
+`BASE_URL` (default `http://localhost:3000`), `ORIGIN` (the allowed browser origin sign-up is sent
+with), `VUS` (50), `DURATION` (`30s`, per scenario) and `SCENARIO` to run only one of the two.
 
 ## Git hooks
 

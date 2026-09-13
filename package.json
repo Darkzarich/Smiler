@@ -21,7 +21,8 @@
     "lint:types": "pnpm --filter backend lint:types && pnpm --filter frontend lint:types",
     "test": "pnpm --filter \"backend\" test && pnpm --filter \"frontend\" test:e2e:ci && pnpm --filter \"frontend\" test:unit:ci",
     "test:prepush": "pnpm --filter backend test && pnpm --filter frontend test:unit:ci",
-    "knip": "knip"
+    "knip": "knip",
+    "bench:stores": "k6 run scripts/benchmarks/stores.js"
   },
   "license": "MIT",
   "bugs": {
@@ -38,9 +39,6 @@
     "lint-staged": "^16.4.0"
   },
   "pnpm": {
-    "overrides": {
-      "underscore": "^1.13.8"
-    },
     "patchedDependencies": {
       "vuedraggable@4.1.0": "patches/vuedraggable@4.1.0.patch"
     }

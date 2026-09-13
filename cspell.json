@@ -19,6 +19,7 @@
   "words": [
     "9gag",
     "agentic",
+    "appendonly",
     "autopopulate",
     "autopopulates",
     "browserslist",
@@ -59,6 +60,7 @@
     "prepush",
     "printjson",
     "redirector",
+    "rediss",
     "resave",
     "resizer",
     "SAMEORIGIN",

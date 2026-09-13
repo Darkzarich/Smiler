@@ -35,6 +35,7 @@ services:
       SESSION_SECRET: ${SESSION_SECRET}
       FRONT_ORIGIN_REMOTE: ${FRONT_ORIGIN_REMOTE}
       DB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@smiler-db:${DB_PORT}/${MONGO_INITDB_DATABASE}?authSource=admin
+      REDIS_URL: redis://smiler-redis:6379
       <<: *common-variables
     restart: always
     # The backend logs one JSON object per line to stdout and leaves collection
@@ -53,6 +54,24 @@ services:
     depends_on:
       smiler-db:
         condition: service_healthy
+      smiler-redis:
+        condition: service_healthy
+  smiler-redis:
+    image: redis:8.2-alpine
+    restart: always
+    container_name: smiler-redis
+    # Sessions outlive a restart, the rate limiter counters are free to not:
+    # one snapshot an hour is enough to keep people logged in through one.
+    command: redis-server --save 3600 1 --appendonly no
+    volumes:
+      - smiler-redis:/data:rw
+    networks:
+      - db
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
   smiler-db:
     image: mongo:8.0.29
     restart: always
@@ -76,4 +95,5 @@ networks:
 
 volumes:
   smiler-db:
+  smiler-redis:
   smiler-backend-uploads:

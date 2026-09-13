@@ -40,7 +40,8 @@ This project is built on the MEVN stack (MongoDB, Express, Vue.js, Node.js), wri
 
   - **Clustering**: If an exception occurs on the server, the app won't crash. Instead, another instance will be spawned to keep the application running.
   - **CORS Protection**: The API restricts access to allowed domains via environment variables.
-  - **Rate Limiting**: Read and write endpoints are protected by separate rate limiters.
+  - **Rate Limiting**: Read and write endpoints are protected by separate rate limiters, counted in Redis so every cluster worker and every host shares one budget per client.
+  - **Sessions in Redis**: Sessions live in Redis rather than the main database, which keeps the hottest read of an authenticated request out of MongoDB.
   - **CSRF Protection**: State-changing requests require a CSRF token, issued and validated per session.
   - **Input Sanitizing and Validation**: Rich text from posts and comments is sanitized server-side, and every endpoint validates its payload before it reaches the database.
   - **Logging**: Every request is logged using [Winston](https://github.com/winstonjs/winston) and [morgan](https://github.com/expressjs/morgan) as structured JSON — one object per line, carrying a request id, the matched route template and the acting user, so a report can be traced from the client's `X-Request-Id` to the error that caused it. Logs go to stdout and are collected and rotated by Docker.
@@ -178,6 +179,7 @@ Smiler has been in development since 2019 and has been through several full-stac
 - **Sep 2026 — pictures** — Pictures added by url stop being hotlinked. The backend now **downloads them, re-encodes with [sharp](https://github.com/lovell/sharp) and stores them** alongside file uploads, for post sections and avatars alike, so a third-party host no longer collects the IP of everyone who opens a post, and the encoded size and pixel count are bounded the way an upload's are. Fetching a url the user chose is an SSRF sink, so it is guarded on both sides: addresses reserved for the local network are refused before a socket opens, every name is rechecked at connect time against what it actually resolved to — which is what closes DNS rebinding — and redirects are revalidated hop by hop.
 - **Sep 2026 — observability** — Backend logging is reworked around **structured stdout**. Winston had been writing `logs/*.log` from every cluster worker at once and rotating by bytes per process, so the workers renamed the file out from under each other and lost lines; stdout is now the only transport, Docker's `json-file` driver owns rotation, and every line is one JSON object carrying a request id, the matched route template and the acting user.
 - **Sep 2026 — API contract** — The `params`, `query` and `body` of every endpoint are now parsed by a **[Zod](https://github.com/colinhacks/zod)** schema before the controller runs, replacing three hand-rolled validator classes and the field checks each controller used to open with. Each route is registered once, together with its schemas, and the **OpenAPI 3.1** document is generated from that registration — so the ~2,700 lines of Swagger JSDoc that used to sit above the routes are gone, and the docs cannot describe anything but what the server accepts. A rejected request now names every field that failed instead of only the first.
+- **Sep 2026 — infrastructure** — **Redis** joins MongoDB as a second datastore and takes over the two things every request touches: sessions move to **[connect-redis](https://github.com/redis/connect-redis)**, and the rate limiter counts through **[rate-limit-redis](https://github.com/express-rate-limit/rate-limit-redis)** instead of an unmaintained Mongo store that shipped its own MongoDB 3 driver and opened a connection pool per limiter per worker. Each limiter also moves under its own key prefix: all five used to share one counter per client, so a single upload could spend a user's read allowance and leave it locked for an hour. A **k6** load script in `scripts/benchmarks/` measures what the two stores cost per request, which is how the move was checked: roughly half the latency of the MongoDB stores, and about 1.75× the throughput on one box.
 - **Sep 2026 — editor** — Any post section can be published behind a **spoiler**: a blurred veil on the rendered post that lifts on click, with the covered content kept out of reach of the keyboard and screen readers until it does. A **Write / Preview** toggle lands alongside it, rendering the draft through the same component readers see, with voting, routing and tag following switched off since none of them have anything to point at yet. An unfinished post is also kept **in the browser it is being written in**, saved on a debounce as the typing happens, so a closed tab costs nothing while the copy on the account still carries the draft between devices — the editor opens whichever of the two was written last, and leaving the page with changes the account has not seen asks first.
 
 </details>
@@ -191,7 +193,9 @@ This project can be run in multiple ways, depending on your preferences and setu
 - **Node.js** (>=24.0.0 — see `.nvmrc` for the exact version used in development)
 - **[pnpm](https://pnpm.io/)** (>=8.6.0)
 - **Docker** and **Docker Compose** (optional, for containerized setups)
+- **[k6](https://github.com/grafana/k6)** (optional, for the load benchmarks in `scripts/benchmarks/`)
 - **MongoDB** (can be set up locally, remotely, or via Docker)
+- **Redis** (same — it holds the sessions and the rate limiter counters)
 
 ---
 
@@ -207,20 +211,29 @@ If you prefer not to use Docker, follow these steps:
    - **Option B: Remote MongoDB (e.g., MongoDB Atlas)**  
      Use a remote MongoDB instance like [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). Copy the connection string provided by the service.
 
-2. **Configure Environment Variables**:
+2. **Set Up Redis**:
+
+   Run one locally, or start a container:
+
+   ```bash
+   docker run -d -p 6379:6379 --name smiler-redis redis:8.2-alpine
+   ```
+
+3. **Configure Environment Variables**:
 
    - Rename `.env.example` to `.env` in the root folder.
    - Open the `.env` file and fill in the required values:
      - For **Local MongoDB**: Set `DB_URL` to `mongodb://localhost:27017/smiler`.
      - For **Remote MongoDB**: Set `DB_URL` to the connection string provided by your remote MongoDB service.
+     - Set `REDIS_URL` to `redis://localhost:6379`, or to wherever your Redis is.
 
-3. **Install Dependencies**:
+4. **Install Dependencies**:
 
    ```bash
    pnpm install
    ```
 
-4. **Run the Application**:
+5. **Run the Application**:
    ```bash
    pnpm dev
    ```
@@ -245,18 +258,26 @@ If you prefer to use Docker, follow these steps:
    - **Option B: Use Remote MongoDB (e.g., MongoDB Atlas)**  
      Use a remote MongoDB instance like [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). Copy the connection string and update the `DB_URL` in `.env`.
 
-2. **Configure Environment Variables**:
+2. **Set Up Redis**:
+
+   ```bash
+   docker run -d -p 6379:6379 --name smiler-redis redis:8.2-alpine
+   ```
+
+   Update the `REDIS_URL` in `.env` to `redis://smiler-redis:6379`.
+
+3. **Configure Environment Variables**:
 
    - Rename `.env.example` to `.env` in the root folder.
    - Open the `.env` file and fill in the required values.
 
-3. **Build Images**:
+4. **Build Images**:
    - Build the images using the following commands:
    ```bash
    docker build --target frontend -t <your_username>/smiler-frontend:latest .
    docker build --target backend -t <your_username>/smiler-backend:latest .
    ```
-4. **Run the Application Images with Docker**:
+5. **Run the Application Images with Docker**:
    - Run the images using the following commands:
    ```bash
    docker run -d -p 8080:80 --name smiler-frontend <your_username>/smiler-frontend:latest
@@ -272,7 +293,7 @@ If you want to run both the application and MongoDB using Docker Compose, follow
 1. **Configure Environment Variables**:
 
    - Rename `.env.example` to `.env` in the root folder.
-   - Open the `.env` file and fill in the required values. For MongoDB, set `DB_URL` to `mongodb://mongo:27017/smiler`.
+   - Open the `.env` file and fill in the required values. For MongoDB, set `DB_URL` to `mongodb://mongo:27017/smiler`. Compose runs its own Redis and points the backend at it, so `REDIS_URL` is not read in this setup.
 
 2. **Run Docker Compose**:
    - Use the provided `docker-compose.yml` and `docker-compose.local.yml` files to start the application and MongoDB together:

@@ -16,6 +16,7 @@ describe('env validation', () => {
       IS_JEST: false,
       LOG_LEVEL: 'debug',
       LOG_FORMAT: 'pretty',
+      REDIS_URL: 'redis://localhost:6379',
       RATE_LIMIT_ENABLED: true,
       RATE_LIMIT_API_MAX: 100,
     });
@@ -63,6 +64,12 @@ describe('env validation', () => {
     expect(() =>
       parseEnv({ ...validEnv, FRONT_ORIGIN_REMOTE: 'domain.example.com' }),
     ).toThrow(/FRONT_ORIGIN_REMOTE/);
+  });
+
+  it('rejects a Redis url that is not one', () => {
+    expect(() =>
+      parseEnv({ ...validEnv, REDIS_URL: 'localhost:6379' }),
+    ).toThrow(/REDIS_URL/);
   });
 
   it('builds a connection string from the database name when DB_URL is unset', () => {

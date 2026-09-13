@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import Config from '@config/index';
 import { connectDB } from '@libs/db';
 import { logger } from '@libs/logger';
+import { getRedisClient } from '@libs/redis';
 import morganMiddleware from '@middlewares/morgan';
 import corsMiddleware from '@middlewares/cors';
 import sessionMiddleware from '@middlewares/session';
@@ -17,7 +18,12 @@ export async function startApp() {
 
   let server: Server | undefined;
 
-  const db = await connectDB();
+  await connectDB();
+
+  // The rate limiter loads its scripts into Redis as soon as it is imported, so
+  // a Redis that is unreachable has to stop the boot here: left to the first
+  // request, the limiter would fail open for the life of the worker.
+  const redis = Config.IS_JEST ? undefined : await getRedisClient();
 
   const app = express();
 
@@ -43,9 +49,7 @@ export async function startApp() {
     app.set('trust proxy', 1);
   }
 
-  if (db) {
-    app.use(sessionMiddleware(db));
-  }
+  app.use(sessionMiddleware(redis));
 
   // Add logger for requests
   app.use(morganMiddleware);

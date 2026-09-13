@@ -13,7 +13,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   // Emptying the collections instead of dropping the database on purpose:
   // dropDatabase aborts index builds that are still in flight, which permanently
-  // rejects the cached collection promise connect-mongo builds its TTL index on.
+  // rejects the cached collection promise the model that started one waits on.
   const collections = await mongoose.connection.db!.collections();
 
   await Promise.all(collections.map((collection) => collection.deleteMany({})));
