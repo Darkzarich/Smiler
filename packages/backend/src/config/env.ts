@@ -99,6 +99,15 @@ const envSchema = z
     DB_PORT: fromEnv(port().default(27017)),
     MONGO_INITDB_DATABASE: fromEnv(z.string().optional()),
 
+    REDIS_URL: fromEnv(
+      z
+        .string()
+        .regex(/^rediss?:\/\//, {
+          message: 'must start with redis:// or rediss://',
+        })
+        .default('redis://localhost:6379'),
+    ),
+
     SESSION_SECRET: fromEnv(z.string().optional()),
 
     FRONT_ORIGIN_LOCAL: fromEnv(origin.optional()),
@@ -123,6 +132,7 @@ const envSchema = z
       DB_URL:
         env.DB_URL ??
         `mongodb://localhost:${env.DB_PORT}/${env.MONGO_INITDB_DATABASE}?authSource=admin`,
+      REDIS_URL: env.REDIS_URL,
       IS_PRODUCTION: isProduction,
       IS_JEST: isJest,
       LOG_LEVEL: env.LOG_LEVEL ?? pickLogLevel(isProduction, isJest),

@@ -38,9 +38,6 @@
     "lint-staged": "^16.4.0"
   },
   "pnpm": {
-    "overrides": {
-      "underscore": "^1.13.8"
-    },
     "patchedDependencies": {
       "vuedraggable@4.1.0": "patches/vuedraggable@4.1.0.patch"
     }
