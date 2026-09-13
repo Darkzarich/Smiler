@@ -583,6 +583,27 @@ describe('POST /posts', () => {
       title: '',
       sections: [],
       tags: [],
+      updatedAt: expect.any(Date),
     });
+  });
+
+  it('Should stamp the cleared template, so a draft held elsewhere loses to it', async () => {
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
+
+    const before = Date.now();
+
+    await request(global.app)
+      .post('/api/posts')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send(requiredPostFields);
+
+    const userFromDb = await UserModel.findById(currentUser._id).lean();
+    const clearedAt = userFromDb!.template.updatedAt!.getTime();
+
+    expect(clearedAt).toBeGreaterThanOrEqual(before);
+    expect(clearedAt).toBeLessThanOrEqual(Date.now());
   });
 });

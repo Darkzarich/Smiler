@@ -111,7 +111,56 @@ describe('PUT /users/me/template', () => {
         ...section,
         hash: expect.any(String),
       })),
+      updatedAt: expect.any(String),
     });
+  });
+
+  it('Should stamp the template with the time of the save', async () => {
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
+
+    const before = Date.now();
+
+    const response = await request(global.app)
+      .put('/api/users/me/template')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send(requiredPostFields);
+
+    const userFromDb = await UserModel.findById(currentUser._id).lean();
+    const savedAt = userFromDb!.template.updatedAt!.getTime();
+
+    expect(savedAt).toBeGreaterThanOrEqual(before);
+    expect(savedAt).toBeLessThanOrEqual(Date.now());
+    expect(response.body.updatedAt).toBe(
+      userFromDb!.template.updatedAt!.toISOString(),
+    );
+  });
+
+  it('Should stamp the template even when the save changes nothing', async () => {
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
+
+    const savedAt = new Date('2026-09-13T10:00:00.000Z');
+
+    await UserModel.updateOne(
+      { _id: currentUser._id },
+      { $set: { 'template.updatedAt': savedAt } },
+    );
+
+    await request(global.app)
+      .put('/api/users/me/template')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken)
+      .send({});
+
+    const userFromDb = await UserModel.findById(currentUser._id).lean();
+
+    expect(userFromDb!.template.updatedAt!.getTime()).toBeGreaterThan(
+      savedAt.getTime(),
+    );
   });
 
   it('Should update title in user.template in the database', async () => {
@@ -215,6 +264,7 @@ describe('PUT /users/me/template', () => {
         ...section,
         hash: expect.any(String),
       })),
+      updatedAt: expect.any(Date),
     });
   });
 });

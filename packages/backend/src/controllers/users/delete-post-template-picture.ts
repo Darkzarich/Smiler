@@ -46,7 +46,10 @@ export async function deletePostTemplatePicture(
 
   await UserModel.updateOne(
     { _id: userId },
-    { $pull: { 'template.sections': { hash } } },
+    {
+      $pull: { 'template.sections': { hash } },
+      $set: { 'template.updatedAt': new Date() },
+    },
   );
 
   sendSuccess(res);

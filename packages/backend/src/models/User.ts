@@ -16,6 +16,10 @@ export interface UserTemplate {
   sections: PostSection[];
   tags: string[];
   title: string;
+  /** When the template was last written, so a client holding a draft of its own
+   * can tell which of the two is the newer one. Absent on templates last saved
+   * before it started being stamped. */
+  updatedAt?: Date;
 }
 
 export interface PopulatedAuthor extends Pick<User, 'login' | 'avatar'> {

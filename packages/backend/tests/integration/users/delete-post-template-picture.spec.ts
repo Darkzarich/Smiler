@@ -189,4 +189,43 @@ describe('DELETE /users/me/template/:hash', () => {
     );
     expect(updatedUser!.template.sections).toHaveLength(0);
   });
+
+  it('Should stamp the template, dropping a section being a save of its own', async () => {
+    const hash = '1234';
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
+
+    await UserModel.updateOne(
+      { _id: currentUser._id },
+      {
+        $set: {
+          template: {
+            sections: [
+              {
+                hash,
+                type: 'pic',
+                isFile: true,
+                url: `/uploads/${currentUser._id}/1234.jpg`,
+              },
+            ],
+            updatedAt: new Date('2026-09-13T10:00:00.000Z'),
+          },
+        },
+      },
+    );
+
+    await request(global.app)
+      .delete(`/api/users/me/template/${hash}`)
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
+
+    const updatedUser = await UserModel.findById(currentUser._id)
+      .select('template')
+      .lean();
+
+    expect(updatedUser!.template.updatedAt!.getTime()).toBeGreaterThan(
+      Date.parse('2026-09-13T10:00:00.000Z'),
+    );
+  });
 });

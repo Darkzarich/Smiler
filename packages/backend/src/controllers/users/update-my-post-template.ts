@@ -24,16 +24,21 @@ export async function updateMyPostTemplate(
   const updatedUser = await UserModel.findByIdAndUpdate(
     userId,
     {
-      // A field the request left out keeps the value it already had: the editor
-      // saves whichever part of the draft changed, not the whole of it.
-      $set: omitBy(
-        {
-          'template.title': title,
-          'template.tags': tags,
-          'template.sections': sections,
-        },
-        isUndefined,
-      ),
+      $set: {
+        // A field the request left out keeps the value it already had: the
+        // editor saves whichever part of the draft changed, not the whole of it.
+        ...omitBy(
+          {
+            'template.title': title,
+            'template.tags': tags,
+            'template.sections': sections,
+          },
+          isUndefined,
+        ),
+        // Stamped on every write, including one that changed nothing: the
+        // client compares it against the draft it keeps locally.
+        'template.updatedAt': new Date(),
+      },
     },
     { new: true, lean: true },
   );

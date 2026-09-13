@@ -92,6 +92,11 @@ export const postTemplateSchema = apiSchema(
     title: z.string(),
     tags: z.array(z.string()),
     sections: z.array(postSectionSchema),
+    updatedAt: isoDateTime()
+      .optional()
+      .describe(
+        'When the template was last saved, absent if that was before it started being stamped',
+      ),
   }),
 );
 

@@ -35,6 +35,9 @@ export async function create(
           'template.title': '',
           'template.sections': [],
           'template.tags': [],
+          // Stamped like any other write, so a draft another device still holds
+          // loses to the clearing instead of resurrecting the published post.
+          'template.updatedAt': new Date(),
         },
       },
     ),
