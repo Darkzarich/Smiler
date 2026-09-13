@@ -113,12 +113,17 @@ onBeforeUnmount(() => {
     z-index: 1001;
     min-width: 300px;
     max-width: calc(100vw - 32px);
+
+    /* svh, not dvh: the panel must not resize while its own content is
+       scrolled under a retracting mobile URL bar. */
+    max-height: calc(100svh - 32px);
     padding: 24px;
     border-radius: 8px;
     box-shadow: 0 8px 30px rgb(0 0 0 / 20%);
     background: var(--color-surface-elevated);
     color: var(--color-text-primary);
     transform: translate(-50%, -50%);
+    overflow-y: auto;
   }
 
   &__header {

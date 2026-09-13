@@ -788,19 +788,19 @@ const searchByTag = (tag: string) => {
   }
 
   &__section-attachment--image {
-    max-height: min(720px, 80vh);
+    max-height: min(720px, 80svh);
   }
 
   &__section-image {
     width: 100%;
-    max-height: min(720px, 80vh);
+    max-height: min(720px, 80svh);
     object-fit: contain;
   }
 
   &__section-video {
     width: 100%;
     height: auto;
-    max-height: 80vh;
+    max-height: 80svh;
     object-fit: contain;
   }
 

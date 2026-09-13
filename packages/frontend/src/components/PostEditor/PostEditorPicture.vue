@@ -187,7 +187,7 @@ const createSectionWithAttachment = async (
     display: flex;
     flex-flow: row nowrap;
     justify-content: center;
-    max-height: min(520px, 70vh);
+    max-height: min(520px, 70svh);
     border-radius: 8px;
     background: var(--color-surface-primary);
     overflow: hidden;
@@ -195,7 +195,7 @@ const createSectionWithAttachment = async (
     img {
       width: 100%;
       height: auto;
-      max-height: min(520px, 70vh);
+      max-height: min(520px, 70svh);
       object-fit: contain;
     }
   }
