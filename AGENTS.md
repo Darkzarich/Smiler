@@ -3,7 +3,7 @@
 ## Project overview
 
 pnpm monorepo — a Reddit-style social platform (MEVN stack).
-Two packages: `packages/backend` (Express 5 + TypeScript + MongoDB/Mongoose + sessions) and `packages/frontend` (Vue 3 + Vite + Pinia).
+Two packages: `packages/backend` (Express 5 + TypeScript + MongoDB/Mongoose, sessions and rate limits in Redis) and `packages/frontend` (Vue 3 + Vite + Pinia).
 
 ## Common commands
 
@@ -33,6 +33,21 @@ pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push
   - Global setup spins up an in-memory MongoDB on port 27018; sets `DB_URL` automatically.
   - Run single test: `pnpm --filter backend test -- tests/integration/some-file.spec.ts`
 - **Path aliases** (tsconfig + ts-node): `@config/*`, `@routes/*`, `@controllers/*`, `@middlewares/*`, `@libs/*`, `@models/*`, `@utils/*`, `@validators/*`, `@constants/*`, `@type/*`, `@errors`, `@test-utils/*`, `@test-data-generators`. Jest's `moduleNameMapper` is derived from the tsconfig paths, so a new alias only has to be added there.
+- **Redis** holds the sessions (`connect-redis`) and the rate limiter counters (`rate-limit-redis`).
+  `src/libs/redis.ts` owns the one client each worker gets; `getRedisClient()` connects on the first
+  call and hands the same promise to everyone after that. Two consequences worth knowing:
+  - `startApp` awaits it, so a worker whose Redis is unreachable dies at boot instead of serving
+    traffic with no rate limiting: `rate-limit-redis` loads its Lua scripts when the middleware is
+    _created_ (at import), and a failure there leaves the limiter passing every request for the life
+    of the worker. Once connected, the client reconnects for as long as the worker lives.
+  - A limiter that cannot reach Redis lets the request through (`passOnStoreError`) and logs
+    `rate_limit_store_error`. A session that cannot be read is a 500 for the request that carries the
+    cookie — anonymous traffic is unaffected.
+  - Every limiter gets its own key prefix (`rate-limit:<name>:`), which is not decoration: with one
+    shared namespace the five limiters increment the same counter for a client, and the first window
+    to be created decides when it expires.
+- Jest runs **without Redis**: the rate limiter is skipped and the session store falls back to
+  express-session's in-memory one, so `tests/` still needs nothing but the in-memory MongoDB.
 - `.env` file required at repo root (copy from `.env.example`). Backend reads it via dotenv.
 - **Environment variables** are declared once, in `src/config/env.ts`, as a [zod](https://github.com/colinhacks/zod)
   schema that `src/config/index.ts` parses at boot. A bad or missing variable prints every problem at
