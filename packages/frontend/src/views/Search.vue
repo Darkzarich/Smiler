@@ -115,7 +115,7 @@ const isAnyFilterActive = computed(() => {
 onBeforeMount(() => {
   Object.keys(route.query).forEach((filterKey) => {
     if (route.query[filterKey]) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // oxlint-disable-next-line @typescript-eslint/no-explicit-any
       (filter.value[filterKey as keyof SearchFilter] as any) =
         route.query[filterKey];
     }

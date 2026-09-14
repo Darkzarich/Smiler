@@ -1,18 +1,14 @@
 {
-  "eslint.validate": [
-    "vue",
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
+  // Oxlint (oxc.oxc-vscode extension) lints all JS/TS; ESLint only the frontend's Vue templates
+  "eslint.validate": ["vue"],
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "eslint.workingDirectories": [
     {
-      "pattern": "./packages/*"
+      "pattern": "./packages/frontend"
     }
   ],
+  "oxc.enable": true,
   "stylelint.validate": ["css", "less", "postcss", "vue"],
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"

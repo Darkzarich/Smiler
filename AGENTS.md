@@ -15,7 +15,7 @@ pnpm build                  # builds backend, then frontend
 # Linting (the pre-commit hook only lints staged files, this is the whole repo)
 pnpm lint                   # all three passes below, in order
 pnpm lint:spell             # cspell spellcheck (root)
-pnpm lint:code              # eslint on backend + eslint+stylelint on frontend
+pnpm lint:code              # oxlint on backend + oxlint, eslint (templates) and stylelint on frontend
 pnpm lint:types             # tsc --noEmit on both packages
 
 # Testing
@@ -31,6 +31,7 @@ pnpm bench:stores           # what the session and rate limiter stores cost per 
 - **Entry**: `index.ts` (cluster mode) → `src/app.ts`
 - **Dev server**: `pnpm --filter backend dev` (ts-node)
 - **Build**: `tsc && tsc-alias` — output goes to `dist/`
+- **Linting**: Oxlint only (`.oxlintrc.json`), **type-aware** through `oxlint-tsgolint`, and `eslint-plugin-security` loaded as an Oxlint JS plugin. tsgolint runs the TypeScript 7 (Go) compiler against `tsconfig.json`, so that file must stay valid for TS 7 — no `baseUrl` (`paths` resolve relative to the tsconfig) and nothing TS 6 deprecated — even though the package itself still builds with TypeScript 5.
 - **Tests**: Jest integration tests using `mongodb-memory-server` (no external DB needed). Requires `NODE_OPTIONS="--experimental-vm-modules"`.
   - Test files: `tests/**/*.spec.ts`
   - Global setup spins up an in-memory MongoDB on port 27018; sets `DB_URL` automatically.
@@ -86,7 +87,10 @@ pnpm bench:stores           # what the session and rate limiter stores cost per 
 - **E2E tests**: Playwright against the built app (`vite preview` on port 4173). Files in `tests/integration/`.
   - Run: `pnpm --filter frontend test:e2e:ci`
 - **Path aliases**: `@/*`, `@components/*`, `@common/*`, `@icons/*`, `@utils/*`
-- **Linting**: separate ESLint (`.js/.ts/.vue`) and Stylelint (`.css/.vue`) passes
+- **Linting**: three passes. Oxlint (`.oxlintrc.json`) lints all JS/TS, including every `.vue` `<script>`. ESLint (`eslint.config.mjs`) lints **only Vue templates**, because Oxlint cannot parse them. Stylelint handles `.css/.vue` styles.
+  - Put script rules in `.oxlintrc.json` and template rules in `eslint.config.mjs`. `eslint-plugin-oxlint` turns off in ESLint every rule the Oxlint config already enables, so the two never report the same thing.
+  - Inside a `.vue` `<script>`, suppress with `// oxlint-disable-next-line`. ESLint 10 errors on an `eslint-disable` comment naming a rule it does not load (e.g. `@typescript-eslint/*`).
+  - `eslint-plugin-oxlint` pins the Oxlint minor (`~1.82.0`), so bump the two together.
 - **Styles**: plain CSS through PostCSS (`postcss.config.mjs`) — there is no Sass. `postcss-nested` gives Sass-style nesting including `&__element` BEM concatenation, which the CSS spec's own nesting cannot do. Breakpoints are `@custom-media` in `src/styles/media.css`, injected into every file by `@csstools/postcss-global-data`, so a component writes `@media (--phone-only)` with no import. Add a breakpoint there, not inline. Responsive differences belong in CSS; reach for the `useMediaQuery('phone-only')` composable only when the DOM itself has to differ (an attribute, or a subtree that would otherwise be duplicated). It parses the same `media.css`, so there is one definition per breakpoint for both languages.
 - Vue component style: PascalCase component names in templates; blank lines between `<template>`/`<script>`/`<style>` blocks.
 - `vuedraggable@4.1.0` is patched — see `patches/` directory.
@@ -113,7 +117,7 @@ with), `VUS` (50), `DURATION` (`30s`, per scenario) and `SCENARIO` to run only o
 
 Managed by [husky](https://github.com/typicode/husky) in `.husky/`; every hook delegates to a root `package.json` script:
 
-- **`pre-commit`** → `pnpm precommit` → `lint-staged` (see `lint-staged.config.cjs`): Prettier, ESLint/Stylelint `--fix` and cspell over the _staged_ files, plus a full-package `lint:types` for any package with staged code.
+- **`pre-commit`** → `pnpm precommit` → `lint-staged` (see `lint-staged.config.cjs`): Prettier, Oxlint/ESLint/Stylelint `--fix` and cspell over the _staged_ files, plus a full-package `lint:types` for any package with staged code.
 - **`commit-msg`** → `pnpm commitmsg` → `scripts/lint-commit-msg.sh`: `commitlint --edit` against `commitlint.config.cjs`, then cspell over the message text. Git's own comment block and the diff `git commit -v` appends are stripped before spellchecking, so only what the author wrote is checked.
 - **`pre-push`** → `pnpm prepush` → `pnpm test:prepush` (backend Jest + frontend Vitest).
 

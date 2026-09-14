@@ -77,11 +77,7 @@ const backend = (files) => {
 
   if (codeFiles.length > 0) {
     tasks.push(
-      command(
-        'pnpm --filter backend exec eslint --fix --ext .js --ext .ts --ignore-path .gitignore',
-        codeFiles,
-        fromDir,
-      ),
+      command('pnpm --filter backend exec oxlint --fix', codeFiles, fromDir),
     );
     tasks.push('pnpm --filter backend lint:types');
   }
@@ -93,6 +89,7 @@ const backend = (files) => {
 
 const frontend = (files) => {
   const codeFiles = filterByExtension(files, ['.js', '.ts', '.vue']);
+  const vueFiles = filterByExtension(files, ['.vue']);
   const styleFiles = filterByExtension(files, ['.css', '.vue']);
   const tasks = [
     prettier('packages/frontend', files),
@@ -102,12 +99,16 @@ const frontend = (files) => {
 
   if (codeFiles.length > 0) {
     tasks.push(
-      command(
-        'pnpm --filter frontend exec eslint --fix --ext .js,.ts,.vue --ignore-path .gitignore',
-        codeFiles,
-        fromDir,
-      ),
+      command('pnpm --filter frontend exec oxlint --fix', codeFiles, fromDir),
     );
+
+    // ESLint only lints Vue templates here, everything else is Oxlint's
+    if (vueFiles.length > 0) {
+      tasks.push(
+        command('pnpm --filter frontend exec eslint --fix', vueFiles, fromDir),
+      );
+    }
+
     tasks.push('pnpm --filter frontend lint:types');
   }
 

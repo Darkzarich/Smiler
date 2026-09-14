@@ -22,6 +22,7 @@ Smiler is a Reddit-style social platform where users share posts with text, imag
   - [Option 2: Running With Docker](#option-2-running-with-docker)
   - [Option 3: Running With Docker Compose (All-in-One)](#option-3-running-with-docker-compose-all-in-one)
 - [Contribution](#contribution)
+  - [Linting](#linting)
 - [License](#license)
 
 ## Key Features
@@ -31,7 +32,7 @@ This project is built on the MEVN stack (MongoDB, Express, Vue.js, Node.js), wri
 ### Common Features
 
 - **Containerized with Docker**: The project is fully containerized using Docker, and the `docker-compose` setup is highly flexible. It can also run without Docker if needed.
-- **pnpm Monorepo**: Backend and frontend live in one workspace with shared tooling — ESLint, Prettier, cspell, and type-checking all run from the root.
+- **pnpm Monorepo**: Backend and frontend live in one workspace with shared tooling — Oxlint (plus ESLint for Vue templates), Prettier, cspell, and type-checking all run from the root.
 - **TypeScript End to End**: Both packages are fully typed, including the API client, which shares request and response types with the components that use them.
 
 ### Backend Key Features
@@ -181,6 +182,7 @@ Smiler has been in development since 2019 and has been through several full-stac
 - **Sep 2026 — API contract** — The `params`, `query` and `body` of every endpoint are now parsed by a **[Zod](https://github.com/colinhacks/zod)** schema before the controller runs, replacing three hand-rolled validator classes and the field checks each controller used to open with. Each route is registered once, together with its schemas, and the **OpenAPI 3.1** document is generated from that registration — so the ~2,700 lines of Swagger JSDoc that used to sit above the routes are gone, and the docs cannot describe anything but what the server accepts. A rejected request now names every field that failed instead of only the first.
 - **Sep 2026 — infrastructure** — **Redis** joins MongoDB as a second datastore and takes over the two things every request touches: sessions move to **[connect-redis](https://github.com/redis/connect-redis)**, and the rate limiter counts through **[rate-limit-redis](https://github.com/express-rate-limit/rate-limit-redis)** instead of an unmaintained Mongo store that shipped its own MongoDB 3 driver and opened a connection pool per limiter per worker. Each limiter also moves under its own key prefix: all five used to share one counter per client, so a single upload could spend a user's read allowance and leave it locked for an hour. A **k6** load script in `scripts/benchmarks/` measures what the two stores cost per request, which is how the move was checked: roughly half the latency of the MongoDB stores, and about 1.75× the throughput on one box.
 - **Sep 2026 — editor** — Any post section can be published behind a **spoiler**: a blurred veil on the rendered post that lifts on click, with the covered content kept out of reach of the keyboard and screen readers until it does. A **Write / Preview** toggle lands alongside it, rendering the draft through the same component readers see, with voting, routing and tag following switched off since none of them have anything to point at yet. An unfinished post is also kept **in the browser it is being written in**, saved on a debounce as the typing happens, so a closed tab costs nothing while the copy on the account still carries the draft between devices — the editor opens whichever of the two was written last, and leaving the page with changes the account has not seen asks first.
+- **Sep 2026 — linting** — **ESLint → [Oxlint](https://github.com/oxc-project/oxc)** in both packages, rule for rule, dropping the unmaintained airbnb and `eslint-plugin-node` configs and turning on type-aware linting on the backend. Vue templates are the one thing Oxlint cannot parse, so the frontend keeps a template-only ESLint beside it. The two together run in about half the time of the old single pass, and the backend lints in 3s instead of 17s.
 
 </details>
 
@@ -305,6 +307,17 @@ If you want to run both the application and MongoDB using Docker Compose, follow
 ## Contribution
 
 Feel free to check out the code, open issues if you find bugs, or suggest improvements. Pull requests are welcome too.
+
+### Linting
+
+`pnpm lint` runs every check the pre-commit hook runs, over the whole repo. JavaScript and TypeScript are linted by **[Oxlint](https://github.com/oxc-project/oxc)** in both packages (`.oxlintrc.json`), type-aware on the backend.
+
+The frontend runs **two linters**, because Oxlint reads only the `<script>` of a `.vue` file and cannot parse its template:
+
+- **Oxlint** lints all the frontend code, `<script>` blocks included.
+- **ESLint** (`packages/frontend/eslint.config.mjs`) lints only the `.vue` templates, with `eslint-plugin-vue` and `eslint-plugin-vuejs-accessibility`. Every rule Oxlint already covers is switched off there, so nothing is reported twice.
+
+Together they still finish in about half the time the single ESLint pass used to take. A new rule for script code belongs in `.oxlintrc.json`, and one for templates in `eslint.config.mjs`. Suppression comments follow the same split: `oxlint-disable` inside `<script>`, and `<!-- eslint-disable -->` in templates. Oxlint also honours `eslint-disable` comments in plain `.ts` files.
 
 ## License
 
