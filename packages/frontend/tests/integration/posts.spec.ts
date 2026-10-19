@@ -254,13 +254,30 @@ test.describe('Post groups', () => {
       }
     });
 
-    test('Feed link is disabled if user is not logged in', async ({
+    test('Asks a visitor to sign in before opening the feed, then opens it', async ({
+      page: currentPage,
       PostsPage,
+      AuthPrompt,
+      Api,
     }) => {
-      await expect(PostsPage.getFeedLink()).toHaveAttribute(
-        'title',
-        'Sign in to access this page',
-      );
+      await PostsPage.getFeedLink().click();
+
+      await expect(AuthPrompt.title).toHaveText('Sign in to see your feed');
+      await expect(currentPage).toHaveURL(PostsPage.urls.today);
+
+      const user = createRandomAuth({ isAuth: true });
+
+      // Every guarded navigation asks for the session again
+      await Api.routes.auth.getAuth.mock({ body: user });
+      await Api.routes.auth.signIn.mock({ body: user });
+      await Api.routes.posts.getFeed.mock({
+        body: { posts, hasNextPage: false },
+      });
+
+      await AuthPrompt.signIn();
+
+      await expect(AuthPrompt.panel).toBeHidden();
+      await expect(currentPage).toHaveURL(PostsPage.urls.feed);
     });
   });
 
@@ -318,6 +335,10 @@ test.describe('Post groups', () => {
 
 test.describe('Post votes', () => {
   test.beforeEach(async ({ Api }) => {
+    Api.routes.auth.getAuth.mock({
+      body: createRandomAuth({ isAuth: true }),
+    });
+
     Api.routes.posts.updateRateById.mock({
       status: 200,
     });
@@ -325,6 +346,36 @@ test.describe('Post votes', () => {
     Api.routes.posts.removeRateById.mock({
       status: 200,
     });
+  });
+
+  test('Asks a visitor to sign in instead of sending a vote', async ({
+    page: currentPage,
+    Api,
+    Post,
+    PostsPage,
+    AuthPrompt,
+  }) => {
+    Api.routes.auth.getAuth.mock({ body: createRandomAuth() });
+
+    const voteRequests: string[] = [];
+
+    currentPage.on('request', (request) => {
+      if (request.url().includes('/vote')) {
+        voteRequests.push(request.url());
+      }
+    });
+
+    await PostsPage.goto(PostsPage.urls.today);
+    await Post.upvotePostById(post1._id);
+
+    await expect(AuthPrompt.title).toHaveText('Sign in to vote');
+    expect(await Post.getIsPostByIdUpvoted(post1._id)).toBe(false);
+
+    await AuthPrompt.close();
+    await Post.downvotePostById(post1._id);
+
+    await expect(AuthPrompt.title).toHaveText('Sign in to vote');
+    expect(voteRequests).toEqual([]);
   });
 
   test('Upvotes a post', async ({ Api, Post, PostsPage }) => {

@@ -15,6 +15,8 @@
     </div>
 
     <FooterElement />
+
+    <AuthPromptModal />
   </div>
 </template>
 
@@ -23,6 +25,7 @@ import { onBeforeMount, onMounted, ref } from 'vue';
 import { useMediaQuery } from '@/composables/use-media-query';
 import { useThemeStore } from '@/store/theme';
 import { useUserStore } from '@/store/user';
+import AuthPromptModal from '@components/AuthForm/AuthPromptModal.vue';
 import FooterElement from '@components/FooterElement.vue';
 import HeaderElement from '@components/Header/HeaderElement.vue';
 import NotificationList from '@components/NotificationList/NotificationList.vue';

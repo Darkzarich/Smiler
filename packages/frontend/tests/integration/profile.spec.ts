@@ -72,7 +72,7 @@ test('Fetches and shows user profile', async ({ ProfilePage, Api }) => {
   );
   await expect(ProfilePage.bio).toContainText(testUser.bio);
   await expect(ProfilePage.unfollowBtn).toBeHidden();
-  await expect(ProfilePage.followBtn).toBeHidden();
+  await expect(ProfilePage.followBtn).toBeVisible();
 });
 
 test.describe('Long offline indicator', () => {
@@ -241,8 +241,9 @@ test.describe('Follows and unfollow', () => {
     await expect(ProfilePage.unfollowBtn).toBeHidden();
   });
 
-  test('Cannot follow or unfollow if not logged in', async ({
+  test('Asks a visitor to sign in to follow, then follows', async ({
     ProfilePage,
+    AuthPrompt,
     Api,
   }) => {
     Api.routes.auth.getAuth.mock({
@@ -251,9 +252,68 @@ test.describe('Follows and unfollow', () => {
       }),
     });
 
+    Api.routes.users.getUserProfile.mock({
+      body: { ...testUser, isFollowed: false },
+    });
+
     await ProfilePage.goto(testUser.login);
 
-    await expect(ProfilePage.followBtn).toBeHidden();
-    await expect(ProfilePage.unfollowBtn).toBeHidden();
+    await ProfilePage.followBtn.click();
+
+    await expect(AuthPrompt.title).toHaveText(
+      `Sign in to follow ${testUser.login}`,
+    );
+
+    await Api.routes.auth.signIn.mock({
+      body: createRandomAuth({ isAuth: true }),
+    });
+
+    const followRequest = await Api.routes.users.followUser.waitForRequest({
+      preRequestAction: AuthPrompt.signIn.bind(AuthPrompt),
+    });
+
+    expect(followRequest.url()).toContain(testUser._id);
+    await expect(ProfilePage.unfollowBtn).toBeVisible();
+  });
+
+  test('Does not follow again after sign in when the account already follows', async ({
+    page: currentPage,
+    ProfilePage,
+    AuthPrompt,
+    Api,
+  }) => {
+    Api.routes.auth.getAuth.mock({
+      body: createRandomAuth({
+        isAuth: false,
+      }),
+    });
+
+    Api.routes.users.getUserProfile.mock({
+      body: { ...testUser, isFollowed: false },
+    });
+
+    await ProfilePage.goto(testUser.login);
+    await ProfilePage.followBtn.click();
+
+    // What the profile says once a session exists
+    await Api.routes.users.getUserProfile.mock({
+      body: { ...testUser, isFollowed: true },
+    });
+    await Api.routes.auth.signIn.mock({
+      body: createRandomAuth({ isAuth: true }),
+    });
+
+    const followRequests: string[] = [];
+
+    currentPage.on('request', (request) => {
+      if (request.method() === 'PUT' && request.url().endsWith('/follow')) {
+        followRequests.push(request.url());
+      }
+    });
+
+    await AuthPrompt.signIn();
+
+    await expect(ProfilePage.unfollowBtn).toBeVisible();
+    expect(followRequests).toEqual([]);
   });
 });

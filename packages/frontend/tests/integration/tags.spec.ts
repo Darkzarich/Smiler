@@ -90,9 +90,10 @@ test('Unfollows a tag', async ({
   );
 });
 
-test('Cannot follow or unfollow a tag if not logged in', async ({
+test('Asks a visitor to sign in to follow a tag, then follows it', async ({
   SinglePostPage,
   Post,
+  AuthPrompt,
   Api,
 }) => {
   Api.routes.auth.getAuth.mock({
@@ -103,6 +104,19 @@ test('Cannot follow or unfollow a tag if not logged in', async ({
 
   await Post.clickTag(post._id, tagToClick);
 
-  await expect(Post.getFollowTagBtn()).toBeHidden();
   await expect(Post.getUnfollowTagBtn()).toBeHidden();
+
+  await Post.getFollowTagBtn().click();
+
+  await expect(AuthPrompt.title).toHaveText('Sign in to follow this tag');
+
+  await Api.routes.auth.signIn.mock({
+    body: createRandomAuth({ isAuth: true, tagsFollowed: [] }),
+  });
+
+  const followRequest = await Api.routes.tags.follow.waitForRequest({
+    preRequestAction: AuthPrompt.signIn.bind(AuthPrompt),
+  });
+
+  expect(followRequest.url()).toContain(tagToClick);
 });

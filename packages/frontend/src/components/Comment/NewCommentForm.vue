@@ -1,7 +1,7 @@
 <template>
   <div
     class="new-comment-form"
-    :class="!userStore.user ? 'new-comment-form--disabled' : ''"
+    :class="!userStore.user ? 'new-comment-form--guest' : ''"
     data-testid="new-comment-form"
   >
     <template v-if="userStore.user">
@@ -22,7 +22,30 @@
       </BaseTextEditor>
     </template>
     <template v-else>
-      Please <b>sign in</b> or <b>create an account</b> to leave a comment.
+      <div class="new-comment-form__title">Join the conversation</div>
+
+      <p class="new-comment-form__guest-text">
+        Sign in or create an account to leave a comment.
+      </p>
+
+      <div class="new-comment-form__guest-actions">
+        <BaseButton
+          size="medium"
+          data-testid="new-comment-form-signin"
+          @click="promptAuth('signin')"
+        >
+          Sign in
+        </BaseButton>
+
+        <BaseButton
+          size="medium"
+          type="ghost"
+          data-testid="new-comment-form-signup"
+          @click="promptAuth('signup')"
+        >
+          Create an account
+        </BaseButton>
+      </div>
     </template>
   </div>
 </template>
@@ -31,6 +54,7 @@
 import { ref } from 'vue';
 import type { Comment } from './types';
 import { api } from '@/api';
+import { type AuthPromptMode, useAuthPromptStore } from '@/store/auth-prompt';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
@@ -51,6 +75,12 @@ const emit = defineEmits<Emits>();
 const userStore = useUserStore();
 
 const notificationsStore = useNotificationsStore();
+
+const authPrompt = useAuthPromptStore();
+
+const promptAuth = (mode: AuthPromptMode) => {
+  void authPrompt.open({ title: 'Sign in to comment', mode });
+};
 
 const commentBody = ref('');
 
@@ -107,11 +137,30 @@ const createComment = async () => {
     padding: 0;
   }
 
-  &--disabled {
-    padding-top: 1rem;
-    border: 1px solid var(--color-text-secondary);
+  &--guest {
+    padding: 24px 16px;
+    border-radius: 8px;
     background: var(--color-surface-secondary);
     color: var(--color-text-primary);
+    text-align: center;
+
+    @media (--phone-only) {
+      border-radius: 0;
+    }
+  }
+
+  &__guest-text {
+    margin: -8px 0 16px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+  }
+
+  &__guest-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
   }
 
   &__title {

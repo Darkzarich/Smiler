@@ -2,8 +2,9 @@ import {
   createRouter,
   createWebHistory,
   type NavigationGuard,
+  type RouteLocationNormalized,
 } from 'vue-router';
-import { useNotificationsStore } from '@/store/notifications';
+import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useUserStore } from '@/store/user';
 
 // Views are loaded on demand so a visitor only downloads the one they land on.
@@ -19,27 +20,35 @@ declare module 'vue-router' {
   interface RouteMeta {
     title?: string;
     titleParam?: string;
+    authPromptTitle?: string;
   }
 }
 
-const authGuard: NavigationGuard = async (to, from, next) => {
+async function openAfterSignIn(to: RouteLocationNormalized) {
+  const isSignedIn = await useAuthPromptStore().open({
+    title: to.meta.authPromptTitle ?? 'Sign in to continue',
+  });
+
+  if (isSignedIn) {
+    await router.push(to.fullPath);
+  }
+}
+
+const authGuard: NavigationGuard = async (to, from) => {
   const userStore = useUserStore();
-  const notificationStore = useNotificationsStore();
 
   // TODO: Why check on each move if the user is logged in
   await userStore.userFetchAuthState();
 
-  if (!userStore.user) {
-    notificationStore.showErrorNotification({
-      message: 'Only authenticated users can access this page.',
-    });
-
-    next(from);
-
-    return;
+  if (userStore.user) {
+    return true;
   }
 
-  next();
+  // Not awaited: the navigation must settle while the prompt is open
+  void openAfterSignIn(to);
+
+  // A visitor who opened the link directly has no page to stay on
+  return from.matched.length > 0 ? false : { name: 'Home' };
 };
 
 export const router = createRouter({
@@ -101,6 +110,7 @@ export const router = createRouter({
       beforeEnter: authGuard,
       meta: {
         title: 'My Feed',
+        authPromptTitle: 'Sign in to see your feed',
       },
     },
     {
@@ -118,6 +128,7 @@ export const router = createRouter({
       beforeEnter: authGuard,
       meta: {
         title: 'Settings',
+        authPromptTitle: 'Sign in to open your settings',
       },
     },
     {
@@ -127,6 +138,7 @@ export const router = createRouter({
       beforeEnter: authGuard,
       meta: {
         title: 'Make New Post',
+        authPromptTitle: 'Sign in to write a post',
       },
     },
     {
@@ -142,6 +154,7 @@ export const router = createRouter({
       meta: {
         mode: 'edit',
         title: 'Edit Post',
+        authPromptTitle: 'Sign in to edit this post',
       },
     },
     {

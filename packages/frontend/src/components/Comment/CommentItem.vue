@@ -123,9 +123,6 @@
 
             <template v-else-if="level < COMMENTS_NESTED_LIMIT">
               <div
-                :class="{
-                  'comment-item__reply-toggler--disabled': !userStore.user,
-                }"
                 class="comment-item__reply-toggler"
                 :data-testid="`comment-${comment._id}-toggle-reply`"
                 role="button"
@@ -179,6 +176,7 @@ import {
   COMMENT_AUTO_HIDE_LEVEL,
   COMMENTS_NESTED_LIMIT,
 } from '@/const';
+import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { checkCanEditComment } from '@/utils/check-can-edit-comment';
@@ -211,6 +209,8 @@ const userStore = useUserStore();
 
 const notificationsStore = useNotificationsStore();
 
+const authPrompt = useAuthPromptStore();
+
 const comment = ref(props.comment);
 
 const isRequesting = ref(false);
@@ -222,12 +222,8 @@ const isChildrenExpanded = ref(props.level <= COMMENT_AUTO_HIDE_LEVEL);
 const replyBody = ref('');
 const isReplyToggled = ref(false);
 
-const toggleReply = () => {
-  if (!userStore.user) {
-    notificationsStore.showErrorNotification({
-      message: 'Please sign in or create an account to leave a reply.',
-    });
-
+const toggleReply = async () => {
+  if (!(await authPrompt.ensureSignedIn({ title: 'Sign in to reply' }))) {
     return;
   }
 
@@ -382,6 +378,13 @@ const upvote = async () => {
     return;
   }
 
+  // Not resumed after sign in: this comment was loaded without the account's vote
+  if (!userStore.user) {
+    void authPrompt.open({ title: 'Sign in to vote' });
+
+    return;
+  }
+
   if (comment.value.rated.isRated && !comment.value.rated.negative) {
     return handleRemoveVote();
   }
@@ -423,6 +426,13 @@ const upvote = async () => {
 
 const downvote = async () => {
   if (isRequesting.value) {
+    return;
+  }
+
+  // Not resumed after sign in: this comment was loaded without the account's vote
+  if (!userStore.user) {
+    void authPrompt.open({ title: 'Sign in to vote' });
+
     return;
   }
 
@@ -556,10 +566,6 @@ const downvote = async () => {
 
     &:hover {
       filter: brightness(120%);
-    }
-
-    &--disabled {
-      color: var(--color-text-secondary) !important;
     }
   }
 

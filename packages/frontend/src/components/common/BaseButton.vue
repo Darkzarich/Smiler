@@ -26,7 +26,8 @@ import CircularLoader from '@icons/animation/CircularLoader.vue';
 interface Props {
   dataTestid?: string;
   attrType?: 'button' | 'submit' | 'reset';
-  type?: 'primary' | 'danger';
+  /** `ghost` has no border, for the lesser of two actions side by side */
+  type?: 'primary' | 'danger' | 'ghost';
   size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   loading?: boolean;
@@ -85,6 +86,17 @@ withDefaults(defineProps<Props>(), {
 
     &.base-button--loading {
       border-color: rgb(var(--color-danger) 0.5);
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: var(--color-primary);
+
+    @media (--hover) {
+      &:hover {
+        background: var(--color-accent-transparent);
+      }
     }
   }
 

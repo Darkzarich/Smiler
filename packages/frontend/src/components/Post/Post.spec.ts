@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Post from './Post.vue';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
+import { useAuthPromptStore } from '@/store/auth-prompt';
+import { useUserStore } from '@/store/user';
 
 vi.mock('vue-router', async () => {
   const actual =
@@ -63,9 +65,21 @@ function buildPost(): postTypes.Post {
   };
 }
 
-function createWrapper(interactive: boolean) {
+function createWrapper(interactive: boolean, { signedIn = true } = {}) {
   const pinia = createPinia();
   setActivePinia(pinia);
+
+  if (signedIn) {
+    useUserStore().setUser({
+      _id: 'user-2',
+      login: 'voter',
+      avatar: '',
+      rating: 0,
+      email: 'voter@example.com',
+      followersAmount: 0,
+      tagsFollowed: [],
+    });
+  }
 
   return mount(Post, {
     props: {
@@ -96,14 +110,25 @@ describe('Post interactive prop', () => {
     expect(api.posts.updateRateById).toHaveBeenCalledOnce();
   });
 
+  it('asks a visitor to sign in instead of voting', async () => {
+    const wrapper = createWrapper(true, { signedIn: false });
+
+    await wrapper.find(testElements.upvote).trigger('click');
+
+    expect(api.posts.updateRateById).not.toHaveBeenCalled();
+    expect(useAuthPromptStore().isOpen).toBe(true);
+    expect(useAuthPromptStore().title).toBe('Sign in to vote');
+  });
+
   it('does not vote when not interactive', async () => {
-    const wrapper = createWrapper(false);
+    const wrapper = createWrapper(false, { signedIn: false });
 
     await wrapper.find(testElements.upvote).trigger('click');
     await wrapper.find(testElements.downvote).trigger('click');
 
     expect(api.posts.updateRateById).not.toHaveBeenCalled();
     expect(api.posts.removeRateById).not.toHaveBeenCalled();
+    expect(useAuthPromptStore().isOpen).toBe(false);
   });
 
   it('does not open the tag menu when not interactive', async () => {

@@ -34,12 +34,12 @@ test.beforeEach(async ({ Api }) => {
   });
 });
 
-test("Only authenticated user can see Settings page, redirect to the today's posts page", async ({
+test("Asks a visitor to sign in instead of opening Settings, on top of today's posts", async ({
   Api,
   page: currentPage,
   SettingsPage,
   PostsPage,
-  NotificationList,
+  AuthPrompt,
 }) => {
   Api.routes.auth.getAuth.mock({
     body: createRandomAuth({
@@ -49,9 +49,7 @@ test("Only authenticated user can see Settings page, redirect to the today's pos
 
   await SettingsPage.goto();
 
-  await expect(NotificationList.root).toContainText(
-    NotificationList.pageNoAccessText,
-  );
+  await expect(AuthPrompt.title).toHaveText('Sign in to open your settings');
   await expect(currentPage).toHaveURL(PostsPage.urls.today);
   await expect(currentPage).toHaveTitle(PostsPage.titles.today);
 });

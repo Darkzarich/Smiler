@@ -17,8 +17,17 @@
 import { ref } from 'vue';
 import SignInForm from './SignInForm.vue';
 import SignUpForm from './SignUpForm.vue';
+import type { AuthPromptMode } from '@/store/auth-prompt';
 
-const isSignIn = ref(true);
+interface Props {
+  initialMode?: AuthPromptMode;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  initialMode: 'signin',
+});
+
+const isSignIn = ref(props.initialMode === 'signin');
 
 const toggleMode = () => {
   isSignIn.value = !isSignIn.value;

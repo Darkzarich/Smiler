@@ -1,6 +1,7 @@
 import { test as base } from '@playwright/test';
 import Api from './api';
 import AuthForm from './components/AuthForm';
+import AuthPrompt from './components/AuthPrompt';
 import Comments from './components/Comments';
 import CurrentUser from './components/CurrentUser';
 import Menu from './components/Menu';
@@ -31,6 +32,7 @@ export interface TestFixtures {
   Post: Post;
   Comments: Comments;
   AuthForm: AuthForm;
+  AuthPrompt: AuthPrompt;
   Menu: Menu;
   PostEditor: PostEditor;
   CurrentUser: CurrentUser;
@@ -84,6 +86,9 @@ const test = base.extend<TestFixtures>({
   },
   AuthForm: async ({ page }, use) => {
     await use(new AuthForm(page));
+  },
+  AuthPrompt: async ({ page }, use) => {
+    await use(new AuthPrompt(page));
   },
   Menu: async ({ page, isMobile }, use) => {
     await use(new Menu(page, isMobile));

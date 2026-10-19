@@ -1,9 +1,5 @@
 <template>
-  <RouterLink
-    class="nav-link"
-    :class="{ 'nav-link--disabled': disabled }"
-    :to="to"
-  >
+  <RouterLink class="nav-link" :to="to">
     <slot />
   </RouterLink>
 </template>
@@ -12,13 +8,10 @@
 import type { RouteLocationRaw } from 'vue-router';
 
 interface Props {
-  disabled?: boolean;
   to: RouteLocationRaw & { name: string };
 }
 
-withDefaults(defineProps<Props>(), {
-  disabled: false,
-});
+defineProps<Props>();
 </script>
 
 <style>
@@ -26,12 +19,6 @@ withDefaults(defineProps<Props>(), {
   color: var(--color-text-primary);
   text-decoration: none;
   font-weight: bold;
-
-  &--disabled {
-    color: var(--color-text-secondary);
-    user-select: none;
-    pointer-events: none;
-  }
 
   &.router-link-exact-active {
     color: var(--color-primary);

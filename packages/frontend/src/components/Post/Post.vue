@@ -249,6 +249,7 @@ import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import { useMediaQuery } from '@/composables/use-media-query';
 import { POST_RATE_VALUE } from '@/const';
+import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { formatFromNow } from '@/utils/format-from-now';
@@ -300,6 +301,8 @@ const { user, isTagFollowed } = storeToRefs(userStore);
 
 const notificationsStore = useNotificationsStore();
 
+const authPrompt = useAuthPromptStore();
+
 interface ContextMenuData {
   show: boolean;
   x: number;
@@ -324,22 +327,21 @@ const contextMenuOptions = computed(() => {
     });
   }
 
-  if (user.value) {
-    const isTargetTagFollowed = contextMenuData.target
+  const isTargetTagFollowed =
+    user.value && contextMenuData.target
       ? isTagFollowed.value[contextMenuData.target]
       : false;
 
-    if (isTargetTagFollowed) {
-      options.push({
-        label: 'Unfollow tag',
-        value: 'unfollow',
-      });
-    } else {
-      options.push({
-        label: 'Follow tag',
-        value: 'follow',
-      });
-    }
+  if (isTargetTagFollowed) {
+    options.push({
+      label: 'Unfollow tag',
+      value: 'unfollow',
+    });
+  } else {
+    options.push({
+      label: 'Follow tag',
+      value: 'follow',
+    });
   }
 
   return options;
@@ -381,6 +383,13 @@ const handleRemoveVote = async (id: string) => {
 
 const upvote = async (id: string) => {
   if (isRequesting.value || !props.interactive) {
+    return;
+  }
+
+  // Not resumed after sign in: this post was loaded without the account's vote
+  if (!user.value) {
+    void authPrompt.open({ title: 'Sign in to vote' });
+
     return;
   }
 
@@ -426,6 +435,13 @@ const upvote = async (id: string) => {
 
 const downvote = async (id: string) => {
   if (isRequesting.value || !props.interactive) {
+    return;
+  }
+
+  // Not resumed after sign in: this post was loaded without the account's vote
+  if (!user.value) {
+    void authPrompt.open({ title: 'Sign in to vote' });
+
     return;
   }
 
@@ -536,6 +552,17 @@ const handleContextMenuAction = (action: string) => {
 
 const handleFollowTag = async (tag: string) => {
   closeContextMenu();
+
+  if (
+    !(await authPrompt.ensureSignedIn({ title: 'Sign in to follow this tag' }))
+  ) {
+    return;
+  }
+
+  // The account just signed in to may follow it already
+  if (isTagFollowed.value[tag]) {
+    return;
+  }
 
   await api.tags.follow(tag);
 

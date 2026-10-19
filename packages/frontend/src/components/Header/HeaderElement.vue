@@ -28,10 +28,7 @@
         class="header__navigation u-flex-row"
       >
         <template #after>
-          <NavigationFeedLink
-            class="header__nav-link"
-            :is-auth="Boolean(user)"
-          />
+          <NavigationFeedLink class="header__nav-link" />
         </template>
       </Navigation>
 
@@ -201,10 +198,6 @@ watch(
 
     &:hover {
       color: var(--color-primary);
-    }
-
-    .nav-link--disabled {
-      border-bottom: 2px solid transparent;
     }
 
     &.router-link-exact-active {

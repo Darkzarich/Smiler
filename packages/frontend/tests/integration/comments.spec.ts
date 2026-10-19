@@ -123,9 +123,10 @@ test('Posts a new comment to a post', async ({
   );
 });
 
-test('Cannot post comments if not logged in', async ({
+test('Offers a visitor sign in or sign up in place of the comment form', async ({
   SinglePostPage,
   Comments,
+  AuthPrompt,
   Api,
 }) => {
   Api.routes.auth.getAuth.mock({
@@ -135,9 +136,16 @@ test('Cannot post comments if not logged in', async ({
   await SinglePostPage.goto(post.slug);
 
   await expect(Comments.newCommentFormEditor).toBeHidden();
-  await expect(Comments.newCommentForm).toContainText(
-    'Please sign in or create an account to leave a comment.',
-  );
+
+  await Comments.newCommentForm.getByTestId('new-comment-form-signin').click();
+
+  await expect(AuthPrompt.title).toHaveText('Sign in to comment');
+  await expect(AuthPrompt.SignInForm).toBeVisible();
+
+  await AuthPrompt.close();
+  await Comments.newCommentForm.getByTestId('new-comment-form-signup').click();
+
+  await expect(AuthPrompt.SignUpForm).toBeVisible();
 });
 
 test.describe('Replies', () => {
@@ -192,10 +200,10 @@ test.describe('Replies', () => {
     );
   });
 
-  test('Cannot reply to a comment if not logged in', async ({
-    NotificationList,
+  test('Asks a visitor to sign in to reply, then opens the reply form', async ({
     SinglePostPage,
     Comments,
+    AuthPrompt,
     Api,
   }) => {
     Api.routes.auth.getAuth.mock({
@@ -206,10 +214,17 @@ test.describe('Replies', () => {
 
     await Comments.clickCommentReplyTogglerById(comment._id);
 
-    await expect(NotificationList.root).toHaveText(
-      'Please sign in or create an account to leave a reply.',
-    );
+    await expect(AuthPrompt.title).toHaveText('Sign in to reply');
     await expect(Comments.getCommentReplyInput()).toBeHidden();
+
+    await Api.routes.auth.signIn.mock({
+      body: createRandomAuth({ isAuth: true }),
+    });
+
+    await AuthPrompt.signIn();
+
+    await expect(AuthPrompt.panel).toBeHidden();
+    await expect(Comments.getCommentReplyInput()).toBeVisible();
   });
 
   test('Closes the reply form', async ({ SinglePostPage, Comments }) => {
@@ -246,6 +261,35 @@ test.describe('Votes', () => {
         hasNextPage: false,
       },
     });
+  });
+
+  test('Asks a visitor to sign in instead of sending a vote', async ({
+    page: currentPage,
+    SinglePostPage,
+    Comments,
+    AuthPrompt,
+    Api,
+  }) => {
+    Api.routes.auth.getAuth.mock({
+      body: createRandomAuth(),
+    });
+
+    const voteRequests: string[] = [];
+
+    currentPage.on('request', (request) => {
+      if (request.url().includes('/vote')) {
+        voteRequests.push(request.url());
+      }
+    });
+
+    await SinglePostPage.goto(post.slug);
+    await Comments.upvoteCommentById(notRatedComment._id);
+
+    await expect(AuthPrompt.title).toHaveText('Sign in to vote');
+    expect(await Comments.getIsCommentByIdUpvoted(notRatedComment._id)).toBe(
+      false,
+    );
+    expect(voteRequests).toEqual([]);
   });
 
   test('Upvotes a comment', async ({ SinglePostPage, Comments, Api }) => {

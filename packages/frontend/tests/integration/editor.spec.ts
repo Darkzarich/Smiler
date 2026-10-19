@@ -517,20 +517,18 @@ test.describe('Tags', () => {
   });
 });
 
-test('Cannot open the editor if the user is not logged in', async ({
+test('Asks a visitor to sign in instead of opening the editor', async ({
   page: currentPage,
   PostsPage,
   Api,
-  NotificationList,
+  AuthPrompt,
   PostCreatePage,
 }) => {
   Api.routes.auth.getAuth.mock({ body: createRandomAuth() });
 
   await PostCreatePage.goto();
 
-  await expect(NotificationList.root).toContainText(
-    NotificationList.pageNoAccessText,
-  );
+  await expect(AuthPrompt.title).toHaveText('Sign in to write a post');
   await expect(currentPage).toHaveURL(PostsPage.urls.today);
   await expect(currentPage).toHaveTitle(PostsPage.titles.today);
 });

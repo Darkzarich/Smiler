@@ -7,9 +7,10 @@ export default class AbstractComponent {
     this.page = page;
   }
 
+  /** Exact, or "Follow tag" would also match "Unfollow tag" */
   findContextMenuOption(text = '') {
     return this.page
       .getByTestId('base-context-menu')
-      .filter({ has: this.page.getByText(text) });
+      .getByRole('button', { name: text, exact: true });
   }
 }

@@ -16,7 +16,7 @@
         {{ profileUser.login }}
 
         <BaseButton
-          v-if="currentUser && !isSameUser"
+          v-if="!isSameUser"
           class="user-profile__follow-btn"
           :data-testid="
             isFollowed ? 'user-profile-unfollow-btn' : 'user-profile-follow-btn'
@@ -53,6 +53,7 @@ import { storeToRefs } from 'pinia';
 import { computed, ref, watch } from 'vue';
 import { api } from '@/api';
 import type { userTypes } from '@/api/users';
+import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useUserStore } from '@/store/user';
 import { formatFromNow } from '@/utils/format-from-now';
 import { resolveAvatar } from '@/utils/resolve-avatar';
@@ -74,10 +75,14 @@ const userStore = useUserStore();
 
 const { user: currentUser } = storeToRefs(userStore);
 
+const authPrompt = useAuthPromptStore();
+
 const isSameUser = computed(
   () => currentUser.value?._id === profileUser.value._id,
 );
-const isFollowed = computed(() => profileUser.value.isFollowed);
+const isFollowed = computed(
+  () => Boolean(currentUser.value) && profileUser.value.isFollowed,
+);
 
 watch(
   () => props.user,
@@ -120,7 +125,30 @@ async function unfollow() {
   }
 }
 
+async function followAfterSignIn() {
+  const isSignedIn = await authPrompt.open({
+    title: `Sign in to follow ${profileUser.value.login}`,
+  });
+
+  if (!isSignedIn) {
+    return;
+  }
+
+  // Loaded without a session, so it says nothing about the account's follows
+  profileUser.value = await api.users.getUserProfile(profileUser.value.login);
+
+  if (!isSameUser.value && !isFollowed.value) {
+    await follow();
+  }
+}
+
 async function handleFollow() {
+  if (!currentUser.value) {
+    await followAfterSignIn();
+
+    return;
+  }
+
   if (isFollowed.value) {
     await unfollow();
   } else {

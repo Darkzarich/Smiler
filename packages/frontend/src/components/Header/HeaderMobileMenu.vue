@@ -13,10 +13,7 @@
       class="mobile-menu__navigation u-flex-col"
     >
       <template #before>
-        <NavigationFeedLink
-          :is-auth="Boolean(userStore.user)"
-          class="mobile-menu__nav-link"
-        />
+        <NavigationFeedLink class="mobile-menu__nav-link" />
       </template>
 
       <template #after>
@@ -29,7 +26,6 @@
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from '@/store/user';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import Navigation from '@components/Navigation/Navigation.vue';
 import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
@@ -42,8 +38,6 @@ interface Emits {
 }
 
 const emit = defineEmits<Emits>();
-
-const userStore = useUserStore();
 
 const closeMenu = () => {
   emit('close');
