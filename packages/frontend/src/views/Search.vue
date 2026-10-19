@@ -114,10 +114,13 @@ const isAnyFilterActive = computed(() => {
 
 onBeforeMount(() => {
   Object.keys(route.query).forEach((filterKey) => {
-    if (route.query[filterKey]) {
+    const value = route.query[filterKey];
+
+    if (value) {
       // oxlint-disable-next-line @typescript-eslint/no-explicit-any
       (filter.value[filterKey as keyof SearchFilter] as any) =
-        route.query[filterKey];
+        // A single ?tags=x is parsed as a string, several as an array
+        filterKey === 'tags' ? [value].flat().filter(Boolean) : value;
     }
   });
 

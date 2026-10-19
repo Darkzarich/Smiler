@@ -213,6 +213,22 @@ test('Sets all filters from URL', async ({
   expect(postsResponse.url()).toContain(requestQueryTags);
 });
 
+test('Sets a single tag from URL as one tag', async ({
+  page: currentPage,
+  SearchPage,
+  Api,
+}) => {
+  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+    preRequestAction: SearchPage.goto.bind(SearchPage, 'tags=cats'),
+  });
+
+  expect(postsResponse.url()).toContain(encodeURI('tags[]=cats'));
+  await expect(
+    currentPage.getByRole('button', { name: /^Remove tag/ }),
+  ).toHaveCount(1);
+  await expect(currentPage.getByTestId('remove-tag-button-cats')).toBeVisible();
+});
+
 test('Searches posts by clicking on a tag name and then "Search tag" option in the context menu', async ({
   Post,
   PostsPage,
