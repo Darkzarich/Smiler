@@ -278,11 +278,6 @@ test('D&D post sections to change order of sections', async ({
   Api,
   isMobile,
 }) => {
-  // TODO: D&D test doesn't pass for mobile but the feature works
-  if (isMobile) {
-    return;
-  }
-
   await PostCreatePage.goto();
 
   await PostCreatePage.postTitleInput.fill(title);
@@ -295,7 +290,7 @@ test('D&D post sections to change order of sections', async ({
   const assertNewOrderOfSections =
     await PostCreatePage.assertOldOrderOfSections();
 
-  await PostCreatePage.dragFirstSectionAfterSecond();
+  await PostCreatePage.dragFirstSectionAfterSecond({ touch: isMobile });
 
   await assertNewOrderOfSections();
 
@@ -313,6 +308,55 @@ test('D&D post sections to change order of sections', async ({
       },
     ],
   });
+});
+
+test('Scrolls the page when a swipe starts on a picture section', async ({
+  PostCreatePage,
+  page,
+  isMobile,
+}) => {
+  // A finger on a section is a scroll; only its grip picks it up. A swipe
+  // needs a touch screen.
+  if (!isMobile) {
+    return;
+  }
+
+  await PostCreatePage.goto();
+
+  await PostCreatePage.addTextSection();
+  await PostCreatePage.addPictureSection();
+  await PostCreatePage.addPictureSection();
+  await PostCreatePage.addVideoSection();
+  await PostCreatePage.awaitDragAndDropAnimation();
+
+  const sectionOrder = () =>
+    page
+      .getByTestId(/^section-grip-/)
+      .evaluateAll((grips) => grips.map((grip) => grip.dataset.testid));
+  const orderBefore = await sectionOrder();
+  const picture = PostCreatePage.getPostSection(2);
+
+  await picture.scrollIntoViewIfNeeded();
+
+  const pictureBox = await picture.boundingBox();
+
+  if (!pictureBox) {
+    throw new Error('Picture section box is not available');
+  }
+
+  const scrollBefore = await page.evaluate(() => window.scrollY);
+  const from = {
+    x: pictureBox.x + pictureBox.width / 2,
+    y: pictureBox.y + pictureBox.height / 2,
+  };
+
+  await PostCreatePage.swipe(from, { x: from.x, y: from.y - 240 });
+
+  await expect
+    .poll(() => page.evaluate(() => window.scrollY))
+    .toBeGreaterThan(scrollBefore + 100);
+  await expect(page.locator('.sortable-fallback')).toHaveCount(0);
+  expect(await sectionOrder()).toEqual(orderBefore);
 });
 
 test('Formatting buttons keep editor focus and do not start section D&D', async ({

@@ -64,6 +64,11 @@ export default class PostCreatePage extends AbstractPage {
     return this.page.getByTestId('post-section').nth(index);
   }
 
+  /** The only place a section can be picked up from */
+  getSectionGrip(index: number) {
+    return this.getPostSection(index).getByTestId(/^section-grip-/);
+  }
+
   async addTag(tag = '') {
     await this.postTagInput.fill(tag);
     await this.page.keyboard.press('Enter');
@@ -165,23 +170,75 @@ export default class PostCreatePage extends AbstractPage {
     });
   }
 
-  async dragFirstSectionAfterSecond() {
-    const sourceBox = await this.getPostSection(0).boundingBox();
-    const targetBox = await this.getPostSection(1).boundingBox();
+  /** From the first section's grip to the bottom of the second section, with
+   * a mouse or, on a touch screen, a finger. */
+  async dragFirstSectionAfterSecond({ touch = false } = {}) {
+    // Just below the sticky site header, so as much of the second section as
+    // possible is on screen to drop onto
+    await this.getSectionGrip(0).evaluate((grip) => {
+      window.scrollBy(0, grip.getBoundingClientRect().top - 100);
+    });
 
-    if (!sourceBox || !targetBox) {
+    const gripBox = await this.getSectionGrip(0).boundingBox();
+    const targetBox = await this.getPostSection(1).boundingBox();
+    const viewport = this.page.viewportSize();
+
+    if (!gripBox || !targetBox || !viewport) {
       throw new Error('Post section boxes are not available');
     }
 
-    await this.page.mouse.move(sourceBox.x + 8, sourceBox.y + 8);
-    await this.page.mouse.down();
-    await this.page.mouse.move(
-      targetBox.x + 8,
-      targetBox.y + targetBox.height - 8,
-      { steps: 20 },
-    );
-    await this.page.mouse.up();
+    const from = {
+      x: gripBox.x + gripBox.width / 2,
+      y: gripBox.y + gripBox.height / 2,
+    };
+    const to = {
+      x: from.x,
+      y: Math.min(targetBox.y + targetBox.height - 8, viewport.height - 40),
+    };
+
+    if (touch) {
+      await this.swipe(from, to);
+    } else {
+      await this.page.mouse.move(from.x, from.y);
+      await this.page.mouse.down();
+      await this.page.mouse.move(to.x, to.y, { steps: 20 });
+      await this.page.mouse.up();
+    }
+
     await this.awaitDragAndDropAnimation();
+  }
+
+  /** Playwright's touchscreen can only tap, so the finger is moved with raw
+   * touch events. Chromium only. */
+  async swipe(
+    from: { x: number; y: number },
+    to: { x: number; y: number },
+    steps = 20,
+  ) {
+    const cdp = await this.page.context().newCDPSession(this.page);
+
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: [from],
+    });
+
+    for (let step = 1; step <= steps; step++) {
+      await cdp.send('Input.dispatchTouchEvent', {
+        type: 'touchMove',
+        touchPoints: [
+          {
+            x: from.x + ((to.x - from.x) * step) / steps,
+            y: from.y + ((to.y - from.y) * step) / steps,
+          },
+        ],
+      });
+    }
+
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchEnd',
+      touchPoints: [],
+    });
+    await cdp.detach();
   }
 
   async assertOldOrderOfSections() {

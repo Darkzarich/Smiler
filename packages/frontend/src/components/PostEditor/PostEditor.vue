@@ -23,6 +23,7 @@
         :list="sections"
         :animation="200"
         :force-fallback="true"
+        handle=".post-editor__section-grip"
         ghost-class="post-editor__section--moving"
         chosen-class="post-editor__section--chosen"
         :component-data="{
@@ -35,74 +36,97 @@
       >
         <template #item="{ element: section }">
           <div
-            class="post-editor__section u-flex-row"
+            class="post-editor__section"
             :class="{ 'post-editor__section--spoiler': section.isSpoiler }"
             data-testid="post-section"
           >
-            <span
-              v-if="section.isSpoiler"
-              class="post-editor__spoiler-badge"
-              :data-testid="`spoiler-badge-${section.hash}`"
-            >
-              <IconEyeOff />
-              Spoiler
-            </span>
+            <div class="post-editor__section-header">
+              <!-- The only place a drag starts, so a swipe anywhere else on the
+                   section scrolls the page. Pointer-only: Sortable has no
+                   keyboard reordering to offer a focusable control for. -->
+              <span
+                class="post-editor__section-grip"
+                :data-testid="`section-grip-${section.hash}`"
+                title="Drag to reorder"
+                aria-hidden="true"
+              >
+                <IconDragHandle />
+              </span>
 
-            <!-- TODO: Refactor this part -->
-            <template v-if="section.type === postTypes.POST_SECTION_TYPES.TEXT">
-              <BaseTextEditor
-                :id="section.hash"
-                v-model="section.content"
-                data-testid="text-section"
-                :features="TextEditorFeatures.Post"
-              />
-            </template>
+              <span class="post-editor__section-type">
+                <component :is="kindOf(section).icon" />
+                {{ kindOf(section).label }}
+              </span>
 
-            <template
-              v-else-if="section.type === postTypes.POST_SECTION_TYPES.PICTURE"
-            >
-              <PostEditorPicture
-                v-model="section.url"
-                data-testid="pic-section"
-                @update-section="updatePictureSection"
-              />
-            </template>
+              <span
+                v-if="section.isSpoiler"
+                class="post-editor__spoiler-badge"
+                :data-testid="`spoiler-badge-${section.hash}`"
+              >
+                <IconEyeOff />
+                Spoiler
+              </span>
 
-            <template
-              v-else-if="section.type === postTypes.POST_SECTION_TYPES.VIDEO"
-            >
-              <PostEditorVideo
-                v-model="section.url"
-                data-testid="video-section"
-              />
-            </template>
+              <div class="post-editor__section-actions">
+                <BaseIconButton
+                  :label="
+                    section.isSpoiler
+                      ? 'Show this section to everyone'
+                      : 'Hide this section behind a spoiler'
+                  "
+                  :data-testid="`toggle-spoiler-${section.hash}`"
+                  tone="warning"
+                  :pressed="Boolean(section.isSpoiler)"
+                  @click="toggleSpoiler(section)"
+                >
+                  <IconEyeOff v-if="section.isSpoiler" />
+                  <IconEye v-else />
+                </BaseIconButton>
 
-            <div class="post-editor__section-actions">
-              <BaseIconButton
-                :label="
-                  section.isSpoiler
-                    ? 'Show this section to everyone'
-                    : 'Hide this section behind a spoiler'
+                <BaseIconButton
+                  label="Delete section"
+                  :data-testid="`delete-section-${section.hash}`"
+                  tone="danger"
+                  @click="requestDeleteSection(section)"
+                >
+                  <IconDelete />
+                </BaseIconButton>
+              </div>
+            </div>
+
+            <div class="post-editor__section-body">
+              <!-- TODO: Refactor this part -->
+              <template
+                v-if="section.type === postTypes.POST_SECTION_TYPES.TEXT"
+              >
+                <BaseTextEditor
+                  :id="section.hash"
+                  v-model="section.content"
+                  data-testid="text-section"
+                  :features="TextEditorFeatures.Post"
+                />
+              </template>
+
+              <template
+                v-else-if="
+                  section.type === postTypes.POST_SECTION_TYPES.PICTURE
                 "
-                :data-testid="`toggle-spoiler-${section.hash}`"
-                size="xsmall"
-                tone="warning"
-                :pressed="Boolean(section.isSpoiler)"
-                @click="toggleSpoiler(section)"
               >
-                <IconEyeOff v-if="section.isSpoiler" />
-                <IconEye v-else />
-              </BaseIconButton>
+                <PostEditorPicture
+                  v-model="section.url"
+                  data-testid="pic-section"
+                  @update-section="updatePictureSection"
+                />
+              </template>
 
-              <BaseIconButton
-                label="Delete section"
-                :data-testid="`delete-section-${section.hash}`"
-                size="xsmall"
-                tone="danger"
-                @click="requestDeleteSection(section)"
+              <template
+                v-else-if="section.type === postTypes.POST_SECTION_TYPES.VIDEO"
               >
-                <IconDelete />
-              </BaseIconButton>
+                <PostEditorVideo
+                  v-model="section.url"
+                  data-testid="video-section"
+                />
+              </template>
             </div>
           </div>
         </template>
@@ -187,7 +211,7 @@
 <script setup lang="ts">
 import { useEventListener } from '@vueuse/core';
 import { isEqual } from 'lodash-es';
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { type Component, computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Draggable from 'vuedraggable';
 import Post from '../Post/Post.vue';
@@ -216,8 +240,27 @@ import BaseTextEditor from '@common/BaseTextEditor.vue';
 import ConfirmModal from '@common/ConfirmModal.vue';
 import { TextEditorFeatures } from '@common/text-editor-features';
 import IconDelete from '@icons/IconDelete.vue';
+import IconDragHandle from '@icons/IconDragHandle.vue';
 import IconEye from '@icons/IconEye.vue';
 import IconEyeOff from '@icons/IconEyeOff.vue';
+import IconPicture from '@icons/IconPicture.vue';
+import IconText from '@icons/IconText.vue';
+import IconVideo from '@icons/IconVideo.vue';
+
+/** What each section's header calls it, with the icon its add button uses */
+const sectionKinds: Record<
+  postTypes.POST_SECTION_TYPES,
+  { label: string; icon: Component }
+> = {
+  [postTypes.POST_SECTION_TYPES.TEXT]: { label: 'Text', icon: IconText },
+  [postTypes.POST_SECTION_TYPES.PICTURE]: {
+    label: 'Picture',
+    icon: IconPicture,
+  },
+  [postTypes.POST_SECTION_TYPES.VIDEO]: { label: 'Video', icon: IconVideo },
+};
+
+const kindOf = (section: postTypes.PostSection) => sectionKinds[section.type];
 
 const router = useRouter();
 
@@ -576,20 +619,14 @@ const saveDraft = async () => {
   }
 
   &__section {
-    align-items: center;
-    position: relative;
-    margin-bottom: 32px;
-    cursor: move;
+    margin-bottom: 24px;
+    border: 1px solid var(--color-text-secondary);
+    border-radius: 8px;
 
-    .base-text-editor {
-      border: 1px solid var(--color-text-secondary);
-      border-radius: 8px;
-
-      @media (--phone-only) {
-        border-right: none;
-        border-left: none;
-        border-radius: 0;
-      }
+    @media (--phone-only) {
+      border-right: none;
+      border-left: none;
+      border-radius: 0;
     }
 
     &:last-child {
@@ -601,33 +638,21 @@ const saveDraft = async () => {
     }
 
     &--chosen {
-      .base-text-editor,
-      .post-editor-picture,
-      .post-editor-video {
-        border: 1px solid var(--color-primary);
-
-        @media (--phone-only) {
-          border-right: none;
-          border-left: none;
-        }
-      }
+      border-color: var(--color-primary);
     }
 
     &--spoiler {
-      outline: 1px dashed var(--color-warning);
-      outline-offset: 4px;
-
-      @media (--phone-only) {
-        outline-offset: 0;
-      }
+      border-style: dashed;
+      border-color: var(--color-warning);
 
       /* Shows the author what a reader sees, and lifts as soon as the section
-         is reached so it never stands in the way of editing. */
-      &::after {
+         is reached so it never stands in the way of editing. The header stays
+         sharp: it says what is hidden and holds the toggle. */
+      .post-editor__section-body::after {
         position: absolute;
         opacity: 1;
         z-index: 1;
-        border-radius: 8px;
+        border-radius: 0 0 8px 8px;
         inset: 0;
         content: '';
         pointer-events: none;
@@ -635,8 +660,8 @@ const saveDraft = async () => {
         backdrop-filter: blur(8px);
       }
 
-      &:hover::after,
-      &:focus-within::after {
+      &:hover .post-editor__section-body::after,
+      &:focus-within .post-editor__section-body::after {
         opacity: 0;
       }
     }
@@ -653,18 +678,81 @@ const saveDraft = async () => {
     }
   }
 
+  &__section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__section-grip {
+    display: inline-flex;
+    flex: none;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    color: var(--color-text-secondary);
+    cursor: grab;
+
+    /* The browser would otherwise take a finger moving from here as a scroll */
+    touch-action: none;
+    transition:
+      color 200ms ease-out,
+      background-color 200ms ease-out;
+
+    /* The same hit area BaseIconButton gives a 28px box on a touch screen */
+    @media (--pointer-coarse) {
+      &::before {
+        position: absolute;
+        content: '';
+        inset: -8px;
+      }
+    }
+
+    @media (--hover) {
+      &:hover {
+        background: var(--color-surface-secondary);
+        color: var(--color-text-primary);
+      }
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+      fill: currentcolor;
+    }
+  }
+
+  &__section--chosen &__section-grip {
+    cursor: grabbing;
+  }
+
+  &__section-type {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    font-weight: bold;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      fill: currentcolor;
+    }
+  }
+
   &__spoiler-badge {
     display: flex;
     align-items: center;
-    position: absolute;
-    top: -10px;
-    left: 16px;
-    z-index: 2;
     gap: 4px;
     padding: 2px 8px;
     border: 1px dashed var(--color-warning);
     border-radius: 999px;
-    background: var(--color-surface-secondary);
     color: var(--color-warning);
     font-size: 0.75rem;
     font-weight: bold;
@@ -678,19 +766,13 @@ const saveDraft = async () => {
 
   &__section-actions {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    position: absolute;
-    top: 0;
-    right: -22px;
-    z-index: 2;
-    gap: 8px;
+    gap: 4px;
+    margin-left: auto;
+  }
 
-    @media (--phone-only) {
-      flex-direction: row;
-      top: -14px;
-      right: 12px;
-    }
+  &__section-body {
+    position: relative;
   }
 
   &__add-section-buttons {

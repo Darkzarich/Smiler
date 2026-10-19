@@ -138,14 +138,6 @@ const createSectionWithAttachment = async (
 .post-editor-picture {
   width: 100%;
   padding: 16px;
-  border: 1px solid var(--color-text-secondary);
-  border-radius: 8px;
-
-  @media (--phone-only) {
-    border-right: none;
-    border-left: none;
-    border-radius: 0;
-  }
 
   &--uploaded {
     padding: 0;
