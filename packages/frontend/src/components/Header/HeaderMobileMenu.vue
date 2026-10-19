@@ -6,7 +6,8 @@
       </BaseIconButton>
     </div>
 
-    <CurrentUser class="mobile-menu__user" />
+    <!-- Wider than a phone, the sidebar and the header already show these -->
+    <CurrentUser v-if="isPhone" class="mobile-menu__user" />
 
     <Navigation
       nav-link-class="mobile-menu__nav-link"
@@ -16,7 +17,7 @@
         <NavigationFeedLink class="mobile-menu__nav-link" />
       </template>
 
-      <template #after>
+      <template v-if="isPhone" #after>
         <div class="mobile-menu__nav-link mobile-menu__theme-item">
           <ThemeToggle />
         </div>
@@ -26,6 +27,7 @@
 </template>
 
 <script setup lang="ts">
+import { useMediaQuery } from '@/composables/use-media-query';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import Navigation from '@components/Navigation/Navigation.vue';
 import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
@@ -38,6 +40,8 @@ interface Emits {
 }
 
 const emit = defineEmits<Emits>();
+
+const isPhone = useMediaQuery('phone-only');
 
 const closeMenu = () => {
   emit('close');
@@ -54,6 +58,11 @@ const closeMenu = () => {
   height: 100%;
   background: var(--color-surface-secondary);
   overflow-y: scroll;
+
+  /* No user card to sit beside, so the close button gets a row of its own */
+  @media (--tablet-portrait-up) {
+    padding-top: 3rem;
+  }
 
   &__close {
     position: absolute;

@@ -23,7 +23,7 @@
       </RouterLink>
 
       <Navigation
-        v-if="!isPhone"
+        v-if="!isCompact"
         nav-link-class="header__nav-link"
         class="header__navigation u-flex-row"
       >
@@ -32,45 +32,47 @@
         </template>
       </Navigation>
 
-      <!-- TODO: Move to Search component -->
-      <div v-if="route.name !== 'Search'" class="header__search">
-        <BaseInput
-          v-model.trim="searchInputValue"
-          placeholder="Search"
-          data-testid="header-search-input"
-          :style="'flex-direction: row'"
-          @keyup.enter="search"
-        >
-          <template #icon-right>
-            <BaseIconButton
-              label="Search"
-              data-testid="header-search-button"
-              @click="search"
-            >
-              <IconSearch />
-            </BaseIconButton>
-          </template>
-        </BaseInput>
-      </div>
+      <div class="header__actions">
+        <!-- TODO: Move to Search component -->
+        <div v-if="route.name !== 'Search'" class="header__search">
+          <BaseInput
+            v-model.trim="searchInputValue"
+            placeholder="Search"
+            data-testid="header-search-input"
+            :style="'flex-direction: row'"
+            @keyup.enter="search"
+          >
+            <template #icon-right>
+              <BaseIconButton
+                label="Search"
+                data-testid="header-search-button"
+                @click="search"
+              >
+                <IconSearch />
+              </BaseIconButton>
+            </template>
+          </BaseInput>
+        </div>
 
-      <ThemeToggle v-if="!isPhone" class="header__theme-toggle" />
+        <ThemeToggle v-if="!isPhone" />
 
-      <div v-if="user" class="header__avatar">
-        <!-- TODO: Move everything like that to its own component AvatarLink or something -->
-        <RouterLink
-          :to="{
-            name: 'UserPage',
-            params: {
-              login: user.login,
-            },
-          }"
-        >
-          <img
-            :src="resolveAvatar(user.avatar)"
-            alt="avatar"
-            referrerpolicy="no-referrer"
-          />
-        </RouterLink>
+        <div v-if="user" class="header__avatar">
+          <!-- TODO: Move everything like that to its own component AvatarLink or something -->
+          <RouterLink
+            :to="{
+              name: 'UserPage',
+              params: {
+                login: user.login,
+              },
+            }"
+          >
+            <img
+              :src="resolveAvatar(user.avatar)"
+              alt="avatar"
+              referrerpolicy="no-referrer"
+            />
+          </RouterLink>
+        </div>
       </div>
     </div>
   </header>
@@ -99,6 +101,8 @@ const router = useRouter();
 const { user } = storeToRefs(useUserStore());
 
 const isPhone = useMediaQuery('phone-only');
+// Below 900px the inline nav does not fit, so it moves into the menu
+const isCompact = useMediaQuery('tablet-portrait-down');
 
 const isMobileMenuOpen = ref(false);
 const searchInputValue = ref('');
@@ -152,11 +156,9 @@ watch(
     display: flex;
     width: 100%;
     max-width: 1110px;
-    padding-left: 40px;
 
-    @media (--phone-only) {
-      padding-right: 0;
-      padding-left: 0;
+    @media (--desktop-up) {
+      padding-left: 40px;
     }
   }
 
@@ -164,7 +166,7 @@ watch(
     display: none;
     margin-right: 0.5rem;
 
-    @media (--phone-only) {
+    @media (--tablet-portrait-down) {
       display: flex;
       align-items: center;
     }
@@ -188,12 +190,18 @@ watch(
   &__navigation {
     align-items: center;
     gap: 16px;
-    margin-left: 4rem;
+    margin-right: 16px;
+    margin-left: 2rem;
+
+    @media (--desktop-up) {
+      margin-left: 4rem;
+    }
   }
 
   &__nav-link {
     padding-top: 5px;
     border-bottom: 2px solid transparent;
+    white-space: nowrap;
     transition: all 200ms ease-out;
 
     &:hover {
@@ -205,11 +213,25 @@ watch(
     }
   }
 
+  /* One group, so it stays on the right whether or not the search is shown */
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-width: 0;
+    gap: 12px;
+    margin-left: auto;
+
+    @media (--phone-only) {
+      flex: 1;
+    }
+  }
+
   &__search {
     display: flex;
     align-items: center;
     width: 14rem;
-    margin-left: auto;
+    min-width: 8rem;
 
     @media (--phone-only) {
       flex: 1;
@@ -228,19 +250,10 @@ watch(
     }
   }
 
-  &__theme-toggle {
-    margin-left: 16px;
-  }
-
   &__avatar {
     display: flex;
     height: 100%;
-    margin-left: auto;
     align-self: center;
-
-    .header__search + & {
-      margin-left: 12px;
-    }
 
     img {
       width: 2.5rem;

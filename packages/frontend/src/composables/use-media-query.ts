@@ -6,6 +6,7 @@ import mediaDefinitions from '@/styles/media.css?raw';
 export type Breakpoint =
   | 'phone-only'
   | 'tablet-portrait-up'
+  | 'tablet-portrait-down'
   | 'tablet-landscape-up'
   | 'desktop-up'
   | 'big-desktop-up'
