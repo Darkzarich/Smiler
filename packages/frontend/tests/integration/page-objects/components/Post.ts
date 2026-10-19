@@ -67,6 +67,10 @@ export default class Post extends AbstractComponent {
     return this.page.getByTestId('no-content');
   }
 
+  getNoMoreContentText() {
+    return this.page.getByTestId('no-more-content');
+  }
+
   getTextSectionByHash(postId = '', hash = '') {
     return this.page.getByTestId(`post-${postId}-text-${hash}`);
   }

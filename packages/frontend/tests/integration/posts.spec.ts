@@ -63,6 +63,51 @@ test('Empty posts lists', async ({ Api, Post, PostsPage }) => {
 
   await expect(Post.postsList).toBeVisible();
   await expect(Post.getNoContentText()).toBeVisible();
+  await expect(Post.getNoMoreContentText()).toBeHidden();
+});
+
+test('Shows the end of the list only once the last page has loaded', async ({
+  Api,
+  Post,
+  PostsPage,
+  context,
+}) => {
+  const lastPagePost = createRandomPost();
+
+  let releaseLastPage = () => {};
+  const lastPageReleased = new Promise<void>((resolve) => {
+    releaseLastPage = resolve;
+  });
+
+  await context.route(
+    Api.routes.posts.getToday.getURLRegExp(),
+    async (route) => {
+      const offset = new URL(route.request().url()).searchParams.get('offset');
+
+      if (offset === '0') {
+        await route.fulfill({ json: { posts, hasNextPage: true } });
+
+        return;
+      }
+
+      await lastPageReleased;
+      await route.fulfill({
+        json: { posts: [lastPagePost], hasNextPage: false },
+      });
+    },
+  );
+
+  await Api.routes.posts.getToday.waitForRequest({
+    preRequestAction: PostsPage.goto.bind(PostsPage, PostsPage.urls.today),
+  });
+
+  await expect(Post.getTitleById(post1._id)).toBeVisible();
+  await expect(Post.getNoMoreContentText()).toBeHidden();
+
+  releaseLastPage();
+
+  await expect(Post.getTitleById(lastPagePost._id)).toBeVisible();
+  await expect(Post.getNoMoreContentText()).toBeVisible();
 });
 
 test.describe('Post groups', () => {

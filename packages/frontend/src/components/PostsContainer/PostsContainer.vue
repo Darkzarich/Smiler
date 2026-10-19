@@ -18,7 +18,11 @@
       <slot name="no-content" />
     </div>
 
-    <div v-if="hasNextPage" class="posts-container__no-more u-widget">
+    <div
+      v-if="posts.length > 0 && !hasNextPage && !isLoading"
+      class="posts-container__no-more u-widget"
+      data-testid="no-more-content"
+    >
       <slot name="no-more-content" />
     </div>
 
