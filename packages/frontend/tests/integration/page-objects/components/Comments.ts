@@ -57,17 +57,18 @@ export default class Comments extends AbstractComponent {
   }
 
   async getIsCommentByIdUpvoted(commentId = '') {
-    const commentClass =
-      await this.getUpvoteBtnById(commentId).getAttribute('class');
-
-    return commentClass ? /upvote-btn--active/.test(commentClass) : false;
+    return (
+      (await this.getUpvoteBtnById(commentId).getAttribute('aria-pressed')) ===
+      'true'
+    );
   }
 
   async getIsCommentByIdDownvoted(commentId = '') {
-    const commentClass =
-      await this.getDownvoteBtnById(commentId).getAttribute('class');
-
-    return commentClass ? /downvote-btn--active/.test(commentClass) : false;
+    return (
+      (await this.getDownvoteBtnById(commentId).getAttribute(
+        'aria-pressed',
+      )) === 'true'
+    );
   }
 
   async toggleRepliesExpanderById(commentId = '') {

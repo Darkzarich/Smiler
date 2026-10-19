@@ -14,14 +14,15 @@
           {{ notification.message }}
         </div>
 
-        <button
-          class="notification-list__close notification-list__item-close-btn"
-          type="button"
-          aria-label="Close notification"
-          @click="notificationsStore.removeNotification(notification.id)"
-        >
-          <IconExit />
-        </button>
+        <div class="notification-list__close">
+          <BaseIconButton
+            label="Close notification"
+            tone="inherit"
+            @click="notificationsStore.removeNotification(notification.id)"
+          >
+            <IconClose />
+          </BaseIconButton>
+        </div>
       </div>
     </TransitionGroup>
   </div>
@@ -30,7 +31,8 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useNotificationsStore } from '@/store/notifications';
-import IconExit from '@icons/IconExit.vue';
+import BaseIconButton from '@common/BaseIconButton.vue';
+import IconClose from '@icons/IconClose.vue';
 
 const notificationsStore = useNotificationsStore();
 
@@ -80,22 +82,16 @@ const { notifications } = storeToRefs(notificationsStore);
     }
   }
 
+  /* Clears the 28px close button on both sides, so the text stays centered */
   &__item-message {
-    margin: 0 20px;
+    margin: 0 36px;
   }
 
   &__close {
     position: absolute;
-    top: 2px;
-    right: 5px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-
-    svg {
-      fill: var(--color-surface-primary);
-    }
+    top: 50%;
+    right: 4px;
+    transform: translateY(-50%);
   }
 }
 </style>

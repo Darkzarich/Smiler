@@ -1,19 +1,19 @@
 <template>
-  <BaseButton
-    type="icon"
-    :aria-label="`Switch to ${nextTheme} theme`"
+  <BaseIconButton
+    :label="`Switch to ${nextTheme} theme`"
     data-testid="theme-toggle"
+    size="medium"
     @click="toggleTheme"
   >
     <IconSun v-if="currentTheme === 'dark'" />
     <IconMoon v-else />
-  </BaseButton>
+  </BaseIconButton>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useThemeStore } from '@/store/theme';
-import BaseButton from '@common/BaseButton.vue';
+import BaseIconButton from '@common/BaseIconButton.vue';
 import IconMoon from '@icons/IconMoon.vue';
 import IconSun from '@icons/IconSun.vue';
 

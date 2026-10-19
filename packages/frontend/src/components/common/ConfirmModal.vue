@@ -44,7 +44,7 @@ interface Props {
   message?: string;
   confirmLabel?: string;
   cancelLabel?: string;
-  confirmType?: 'primary' | 'danger' | 'icon';
+  confirmType?: 'primary' | 'danger';
   closeOnBackdrop?: boolean;
   closeOnEsc?: boolean;
 }

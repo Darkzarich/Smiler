@@ -1,43 +1,31 @@
 <template>
   <div ref="postRef" class="post" :class="{ 'post--inert': !interactive }">
     <div class="post__left" :inert="!interactive || undefined">
-      <div
+      <BaseIconButton
+        label="Upvote"
         :data-testid="`post-${post._id}-upvote`"
-        class="post__upvote"
-        :class="
-          post.rated.isRated && !post.rated.negative
-            ? 'post__upvote--active'
-            : ''
-        "
-        role="button"
-        tabindex="0"
+        size="medium"
+        tone="primary"
+        :pressed="isUpvoted"
         @click="upvote(post._id)"
-        @keydown.enter="upvote(post._id)"
-        @keydown.space="upvote(post._id)"
       >
         <IconPlus />
-      </div>
+      </BaseIconButton>
 
       <div class="post__rating" :data-testid="`post-${post._id}-rating`">
         {{ post.rating }}
       </div>
 
-      <div
+      <BaseIconButton
+        label="Downvote"
         :data-testid="`post-${post._id}-downvote`"
-        class="post__downvote"
-        :class="
-          post.rated.isRated && post.rated.negative
-            ? 'post__downvote--active'
-            : ''
-        "
-        role="button"
-        tabindex="0"
+        size="medium"
+        tone="danger"
+        :pressed="isDownvoted"
         @click="downvote(post._id)"
-        @keydown.enter="downvote(post._id)"
-        @keydown.space="downvote(post._id)"
       >
         <IconMinus />
-      </div>
+      </BaseIconButton>
     </div>
 
     <div class="post__main u-widget">
@@ -73,9 +61,13 @@
             <IconEdit data-testid="post-edit-icon" />
           </RouterLink>
 
-          <button class="post__delete-button" @click="deletePost(post._id)">
+          <BaseIconButton
+            label="Delete post"
+            tone="danger"
+            @click="deletePost(post._id)"
+          >
             <IconDelete data-testid="post-delete-icon" />
-          </button>
+          </BaseIconButton>
         </template>
       </div>
 
@@ -155,33 +147,29 @@
 
       <!-- for mobile -->
       <div class="post__rate-mobile" :inert="!interactive || undefined">
-        <button
-          class="post__upvote"
+        <BaseIconButton
+          label="Upvote"
           :data-testid="`m-post-${post._id}-upvote`"
-          :class="
-            post.rated.isRated && !post.rated.negative
-              ? 'post__upvote--active'
-              : ''
-          "
+          size="medium"
+          tone="primary"
+          :pressed="isUpvoted"
           @click="upvote(post._id)"
         >
           <IconPlus />
-        </button>
+        </BaseIconButton>
         <div class="post__rating">
           {{ post.rating }}
         </div>
-        <button
-          class="post__downvote"
+        <BaseIconButton
+          label="Downvote"
           :data-testid="`m-post-${post._id}-downvote`"
-          :class="
-            post.rated.isRated && post.rated.negative
-              ? 'post__downvote--active'
-              : ''
-          "
+          size="medium"
+          tone="danger"
+          :pressed="isDownvoted"
           @click="downvote(post._id)"
         >
           <IconMinus />
-        </button>
+        </BaseIconButton>
       </div>
 
       <!-- for mobile -->
@@ -268,6 +256,7 @@ import { resolveAvatar } from '@/utils/resolve-avatar';
 import { resolveImage } from '@/utils/resolve-image';
 import { resolveImageError } from '@/utils/resolve-image-error';
 import BaseContextMenu from '@common/BaseContextMenu.vue';
+import BaseIconButton from '@common/BaseIconButton.vue';
 import CollapsibleContent from '@common/CollapsibleContent.vue';
 import IconComments from '@icons/IconComments.vue';
 import IconDelete from '@icons/IconDelete.vue';
@@ -298,6 +287,13 @@ const router = useRouter();
 const isPhone = useMediaQuery('phone-only');
 
 const isRequesting = ref(false);
+
+const isUpvoted = computed(
+  () => post.value.rated.isRated && !post.value.rated.negative,
+);
+const isDownvoted = computed(
+  () => post.value.rated.isRated && post.value.rated.negative,
+);
 
 const userStore = useUserStore();
 const { user, isTagFollowed } = storeToRefs(userStore);
@@ -585,6 +581,7 @@ const searchByTag = (tag: string) => {
     flex-direction: column;
     align-items: center;
     width: 10%;
+    gap: 4px;
 
     @media (--phone-only) {
       display: none;
@@ -592,8 +589,7 @@ const searchByTag = (tag: string) => {
   }
 
   &__rating {
-    margin-top: -1rem;
-    margin-bottom: -1rem;
+    color: var(--color-text-secondary);
     font-size: 20px;
   }
 
@@ -605,57 +601,17 @@ const searchByTag = (tag: string) => {
     font-size: 20px;
     font-weight: 400;
 
-    svg {
+    /* The edit link; the delete button styles its own icon */
+    a svg {
       position: relative;
       top: 3px;
       fill: var(--color-text-secondary);
-      cursor: pointer;
     }
   }
 
   &__title-link {
     color: var(--color-text-primary);
     text-decoration: none;
-  }
-
-  &__upvote,
-  &__rating,
-  &__downvote {
-    border: none;
-    background: transparent;
-    color: var(--color-text-secondary);
-    transition: all 200ms ease-out;
-
-    svg {
-      width: 5rem;
-      fill: var(--color-text-secondary);
-      transition: all 200ms ease-out;
-
-      @media (--phone-only) {
-        width: 3rem;
-      }
-    }
-  }
-
-  &__downvote {
-    &--active,
-    &:hover {
-      svg {
-        cursor: pointer;
-        fill: var(--color-danger);
-      }
-    }
-  }
-
-  &__upvote {
-    &--active,
-    &:hover {
-      /* stylelint-disable-next-line no-descending-specificity */
-      svg {
-        cursor: pointer;
-        fill: var(--color-primary);
-      }
-    }
   }
 
   &__tags {
@@ -696,6 +652,7 @@ const searchByTag = (tag: string) => {
       display: flex;
       justify-content: center;
       align-items: center;
+      gap: 12px;
     }
   }
 
@@ -817,11 +774,6 @@ const searchByTag = (tag: string) => {
     height: 1.5rem;
     margin-left: 0.5rem;
     border-radius: 50%;
-  }
-
-  &__delete-button {
-    border: none;
-    background: transparent;
   }
 
   /* Keeps the layout honest while showing nothing here is clickable yet */

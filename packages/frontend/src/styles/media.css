@@ -19,3 +19,8 @@
    guessing from the viewport: a narrow desktop window still has a mouse, and a
    tablet does not. */
 @custom-media --pointer-coarse ((hover: none) and (pointer: coarse));
+
+/* A touch screen keeps :hover on whatever was tapped last, so a hover color
+   would stick after the tap (a vote taken back would still look cast). Hover
+   styles go inside this. */
+@custom-media --hover (hover: hover);

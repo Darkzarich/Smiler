@@ -109,6 +109,8 @@ function createWrapper(
     global: {
       plugins: [pinia],
       stubs: {
+        // The section controls are clicked by their data-testid
+        BaseIconButton: false,
         Draggable: {
           name: 'Draggable',
           props: ['list', 'itemKey'],

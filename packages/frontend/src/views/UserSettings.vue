@@ -21,17 +21,15 @@
                 referrerpolicy="no-referrer"
               />
               {{ author.login }}
-              <span
-                class="user-settings__unfollow"
+              <BaseIconButton
+                :label="`Unfollow ${author.login}`"
                 :data-testid="`user-settings-author-${author._id}-unfollow`"
-                role="button"
-                tabindex="0"
+                size="xsmall"
+                tone="danger"
                 @click="handleUnfollowUser(author._id)"
-                @keydown.enter="handleUnfollowUser(author._id)"
-                @keydown.space.prevent="handleUnfollowUser(author._id)"
               >
-                x
-              </span>
+                <IconClose />
+              </BaseIconButton>
             </div>
           </div>
 
@@ -48,17 +46,15 @@
               class="user-settings__following-item user-settings__tag"
             >
               {{ tag }}
-              <span
-                class="user-settings__unfollow"
+              <BaseIconButton
+                :label="`Unfollow tag ${tag}`"
                 :data-testid="`user-settings-tag-${tag}-unfollow`"
-                role="button"
-                tabindex="0"
+                size="xsmall"
+                tone="danger"
                 @click="handleUnfollowTag(tag)"
-                @keydown.enter="handleUnfollowTag(tag)"
-                @keydown.space.prevent="handleUnfollowTag(tag)"
               >
-                x
-              </span>
+                <IconClose />
+              </BaseIconButton>
             </div>
           </div>
         </template>
@@ -155,9 +151,11 @@ import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseButton from '@common/BaseButton.vue';
+import BaseIconButton from '@common/BaseIconButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseTextarea from '@common/BaseTextarea.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
+import IconClose from '@icons/IconClose.vue';
 
 const { unfollowTag, setAvatar } = useUserStore();
 
@@ -420,12 +418,6 @@ onBeforeMount(() => {
   &__following-type {
     color: var(--color-text-secondary);
     font-weight: bold;
-  }
-
-  &__unfollow {
-    color: var(--color-danger);
-    font-family: monospace;
-    cursor: pointer;
   }
 
   &__following-item {

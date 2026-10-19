@@ -26,7 +26,7 @@ import CircularLoader from '@icons/animation/CircularLoader.vue';
 interface Props {
   dataTestid?: string;
   attrType?: 'button' | 'submit' | 'reset';
-  type?: 'primary' | 'danger' | 'icon';
+  type?: 'primary' | 'danger';
   size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   loading?: boolean;
@@ -52,7 +52,6 @@ withDefaults(defineProps<Props>(), {
   display: flex;
   justify-content: center;
   padding: 8px;
-  outline: none;
   border: 2px solid transparent;
   border-radius: 8px;
   background: var(--color-surface-primary);
@@ -86,23 +85,6 @@ withDefaults(defineProps<Props>(), {
 
     &.base-button--loading {
       border-color: rgb(var(--color-danger) 0.5);
-    }
-  }
-
-  &--icon {
-    padding: 8px;
-    border: 2px solid var(--color-primary);
-    color: var(--color-primary);
-
-    &:hover {
-      border-color: var(--color-primary-dark);
-      background: var(--color-surface-secondary);
-      color: var(--color-primary-dark);
-    }
-
-    svg {
-      width: 20px;
-      height: 20px;
     }
   }
 

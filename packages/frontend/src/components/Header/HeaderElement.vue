@@ -1,17 +1,16 @@
 <template>
   <header class="header">
     <div class="header__container">
-      <div
-        data-testid="mobile-menu"
-        class="header__mobile-menu"
-        :class="isMobileMenuOpen ? 'header__mobile--active' : ''"
-        role="button"
-        tabindex="0"
-        @click="toggleMobileMenu()"
-        @keydown.enter="toggleMobileMenu()"
-        @keydown.space.prevent="toggleMobileMenu()"
-      >
-        <IconMenuMobile />
+      <div class="header__mobile-menu">
+        <BaseIconButton
+          label="Menu"
+          data-testid="mobile-menu"
+          size="medium"
+          :aria-expanded="isMobileMenuOpen"
+          @click="toggleMobileMenu()"
+        >
+          <IconMenuMobile />
+        </BaseIconButton>
       </div>
 
       <!-- TODO: Should be moved to App.vue -->
@@ -46,15 +45,13 @@
           @keyup.enter="search"
         >
           <template #icon-right>
-            <button
-              type="button"
-              class="header__search-button"
-              aria-label="Search"
+            <BaseIconButton
+              label="Search"
               data-testid="header-search-button"
               @click="search"
             >
               <IconSearch />
-            </button>
+            </BaseIconButton>
           </template>
         </BaseInput>
       </div>
@@ -91,6 +88,7 @@ import SiteLogo from './SiteLogo.vue';
 import { useMediaQuery } from '@/composables/use-media-query';
 import { useUserStore } from '@/store/user';
 import { resolveAvatar } from '@/utils/resolve-avatar';
+import BaseIconButton from '@common/BaseIconButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import Navigation from '@components/Navigation/Navigation.vue';
 import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
@@ -167,16 +165,11 @@ watch(
 
   &__mobile-menu {
     display: none;
-    margin-right: 1rem;
-    cursor: pointer;
+    margin-right: 0.5rem;
 
     @media (--phone-only) {
-      display: block;
-
-      svg {
-        height: 100%;
-        fill: var(--color-text-secondary);
-      }
+      display: flex;
+      align-items: center;
     }
 
     &-enter-active,
@@ -191,12 +184,6 @@ watch(
 
       @media (--phone-only) {
         transform: translateY(-15px);
-      }
-    }
-
-    &--active {
-      svg {
-        fill: var(--color-text-primary);
       }
     }
   }
@@ -245,23 +232,6 @@ watch(
     .base-input__input {
       width: 100%;
       min-width: 0;
-    }
-  }
-
-  &__search-button {
-    display: flex;
-    padding: 0;
-    border: none;
-    border-radius: 4px;
-    background: none;
-    cursor: pointer;
-
-    &:hover svg {
-      fill: var(--color-text-primary);
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--color-primary);
     }
   }
 

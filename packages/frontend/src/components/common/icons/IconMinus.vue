@@ -1,11 +1,10 @@
 <template>
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="50"
-    height="50"
-    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    viewBox="6 6.5 12 12"
   >
     <path d="m7 10 5 5 5-5z" />
-    <path fill="none" d="M0 0h24v24H0z" />
   </svg>
 </template>

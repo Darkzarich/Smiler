@@ -134,16 +134,13 @@ const setValue = (event: Event) => {
     font-size: 12px;
   }
 
+  /* Sized for a small BaseIconButton (28px), centered in the 36px field */
   &__icon {
     display: flex;
     align-items: center;
     position: absolute;
-    top: 6px;
-    right: 7px;
-
-    svg {
-      fill: var(--color-text-secondary);
-    }
+    top: 4px;
+    right: 4px;
   }
 }
 </style>

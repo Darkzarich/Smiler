@@ -13,9 +13,9 @@ export default class NotificationList extends AbstractComponent {
   }
 
   async dismissAll() {
-    const closeButtons = this.root.locator(
-      '.notification-list__item-close-btn',
-    );
+    const closeButtons = this.root.getByRole('button', {
+      name: 'Close notification',
+    });
     const count = await closeButtons.count();
 
     for (let i = 0; i < count; i++) {

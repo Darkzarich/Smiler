@@ -15,39 +15,25 @@
             {{ comment.rating }}
           </div>
 
-          <div
-            class="comment-item__upvote-btn"
+          <BaseIconButton
+            label="Upvote"
             :data-testid="`comment-${comment._id}-upvote`"
-            :class="
-              comment.rated.isRated && !comment.rated.negative
-                ? 'comment-item__upvote-btn--active'
-                : ''
-            "
-            role="button"
-            tabindex="0"
+            tone="primary"
+            :pressed="comment.rated.isRated && !comment.rated.negative"
             @click="upvote()"
-            @keydown.enter="upvote()"
-            @keydown.space.prevent="upvote()"
           >
             <IconPlus />
-          </div>
+          </BaseIconButton>
 
-          <div
+          <BaseIconButton
+            label="Downvote"
             :data-testid="`comment-${comment._id}-downvote`"
-            class="comment-item__downvote-btn"
-            :class="
-              comment.rated.isRated && comment.rated.negative
-                ? 'comment-item__downvote-btn--active'
-                : ''
-            "
-            role="button"
-            tabindex="0"
+            tone="danger"
+            :pressed="comment.rated.isRated && comment.rated.negative"
             @click="downvote()"
-            @keydown.enter="downvote()"
-            @keydown.space.prevent="downvote()"
           >
             <IconMinus />
-          </div>
+          </BaseIconButton>
 
           <RouterLink
             :to="{
@@ -71,29 +57,25 @@
           </RouterLink>
 
           <template v-if="checkCanEditComment(comment, userStore.user?._id)">
-            <div
+            <BaseIconButton
               class="comment-item__edit-btn"
+              label="Edit comment"
               :data-testid="`comment-${comment._id}-edit`"
-              role="button"
-              tabindex="0"
+              tone="primary"
+              :pressed="isEditToggled"
               @click="toggleEdit()"
-              @keydown.enter="toggleEdit()"
-              @keydown.space.prevent="toggleEdit()"
             >
               <IconEdit />
-            </div>
+            </BaseIconButton>
 
-            <div
-              class="comment-item__delete-btn"
+            <BaseIconButton
+              label="Delete comment"
               :data-testid="`comment-${comment._id}-delete`"
-              role="button"
-              tabindex="0"
+              tone="danger"
               @click="handleDeleteComment()"
-              @keydown.enter="handleDeleteComment()"
-              @keydown.space.prevent="handleDeleteComment()"
             >
               <IconDelete />
-            </div>
+            </BaseIconButton>
           </template>
         </template>
 
@@ -202,6 +184,7 @@ import { useUserStore } from '@/store/user';
 import { checkCanEditComment } from '@/utils/check-can-edit-comment';
 import { formatFromNow } from '@/utils/format-from-now';
 import { resolveAvatar } from '@/utils/resolve-avatar';
+import BaseIconButton from '@common/BaseIconButton.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';
@@ -515,6 +498,15 @@ const downvote = async () => {
   &__header {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+
+    /* Neighboring icon buttons, so that their 44px hit areas meet only in the gap */
+    @media (--pointer-coarse) {
+      .base-icon-button + .base-icon-button {
+        margin-left: 8px;
+      }
+    }
 
     a {
       display: flex;
@@ -530,54 +522,13 @@ const downvote = async () => {
     border-radius: 50%;
   }
 
-  &__upvote-btn,
-  &__rating,
-  &__downvote-btn,
-  &__edit-btn,
-  &__delete-btn {
+  &__rating {
+    margin-right: 4px;
     color: var(--color-text-secondary);
-    cursor: pointer;
-
-    svg {
-      position: relative;
-      top: -8px;
-      width: 2rem;
-      height: 2rem;
-      fill: var(--color-text-secondary);
-      transform: scale(1.2);
-    }
   }
 
-  &__downvote-btn {
-    margin-left: -0.5rem;
-  }
-
-  &__edit-btn,
-  &__delete-btn {
+  &__edit-btn {
     margin-left: 0.5rem;
-
-    svg {
-      width: 1.3rem;
-      transform: scale(1);
-    }
-  }
-
-  &__upvote-btn--active,
-  &__upvote-btn:hover,
-  &__edit:hover {
-    svg {
-      fill: var(--color-primary);
-    }
-  }
-
-  &__downvote-btn:hover,
-  &__downvote-btn--active,
-  &__delete:hover {
-    /* stylelint-disable-next-line no-descending-specificity */
-    svg {
-      cursor: pointer;
-      fill: var(--color-danger);
-    }
   }
 
   &__created-at {

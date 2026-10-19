@@ -78,40 +78,31 @@
             </template>
 
             <div class="post-editor__section-actions">
-              <button
-                type="button"
-                class="post-editor__spoiler-btn"
-                :class="{
-                  'post-editor__spoiler-btn--active': section.isSpoiler,
-                }"
-                :title="
+              <BaseIconButton
+                :label="
                   section.isSpoiler
                     ? 'Show this section to everyone'
                     : 'Hide this section behind a spoiler'
                 "
-                :aria-pressed="Boolean(section.isSpoiler)"
+                :data-testid="`toggle-spoiler-${section.hash}`"
+                size="xsmall"
+                tone="warning"
+                :pressed="Boolean(section.isSpoiler)"
                 @click="toggleSpoiler(section)"
               >
-                <IconEyeOff
-                  v-if="section.isSpoiler"
-                  :data-testid="`toggle-spoiler-${section.hash}`"
-                />
-                <IconEye
-                  v-else
-                  :data-testid="`toggle-spoiler-${section.hash}`"
-                />
-              </button>
+                <IconEyeOff v-if="section.isSpoiler" />
+                <IconEye v-else />
+              </BaseIconButton>
 
-              <button
-                type="button"
-                class="post-editor__delete-btn"
+              <BaseIconButton
+                label="Delete section"
+                :data-testid="`delete-section-${section.hash}`"
+                size="xsmall"
+                tone="danger"
                 @click="requestDeleteSection(section)"
               >
-                <CloseIcon
-                  title="Delete"
-                  :data-testid="`delete-section-${section.hash}`"
-                />
-              </button>
+                <IconDelete />
+              </BaseIconButton>
             </div>
           </div>
         </template>
@@ -218,12 +209,13 @@ import * as consts from '@/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
+import BaseIconButton from '@common/BaseIconButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseSegmentedControl from '@common/BaseSegmentedControl.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 import ConfirmModal from '@common/ConfirmModal.vue';
 import { TextEditorFeatures } from '@common/text-editor-features';
-import CloseIcon from '@icons/IconExit.vue';
+import IconDelete from '@icons/IconDelete.vue';
 import IconEye from '@icons/IconEye.vue';
 import IconEyeOff from '@icons/IconEyeOff.vue';
 
@@ -690,47 +682,15 @@ const saveDraft = async () => {
     align-items: center;
     position: absolute;
     top: 0;
-    right: -20px;
+    right: -22px;
     z-index: 2;
-    gap: 12px;
+    gap: 8px;
 
     @media (--phone-only) {
       flex-direction: row;
       top: -14px;
       right: 12px;
     }
-  }
-
-  &__spoiler-btn,
-  &__delete-btn {
-    display: flex;
-    padding: 0;
-    border: none;
-    background-color: transparent;
-
-    &:hover {
-      filter: brightness(120%);
-    }
-
-    svg {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-      transition: fill 0.3s ease-in-out;
-    }
-  }
-
-  &__delete-btn svg {
-    fill: var(--color-danger);
-  }
-
-  &__spoiler-btn svg {
-    fill: var(--color-text-secondary);
-  }
-
-  &__spoiler-btn--active svg,
-  &__spoiler-btn:hover svg {
-    fill: var(--color-warning);
   }
 
   &__add-section-buttons {

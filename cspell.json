@@ -93,6 +93,7 @@
     "vueuse",
     "vuex",
     "Vuex",
+    "xsmall",
     "youtu"
   ],
   "ignoreRegExpList": ["GHSA(-[0-9a-z]+)+"]

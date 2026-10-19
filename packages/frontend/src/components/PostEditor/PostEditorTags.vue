@@ -7,14 +7,15 @@
     >
       <div v-for="tag in tags" :key="tag" class="post-editor-tags__item">
         {{ tag }}
-        <button
-          type="button"
+        <BaseIconButton
+          :label="`Remove tag ${tag}`"
           :data-testid="`remove-tag-button-${tag}`"
-          class="post-editor-tags__ghost-btn post-editor-tags__remove-tag-btn"
+          size="xsmall"
+          tone="danger"
           @click="removeTag(tag)"
         >
-          x
-        </button>
+          <IconClose />
+        </BaseIconButton>
       </div>
     </div>
 
@@ -30,15 +31,15 @@
         @keyup.enter="addTag"
       />
 
-      <!-- TODO: Think of a component for this -->
-      <button
+      <BaseIconButton
         v-if="tagInput.length > 0"
-        type="button"
-        class="post-editor-tags__ghost-btn post-editor-tags__add-tag-btn"
+        label="Add tag"
+        data-testid="add-tag-button"
+        tone="primary"
         @click="addTag"
       >
-        +
-      </button>
+        <IconAdd />
+      </BaseIconButton>
     </div>
   </div>
 </template>
@@ -47,7 +48,10 @@
 // TODO: This can be a BasicElements
 import { computed, ref } from 'vue';
 import * as consts from '@/const';
+import BaseIconButton from '@common/BaseIconButton.vue';
 import BaseInput from '@common/BaseInput.vue';
+import IconAdd from '@icons/IconAdd.vue';
+import IconClose from '@icons/IconClose.vue';
 
 interface Props {
   dataTestid?: string;
@@ -110,7 +114,8 @@ const removeTag = (tag: string) => {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 2px 4px;
+    gap: 2px;
+    padding: 2px 2px 2px 6px;
     border: 1px solid var(--color-primary);
     border-radius: 5px;
     background: transparent;
@@ -124,26 +129,7 @@ const removeTag = (tag: string) => {
   &__form {
     display: flex;
     align-items: center;
-  }
-
-  &__ghost-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: none;
-    background-color: transparent;
-    font-size: 1.5rem;
-    user-select: none;
-    cursor: pointer;
-  }
-
-  &__add-tag-btn {
-    color: var(--color-primary);
-  }
-
-  &__remove-tag-btn {
-    color: var(--color-danger);
-    font-size: 0.8rem;
+    gap: 4px;
   }
 }
 </style>

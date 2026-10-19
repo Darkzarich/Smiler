@@ -1,14 +1,9 @@
 <template>
   <div class="mobile-menu">
-    <div
-      class="mobile-menu__close-btn"
-      role="button"
-      tabindex="0"
-      @click="closeMenu()"
-      @keydown.enter="closeMenu()"
-      @keydown.space.prevent="closeMenu()"
-    >
-      <IconExit />
+    <div class="mobile-menu__close">
+      <BaseIconButton label="Close menu" size="medium" @click="closeMenu()">
+        <IconClose />
+      </BaseIconButton>
     </div>
 
     <CurrentUser class="mobile-menu__user" />
@@ -35,11 +30,12 @@
 
 <script setup lang="ts">
 import { useUserStore } from '@/store/user';
+import BaseIconButton from '@common/BaseIconButton.vue';
 import Navigation from '@components/Navigation/Navigation.vue';
 import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
 import ThemeToggle from '@components/Theme/ThemeToggle.vue';
 import CurrentUser from '@components/User/CurrentUser.vue';
-import IconExit from '@icons/IconExit.vue';
+import IconClose from '@icons/IconClose.vue';
 
 interface Emits {
   close: [];
@@ -65,14 +61,11 @@ const closeMenu = () => {
   background: var(--color-surface-secondary);
   overflow-y: scroll;
 
-  &__close-btn {
+  &__close {
     position: absolute;
-    top: 0.5rem;
+    top: 0.25rem;
     right: 0.5rem;
-
-    svg {
-      fill: var(--color-danger);
-    }
+    z-index: 1;
   }
 
   &__navigation {

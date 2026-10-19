@@ -92,16 +92,17 @@ export default class Post extends AbstractComponent {
   }
 
   async getIsPostByIdUpvoted(postId = '') {
-    const postClass = await this.getUpvoteBtnById(postId).getAttribute('class');
-
-    return postClass ? /upvote--active/.test(postClass) : false;
+    return (
+      (await this.getUpvoteBtnById(postId).getAttribute('aria-pressed')) ===
+      'true'
+    );
   }
 
   async getIsPostByIdDownvoted(postId = '') {
-    const postClass =
-      await this.getDownvoteBtnById(postId).getAttribute('class');
-
-    return postClass ? /downvote--active/.test(postClass) : false;
+    return (
+      (await this.getDownvoteBtnById(postId).getAttribute('aria-pressed')) ===
+      'true'
+    );
   }
 
   async clickTag(postId = '', tag = '') {
