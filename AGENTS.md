@@ -22,6 +22,10 @@ pnpm lint:types             # tsc --noEmit on both packages
 pnpm test                   # backend jest + frontend playwright e2e + frontend vitest
 pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push runs)
 
+# Seed data (writes to DB_URL; refuses a non-empty database without --reset)
+pnpm db:seed                # 64 users, 150 posts, comments, votes; sign in as demo@example.com / password
+pnpm db:seed --reset        # wipe users, posts, comments and rates (and those users' uploads) first
+
 # Benchmarks (needs k6 installed and a backend already running — see Benchmarks below)
 pnpm bench:stores           # what the session and rate limiter stores cost per request
 ```
@@ -50,6 +54,11 @@ pnpm bench:stores           # what the session and rate limiter stores cost per 
   - Every limiter gets its own key prefix (`rate-limit:<name>:`), which is not decoration: with one
     shared namespace the five limiters increment the same counter for a client, and the first window
     to be created decides when it expires.
+- **Seed script**: `scripts/seed/` (`pnpm db:seed`). Builds everything in memory with a seeded
+  generator, then `insertMany`s it - `insertMany` keeps the backdated `createdAt`, `create` would not -
+  so ratings, `commentCount`, `followersAmount` and comment `children` must be kept consistent by hand
+  when a model gains a counter. Pictures are drawn with sharp from SVG (no `<text>`, slim containers
+  have no fonts). Content pools live in `content.ts`.
 - Jest runs **without Redis**: the rate limiter is skipped and the session store falls back to
   express-session's in-memory one, so `tests/` still needs nothing but the in-memory MongoDB.
 - `.env` file required at repo root (copy from `.env.example`). Backend reads it via dotenv.

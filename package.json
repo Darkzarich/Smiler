@@ -22,6 +22,7 @@
     "test": "pnpm --filter \"backend\" test && pnpm --filter \"frontend\" test:e2e:ci && pnpm --filter \"frontend\" test:unit:ci",
     "test:prepush": "pnpm --filter backend test && pnpm --filter frontend test:unit:ci",
     "knip": "knip",
+    "db:seed": "pnpm --filter backend seed",
     "bench:stores": "k6 run scripts/benchmarks/stores.js"
   },
   "license": "MIT",

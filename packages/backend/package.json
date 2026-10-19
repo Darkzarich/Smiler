@@ -19,6 +19,7 @@
     "dev": "ts-node index.ts",
     "dev:watch": "nodemon --exec ts-node index.ts",
     "dev:debug": "node --inspect -r ts-node/register index.ts",
+    "seed": "ts-node scripts/seed/index.ts",
     "lint:code": "oxlint",
     "lint:types": "tsc --noEmit",
     "prettier": "prettier . --write",

@@ -21,6 +21,7 @@ Smiler is a Reddit-style social platform where users share posts with text, imag
   - [Option 1: Running Without Docker](#option-1-running-without-docker)
   - [Option 2: Running With Docker](#option-2-running-with-docker)
   - [Option 3: Running With Docker Compose (All-in-One)](#option-3-running-with-docker-compose-all-in-one)
+  - [Seeding the Database](#seeding-the-database)
 - [Contribution](#contribution)
   - [Linting](#linting)
 - [License](#license)
@@ -32,7 +33,7 @@ This project is built on the MEVN stack (MongoDB, Express, Vue.js, Node.js), wri
 ### Common Features
 
 - **Containerized with Docker**: The project is fully containerized using Docker, and the `docker-compose` setup is highly flexible. It can also run without Docker if needed.
-- **pnpm Monorepo**: Backend and frontend live in one workspace with shared tooling — Oxlint (plus ESLint for Vue templates), Prettier, cspell, and type-checking all run from the root.
+- **pnpm Monorepo**: Backend and frontend live in one workspace with shared tooling - Oxlint (plus ESLint for Vue templates), Prettier, cspell, and type-checking all run from the root.
 - **TypeScript End to End**: Both packages are fully typed, including the API client, which shares request and response types with the components that use them.
 
 ### Backend Key Features
@@ -45,7 +46,7 @@ This project is built on the MEVN stack (MongoDB, Express, Vue.js, Node.js), wri
   - **Sessions in Redis**: Sessions live in Redis rather than the main database, which keeps the hottest read of an authenticated request out of MongoDB.
   - **CSRF Protection**: State-changing requests require a CSRF token, issued and validated per session.
   - **Input Sanitizing and Validation**: Rich text from posts and comments is sanitized server-side, and every endpoint validates its payload before it reaches the database.
-  - **Logging**: Every request is logged using [Winston](https://github.com/winstonjs/winston) and [morgan](https://github.com/expressjs/morgan) as structured JSON — one object per line, carrying a request id, the matched route template and the acting user, so a report can be traced from the client's `X-Request-Id` to the error that caused it. Logs go to stdout and are collected and rotated by Docker.
+  - **Logging**: Every request is logged using [Winston](https://github.com/winstonjs/winston) and [morgan](https://github.com/expressjs/morgan) as structured JSON - one object per line, carrying a request id, the matched route template and the acting user, so a report can be traced from the client's `X-Request-Id` to the error that caused it. Logs go to stdout and are collected and rotated by Docker.
   - **Integration Testing**: The backend is rigorously tested with **integration tests** to ensure real-world functionality. These tests verify that ORM functions interact correctly with the database, API endpoints return the expected data, a file is actually written to disk or deleted, and dependencies (e.g., ORM, middleware) work as intended, even after updates and so on.
 
 - **Posts**:
@@ -115,74 +116,74 @@ This project is built on the MEVN stack (MongoDB, Express, Vue.js, Node.js), wri
 
 ## Motivation
 
-I built Smiler to practice building a full-stack application from scratch, working with the full MEVN stack, experimenting with different architectural patterns and testing strategies along the way. It's a playground for trying out new ideas and seeing what works (and what doesn't) in a real project context — from clustering and file uploads to hierarchical comments and multi-section posts. Starting from February 2026, I also use this project to learn and get comfortable working with agentic coding tools (vibecoding).
+I built Smiler to practice building a full-stack application from scratch, working with the full MEVN stack, experimenting with different architectural patterns and testing strategies along the way. It's a playground for trying out new ideas and seeing what works (and what doesn't) in a real project context - from clustering and file uploads to hierarchical comments and multi-section posts. Starting from February 2026, I also use this project to learn and get comfortable working with agentic coding tools (vibecoding).
 
 ## Project Timeline
 
-Smiler has been in development since 2019 and has been through several full-stack rewrites along the way. The collapsed timeline below highlights the milestones — stack migrations, major features, and large refactors.
+Smiler has been in development since 2019 and has been through several full-stack rewrites along the way. The collapsed timeline below highlights the milestones - stack migrations, major features, and large refactors.
 
 <details>
 <summary><b>Show the project timeline (2019 → today)</b></summary>
 
-### 2019 — The beginning
+### 2019 - The beginning
 
-- **Aug 2019** — Project starts as an [Express](https://github.com/expressjs/express) + MongoDB/[Mongoose](https://github.com/Automattic/mongoose) REST API: posts, users with sessions-based auth, a recursive comment tree, file uploads with image resizing, and Node.js **clustering** so a crashed worker never takes the app down.
-- **Sep 2019** — **Swagger** documentation added for the whole API. The **[Vue 2](https://github.com/vuejs/vue) frontend** ([vue-cli](https://github.com/vuejs/vue-cli)) is bootstrapped and the app gets its first deployment to **Heroku**. Auth UI, user profiles, and the post/comment rating system land.
-- **Oct 2019** — **Swagger 2.0 → OpenAPI 3.0.0**. Posts are remodeled around **"sections"** (text, picture, picture link, video) instead of a plain body — the single biggest data-model change in the project's history. A custom rich-text **post editor**, tags, following users and tags, the personal feed, search with filters, infinite scroll, and the mobile layout all arrive in the same month.
-- **Dec 2019** — Drag-and-drop reordering for post editor sections. Backend gets **[Winston](https://github.com/winstonjs/winston)** request/response logging and global error handling.
+- **Aug 2019** - Project starts as an [Express](https://github.com/expressjs/express) + MongoDB/[Mongoose](https://github.com/Automattic/mongoose) REST API: posts, users with sessions-based auth, a recursive comment tree, file uploads with image resizing, and Node.js **clustering** so a crashed worker never takes the app down.
+- **Sep 2019** - **Swagger** documentation added for the whole API. The **[Vue 2](https://github.com/vuejs/vue) frontend** ([vue-cli](https://github.com/vuejs/vue-cli)) is bootstrapped and the app gets its first deployment to **Heroku**. Auth UI, user profiles, and the post/comment rating system land.
+- **Oct 2019** - **Swagger 2.0 → OpenAPI 3.0.0**. Posts are remodeled around **"sections"** (text, picture, picture link, video) instead of a plain body - the single biggest data-model change in the project's history. A custom rich-text **post editor**, tags, following users and tags, the personal feed, search with filters, infinite scroll, and the mobile layout all arrive in the same month.
+- **Dec 2019** - Drag-and-drop reordering for post editor sections. Backend gets **[Winston](https://github.com/winstonjs/winston)** request/response logging and global error handling.
 
-### 2020–2022 — Dormant years
+### 2020–2022 - Dormant years
 
-- **2020** — Mostly dependency and security bumps. Session cookies reworked for `secure` / `sameSite` so the deployed app works over HTTPS.
-- **Apr 2021** — Swagger JSDoc comments rewritten as a standalone JSON spec.
-- **2022** — Not a single commit. The project sat untouched for the whole year.
+- **2020** - Mostly dependency and security bumps. Session cookies reworked for `secure` / `sameSite` so the deployed app works over HTTPS.
+- **Apr 2021** - Swagger JSDoc comments rewritten as a standalone JSON spec.
+- **2022** - Not a single commit. The project sat untouched for the whole year.
 
-### 2023 — Revival and containerization
+### 2023 - Revival and containerization
 
-- **Feb 2023** — The project comes back to life: **Docker + Docker Compose** for frontend, backend, and MongoDB, a large dependency upgrade across both packages, and flexible layered configs for local vs. published images.
-- **Apr 2023** — Frontend build tooling migrates from **vue-cli to [Vite](https://github.com/vitejs/vite)**.
-- **Jul 2023** — Deployment moves off Heroku to its own domain.
-- **Dec 2023** — First **[Playwright](https://github.com/microsoft/playwright)** E2E setup with mocked API fixtures.
+- **Feb 2023** - The project comes back to life: **Docker + Docker Compose** for frontend, backend, and MongoDB, a large dependency upgrade across both packages, and flexible layered configs for local vs. published images.
+- **Apr 2023** - Frontend build tooling migrates from **vue-cli to [Vite](https://github.com/vitejs/vite)**.
+- **Jul 2023** - Deployment moves off Heroku to its own domain.
+- **Dec 2023** - First **[Playwright](https://github.com/microsoft/playwright)** E2E setup with mocked API fixtures.
 
-### 2024 — Tests, tooling, and hardening
+### 2024 - Tests, tooling, and hardening
 
-- **Jan–May 2024** — A full **E2E test suite** is built out: posts, single post, editor, auth, profile, settings, search, tags, comments. Tests are then refactored twice — first onto an **API Page Object**, then onto page objects for every element — and factories move to **[faker.js](https://github.com/faker-js/faker)**.
-- **Mar 2024** — Linting infrastructure: **[Stylelint](https://github.com/stylelint/stylelint)** for Vue/PostCSS, **[Prettier](https://github.com/prettier/prettier)**, a reconfigured [ESLint](https://github.com/eslint/eslint), and a custom Stylelint rule enforcing two-dash **BEM** (later published as its own npm package). Backend MongoDB **indexes** are made explicit and optimized.
-- **May 2024** — **[cspell](https://github.com/streetsidesoftware/cspell)** spellchecking with a project dictionary. Backend controllers split into per-entity files.
-- **Jun 2024** — Frontend design-system pass: SCSS variables → **CSS custom properties**, **[moment.js](https://github.com/moment/moment) → [date-fns](https://github.com/date-fns/date-fns)**, [SVGO](https://github.com/svg/svgo)-optimized icons, Concentric CSS property ordering, and a component-folder restructure with import aliases. [`sanitize-html`](https://github.com/apostrophecms/sanitize-html) added for user content.
-- **Jul 2024** — Security and observability: **[helmet.js](https://github.com/helmetjs/helmet)**, timing-attack and unsanitized-regex fixes, JSON-formatted logs with multiple transports, and post categories split from one endpoint into separate ones. **[Jest](https://github.com/jestjs/jest) + [`mongodb-memory-server`](https://github.com/typegoose/mongodb-memory-server)** arrive — the first backend tests.
-- **Aug 2024** — Large **error-handling refactor**: typed HTTP error classes, a single global handler, and `async/await` throughout the controllers, replacing ad-hoc `try/catch` and promise chains. All updating endpoints start returning the updated document so the client can sync from responses. A **full UI redesign** ships at the end of the month.
-- **Sep 2024** — Pagination reworked with `total` / `hasNextPage`. Backend converts from CommonJS to **ES modules** (`type: module`). Sessions key off `userId` instead of `userLogin`.
-- **Nov 2024 – Feb 2025** — A months-long campaign of **backend integration tests** covering nearly every endpoint: posts, comments, auth, users, tags, categories, votes, and uploads.
-- **Dec 2024** — Repo moves from **npm to a [pnpm](https://github.com/pnpm/pnpm) monorepo** with a single shared Dockerfile. **[knip](https://github.com/webpro-nl/knip)** added to hunt dead code and unused dependencies.
+- **Jan–May 2024** - A full **E2E test suite** is built out: posts, single post, editor, auth, profile, settings, search, tags, comments. Tests are then refactored twice - first onto an **API Page Object**, then onto page objects for every element - and factories move to **[faker.js](https://github.com/faker-js/faker)**.
+- **Mar 2024** - Linting infrastructure: **[Stylelint](https://github.com/stylelint/stylelint)** for Vue/PostCSS, **[Prettier](https://github.com/prettier/prettier)**, a reconfigured [ESLint](https://github.com/eslint/eslint), and a custom Stylelint rule enforcing two-dash **BEM** (later published as its own npm package). Backend MongoDB **indexes** are made explicit and optimized.
+- **May 2024** - **[cspell](https://github.com/streetsidesoftware/cspell)** spellchecking with a project dictionary. Backend controllers split into per-entity files.
+- **Jun 2024** - Frontend design-system pass: SCSS variables → **CSS custom properties**, **[moment.js](https://github.com/moment/moment) → [date-fns](https://github.com/date-fns/date-fns)**, [SVGO](https://github.com/svg/svgo)-optimized icons, Concentric CSS property ordering, and a component-folder restructure with import aliases. [`sanitize-html`](https://github.com/apostrophecms/sanitize-html) added for user content.
+- **Jul 2024** - Security and observability: **[helmet.js](https://github.com/helmetjs/helmet)**, timing-attack and unsanitized-regex fixes, JSON-formatted logs with multiple transports, and post categories split from one endpoint into separate ones. **[Jest](https://github.com/jestjs/jest) + [`mongodb-memory-server`](https://github.com/typegoose/mongodb-memory-server)** arrive - the first backend tests.
+- **Aug 2024** - Large **error-handling refactor**: typed HTTP error classes, a single global handler, and `async/await` throughout the controllers, replacing ad-hoc `try/catch` and promise chains. All updating endpoints start returning the updated document so the client can sync from responses. A **full UI redesign** ships at the end of the month.
+- **Sep 2024** - Pagination reworked with `total` / `hasNextPage`. Backend converts from CommonJS to **ES modules** (`type: module`). Sessions key off `userId` instead of `userLogin`.
+- **Nov 2024 – Feb 2025** - A months-long campaign of **backend integration tests** covering nearly every endpoint: posts, comments, auth, users, tags, categories, votes, and uploads.
+- **Dec 2024** - Repo moves from **npm to a [pnpm](https://github.com/pnpm/pnpm) monorepo** with a single shared Dockerfile. **[knip](https://github.com/webpro-nl/knip)** added to hunt dead code and unused dependencies.
 
-### 2025 — TypeScript everywhere
+### 2025 - TypeScript everywhere
 
-- **Mar 2025** — **Backend migrates from JavaScript to [TypeScript](https://github.com/microsoft/TypeScript)**: full `.js → .ts` rename, typed controllers, and Swagger built at runtime. **Mongoose → [Typegoose](https://github.com/typegoose/typegoose)**, with Mongoose itself jumping from v5 to v8.
-- **Apr 2025** — **Express 4 → Express 5**. Typed request/response contracts for every controller, remapped TS path aliases across source and tests, and **[swc](https://github.com/swc-project/swc)** for faster compilation.
-- **Apr–May 2025** — **Vue 2.7 → [Vue 3.5](https://github.com/vuejs/core)**, the frontend's biggest migration: new global API, updated `v-model`/event syntax, transition classes, and a patched [`vuedraggable`](https://github.com/SortableJS/vue.draggable.next). **[Vuex](https://github.com/vuejs/vuex) 4 → [Pinia](https://github.com/vuejs/pinia)** follows days later.
-- **May–Jul 2025** — Every component is rewritten to **Composition API + TypeScript** (`<script setup lang="ts">`), the API client is rebuilt with per-endpoint types, and **[vue-tsc](https://github.com/vuejs/language-tools)** starts type-checking the whole app.
-- **Aug 2025** — **Voting system rework**: votes can be flipped to the opposite direction, and deleting a post or comment now correctly rolls back the author's rating and removes the rate documents.
-- **Sep 2025** — Playwright tests, factories, page objects, and route objects migrated **from JS to TypeScript** with their own tsconfig.
+- **Mar 2025** - **Backend migrates from JavaScript to [TypeScript](https://github.com/microsoft/TypeScript)**: full `.js → .ts` rename, typed controllers, and Swagger built at runtime. **Mongoose → [Typegoose](https://github.com/typegoose/typegoose)**, with Mongoose itself jumping from v5 to v8.
+- **Apr 2025** - **Express 4 → Express 5**. Typed request/response contracts for every controller, remapped TS path aliases across source and tests, and **[swc](https://github.com/swc-project/swc)** for faster compilation.
+- **Apr–May 2025** - **Vue 2.7 → [Vue 3.5](https://github.com/vuejs/core)**, the frontend's biggest migration: new global API, updated `v-model`/event syntax, transition classes, and a patched [`vuedraggable`](https://github.com/SortableJS/vue.draggable.next). **[Vuex](https://github.com/vuejs/vuex) 4 → [Pinia](https://github.com/vuejs/pinia)** follows days later.
+- **May–Jul 2025** - Every component is rewritten to **Composition API + TypeScript** (`<script setup lang="ts">`), the API client is rebuilt with per-endpoint types, and **[vue-tsc](https://github.com/vuejs/language-tools)** starts type-checking the whole app.
+- **Aug 2025** - **Voting system rework**: votes can be flipped to the opposite direction, and deleting a post or comment now correctly rolls back the author's rating and removes the rate documents.
+- **Sep 2025** - Playwright tests, factories, page objects, and route objects migrated **from JS to TypeScript** with their own tsconfig.
 
-### 2026 — Security, DX, and agentic coding
+### 2026 - Security, DX, and agentic coding
 
-- **Feb 2026** — Custom directives replaced with **[VueUse](https://github.com/vueuse/vueuse)**. This is also when the project starts being used to learn agentic coding tools.
-- **Mar 2026** — **Light/dark theme system** with a full color-variable refactor, plus **[Vitest](https://github.com/vitest-dev/vitest)** unit tests alongside the E2E suite. ESLint, Prettier, and TypeScript versions aligned across packages.
-- **Apr 2026 — security** — The largest **security hardening** push so far: API and write **rate limiting**, a path-traversal fix in upload/delete, **CSRF protection** end to end, hardened sessions, uploads, request logging and request IDs, stricter post/comment/profile validation, unique email and login indexes with normalization, and server-side-only section hashes. User rates move into their own collection with a **MongoDB migration script**.
-- **Apr 2026 — editor & DX** — The hand-rolled text editor is replaced with **[Tiptap](https://github.com/ueberdosis/tiptap)**, with rich-text sanitizing on the backend. **[husky](https://github.com/typicode/husky) + [lint-staged](https://github.com/lint-staged/lint-staged)** git hooks added, `AGENTS.md` written, and the backend switches to `lean()` everywhere (`id` → `_id` across both packages).
-- **May–Aug 2026** — Collapsible post content in feeds, a reusable **modal/confirm-dialog system** with unit and E2E coverage, and steady dependency upkeep.
-- **Aug 2026 — security & performance** — **Stronger password hashing with gradual migration** of existing hashes, case-normalized email/login lookups, **lazy-loaded route components** for a much smaller bundle, and a reworked graceful shutdown. A follow-up hardening pass widens the SSRF denylist, ties uploaded pictures to their author, forces a hardened `rel` on sanitized links, requires a browser origin for every state-changing request, and adds a **Content Security Policy** to the nginx config. List endpoints drop their per-request `countDocuments`, and the lists sorted by date of creation gain **cursor-based pagination**, so infinite scroll no longer repeats posts when new ones land mid-scroll.
-- **Aug 2026 — database** — **MongoDB upgraded 5.0 → 8.0** one major at a time, with the test suite switched to clearing collections instead of dropping the database between runs.
-- **Aug 2026 — runtime** — **Node.js upgraded 20 → 24 LTS** across the dev environment, the `engines` fields, and the Docker images, with `@types/node` moved to the matching major. Jest's config loader is pinned to **[ts-node](https://github.com/TypeStrong/ts-node)** so the new native type stripping in Node doesn't try to load `jest.config.ts` as ESM.
-- **Aug 2026 — commit conventions** — The repo adopts **Conventional Commits** (the Angular flavour), validated and spellchecked on every commit by **[commitlint](https://github.com/conventional-changelog/commitlint)** in a new `commit-msg` hook, with scopes restricted to the workspace packages. The git hooks are rebalanced at the same time: linting stays at commit time through lint-staged, while pre-push runs only the test suites.
-- **Sep 2026 — styling** — The frontend drops **Sass for plain CSS on [PostCSS](https://github.com/postcss/postcss)**. The March color-variable refactor had already left the preprocessor supplying only nesting and one breakpoint mixin, so **[postcss-nested](https://github.com/postcss/postcss-nested)** takes over the nesting — the Sass flavour, since BEM `&__element` concatenation is something the CSS spec cannot express — and the breakpoints become `@custom-media` definitions that **[@csstools/postcss-global-data](https://github.com/csstools/postcss-plugins)** injects into every style block, so components no longer import anything to be responsive.
-- **Sep 2026 — pictures** — Pictures added by url stop being hotlinked. The backend now **downloads them, re-encodes with [sharp](https://github.com/lovell/sharp) and stores them** alongside file uploads, for post sections and avatars alike, so a third-party host no longer collects the IP of everyone who opens a post, and the encoded size and pixel count are bounded the way an upload's are. Fetching a url the user chose is an SSRF sink, so it is guarded on both sides: addresses reserved for the local network are refused before a socket opens, every name is rechecked at connect time against what it actually resolved to — which is what closes DNS rebinding — and redirects are revalidated hop by hop.
-- **Sep 2026 — observability** — Backend logging is reworked around **structured stdout**. Winston had been writing `logs/*.log` from every cluster worker at once and rotating by bytes per process, so the workers renamed the file out from under each other and lost lines; stdout is now the only transport, Docker's `json-file` driver owns rotation, and every line is one JSON object carrying a request id, the matched route template and the acting user.
-- **Sep 2026 — API contract** — The `params`, `query` and `body` of every endpoint are now parsed by a **[Zod](https://github.com/colinhacks/zod)** schema before the controller runs, replacing three hand-rolled validator classes and the field checks each controller used to open with. Each route is registered once, together with its schemas, and the **OpenAPI 3.1** document is generated from that registration — so the ~2,700 lines of Swagger JSDoc that used to sit above the routes are gone, and the docs cannot describe anything but what the server accepts. A rejected request now names every field that failed instead of only the first.
-- **Sep 2026 — infrastructure** — **Redis** joins MongoDB as a second datastore and takes over the two things every request touches: sessions move to **[connect-redis](https://github.com/redis/connect-redis)**, and the rate limiter counts through **[rate-limit-redis](https://github.com/express-rate-limit/rate-limit-redis)** instead of an unmaintained Mongo store that shipped its own MongoDB 3 driver and opened a connection pool per limiter per worker. Each limiter also moves under its own key prefix: all five used to share one counter per client, so a single upload could spend a user's read allowance and leave it locked for an hour. A **k6** load script in `scripts/benchmarks/` measures what the two stores cost per request, which is how the move was checked: roughly half the latency of the MongoDB stores, and about 1.75× the throughput on one box.
-- **Sep 2026 — editor** — Any post section can be published behind a **spoiler**: a blurred veil on the rendered post that lifts on click, with the covered content kept out of reach of the keyboard and screen readers until it does. A **Write / Preview** toggle lands alongside it, rendering the draft through the same component readers see, with voting, routing and tag following switched off since none of them have anything to point at yet. An unfinished post is also kept **in the browser it is being written in**, saved on a debounce as the typing happens, so a closed tab costs nothing while the copy on the account still carries the draft between devices — the editor opens whichever of the two was written last, and leaving the page with changes the account has not seen asks first.
-- **Sep 2026 — linting** — **ESLint → [Oxlint](https://github.com/oxc-project/oxc)** in both packages, rule for rule, dropping the unmaintained airbnb and `eslint-plugin-node` configs and turning on type-aware linting on the backend. Vue templates are the one thing Oxlint cannot parse, so the frontend keeps a template-only ESLint beside it. The two together run in about half the time of the old single pass, and the backend lints in 3s instead of 17s.
+- **Feb 2026** - Custom directives replaced with **[VueUse](https://github.com/vueuse/vueuse)**. This is also when the project starts being used to learn agentic coding tools.
+- **Mar 2026** - **Light/dark theme system** with a full color-variable refactor, plus **[Vitest](https://github.com/vitest-dev/vitest)** unit tests alongside the E2E suite. ESLint, Prettier, and TypeScript versions aligned across packages.
+- **Apr 2026 - security** - The largest **security hardening** push so far: API and write **rate limiting**, a path-traversal fix in upload/delete, **CSRF protection** end to end, hardened sessions, uploads, request logging and request IDs, stricter post/comment/profile validation, unique email and login indexes with normalization, and server-side-only section hashes. User rates move into their own collection with a **MongoDB migration script**.
+- **Apr 2026 - editor & DX** - The hand-rolled text editor is replaced with **[Tiptap](https://github.com/ueberdosis/tiptap)**, with rich-text sanitizing on the backend. **[husky](https://github.com/typicode/husky) + [lint-staged](https://github.com/lint-staged/lint-staged)** git hooks added, `AGENTS.md` written, and the backend switches to `lean()` everywhere (`id` → `_id` across both packages).
+- **May–Aug 2026** - Collapsible post content in feeds, a reusable **modal/confirm-dialog system** with unit and E2E coverage, and steady dependency upkeep.
+- **Aug 2026 - security & performance** - **Stronger password hashing with gradual migration** of existing hashes, case-normalized email/login lookups, **lazy-loaded route components** for a much smaller bundle, and a reworked graceful shutdown. A follow-up hardening pass widens the SSRF denylist, ties uploaded pictures to their author, forces a hardened `rel` on sanitized links, requires a browser origin for every state-changing request, and adds a **Content Security Policy** to the nginx config. List endpoints drop their per-request `countDocuments`, and the lists sorted by date of creation gain **cursor-based pagination**, so infinite scroll no longer repeats posts when new ones land mid-scroll.
+- **Aug 2026 - database** - **MongoDB upgraded 5.0 → 8.0** one major at a time, with the test suite switched to clearing collections instead of dropping the database between runs.
+- **Aug 2026 - runtime** - **Node.js upgraded 20 → 24 LTS** across the dev environment, the `engines` fields, and the Docker images, with `@types/node` moved to the matching major. Jest's config loader is pinned to **[ts-node](https://github.com/TypeStrong/ts-node)** so the new native type stripping in Node doesn't try to load `jest.config.ts` as ESM.
+- **Aug 2026 - commit conventions** - The repo adopts **Conventional Commits** (the Angular flavour), validated and spellchecked on every commit by **[commitlint](https://github.com/conventional-changelog/commitlint)** in a new `commit-msg` hook, with scopes restricted to the workspace packages. The git hooks are rebalanced at the same time: linting stays at commit time through lint-staged, while pre-push runs only the test suites.
+- **Sep 2026 - styling** - The frontend drops **Sass for plain CSS on [PostCSS](https://github.com/postcss/postcss)**. The March color-variable refactor had already left the preprocessor supplying only nesting and one breakpoint mixin, so **[postcss-nested](https://github.com/postcss/postcss-nested)** takes over the nesting - the Sass flavour, since BEM `&__element` concatenation is something the CSS spec cannot express - and the breakpoints become `@custom-media` definitions that **[@csstools/postcss-global-data](https://github.com/csstools/postcss-plugins)** injects into every style block, so components no longer import anything to be responsive.
+- **Sep 2026 - pictures** - Pictures added by url stop being hotlinked. The backend now **downloads them, re-encodes with [sharp](https://github.com/lovell/sharp) and stores them** alongside file uploads, for post sections and avatars alike, so a third-party host no longer collects the IP of everyone who opens a post, and the encoded size and pixel count are bounded the way an upload's are. Fetching a url the user chose is an SSRF sink, so it is guarded on both sides: addresses reserved for the local network are refused before a socket opens, every name is rechecked at connect time against what it actually resolved to - which is what closes DNS rebinding - and redirects are revalidated hop by hop.
+- **Sep 2026 - observability** - Backend logging is reworked around **structured stdout**. Winston had been writing `logs/*.log` from every cluster worker at once and rotating by bytes per process, so the workers renamed the file out from under each other and lost lines; stdout is now the only transport, Docker's `json-file` driver owns rotation, and every line is one JSON object carrying a request id, the matched route template and the acting user.
+- **Sep 2026 - API contract** - The `params`, `query` and `body` of every endpoint are now parsed by a **[Zod](https://github.com/colinhacks/zod)** schema before the controller runs, replacing three hand-rolled validator classes and the field checks each controller used to open with. Each route is registered once, together with its schemas, and the **OpenAPI 3.1** document is generated from that registration - so the ~2,700 lines of Swagger JSDoc that used to sit above the routes are gone, and the docs cannot describe anything but what the server accepts. A rejected request now names every field that failed instead of only the first.
+- **Sep 2026 - infrastructure** - **Redis** joins MongoDB as a second datastore and takes over the two things every request touches: sessions move to **[connect-redis](https://github.com/redis/connect-redis)**, and the rate limiter counts through **[rate-limit-redis](https://github.com/express-rate-limit/rate-limit-redis)** instead of an unmaintained Mongo store that shipped its own MongoDB 3 driver and opened a connection pool per limiter per worker. Each limiter also moves under its own key prefix: all five used to share one counter per client, so a single upload could spend a user's read allowance and leave it locked for an hour. A **k6** load script in `scripts/benchmarks/` measures what the two stores cost per request, which is how the move was checked: roughly half the latency of the MongoDB stores, and about 1.75× the throughput on one box.
+- **Sep 2026 - editor** - Any post section can be published behind a **spoiler**: a blurred veil on the rendered post that lifts on click, with the covered content kept out of reach of the keyboard and screen readers until it does. A **Write / Preview** toggle lands alongside it, rendering the draft through the same component readers see, with voting, routing and tag following switched off since none of them have anything to point at yet. An unfinished post is also kept **in the browser it is being written in**, saved on a debounce as the typing happens, so a closed tab costs nothing while the copy on the account still carries the draft between devices - the editor opens whichever of the two was written last, and leaving the page with changes the account has not seen asks first.
+- **Sep 2026 - linting** - **ESLint → [Oxlint](https://github.com/oxc-project/oxc)** in both packages, rule for rule, dropping the unmaintained airbnb and `eslint-plugin-node` configs and turning on type-aware linting on the backend. Vue templates are the one thing Oxlint cannot parse, so the frontend keeps a template-only ESLint beside it. The two together run in about half the time of the old single pass, and the backend lints in 3s instead of 17s.
 
 </details>
 
@@ -192,12 +193,12 @@ This project can be run in multiple ways, depending on your preferences and setu
 
 ### Prerequisites
 
-- **Node.js** (>=24.0.0 — see `.nvmrc` for the exact version used in development)
+- **Node.js** (>=24.0.0 - see `.nvmrc` for the exact version used in development)
 - **[pnpm](https://pnpm.io/)** (>=8.6.0)
 - **Docker** and **Docker Compose** (optional, for containerized setups)
 - **[k6](https://github.com/grafana/k6)** (optional, for the load benchmarks in `scripts/benchmarks/`)
 - **MongoDB** (can be set up locally, remotely, or via Docker)
-- **Redis** (same — it holds the sessions and the rate limiter counters)
+- **Redis** (same - it holds the sessions and the rate limiter counters)
 
 ---
 
@@ -303,6 +304,19 @@ If you want to run both the application and MongoDB using Docker Compose, follow
      # Optionally add --build to build images instead of pulling them from Docker Hub
      docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
      ```
+
+### Seeding the Database
+
+A fresh database makes for an empty site, so there is a script that fills it with something to click through:
+
+```bash
+pnpm db:seed           # refuses to run if the database already has data
+pnpm db:seed --reset   # deletes all users, posts, comments and votes first
+```
+
+It writes straight to the database in `DB_URL` (the backend does not need to be running) and creates 64 users, 150 posts with text, picture and video sections, threaded comments, votes and follows. Ratings, comment and follower counts all add up the way the API would have left them, and the posts are backdated so every category - blowing, recent, today, this week - has something in it. Blowing posts are the ones from the last hour, so they drop off that page an hour after seeding.
+
+Sign in as **`demo@example.com`** / **`password`** - every seeded user has that password, and the demo account already follows a few people and tags, so the feed is not empty. Pictures and avatars are generated locally into `packages/backend/uploads/`, so seeding works offline. The script refuses to run with `NODE_ENV=production`.
 
 ## Contribution
 
