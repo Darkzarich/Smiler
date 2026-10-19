@@ -26,6 +26,12 @@ export default class Menu extends AbstractComponent {
     await this.page.getByTestId('header-search-input').press('Enter');
   }
 
+  async clickSearchButton() {
+    await this.page
+      .getByRole('button', { name: 'Search', exact: true })
+      .click();
+  }
+
   async goToCreatePostPage() {
     await this.createPostBtn.click();
   }

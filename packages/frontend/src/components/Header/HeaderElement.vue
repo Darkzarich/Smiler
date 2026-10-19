@@ -46,7 +46,15 @@
           @keyup.enter="search"
         >
           <template #icon-right>
-            <IconSearch @click="search" />
+            <button
+              type="button"
+              class="header__search-button"
+              aria-label="Search"
+              data-testid="header-search-button"
+              @click="search"
+            >
+              <IconSearch />
+            </button>
           </template>
         </BaseInput>
       </div>
@@ -220,10 +228,40 @@ watch(
   &__search {
     display: flex;
     align-items: center;
+    width: 14rem;
     margin-left: auto;
 
     @media (--phone-only) {
-      width: 70%;
+      flex: 1;
+      width: auto;
+      min-width: 0;
+    }
+
+    .base-input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .base-input__input {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+
+  &__search-button {
+    display: flex;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+
+    &:hover svg {
+      fill: var(--color-text-primary);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
     }
   }
 
@@ -236,6 +274,10 @@ watch(
     height: 100%;
     margin-left: auto;
     align-self: center;
+
+    .header__search + & {
+      margin-left: 12px;
+    }
 
     img {
       width: 2.5rem;

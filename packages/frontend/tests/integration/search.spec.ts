@@ -40,6 +40,26 @@ test('Searches posts using the search bar in the header', async ({
   await expect(SearchPage.searchInput).toHaveValue('test');
 });
 
+test('Searches posts using the search button in the header', async ({
+  page: currentPage,
+  PostsPage,
+  SearchPage,
+  Menu,
+  Api,
+}) => {
+  await PostsPage.goto();
+
+  await Menu.fillSearchInput('test');
+
+  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+    preRequestAction: Menu.clickSearchButton.bind(Menu),
+  });
+
+  expect(postsResponse.url()).toContain('title=test');
+  await expect(currentPage).toHaveTitle(SearchPage.title);
+  expect(SearchPage.pageHasTitleQueryParam('test')).toBe(true);
+});
+
 test("Doesn't send posts request when just opened the search page", async ({
   page: currentPage,
   SearchPage,

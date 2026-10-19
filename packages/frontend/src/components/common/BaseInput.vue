@@ -1,7 +1,10 @@
 <template>
   <div
     class="base-input u-flex-col"
-    :class="error && isDirty ? 'base-input--error' : ''"
+    :class="{
+      'base-input--error': error && isDirty,
+      'base-input--with-icon': $slots['icon-right'],
+    }"
   >
     <label v-if="label" class="base-input__label" :for="id">
       {{ label }}
@@ -20,7 +23,7 @@
       @keyup.enter="$emit('keyup.enter')"
     />
 
-    <div v-if="$slots.iconRight" class="base-input__icon">
+    <div v-if="$slots['icon-right']" class="base-input__icon">
       <slot name="icon-right" />
     </div>
 
@@ -105,6 +108,10 @@ const setValue = (event: Event) => {
     }
   }
 
+  &--with-icon &__input {
+    padding-right: 2.25rem;
+  }
+
   &--error {
     .base-input {
       &__label {
@@ -136,7 +143,6 @@ const setValue = (event: Event) => {
 
     svg {
       fill: var(--color-text-secondary);
-      cursor: pointer;
     }
   }
 }
