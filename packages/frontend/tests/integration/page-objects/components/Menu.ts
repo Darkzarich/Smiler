@@ -4,17 +4,21 @@ import AbstractComponent from './AbstractComponent';
 export default class Menu extends AbstractComponent {
   readonly isMobile: boolean;
   readonly createPostBtn: Locator;
+  readonly mobileMenuBtn: Locator;
+  readonly mobileMenu: Locator;
 
   constructor(page: Page, isMobile: boolean) {
     super(page);
 
     this.isMobile = isMobile;
     this.createPostBtn = page.getByTestId('create-post-btn');
+    this.mobileMenuBtn = page.getByTestId('mobile-menu');
+    this.mobileMenu = page.getByTestId('mobile-menu-dialog');
   }
 
   async openIfMobile() {
     if (this.isMobile) {
-      await this.page.getByTestId('mobile-menu').click();
+      await this.mobileMenuBtn.click();
     }
   }
 

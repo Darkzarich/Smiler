@@ -3,6 +3,7 @@
     <div class="header__container">
       <div class="header__mobile-menu">
         <BaseIconButton
+          ref="menuButton"
           label="Menu"
           data-testid="mobile-menu"
           size="medium"
@@ -15,7 +16,11 @@
 
       <!-- TODO: Should be moved to App.vue -->
       <Transition name="header__mobile-menu">
-        <HeaderMobileMenu v-if="isMobileMenuOpen" @close="toggleMobileMenu()" />
+        <HeaderMobileMenu
+          v-if="isMobileMenuOpen"
+          :return-focus-to="menuButton?.$el"
+          @close="closeMobileMenu()"
+        />
       </Transition>
 
       <RouterLink class="header__home-link" :to="{ name: 'Home' }">
@@ -80,7 +85,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { ref, watch } from 'vue';
+import { onBeforeUnmount, ref, useTemplateRef } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import HeaderMobileMenu from './HeaderMobileMenu.vue';
 import SiteLogo from './SiteLogo.vue';
@@ -104,6 +109,8 @@ const isPhone = useMediaQuery('phone-only');
 // Below 900px the inline nav does not fit, so it moves into the menu
 const isCompact = useMediaQuery('tablet-portrait-down');
 
+const menuButton =
+  useTemplateRef<InstanceType<typeof BaseIconButton>>('menuButton');
 const isMobileMenuOpen = ref(false);
 const searchInputValue = ref('');
 
@@ -122,14 +129,16 @@ const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
 };
 
-watch(
-  () => route.name,
-  () => {
-    if (isMobileMenuOpen.value) {
-      toggleMobileMenu();
-    }
-  },
-);
+const closeMobileMenu = () => {
+  isMobileMenuOpen.value = false;
+};
+
+// Not a watch on the route: neither a link to the page already shown nor a
+// navigation a guard cancels (the sign-in prompt) changes it. afterEach runs
+// for both
+const removeAfterEach = router.afterEach(closeMobileMenu);
+
+onBeforeUnmount(removeAfterEach);
 </script>
 
 <style>

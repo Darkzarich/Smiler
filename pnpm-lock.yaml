@@ -254,6 +254,9 @@ importers:
       '@vueuse/core':
         specifier: ^14.4.0
         version: 14.4.0(vue@3.5.42)
+      '@vueuse/integrations':
+        specifier: ^14.4.0
+        version: 14.4.0(axios@1.20.0)(focus-trap@8.2.3)(vue@3.5.42)
       axios:
         specifier: ^1.20.0
         version: 1.20.0
@@ -263,6 +266,9 @@ importers:
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0
+      focus-trap:
+        specifier: ^8.2.3
+        version: 8.2.3
       lodash-es:
         specifier: ^4.18.1
         version: 4.18.1
@@ -4503,6 +4509,55 @@ packages:
       vue: 3.5.42(typescript@5.9.3)
     dev: false
 
+  /@vueuse/integrations@14.4.0(axios@1.20.0)(focus-trap@8.2.3)(vue@3.5.42):
+    resolution: {integrity: sha512-oJz9qTgczvA7L1nXQFRU7h8tQbOCoiceqvMMhT9XYMyOGTqLJ2rEa09PON+nD2t48sZUfeOmg4eaWJXV4sZb/w==}
+    peerDependencies:
+      async-validator: ^4
+      axios: ^1
+      change-case: ^5
+      drauu: ^0.4
+      focus-trap: ^7 || ^8
+      fuse.js: ^7
+      idb-keyval: ^6
+      jwt-decode: ^4
+      nprogress: ^0.2
+      qrcode: ^1.5
+      sortablejs: ^1
+      universal-cookie: ^7 || ^8
+      vue: ^3.5.0
+    peerDependenciesMeta:
+      async-validator:
+        optional: true
+      axios:
+        optional: true
+      change-case:
+        optional: true
+      drauu:
+        optional: true
+      focus-trap:
+        optional: true
+      fuse.js:
+        optional: true
+      idb-keyval:
+        optional: true
+      jwt-decode:
+        optional: true
+      nprogress:
+        optional: true
+      qrcode:
+        optional: true
+      sortablejs:
+        optional: true
+      universal-cookie:
+        optional: true
+    dependencies:
+      '@vueuse/core': 14.4.0(vue@3.5.42)
+      '@vueuse/shared': 14.4.0(vue@3.5.42)
+      axios: 1.20.0
+      focus-trap: 8.2.3
+      vue: 3.5.42(typescript@5.9.3)
+    dev: false
+
   /@vueuse/metadata@14.4.0:
     resolution: {integrity: sha512-swx/255R6JyHZFJhx845iz5CRWDZdCfvkZOpACWc5+c5WHcG24mv8gUT1WIdFQaHt6dq79rvILd9QnCWiyVm9g==}
     dev: false
@@ -6317,6 +6372,12 @@ packages:
 
   /fn.name@1.1.0:
     resolution: {integrity: sha512-GRnmB5gPyJpAhTQdSZTSp9uaPSvl09KoYcMQtsB9rQoOmzs9dH6ffeccH+Z+cv6P68Hu5bC6JjRh4Ah/mHSNRw==}
+    dev: false
+
+  /focus-trap@8.2.3:
+    resolution: {integrity: sha512-LTNHZwcFM7bSdU1cG1ExoaTEzoGmdjw+EzDotolZmLTCbm0ll2k6J3NL+WfqP14nGLxAp+XDJgwlT2DtNhcukA==}
+    dependencies:
+      tabbable: 6.5.0
     dev: false
 
   /follow-redirects@1.16.0(debug@4.4.3):
@@ -9476,6 +9537,10 @@ packages:
     dependencies:
       '@pkgr/core': 0.3.6
     dev: true
+
+  /tabbable@6.5.0:
+    resolution: {integrity: sha512-wieBHXygIm7OyQOu5hQlkk62/WyCFYGlWg7L6/ZCUZwx0o398Zkn4pVmMyfYhfMG8kGrj/Krt8eIk6UKC6VzwA==}
+    dev: false
 
   /table@6.9.0:
     resolution: {integrity: sha512-9kY+CygyYM6j02t5YFHbNz2FN5QmYGv9zAjVp4lCDjlCw7amdckXlEt/bjMhUIfj4ThGRE4gCUH5+yGnNuPo5A==}

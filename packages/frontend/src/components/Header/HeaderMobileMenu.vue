@@ -1,5 +1,12 @@
 <template>
-  <div class="mobile-menu">
+  <div
+    ref="menu"
+    class="mobile-menu"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Menu"
+    data-testid="mobile-menu-dialog"
+  >
     <div class="mobile-menu__close">
       <BaseIconButton label="Close menu" size="medium" @click="closeMenu()">
         <IconClose />
@@ -27,6 +34,8 @@
 </template>
 
 <script setup lang="ts">
+import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
+import { useTemplateRef } from 'vue';
 import { useMediaQuery } from '@/composables/use-media-query';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import Navigation from '@components/Navigation/Navigation.vue';
@@ -35,10 +44,16 @@ import ThemeToggle from '@components/Theme/ThemeToggle.vue';
 import CurrentUser from '@components/User/CurrentUser.vue';
 import IconClose from '@icons/IconClose.vue';
 
+interface Props {
+  /** Where focus goes when the menu closes. Safari focuses no button on a click */
+  returnFocusTo?: HTMLElement;
+}
+
 interface Emits {
   close: [];
 }
 
+const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const isPhone = useMediaQuery('phone-only');
@@ -46,6 +61,19 @@ const isPhone = useMediaQuery('phone-only');
 const closeMenu = () => {
   emit('close');
 };
+
+// The menu covers the page, so Tab stays inside it. Focus starts on the close
+// button and goes back to the hamburger when the menu unmounts
+useFocusTrap(useTemplateRef('menu'), {
+  immediate: true,
+  setReturnFocus: (previous) => props.returnFocusTo ?? previous,
+  // Leave the trap to the unmount, so the parent decides when the menu closes
+  escapeDeactivates: () => {
+    closeMenu();
+
+    return false;
+  },
+});
 </script>
 
 <style>

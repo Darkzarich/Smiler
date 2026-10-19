@@ -3,6 +3,7 @@
 import { expect } from '@playwright/test';
 import test from './page-objects';
 import createRandomAuth from '@factory/auth';
+import createRandomProfile from '@factory/profile';
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
@@ -73,4 +74,83 @@ test.describe('Header between phone and desktop widths', () => {
       expect(layout).toEqual({ pastRightEdge: [], wrappedLinks: [] });
     });
   }
+});
+
+test.describe('Mobile menu', () => {
+  const auth = createRandomAuth({ isAuth: true });
+
+  test.beforeEach(async ({ Api, isMobile }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(!isMobile, 'The menu replaces the nav on narrow screens only');
+
+    Api.routes.auth.getAuth.mock({ body: auth });
+
+    Api.routes.posts.getToday.mock({
+      body: { posts: [], hasNextPage: false },
+    });
+
+    Api.routes.posts.getPosts.mock({
+      body: { posts: [], hasNextPage: false },
+    });
+
+    Api.routes.users.getUserProfile.mock({
+      body: createRandomProfile(),
+    });
+  });
+
+  test('Closes after a link to a page of the same kind', async ({
+    page,
+    ProfilePage,
+    Menu,
+  }) => {
+    await ProfilePage.goto('someone-else');
+    await Menu.openIfMobile();
+
+    await Menu.mobileMenu.getByTestId('user-login').click();
+
+    await expect(page).toHaveURL(ProfilePage.getUrlWithLogin(auth.login));
+    await expect(Menu.mobileMenu).toBeHidden();
+  });
+
+  test('Closes after a link to the page already shown', async ({
+    PostsPage,
+    Menu,
+  }) => {
+    await PostsPage.goto(PostsPage.urls.today);
+    await Menu.openIfMobile();
+
+    await Menu.mobileMenu.getByTestId('today-link').click();
+
+    await expect(Menu.mobileMenu).toBeHidden();
+  });
+
+  test('Takes focus while open and closes on Escape', async ({
+    page,
+    PostsPage,
+    Menu,
+  }) => {
+    await PostsPage.goto(PostsPage.urls.today);
+    await Menu.openIfMobile();
+
+    await expect(Menu.mobileMenu).toHaveRole('dialog');
+
+    const closeBtn = Menu.mobileMenu.getByRole('button', {
+      name: 'Close menu',
+    });
+
+    await expect(closeBtn).toBeFocused();
+
+    // Shift+Tab from the first control wraps to the last, never behind the menu
+    await page.keyboard.press('Shift+Tab');
+    await expect(Menu.mobileMenu.locator(':focus')).toHaveCount(1);
+    await expect(closeBtn).not.toBeFocused();
+
+    await page.keyboard.press('Tab');
+    await expect(closeBtn).toBeFocused();
+
+    await page.keyboard.press('Escape');
+
+    await expect(Menu.mobileMenu).toBeHidden();
+    await expect(Menu.mobileMenuBtn).toBeFocused();
+  });
 });
