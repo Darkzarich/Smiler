@@ -42,11 +42,9 @@ const isLoading = ref(false);
 const nextCursor = ref<string | null>(null);
 const hasNextPage = ref(false);
 
-const handleFetchUser = async () => {
+const handleFetchUser = async (login: string) => {
   try {
-    const fetchedUser = await api.users.getUserProfile(
-      route.params.login as string,
-    );
+    const fetchedUser = await api.users.getUserProfile(login);
 
     user.value = fetchedUser;
   } catch {
@@ -90,18 +88,19 @@ const handleNextPage = () => {
   handleFetchPosts({ isCombine: true });
 };
 
-const handleFetchAll = async () => {
-  await handleFetchUser();
+const handleFetchAll = async (login: string) => {
+  await handleFetchUser(login);
   await handleFetchPosts();
 };
 
+// `route` still holds the old login here: the update has not happened yet
 onBeforeRouteUpdate((to, from) => {
   if (to.params.login !== from.params.login) {
-    handleFetchAll();
+    handleFetchAll(to.params.login as string);
   }
 });
 
 onBeforeMount(() => {
-  handleFetchAll();
+  handleFetchAll(route.params.login as string);
 });
 </script>

@@ -75,6 +75,34 @@ test('Fetches and shows user profile', async ({ ProfilePage, Api }) => {
   await expect(ProfilePage.followBtn).toBeVisible();
 });
 
+test('Shows the new profile after a link from one profile to another', async ({
+  page,
+  ProfilePage,
+  Api,
+}) => {
+  const me = createRandomAuth({ isAuth: true });
+
+  Api.routes.auth.getAuth.mock({ body: me });
+
+  await ProfilePage.goto(testUser.login);
+  await expect(ProfilePage.login).toContainText(testUser.login);
+
+  Api.routes.users.getUserProfile.mock({
+    body: createRandomProfile({ login: me.login }),
+  });
+
+  // The header avatar links to the signed in user's own profile
+  const userRequest = await Api.routes.users.getUserProfile.waitForRequest({
+    preRequestAction: async () => {
+      await page.locator('header').getByRole('img', { name: 'avatar' }).click();
+    },
+  });
+
+  expect(userRequest.url()).toContain(`/users/${me.login}`);
+  await expect(page).toHaveURL(ProfilePage.getUrlWithLogin(me.login));
+  await expect(ProfilePage.login).toContainText(me.login);
+});
+
 test.describe('Long offline indicator', () => {
   test('Shows how long the user has been away when they have not signed in for a long time', async ({
     ProfilePage,
