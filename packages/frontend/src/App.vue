@@ -47,6 +47,7 @@ onMounted(() => {
 
 <style>
 @import '@/styles/utilities.css';
+@import '@/styles/rich-text.css';
 @import '@/styles/themes/dark.css';
 @import '@/styles/themes/light.css';
 

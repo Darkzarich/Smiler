@@ -111,6 +111,7 @@
               <!-- eslint-disable vue/no-v-html -->
               <div
                 v-if="isTextSection(section)"
+                class="rich-text"
                 :data-testid="`post-${post._id}-text-${section.hash}`"
                 v-html="section.content"
               />
@@ -700,65 +701,6 @@ const searchByTag = (tag: string) => {
 
   &__body {
     line-height: 1.5rem;
-
-    :deep(p),
-    :deep(blockquote),
-    :deep(ul),
-    :deep(ol),
-    :deep(h1),
-    :deep(h2),
-    :deep(h3),
-    :deep(h4),
-    :deep(h5),
-    :deep(h6) {
-      margin-top: 0;
-      margin-bottom: 1rem;
-    }
-
-    :deep(p:last-child),
-    :deep(blockquote:last-child),
-    :deep(ul:last-child),
-    :deep(ol:last-child),
-    :deep(h1:last-child),
-    :deep(h2:last-child),
-    :deep(h3:last-child),
-    :deep(h4:last-child),
-    :deep(h5:last-child),
-    :deep(h6:last-child) {
-      margin-bottom: 0;
-    }
-
-    :deep(ul),
-    :deep(ol) {
-      padding-left: 1.5rem;
-    }
-
-    :deep(code) {
-      padding: 0.1rem 0.25rem;
-      border-radius: 4px;
-      background: var(--color-surface-secondary);
-      font-family: monospace;
-    }
-
-    :deep(blockquote),
-    :deep(cite) {
-      display: block;
-      margin-top: 0.5rem;
-      padding: 0.5rem;
-      padding-left: 1rem;
-      border-left: 3px solid var(--color-text-secondary);
-      background: var(--color-surface-primary);
-    }
-
-    :deep(hr) {
-      margin: 1rem 0;
-      border: none;
-      border-top: 1px solid var(--color-text-secondary);
-    }
-
-    :deep(a) {
-      color: var(--color-primary);
-    }
   }
 
   &__section-attachment {
