@@ -96,9 +96,12 @@ onBeforeUnmount(() => {
 
 <style>
 .base-modal {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+
   &__backdrop {
     position: fixed;
-    z-index: 1000;
     padding: 0;
     border: none;
     background: rgb(0 0 0 / 50%);
@@ -110,7 +113,6 @@ onBeforeUnmount(() => {
     position: fixed;
     top: 50%;
     left: 50%;
-    z-index: 1001;
     min-width: 300px;
     max-width: calc(100vw - 32px);
 
