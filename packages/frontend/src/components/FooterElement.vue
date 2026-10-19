@@ -6,12 +6,17 @@
         href="https://github.com/Darkzarich/Smiler"
         rel="noopener noreferrer"
         target="_blank"
+        aria-label="GitHub"
       >
-        <img src="@/assets/GitHub-Mark-Light-64px.png" alt="GitHub" />
+        <IconGitHub aria-hidden="true" />
       </a>
     </div>
   </footer>
 </template>
+
+<script setup lang="ts">
+import IconGitHub from '@icons/IconGitHub.vue';
+</script>
 
 <style>
 footer {
@@ -36,19 +41,24 @@ footer {
   .github-link {
     display: flex;
     align-items: center;
-    opacity: 0.5;
     height: 100%;
     margin-right: 1rem;
     margin-left: auto;
+    color: var(--color-text-secondary);
     cursor: pointer;
 
     &:hover {
-      opacity: 1;
+      color: var(--color-text-primary);
     }
 
-    img {
-      height: 100%;
-      padding: 5px;
+    svg {
+      width: 2rem;
+      height: 2rem;
+
+      @media (--phone-only) {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
     }
   }
 }
