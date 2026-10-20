@@ -229,8 +229,35 @@ test.describe('Sign In validation', () => {
   });
 
   test.afterEach(async ({ AuthForm }) => {
-    // After any validation error the submit button should be disabled
-    await expect(AuthForm.signInSubmitBtn).toBeDisabled();
+    // A validation error never disables the submit button: pressing it shows what is missing
+    await expect(AuthForm.signInSubmitBtn).toBeEnabled();
+  });
+
+  test('Shows every error and sends nothing when submitted empty', async ({
+    AuthForm,
+    Api,
+  }) => {
+    const wasSignInSent = Api.routes.auth.signIn.watchIfRequestWasCalled();
+
+    await AuthForm.clickSignInBtn();
+
+    await expect(AuthForm.signInEmailError).toHaveText("Email can't be empty");
+    await expect(AuthForm.signInPasswordError).toHaveText(
+      "Password can't be empty",
+    );
+    await expect(AuthForm.signInEmail).toBeFocused();
+    expect(wasSignInSent()).toBe(false);
+  });
+
+  test('Focuses the first field with an error on submit', async ({
+    AuthForm,
+  }) => {
+    await AuthForm.signInEmail.fill('test@example.com');
+
+    await AuthForm.clickSignInBtn();
+
+    await expect(AuthForm.signInEmailError).toBeHidden();
+    await expect(AuthForm.signInPassword).toBeFocused();
   });
 
   test('Shows no validation errors by default', async ({ AuthForm }) => {
@@ -281,8 +308,38 @@ test.describe('Sign Up validation', () => {
   });
 
   test.afterEach(async ({ AuthForm }) => {
-    // After any validation error the submit button should be disabled
-    await expect(AuthForm.signUpSubmitBtn).toBeDisabled();
+    // A validation error never disables the submit button: pressing it shows what is missing
+    await expect(AuthForm.signUpSubmitBtn).toBeEnabled();
+  });
+
+  test('Shows every error and sends nothing when submitted empty', async ({
+    AuthForm,
+    Api,
+  }) => {
+    const wasSignUpSent = Api.routes.auth.signUp.watchIfRequestWasCalled();
+
+    await AuthForm.clickSignUpBtn();
+
+    await expect(AuthForm.signUpEmailError).toHaveText("Email can't be empty");
+    await expect(AuthForm.signUpLoginError).toHaveText("Login can't be empty");
+    await expect(AuthForm.signUpPasswordError).toHaveText(
+      "Password can't be empty",
+    );
+    await expect(AuthForm.signUpConfirmError).toHaveText(
+      "Password confirm can't be empty",
+    );
+    await expect(AuthForm.signUpEmail).toBeFocused();
+    expect(wasSignUpSent()).toBe(false);
+  });
+
+  test('Focuses the first field with an error on submit', async ({
+    AuthForm,
+  }) => {
+    await AuthForm.signUpEmail.fill('test@example.com');
+
+    await AuthForm.clickSignUpBtn();
+
+    await expect(AuthForm.signUpLogin).toBeFocused();
   });
 
   test('Shows no validation errors by default', async ({ AuthForm }) => {

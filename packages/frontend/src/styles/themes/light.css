@@ -12,6 +12,11 @@
   --color-logo: var(--color-primary);
   --color-danger: #dc2626;
   --color-danger-strong: #da2323;
+
+  /* Button fills, the same in both themes: the lightest that keep white text at 4.5:1 */
+  --color-primary-fill: #4e820b;
+  --color-danger-fill: #d12b2b;
+  --color-text-on-fill: #fff;
   --color-warning: #b45309;
   --color-warning-transparent: rgb(245 158 11 / 12%);
   --color-accent-transparent: rgb(110 166 37 / 15%);

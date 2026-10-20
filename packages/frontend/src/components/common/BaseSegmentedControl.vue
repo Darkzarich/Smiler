@@ -55,6 +55,11 @@ const model = defineModel<string>({ required: true });
     &:not(:first-child) {
       margin-left: -2px;
     }
+
+    /* Above its neighbors, whose overlapping border would hide one edge of it */
+    &--active {
+      position: relative;
+    }
   }
 }
 </style>

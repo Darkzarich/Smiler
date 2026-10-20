@@ -4,23 +4,27 @@
 
     <div class="signin-form__input">
       <BaseInput
+        ref="emailInput"
         v-model="email"
         data-testid="signin-form-email"
         label="Email"
         name="email"
         placeholder="Enter email"
         :error="validation.email"
+        :show-error="isSubmitted"
       />
     </div>
 
     <div class="signin-form__input">
       <BaseInput
+        ref="passwordInput"
         v-model="password"
         data-testid="signin-form-password"
         label="Password"
         type="password"
         name="password"
         :error="validation.password"
+        :show-error="isSubmitted"
         placeholder="Enter password"
       />
     </div>
@@ -30,8 +34,8 @@
       class="signin-form__submit"
       stretched
       data-testid="signin-form-submit"
+      type="primary"
       :loading="isLoading"
-      :disabled="isSubmitDisabled"
     >
       SIGN IN
     </BaseButton>
@@ -39,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import { api, getRequestErrorMessage } from '@/api';
 import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
@@ -48,7 +52,12 @@ import BaseInput from '@common/BaseInput.vue';
 
 const userStore = useUserStore();
 
+const emailInput = useTemplateRef<InstanceType<typeof BaseInput>>('emailInput');
+const passwordInput =
+  useTemplateRef<InstanceType<typeof BaseInput>>('passwordInput');
+
 const isLoading = ref(false);
+const isSubmitted = ref(false);
 const requestError = ref('');
 
 const email = ref('');
@@ -80,7 +89,7 @@ const validation = computed(() => {
   return validation;
 });
 
-const isSubmitDisabled = computed(
+const isInvalid = computed(
   () => !!(validation.value.email || validation.value.password),
 );
 
@@ -89,7 +98,14 @@ watch([email, password], () => {
 });
 
 async function signIn() {
-  if (isSubmitDisabled.value || isLoading.value) {
+  if (isLoading.value) {
+    return;
+  }
+
+  if (isInvalid.value) {
+    isSubmitted.value = true;
+    (validation.value.email ? emailInput : passwordInput).value?.focus();
+
     return;
   }
 

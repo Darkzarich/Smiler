@@ -4,46 +4,54 @@
 
     <div class="signup-form__input">
       <BaseInput
+        ref="emailInput"
         v-model="email"
         data-testid="signup-form-email"
         label="Email"
         name="email"
         placeholder="Enter email"
         :error="validation.email"
+        :show-error="isSubmitted"
       />
     </div>
 
     <div class="signup-form__input">
       <BaseInput
+        ref="loginInput"
         v-model="login"
         data-testid="signup-form-login"
         label="Login"
         name="login"
         placeholder="Enter login"
         :error="validation.login"
+        :show-error="isSubmitted"
       />
     </div>
 
     <div class="signup-form__input">
       <BaseInput
+        ref="passwordInput"
         v-model="password"
         data-testid="signup-form-password"
         label="Password"
         :type="'password'"
         name="password"
         :error="validation.password"
+        :show-error="isSubmitted"
         placeholder="Enter password"
       />
     </div>
 
     <div class="signup-form__input">
       <BaseInput
+        ref="confirmInput"
         v-model="confirm"
         data-testid="signup-form-confirm"
         label="Confirm password"
         type="password"
         name="confirm"
         :error="validation.confirm"
+        :show-error="isSubmitted"
         placeholder="Enter password again"
       />
     </div>
@@ -53,8 +61,8 @@
       class="signup-form__submit"
       stretched
       data-testid="signup-form-submit"
+      type="primary"
       :loading="isLoading"
-      :disabled="isSubmitDisabled"
     >
       FINISH
     </BaseButton>
@@ -62,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import { api, getRequestErrorMessage } from '@/api';
 import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
@@ -76,6 +84,15 @@ const login = ref('');
 const password = ref('');
 const confirm = ref('');
 const isLoading = ref(false);
+const isSubmitted = ref(false);
+
+// In the order of the form, so the first one with an error gets the focus
+const inputs = {
+  email: useTemplateRef<InstanceType<typeof BaseInput>>('emailInput'),
+  login: useTemplateRef<InstanceType<typeof BaseInput>>('loginInput'),
+  password: useTemplateRef<InstanceType<typeof BaseInput>>('passwordInput'),
+  confirm: useTemplateRef<InstanceType<typeof BaseInput>>('confirmInput'),
+};
 const requestError = ref('');
 
 const validation = computed(() => {
@@ -126,7 +143,7 @@ const validation = computed(() => {
   return validation;
 });
 
-const isSubmitDisabled = computed(() => {
+const isInvalid = computed(() => {
   return Boolean(
     validation.value.email ||
       validation.value.password ||
@@ -140,7 +157,21 @@ watch([email, login, password, confirm], () => {
 });
 
 async function signUp() {
-  if (isSubmitDisabled.value || isLoading.value) {
+  if (isLoading.value) {
+    return;
+  }
+
+  if (isInvalid.value) {
+    isSubmitted.value = true;
+
+    const field = (Object.keys(inputs) as (keyof typeof inputs)[]).find(
+      (key) => validation.value[key],
+    );
+
+    if (field) {
+      inputs[field].value?.focus();
+    }
+
     return;
   }
 

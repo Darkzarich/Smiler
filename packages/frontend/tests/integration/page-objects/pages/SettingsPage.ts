@@ -5,6 +5,7 @@ export default class SettingsPage extends AbstractPage {
   readonly url = '/user/settings';
 
   readonly avatarInput: Locator;
+  readonly avatarError: Locator;
   readonly avatarSubmitBtn: Locator;
   readonly avatarRemoveBtn: Locator;
   readonly avatarPreview: Locator;
@@ -21,6 +22,7 @@ export default class SettingsPage extends AbstractPage {
     super(page);
 
     this.avatarInput = page.getByTestId('user-settings-avatar-input');
+    this.avatarError = page.getByTestId('user-settings-avatar-input-error');
     this.avatarSubmitBtn = page.getByTestId('user-settings-avatar-submit');
     this.avatarRemoveBtn = page.getByTestId('user-settings-avatar-remove');
     this.avatarPreview = page.locator('.user-settings__current-avatar img');

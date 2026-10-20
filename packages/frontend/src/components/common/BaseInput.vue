@@ -2,7 +2,7 @@
   <div
     class="base-input u-flex-col"
     :class="{
-      'base-input--error': error && isDirty,
+      'base-input--error': error && isErrorShown,
       'base-input--with-icon': $slots['icon-right'],
     }"
   >
@@ -12,6 +12,7 @@
 
     <input
       :id="id"
+      ref="input"
       :value="modelValue"
       :data-testid="dataTestid"
       :disabled="disabled"
@@ -19,6 +20,8 @@
       :name="name"
       :placeholder="placeholder"
       class="base-input__input"
+      :aria-invalid="Boolean(error && isErrorShown)"
+      :aria-describedby="error && isErrorShown ? `${id}-error` : undefined"
       @input="setValue"
       @keyup.enter="$emit('keyup.enter')"
     />
@@ -28,7 +31,8 @@
     </div>
 
     <span
-      v-if="isDirty && error"
+      v-if="isErrorShown && error"
+      :id="`${id}-error`"
       :data-testid="`${dataTestid}-error`"
       class="base-input__error"
     >
@@ -38,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 
 interface Emit {
   'keyup.enter': [];
@@ -54,9 +58,11 @@ interface Props {
   name?: string;
   placeholder?: string;
   error?: string;
+  /** Shows the error before the field is typed in, e.g. once its form was submitted */
+  showError?: boolean;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   dataTestid: 'input',
   disabled: false,
   label: '',
@@ -64,6 +70,7 @@ withDefaults(defineProps<Props>(), {
   name: '',
   placeholder: 'Enter any text',
   error: '',
+  showError: false,
 });
 
 const textAreaValue = defineModel<string>({
@@ -73,6 +80,14 @@ const textAreaValue = defineModel<string>({
 const id = crypto.randomUUID();
 
 const isDirty = ref(false);
+
+const isErrorShown = computed(() => isDirty.value || props.showError);
+
+const input = useTemplateRef<HTMLInputElement>('input');
+
+defineExpose({
+  focus: () => input.value?.focus(),
+});
 
 const setValue = (event: Event) => {
   const target = event.target as HTMLInputElement;

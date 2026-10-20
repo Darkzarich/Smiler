@@ -26,8 +26,13 @@ import CircularLoader from '@icons/animation/CircularLoader.vue';
 interface Props {
   dataTestid?: string;
   attrType?: 'button' | 'submit' | 'reset';
-  /** `ghost` has no border, for the lesser of two actions side by side */
-  type?: 'primary' | 'danger' | 'ghost';
+  /**
+   * `primary` is filled, for the one main action of a form or dialog.
+   * `danger` is filled red, for confirming something destructive.
+   * `secondary` is a neutral outline, for everything else.
+   * `ghost` has no border, for the lesser of two actions side by side.
+   */
+  type?: 'primary' | 'secondary' | 'danger' | 'ghost';
   size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   loading?: boolean;
@@ -39,7 +44,7 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   dataTestid: 'button',
   attrType: 'button',
-  type: 'primary',
+  type: 'secondary',
   size: 'small',
   disabled: false,
   loading: false,
@@ -55,37 +60,51 @@ withDefaults(defineProps<Props>(), {
   padding: 8px;
   border: 2px solid transparent;
   border-radius: 8px;
-  background: var(--color-surface-primary);
   font-size: 13px;
   font-weight: bold;
   cursor: pointer;
   transition: all 200ms ease-out;
 
-  &:hover {
-    background: var(--color-surface-secondary);
+  &--primary,
+  &--danger {
+    color: var(--color-text-on-fill);
   }
 
-  &[disabled] {
-    border: 2px solid var(--color-text-disabled);
-    color: var(--color-text-disabled);
-    pointer-events: none;
-  }
-
+  /* Hover darkens in both themes: lightening would take the white text below 4.5:1 */
   &--primary {
-    border-color: var(--color-primary);
-    color: var(--color-primary-strong);
+    border-color: var(--color-primary-fill);
+    background: var(--color-primary-fill);
 
-    &.base-button--loading {
-      border-color: rgb(var(--color-primary) 0.5);
+    @media (--hover) {
+      &:hover {
+        border-color: color-mix(in srgb, var(--color-primary-fill) 85%, #000);
+        background: color-mix(in srgb, var(--color-primary-fill) 85%, #000);
+      }
     }
   }
 
   &--danger {
-    border-color: var(--color-danger);
-    color: var(--color-danger-strong);
+    border-color: var(--color-danger-fill);
+    background: var(--color-danger-fill);
 
-    &.base-button--loading {
-      border-color: rgb(var(--color-danger) 0.5);
+    @media (--hover) {
+      &:hover {
+        border-color: color-mix(in srgb, var(--color-danger-fill) 85%, #000);
+        background: color-mix(in srgb, var(--color-danger-fill) 85%, #000);
+      }
+    }
+  }
+
+  &--secondary {
+    border-color: var(--color-border-hover);
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
+
+    @media (--hover) {
+      &:hover {
+        border-color: var(--color-text-secondary);
+        background: var(--color-surface-secondary);
+      }
     }
   }
 
@@ -98,6 +117,14 @@ withDefaults(defineProps<Props>(), {
         background: var(--color-accent-transparent);
       }
     }
+  }
+
+  /* After the variants, so it overrides their colors */
+  &[disabled] {
+    border-color: var(--color-border);
+    background: transparent;
+    color: var(--color-text-disabled);
+    pointer-events: none;
   }
 
   &--medium {
@@ -113,7 +140,9 @@ withDefaults(defineProps<Props>(), {
   /* Also on hover, which would otherwise win and hide the chosen state */
   &--active,
   &--active:hover {
+    border-color: var(--color-primary);
     background: var(--color-accent-transparent);
+    color: var(--color-primary-strong);
   }
 
   &--loading {

@@ -220,6 +220,24 @@ test('Sends the link to download the avatar from, and shows what was stored', as
   await expect(SettingsPage.avatarInput).toHaveValue('');
 });
 
+test('Asks for a link instead of sending an empty one', async ({
+  Api,
+  SettingsPage,
+}) => {
+  await SettingsPage.goto();
+
+  const wasAvatarSent =
+    Api.routes.users.updateMyAvatar.watchIfRequestWasCalled();
+
+  await SettingsPage.submitAvatar();
+
+  await expect(SettingsPage.avatarError).toHaveText(
+    'Paste a link to a picture first',
+  );
+  await expect(SettingsPage.avatarInput).toBeFocused();
+  expect(wasAvatarSent()).toBe(false);
+});
+
 test("Removes current user's avatar", async ({
   Api,
   SettingsPage,

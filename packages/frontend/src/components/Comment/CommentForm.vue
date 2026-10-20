@@ -10,6 +10,7 @@
           class="comment-form__action-btn"
           :loading="loading"
           :data-testid="`${dataTestid}-submit-btn`"
+          type="primary"
           @click="$emit('submit')"
         >
           Send

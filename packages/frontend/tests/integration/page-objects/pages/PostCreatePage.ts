@@ -7,6 +7,8 @@ export default class PostCreatePage extends AbstractPage {
 
   readonly header: Locator;
   readonly postTitleInput: Locator;
+  readonly postTitleError: Locator;
+  readonly sectionsError: Locator;
   readonly postTagInput: Locator;
 
   readonly title = AbstractPage.formatTitle('Edit Post');
@@ -19,6 +21,8 @@ export default class PostCreatePage extends AbstractPage {
     this.header = page.getByTestId('post-create-header');
 
     this.postTitleInput = page.getByTestId('post-title-input');
+    this.postTitleError = page.getByTestId('post-title-input-error');
+    this.sectionsError = page.getByTestId('post-editor-sections-error');
     this.postTagInput = page.getByTestId('post-tag-input');
     this.confirmDeleteModal = new ConfirmModal(page, 'confirm-delete-modal');
   }

@@ -497,6 +497,7 @@ describe('PostEditor local draft', () => {
   it('drops this device copy once the post is published', async () => {
     storeLocalDraft({
       title: 'Written here',
+      sections: [textSection('Written here too')],
       updatedAt: Date.parse('2026-09-13T12:00:00.000Z'),
     });
 

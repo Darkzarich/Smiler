@@ -49,7 +49,12 @@
     </div>
 
     <div class="search-form__actions u-flex-row">
-      <BaseButton data-testid="search-form-submit" stretched @click="search">
+      <BaseButton
+        data-testid="search-form-submit"
+        type="primary"
+        stretched
+        @click="search"
+      >
         Submit
       </BaseButton>
 

@@ -142,6 +142,26 @@ test('Creates a post with title, tags and content', async ({
   });
 });
 
+test('Shows what is missing instead of sending an empty post', async ({
+  Api,
+  PostCreatePage,
+}) => {
+  const wasPostSent = Api.routes.posts.createPost.watchIfRequestWasCalled();
+
+  await PostCreatePage.goto();
+
+  await PostCreatePage.submitPost();
+
+  await expect(PostCreatePage.postTitleError).toHaveText(
+    "Title can't be empty",
+  );
+  await expect(PostCreatePage.sectionsError).toHaveText(
+    'You should add at least one section',
+  );
+  await expect(PostCreatePage.postTitleInput).toBeFocused();
+  expect(wasPostSent()).toBe(false);
+});
+
 test('Uploads a picture in the picture section', async ({
   PostCreatePage,
   Api,

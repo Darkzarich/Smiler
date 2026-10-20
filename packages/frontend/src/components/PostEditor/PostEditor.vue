@@ -10,11 +10,13 @@
     <!-- Hidden rather than unmounted so the tiptap instances survive a preview -->
     <div v-show="!isPreview" class="post-editor__write">
       <BaseInput
+        ref="titleInput"
         v-model="title"
         class="post-editor__title"
         data-testid="post-title-input"
         :placeholder="'Title'"
         :error="validation.title"
+        :show-error="isSubmitted"
       />
 
       <PostEditorTags v-model:tags="tags" class="post-editor__tags" />
@@ -169,13 +171,22 @@
       @cancel="cancelDeleteSection"
     />
 
+    <p
+      v-if="isSubmitted && validation.sections"
+      class="post-editor__submit-error"
+      data-testid="post-editor-sections-error"
+      role="alert"
+    >
+      {{ validation.sections }}
+    </p>
+
     <div class="post-editor__submit-form">
       <template v-if="isEdit">
         <BaseButton
           class="post-editor__submit-form-btn"
           data-testid="finish-edit-post-button"
+          type="primary"
           :loading="isSaving"
-          :disabled="!sections.length"
           @click="saveEdited"
         >
           Save Edited
@@ -187,8 +198,8 @@
           class="post-editor__submit-form-btn"
           stretched
           data-testid="create-post-button"
+          type="primary"
           :loading="isSending"
-          :disabled="isSubmitDisabled"
           @click="createPost"
         >
           Create Post
@@ -211,7 +222,15 @@
 <script setup lang="ts">
 import { useEventListener } from '@vueuse/core';
 import { isEqual } from 'lodash-es';
-import { type Component, computed, nextTick, onMounted, ref, watch } from 'vue';
+import {
+  type Component,
+  computed,
+  nextTick,
+  onMounted,
+  ref,
+  useTemplateRef,
+  watch,
+} from 'vue';
 import { useRouter } from 'vue-router';
 import Draggable from 'vuedraggable';
 import Post from '../Post/Post.vue';
@@ -289,6 +308,10 @@ const isDirty = ref(false);
 const sectionPendingDeletion = ref<postTypes.PostSection | null>(null);
 
 const isPreview = ref(false);
+
+const isSubmitted = ref(false);
+
+const titleInput = useTemplateRef<InstanceType<typeof BaseInput>>('titleInput');
 
 const modeOptions = [
   { value: 'write', label: 'Write', dataTestid: 'write-mode-button' },
@@ -383,9 +406,25 @@ useEventListener(window, 'beforeunload', (event: BeforeUnloadEvent) => {
   event.returnValue = '';
 });
 
-const isSubmitDisabled = computed(() => {
+const isInvalid = computed(() => {
   return Boolean(validation.value.title || validation.value.sections);
 });
+
+const validateBeforeSend = async () => {
+  if (!isInvalid.value) {
+    return true;
+  }
+
+  isSubmitted.value = true;
+  isPreview.value = false;
+
+  if (validation.value.title) {
+    await nextTick();
+    titleInput.value?.focus();
+  }
+
+  return false;
+};
 
 const createSection = (type: postTypes.POST_SECTION_TYPES) => {
   const base = {
@@ -510,6 +549,10 @@ onMounted(async () => {
 });
 
 const createPost = async () => {
+  if (!(await validateBeforeSend())) {
+    return;
+  }
+
   try {
     isSending.value = true;
 
@@ -536,7 +579,7 @@ const createPost = async () => {
 };
 
 const saveEdited = async () => {
-  if (!props.post) {
+  if (!props.post || !(await validateBeforeSend())) {
     return;
   }
 
@@ -777,6 +820,13 @@ const saveDraft = async () => {
 
   &__add-section-buttons {
     margin: 32px;
+  }
+
+  &__submit-error {
+    margin: 0 0 12px;
+    color: var(--color-danger-strong);
+    text-align: center;
+    font-size: 12px;
   }
 
   &__submit-form {

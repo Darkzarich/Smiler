@@ -15,6 +15,7 @@
           class="new-comment-form__submit-btn"
           :loading="isLoading"
           data-testid="new-comment-button"
+          type="primary"
           @click="createComment"
         >
           Send
@@ -32,6 +33,7 @@
         <BaseButton
           size="medium"
           data-testid="new-comment-form-signin"
+          type="primary"
           @click="promptAuth('signin')"
         >
           Sign in

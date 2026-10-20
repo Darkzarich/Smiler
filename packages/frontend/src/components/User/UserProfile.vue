@@ -18,7 +18,7 @@
             isFollowed ? 'user-profile-unfollow-btn' : 'user-profile-follow-btn'
           "
           :loading="isRequesting"
-          :type="isFollowed ? 'danger' : 'primary'"
+          :type="isFollowed ? 'secondary' : 'primary'"
           @click="handleFollow"
         >
           {{ isFollowed ? 'Unfollow' : 'Follow' }}

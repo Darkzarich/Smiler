@@ -81,7 +81,8 @@
         <BaseButton
           class="user-settings__submit-btn"
           data-testid="user-settings-bio-submit"
-          :is-fetching="bioEditRequesting"
+          type="primary"
+          :loading="bioEditRequesting"
           :disabled="Boolean(bioTooLongError)"
           @click="editBio"
         >
@@ -97,10 +98,13 @@
         </div>
 
         <BaseInput
+          ref="avatarInput"
           v-model.lazy.trim="avatarUrlInput"
           class="user-settings__avatar-edit"
           data-testid="user-settings-avatar-input"
           placeholder="URL to avatar..."
+          :error="avatarUrlInput ? '' : 'Paste a link to a picture first'"
+          :show-error="isAvatarSubmitted"
         />
 
         <div class="user-settings__avatar-hint">
@@ -111,8 +115,8 @@
         <BaseButton
           class="user-settings__submit-btn"
           data-testid="user-settings-avatar-submit"
-          :is-fetching="avatarEditRequesting"
-          :disabled="!avatarUrlInput"
+          type="primary"
+          :loading="avatarEditRequesting"
           @click="editAvatar"
         >
           Save
@@ -122,7 +126,7 @@
           v-if="currentAvatar"
           class="user-settings__submit-btn"
           data-testid="user-settings-avatar-remove"
-          :is-fetching="avatarRemoveRequesting"
+          :loading="avatarRemoveRequesting"
           @click="removeAvatar"
         >
           Remove
@@ -137,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref, useTemplateRef } from 'vue';
 import { api } from '@/api';
 import { userTypes } from '@/api/users';
 import * as consts from '@/const';
@@ -251,8 +255,19 @@ const currentAvatar = ref('');
 const avatarUrlInput = ref('');
 const avatarEditRequesting = ref(false);
 const avatarRemoveRequesting = ref(false);
+const isAvatarSubmitted = ref(false);
+
+const avatarInput =
+  useTemplateRef<InstanceType<typeof BaseInput>>('avatarInput');
 
 const editAvatar = async () => {
+  if (!avatarUrlInput.value) {
+    isAvatarSubmitted.value = true;
+    avatarInput.value?.focus();
+
+    return;
+  }
+
   try {
     avatarEditRequesting.value = true;
 
@@ -260,6 +275,7 @@ const editAvatar = async () => {
 
     currentAvatar.value = data.avatar;
     avatarUrlInput.value = '';
+    isAvatarSubmitted.value = false;
 
     setAvatar(data.avatar);
 

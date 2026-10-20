@@ -113,7 +113,7 @@ export default class Route {
 
   /**
    * Watches if a request was called and if it was changes the flag that can be checked
-   * by calling the returned callback
+   * by calling the returned callback. Only a request with this route's method counts.
    */
   watchIfRequestWasCalled() {
     let wasRequestSent = false;
@@ -123,7 +123,10 @@ export default class Route {
     }
 
     this.page.on('request', (req) => {
-      if (req.url().includes(`api${this.url}`)) {
+      if (
+        req.url().includes(`api${this.url}`) &&
+        req.method() === this.method
+      ) {
         wasRequestSent = true;
       }
     });
