@@ -611,4 +611,28 @@ test.describe('Opens a post at its comments', () => {
       .poll(() => SinglePostPage.getCommentsOffsetFromHeader())
       .toBeLessThanOrEqual(1);
   });
+
+  test('From a link to the comments on a slow network', async ({
+    Api,
+    SinglePostPage,
+    page: currentPage,
+  }) => {
+    await currentPage.route(
+      Api.routes.posts.getPostBySlug.getURLRegExp(),
+      async (route) => {
+        await new Promise((resolve) => {
+          setTimeout(resolve, 6000);
+        });
+        await route.fallback();
+      },
+    );
+
+    await SinglePostPage.gotoComments(postWithPicture.slug);
+
+    await expect
+      .poll(() => SinglePostPage.getCommentsOffsetFromHeader(), {
+        timeout: 15_000,
+      })
+      .toBeLessThanOrEqual(1);
+  });
 });

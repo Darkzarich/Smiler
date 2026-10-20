@@ -53,35 +53,35 @@ const authGuard: NavigationGuard = async (to, from) => {
   return from.matched.length > 0 ? false : { name: 'Home' };
 };
 
-let unpinScroll = () => {};
+// Ends the wait for a hash's element and the pin after it. A browser Back sends
+// the page no input event, so only the next navigation can stop them.
+let hashScroll = new AbortController();
 
 export const router = createRouter({
   history: createWebHistory('/'),
   async scrollBehavior(to, _from, savedPosition) {
     if (to.hash) {
-      const el = await waitForElementById(to.hash.slice(1), 5000);
+      const { signal } = hashScroll;
+      const el = await waitForElementById(to.hash.slice(1), signal);
 
-      // vue-router would apply a late result to whatever page is shown by then
-      if (router.currentRoute.value.fullPath !== to.fullPath) {
+      // The reader has moved on, and vue-router would scroll the next page
+      if (!el) {
         return false;
       }
 
       // Back and Forward return to where the reader was, not to the hash
       if (savedPosition) {
-        unpinScroll = pinScroll(() => savedPosition.top, 10_000);
+        pinScroll(() => savedPosition.top, 10_000, signal);
         return false;
-      }
-
-      if (!el) {
-        return { top: 0 };
       }
 
       const headerHeight = () =>
         document.querySelector('.header')?.getBoundingClientRect().bottom ?? 0;
 
-      unpinScroll = pinScroll(
+      pinScroll(
         () => el.getBoundingClientRect().top + window.scrollY - headerHeight(),
         10_000,
+        signal,
       );
       return false;
     }
@@ -210,10 +210,9 @@ export const router = createRouter({
   ],
 });
 
-// A pin left running would scroll the next page after a browser Back, which
-// sends no input event to the page
 router.beforeEach(() => {
-  unpinScroll();
+  hashScroll.abort();
+  hashScroll = new AbortController();
 });
 
 router.beforeEach((to, from, next) => {
