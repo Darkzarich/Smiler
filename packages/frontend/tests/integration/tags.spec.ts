@@ -120,3 +120,85 @@ test('Asks a visitor to sign in to follow a tag, then follows it', async ({
 
   expect(followRequest.url()).toContain(tagToClick);
 });
+
+test('Opens the tag menu under the tag, clear of the title', async ({
+  SinglePostPage,
+  Post,
+}) => {
+  await SinglePostPage.goto(post.slug);
+
+  await Post.clickTag(post._id, tagToClick);
+  // The enter transition slides the menu down 20px
+  await expect(Post.getContextMenu()).toHaveCSS('transform', 'none');
+
+  const tagBox = await Post.getTag(post._id, tagToClick).boundingBox();
+  const titleBox = await Post.getTitleById(post._id).boundingBox();
+  const menuBox = await Post.getContextMenu().boundingBox();
+
+  expect(menuBox!.y).toBeGreaterThanOrEqual(tagBox!.y + tagBox!.height);
+  expect(menuBox!.y).toBeGreaterThan(titleBox!.y + titleBox!.height);
+});
+
+test('Opens the tag menu above the tag when there is no room below', async ({
+  SinglePostPage,
+  Post,
+  page,
+}) => {
+  await SinglePostPage.goto(post.slug);
+
+  const tagBox = await Post.getTag(post._id, tagToClick).boundingBox();
+
+  await page.setViewportSize({
+    width: page.viewportSize()!.width,
+    height: Math.ceil(tagBox!.y + tagBox!.height + 30),
+  });
+
+  await Post.clickTag(post._id, tagToClick);
+  await expect(Post.getContextMenu()).toHaveCSS('transform', 'none');
+
+  const menuBox = await Post.getContextMenu().boundingBox();
+
+  expect(menuBox!.y + menuBox!.height).toBeLessThanOrEqual(tagBox!.y);
+  expect(menuBox!.y).toBeGreaterThanOrEqual(0);
+});
+
+test('Opens the tag menu in place, not sliding over from its last tag', async ({
+  SinglePostPage,
+  Post,
+  page,
+}) => {
+  await SinglePostPage.goto(post.slug);
+
+  await Post.clickTag(post._id, tags[0]);
+  await page.mouse.click(1, 1);
+  await expect(Post.getContextMenu()).toBeHidden();
+
+  // offsetLeft/offsetTop leave out the enter transition's transform
+  const positions = await Post.getTag(post._id, tags[2]).evaluate(
+    (tag: HTMLElement) =>
+      new Promise<string[]>((resolve) => {
+        const seen = new Set<string>();
+        const start = performance.now();
+        const sample = () => {
+          const menu = document.querySelector<HTMLElement>(
+            '[data-testid="base-context-menu"]',
+          );
+
+          if (menu) {
+            seen.add(`${menu.offsetLeft},${menu.offsetTop}`);
+          }
+
+          if (performance.now() - start < 300) {
+            requestAnimationFrame(sample);
+          } else {
+            resolve([...seen]);
+          }
+        };
+
+        tag.click();
+        requestAnimationFrame(sample);
+      }),
+  );
+
+  expect(positions).toHaveLength(1);
+});

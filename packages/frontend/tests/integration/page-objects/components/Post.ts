@@ -105,8 +105,12 @@ export default class Post extends AbstractComponent {
     );
   }
 
+  getTag(postId = '', tag = '') {
+    return this.page.getByTestId(`post-${postId}-tag-${tag}`);
+  }
+
   async clickTag(postId = '', tag = '') {
-    await this.page.getByTestId(`post-${postId}-tag-${tag}`).click();
+    await this.getTag(postId, tag).click();
   }
 
   async followTag(postId = '', tag = '') {

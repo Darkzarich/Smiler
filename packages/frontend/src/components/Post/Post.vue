@@ -1,5 +1,5 @@
 <template>
-  <div ref="postRef" class="post" :class="{ 'post--inert': !interactive }">
+  <div class="post" :class="{ 'post--inert': !interactive }">
     <div class="post__left" :inert="!interactive || undefined">
       <BaseIconButton
         label="Upvote"
@@ -220,8 +220,7 @@
     <BaseContextMenu
       v-on-click-outside="closeContextMenu"
       :show="contextMenuData.show"
-      :pos-x="contextMenuData.x"
-      :pos-y="contextMenuData.y"
+      :anchor="contextMenuData.anchor"
       :items="contextMenuOptions"
       @action="handleContextMenuAction"
     />
@@ -299,15 +298,13 @@ const authPrompt = useAuthPromptStore();
 
 interface ContextMenuData {
   show: boolean;
-  x: number;
-  y: number;
+  anchor: HTMLElement | null;
   target: string | null;
 }
 
 const contextMenuData = reactive<ContextMenuData>({
   show: false,
-  x: 0,
-  y: 0,
+  anchor: null,
   target: null,
 });
 
@@ -491,31 +488,14 @@ const deletePost = async (id: string) => {
   router.push({ name: 'Home' });
 };
 
-const postRef = ref<HTMLElement | null>(null);
-
 const openContextMenu = (ev: MouseEvent | KeyboardEvent, tag: string) => {
-  if (!props.interactive) {
+  if (!props.interactive || contextMenuData.show) {
     return;
   }
 
-  if (!contextMenuData.show && postRef.value) {
-    const postRect = postRef.value.getBoundingClientRect();
-
-    contextMenuData.show = true;
-    contextMenuData.target = tag;
-
-    if ('clientX' in ev) {
-      // MouseEvent: convert viewport coords to post-relative
-      contextMenuData.x = ev.clientX - postRect.left;
-      contextMenuData.y = ev.clientY - postRect.top;
-    } else {
-      // KeyboardEvent: use target element position, relative to post
-      const target = ev.target as HTMLElement;
-      const rect = target.getBoundingClientRect();
-      contextMenuData.x = rect.left - postRect.left;
-      contextMenuData.y = rect.bottom - postRect.top;
-    }
-  }
+  contextMenuData.show = true;
+  contextMenuData.anchor = ev.currentTarget as HTMLElement;
+  contextMenuData.target = tag;
 };
 
 const closeContextMenu = () => {
