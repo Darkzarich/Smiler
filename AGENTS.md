@@ -122,6 +122,15 @@ gets measured — the script stops with that as its message if it sees a 429. Kn
 `BASE_URL` (default `http://localhost:3000`), `ORIGIN` (the allowed browser origin sign-up is sent
 with), `VUS` (50), `DURATION` (`30s`, per scenario) and `SCENARIO` to run only one of the two.
 
+## Code comments
+
+Most of the code explains itself through its names, so comment sparingly. A comment is for what the
+code cannot say: a reason that isn't obvious (a browser quirk, an order that matters, a constraint
+from elsewhere such as a contrast ratio or a backend rule), or a workaround that looks wrong until
+you know why. Don't narrate what the next line does, restate a name, or repeat a type in prose — a
+clearer name usually beats the comment. Before committing, reread the comments in the diff and cut
+the ones a reader wouldn't miss.
+
 ## Git hooks
 
 Managed by [husky](https://github.com/typicode/husky) in `.husky/`; every hook delegates to a root `package.json` script:
