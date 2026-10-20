@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 
-import { expect } from '@playwright/test';
+import { type Locator, expect } from '@playwright/test';
 import { subMinutes } from 'date-fns';
 import test from './page-objects';
 import mockDate from './utils/mock-date';
@@ -514,5 +514,101 @@ test.describe('Post edit', () => {
     await expect(NotificationList.root).toHaveText(
       'The post has been successfully deleted',
     );
+  });
+});
+
+test.describe('Opens a post at its comments', () => {
+  // Tall and late, so the comments move down after the post first renders
+  const pictureUrl = 'https://placehold.co/600x1800';
+  const picture = createRandomSection(postTypes.POST_SECTION_TYPES.PICTURE, {
+    url: pictureUrl,
+  });
+
+  const postWithPicture = createRandomPost({
+    sections: [
+      createRandomSection(postTypes.POST_SECTION_TYPES.TEXT),
+      picture,
+      createRandomSection(postTypes.POST_SECTION_TYPES.TEXT),
+    ],
+  });
+
+  const getNaturalHeight = (img: Locator) =>
+    img.evaluate((el: HTMLImageElement) => el.naturalHeight);
+
+  test.beforeEach(async ({ Api, page: currentPage }) => {
+    Api.routes.posts.getPostBySlug.mock({
+      body: postWithPicture,
+    });
+
+    Api.routes.posts.getToday.mock({
+      body: {
+        posts: [postWithPicture],
+        hasNextPage: false,
+      },
+    });
+
+    // Enough comments for the page to scroll them up to the header
+    Api.routes.comments.getComments.mock({
+      body: {
+        comments: Array.from({ length: 10 }, () => createRandomComment()),
+        hasNextPage: false,
+      },
+    });
+
+    await currentPage.route(pictureUrl, async (route) => {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+      await route.fulfill({
+        contentType: 'image/svg+xml',
+        body: '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1800"/>',
+      });
+    });
+  });
+
+  test('From the comment count in the list of posts', async ({
+    PostsPage,
+    SinglePostPage,
+    Post,
+    isMobile,
+    page: currentPage,
+  }) => {
+    // Desktop opens the post in a new tab, which is the next test's fresh load
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (!isMobile) {
+      return;
+    }
+
+    await PostsPage.goto();
+    await Post.getCommentsCountById(postWithPicture._id).click();
+
+    await expect(currentPage).toHaveURL(
+      `${SinglePostPage.getUrlWithSlug(postWithPicture.slug)}#comments`,
+    );
+    await expect
+      .poll(() =>
+        getNaturalHeight(
+          Post.getPicSectionByHash(postWithPicture._id, picture.hash),
+        ),
+      )
+      .toBe(1800);
+    await expect
+      .poll(() => SinglePostPage.getCommentsOffsetFromHeader())
+      .toBeLessThanOrEqual(1);
+  });
+
+  test('From a link to the comments', async ({ SinglePostPage, Post }) => {
+    await SinglePostPage.gotoComments(postWithPicture.slug);
+
+    await expect
+      .poll(() =>
+        getNaturalHeight(
+          Post.getPicSectionByHash(postWithPicture._id, picture.hash),
+        ),
+      )
+      .toBe(1800);
+    await expect
+      .poll(() => SinglePostPage.getCommentsOffsetFromHeader())
+      .toBeLessThanOrEqual(1);
   });
 });

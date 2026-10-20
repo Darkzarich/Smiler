@@ -6,6 +6,8 @@ import {
 } from 'vue-router';
 import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useUserStore } from '@/store/user';
+import { pinScroll } from '@/utils/pin-scroll';
+import { waitForElementById } from '@/utils/wait-for-element';
 
 // Views are loaded on demand so a visitor only downloads the one they land on.
 const NotFound = () => import('./views/NotFound.vue');
@@ -51,11 +53,37 @@ const authGuard: NavigationGuard = async (to, from) => {
   return from.matched.length > 0 ? false : { name: 'Home' };
 };
 
+let unpinScroll = () => {};
+
 export const router = createRouter({
   history: createWebHistory('/'),
-  scrollBehavior(to) {
+  async scrollBehavior(to, _from, savedPosition) {
     if (to.hash) {
-      return { el: to.hash };
+      const el = await waitForElementById(to.hash.slice(1), 5000);
+
+      // vue-router would apply a late result to whatever page is shown by then
+      if (router.currentRoute.value.fullPath !== to.fullPath) {
+        return false;
+      }
+
+      // Back and Forward return to where the reader was, not to the hash
+      if (savedPosition) {
+        unpinScroll = pinScroll(() => savedPosition.top, 10_000);
+        return false;
+      }
+
+      if (!el) {
+        return { top: 0 };
+      }
+
+      const headerHeight = () =>
+        document.querySelector('.header')?.getBoundingClientRect().bottom ?? 0;
+
+      unpinScroll = pinScroll(
+        () => el.getBoundingClientRect().top + window.scrollY - headerHeight(),
+        10_000,
+      );
+      return false;
     }
     return { x: 0, top: 0 };
   },
@@ -180,6 +208,12 @@ export const router = createRouter({
       },
     },
   ],
+});
+
+// A pin left running would scroll the next page after a browser Back, which
+// sends no input event to the page
+router.beforeEach(() => {
+  unpinScroll();
 });
 
 router.beforeEach((to, from, next) => {
