@@ -119,7 +119,7 @@ const removeTag = (tag: string) => {
     border: 1px solid var(--color-primary);
     border-radius: 5px;
     background: transparent;
-    color: var(--color-primary);
+    color: var(--color-primary-strong);
     font-family: monospace;
     font-size: 0.8rem;
     font-weight: bold;

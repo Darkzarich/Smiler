@@ -112,11 +112,11 @@ withDefaults(defineProps<Props>(), {
   }
 
   &--primary {
-    --icon-button-accent: var(--color-primary);
+    --icon-button-accent: var(--color-primary-strong);
   }
 
   &--danger {
-    --icon-button-accent: var(--color-danger);
+    --icon-button-accent: var(--color-danger-strong);
   }
 
   &--warning {
@@ -147,7 +147,7 @@ withDefaults(defineProps<Props>(), {
 
   &--neutral.base-icon-button--pressed,
   &--neutral[aria-expanded='true'] {
-    color: var(--color-primary);
+    color: var(--color-primary-strong);
   }
 
   &[disabled] {

@@ -42,11 +42,11 @@ defineProps<{
     font-size: 14px;
 
     &--negative .user-stats__stat-count {
-      color: var(--color-danger-dark);
+      color: var(--color-danger-strong);
     }
 
     &--positive .user-stats__stat-count {
-      color: var(--color-primary-dark);
+      color: var(--color-primary-strong);
     }
   }
 }

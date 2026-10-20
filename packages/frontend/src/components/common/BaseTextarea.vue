@@ -83,21 +83,21 @@ const setValue = (event: Event) => {
 
     &:focus {
       outline: none;
-      border: 1px solid var(--color-primary);
+      border: 1px solid var(--color-primary-strong);
     }
   }
 
   &--error {
     .base-textarea {
       &__label {
-        color: var(--color-danger);
+        color: var(--color-danger-strong);
       }
 
       &__textarea {
-        border: 1px solid var(--color-danger);
+        border: 1px solid var(--color-danger-strong);
 
         &:focus {
-          outline-color: var(--color-danger);
+          outline-color: var(--color-danger-strong);
         }
       }
     }
@@ -105,7 +105,7 @@ const setValue = (event: Event) => {
 
   &__error {
     margin-top: 6px;
-    color: var(--color-danger);
+    color: var(--color-danger-strong);
     font-size: 12px;
   }
 }

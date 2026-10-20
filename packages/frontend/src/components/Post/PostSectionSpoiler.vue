@@ -85,7 +85,7 @@ const isHidden = computed(() => props.isSpoiler && !isRevealed.value);
     }
 
     &:focus-visible {
-      outline: 2px solid var(--color-primary);
+      outline: 2px solid var(--color-primary-strong);
       outline-offset: -2px;
     }
 

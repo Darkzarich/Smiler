@@ -21,7 +21,7 @@ defineProps<Props>();
   font-weight: bold;
 
   &.router-link-exact-active {
-    color: var(--color-primary);
+    color: var(--color-primary-strong);
   }
 }
 </style>

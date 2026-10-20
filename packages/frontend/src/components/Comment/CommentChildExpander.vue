@@ -31,14 +31,14 @@ withDefaults(defineProps<Props>(), {
   margin-left: -18px;
   border: 1px solid currentcolor;
   background: var(--color-surface-primary);
-  color: var(--color-primary);
+  color: var(--color-primary-strong);
   font-family: monospace;
   font-weight: bold;
   cursor: pointer;
   transition: color 200ms ease-out;
 
   &:hover {
-    color: var(--color-primary);
+    color: var(--color-primary-strong);
   }
 
   &--expanded {

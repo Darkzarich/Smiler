@@ -702,7 +702,7 @@ watch(textEditorValue, (value) => {
     }
 
     a {
-      color: var(--color-primary);
+      color: var(--color-primary-strong);
     }
 
     @media (--phone-only) {

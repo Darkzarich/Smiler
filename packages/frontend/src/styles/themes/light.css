@@ -2,8 +2,13 @@
   --color-primary: #6ea625;
   --color-primary-dark: #4d7a1c;
   --color-primary-light: #85c02d;
+
+  /* The -strong colors are for text and state indicators (focus, active, pressed, error):
+     4.5:1 on every surface, the 15% tint included. The plain ones stay for fills, borders and
+     decoration. */
+  --color-primary-strong: #4e761a;
   --color-danger: #dc2626;
-  --color-danger-dark: #b91c1c;
+  --color-danger-strong: #da2323;
   --color-warning: #b45309;
   --color-warning-transparent: rgb(245 158 11 / 12%);
   --color-accent-transparent: rgb(110 166 37 / 15%);

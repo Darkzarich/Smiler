@@ -73,7 +73,7 @@ withDefaults(defineProps<Props>(), {
 
   &--primary {
     border-color: var(--color-primary);
-    color: var(--color-primary);
+    color: var(--color-primary-strong);
 
     &.base-button--loading {
       border-color: rgb(var(--color-primary) 0.5);
@@ -82,7 +82,7 @@ withDefaults(defineProps<Props>(), {
 
   &--danger {
     border-color: var(--color-danger);
-    color: var(--color-danger);
+    color: var(--color-danger-strong);
 
     &.base-button--loading {
       border-color: rgb(var(--color-danger) 0.5);
@@ -91,7 +91,7 @@ withDefaults(defineProps<Props>(), {
 
   &--ghost {
     background: transparent;
-    color: var(--color-primary);
+    color: var(--color-primary-strong);
 
     @media (--hover) {
       &:hover {

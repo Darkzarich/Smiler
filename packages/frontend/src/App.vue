@@ -102,7 +102,7 @@ h6 {
 /* One keyboard focus ring for every control. Fields that draw their own (a
    border color) opt out with outline: none on :focus. */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--color-primary-strong);
   outline-offset: 2px;
 }
 

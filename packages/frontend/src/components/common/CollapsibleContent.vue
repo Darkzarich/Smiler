@@ -123,12 +123,12 @@ defineExpose({ measure });
     border: none;
     border-bottom: 1px solid transparent;
     background: none;
-    color: var(--color-primary);
+    color: var(--color-primary-strong);
     font-size: 13px;
     cursor: pointer;
 
     &:hover {
-      border-bottom-color: var(--color-primary);
+      border-bottom-color: var(--color-primary-strong);
     }
   }
 }
