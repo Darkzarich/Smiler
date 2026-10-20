@@ -659,6 +659,26 @@ watch(textEditorValue, (value) => {
       margin-bottom: 1rem;
     }
 
+    /* The heading scale of styles/rich-text.css */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+    }
+
+    h2 {
+      font-size: 1.125rem;
+    }
+
     ul,
     ol {
       padding-left: 1.5rem;

@@ -601,8 +601,13 @@ const searchByTag = (tag: string) => {
     align-items: center;
     gap: 8px;
     margin-bottom: 1rem;
-    font-size: 20px;
-    font-weight: 400;
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+
+    @media (--phone-only) {
+      font-size: 1.25rem;
+    }
 
     /* The edit link; the delete button styles its own icon */
     a svg {
