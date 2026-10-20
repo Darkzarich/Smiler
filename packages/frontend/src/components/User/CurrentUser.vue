@@ -55,7 +55,7 @@ const user = computed(() => userStore.user);
     width: 100%;
     margin: 0 auto;
     padding: 1rem;
-    background: var(--color-surface-elevated);
+    border-bottom: 1px solid var(--color-border);
     user-select: none;
 
     @media (--phone-only) {

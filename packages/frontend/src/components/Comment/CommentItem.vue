@@ -479,8 +479,14 @@ const downvote = async () => {
   &__content {
     padding: 1rem;
     border-radius: 8px;
+    box-shadow: 0 0 0 1px var(--color-card-edge);
     background: var(--color-surface-secondary);
     margin-block: 1rem;
+
+    /* The reply editor shares the comment's card */
+    .u-widget {
+      box-shadow: none;
+    }
 
     &--created {
       animation: flash 1s ease-out;

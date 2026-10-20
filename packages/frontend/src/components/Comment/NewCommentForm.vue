@@ -141,6 +141,7 @@ const createComment = async () => {
   &--guest {
     padding: 24px 16px;
     border-radius: 8px;
+    box-shadow: 0 0 0 1px var(--color-card-edge);
     background: var(--color-surface-secondary);
     color: var(--color-text-primary);
     text-align: center;

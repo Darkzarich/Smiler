@@ -744,14 +744,8 @@ const searchByTag = (tag: string) => {
     align-items: center;
     margin: -1rem;
     margin-top: 1rem;
-    padding: 0.5rem;
-    border-bottom-right-radius: 8px;
-    border-bottom-left-radius: 8px;
-    background: var(--color-surface-elevated);
-
-    @media (--phone-only) {
-      border-top: none;
-    }
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--color-border);
   }
 
   &__date {

@@ -123,7 +123,9 @@ onBeforeUnmount(() => {
     max-height: calc(100svh - 32px);
     padding: 24px;
     border-radius: 8px;
-    box-shadow: 0 8px 30px rgb(0 0 0 / 20%);
+    box-shadow:
+      0 0 0 1px var(--color-card-edge),
+      0 8px 30px rgb(0 0 0 / 20%);
     background: var(--color-surface-elevated);
     color: var(--color-text-primary);
     transform: translate(-50%, -50%);

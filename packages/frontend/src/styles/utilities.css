@@ -13,7 +13,13 @@
 .u-widget {
   padding: 1rem;
   border-radius: 8px;
+  box-shadow: 0 0 0 1px var(--color-card-edge);
   background: var(--color-surface-secondary);
+
+  /* A widget inside another (the editor in the post form) shares its card */
+  .u-widget & {
+    box-shadow: none;
+  }
 }
 
 .u-scroll {
