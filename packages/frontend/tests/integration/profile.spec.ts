@@ -103,6 +103,39 @@ test('Shows the new profile after a link from one profile to another', async ({
   await expect(ProfilePage.login).toContainText(me.login);
 });
 
+test('Fits the profile header on a 320px phone', async ({
+  page,
+  ProfilePage,
+  Api,
+}) => {
+  // The longest login allowed, in the widest letter
+  const longUser = createRandomProfile({
+    login: 'w'.repeat(15),
+    rating: -1234.5,
+    followersAmount: 1234,
+  });
+
+  Api.routes.users.getUserProfile.mock({ body: longUser });
+
+  await page.setViewportSize({ width: 320, height: 800 });
+  await ProfilePage.goto(longUser.login);
+  await expect(ProfilePage.followBtn).toBeVisible();
+
+  const card = await page.locator('.user-profile').boundingBox();
+
+  for (const part of [
+    ProfilePage.login,
+    ProfilePage.rating,
+    ProfilePage.followersCount,
+    ProfilePage.followBtn,
+  ]) {
+    const box = await part.boundingBox();
+
+    expect(box!.x).toBeGreaterThanOrEqual(card!.x);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(card!.x + card!.width);
+  }
+});
+
 test.describe('Long offline indicator', () => {
   test('Shows how long the user has been away when they have not signed in for a long time', async ({
     ProfilePage,

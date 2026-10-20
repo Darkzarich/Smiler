@@ -1,5 +1,20 @@
 <template>
-  <div class="user-profile u-flex-row">
+  <div class="user-profile">
+    <DefineFollowButton>
+      <BaseButton
+        v-if="!isSameUser"
+        class="user-profile__follow-btn"
+        :data-testid="
+          isFollowed ? 'user-profile-unfollow-btn' : 'user-profile-follow-btn'
+        "
+        :loading="isRequesting"
+        :type="isFollowed ? 'secondary' : 'primary'"
+        @click="handleFollow"
+      >
+        {{ isFollowed ? 'Unfollow' : 'Follow' }}
+      </BaseButton>
+    </DefineFollowButton>
+
     <div class="user-profile__avatar">
       <UserAvatar :src="profileUser.avatar" />
     </div>
@@ -11,18 +26,7 @@
       >
         {{ profileUser.login }}
 
-        <BaseButton
-          v-if="!isSameUser"
-          class="user-profile__follow-btn"
-          :data-testid="
-            isFollowed ? 'user-profile-unfollow-btn' : 'user-profile-follow-btn'
-          "
-          :loading="isRequesting"
-          :type="isFollowed ? 'secondary' : 'primary'"
-          @click="handleFollow"
-        >
-          {{ isFollowed ? 'Unfollow' : 'Follow' }}
-        </BaseButton>
+        <ReuseFollowButton v-if="!isPhone" />
       </div>
 
       <div class="user-profile__date">
@@ -42,6 +46,8 @@
       <UserStats :stats="profileUser" />
     </div>
 
+    <ReuseFollowButton v-if="isPhone" />
+
     <IconSmiley
       class="user-profile__watermark"
       preserveAspectRatio="xMidYMid slice"
@@ -51,9 +57,11 @@
 </template>
 
 <script setup lang="ts">
+import { createReusableTemplate } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { computed, ref, watch } from 'vue';
 import { api } from '@/api';
+import { useMediaQuery } from '@/composables/use-media-query';
 import type { userTypes } from '@/api/users';
 import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useUserStore } from '@/store/user';
@@ -69,6 +77,11 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const [DefineFollowButton, ReuseFollowButton] = createReusableTemplate();
+
+// Beside the login a long login leaves the button a sliver of a phone screen
+const isPhone = useMediaQuery('phone-only');
 
 const profileUser = ref({ ...props.user });
 
@@ -162,6 +175,8 @@ async function handleFollow() {
 
 <style>
 .user-profile {
+  display: grid;
+  align-items: start;
   position: relative;
   margin-bottom: var(--variable-widget-margin);
   padding: 1rem;
@@ -169,6 +184,8 @@ async function handleFollow() {
   box-shadow: 0 0 0 1px var(--color-card-edge);
   background: var(--color-surface-secondary);
   color: var(--color-text-primary);
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 1rem;
 
   @media (--phone-only) {
     border: none;
@@ -194,12 +211,16 @@ async function handleFollow() {
 
   /* TODO: Move avatar to its own component */
   &__avatar {
-    margin-right: 1rem;
-
     .user-avatar {
       width: 7rem;
       height: 7rem;
       border-radius: 50%;
+
+      /* A 15-character login needs 187px; at 600px a 112px avatar leaves it 169 */
+      @media (--tablet-portrait-down) {
+        width: 4rem;
+        height: 4rem;
+      }
     }
   }
 
@@ -208,12 +229,19 @@ async function handleFollow() {
     align-items: center;
     gap: 8px 1rem;
     font-size: 1.5rem;
+    overflow-wrap: anywhere;
   }
 
   &__follow-btn {
     z-index: 1;
     width: 100px;
     font-size: 13px;
+
+    @media (--phone-only) {
+      width: auto;
+      margin-top: 1rem;
+      grid-column: 1 / -1;
+    }
   }
 
   &__login,
