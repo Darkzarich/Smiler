@@ -14,12 +14,7 @@
               },
             }"
           >
-            <img
-              class="current-user__avatar"
-              :src="resolveAvatar(user.avatar)"
-              alt="avatar"
-              referrerpolicy="no-referrer"
-            />
+            <UserAvatar class="current-user__avatar" :src="user.avatar" />
 
             <div class="current-user__login" data-testid="user-login">
               {{ user.login }}
@@ -40,7 +35,7 @@ import { computed } from 'vue';
 import AuthFormSwitcher from '../AuthForm/AuthFormSwitcher.vue';
 import CurrentUserNavigation from './CurrentUserNavigation.vue';
 import { useUserStore } from '@/store/user';
-import { resolveAvatar } from '@/utils/resolve-avatar';
+import UserAvatar from '@components/User/UserAvatar.vue';
 import UserStats from '@components/User/UserStats.vue';
 
 const userStore = useUserStore();

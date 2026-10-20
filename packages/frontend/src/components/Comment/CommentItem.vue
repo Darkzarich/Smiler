@@ -48,11 +48,7 @@
             </div>
 
             <div class="comment-item__avatar">
-              <img
-                :src="resolveAvatar(comment.author.avatar)"
-                alt="avatar"
-                referrerpolicy="no-referrer"
-              />
+              <UserAvatar :src="comment.author.avatar" />
             </div>
           </RouterLink>
 
@@ -181,12 +177,12 @@ import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { checkCanEditComment } from '@/utils/check-can-edit-comment';
 import { formatFromNow } from '@/utils/format-from-now';
-import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';
 import IconPlus from '@icons/IconPlus.vue';
+import UserAvatar from '@components/User/UserAvatar.vue';
 
 interface Props {
   postId: string;
@@ -525,7 +521,7 @@ const downvote = async () => {
     }
   }
 
-  &__avatar img {
+  &__avatar .user-avatar {
     width: 1rem;
     height: 1rem;
     margin-left: 0.5rem;
@@ -557,7 +553,7 @@ const downvote = async () => {
   &__reply-toggler {
     display: inline-block;
     margin-top: 8px;
-    color: var(--color-primary);
+    color: var(--color-primary-strong);
     font-size: 0.9rem;
     cursor: pointer;
     font-weight: bold;

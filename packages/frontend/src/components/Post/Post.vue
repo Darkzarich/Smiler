@@ -116,14 +116,13 @@
                 <!-- Sections stored before pictures were downloaded server side
                      still point at a third party host, so the request must not
                      carry a referrer and must not fire until it is on screen. -->
-                <img
+                <BaseImage
                   class="post__section-image"
                   :src="resolveImage(section.url)"
                   alt="Post attachment"
                   loading="lazy"
                   referrerpolicy="no-referrer"
                   :data-testid="`post-${post._id}-pic-${section.hash}`"
-                  @error="resolveImageError"
                 />
               </div>
 
@@ -208,16 +207,11 @@
             <span class="post__author-login">
               {{ post.author.login }}
             </span>
-            <img
-              class="post__author-avatar"
-              :src="resolveAvatar(post.author.avatar)"
-              alt="avatar"
-              referrerpolicy="no-referrer"
-            />
+            <UserAvatar class="post__author-avatar" :src="post.author.avatar" />
           </RouterLink>
           <span v-else class="post__author-container">
             <span> Anonymous </span>
-            <img :src="resolveAvatar('')" :alt="'avatar'" />
+            <UserAvatar class="post__author-avatar" src="" />
           </span>
         </div>
       </div>
@@ -253,17 +247,17 @@ import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { formatFromNow } from '@/utils/format-from-now';
-import { resolveAvatar } from '@/utils/resolve-avatar';
 import { resolveImage } from '@/utils/resolve-image';
-import { resolveImageError } from '@/utils/resolve-image-error';
 import BaseContextMenu from '@common/BaseContextMenu.vue';
 import BaseIconButton from '@common/BaseIconButton.vue';
+import BaseImage from '@common/BaseImage.vue';
 import CollapsibleContent from '@common/CollapsibleContent.vue';
 import IconComments from '@icons/IconComments.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';
 import IconPlus from '@icons/IconPlus.vue';
+import UserAvatar from '@components/User/UserAvatar.vue';
 
 interface Props {
   canEdit?: boolean;
@@ -653,7 +647,7 @@ const searchByTag = (tag: string) => {
     border: 1px solid var(--color-primary);
     border-radius: 5px;
     background: transparent;
-    color: var(--color-primary);
+    color: var(--color-primary-strong);
     font-family: monospace;
     font-size: 0.8rem;
     font-weight: bold;

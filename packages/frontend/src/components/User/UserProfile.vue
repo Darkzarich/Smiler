@@ -1,11 +1,7 @@
 <template>
   <div class="user-profile u-flex-row">
     <div class="user-profile__avatar">
-      <img
-        :src="resolveAvatar(profileUser.avatar)"
-        alt="avatar"
-        referrerpolicy="no-referrer"
-      />
+      <UserAvatar :src="profileUser.avatar" />
     </div>
 
     <div class="user-profile__info">
@@ -45,6 +41,12 @@
 
       <UserStats :stats="profileUser" />
     </div>
+
+    <IconSmiley
+      class="user-profile__watermark"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+    />
   </div>
 </template>
 
@@ -56,8 +58,9 @@ import type { userTypes } from '@/api/users';
 import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useUserStore } from '@/store/user';
 import { formatFromNow } from '@/utils/format-from-now';
-import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseButton from '@common/BaseButton.vue';
+import UserAvatar from '@components/User/UserAvatar.vue';
+import IconSmiley from '@icons/IconSmiley.vue';
 import UserOfflineBadge from '@components/User/UserOfflineBadge.vue';
 import UserStats from '@components/User/UserStats.vue';
 
@@ -174,19 +177,16 @@ async function handleFollow() {
     border-radius: 0;
   }
 
-  &::after {
+  /* The slice aspect ratio crops it the way background-size: cover did, and the
+     grey is what grayscale() made of the old PNG's green */
+  &__watermark {
     display: inline-block;
     position: absolute;
     right: 5%;
     opacity: 0.05;
     width: 48%;
     height: 82%;
-    background-image: url('../../assets/neutral_avatar.png');
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    content: '';
-    filter: grayscale(1);
+    color: rgb(173 173 173);
     pointer-events: none;
 
     @media (--phone-only) {
@@ -198,7 +198,7 @@ async function handleFollow() {
   &__avatar {
     margin-right: 1rem;
 
-    img {
+    .user-avatar {
       width: 7rem;
       height: 7rem;
       border-radius: 50%;

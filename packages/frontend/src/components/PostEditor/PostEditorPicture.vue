@@ -43,11 +43,10 @@
     </div>
 
     <div v-else class="post-editor-picture__image">
-      <img
+      <BaseImage
         :src="resolveImage(value)"
         alt="Post attachment"
         referrerpolicy="no-referrer"
-        @error="resolveImageError"
       />
     </div>
   </div>
@@ -60,9 +59,9 @@ import { postTypes } from '@/api/posts';
 import { POST_PICTURE_ALLOWED_MIME_TYPES } from '@/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { resolveImage } from '@/utils/resolve-image';
-import { resolveImageError } from '@/utils/resolve-image-error';
 import { validatePictureFile } from '@/utils/validate-picture-file';
 import BaseButton from '@common/BaseButton.vue';
+import BaseImage from '@common/BaseImage.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseUploadForm from '@common/BaseUploadForm.vue';
 

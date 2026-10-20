@@ -9,6 +9,7 @@
      4.5:1 on every surface, the 15% tint included. The plain ones stay for fills, borders and
      decoration. */
   --color-primary-strong: #75b027;
+  --color-logo: var(--color-primary-light);
   --color-danger: #dc2626;
   --color-danger-strong: #e66262;
   --color-warning: #fbbf24;

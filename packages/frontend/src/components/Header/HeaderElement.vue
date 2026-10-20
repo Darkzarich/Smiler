@@ -71,11 +71,7 @@
               },
             }"
           >
-            <img
-              :src="resolveAvatar(user.avatar)"
-              alt="avatar"
-              referrerpolicy="no-referrer"
-            />
+            <UserAvatar :src="user.avatar" />
           </RouterLink>
         </div>
       </div>
@@ -91,7 +87,6 @@ import HeaderMobileMenu from './HeaderMobileMenu.vue';
 import SiteLogo from './SiteLogo.vue';
 import { useMediaQuery } from '@/composables/use-media-query';
 import { useUserStore } from '@/store/user';
-import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import Navigation from '@components/Navigation/Navigation.vue';
@@ -99,6 +94,7 @@ import NavigationFeedLink from '@components/Navigation/NavigationFeedLink.vue';
 import ThemeToggle from '@components/Theme/ThemeToggle.vue';
 import IconMenuMobile from '@icons/IconMenuMobile.vue';
 import IconSearch from '@icons/IconSearch.vue';
+import UserAvatar from '@components/User/UserAvatar.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -214,11 +210,11 @@ onBeforeUnmount(removeAfterEach);
     transition: all 200ms ease-out;
 
     &:hover {
-      color: var(--color-primary);
+      color: var(--color-primary-strong);
     }
 
     &.router-link-exact-active {
-      border-bottom: 2px solid var(--color-primary);
+      border-bottom: 2px solid var(--color-primary-strong);
     }
   }
 
@@ -264,7 +260,7 @@ onBeforeUnmount(removeAfterEach);
     height: 100%;
     align-self: center;
 
-    img {
+    .user-avatar {
       width: 2.5rem;
       height: 2.5rem;
       border-radius: 50%;

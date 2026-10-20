@@ -14,11 +14,9 @@
               :data-testid="`user-settings-author-${author._id}`"
               class="user-settings__following-item"
             >
-              <img
+              <UserAvatar
                 class="user-settings__following-avatar"
-                :src="resolveAvatar(author.avatar)"
-                alt="avatar"
-                referrerpolicy="no-referrer"
+                :src="author.avatar"
               />
               {{ author.login }}
               <BaseIconButton
@@ -95,11 +93,7 @@
         <h3 class="user-settings__block-title">Avatar</h3>
 
         <div class="user-settings__current-avatar">
-          <img
-            :src="resolveAvatar(currentAvatar)"
-            alt="current avatar"
-            referrerpolicy="no-referrer"
-          />
+          <UserAvatar :src="currentAvatar" alt="current avatar" />
         </div>
 
         <BaseInput
@@ -149,13 +143,13 @@ import { userTypes } from '@/api/users';
 import * as consts from '@/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
-import { resolveAvatar } from '@/utils/resolve-avatar';
 import BaseButton from '@common/BaseButton.vue';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseTextarea from '@common/BaseTextarea.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 import IconClose from '@icons/IconClose.vue';
+import UserAvatar from '@components/User/UserAvatar.vue';
 
 const { unfollowTag, setAvatar } = useUserStore();
 
@@ -387,7 +381,7 @@ onBeforeMount(() => {
     height: 8rem;
     margin-bottom: 12px;
 
-    img {
+    .user-avatar {
       width: 128px;
       border: 1px solid var(--color-text-secondary);
       border-radius: 50%;
@@ -439,7 +433,7 @@ onBeforeMount(() => {
     border: 1px solid var(--color-primary);
     border-radius: 5px;
     background: transparent;
-    color: var(--color-primary);
+    color: var(--color-primary-strong);
     font-family: monospace;
     font-size: 0.8rem;
     font-weight: bold;
