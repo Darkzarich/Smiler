@@ -25,6 +25,7 @@ footer {
   height: 4rem;
   margin-top: 1.5rem;
   background: var(--color-surface-elevated);
+  padding-inline: var(--page-gutter);
 
   @media (--phone-only) {
     height: 2rem;
@@ -33,7 +34,7 @@ footer {
   .footer-content {
     display: flex;
     width: 100%;
-    max-width: 1110px;
+    max-width: var(--page-max-width);
     height: 100%;
     margin: 0 auto;
   }

@@ -3,6 +3,7 @@
 import { expect } from '@playwright/test';
 import test from './page-objects';
 import createRandomAuth from '@factory/auth';
+import createRandomPost from '@factory/post';
 import createRandomProfile from '@factory/profile';
 
 test.beforeEach(async ({ Api }) => {
@@ -72,6 +73,44 @@ test.describe('Header between phone and desktop widths', () => {
       }));
 
       expect(layout).toEqual({ pastRightEdge: [], wrappedLinks: [] });
+    });
+  }
+});
+
+test.describe('Page gutter between phone and desktop widths', () => {
+  test.beforeEach(async ({ Api }) => {
+    Api.routes.posts.getToday.mock({
+      body: { posts: [createRandomPost()], hasNextPage: false },
+    });
+  });
+
+  for (const width of [600, 768, 1024, 1110]) {
+    test(`Keeps the page off the edges of a ${width}px wide window`, async ({
+      page,
+      PostsPage,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await PostsPage.goto(PostsPage.urls.today);
+      await expect(page.getByTestId('signin-form')).toBeVisible();
+
+      const gaps = await page
+        .locator('main')
+        .locator('..')
+        .evaluate((row) => {
+          const boxes = [...row.querySelectorAll('*')]
+            .map((el) => el.getBoundingClientRect())
+            .filter((box) => box.width > 0);
+
+          return {
+            left: Math.min(...boxes.map((box) => box.left)),
+            right:
+              document.documentElement.clientWidth -
+              Math.max(...boxes.map((box) => box.right)),
+          };
+        });
+
+      expect(gaps.left).toBeGreaterThanOrEqual(16);
+      expect(gaps.right).toBeGreaterThanOrEqual(16);
     });
   }
 });

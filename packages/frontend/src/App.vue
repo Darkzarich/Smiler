@@ -56,6 +56,16 @@ onMounted(() => {
 
 :root {
   --variable-widget-margin: 24px;
+  --page-max-width: 1110px;
+  --page-gutter: 0px;
+
+  @media (--tablet-portrait-up) {
+    --page-gutter: 16px;
+  }
+
+  @media (--tablet-landscape-up) {
+    --page-gutter: 24px;
+  }
 }
 
 html {
@@ -118,10 +128,11 @@ h6 {
   flex-grow: 1;
   flex-flow: row nowrap;
   width: 100%;
-  max-width: 1110px;
+  max-width: calc(var(--page-max-width) + 2 * var(--page-gutter));
   margin-top: 72px;
   margin-right: auto;
   margin-left: auto;
+  padding-inline: var(--page-gutter);
 
   &__main {
     flex: 1;

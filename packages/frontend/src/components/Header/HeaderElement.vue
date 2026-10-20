@@ -146,7 +146,7 @@ onBeforeUnmount(removeAfterEach);
   z-index: 2;
   width: 100%;
   height: 56px;
-  padding: 0.5rem;
+  padding: 0.5rem max(0.5rem, var(--page-gutter));
   background-color: var(--color-surface-elevated);
 
   @media (--phone-only) {
@@ -160,7 +160,7 @@ onBeforeUnmount(removeAfterEach);
   &__container {
     display: flex;
     width: 100%;
-    max-width: 1110px;
+    max-width: var(--page-max-width);
 
     @media (--desktop-up) {
       padding-left: 40px;
