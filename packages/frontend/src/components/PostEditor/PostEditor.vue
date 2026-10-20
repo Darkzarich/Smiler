@@ -143,7 +143,7 @@
 
     <div v-if="isPreview" class="post-editor__preview">
       <Post
-        v-if="sections.length"
+        v-if="previewPost.sections.length"
         v-model:post="previewPost"
         data-testid="post-preview"
         :collapsible="false"
@@ -155,8 +155,8 @@
         class="post-editor__preview-empty"
         data-testid="post-preview-empty"
       >
-        Nothing to preview yet. Add a section and it shows up here the way
-        readers will see it.
+        Nothing to preview yet. Sections show up here once they have content,
+        the way readers will see them.
       </p>
     </div>
 
@@ -329,7 +329,8 @@ const openPreview = () => {
   previewPost.value = buildPreviewPost({
     title: title.value,
     tags: tags.value,
-    sections: sections.value,
+    // The server rejects an empty section, so readers never see one
+    sections: sections.value.filter(hasSectionContent),
     author: user
       ? { _id: user._id, login: user.login, avatar: user.avatar }
       : null,

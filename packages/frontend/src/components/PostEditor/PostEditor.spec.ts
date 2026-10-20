@@ -75,6 +75,14 @@ function pictureSection(
   };
 }
 
+function videoSection(url: string): postTypes.PostVideoSection {
+  return {
+    type: postTypes.POST_SECTION_TYPES.VIDEO,
+    hash: 'vid-1',
+    url,
+  };
+}
+
 function createWrapper(
   sections: postTypes.PostSection[],
   isEdit = false,
@@ -323,6 +331,33 @@ describe('PostEditor preview', () => {
 
   it('shows an empty state instead of a post when there are no sections', async () => {
     const wrapper = createWrapper([]);
+
+    await flushPromises();
+
+    await setMode(wrapper, 'preview');
+
+    expect(wrapper.find(testElements.preview).exists()).toBe(false);
+    expect(wrapper.find(testElements.previewEmpty).exists()).toBe(true);
+  });
+
+  it('leaves empty picture and video sections out', async () => {
+    const wrapper = createWrapper([
+      textSection('Some content'),
+      pictureSection(''),
+      videoSection(''),
+    ]);
+
+    await flushPromises();
+
+    await setMode(wrapper, 'preview');
+
+    expect(wrapper.findComponent(Post).props('post').sections).toEqual([
+      expect.objectContaining({ content: 'Some content' }),
+    ]);
+  });
+
+  it('shows the empty state when every section is empty', async () => {
+    const wrapper = createWrapper([pictureSection(''), videoSection('')]);
 
     await flushPromises();
 
