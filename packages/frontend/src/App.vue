@@ -59,8 +59,13 @@ onMounted(() => {
   --page-max-width: 1110px;
   --page-gutter: 0px;
 
+  /* Wide enough for a five-digit rating. The page column is padded by it, so
+     everything lines up with the post cards and a Post hangs its votes into it. */
+  --post-votes-width: 0px;
+
   @media (--tablet-portrait-up) {
     --page-gutter: 16px;
+    --post-votes-width: 64px;
   }
 
   @media (--tablet-landscape-up) {
@@ -84,7 +89,6 @@ html {
 body {
   margin: 0;
   background: var(--color-surface-primary);
-  overflow-y: hidden;
 
   &::-webkit-scrollbar {
     width: 4px;
@@ -120,7 +124,10 @@ h6 {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  overflow-x: hidden;
+
+  /* Not hidden: that makes #app a scroll container, and the sidebar would
+     stick to it instead of the window */
+  overflow-x: clip;
 }
 
 .content {
@@ -137,6 +144,7 @@ h6 {
   &__main {
     flex: 1;
     margin-right: var(--variable-widget-margin);
+    padding-left: var(--post-votes-width);
 
     @media (--phone-only) {
       width: 100%;
@@ -146,6 +154,12 @@ h6 {
 
   &__sidebar {
     width: 26%;
+
+    @media (--sidebar-fits) {
+      position: sticky;
+      top: 72px;
+      align-self: flex-start;
+    }
   }
 }
 </style>

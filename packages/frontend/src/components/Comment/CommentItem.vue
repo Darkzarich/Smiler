@@ -477,14 +477,10 @@ const downvote = async () => {
   color: var(--color-text-primary);
 
   &__content {
-    margin: 1rem;
     padding: 1rem;
     border-radius: 8px;
     background: var(--color-surface-secondary);
-
-    @media (--phone-only) {
-      margin-right: 0;
-    }
+    margin-block: 1rem;
 
     &--created {
       animation: flash 1s ease-out;
@@ -565,9 +561,10 @@ const downvote = async () => {
     }
   }
 
+  /* The line runs down from the center of the parent's expander */
   &__replies {
-    margin-left: 19.5px;
-    padding-left: 8px;
+    margin-left: 3.5px;
+    padding-left: 24px;
     border-left: solid 1px var(--color-text-secondary);
   }
 }

@@ -164,15 +164,12 @@ async function handleFollow() {
 .user-profile {
   position: relative;
   margin-bottom: var(--variable-widget-margin);
-  margin-left: 10%;
   padding: 1rem;
   border-radius: 8px;
   background: var(--color-surface-secondary);
   color: var(--color-text-primary);
 
   @media (--phone-only) {
-    width: 100%;
-    margin-left: 0;
     border: none;
     border-radius: 0;
   }
@@ -206,14 +203,15 @@ async function handleFollow() {
   }
 
   &__login {
+    flex-wrap: wrap;
     align-items: center;
+    gap: 8px 1rem;
     font-size: 1.5rem;
   }
 
   &__follow-btn {
     z-index: 1;
     width: 100px;
-    margin-left: 1rem;
     font-size: 13px;
   }
 

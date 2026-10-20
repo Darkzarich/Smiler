@@ -40,7 +40,7 @@ afterEach(() => {
   activeWrapper = null;
 
   document.body.innerHTML = '';
-  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
 });
 
 describe('BaseModal', () => {
@@ -149,15 +149,15 @@ describe('BaseModal', () => {
     expect(wrapper.emitted('close')).toBeFalsy();
   });
 
-  it('locks body scroll while open', async () => {
+  it('locks page scroll while open', async () => {
     createWrapper({ isOpen: true });
 
     await nextTick();
 
-    expect(document.body.style.overflow).toBe('hidden');
+    expect(document.documentElement.style.overflow).toBe('hidden');
   });
 
-  it('restores body scroll on close', async () => {
+  it('restores page scroll on close', async () => {
     const wrapper = createWrapper({ isOpen: true });
 
     await nextTick();
@@ -165,6 +165,6 @@ describe('BaseModal', () => {
     await wrapper.setProps({ isOpen: false });
     await nextTick();
 
-    expect(document.body.style.overflow).toBe('');
+    expect(document.documentElement.style.overflow).toBe('');
   });
 });

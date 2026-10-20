@@ -134,10 +134,8 @@ onBeforeMount(() => {
 .search {
   &__form {
     margin-bottom: var(--variable-widget-margin);
-    margin-left: 10%;
 
     @media (--phone-only) {
-      margin-left: 0;
       border: none;
     }
   }

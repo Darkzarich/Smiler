@@ -68,18 +68,20 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 };
 
-let previousBodyOverflow = '';
+// On <html>, not <body>: the page scrolls on <html>, and a hidden <body> would
+// lock nothing and become a scroll container that unpins the sticky sidebar.
+let previousPageOverflow = '';
 
 watch(
   () => props.isOpen,
   (isOpen) => {
     if (isOpen) {
-      previousBodyOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
+      previousPageOverflow = document.documentElement.style.overflow;
+      document.documentElement.style.overflow = 'hidden';
 
       window.addEventListener('keydown', handleKeydown);
     } else {
-      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousPageOverflow;
 
       window.removeEventListener('keydown', handleKeydown);
     }
@@ -88,7 +90,7 @@ watch(
 );
 
 onBeforeUnmount(() => {
-  document.body.style.overflow = previousBodyOverflow;
+  document.documentElement.style.overflow = previousPageOverflow;
 
   window.removeEventListener('keydown', handleKeydown);
 });

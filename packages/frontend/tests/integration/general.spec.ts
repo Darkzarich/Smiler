@@ -1,8 +1,9 @@
 /* eslint-disable no-await-in-loop */
 
-import { expect } from '@playwright/test';
+import { expect, type Locator } from '@playwright/test';
 import test from './page-objects';
 import createRandomAuth from '@factory/auth';
+import createRandomComment from '@factory/comment';
 import createRandomPost from '@factory/post';
 import createRandomProfile from '@factory/profile';
 
@@ -113,6 +114,95 @@ test.describe('Page gutter between phone and desktop widths', () => {
       expect(gaps.right).toBeGreaterThanOrEqual(16);
     });
   }
+});
+
+test.describe('One card column on every page', () => {
+  const posts = [
+    createRandomPost({ rating: 12345 }),
+    ...Array.from({ length: 5 }, () => createRandomPost()),
+  ];
+
+  const edgesOf = async (locator: Locator) => {
+    await expect(locator).toBeVisible();
+
+    return locator.evaluate((el) => {
+      const box = el.getBoundingClientRect();
+
+      return { left: Math.round(box.left), right: Math.round(box.right) };
+    });
+  };
+
+  test.beforeEach(async ({ Api }) => {
+    Api.routes.posts.getToday.mock({
+      body: { posts, hasNextPage: false },
+    });
+
+    Api.routes.posts.getPostBySlug.mock({ body: posts[1] });
+
+    Api.routes.comments.getComments.mock({
+      body: { comments: [createRandomComment()], hasNextPage: false },
+    });
+  });
+
+  for (const width of [768, 1366]) {
+    test(`Lines up posts, comments and the 404 page at ${width}px`, async ({
+      page,
+      PostsPage,
+      SinglePostPage,
+      NotFoundPage,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await PostsPage.goto(PostsPage.urls.today);
+
+      const column = await edgesOf(page.locator('.post__main').first());
+
+      await SinglePostPage.goto(posts[1].slug);
+
+      expect(await edgesOf(page.locator('.post__main'))).toEqual(column);
+      expect(await edgesOf(page.getByTestId('new-comment-form'))).toEqual(
+        column,
+      );
+      expect(
+        await edgesOf(page.locator('.comment-item__content').first()),
+      ).toEqual(column);
+
+      await page.goto(NotFoundPage.url);
+
+      expect(await edgesOf(page.locator('.not-found'))).toEqual(column);
+    });
+  }
+
+  test('Keeps a five-digit rating inside the vote column', async ({
+    page,
+    PostsPage,
+  }) => {
+    await page.setViewportSize({ width: 600, height: 900 });
+    await PostsPage.goto(PostsPage.urls.today);
+
+    const rating = page.getByTestId(`post-${posts[0]._id}-rating`);
+    const ratingEdges = await edgesOf(rating);
+    const columnEdges = await edgesOf(rating.locator('..'));
+    const cardEdges = await edgesOf(page.locator('.post__main').first());
+
+    expect(ratingEdges.left).toBeGreaterThanOrEqual(columnEdges.left);
+    expect(ratingEdges.right).toBeLessThanOrEqual(cardEdges.left);
+  });
+
+  test('Keeps the sidebar in view down a long page', async ({
+    page,
+    PostsPage,
+  }) => {
+    await page.setViewportSize({ width: 1366, height: 860 });
+    await PostsPage.goto(PostsPage.urls.today);
+    await expect(page.getByTestId('signin-form')).toBeVisible();
+
+    await page.evaluate(() => window.scrollTo(0, 2000));
+    await expect
+      .poll(() => page.evaluate(() => window.scrollY))
+      .toBeGreaterThan(1000);
+
+    await expect(page.getByTestId('signin-form')).toBeInViewport({ ratio: 1 });
+  });
 });
 
 test.describe('Mobile menu', () => {

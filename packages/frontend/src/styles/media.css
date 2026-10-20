@@ -15,6 +15,11 @@
 @custom-media --desktop-up (width >= 1200px);
 @custom-media --big-desktop-up (width >= 1800px);
 
+/* Tall enough to pin the sidebar under the header: its tallest state, the
+   sign-up form showing errors, is about 525px. A landscape phone is not, and a
+   pinned card taller than the window could never be scrolled to its end. */
+@custom-media --sidebar-fits (height >= 640px);
+
 /* Not a width — a pointer capability. A drag-and-drop affordance is meaningless
    on a touch screen, so the components that offer one ask for this instead of
    guessing from the viewport: a narrow desktop window still has a mouse, and a

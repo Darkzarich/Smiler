@@ -132,8 +132,7 @@ const createComment = async () => {
 
 <style>
 .new-comment-form {
-  padding: 1rem;
-  padding-top: 0;
+  padding-bottom: 1rem;
 
   @media (--phone-only) {
     padding: 0;

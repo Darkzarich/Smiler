@@ -599,10 +599,12 @@ const searchByTag = (tag: string) => {
 
   &__left {
     display: flex;
+    flex-shrink: 0;
     flex-direction: column;
     align-items: center;
-    width: 10%;
+    width: var(--post-votes-width);
     gap: 4px;
+    margin-left: calc(-1 * var(--post-votes-width));
 
     @media (--phone-only) {
       display: none;
@@ -656,11 +658,11 @@ const searchByTag = (tag: string) => {
   }
 
   &__main {
-    width: 90%;
+    flex: 1;
+    min-width: 0;
     color: var(--color-text-primary);
 
     @media (--phone-only) {
-      width: 100%;
       border: none;
       border-radius: 0;
     }

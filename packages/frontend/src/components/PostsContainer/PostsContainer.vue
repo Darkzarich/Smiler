@@ -76,11 +76,9 @@ useInfiniteScroll(
   &__loading,
   &__no-more,
   &__no-posts {
-    margin-left: 10%;
     text-align: center;
 
     @media (--phone-only) {
-      margin-left: 0% !important;
       border: none !important;
       border-radius: 0 !important;
     }

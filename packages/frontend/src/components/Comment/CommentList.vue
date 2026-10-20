@@ -54,13 +54,3 @@ const handleRemoveComment = (id: string) => {
   emit('remove', id);
 };
 </script>
-
-<style>
-.comment-list {
-  &__comment {
-    @media (--phone-only) {
-      margin-left: -1rem;
-    }
-  }
-}
-</style>

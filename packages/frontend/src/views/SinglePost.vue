@@ -169,7 +169,7 @@ onBeforeMount(async () => {
 
 .comments {
   margin-bottom: 2rem;
-  padding: 1rem;
+  padding-block: 1rem;
 
   @media (--phone-only) {
     padding: 0;

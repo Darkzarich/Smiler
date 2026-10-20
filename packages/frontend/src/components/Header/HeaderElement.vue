@@ -161,10 +161,6 @@ onBeforeUnmount(removeAfterEach);
     display: flex;
     width: 100%;
     max-width: var(--page-max-width);
-
-    @media (--desktop-up) {
-      padding-left: 40px;
-    }
   }
 
   &__mobile-menu {

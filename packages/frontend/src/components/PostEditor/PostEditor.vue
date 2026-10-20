@@ -643,6 +643,7 @@ const saveDraft = async () => {
   /* Matches the gap write mode gets from the add-section buttons. */
   &__preview {
     margin-bottom: 32px;
+    padding-left: var(--post-votes-width);
   }
 
   &__preview-empty {
