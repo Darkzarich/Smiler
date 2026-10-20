@@ -8,6 +8,7 @@
       :id="inputId"
       :value="modelValue"
       class="base-slider__input"
+      :style="{ '--slider-fill': fill }"
       :data-testid="dataTestid"
       type="range"
       :max="max"
@@ -23,6 +24,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 interface Props {
   dataTestid?: string;
   label?: string;
@@ -30,7 +33,7 @@ interface Props {
   max?: number;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   dataTestid: 'slider',
   label: 'Slider',
   min: -2000,
@@ -41,6 +44,14 @@ const inputId = crypto.randomUUID();
 
 const sliderValue = defineModel<number | null>({
   default: 0,
+});
+
+// How far the track is filled, up to the thumb. Without a value the browser puts the thumb in the
+// middle, so the fill starts there too.
+const fill = computed(() => {
+  const value = sliderValue.value ?? (props.min + props.max) / 2;
+
+  return `${((value - props.min) / (props.max - props.min)) * 100}%`;
 });
 
 const handleInput = (event: Event) => {
@@ -64,29 +75,52 @@ const handleInput = (event: Event) => {
   }
 
   &__input {
+    --slider-track: linear-gradient(
+      to right,
+      var(--color-primary) var(--slider-fill),
+      var(--color-border-hover) var(--slider-fill)
+    );
+
     margin: 0 8px;
-    outline: var(--color-primary);
-    border: 1px solid var(--color-text-secondary);
-    border-radius: 5px;
-    background: var(--color-surface-primary);
-    color: var(--color-text-primary);
+    border-radius: 4px;
+    background: transparent;
     appearance: none;
 
+    /* A ring on the card color: the thumb reads as a knob on the green fill and on the grey */
     &::-webkit-slider-thumb {
-      width: 16px;
-      height: 16px;
-      margin-top: -4px;
-      border-radius: 12px;
-      background: var(--color-primary);
+      width: 18px;
+      height: 18px;
+      margin-top: -6px;
+      border: 2px solid var(--color-primary-strong);
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+      background: var(--color-surface-secondary);
       cursor: pointer;
       appearance: none;
     }
 
+    &::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--color-primary-strong);
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+      background: var(--color-surface-secondary);
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
     &::-webkit-slider-runnable-track {
-      height: 0.5rem;
-      border: none;
-      border-radius: 5px;
-      background: var(--color-text-secondary);
+      height: 6px;
+      border-radius: 3px;
+      background: var(--slider-track);
+      cursor: pointer;
+    }
+
+    &::-moz-range-track {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--slider-track);
       cursor: pointer;
     }
   }
