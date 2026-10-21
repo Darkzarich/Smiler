@@ -51,14 +51,6 @@ export async function deleteById(req: Request<CommentIdParams>, res: Response) {
   }
 
   await Promise.all([
-    CommentModel.updateOne(
-      { _id: comment.parent },
-      {
-        $pull: {
-          children: comment._id,
-        },
-      },
-    ),
     PostModel.decreaseCommentCount(comment.post.toString()),
     CommentModel.deleteOne({
       _id: comment._id,

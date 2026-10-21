@@ -20,9 +20,9 @@ import {
   commentIdParamsSchema,
   commentListQuerySchema,
   commentListSchema,
-  commentSchema,
   commentUpdateBodySchema,
   storedCommentSchema,
+  writtenCommentSchema,
 } from '@validators/comments';
 
 const api = createApiRouter({
@@ -65,7 +65,10 @@ api.post({
   rateLimiter: writeRateLimiter,
   request: { body: commentCreateBodySchema },
   responses: {
-    200: { description: 'The comment that was written', schema: commentSchema },
+    200: {
+      description: 'The comment that was written',
+      schema: writtenCommentSchema,
+    },
     404: { description: 'No such post, or no such parent comment in it' },
   },
   handler: create,
@@ -80,7 +83,10 @@ api.put({
   rateLimiter: writeRateLimiter,
   request: { params: commentIdParamsSchema, body: commentUpdateBodySchema },
   responses: {
-    200: { description: 'The comment as it now stands', schema: commentSchema },
+    200: {
+      description: 'The comment as it now stands',
+      schema: writtenCommentSchema,
+    },
     400: { description: 'Somebody has already replied to it' },
     403: { description: 'Not your comment, or the edit window has closed' },
     404: { description: 'No such comment' },

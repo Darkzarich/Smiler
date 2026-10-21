@@ -103,7 +103,7 @@ describe('DELETE /comments/:id', () => {
       expect(response.status).toBe(200);
     });
 
-    it("Should remove comment from parent's children if it had a parent and no replies before being deleted", async () => {
+    it('Should leave the parent without replies once its only reply is deleted', async () => {
       const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
         global.app,
       );
@@ -121,20 +121,14 @@ describe('DELETE /comments/:id', () => {
         }),
       );
 
-      parentComment.children.push(comment.id);
-      await parentComment.save();
-
       const response = await request(global.app)
         .delete(`/api/comments/${comment.id}`)
         .set('Cookie', sessionCookie)
         .set('X-CSRF-Token', csrfToken);
 
-      const updatedParentComment = await CommentModel.findById(
-        parentComment.id,
-      ).lean();
-
-      expect(updatedParentComment!.children).toEqual([]);
       expect(response.status).toBe(200);
+      expect(await CommentModel.findById(comment.id)).toBeNull();
+      expect(await CommentModel.hasReplies(parentComment._id)).toBe(false);
     });
 
     it('Should decrease post comments count if a comment of the post was deleted', async () => {

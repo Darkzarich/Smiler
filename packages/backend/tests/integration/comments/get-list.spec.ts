@@ -213,17 +213,6 @@ describe('GET /comments', () => {
       }),
     );
 
-    await Promise.all([
-      CommentModel.updateOne(
-        { _id: comment._id },
-        { $push: { children: childComment._id } },
-      ),
-      CommentModel.updateOne(
-        { _id: childComment._id },
-        { $push: { children: childOfChildComment._id } },
-      ),
-    ]);
-
     const response = await request(global.app)
       .get(`/api/comments?post=${post.id}`)
       .set('Cookie', sessionCookie)
@@ -301,7 +290,6 @@ describe('GET /comments', () => {
           post: post.id,
           body: `level ${level + 1}`,
           parent: ids[level - 1],
-          children: ids.slice(level + 1, level + 2),
         }),
         _id,
       })),
@@ -430,11 +418,6 @@ describe('GET /comments', () => {
           createdAt: new Date(Date.now() - minutesAgo * 60_000),
         }),
       ),
-    );
-
-    await CommentModel.updateOne(
-      { _id: comment._id },
-      { $set: { children: replies.map((reply) => reply._id) } },
     );
 
     const response = await request(global.app).get(

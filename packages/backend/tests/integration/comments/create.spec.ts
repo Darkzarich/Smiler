@@ -98,7 +98,6 @@ describe('POST /comments', () => {
         login: currentUser.login,
         avatar: currentUser.avatar,
       },
-      children: [],
       createdAt: expect.any(String),
       updatedAt: expect.any(String),
       rating: 0,
@@ -215,14 +214,13 @@ describe('POST /comments', () => {
         login: currentUser.login,
         avatar: currentUser.avatar,
       },
-      children: [],
       createdAt: expect.any(String),
       updatedAt: expect.any(String),
       rating: 0,
     });
   });
 
-  it("Should add children comment to parent's children array", async () => {
+  it('Should store a reply through its parent pointer only', async () => {
     const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
       global.app,
     );
@@ -246,13 +244,13 @@ describe('POST /comments', () => {
       .set('Cookie', sessionCookie)
       .set('X-CSRF-Token', csrfToken);
 
-    const updatedParentComment = await CommentModel.findById(
-      parentComment.id,
-    ).lean();
+    const [stored, updatedParentComment] = await Promise.all([
+      CommentModel.findById(newComment.body._id).lean(),
+      CommentModel.findById(parentComment.id).lean(),
+    ]);
 
-    expect(
-      updatedParentComment!.children.map((comment) => comment.toString()),
-    ).toEqual([newComment.body._id]);
+    expect(stored!.parent).toEqual(parentComment._id);
+    expect(updatedParentComment).not.toHaveProperty('children');
   });
 
   it('Should increase post comment count (after a comment without a parent)', async () => {
@@ -353,11 +351,7 @@ describe('POST /comments', () => {
         repliedTo: COMMENT_MAX_DEPTH,
       });
 
-      const [stored, newParent, repliedTo] = await Promise.all([
-        CommentModel.findById(response.body._id).lean(),
-        CommentModel.findById(ids[COMMENT_MAX_DEPTH - 2]).lean(),
-        CommentModel.findById(ids[COMMENT_MAX_DEPTH - 1]).lean(),
-      ]);
+      const stored = await CommentModel.findById(response.body._id).lean();
 
       expect(response.status).toBe(200);
       expect(response.body.parent).toBe(ids[COMMENT_MAX_DEPTH - 2].toString());
@@ -366,8 +360,7 @@ describe('POST /comments', () => {
         login: author.login,
       });
       expect(stored!.replyTo).toEqual(ids[COMMENT_MAX_DEPTH - 1]);
-      expect(newParent!.children).toContainEqual(stored!._id);
-      expect(repliedTo!.children).toEqual([]);
+      expect(stored!.parent).toEqual(ids[COMMENT_MAX_DEPTH - 2]);
     });
 
     it('Should store a reply to a comment already deeper than the limit at the limit', async () => {

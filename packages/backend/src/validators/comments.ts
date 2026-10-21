@@ -114,6 +114,19 @@ export const commentSchema: z.ZodType<CommentNode> = apiSchema(
   }),
 );
 
+/** A comment just written or edited: one comment, not a node of the tree */
+export const writtenCommentSchema = apiSchema(
+  'WrittenComment',
+  z.object({
+    ...commentFields,
+    post: z.string(),
+    author: z
+      .union([z.string(), authorSchema])
+      .describe('An id when written, the author expanded when edited'),
+    updatedAt: isoDateTime(),
+  }),
+);
+
 /** A comment as the vote endpoints return it: the stored document, with only
  * what the query happened to populate expanded. */
 export const storedCommentSchema = apiSchema(
@@ -127,7 +140,6 @@ export const storedCommentSchema = apiSchema(
     author: z
       .union([z.string(), authorSchema])
       .describe('An id, or the author expanded where the query populates it'),
-    children: z.array(z.unknown()),
     rating: z.number(),
     deleted: z.boolean().optional(),
     createdAt: isoDateTime(),

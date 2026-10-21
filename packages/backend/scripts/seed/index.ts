@@ -113,7 +113,6 @@ interface SeedComment {
   author: Types.ObjectId;
   body: string;
   parent?: Types.ObjectId;
-  children: Types.ObjectId[];
   rating: number;
   deleted: boolean;
   createdAt: Date;
@@ -400,14 +399,12 @@ function buildComments(
           SanitizeHtmlProfile.Comment,
         ),
         ...(parent && { parent: parent._id }),
-        children: [],
         rating: 0,
         deleted: false,
         createdAt,
         updatedAt: createdAt,
       };
 
-      parent?.children.push(comment._id);
       comments.push(comment);
     }
 

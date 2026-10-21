@@ -18,8 +18,8 @@ interface GetListResponse extends PaginationResponse {
   comments: CommentResponse[];
 }
 
-/** One round trip however deep the threads go: populating `children` level by
- * level took two queries per level, and stopped at 20 levels. */
+/** One round trip however deep the threads go: populating replies level by level
+ * took two queries per level, and stopped at 20 levels. */
 async function findReplies(rootIds: Types.ObjectId[]) {
   if (rootIds.length === 0) {
     return [];
@@ -38,10 +38,9 @@ async function findReplies(rootIds: Types.ObjectId[]) {
     },
     { $unwind: '$reply' },
     { $replaceRoot: { newRoot: '$reply' } },
-    { $project: { children: 0 } },
   ]);
 
-  // The order they were pushed onto `children` in: an id starts with its creation time
+  // Oldest first: an id starts with its creation time
   return replies.sort((a, b) =>
     a._id.toString().localeCompare(b._id.toString()),
   );
@@ -134,7 +133,6 @@ export async function getList(
   }
 
   const foundRoots = await CommentModel.find(query)
-    .select({ children: 0 })
     .sort({ rating: -1 })
     .skip(offset)
     .limit(limit + PAGE_LOOKAHEAD)

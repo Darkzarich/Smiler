@@ -35,11 +35,6 @@ export class Comment {
   @prop({ ref: () => Post, required: true })
   public post!: Ref<Post>;
 
-  /** Still written so that the previous release can be rolled back to, but no longer read:
-   * replies are found through `parent`, and old documents hold ids of replies deleted since. */
-  @prop({ ref: () => Comment, default: [] })
-  public children!: Ref<Comment>[];
-
   @prop({ ref: () => Comment })
   public parent!: Ref<Comment>;
 

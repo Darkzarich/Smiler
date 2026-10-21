@@ -21,7 +21,6 @@ export async function insertThread({
         author,
         post,
         parent: ids[level - 1],
-        children: ids.slice(level + 1, level + 2),
       }),
       _id,
     })),

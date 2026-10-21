@@ -95,10 +95,6 @@ export async function create(
 
   const [replyTo] = await Promise.all([
     place.replyTo && CommentModel.findReplyTo(place.replyTo),
-    CommentModel.updateOne(
-      { _id: place.parent },
-      { $push: { children: comment._id.toString() } },
-    ),
     PostModel.increaseCommentCount(postId),
   ]);
 

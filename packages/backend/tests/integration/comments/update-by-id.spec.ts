@@ -242,7 +242,6 @@ describe('PUT /comments/:id', () => {
         avatar: currentUser.avatar,
         login: currentUser.login,
       },
-      children: [],
       rating: comment.rating,
       post: comment.post.toString(),
       createdAt: comment.createdAt.toJSON(),
