@@ -1,11 +1,14 @@
 import request from 'supertest';
 import { signUpRequest } from '@test-utils/request-auth';
-import { COMMENT_MAX_BODY_LENGTH } from '@constants/index';
+import { insertThread } from '@test-utils/comment-thread';
+import { COMMENT_MAX_BODY_LENGTH, COMMENT_MAX_DEPTH } from '@constants/index';
 import { PostModel } from '@models/Post';
 import { CommentModel } from '@models/Comment';
+import { UserModel } from '@models/User';
 import {
   generateRandomPost,
   generateRandomComment,
+  generateRandomUser,
 } from '@test-data-generators';
 import { ERRORS } from '@errors';
 
@@ -298,5 +301,108 @@ describe('POST /comments', () => {
     const updatedPost = await PostModel.findById(post.id).lean();
 
     expect(updatedPost!.commentCount).toBe(post.commentCount + 1);
+  });
+
+  describe('Depth limit', () => {
+    async function reply({
+      depth,
+      repliedTo,
+    }: {
+      depth: number;
+      repliedTo: number;
+    }) {
+      const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+      const post = await PostModel.create(generateRandomPost());
+
+      const author = await UserModel.create(generateRandomUser());
+
+      const ids = await insertThread({
+        post: post._id,
+        author: author._id,
+        depth,
+      });
+
+      const response = await request(global.app)
+        .post('/api/comments')
+        .send({
+          body: 'test',
+          post: post.id,
+          parent: ids[repliedTo - 1],
+        })
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      return { response, ids, author };
+    }
+
+    it(`Should nest a reply to a comment at depth ${COMMENT_MAX_DEPTH - 1} under it`, async () => {
+      const { response, ids } = await reply({
+        depth: COMMENT_MAX_DEPTH - 1,
+        repliedTo: COMMENT_MAX_DEPTH - 1,
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.parent).toBe(ids.at(-1)!.toString());
+      expect(response.body.replyTo).toBeUndefined();
+    });
+
+    it(`Should store a reply to a comment at depth ${COMMENT_MAX_DEPTH} next to it, naming the comment answered`, async () => {
+      const { response, ids, author } = await reply({
+        depth: COMMENT_MAX_DEPTH,
+        repliedTo: COMMENT_MAX_DEPTH,
+      });
+
+      const [stored, newParent, repliedTo] = await Promise.all([
+        CommentModel.findById(response.body._id).lean(),
+        CommentModel.findById(ids[COMMENT_MAX_DEPTH - 2]).lean(),
+        CommentModel.findById(ids[COMMENT_MAX_DEPTH - 1]).lean(),
+      ]);
+
+      expect(response.status).toBe(200);
+      expect(response.body.parent).toBe(ids[COMMENT_MAX_DEPTH - 2].toString());
+      expect(response.body.replyTo).toEqual({
+        _id: ids[COMMENT_MAX_DEPTH - 1].toString(),
+        login: author.login,
+      });
+      expect(stored!.replyTo).toEqual(ids[COMMENT_MAX_DEPTH - 1]);
+      expect(newParent!.children).toContainEqual(stored!._id);
+      expect(repliedTo!.children).toEqual([]);
+    });
+
+    it('Should store a reply to a comment already deeper than the limit at the limit', async () => {
+      const { response, ids } = await reply({
+        depth: COMMENT_MAX_DEPTH + 3,
+        repliedTo: COMMENT_MAX_DEPTH + 3,
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.parent).toBe(ids[COMMENT_MAX_DEPTH - 2].toString());
+      expect(response.body.replyTo._id).toBe(ids.at(-1)!.toString());
+    });
+
+    it('Should return status 404 if the comment replied to is on another post', async () => {
+      const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+      const [post, otherPost] = await PostModel.create([
+        generateRandomPost(),
+        generateRandomPost(),
+      ]);
+
+      const comment = await CommentModel.create(
+        generateRandomComment({ post: otherPost.id }),
+      );
+
+      const response = await request(global.app)
+        .post('/api/comments')
+        .send({ body: 'test', post: post.id, parent: comment.id })
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      expect(response.body.error.message).toBe(
+        ERRORS.COMMENT_PARENT_COMMENT_NOT_FOUND,
+      );
+      expect(response.status).toBe(404);
+    });
   });
 });

@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
+import type { Types } from 'mongoose';
 import { CommentModel } from '@models/Comment';
 import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
 import {
@@ -61,5 +62,12 @@ export async function updateById(
     throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
   }
 
-  sendSuccess(res, updatedComment);
+  sendSuccess(res, {
+    ...updatedComment,
+    ...(updatedComment.replyTo && {
+      replyTo: await CommentModel.findReplyTo(
+        updatedComment.replyTo as Types.ObjectId,
+      ),
+    }),
+  });
 }

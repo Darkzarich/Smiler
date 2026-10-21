@@ -236,6 +236,35 @@ describe('DELETE /comments/:id', () => {
       expect(response.status).toBe(200);
     });
 
+    it('Should set "deleted" flag to true if comment was answered from the depth limit', async () => {
+      const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+        global.app,
+      );
+
+      const comment = await CommentModel.create(
+        generateRandomComment({
+          author: currentUser._id,
+        }),
+      );
+
+      await CommentModel.create(
+        generateRandomComment({
+          parent: new Types.ObjectId(),
+          replyTo: comment._id,
+        }),
+      );
+
+      const response = await request(global.app)
+        .delete(`/api/comments/${comment.id}`)
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      const updatedComment = await CommentModel.findById(comment.id).lean();
+
+      expect(updatedComment!.deleted).toBe(true);
+      expect(response.status).toBe(200);
+    });
+
     it('Should decrease user rating after the comment is deleted', async () => {
       const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
         global.app,

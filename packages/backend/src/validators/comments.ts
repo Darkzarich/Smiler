@@ -1,5 +1,9 @@
 import { z } from 'zod';
-import { COMMENT_MAX_BODY_LENGTH, COMMENT_MAX_LIMIT } from '@constants/index';
+import {
+  COMMENT_MAX_BODY_LENGTH,
+  COMMENT_MAX_DEPTH,
+  COMMENT_MAX_LIMIT,
+} from '@constants/index';
 import { ERRORS } from '@errors';
 import { apiSchema } from '@libs/openapi/registry';
 import sanitizeHtml, {
@@ -68,9 +72,22 @@ export const commentListQuerySchema = listQuery(
   },
 );
 
+const replyToSchema = z
+  .object({
+    _id: z.string(),
+    login: z
+      .string()
+      .nullable()
+      .describe('Its author, or null once it is deleted'),
+  })
+  .describe(
+    `The comment answered, when it was ${COMMENT_MAX_DEPTH} or more levels deep: the reply is then stored next to it, under \`parent\`, instead of under it`,
+  );
+
 const commentFields = {
   _id: z.string(),
   parent: z.string().optional(),
+  replyTo: replyToSchema.optional(),
   createdAt: isoDateTime(),
   /** A deleted comment keeps its place in the tree so the replies under it
    * still have somewhere to hang, and carries nothing else. */
@@ -106,6 +123,7 @@ export const storedCommentSchema = apiSchema(
     body: z.string(),
     post: z.string(),
     parent: z.string().optional(),
+    replyTo: z.string().optional(),
     author: z
       .union([z.string(), authorSchema])
       .describe('An id, or the author expanded where the query populates it'),

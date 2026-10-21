@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { Types } from 'mongoose';
 import { signUpRequest } from '@test-utils/request-auth';
+import { insertThread } from '@test-utils/comment-thread';
 import { PostModel } from '@models/Post';
 import { CommentModel } from '@models/Comment';
 import {
@@ -10,7 +11,7 @@ import {
   generateRate,
 } from '@test-data-generators';
 import { ERRORS } from '@errors';
-import { COMMENT_MAX_LIMIT } from '@constants/index';
+import { COMMENT_MAX_DEPTH, COMMENT_MAX_LIMIT } from '@constants/index';
 import { RateModel, RateTargetModel } from '@models/Rate';
 import { UserModel } from '@models/User';
 
@@ -338,6 +339,80 @@ describe('GET /comments', () => {
       true,
     );
     expect(levels.at(-1).rated).toEqual({ isRated: true, negative: false });
+  });
+
+  it(`Should list a reply to a comment at depth ${COMMENT_MAX_DEPTH} next to it, with the login it answers`, async () => {
+    const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+    const post = await PostModel.create(generateRandomPost());
+
+    const author = await UserModel.create(generateRandomUser());
+
+    const ids = await insertThread({
+      post: post._id,
+      author: author._id,
+      depth: COMMENT_MAX_DEPTH,
+    });
+
+    const { body: reply } = await request(global.app)
+      .post('/api/comments')
+      .send({ body: 'test', post: post.id, parent: ids.at(-1) })
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
+
+    const response = await request(global.app).get(
+      `/api/comments?post=${post.id}`,
+    );
+
+    let [node] = response.body.comments;
+
+    for (let depth = 1; depth < COMMENT_MAX_DEPTH - 1; depth += 1) {
+      [node] = node.children;
+    }
+
+    expect(response.status).toBe(200);
+    expect(
+      node.children.map(
+        (child: { _id: string; replyTo?: unknown; children: unknown[] }) => [
+          child._id,
+          child.replyTo,
+          child.children,
+        ],
+      ),
+    ).toEqual([
+      [ids.at(-1)!.toString(), undefined, []],
+      [reply._id, { _id: ids.at(-1)!.toString(), login: author.login }, []],
+    ]);
+  });
+
+  it('Should list a reply to a deleted comment with no login to show', async () => {
+    const post = await PostModel.create(generateRandomPost());
+
+    const [comment, repliedTo] = await CommentModel.create([
+      generateRandomComment({ post: post.id }),
+      generateRandomComment({ post: post.id, deleted: true }),
+    ]);
+
+    await CommentModel.insertMany([
+      generateRandomComment({
+        post: post.id,
+        parent: comment._id,
+        replyTo: repliedTo._id,
+      }),
+    ]);
+
+    const response = await request(global.app).get(
+      `/api/comments?post=${post.id}`,
+    );
+
+    const listed = response.body.comments.find(
+      (root: { _id: string }) => root._id === comment.id,
+    );
+
+    expect(listed.children[0].replyTo).toEqual({
+      _id: repliedTo.id,
+      login: null,
+    });
   });
 
   it('Should list the replies to a comment oldest first', async () => {

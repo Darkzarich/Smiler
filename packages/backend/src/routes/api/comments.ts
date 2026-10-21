@@ -6,6 +6,7 @@ import {
   updateById,
   voteById,
 } from '@controllers/comments';
+import { COMMENT_MAX_DEPTH } from '@constants/index';
 import { createApiRouter } from '@libs/api-router';
 import {
   apiRateLimiter,
@@ -59,7 +60,7 @@ api.get({
 api.post({
   path: '/',
   summary: 'Write a comment',
-  description: 'With `parent`, the comment is a reply to that comment.',
+  description: `With \`parent\`, the comment is a reply to that comment. Threads stop nesting at depth ${COMMENT_MAX_DEPTH}: a reply to a comment that deep is stored next to it instead, and comes back with the \`parent\` it was stored under and \`replyTo\` naming the comment it answers.`,
   auth: true,
   rateLimiter: writeRateLimiter,
   request: { body: commentCreateBodySchema },

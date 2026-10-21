@@ -12,6 +12,7 @@ import {
 } from '@test-data-generators';
 import { ERRORS } from '@errors';
 import { subMinutes } from 'date-fns';
+import { Types } from 'mongoose';
 
 describe('PUT /comments/:id', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -102,6 +103,68 @@ describe('PUT /comments/:id', () => {
       ERRORS.COMMENT_CANT_EDIT_WITH_REPLIES,
     );
     expect(response.status).toBe(400);
+  });
+
+  it('Should return status 400 and an expected message if comment was answered from the depth limit', async () => {
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
+
+    const comment = await CommentModel.create(
+      generateRandomComment({
+        author: currentUser._id,
+      }),
+    );
+
+    await CommentModel.create(
+      generateRandomComment({
+        parent: new Types.ObjectId(),
+        replyTo: comment._id,
+      }),
+    );
+
+    const response = await request(global.app)
+      .put(`/api/comments/${comment.id}`)
+      .send({ body: 'test test test' })
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
+
+    expect(response.body.error.message).toBe(
+      ERRORS.COMMENT_CANT_EDIT_WITH_REPLIES,
+    );
+    expect(response.status).toBe(400);
+  });
+
+  it('Should return the login the comment answers, as the list does', async () => {
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
+
+    const author = await UserModel.create(generateRandomUser());
+
+    const repliedTo = await CommentModel.create(
+      generateRandomComment({ author: author._id }),
+    );
+
+    const comment = await CommentModel.create(
+      generateRandomComment({
+        author: currentUser._id,
+        parent: new Types.ObjectId(),
+        replyTo: repliedTo._id,
+      }),
+    );
+
+    const response = await request(global.app)
+      .put(`/api/comments/${comment.id}`)
+      .send({ body: 'test test test' })
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
+
+    expect(response.status).toBe(200);
+    expect(response.body.replyTo).toEqual({
+      _id: repliedTo.id,
+      login: author.login,
+    });
   });
 
   it("Should return status 200 and update the comment's body in the database", async () => {

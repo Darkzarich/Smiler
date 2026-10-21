@@ -86,9 +86,22 @@ function buildTree({
   }
 
   for (const reply of replies) {
-    nodes
-      .get(reply.parent!.toString())
-      ?.children.push(nodes.get(reply._id.toString())!);
+    const node = nodes.get(reply._id.toString())!;
+
+    nodes.get(reply.parent!.toString())?.children.push(node);
+
+    if (reply.replyTo && !reply.deleted) {
+      // In the same thread: the reply's `parent` is one of its ancestors
+      const repliedTo = nodes.get(reply.replyTo.toString());
+
+      node.replyTo = {
+        _id: reply.replyTo,
+        login:
+          repliedTo && 'author' in repliedTo
+            ? repliedTo.author?.login ?? null
+            : null,
+      };
+    }
   }
 
   return roots.map((root) => nodes.get(root._id.toString())!);

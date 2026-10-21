@@ -45,6 +45,8 @@ export const COMMENT_RATE_VALUE = 0.5;
 export const COMMENT_TIME_TO_UPDATE = minutesToMilliseconds(10);
 export const COMMENT_MAX_LIMIT = 30;
 export const COMMENT_MAX_BODY_LENGTH = 10000;
+/** A top-level comment is at depth 1. Eight levels is what a desktop column fits. */
+export const COMMENT_MAX_DEPTH = 8;
 
 export const USER_MAX_BIO_LENGTH = 300;
 export const USER_MAX_AVATAR_LENGTH = 150;
