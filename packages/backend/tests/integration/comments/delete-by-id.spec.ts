@@ -220,10 +220,10 @@ describe('DELETE /comments/:id', () => {
       const comment = await CommentModel.create(
         generateRandomComment({
           author: currentUser._id,
-          // random id
-          children: [new Types.ObjectId('5d5467b4c17806706f3df347')],
         }),
       );
+
+      await CommentModel.create(generateRandomComment({ parent: comment._id }));
 
       const response = await request(global.app)
         .delete(`/api/comments/${comment.id}`)
@@ -244,10 +244,10 @@ describe('DELETE /comments/:id', () => {
       const comment = await CommentModel.create(
         generateRandomComment({
           author: currentUser._id,
-          // random id
-          children: [new Types.ObjectId('5d5467b4c17806706f3df347')],
         }),
       );
+
+      await CommentModel.create(generateRandomComment({ parent: comment._id }));
 
       await request(global.app)
         .delete(`/api/comments/${comment.id}`)
@@ -267,10 +267,10 @@ describe('DELETE /comments/:id', () => {
       const comment = await CommentModel.create(
         generateRandomComment({
           author: currentUser._id,
-          // random id
-          children: [new Types.ObjectId('5d5467b4c17806706f3df347')],
         }),
       );
+
+      await CommentModel.create(generateRandomComment({ parent: comment._id }));
 
       await Promise.all([
         RateModel.create(
@@ -300,9 +300,10 @@ describe('DELETE /comments/:id', () => {
       const comment = await CommentModel.create(
         generateRandomComment({
           author: currentUser._id,
-          children: [new Types.ObjectId('5d5467b4c17806706f3df347')],
         }),
       );
+
+      await CommentModel.create(generateRandomComment({ parent: comment._id }));
 
       await request(global.app)
         .delete(`/api/comments/${comment.id}`)

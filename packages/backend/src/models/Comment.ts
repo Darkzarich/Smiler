@@ -2,6 +2,7 @@ import {
   prop,
   getModelForClass,
   type Ref,
+  type ReturnModelType,
   index,
   modelOptions,
   plugin,
@@ -53,6 +54,13 @@ export class Comment {
 
   public createdAt!: Date;
   public updatedAt!: Date;
+
+  public static async hasReplies(
+    this: ReturnModelType<typeof Comment>,
+    commentId: Types.ObjectId,
+  ) {
+    return (await this.exists({ parent: commentId })) !== null;
+  }
 }
 
 export interface LeanComment

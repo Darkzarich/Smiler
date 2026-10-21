@@ -79,6 +79,31 @@ describe('PUT /comments/:id', () => {
     expect(response.status).toBe(403);
   });
 
+  it('Should return status 400 and an expected message if comment has replies', async () => {
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
+
+    const comment = await CommentModel.create(
+      generateRandomComment({
+        author: currentUser._id,
+      }),
+    );
+
+    await CommentModel.create(generateRandomComment({ parent: comment._id }));
+
+    const response = await request(global.app)
+      .put(`/api/comments/${comment.id}`)
+      .send({ body: 'test test test' })
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
+
+    expect(response.body.error.message).toBe(
+      ERRORS.COMMENT_CANT_EDIT_WITH_REPLIES,
+    );
+    expect(response.status).toBe(400);
+  });
+
   it("Should return status 200 and update the comment's body in the database", async () => {
     const body = 'test test test';
 

@@ -32,7 +32,7 @@ export async function updateById(
     throw new ForbiddenError(ERRORS.COMMENT_CANT_EDIT_NOT_OWN);
   }
 
-  if (comment.children.length > 0) {
+  if (await CommentModel.hasReplies(comment._id)) {
     throw new BadRequestError(ERRORS.COMMENT_CANT_EDIT_WITH_REPLIES);
   }
 

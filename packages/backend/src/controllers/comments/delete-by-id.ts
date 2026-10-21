@@ -32,7 +32,7 @@ export async function deleteById(req: Request<CommentIdParams>, res: Response) {
 
   // If comment has replies we cannot delete it completely
   // instead we mark it as deleted with a flag
-  if (comment.children.length > 0) {
+  if (await CommentModel.hasReplies(comment._id)) {
     const [updateComment] = await Promise.all([
       CommentModel.findByIdAndUpdate(comment._id, {
         deleted: true,
