@@ -23,7 +23,9 @@ export default {
     );
   },
   deleteComment(id: string) {
-    return apiClient.delete(`${CONTROLLER_URL}/${id}`);
+    return apiClient.delete<commentTypes.DeleteCommentResponse>(
+      `${CONTROLLER_URL}/${id}`,
+    );
   },
   updateRateById(id: string, data: commentTypes.UpdateRateByIdRequest) {
     return apiClient.put<commentTypes.UpdateRateByIdResponse>(

@@ -5,20 +5,15 @@
       :key="comment._id"
       class="comment-list__comment"
     >
-      <CommentItem
-        :comment="comment"
-        :post-id="postId"
-        :level="level"
-        @remove="handleRemoveComment"
-        @reply-created="emit('reply-created')"
-      />
+      <CommentItem :comment="comment" :post-id="postId" :level="level" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { provide, ref } from 'vue';
 import CommentItem from './CommentItem.vue';
+import { commentThreadKey, insertReply, removeComment } from './thread';
 import type { Comment } from './types';
 
 interface Props {
@@ -40,17 +35,19 @@ const emit = defineEmits<Emits>();
 
 const comments = ref(props.data);
 
-const handleRemoveComment = (id: string) => {
-  const commentIndex = comments.value.findIndex(
-    (comment) => comment._id === id,
-  );
-
-  if (commentIndex === -1) {
-    return;
-  }
-
-  comments.value.splice(commentIndex, 1);
-
-  emit('remove', id);
-};
+// A reply can land anywhere in the tree: the server may store it under an
+// ancestor of the comment answered, and a flat thread shows replies that are
+// not the children of the comment rendering them.
+provide(commentThreadKey, {
+  addReply(reply, answeredId) {
+    if (insertReply(comments.value, reply, answeredId)) {
+      emit('reply-created');
+    }
+  },
+  remove(id) {
+    if (removeComment(comments.value, id)) {
+      emit('remove', id);
+    }
+  },
+});
 </script>

@@ -8,32 +8,34 @@
     >
       <div class="comment-item__header">
         <template v-if="!comment.deleted">
-          <div
-            class="comment-item__rating"
-            :data-testid="`comment-${comment._id}-rating`"
-          >
-            {{ comment.rating }}
+          <div class="comment-item__votes">
+            <BaseIconButton
+              label="Upvote"
+              :data-testid="`comment-${comment._id}-upvote`"
+              tone="primary"
+              :pressed="comment.rated.isRated && !comment.rated.negative"
+              @click="upvote()"
+            >
+              <IconPlus />
+            </BaseIconButton>
+
+            <div
+              class="comment-item__rating"
+              :data-testid="`comment-${comment._id}-rating`"
+            >
+              {{ comment.rating }}
+            </div>
+
+            <BaseIconButton
+              label="Downvote"
+              :data-testid="`comment-${comment._id}-downvote`"
+              tone="danger"
+              :pressed="comment.rated.isRated && comment.rated.negative"
+              @click="downvote()"
+            >
+              <IconMinus />
+            </BaseIconButton>
           </div>
-
-          <BaseIconButton
-            label="Upvote"
-            :data-testid="`comment-${comment._id}-upvote`"
-            tone="primary"
-            :pressed="comment.rated.isRated && !comment.rated.negative"
-            @click="upvote()"
-          >
-            <IconPlus />
-          </BaseIconButton>
-
-          <BaseIconButton
-            label="Downvote"
-            :data-testid="`comment-${comment._id}-downvote`"
-            tone="danger"
-            :pressed="comment.rated.isRated && comment.rated.negative"
-            @click="downvote()"
-          >
-            <IconMinus />
-          </BaseIconButton>
 
           <RouterLink
             :to="{
@@ -52,9 +54,19 @@
             </div>
           </RouterLink>
 
-          <template v-if="checkCanEditComment(comment, userStore.user?._id)">
+          <span
+            v-if="answers !== undefined"
+            class="comment-item__reply-to"
+            :data-testid="`comment-${comment._id}-reply-to`"
+          >
+            ↳ {{ answers === null ? 'deleted comment' : `@${answers}` }}
+          </span>
+
+          <div
+            v-if="checkCanEditComment(comment, userStore.user?._id)"
+            class="comment-item__own-actions"
+          >
             <BaseIconButton
-              class="comment-item__edit-btn"
               label="Edit comment"
               :data-testid="`comment-${comment._id}-edit`"
               tone="primary"
@@ -72,7 +84,7 @@
             >
               <IconDelete />
             </BaseIconButton>
-          </template>
+          </div>
         </template>
 
         <div
@@ -106,72 +118,82 @@
           <!-- eslint-disable-next-line vue/no-v-html -->
           <div class="rich-text" v-html="comment.body" />
 
-          <div class="comment-item__reply">
-            <CommentForm
-              v-if="isReplyToggled"
-              v-model="replyBody"
-              class="comment-item__comment-form"
-              :loading="isRequesting"
-              data-testid="comment-reply"
-              @submit="handleReply()"
-              @close="toggleReply"
-            />
-
-            <template v-else-if="level < COMMENTS_NESTED_LIMIT">
-              <div
-                class="comment-item__reply-toggler"
-                :data-testid="`comment-${comment._id}-toggle-reply`"
-                role="button"
-                tabindex="0"
-                @click="toggleReply()"
-                @keydown.enter="toggleReply()"
-                @keydown.space.prevent="toggleReply()"
-              >
-                Reply
-              </div>
-            </template>
-          </div>
+          <CommentForm
+            v-if="isReplyToggled"
+            v-model="replyBody"
+            class="comment-item__comment-form"
+            :loading="isRequesting"
+            data-testid="comment-reply"
+            @submit="handleReply()"
+            @close="toggleReply"
+          />
         </template>
       </div>
 
-      <CommentChildExpander
-        v-if="comment.children.length > 0"
-        :data-testid="`comment-${comment._id}-expander`"
-        :is-expanded="isChildrenExpanded"
-        role="button"
-        tabindex="0"
-        @click="isChildrenExpanded = !isChildrenExpanded"
-        @keydown.enter="isChildrenExpanded = !isChildrenExpanded"
-        @keydown.space.prevent="isChildrenExpanded = !isChildrenExpanded"
-      />
+      <div v-if="canReply || hasRepliesToggle" class="comment-item__actions">
+        <button
+          v-if="canReply"
+          type="button"
+          class="comment-item__action"
+          :data-testid="`comment-${comment._id}-toggle-reply`"
+          @click="toggleReply()"
+        >
+          Reply
+        </button>
+
+        <button
+          v-if="hasRepliesToggle"
+          type="button"
+          class="comment-item__action"
+          :aria-expanded="isChildrenExpanded"
+          :data-testid="`comment-${comment._id}-replies-toggle`"
+          @click="isChildrenExpanded = !isChildrenExpanded"
+        >
+          {{ isChildrenExpanded ? 'Hide' : 'Show' }} {{ replyCount }}
+          {{ replyCount === 1 ? 'reply' : 'replies' }}
+        </button>
+      </div>
     </div>
 
-    <div v-if="isChildrenExpanded" class="comment-item__replies">
-      <CommentItem
-        v-for="childComment in comment.children"
-        :key="childComment._id"
-        :comment="childComment"
-        :post-id="postId"
-        :level="level + 1"
-        @remove="handleRemoveComment"
-        @reply-created="emit('reply-created')"
-      />
+    <div
+      v-if="hasRepliesToggle && isChildrenExpanded"
+      class="comment-item__replies"
+    >
+      <template v-if="isThreadFlat">
+        <CommentItem
+          v-for="reply in flatReplies"
+          :key="reply.comment._id"
+          :comment="reply.comment"
+          :answers="reply.answers"
+          :post-id="postId"
+          :level="level + 1"
+          flat
+        />
+      </template>
+
+      <template v-else>
+        <CommentItem
+          v-for="childComment in comment.children"
+          :key="childComment._id"
+          :comment="childComment"
+          :answers="childComment.replyTo?.login"
+          :post-id="postId"
+          :level="level + 1"
+        />
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { cloneDeep } from 'lodash-es';
-import { ref } from 'vue';
-import CommentChildExpander from './CommentChildExpander.vue';
+import { computed, inject, ref } from 'vue';
 import CommentForm from './CommentForm.vue';
+import { commentThreadKey, countReplies, flattenReplies } from './thread';
 import type { Comment } from './types';
+import { useVisibleDepth } from './use-visible-depth';
 import { api } from '@/api';
-import {
-  COMMENT_RATE_VALUE,
-  COMMENT_AUTO_HIDE_LEVEL,
-  COMMENTS_NESTED_LIMIT,
-} from '@/const';
+import { COMMENT_RATE_VALUE, COMMENT_AUTO_HIDE_LEVEL } from '@/const';
 import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
@@ -188,18 +210,21 @@ interface Props {
   postId: string;
   comment: Comment;
   level?: number;
+  /** One of the replies a thread too deep to indent shows in a single list:
+   * its own replies follow it there, so it renders none */
+  flat?: boolean;
+  /** The login this comment answers, for the "↳ @login" chip; null for a
+   * deleted comment, undefined for no chip */
+  answers?: string | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   level: 1,
+  flat: false,
+  answers: undefined,
 });
 
-interface Emits {
-  remove: [id: string];
-  'reply-created': [];
-}
-
-const emit = defineEmits<Emits>();
+const thread = inject(commentThreadKey)!;
 
 const userStore = useUserStore();
 
@@ -212,6 +237,21 @@ const comment = ref(props.comment);
 const isRequesting = ref(false);
 
 const isChildrenExpanded = ref(props.level <= COMMENT_AUTO_HIDE_LEVEL);
+
+const visibleDepth = useVisibleDepth();
+
+// `level` counts from 0 at the top
+const isThreadFlat = computed(() => props.level + 1 >= visibleDepth.value);
+
+const flatReplies = computed(() =>
+  isThreadFlat.value ? flattenReplies(comment.value) : [],
+);
+
+const replyCount = computed(() => countReplies(comment.value));
+
+const hasRepliesToggle = computed(
+  () => !props.flat && comment.value.children.length > 0,
+);
 
 // replyBody and editBody potentially can be optimized by using a single one of them
 
@@ -260,9 +300,8 @@ const handleReply = async () => {
       created: true,
     };
 
-    comment.value.children.unshift(newComment);
-
-    emit('reply-created');
+    thread.addReply(newComment, comment.value._id);
+    isChildrenExpanded.value = true;
 
     replyBody.value = '';
     toggleReply();
@@ -273,6 +312,10 @@ const handleReply = async () => {
 
 const editBody = ref('');
 const isEditToggled = ref(false);
+
+const canReply = computed(
+  () => !comment.value.deleted && !isEditToggled.value && !isReplyToggled.value,
+);
 
 const toggleEdit = () => {
   editBody.value = comment.value.body;
@@ -308,32 +351,20 @@ const handleDeleteComment = async () => {
 
     const { _id } = comment.value;
 
-    await api.comments.deleteComment(_id);
+    const result = await api.comments.deleteComment(_id);
 
-    if (!comment.value.children?.length) {
-      emit('remove', _id);
+    // The server decides: a comment answered from deeper down, through
+    // `replyTo`, has no children here but is still only emptied
+    if ('_id' in result) {
+      comment.value.deleted = true;
 
       return;
     }
 
-    comment.value.deleted = true;
+    thread.remove(_id);
   } finally {
     isRequesting.value = false;
   }
-};
-
-const handleRemoveComment = (id: string) => {
-  const commentIndex = comment.value.children.findIndex(
-    (comment) => comment._id === id,
-  );
-
-  if (commentIndex === -1) {
-    return;
-  }
-
-  comment.value.children.splice(commentIndex, 1);
-
-  emit('remove', id);
 };
 
 const handleRemoveVote = async () => {
@@ -509,6 +540,7 @@ const downvote = async () => {
     display: flex;
     flex-flow: row wrap;
     align-items: center;
+    gap: 4px 0.5rem;
     margin-bottom: 8px;
 
     /* Neighboring icon buttons, so that their 44px hit areas meet only in the gap */
@@ -532,17 +564,28 @@ const downvote = async () => {
     border-radius: 50%;
   }
 
-  &__rating {
-    margin-right: 4px;
-    color: var(--color-text-secondary);
+  &__votes,
+  &__own-actions {
+    display: flex;
+    align-items: center;
   }
 
-  &__edit-btn {
-    margin-left: 0.5rem;
+  &__rating {
+    min-width: 2ch;
+    color: var(--color-text-secondary);
+    text-align: center;
+    padding-inline: 2px;
+  }
+
+  &__reply-to {
+    min-width: 0;
+    color: var(--color-text-secondary);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   &__created-at {
-    margin-left: 0.5rem;
     color: var(--color-text-secondary);
     white-space: nowrap;
   }
@@ -555,22 +598,31 @@ const downvote = async () => {
     margin-top: 16px;
   }
 
-  &__reply-toggler {
-    display: inline-block;
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1rem;
     margin-top: 8px;
-    color: var(--color-primary-strong);
-    font-size: 0.9rem;
-    cursor: pointer;
-    font-weight: bold;
-    transition: color 0.2s ease;
-    transition: all 200ms ease-out;
+  }
 
-    &:hover {
-      filter: brightness(120%);
+  &__action {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-primary-strong);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: filter 200ms ease-out;
+
+    @media (--hover) {
+      &:hover {
+        filter: brightness(120%);
+      }
     }
   }
 
-  /* The line runs down from the center of the parent's expander */
   &__replies {
     margin-left: 3.5px;
     padding-left: 24px;

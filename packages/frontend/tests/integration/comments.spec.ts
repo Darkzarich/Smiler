@@ -56,8 +56,17 @@ test('Hides replies to a comments if root comment is collapsed', async ({
 }) => {
   await SinglePostPage.goto(post.slug);
 
-  await Comments.toggleRepliesExpanderById(comment._id);
+  const replyCount = comment.children.length * 2;
 
+  await expect(Comments.getRepliesToggleById(comment._id)).toHaveText(
+    `Hide ${replyCount} replies`,
+  );
+
+  await Comments.toggleRepliesById(comment._id);
+
+  await expect(Comments.getRepliesToggleById(comment._id)).toHaveText(
+    `Show ${replyCount} replies`,
+  );
   await expect(Comments.getCommentById(comment.children[0]._id)).toBeHidden();
   await expect(
     Comments.getCommentById(comment.children[0].children[0]._id),
@@ -164,6 +173,7 @@ test.describe('Replies', () => {
         body: newReplyText,
         children: [],
         _id: newReplyId,
+        parent: comment._id,
       },
     });
   });
@@ -247,6 +257,128 @@ test.describe('Replies', () => {
 
   //   await expect(page.getByTestId(`comment-reply-input`)).toHaveCount(1);
   // });
+});
+
+test.describe('Deep threads', () => {
+  /** A thread `length` comments deep, each one replying to the one before.
+   * Returns the top-level comment and the comments from the top down. */
+  function createThread(length: number) {
+    const comments = Array.from({ length }, (_, index) =>
+      createRandomComment({ author: { _id: `thread-${index}` } }),
+    );
+
+    comments.slice(1).forEach((reply, index) => {
+      reply.parent = comments[index]._id;
+      comments[index].children = [reply];
+    });
+
+    return comments;
+  }
+
+  // How many levels indent at the project's width, see COMMENT_VISIBLE_DEPTH
+  const visibleDepth = () =>
+    test.info().project.name === 'Mobile Chrome' ? 3 : 8;
+
+  test('Shows the replies past the visible depth in one list, each naming the comment it answers', async ({
+    SinglePostPage,
+    Comments,
+    Api,
+  }) => {
+    const thread = createThread(10);
+    const depth = visibleDepth();
+
+    Api.routes.comments.getComments.mock({
+      body: { comments: [thread[0]], hasNextPage: false },
+    });
+
+    await SinglePostPage.goto(post.slug);
+    await Comments.expandAllReplies();
+
+    for (const reply of thread.slice(0, depth)) {
+      await expect(Comments.getReplyToById(reply._id)).toBeHidden();
+    }
+
+    for (const [index, reply] of thread.entries().drop(depth)) {
+      await expect(Comments.getReplyToById(reply._id)).toHaveText(
+        `↳ @${thread[index - 1].author.login}`,
+      );
+    }
+
+    const lastIndented = await Comments.getCommentById(
+      thread[depth]._id,
+    ).boundingBox();
+    const deepest = await Comments.getCommentById(
+      thread.at(-1)!._id,
+    ).boundingBox();
+
+    expect(deepest!.x).toBe(lastIndented!.x);
+  });
+
+  test('Puts a reply where the server stored it, naming the comment it answers', async ({
+    SinglePostPage,
+    Comments,
+    Api,
+  }) => {
+    const thread = createThread(8);
+    const [answered, storedUnder] = [thread[7], thread[6]];
+
+    Api.routes.comments.getComments.mock({
+      body: { comments: [thread[0]], hasNextPage: false },
+    });
+
+    // The backend stops nesting at 8: a reply to the 8th comment goes next to it
+    Api.routes.comments.createComment.mock({
+      body: {
+        _id: 'deep-reply',
+        body: '<p>deep reply</p>',
+        children: [],
+        parent: storedUnder._id,
+        replyTo: { _id: answered._id, login: answered.author.login },
+      },
+    });
+
+    await SinglePostPage.goto(post.slug);
+    await Comments.expandAllReplies();
+
+    await Comments.clickCommentReplyTogglerById(answered._id);
+    await Comments.fillCommentReplyInput('deep reply');
+    await Comments.submitCommentReply();
+
+    await expect(Comments.getCommentById('deep-reply')).toContainText(
+      'deep reply',
+    );
+    await expect(Comments.getReplyToById('deep-reply')).toHaveText(
+      `↳ @${answered.author.login}`,
+    );
+  });
+
+  test('Keeps a deleted comment in place when it was answered from deeper down', async ({
+    SinglePostPage,
+    Comments,
+    Api,
+    context,
+  }) => {
+    const answered = createRandomComment({ author: { _id: auth._id } });
+
+    Api.routes.comments.getComments.mock({
+      body: { comments: [answered], hasNextPage: false },
+    });
+
+    // No children here, but a reply elsewhere names it in `replyTo`
+    Api.routes.comments.deleteComment.mock({
+      status: 200,
+      body: { ...answered, children: [] },
+    });
+
+    await mockDate(context, answered.createdAt);
+    await SinglePostPage.goto(post.slug);
+
+    await Comments.deleteCommentById(answered._id);
+
+    await expect(Comments.getCommentById(answered._id)).toContainText(
+      'This comment has been deleted',
+    );
+  });
 });
 
 test.describe('Votes', () => {
@@ -669,6 +801,7 @@ test.describe('Editing or deleting a comment', () => {
   }) => {
     Api.routes.comments.deleteComment.mock({
       status: 200,
+      body: { ok: true },
     });
 
     await mockDate(context, currentUserComment.createdAt);
@@ -747,11 +880,10 @@ test.describe('Editing or deleting a comment', () => {
       },
     });
 
+    // The emptied comment comes back in place of `{ ok: true }`
     Api.routes.comments.deleteComment.mock({
       status: 200,
-      body: {
-        success: true,
-      },
+      body: { ...currentUserCommentWithReplies, children: [] },
     });
 
     await mockDate(context, currentUserCommentWithReplies.createdAt);

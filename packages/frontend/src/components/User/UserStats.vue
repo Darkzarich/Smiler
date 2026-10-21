@@ -8,7 +8,9 @@
       class="user-stats__stat"
       data-testid="user-profile-rating"
     >
-      <span class="user-stats__stat-count">{{ stats.rating }} </span>
+      <span class="user-stats__stat-count"
+        >{{ formatRating(stats.rating) }}
+      </span>
       <span class="user-stats__stat-count-label">Rating</span>
     </div>
 
@@ -21,6 +23,7 @@
 
 <script setup lang="ts">
 import { userTypes } from '@/api/users';
+import { formatRating } from '@/utils/format-rating';
 
 defineProps<{
   stats: Pick<userTypes.GetUserProfileResponse, 'rating' | 'followersAmount'>;

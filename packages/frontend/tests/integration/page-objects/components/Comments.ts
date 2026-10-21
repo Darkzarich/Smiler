@@ -71,8 +71,28 @@ export default class Comments extends AbstractComponent {
     );
   }
 
-  async toggleRepliesExpanderById(commentId = '') {
-    await this.page.getByTestId(`comment-${commentId}-expander`).click();
+  getRepliesToggleById(commentId = '') {
+    return this.page.getByTestId(`comment-${commentId}-replies-toggle`);
+  }
+
+  getReplyToById(commentId = '') {
+    return this.page.getByTestId(`comment-${commentId}-reply-to`);
+  }
+
+  async toggleRepliesById(commentId = '') {
+    await this.getRepliesToggleById(commentId).click();
+  }
+
+  /** Opens every collapsed thread, including the ones that only appear once
+   * their parent's thread is open */
+  async expandAllReplies() {
+    const collapsed = this.page.locator(
+      '[data-testid$="-replies-toggle"][aria-expanded="false"]',
+    );
+
+    while ((await collapsed.count()) > 0) {
+      await collapsed.first().click();
+    }
   }
 
   async submitNewComment() {

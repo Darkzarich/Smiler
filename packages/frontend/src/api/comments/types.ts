@@ -14,6 +14,9 @@ interface CommentRate {
 export interface Comment {
   _id: string;
   parent?: string; // parent comment id
+  /** The comment answered, when the server stored the reply next to it
+   * because it was too deep to nest under; login is null once it's deleted */
+  replyTo?: { _id: string; login: string | null };
   author: CommentAuthor;
   body: string;
   children: Comment[];
@@ -45,6 +48,9 @@ export interface UpdateCommentRequest {
 }
 
 export type UpdateCommentResponse = Comment;
+
+/** The emptied comment when it had replies, which keeps its place */
+export type DeleteCommentResponse = { ok: true } | Comment;
 
 export interface UpdateRateByIdRequest {
   negative: boolean;
