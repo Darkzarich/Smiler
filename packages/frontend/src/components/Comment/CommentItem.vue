@@ -503,9 +503,11 @@ const downvote = async () => {
     }
   }
 
+  /* Wraps rather than overflows: a deep reply on a phone is narrower than a
+     long login and its date */
   &__header {
     display: flex;
-    flex-direction: row;
+    flex-flow: row wrap;
     align-items: center;
     margin-bottom: 8px;
 
@@ -542,6 +544,7 @@ const downvote = async () => {
   &__created-at {
     margin-left: 0.5rem;
     color: var(--color-text-secondary);
+    white-space: nowrap;
   }
 
   &__body {
