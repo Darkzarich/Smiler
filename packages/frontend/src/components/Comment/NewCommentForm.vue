@@ -109,6 +109,7 @@ const createComment = async () => {
 
     const newComment: Comment = {
       ...data,
+      children: [],
       rated: {
         isRated: false,
         negative: false,

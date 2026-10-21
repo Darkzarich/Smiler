@@ -41,13 +41,14 @@ export interface CreateCommentRequest {
   body: string;
 }
 
-export type CreateCommentResponse = Comment;
+/** One comment, not a node of the tree: it has no `children` */
+export type CreateCommentResponse = Omit<Comment, 'children'>;
 
 export interface UpdateCommentRequest {
   body: string;
 }
 
-export type UpdateCommentResponse = Comment;
+export type UpdateCommentResponse = Omit<Comment, 'children'>;
 
 /** The emptied comment when it had replies, which keeps its place */
 export type DeleteCommentResponse = { ok: true } | Comment;

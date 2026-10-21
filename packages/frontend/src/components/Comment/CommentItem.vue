@@ -288,6 +288,7 @@ const handleReply = async () => {
 
     const newComment: Comment = {
       ...data,
+      children: [],
       rated: {
         isRated: false,
         negative: false,

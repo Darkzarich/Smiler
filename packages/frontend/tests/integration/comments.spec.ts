@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import { expect } from '@playwright/test';
 import { subMinutes } from 'date-fns';
+import { omit } from 'lodash';
 import test from './page-objects';
 import mockDate from './utils/mock-date';
 import createRandomAuth from '@factory/auth';
@@ -106,7 +107,7 @@ test('Posts a new comment to a post', async ({
   const newComment = createRandomComment();
 
   Api.routes.comments.createComment.mock({
-    body: newComment,
+    body: omit(newComment, 'children'),
   });
 
   await SinglePostPage.goto(post.slug);
@@ -171,7 +172,6 @@ test.describe('Replies', () => {
     Api.routes.comments.createComment.mock({
       body: {
         body: newReplyText,
-        children: [],
         _id: newReplyId,
         parent: comment._id,
       },
@@ -331,7 +331,6 @@ test.describe('Deep threads', () => {
       body: {
         _id: 'deep-reply',
         body: '<p>deep reply</p>',
-        children: [],
         parent: storedUnder._id,
         replyTo: { _id: answered._id, login: answered.author.login },
       },
@@ -833,7 +832,7 @@ test.describe('Editing or deleting a comment', () => {
     Api.routes.comments.updateComment.mock({
       status: 200,
       body: {
-        ...currentUserComment,
+        ...omit(currentUserComment, 'children'),
         body: editCommentText,
       },
     });
