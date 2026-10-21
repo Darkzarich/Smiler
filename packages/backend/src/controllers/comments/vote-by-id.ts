@@ -2,7 +2,10 @@ import type { Request, Response } from 'express';
 import { UserModel } from '@models/User';
 import { RateModel, RateTargetModel } from '@models/Rate';
 import { CommentModel, Comment } from '@models/Comment';
-import { COMMENT_RATE_VALUE } from '@constants/index';
+import {
+  COMMENT_AUTHOR_RATING_SHARE,
+  COMMENT_RATE_VALUE,
+} from '@constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import type { VoteBody } from '@validators/common';
@@ -63,7 +66,11 @@ export async function voteById(
     ),
     UserModel.updateOne(
       { _id: targetComment.author },
-      { $inc: { rating: rateChange.ratingDelta } },
+      {
+        $inc: {
+          rating: rateChange.ratingDelta * COMMENT_AUTHOR_RATING_SHARE,
+        },
+      },
     ),
   ]);
 

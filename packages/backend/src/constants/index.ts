@@ -41,7 +41,10 @@ export const POST_MAX_LIMIT = 15;
 export const POST_MAX_IMAGE_HEIGHT = 640;
 export const POST_MAX_IMAGE_WIDTH = 360;
 
-export const COMMENT_RATE_VALUE = 0.5;
+export const COMMENT_RATE_VALUE = 1;
+/** A comment's author gets this share of what a vote moves the comment by. Before,
+ * the comment got 0.5 too, and showed halves; see migrations/20261021-*. */
+export const COMMENT_AUTHOR_RATING_SHARE = 0.5;
 export const COMMENT_TIME_TO_UPDATE = minutesToMilliseconds(10);
 export const COMMENT_MAX_LIMIT = 30;
 export const COMMENT_MAX_BODY_LENGTH = 10000;

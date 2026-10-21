@@ -8,6 +8,7 @@ import slugLib from 'slug';
 import Config from '@config/index';
 import {
   BASE_UPLOAD_FOLDER,
+  COMMENT_AUTHOR_RATING_SHARE,
   COMMENT_RATE_VALUE,
   POST_RATE_VALUE,
 } from '@constants/index';
@@ -439,16 +440,16 @@ function castVotes(
     voter: SeedUser,
     negative: boolean,
   ) => {
-    const value =
-      targetModel === RateTargetModel.POST
-        ? POST_RATE_VALUE
-        : COMMENT_RATE_VALUE;
+    const isPost = targetModel === RateTargetModel.POST;
+    const value = isPost ? POST_RATE_VALUE : COMMENT_RATE_VALUE;
     const delta = negative ? -value : value;
     const createdAt = randomDateBetween(random, target.createdAt, now);
 
     // eslint-disable-next-line no-param-reassign
     target.rating += delta;
-    usersById.get(target.author.toString())!.rating += delta;
+    usersById.get(target.author.toString())!.rating += isPost
+      ? delta
+      : delta * COMMENT_AUTHOR_RATING_SHARE;
     rates.push({
       user: voter._id,
       target: target._id,

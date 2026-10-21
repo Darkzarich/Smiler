@@ -1,5 +1,8 @@
 import request from 'supertest';
-import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
+import {
+  COMMENT_AUTHOR_RATING_SHARE,
+  COMMENT_TIME_TO_UPDATE,
+} from '@constants/index';
 import { signUpRequest } from '@test-utils/request-auth';
 import { PostModel } from '@models/Post';
 import { CommentModel } from '@models/Comment';
@@ -176,7 +179,9 @@ describe('DELETE /comments/:id', () => {
 
       const updatedUser = await UserModel.findById(currentUser._id).lean();
 
-      expect(updatedUser!.rating).toBe(currentUser.rating - comment.rating);
+      expect(updatedUser!.rating).toBe(
+        currentUser.rating - comment.rating * COMMENT_AUTHOR_RATING_SHARE,
+      );
     });
 
     it('Should delete all rates for the comment after the comment is deleted', async () => {
@@ -285,7 +290,9 @@ describe('DELETE /comments/:id', () => {
 
       const updatedUser = await UserModel.findById(currentUser._id).lean();
 
-      expect(updatedUser!.rating).toBe(currentUser.rating - comment.rating);
+      expect(updatedUser!.rating).toBe(
+        currentUser.rating - comment.rating * COMMENT_AUTHOR_RATING_SHARE,
+      );
     });
 
     it('Should delete all rates for the comment after the comment is deleted', async () => {

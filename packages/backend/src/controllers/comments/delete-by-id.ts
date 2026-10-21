@@ -2,7 +2,10 @@ import type { Request, Response } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
 import { CommentModel } from '@models/Comment';
 import { PostModel } from '@models/Post';
-import { COMMENT_TIME_TO_UPDATE } from '@constants/index';
+import {
+  COMMENT_AUTHOR_RATING_SHARE,
+  COMMENT_TIME_TO_UPDATE,
+} from '@constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import type { CommentIdParams } from '@validators/comments';
@@ -39,7 +42,7 @@ export async function deleteById(req: Request<CommentIdParams>, res: Response) {
       }).lean({ autopopulate: true }),
       UserModel.updateOne(
         { _id: comment.author },
-        { $inc: { rating: -comment.rating } },
+        { $inc: { rating: -comment.rating * COMMENT_AUTHOR_RATING_SHARE } },
       ),
       RateModel.deleteMany({ target: id }),
     ]);
@@ -62,7 +65,7 @@ export async function deleteById(req: Request<CommentIdParams>, res: Response) {
     }),
     UserModel.updateOne(
       { _id: comment.author },
-      { $inc: { rating: -comment.rating } },
+      { $inc: { rating: -comment.rating * COMMENT_AUTHOR_RATING_SHARE } },
     ),
     RateModel.deleteMany({ target: id }),
   ]);

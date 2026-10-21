@@ -9,7 +9,10 @@ import {
 } from '@test-data-generators';
 import { signUpRequest } from '@test-utils/request-auth';
 import { ERRORS } from '@errors';
-import { COMMENT_RATE_VALUE } from '@constants/index';
+import {
+  COMMENT_AUTHOR_RATING_SHARE,
+  COMMENT_RATE_VALUE,
+} from '@constants/index';
 
 describe('DELETE /comments/:id/vote', () => {
   it('Should return status 401 and an expected message if user is not signed in', async () => {
@@ -166,8 +169,8 @@ describe('DELETE /comments/:id/vote', () => {
 
       expect(commentVotedFor!.rating).toBe(
         isNegative
-          ? otherUser.rating + COMMENT_RATE_VALUE
-          : otherUser.rating - COMMENT_RATE_VALUE,
+          ? otherUser.rating + COMMENT_RATE_VALUE * COMMENT_AUTHOR_RATING_SHARE
+          : otherUser.rating - COMMENT_RATE_VALUE * COMMENT_AUTHOR_RATING_SHARE,
       );
     },
   );

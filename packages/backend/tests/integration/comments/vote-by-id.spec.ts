@@ -9,7 +9,10 @@ import {
 } from '@test-data-generators';
 import { signUpRequest } from '@test-utils/request-auth';
 import { ERRORS } from '@errors';
-import { COMMENT_RATE_VALUE } from '@constants/index';
+import {
+  COMMENT_AUTHOR_RATING_SHARE,
+  COMMENT_RATE_VALUE,
+} from '@constants/index';
 
 type SignedInUser = Awaited<ReturnType<typeof signUpRequest>>['currentUser'];
 
@@ -198,7 +201,9 @@ describe('PUT /comments/:id/vote', () => {
 
         const rateValue = isNegative ? -COMMENT_RATE_VALUE : COMMENT_RATE_VALUE;
 
-        expect(otherUser.rating).toBe(updatedOtherUser!.rating - rateValue);
+        expect(otherUser.rating).toBe(
+          updatedOtherUser!.rating - rateValue * COMMENT_AUTHOR_RATING_SHARE,
+        );
       },
     );
 
@@ -223,6 +228,32 @@ describe('PUT /comments/:id/vote', () => {
       expect(response.body.rating).toBe(
         otherUserComment.rating + -COMMENT_RATE_VALUE,
       );
+    });
+
+    it('Should move the comment by a whole point and its author by half of it', async () => {
+      const { sessionCookie, csrfToken } = await signUpRequest(global.app);
+
+      const otherUser = await UserModel.create(
+        generateRandomUser({ rating: 10 }),
+      );
+
+      const otherUserComment = await CommentModel.create(
+        generateRandomComment({
+          author: otherUser.id,
+          rating: 3,
+        }),
+      );
+
+      const response = await request(global.app)
+        .put(`/api/comments/${otherUserComment._id}/vote`)
+        .send({ negative: false })
+        .set('Cookie', sessionCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      const updatedOtherUser = await UserModel.findById(otherUser._id).lean();
+
+      expect(response.body.rating).toBe(4);
+      expect(updatedOtherUser!.rating).toBe(10.5);
     });
   });
 
@@ -307,7 +338,10 @@ describe('PUT /comments/:id/vote', () => {
 
         const rateValue = isNegative ? -COMMENT_RATE_VALUE : COMMENT_RATE_VALUE;
 
-        expect(otherUser.rating).toBe(updatedOtherUser!.rating - rateValue * 2);
+        expect(otherUser.rating).toBe(
+          updatedOtherUser!.rating -
+            rateValue * 2 * COMMENT_AUTHOR_RATING_SHARE,
+        );
       },
     );
 
