@@ -12,7 +12,10 @@ import { Post } from '@models/Post';
 import { isAuthorPopulated, PopulatedAuthor, User } from '@models/User';
 import type { RatedTargets } from '@models/Rate';
 
-@index({ post: 1 })
+// A post's page of top-level comments, in rating order, straight off the index
+@index({ post: 1, parent: 1, rating: -1 })
+// What $graphLookup follows to find the replies
+@index({ parent: 1 })
 @modelOptions({
   schemaOptions: {
     timestamps: true,
@@ -30,8 +33,9 @@ export class Comment {
   @prop({ ref: () => Post, required: true })
   public post!: Ref<Post>;
 
-  // TODO: Come up with a better solution for this autopopulate
-  @prop({ ref: () => Comment, default: [], autopopulate: { maxDepth: 20 } })
+  /** Still written so that the previous release can be rolled back to, but no longer read:
+   * replies are found through `parent`, and old documents hold ids of replies deleted since. */
+  @prop({ ref: () => Comment, default: [] })
   public children!: Ref<Comment>[];
 
   @prop({ ref: () => Comment })
@@ -58,7 +62,6 @@ export interface LeanComment
   > {
   _id: Types.ObjectId;
   post: Types.ObjectId;
-  children: LeanComment[];
   parent?: Types.ObjectId;
   author: Types.ObjectId | PopulatedAuthor;
 }
@@ -70,7 +73,6 @@ export function commentToResponse(
   if (comment.deleted) {
     return {
       _id: comment._id,
-      children: comment.children ?? [],
       deleted: true,
       parent: comment.parent,
       createdAt: comment.createdAt,
@@ -83,7 +85,6 @@ export function commentToResponse(
     _id: comment._id,
     body: comment.body,
     author: isAuthorPopulated(comment.author) ? comment.author : null,
-    children: comment.children ?? [],
     parent: comment.parent,
     rating: comment.rating,
     createdAt: comment.createdAt,
@@ -100,6 +101,8 @@ export function commentToResponse(
   };
 }
 
-export type CommentResponse = ReturnType<typeof commentToResponse>;
+export type CommentResponse = ReturnType<typeof commentToResponse> & {
+  children: CommentResponse[];
+};
 
 export const CommentModel = getModelForClass(Comment);

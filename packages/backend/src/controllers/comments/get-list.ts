@@ -1,11 +1,12 @@
 import type { Request, Response } from 'express';
+import type { Types } from 'mongoose';
 import {
   CommentModel,
   LeanComment,
   commentToResponse,
   CommentResponse,
 } from '@models/Comment';
-import { UserModel } from '@models/User';
+import { UserModel, type PopulatedAuthor } from '@models/User';
 import { RateModel, RateTargetModel, type RatedTargets } from '@models/Rate';
 import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
@@ -17,36 +18,80 @@ interface GetListResponse extends PaginationResponse {
   comments: CommentResponse[];
 }
 
-function fillWithRatedRecursive({
-  comments,
-  ratedTargets,
-}: {
-  comments: LeanComment[];
-  ratedTargets?: RatedTargets;
-}) {
-  if (!comments) {
+/** One round trip however deep the threads go: populating `children` level by
+ * level took two queries per level, and stopped at 20 levels. */
+async function findReplies(rootIds: Types.ObjectId[]) {
+  if (rootIds.length === 0) {
     return [];
   }
 
-  return comments.map((comment) => {
-    const commentWithUser = commentToResponse(comment, ratedTargets);
+  const replies = await CommentModel.aggregate<LeanComment>([
+    { $match: { _id: { $in: rootIds } } },
+    {
+      $graphLookup: {
+        from: CommentModel.collection.name,
+        startWith: '$_id',
+        connectFromField: '_id',
+        connectToField: 'parent',
+        as: 'reply',
+      },
+    },
+    { $unwind: '$reply' },
+    { $replaceRoot: { newRoot: '$reply' } },
+    { $project: { children: 0 } },
+  ]);
 
-    if (commentWithUser.children && commentWithUser.children.length > 0) {
-      commentWithUser.children = fillWithRatedRecursive({
-        comments: comment.children ?? [],
-        ratedTargets,
-      }) as unknown as typeof commentWithUser.children;
-    }
-
-    return commentWithUser;
-  });
+  // The order they were pushed onto `children` in: an id starts with its creation time
+  return replies.sort((a, b) =>
+    a._id.toString().localeCompare(b._id.toString()),
+  );
 }
 
-function collectCommentIds(comments: LeanComment[]): string[] {
-  return comments.flatMap((comment) => [
-    comment._id.toString(),
-    ...collectCommentIds(comment.children ?? []),
-  ]);
+async function findAuthors(comments: LeanComment[]) {
+  const authorIds = comments
+    .filter((comment) => !comment.deleted)
+    .map((comment) => comment.author);
+
+  const authors = await UserModel.find({ _id: { $in: authorIds } })
+    .select({ login: 1, avatar: 1 })
+    .lean<PopulatedAuthor[]>();
+
+  return new Map(authors.map((author) => [author._id.toString(), author]));
+}
+
+function buildTree({
+  roots,
+  replies,
+  authors,
+  ratedTargets,
+}: {
+  roots: LeanComment[];
+  replies: LeanComment[];
+  authors: Map<string, PopulatedAuthor>;
+  ratedTargets?: RatedTargets;
+}) {
+  const nodes = new Map<string, CommentResponse>();
+
+  for (const comment of [...roots, ...replies]) {
+    nodes.set(comment._id.toString(), {
+      ...commentToResponse(
+        {
+          ...comment,
+          author: authors.get(comment.author.toString()) ?? comment.author,
+        },
+        ratedTargets,
+      ),
+      children: [],
+    });
+  }
+
+  for (const reply of replies) {
+    nodes
+      .get(reply.parent!.toString())
+      ?.children.push(nodes.get(reply._id.toString())!);
+  }
+
+  return roots.map((root) => nodes.get(root._id.toString())!);
 }
 
 export async function getList(
@@ -75,24 +120,30 @@ export async function getList(
     query.author = foundAuthor._id.toString();
   }
 
-  const foundComments = await CommentModel.find(query)
+  const foundRoots = await CommentModel.find(query)
+    .select({ children: 0 })
     .sort({ rating: -1 })
     .skip(offset)
     .limit(limit + PAGE_LOOKAHEAD)
-    .lean({ autopopulate: true });
+    .lean<LeanComment[]>();
 
-  const { items: comments, hasNextPage } = toPage(foundComments, limit);
+  const { items: roots, hasNextPage } = toPage(foundRoots, limit);
 
-  const leanComments = comments as LeanComment[];
+  const replies = await findReplies(roots.map((root) => root._id));
 
-  const ratedTargets = await RateModel.findRatedTargets({
-    userId,
-    targetIds: collectCommentIds(leanComments),
-    targetModel: RateTargetModel.COMMENT,
-  });
+  const comments = [...roots, ...replies];
+
+  const [authors, ratedTargets] = await Promise.all([
+    findAuthors(comments),
+    RateModel.findRatedTargets({
+      userId,
+      targetIds: comments.map((comment) => comment._id.toString()),
+      targetModel: RateTargetModel.COMMENT,
+    }),
+  ]);
 
   sendSuccess(res, {
-    comments: fillWithRatedRecursive({ comments: leanComments, ratedTargets }),
+    comments: buildTree({ roots, replies, authors, ratedTargets }),
     hasNextPage,
   });
 }

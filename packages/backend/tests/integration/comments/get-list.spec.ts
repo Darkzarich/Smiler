@@ -1,4 +1,5 @@
 import request from 'supertest';
+import { Types } from 'mongoose';
 import { signUpRequest } from '@test-utils/request-auth';
 import { PostModel } from '@models/Post';
 import { CommentModel } from '@models/Comment';
@@ -279,6 +280,98 @@ describe('GET /comments', () => {
       ],
       hasNextPage: false,
     });
+  });
+
+  it('Should return every reply of a thread 25 levels deep, with its author and vote', async () => {
+    const { sessionCookie, csrfToken, currentUser } = await signUpRequest(
+      global.app,
+    );
+
+    const post = await PostModel.create(generateRandomPost());
+
+    const author = await UserModel.create(generateRandomUser());
+
+    const ids = Array.from({ length: 25 }, () => new Types.ObjectId());
+
+    await CommentModel.insertMany(
+      ids.map((_id, level) => ({
+        ...generateRandomComment({
+          author: author._id,
+          post: post.id,
+          body: `level ${level + 1}`,
+          parent: ids[level - 1],
+          children: ids.slice(level + 1, level + 2),
+        }),
+        _id,
+      })),
+    );
+
+    await RateModel.create(
+      generateRate({
+        user: currentUser._id,
+        target: ids.at(-1),
+        negative: false,
+        targetModel: RateTargetModel.COMMENT,
+      }),
+    );
+
+    const response = await request(global.app)
+      .get(`/api/comments?post=${post.id}`)
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrfToken);
+
+    expect(response.status).toBe(200);
+
+    const levels = [];
+
+    let [node] = response.body.comments;
+
+    while (node) {
+      levels.push(node);
+      [node] = node.children;
+    }
+
+    expect(levels.map((level) => level.body)).toEqual(
+      ids.map((_id, level) => `level ${level + 1}`),
+    );
+    expect(levels.every((level) => level.author?.login === author.login)).toBe(
+      true,
+    );
+    expect(levels.at(-1).rated).toEqual({ isRated: true, negative: false });
+  });
+
+  it('Should list the replies to a comment oldest first', async () => {
+    const post = await PostModel.create(generateRandomPost());
+
+    const comment = await CommentModel.create(
+      generateRandomComment({ post: post.id }),
+    );
+
+    const replies = await CommentModel.insertMany(
+      [3, 2, 1].map((minutesAgo) =>
+        generateRandomComment({
+          post: post.id,
+          parent: comment._id,
+          createdAt: new Date(Date.now() - minutesAgo * 60_000),
+        }),
+      ),
+    );
+
+    await CommentModel.updateOne(
+      { _id: comment._id },
+      { $set: { children: replies.map((reply) => reply._id) } },
+    );
+
+    const response = await request(global.app).get(
+      `/api/comments?post=${post.id}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(
+      response.body.comments[0].children.map(
+        (reply: { _id: string }) => reply._id,
+      ),
+    ).toEqual(replies.map((reply) => reply._id.toString()));
   });
 
   it('Should sort comments by rating descending', async () => {
