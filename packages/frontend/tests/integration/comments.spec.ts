@@ -423,6 +423,34 @@ test.describe('Votes', () => {
     expect(voteRequests).toEqual([]);
   });
 
+  test("Shows the account's votes on the comments on screen once a visitor signs in", async ({
+    SinglePostPage,
+    Comments,
+    AuthPrompt,
+    Api,
+  }) => {
+    Api.routes.auth.getAuth.mock({ body: createRandomAuth() });
+    Api.routes.auth.signIn.mock({ body: createRandomAuth({ isAuth: true }) });
+    Api.routes.posts.getMyVotes.mock({ body: {} });
+    Api.routes.comments.getMyVotes.mock({
+      body: { [notRatedComment._id]: { isRated: true, negative: true } },
+    });
+
+    await SinglePostPage.goto(post.slug);
+    await Comments.downvoteCommentById(notRatedComment._id);
+
+    const lookup = await Api.routes.comments.getMyVotes.waitForRequest({
+      preRequestAction: AuthPrompt.signIn.bind(AuthPrompt),
+    });
+
+    expect(new URL(lookup.url()).searchParams.get('ids')).toBe(
+      notRatedComment._id,
+    );
+    await expect(
+      Comments.getDownvoteBtnById(notRatedComment._id),
+    ).toHaveAttribute('aria-pressed', 'true');
+  });
+
   test('Upvotes a comment', async ({ SinglePostPage, Comments, Api }) => {
     Api.routes.comments.updateRate.mock({
       status: 200,

@@ -378,6 +378,72 @@ test.describe('Post votes', () => {
     expect(voteRequests).toEqual([]);
   });
 
+  test("Shows the account's votes on the posts on screen once a visitor signs in", async ({
+    Api,
+    Post,
+    PostsPage,
+    AuthPrompt,
+  }) => {
+    Api.routes.auth.getAuth.mock({ body: createRandomAuth() });
+    Api.routes.auth.signIn.mock({ body: createRandomAuth({ isAuth: true }) });
+    Api.routes.posts.getMyVotes.mock({
+      body: {
+        [post1._id]: { isRated: true, negative: false },
+        [post2._id]: { isRated: true, negative: true },
+      },
+    });
+
+    await PostsPage.goto(PostsPage.urls.today);
+    await Post.upvotePostById(post1._id);
+
+    const lookup = await Api.routes.posts.getMyVotes.waitForRequest({
+      preRequestAction: AuthPrompt.signIn.bind(AuthPrompt),
+    });
+
+    expect(new URL(lookup.url()).searchParams.get('ids')).toBe(
+      `${post1._id},${post2._id}`,
+    );
+    await expect(Post.getUpvoteBtnById(post1._id)).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await expect(Post.getDownvoteBtnById(post2._id)).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  test('Clears the votes on screen when the user signs out', async ({
+    Api,
+    Post,
+    PostsPage,
+    Menu,
+    CurrentUser,
+  }) => {
+    Api.routes.posts.getToday.mock({
+      body: {
+        hasNextPage: false,
+        posts: [{ ...post1, rated: { isRated: true, negative: false } }],
+      },
+    });
+    Api.routes.auth.logout.mock({ body: { ok: true } });
+
+    // Signing out goes to Home, which is the page already shown
+    await PostsPage.goto(PostsPage.urls.today);
+    await expect(Post.getUpvoteBtnById(post1._id)).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+
+    await Menu.openIfMobile();
+    await CurrentUser.clickLogoutBtn();
+
+    await expect(Post.getUpvoteBtnById(post1._id)).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+  });
+
   test('Upvotes a post', async ({ Api, Post, PostsPage }) => {
     Api.routes.posts.updateRateById.mock({
       status: 200,

@@ -241,6 +241,7 @@ import {
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import { useMediaQuery } from '@/composables/use-media-query';
+import { useOwnVote } from '@/composables/use-own-vote';
 import { POST_RATE_VALUE } from '@/const';
 import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useNotificationsStore } from '@/store/notifications';
@@ -275,6 +276,8 @@ const props = withDefaults(defineProps<Props>(), {
 const post = defineModel<postTypes.Post>('post', {
   required: true,
 });
+
+useOwnVote('post', post);
 
 const router = useRouter();
 

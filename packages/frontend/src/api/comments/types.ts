@@ -58,3 +58,5 @@ export interface UpdateRateByIdRequest {
 }
 
 export type UpdateRateByIdResponse = Comment;
+
+export type GetMyVotesResponse = Record<string, CommentRate>;

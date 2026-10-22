@@ -141,3 +141,5 @@ export interface UpdateRateByIdRequest {
 }
 
 export type UpdateRateByIdResponse = Post;
+
+export type GetMyVotesResponse = Record<string, PostRate>;

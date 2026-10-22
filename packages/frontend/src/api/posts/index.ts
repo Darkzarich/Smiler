@@ -15,6 +15,12 @@ export default {
       params,
     );
   },
+  getMyVotes(ids: string[]) {
+    return apiClient.get<postTypes.GetMyVotesResponse>(
+      `${CONTROLLER_URL}/votes`,
+      { ids: ids.join(',') },
+    );
+  },
   getAll(params: postTypes.GetAllRequest) {
     return apiClient.get<postTypes.GetAllResponse>(
       `${CONTROLLER_URL}/categories/all`,

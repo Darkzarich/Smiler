@@ -193,6 +193,7 @@ import { commentThreadKey, countReplies, flattenReplies } from './thread';
 import type { Comment } from './types';
 import { useVisibleDepth } from './use-visible-depth';
 import { api } from '@/api';
+import { useOwnVote } from '@/composables/use-own-vote';
 import { COMMENT_RATE_VALUE, COMMENT_AUTO_HIDE_LEVEL } from '@/const';
 import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useNotificationsStore } from '@/store/notifications';
@@ -233,6 +234,8 @@ const notificationsStore = useNotificationsStore();
 const authPrompt = useAuthPromptStore();
 
 const comment = ref(props.comment);
+
+useOwnVote('comment', comment);
 
 const isRequesting = ref(false);
 

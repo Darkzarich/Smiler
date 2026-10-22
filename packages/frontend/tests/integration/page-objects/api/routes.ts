@@ -14,6 +14,7 @@ export const routes = {
     getRecent: new Route('/posts/categories/recent', Method.GET),
     getTopThisWeek: new Route('/posts/categories/top-this-week', Method.GET),
     getFeed: new Route('/posts/feed', Method.GET),
+    getMyVotes: new Route('/posts/votes', Method.GET),
     createPost: new Route('/posts', Method.POST),
     uploadAttachment: new Route('/posts/upload', Method.POST),
     uploadAttachmentByUrl: new Route('/posts/upload/url', Method.POST),
@@ -44,6 +45,7 @@ export const routes = {
   },
   comments: {
     getComments: new Route('/comments', Method.GET),
+    getMyVotes: new Route('/comments/votes', Method.GET),
     createComment: new Route('/comments', Method.POST),
     updateComment: new Route('/comments/*', Method.PUT),
     deleteComment: new Route('/comments/*', Method.DELETE),

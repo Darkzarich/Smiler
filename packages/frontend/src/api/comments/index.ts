@@ -10,6 +10,12 @@ export default {
       params,
     );
   },
+  getMyVotes(ids: string[]) {
+    return apiClient.get<commentTypes.GetMyVotesResponse>(
+      `${CONTROLLER_URL}/votes`,
+      { ids: ids.join(',') },
+    );
+  },
   createComment(data: commentTypes.CreateCommentRequest) {
     return apiClient.post<commentTypes.CreateCommentResponse>(
       CONTROLLER_URL,
