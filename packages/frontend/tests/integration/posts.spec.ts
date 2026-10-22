@@ -413,6 +413,98 @@ test.describe('Post votes', () => {
     );
   });
 
+  test.describe('A vote pressed before signing in', () => {
+    test.beforeEach(async ({ Api }) => {
+      Api.routes.auth.getAuth.mock({ body: createRandomAuth() });
+      Api.routes.auth.signIn.mock({
+        body: createRandomAuth({ isAuth: true }),
+      });
+      Api.routes.posts.getMyVotes.mock({ body: {} });
+    });
+
+    test('Is sent once the visitor signs in', async ({
+      Api,
+      Post,
+      PostsPage,
+      AuthPrompt,
+    }) => {
+      Api.routes.posts.updateRateById.mock({
+        body: { ...post1, rating: post1.rating + 1 },
+      });
+
+      await PostsPage.goto(PostsPage.urls.today);
+      await Post.downvotePostById(post1._id);
+
+      const voteRequest = await Api.routes.posts.updateRateById.waitForRequest({
+        preRequestAction: AuthPrompt.signIn.bind(AuthPrompt),
+      });
+
+      expect(voteRequest.url()).toContain(post1._id);
+      expect(voteRequest.postDataJSON()).toEqual({ negative: true });
+      await expect(Post.getDownvoteBtnById(post1._id)).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+    });
+
+    // A resumed vote shows on the arrows in the same task that shows the
+    // lookup's votes, so once those are on screen the arrows have settled
+    test("Doesn't take back the vote the account already had", async ({
+      Api,
+      Post,
+      PostsPage,
+      AuthPrompt,
+    }) => {
+      Api.routes.posts.getMyVotes.mock({
+        body: { [post1._id]: { isRated: true, negative: false } },
+      });
+
+      const wasVoteRemoved =
+        Api.routes.posts.removeRateById.watchIfRequestWasCalled();
+
+      await PostsPage.goto(PostsPage.urls.today);
+      await Post.upvotePostById(post1._id);
+      await AuthPrompt.signIn();
+
+      await expect(Post.getUpvoteBtnById(post1._id)).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      expect(wasVoteRemoved()).toBe(false);
+    });
+
+    test("Isn't sent when the account turns out to be the post's author", async ({
+      Api,
+      Post,
+      PostsPage,
+      AuthPrompt,
+    }) => {
+      Api.routes.auth.signIn.mock({
+        body: createRandomAuth({ isAuth: true, _id: post1.author._id }),
+      });
+      Api.routes.posts.getMyVotes.mock({
+        body: { [post2._id]: { isRated: true, negative: true } },
+      });
+
+      const wasVoteSent =
+        Api.routes.posts.updateRateById.watchIfRequestWasCalled();
+
+      await PostsPage.goto(PostsPage.urls.today);
+      await Post.upvotePostById(post1._id);
+      await AuthPrompt.signIn();
+
+      await expect(Post.getDownvoteBtnById(post2._id)).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      await expect(Post.getUpvoteBtnById(post1._id)).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      );
+      expect(wasVoteSent()).toBe(false);
+    });
+  });
+
   test('Clears the votes on screen when the user signs out', async ({
     Api,
     Post,

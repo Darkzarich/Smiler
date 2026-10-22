@@ -235,7 +235,7 @@ const authPrompt = useAuthPromptStore();
 
 const comment = ref(props.comment);
 
-useOwnVote('comment', comment);
+const { whenOwnVoteShown } = useOwnVote('comment', comment);
 
 const isRequesting = ref(false);
 
@@ -404,14 +404,33 @@ const handleRemoveVote = async () => {
   }
 };
 
+/** Waits for the account's own vote first: pressing ▲ on a comment the account
+ * has already upvoted would otherwise take that vote back */
+async function voteAfterSignIn({ negative }: { negative: boolean }) {
+  if (!(await authPrompt.open({ title: 'Sign in to vote' }))) {
+    return;
+  }
+
+  await whenOwnVoteShown();
+
+  const { rated, author } = comment.value;
+  const isOwnComment = author._id === userStore.userId;
+  const isVotedSo = rated.isRated && Boolean(rated.negative) === negative;
+
+  if (!userStore.user || isOwnComment || isVotedSo) {
+    return;
+  }
+
+  await (negative ? downvote : upvote)();
+}
+
 const upvote = async () => {
   if (isRequesting.value) {
     return;
   }
 
-  // Not resumed after sign in: this comment was loaded without the account's vote
   if (!userStore.user) {
-    void authPrompt.open({ title: 'Sign in to vote' });
+    void voteAfterSignIn({ negative: false });
 
     return;
   }
@@ -460,9 +479,8 @@ const downvote = async () => {
     return;
   }
 
-  // Not resumed after sign in: this comment was loaded without the account's vote
   if (!userStore.user) {
-    void authPrompt.open({ title: 'Sign in to vote' });
+    void voteAfterSignIn({ negative: true });
 
     return;
   }

@@ -40,6 +40,12 @@ function watchItems(target: 'post' | 'comment', ids: string[]) {
   return items;
 }
 
+function watchItem(target: 'post' | 'comment', _id: string) {
+  const item = ref({ _id, rated: notRated() });
+
+  return { item, ...scope.run(() => useOwnVote(target, item))! };
+}
+
 describe('useOwnVote', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -138,5 +144,32 @@ describe('useOwnVote', () => {
     await flushPromises();
 
     expect(item.value.rated).toEqual({ isRated: false });
+  });
+
+  it('tells when an item shows the vote of the user who has just signed in', async () => {
+    let answer: (votes: Record<string, Rated>) => void = () => {};
+
+    vi.mocked(api.posts.getMyVotes).mockReturnValue(
+      new Promise((resolve) => {
+        answer = resolve;
+      }),
+    );
+
+    const { item, whenOwnVoteShown } = watchItem('post', 'a');
+    const onShown = vi.fn();
+
+    useUserStore().setUser(user);
+    void whenOwnVoteShown().then(() => onShown(item.value.rated));
+    await flushPromises();
+
+    expect(onShown).not.toHaveBeenCalled();
+
+    answer({ a: { isRated: true, negative: false } });
+    await flushPromises();
+
+    expect(onShown).toHaveBeenCalledExactlyOnceWith({
+      isRated: true,
+      negative: false,
+    });
   });
 });

@@ -451,6 +451,34 @@ test.describe('Votes', () => {
     ).toHaveAttribute('aria-pressed', 'true');
   });
 
+  test('Sends a vote pressed before signing in once the visitor signs in', async ({
+    SinglePostPage,
+    Comments,
+    AuthPrompt,
+    Api,
+  }) => {
+    Api.routes.auth.getAuth.mock({ body: createRandomAuth() });
+    Api.routes.auth.signIn.mock({ body: createRandomAuth({ isAuth: true }) });
+    Api.routes.posts.getMyVotes.mock({ body: {} });
+    Api.routes.comments.getMyVotes.mock({ body: {} });
+    Api.routes.comments.updateRate.mock({
+      body: { ...notRatedComment, rating: notRatedComment.rating + 1 },
+    });
+
+    await SinglePostPage.goto(post.slug);
+    await Comments.upvoteCommentById(notRatedComment._id);
+
+    const voteRequest = await Api.routes.comments.updateRate.waitForRequest({
+      preRequestAction: AuthPrompt.signIn.bind(AuthPrompt),
+    });
+
+    expect(voteRequest.url()).toContain(notRatedComment._id);
+    expect(voteRequest.postDataJSON()).toEqual({ negative: false });
+    await expect(
+      Comments.getUpvoteBtnById(notRatedComment._id),
+    ).toHaveAttribute('aria-pressed', 'true');
+  });
+
   test('Upvotes a comment', async ({ SinglePostPage, Comments, Api }) => {
     Api.routes.comments.updateRate.mock({
       status: 200,

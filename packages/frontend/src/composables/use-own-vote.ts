@@ -1,5 +1,6 @@
+import { until } from '@vueuse/core';
 import { chunk } from 'lodash-es';
-import { watch, type Ref } from 'vue';
+import { ref, watch, type Ref } from 'vue';
 import { api } from '@/api';
 import { useUserStore } from '@/store/user';
 
@@ -74,20 +75,36 @@ export function useOwnVote<T extends Votable>(
 ) {
   const userStore = useUserStore();
 
+  /** Whose vote `item` shows */
+  const shownFor = ref(userStore.userId);
+
   watch(
     () => userStore.userId,
     async (userId) => {
       if (!userId) {
         item.value = { ...item.value, rated: { isRated: false } };
+        shownFor.value = userId;
 
         return;
       }
 
       const rated = await lookUpOwnVote(target, item.value._id);
 
-      if (rated && userStore.userId === userId) {
+      if (userStore.userId !== userId) {
+        return;
+      }
+
+      if (rated) {
         item.value = { ...item.value, rated };
       }
+
+      // Even when the lookup failed: what the item shows is all there is to go on
+      shownFor.value = userId;
     },
   );
+
+  return {
+    whenOwnVoteShown: () =>
+      until(() => shownFor.value === userStore.userId).toBe(true),
+  };
 }

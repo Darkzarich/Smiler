@@ -277,7 +277,7 @@ const post = defineModel<postTypes.Post>('post', {
   required: true,
 });
 
-useOwnVote('post', post);
+const { whenOwnVoteShown } = useOwnVote('post', post);
 
 const router = useRouter();
 
@@ -380,9 +380,8 @@ const upvote = async (id: string) => {
     return;
   }
 
-  // Not resumed after sign in: this post was loaded without the account's vote
   if (!user.value) {
-    void authPrompt.open({ title: 'Sign in to vote' });
+    void voteAfterSignIn({ negative: false });
 
     return;
   }
@@ -432,9 +431,8 @@ const downvote = async (id: string) => {
     return;
   }
 
-  // Not resumed after sign in: this post was loaded without the account's vote
   if (!user.value) {
-    void authPrompt.open({ title: 'Sign in to vote' });
+    void voteAfterSignIn({ negative: true });
 
     return;
   }
@@ -478,6 +476,25 @@ const downvote = async (id: string) => {
     isRequesting.value = false;
   }
 };
+
+/** Waits for the account's own vote first: pressing ▲ on a post the account
+ * has already upvoted would otherwise take that vote back */
+async function voteAfterSignIn({ negative }: { negative: boolean }) {
+  if (!(await authPrompt.open({ title: 'Sign in to vote' }))) {
+    return;
+  }
+
+  await whenOwnVoteShown();
+
+  const isOwnPost = post.value.author._id === user.value?._id;
+  const isVotedSo = negative ? isDownvoted.value : isUpvoted.value;
+
+  if (!user.value || isOwnPost || isVotedSo) {
+    return;
+  }
+
+  await (negative ? downvote : upvote)(post.value._id);
+}
 
 const deletePost = async (id: string) => {
   await api.posts.deletePostById({
