@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { createReusableTemplate } from '@vueuse/core';
+import { createReusableTemplate, until } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { computed, ref, watch } from 'vue';
 import { api } from '@/api';
@@ -107,6 +107,33 @@ watch(
   },
 );
 
+/** Whose follow `profileUser.isFollowed` says: it comes with the session the
+ * profile was loaded with */
+const loadedFor = ref(userStore.userId);
+
+watch(
+  () => userStore.userId,
+  async (userId) => {
+    if (userId) {
+      try {
+        const reloaded = await api.users.getUserProfile(
+          profileUser.value.login,
+        );
+
+        if (userStore.userId === userId) {
+          profileUser.value = reloaded;
+        }
+      } catch {
+        // The API client has told the user; the button keeps what it shows
+      }
+    }
+
+    if (userStore.userId === userId) {
+      loadedFor.value = userId;
+    }
+  },
+);
+
 async function follow() {
   if (isRequesting.value) {
     return;
@@ -150,10 +177,9 @@ async function followAfterSignIn() {
     return;
   }
 
-  // Loaded without a session, so it says nothing about the account's follows
-  profileUser.value = await api.users.getUserProfile(profileUser.value.login);
+  await until(() => loadedFor.value === userStore.userId).toBe(true);
 
-  if (!isSameUser.value && !isFollowed.value) {
+  if (currentUser.value && !isSameUser.value && !isFollowed.value) {
     await follow();
   }
 }

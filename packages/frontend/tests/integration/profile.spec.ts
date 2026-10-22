@@ -337,6 +337,36 @@ test.describe('Follows and unfollow', () => {
     await expect(ProfilePage.unfollowBtn).toBeVisible();
   });
 
+  test("Shows the account's follow once a visitor signs in from the sidebar", async ({
+    ProfilePage,
+    Menu,
+    AuthForm,
+    Api,
+  }) => {
+    Api.routes.auth.getAuth.mock({ body: createRandomAuth() });
+    Api.routes.users.getUserProfile.mock({
+      body: { ...testUser, isFollowed: false },
+    });
+
+    await ProfilePage.goto(testUser.login);
+    await expect(ProfilePage.followBtn).toBeVisible();
+
+    // What the profile says once a session exists
+    await Api.routes.users.getUserProfile.mock({
+      body: { ...testUser, isFollowed: true },
+    });
+    await Api.routes.auth.signIn.mock({
+      body: createRandomAuth({ isAuth: true }),
+    });
+
+    await Menu.openIfMobile();
+    await AuthForm.signInEmail.fill('visitor@example.com');
+    await AuthForm.signInPassword.fill('password');
+    await AuthForm.clickSignInBtn();
+
+    await expect(ProfilePage.unfollowBtn).toBeVisible();
+  });
+
   test('Does not follow again after sign in when the account already follows', async ({
     page: currentPage,
     ProfilePage,
