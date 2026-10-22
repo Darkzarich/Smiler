@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { VOTE_LOOKUP_MAX_IDS } from '@constants/index';
 import { ERRORS } from '@errors';
 import { apiSchema } from '@libs/openapi/registry';
 import { decodeCursor, type PageCursor } from '@utils/pagination';
@@ -253,3 +254,28 @@ export const voteBodySchema = apiSchema(
 );
 
 export type VoteBody = z.infer<typeof voteBodySchema>;
+
+/** One comma separated parameter rather than a repeated one, so that a hundred
+ * ids still fit in a URL. */
+export const voteLookupQuerySchema = z.object({
+  ids: z
+    .string({ error: ERRORS.VOTE_LOOKUP_IDS_REQUIRED })
+    .transform((value) => value.split(','))
+    .pipe(
+      z
+        .array(objectId())
+        .max(VOTE_LOOKUP_MAX_IDS, ERRORS.VOTE_LOOKUP_TOO_MANY_IDS),
+    )
+    .describe(`Up to ${VOTE_LOOKUP_MAX_IDS} ids, separated by commas`),
+});
+
+export type VoteLookupQuery = z.infer<typeof voteLookupQuerySchema>;
+
+export const votesSchema = apiSchema(
+  'Votes',
+  z
+    .record(z.string(), ratedSchema)
+    .describe('How you voted on each id asked about, keyed by that id'),
+);
+
+export type Votes = z.infer<typeof votesSchema>;

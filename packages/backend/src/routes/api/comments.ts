@@ -2,6 +2,7 @@ import {
   create,
   deleteById,
   getList,
+  getMyVotes,
   unvoteById,
   updateById,
   voteById,
@@ -13,7 +14,11 @@ import {
   voteRateLimiter,
   writeRateLimiter,
 } from '@middlewares/rate-limiter';
-import { voteBodySchema } from '@validators/common';
+import {
+  voteBodySchema,
+  voteLookupQuerySchema,
+  votesSchema,
+} from '@validators/common';
 import {
   commentCreateBodySchema,
   commentDeleteResultSchema,
@@ -55,6 +60,20 @@ api.get({
     404: { description: 'No user with that id, when `author` is given' },
   },
   handler: getList,
+});
+
+api.get({
+  path: '/votes',
+  summary: 'Your votes on a set of comments',
+  description:
+    'For a page loaded before you signed in, whose comments came back without your votes.',
+  auth: true,
+  rateLimiter: apiRateLimiter,
+  request: { query: voteLookupQuerySchema },
+  responses: {
+    200: { description: 'Your vote on each of them', schema: votesSchema },
+  },
+  handler: getMyVotes,
 });
 
 api.post({

@@ -6,6 +6,7 @@ import {
   POST_TIME_TO_UPDATE,
   POST_TITLE_MAX_LENGTH,
   USER_MAX_BIO_LENGTH,
+  VOTE_LOOKUP_MAX_IDS,
 } from '@constants/index';
 
 export const ERRORS = {
@@ -37,6 +38,8 @@ export const ERRORS = {
   USER_BIO_MAX_LENGTH_EXCEEDED: `Bio can't be longer than ${USER_MAX_BIO_LENGTH} characters`,
 
   TARGET_IS_NOT_RATED: "It's not yet rated by the current user",
+  VOTE_LOOKUP_IDS_REQUIRED: 'At least one id must be specified',
+  VOTE_LOOKUP_TOO_MANY_IDS: `Can't look up more than ${VOTE_LOOKUP_MAX_IDS} ids at once`,
   AUTHOR_NOT_FOUND: 'Author is not found',
 
   COMMENT_SHOULD_NOT_BE_EMPTY: 'Comment should not be empty',

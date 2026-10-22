@@ -6,6 +6,7 @@ import {
   getBySlug,
   getFeed,
   getListByAuthor,
+  getMyVotes,
   recent,
   search,
   today,
@@ -23,7 +24,12 @@ import {
   voteRateLimiter,
   writeRateLimiter,
 } from '@middlewares/rate-limiter';
-import { okResponseSchema, voteBodySchema } from '@validators/common';
+import {
+  okResponseSchema,
+  voteBodySchema,
+  voteLookupQuerySchema,
+  votesSchema,
+} from '@validators/common';
 import {
   cursorPostListSchema,
   externalImageBodySchema,
@@ -219,6 +225,21 @@ api.post({
     },
   },
   handler: uploadByUrl,
+});
+
+// Before `/:slug`, which would take "votes" for a slug
+api.get({
+  path: '/votes',
+  summary: 'Your votes on a set of posts',
+  description:
+    'For a page loaded before you signed in, whose posts came back without your votes.',
+  auth: true,
+  rateLimiter: apiRateLimiter,
+  request: { query: voteLookupQuerySchema },
+  responses: {
+    200: { description: 'Your vote on each of them', schema: votesSchema },
+  },
+  handler: getMyVotes,
 });
 
 api.get({

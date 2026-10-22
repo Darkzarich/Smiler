@@ -3,6 +3,7 @@ export { deleteById } from './delete-by-id';
 export { getBySlug } from './get-by-slug';
 export { getListByAuthor } from './get-list-by-author';
 export { getFeed } from './get-feed';
+export { getMyVotes } from './get-my-votes';
 export { all } from './categories/all';
 export { blowing } from './categories/blowing';
 export { recent } from './categories/recent';

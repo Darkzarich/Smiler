@@ -41,6 +41,9 @@ export const POST_MAX_LIMIT = 15;
 export const POST_MAX_IMAGE_HEIGHT = 640;
 export const POST_MAX_IMAGE_WIDTH = 360;
 
+/** A long scrolled feed asks for its votes in chunks of this many */
+export const VOTE_LOOKUP_MAX_IDS = 100;
+
 export const COMMENT_RATE_VALUE = 1;
 /** A comment's author gets this share of what a vote moves the comment by. Before,
  * the comment got 0.5 too, and showed halves; see migrations/20261021-*. */

@@ -39,6 +39,22 @@ interface FindRatedTargetsParams {
 
 export type RatedTargets = Map<string, boolean>;
 
+/** How the current user voted on each of `targetIds`, an entry for every one. */
+export function toVotes(targetIds: string[], ratedTargets?: RatedTargets) {
+  return Object.fromEntries(
+    targetIds.map((targetId) => {
+      const negative = ratedTargets?.get(targetId);
+
+      return [
+        targetId,
+        negative === undefined
+          ? { isRated: false }
+          : { isRated: true, negative },
+      ];
+    }),
+  );
+}
+
 type ApplyChangeResult =
   | {
       alreadyRated: true;
