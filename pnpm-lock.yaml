@@ -314,7 +314,7 @@ importers:
         version: 8.70.0(eslint@10.10.0)(typescript@5.9.3)
       '@vitejs/plugin-vue':
         specifier: ^5.2.4
-        version: 5.2.4(vite@6.4.3)(vue@3.5.42)
+        version: 5.2.4(vite@6.4.4)(vue@3.5.42)
       '@vitest/coverage-v8':
         specifier: ^4.1.11
         version: 4.1.11(vitest@4.1.11)
@@ -391,11 +391,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: ^6.4.3
-        version: 6.4.3(@types/node@24.10.1)
+        specifier: ^6.4.4
+        version: 6.4.4(@types/node@24.10.1)
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@types/node@24.10.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@24.1.3)(vite@6.4.3)
+        version: 4.1.11(@types/node@24.10.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@24.1.3)(vite@6.4.4)
       vue-eslint-parser:
         specifier: ^10.4.1
         version: 10.4.1(eslint@10.10.0)
@@ -438,7 +438,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@types/node@24.10.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@24.1.3)(vite@6.4.3)
+        version: 4.1.11(@types/node@24.10.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@24.1.3)(vite@6.4.4)
 
 packages:
 
@@ -4315,14 +4315,14 @@ packages:
     dev: true
     optional: true
 
-  /@vitejs/plugin-vue@5.2.4(vite@6.4.3)(vue@3.5.42):
+  /@vitejs/plugin-vue@5.2.4(vite@6.4.4)(vue@3.5.42):
     resolution: {integrity: sha512-7Yx/SXSOcQq5HiiV3orevHUFn+pmMB4cgbEkDYgnkUWb0WfeQ/wa2yFv6D5ICiCQOVpjA7vYDXrC7AGO8yjDHA==}
     engines: {node: ^18.0.0 || >=20.0.0}
     peerDependencies:
       vite: ^5.0.0 || ^6.0.0
       vue: ^3.2.25
     dependencies:
-      vite: 6.4.3(@types/node@24.10.1)
+      vite: 6.4.4(@types/node@24.10.1)
       vue: 3.5.42(typescript@5.9.3)
     dev: true
 
@@ -4345,7 +4345,7 @@ packages:
       obug: 2.1.4
       std-env: 4.2.0
       tinyrainbow: 3.1.1
-      vitest: 4.1.11(@types/node@24.10.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@24.1.3)(vite@6.4.3)
+      vitest: 4.1.11(@types/node@24.10.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@24.1.3)(vite@6.4.4)
     dev: true
 
   /@vitest/expect@4.1.11:
@@ -4359,7 +4359,7 @@ packages:
       tinyrainbow: 3.1.1
     dev: true
 
-  /@vitest/mocker@4.1.11(vite@6.4.3):
+  /@vitest/mocker@4.1.11(vite@6.4.4):
     resolution: {integrity: sha512-2XJVD55d1o5AZous5CCGKS74g/riOj9odEt2bQpCVZeblHyHdnMeFl4jl0XjU21stf4mbjUkew2eXQZt65g5CQ==}
     peerDependencies:
       msw: ^2.4.9
@@ -4373,7 +4373,7 @@ packages:
       '@vitest/spy': 4.1.11
       estree-walker: 3.0.3
       magic-string: 0.30.21
-      vite: 6.4.3(@types/node@24.10.1)
+      vite: 6.4.4(@types/node@24.10.1)
     dev: true
 
   /@vitest/pretty-format@4.1.11:
@@ -4414,7 +4414,7 @@ packages:
       sirv: 3.0.2
       tinyglobby: 0.2.17
       tinyrainbow: 3.1.1
-      vitest: 4.1.11(@types/node@24.10.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@24.1.3)(vite@6.4.3)
+      vitest: 4.1.11(@types/node@24.10.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@24.1.3)(vite@6.4.4)
     dev: true
 
   /@vitest/utils@4.1.11:
@@ -10063,8 +10063,8 @@ packages:
     engines: {node: '>= 0.8'}
     dev: false
 
-  /vite@6.4.3(@types/node@24.10.1):
-    resolution: {integrity: sha512-NTKlcQjlAK7MlQoyb6LgaqHc8sso/pVyUJYWMws3jg21uTJw/LddqIFPcPqP6PzpgbIcZyKI85sFE4HBrQDA8A==}
+  /vite@6.4.4(@types/node@24.10.1):
+    resolution: {integrity: sha512-xGjU/SyjeNyb0E4KxXBvYz/1C+3JXuujvf2hXNOtnlcE+58o5ajd9N2/n2VhkiJvpCP2qQasnUpx5PXNeI+p1Q==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
@@ -10114,7 +10114,7 @@ packages:
       fsevents: 2.3.3
     dev: true
 
-  /vitest@4.1.11(@types/node@24.10.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@24.1.3)(vite@6.4.3):
+  /vitest@4.1.11(@types/node@24.10.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@24.1.3)(vite@6.4.4):
     resolution: {integrity: sha512-fhACrNXUidIbGSBr5FlbuBkO7VWC1ZyLl0DO4CU2DrQoAPxX84Ysxs+HeGQpii5lZWV1Q4gBZTTu49mF+A6Edw==}
     engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}
     hasBin: true
@@ -10158,7 +10158,7 @@ packages:
       '@types/node': 24.10.1
       '@vitest/coverage-v8': 4.1.11(vitest@4.1.11)
       '@vitest/expect': 4.1.11
-      '@vitest/mocker': 4.1.11(vite@6.4.3)
+      '@vitest/mocker': 4.1.11(vite@6.4.4)
       '@vitest/pretty-format': 4.1.11
       '@vitest/runner': 4.1.11
       '@vitest/snapshot': 4.1.11
@@ -10177,7 +10177,7 @@ packages:
       tinyexec: 1.3.0
       tinyglobby: 0.2.17
       tinyrainbow: 3.1.1
-      vite: 6.4.3(@types/node@24.10.1)
+      vite: 6.4.4(@types/node@24.10.1)
       why-is-node-running: 2.3.0
     transitivePeerDependencies:
       - msw
