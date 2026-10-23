@@ -3,14 +3,14 @@
 ## Project overview
 
 pnpm monorepo — a Reddit-style social platform (MEVN stack).
-Two packages: `packages/backend` (Express 5 + TypeScript + MongoDB/Mongoose, sessions and rate limits in Redis) and `packages/frontend` (Vue 3 + Vite + Pinia).
+Three packages: `packages/backend` (Express 5 + TypeScript + MongoDB/Mongoose, sessions and rate limits in Redis), `packages/frontend` (Vue 3 + Vite + Pinia) and `packages/mongodb-migrator` (the MongoDB migration runner the backend uses, see Migrations below).
 
 ## Common commands
 
 ```bash
 pnpm install                # install all workspace deps
 pnpm dev                    # runs backend + frontend concurrently
-pnpm build                  # builds backend, then frontend
+pnpm build                  # builds the migrator, backend, then frontend
 
 # Linting (the pre-commit hook only lints staged files, this is the whole repo)
 pnpm lint                   # all three passes below, in order
@@ -19,12 +19,18 @@ pnpm lint:code              # oxlint on backend + oxlint, eslint (templates) and
 pnpm lint:types             # tsc --noEmit on both packages
 
 # Testing
-pnpm test                   # backend jest + frontend playwright e2e + frontend vitest
-pnpm test:prepush           # backend jest + frontend vitest unit (what pre-push runs)
+pnpm test                   # migrator vitest + backend jest + frontend playwright e2e + frontend vitest
+pnpm test:prepush           # migrator vitest + backend jest + frontend vitest unit (what pre-push runs)
 
 # Seed data (writes to DB_URL; refuses a non-empty database without --reset)
 pnpm db:seed                # 64 users, 150 posts, comments, votes; sign in as demo@example.com / password
 pnpm db:seed --reset        # wipe users, posts, comments and rates (and those users' uploads) first
+
+# Migrations (against DB_URL; run by hand with the backend stopped)
+pnpm db:migrate status      # applied / baselined / pending / unknown
+pnpm db:migrate up          # apply the pending ones; asks first, --yes skips that
+pnpm db:migrate down        # revert the newest one; asks first
+pnpm db:migrate:create rename user bio  # new migrations/<UTC timestamp>-rename-user-bio.ts
 
 # Benchmarks (needs k6 installed and a backend already running — see Benchmarks below)
 pnpm bench:stores           # what the session and rate limiter stores cost per request
@@ -56,7 +62,7 @@ pnpm bench:stores           # what the session and rate limiter stores cost per 
     to be created decides when it expires.
 - **Seed script**: `scripts/seed/` (`pnpm db:seed`). Builds everything in memory with a seeded
   generator, then `insertMany`s it - `insertMany` keeps the backdated `createdAt`, `create` would not -
-  so ratings, `commentCount`, `followersAmount` and comment `children` must be kept consistent by hand
+  so ratings, `commentCount` and `followersAmount` must be kept consistent by hand
   when a model gains a counter. Pictures are drawn with sharp from SVG (no `<text>`, slim containers
   have no fonts). Content pools live in `content.ts`.
 - Jest runs **without Redis**: the rate limiter is skipped and the session store falls back to
@@ -104,6 +110,47 @@ pnpm bench:stores           # what the session and rate limiter stores cost per 
 - Vue component style: PascalCase component names in templates; blank lines between `<template>`/`<script>`/`<style>` blocks.
 - `vuedraggable@4.1.0` is patched — see `patches/` directory.
 
+## Migrations (`packages/mongodb-migrator`)
+
+A workspace package with no Smiler code in it: a service gives it a connected driver `Db`, its
+`migrations/` folder and its logger. `packages/mongodb-migrator/README.md` is the guide — running
+locally and on Docker Compose, backups, rollback, writing one. The points that bite:
+
+- **Nothing runs a migration automatically.** They are run by hand with the backend stopped. At
+  boot the cluster primary only calls `migrator.check()` before forking: on a database with no
+  migration records and no documents in any collection it records every migration as
+  `baselined` (the current code wrote that data, so it is already in the newest shape), and
+  otherwise it logs `migrations_pending` for anything not run yet. `pnpm db:seed` baselines the
+  same way before it inserts.
+- **A pending `critical: true` migration keeps the backend down**: the primary logs
+  `migrations_critical_pending` and exits 1 without forking. So does a check that fails, since
+  then nothing says whether one is pending. Non-critical pending ones are only a warning.
+- **Records** live in the `migrations` collection as `{ _id, startedAt, finishedAt, stats }`, the
+  shape the old `mongosh` scripts wrote, so databases that ran those see them as applied.
+- **A migration** is `packages/backend/migrations/<YYYYMMDDHHmmss>-<kebab-slug>.ts` (UTC; the
+  first three carry only the date), made with `pnpm db:migrate:create`, exporting
+  `defineMigration({ critical, up, down })`. `critical` is required: `true` when the code that
+  ships with it breaks or damages data on the old shape, with a comment saying why. It uses the
+  plain driver, never the models or app code, must be
+  safe to run twice (no transactions on a standalone MongoDB; a failed one is re-run from the
+  start), returns its stats, and names the collections it touches in its header. `down` is a
+  function or `irreversible('why')`, and must also work on a database where `up` was only
+  baselined. Test it from the old shape through `up` and `down` in
+  `tests/integration/migrations/`.
+- Migrations are compiled into `dist/migrations` and shipped in the image with
+  `dist/scripts/migrate.js`, so production runs them with the backend's compiled scripts:
+  `docker compose run --rm smiler-backend pnpm migrate:status` (also `migrate:up`,
+  `migrate:down`, and `pnpm migrate <command>` for the rest). The image has pnpm baked in through
+  `corepack install`, so these do not download it on every run. Locally, `migrate:dev` and
+  `migrate:create` run the sources through ts-node.
+- The backend imports the package's **compiled** `dist`. `pnpm install` builds it through
+  `prepare`, and the Docker build through `pnpm -r build`. After changing the migrator's own
+  code, run `pnpm --filter mongodb-migrator build`, or the backend keeps the old one.
+- Its CLI is [commander](https://github.com/tj/commander.js) with an
+  [`@inquirer/confirm`](https://github.com/SBoudrias/Inquirer.js) prompt. Both are ESM only and
+  are loaded through Node's `require(esm)` from the package's CommonJS build.
+- Its tests are Vitest against one in-memory MongoDB, a database per test.
+
 ## Benchmarks
 
 `scripts/benchmarks/` holds the [k6](https://github.com/grafana/k6) load scripts. They are deliberately
@@ -137,7 +184,7 @@ Managed by [husky](https://github.com/typicode/husky) in `.husky/`; every hook d
 
 - **`pre-commit`** → `pnpm precommit` → `lint-staged` (see `lint-staged.config.cjs`): Prettier, Oxlint/ESLint/Stylelint `--fix` and cspell over the _staged_ files, plus a full-package `lint:types` for any package with staged code.
 - **`commit-msg`** → `pnpm commitmsg` → `scripts/lint-commit-msg.sh`: `commitlint --edit` against `commitlint.config.cjs`, then cspell over the message text. Git's own comment block and the diff `git commit -v` appends are stripped before spellchecking, so only what the author wrote is checked.
-- **`pre-push`** → `pnpm prepush` → `pnpm test:prepush` (backend Jest + frontend Vitest).
+- **`pre-push`** → `pnpm prepush` → `pnpm test:prepush` (migrator Vitest + backend Jest + frontend Vitest).
 
 The split is deliberate: **linting at commit time, tests at push time**. Commits stay fast and mechanical, while every push carries a green suite. Do **not** move the test suites into `pre-commit` — they take minutes and are memory-heavy, and they would run on every WIP commit. Nor should the repo-wide lint passes go back into `pre-push`: `lint-staged` already covers those files at commit time, so re-running them on push only added waiting. Run `pnpm lint` by hand (or in CI) when a whole-repo sweep is wanted.
 
@@ -158,7 +205,7 @@ The split is deliberate: **linting at commit time, tests at push time**. Commits
 - **type** — one of `feat`, `fix`, `perf`, `refactor`, `test`, `docs`, `style`, `build`, `ci`, `chore`, `revert`. Lowercase.
   - `feat` / `fix` describe user-facing behavior; `refactor` keeps behavior identical; `perf` makes it faster.
   - `build` covers the toolchain and deps, `chore(deps)` a plain dependency bump, `style` formatting-only churn.
-- **scope** — optional, and limited to `backend`, `frontend` or `deps` by the `scope-enum` rule in `commitlint.config.cjs`. Omit it entirely for repo-wide changes (tooling, docs, Docker, root config). Add new scopes to that rule, not ad hoc.
+- **scope** — optional, and limited to `backend`, `frontend`, `mongodb-migrator` or `deps` by the `scope-enum` rule in `commitlint.config.cjs`. Omit it entirely for repo-wide changes (tooling, docs, Docker, root config). Add new scopes to that rule, not ad hoc.
 - **description** — imperative mood, lowercase, no trailing period. The header (type + scope + description) is capped at 100 characters.
 - **spelling** — the whole message goes through cspell with the project dictionary. Add project terms to the `words` list in `cspell.json` instead of rewording around them.
 - **breaking changes** — `!` before the colon and/or a `BREAKING CHANGE: <what broke>` footer.

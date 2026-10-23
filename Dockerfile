@@ -17,6 +17,10 @@ COPY /packages/backend/docker-entrypoint.sh /prod/backend/docker-entrypoint.sh
 FROM base AS backend
 COPY --from=build /prod/backend /prod/backend
 WORKDIR /prod/backend
+# For `pnpm migrate:*`: every `docker compose run` is a new container, which
+# would otherwise download the pnpm that package.json asks for each time
+ENV COREPACK_HOME=/corepack
+RUN corepack install && chmod -R a+rX /corepack
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD [ "node", "dist/index.js" ]
 

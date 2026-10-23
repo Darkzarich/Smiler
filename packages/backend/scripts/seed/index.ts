@@ -14,6 +14,7 @@ import {
 } from '@constants/index';
 import { connectDB } from '@libs/db';
 import { logger } from '@libs/logger';
+import { createBackendMigrator } from '@libs/migrations';
 import sanitizeHtml, { SanitizeHtmlProfile } from '@libs/sanitize-html';
 import { CommentModel } from '@models/Comment';
 import {
@@ -504,6 +505,11 @@ async function insertSeedData(reset: boolean) {
   if (!(await prepareDatabase(reset))) {
     return false;
   }
+
+  // Seeded data is already in the shape of every migration there is
+  const migrator = await createBackendMigrator(mongoose.connection.db!);
+
+  await migrator.stampIfNew();
 
   const random = createRandom(RANDOM_SEED);
   const now = new Date();

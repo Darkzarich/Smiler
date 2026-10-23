@@ -11,6 +11,8 @@
   "files": [
     "dist/src",
     "dist/index.js",
+    "dist/migrations",
+    "dist/scripts/migrate.js",
     "tsconfig.json"
   ],
   "scripts": {
@@ -20,6 +22,12 @@
     "dev:watch": "nodemon --exec ts-node index.ts",
     "dev:debug": "node --inspect -r ts-node/register index.ts",
     "seed": "ts-node scripts/seed/index.ts",
+    "migrate": "node dist/scripts/migrate.js",
+    "migrate:status": "node dist/scripts/migrate.js status",
+    "migrate:up": "node dist/scripts/migrate.js up",
+    "migrate:down": "node dist/scripts/migrate.js down",
+    "migrate:dev": "ts-node scripts/migrate.ts",
+    "migrate:create": "ts-node scripts/migrate.ts create",
     "lint:code": "oxlint",
     "lint:types": "tsc --noEmit",
     "prettier": "prettier . --write",
@@ -66,6 +74,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@smiler/mongodb-migrator": "workspace:*",
     "@typegoose/typegoose": "^12.21.1",
     "connect-redis": "^10.0.0",
     "cors": "^2.8.6",
@@ -84,7 +93,7 @@
     "nanoid": "^3.3.18",
     "rate-limit-redis": "^6.0.1",
     "redis": "^6.2.1",
-    "sanitize-html": "2.17.7",
+    "sanitize-html": "2.18.0",
     "sharp": "^0.35.5",
     "slug": "^1.1.0",
     "swagger-ui-express": "^4.6.3",
