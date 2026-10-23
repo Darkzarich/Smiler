@@ -1,0 +1,43 @@
+{
+  "name": "@smiler/mongodb-migrator",
+  "version": "1.0.0",
+  "description": "Runs a service's MongoDB migrations, records them and reverts them",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "packageManager": "pnpm@8.6.0",
+  "engines": {
+    "node": ">=v24.0.0",
+    "pnpm": ">=8.6.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "pnpm build",
+    "lint:code": "oxlint",
+    "lint:types": "tsc --noEmit",
+    "prettier": "prettier . --write",
+    "test": "vitest run"
+  },
+  "author": "Darkzarich",
+  "license": "MIT",
+  "peerDependencies": {
+    "mongodb": "~6.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "eslint-plugin-security": "^4.0.1",
+    "mongodb": "~6.20.0",
+    "mongodb-memory-server": "^10.4.3",
+    "oxlint": "~1.82.0",
+    "oxlint-tsgolint": "^7.0.2001",
+    "prettier": "3.2.5",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
+  },
+  "dependencies": {
+    "@inquirer/confirm": "^6.3.4",
+    "commander": "^15.0.0"
+  }
+}

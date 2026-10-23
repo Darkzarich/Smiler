@@ -9,6 +9,10 @@ module.exports = {
   rules: {
     // Scope is the workspace package a change belongs to. Repo-wide changes
     // (tooling, docs, Docker) carry no scope at all.
-    'scope-enum': [2, 'always', ['backend', 'frontend', 'deps']],
+    'scope-enum': [
+      2,
+      'always',
+      ['backend', 'frontend', 'mongodb-migrator', 'deps'],
+    ],
   },
 };

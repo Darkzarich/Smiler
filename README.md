@@ -22,6 +22,7 @@ Smiler is a Reddit-style social platform where users share posts with text, imag
   - [Option 2: Running With Docker](#option-2-running-with-docker)
   - [Option 3: Running With Docker Compose (All-in-One)](#option-3-running-with-docker-compose-all-in-one)
   - [Seeding the Database](#seeding-the-database)
+  - [Database Migrations](#database-migrations)
 - [Contribution](#contribution)
   - [Linting](#linting)
 - [License](#license)
@@ -186,6 +187,7 @@ Smiler has been in development since 2019 and has been through several full-stac
 - **Sep 2026 - linting** - **ESLint → [Oxlint](https://github.com/oxc-project/oxc)** in both packages, rule for rule, dropping the unmaintained airbnb and `eslint-plugin-node` configs and turning on type-aware linting on the backend. Vue templates are the one thing Oxlint cannot parse, so the frontend keeps a template-only ESLint beside it. The two together run in about half the time of the old single pass, and the backend lints in 3s instead of 17s.
 - **Oct 2026 - design audit** - A **design audit** of every page on desktop, tablet and phone, followed by fixes in batches, bringing the interface toward one consistent, accessible design system that holds up on touch screens as well as with a mouse.
 - **Oct 2026 - comments** - Comment threads load with **one `$graphLookup`** instead of being populated level by level: deep threads are 5–8× faster and no longer lose replies past level 20. Past the depth a screen fits, replies continue as one list naming the comment each answers, and comment scores lose their halves.
+- **Oct 2026 - migrations** - The `mongosh` scripts that were run by hand against the database give way to **`@smiler/mongodb-migrator`**, a workspace package any service can use to apply, revert and record its MongoDB migrations with its own credentials, by hand and with the service stopped, locally or through `docker compose run`. A migration the new code cannot run without is marked **critical** and keeps the backend from starting until it has run. A new database - a fork, a fresh setup, a seed - is recorded as already migrated at boot instead of being migrated, since the current code wrote it in the newest shape to begin with.
 
 </details>
 
@@ -319,6 +321,21 @@ pnpm db:seed --reset   # deletes all users, posts, comments and votes first
 It writes straight to the database in `DB_URL` (the backend does not need to be running) and creates 64 users, 150 posts with text, picture and video sections, threaded comments, votes and follows. Ratings, comment and follower counts all add up the way the API would have left them, and the posts are backdated so every category - blowing, recent, today, this week - has something in it. Blowing posts are the ones from the last hour, so they drop off that page an hour after seeding.
 
 Sign in as **`demo@example.com`** / **`password`** - every seeded user has that password, and the demo account already follows a few people and tags, so the feed is not empty. Pictures and avatars are generated locally into `packages/backend/uploads/`, so seeding works offline. The script refuses to run with `NODE_ENV=production`.
+
+### Database Migrations
+
+Changes to the shape of data already in the database ship as migrations in `packages/backend/migrations/`, run by hand with the backend stopped:
+
+```bash
+pnpm db:migrate status   # what has run and what is pending
+pnpm db:migrate up       # apply the pending ones, after asking
+pnpm db:migrate down     # revert the newest one, after asking
+pnpm db:migrate:create rename user bio   # start a new one from the template
+```
+
+A new database - a fresh setup, a fork, a seeded one - needs none of them: the backend records every migration as already applied the first time it starts against an empty database. Whenever migrations are pending it says so in its log at boot, and it refuses to start while one marked **critical** is pending - one the new code would fail on.
+
+The runner is its own workspace package. **[`packages/mongodb-migrator/README.md`](packages/mongodb-migrator/README.md)** has the full guide: running migrations locally and on a Docker Compose deployment, backing up and restoring, rolling back, and writing a new migration.
 
 ## Contribution
 

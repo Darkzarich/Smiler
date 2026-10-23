@@ -70,16 +70,17 @@ const scripts = (files) => [
   ...spellcheckTasks(files),
 ];
 
-const backend = (files) => {
+// The backend and the migrator package lint the same way
+const nodePackage = (name) => (files) => {
   const codeFiles = filterByExtension(files, ['.js', '.ts']);
-  const tasks = [prettier('packages/backend', files)];
-  const fromDir = path.join(process.cwd(), 'packages/backend');
+  const tasks = [prettier(`packages/${name}`, files)];
+  const fromDir = path.join(process.cwd(), `packages/${name}`);
 
   if (codeFiles.length > 0) {
     tasks.push(
-      command('pnpm --filter backend exec oxlint --fix', codeFiles, fromDir),
+      command(`pnpm --filter ${name} exec oxlint --fix`, codeFiles, fromDir),
     );
-    tasks.push('pnpm --filter backend lint:types');
+    tasks.push(`pnpm --filter ${name} lint:types`);
   }
 
   tasks.push(...spellcheckTasks(files));
@@ -128,6 +129,8 @@ const frontend = (files) => {
 module.exports = {
   '*.{js,cjs,json,md,yml,yaml}': root,
   'scripts/**/*.{js,cjs,json,md,yml,yaml}': scripts,
-  'packages/backend/**/*.{js,ts,json,md,yml,yaml}': backend,
+  'packages/backend/**/*.{js,ts,json,md,yml,yaml}': nodePackage('backend'),
+  'packages/mongodb-migrator/**/*.{js,mts,ts,json,md,yml,yaml}':
+    nodePackage('mongodb-migrator'),
   'packages/frontend/**/*.{js,ts,vue,css,html,json,md,yml,yaml}': frontend,
 };
