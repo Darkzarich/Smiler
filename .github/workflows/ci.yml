@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # One folder for both packages' mongodb-memory-server, so a single cache entry covers them
+  MONGOMS_DOWNLOAD_DIR: ${{ github.workspace }}/.cache/mongodb-binaries
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      # Reads the version from `packageManager` in package.json
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+
+  test:
+    name: test (${{ matrix.suite }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: migrator
+            run: pnpm --filter mongodb-migrator test
+          - suite: backend
+            run: pnpm --filter backend test
+          - suite: frontend unit
+            run: pnpm --filter frontend test:unit:ci
+          - suite: frontend e2e
+            run: pnpm --filter frontend test:e2e:ci
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - if: matrix.suite == 'migrator' || matrix.suite == 'backend'
+        uses: actions/cache@v6
+        with:
+          path: ${{ env.MONGOMS_DOWNLOAD_DIR }}
+          # The MongoDB version is pinned in these setup files
+          key: mongodb-binaries-${{ runner.os }}-${{ hashFiles('packages/*/tests/*setup*.ts') }}
+      - if: matrix.suite == 'frontend e2e'
+        run: pnpm --filter frontend exec playwright install --with-deps chromium
+      - run: ${{ matrix.run }}
+      - if: failure() && matrix.suite == 'frontend e2e'
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-traces
+          path: packages/frontend/test-results/
+          retention-days: 7
