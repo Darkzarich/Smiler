@@ -222,9 +222,10 @@ test('Uploads a picture dropped on the picture section', async ({
     'multipart/form-data; boundary=',
   );
 
+  // Nothing serves /uploads here, so the picture never loads and stays hidden
   await expect(
     PostCreatePage.getPictureSection().getByAltText('Post attachment'),
-  ).toBeVisible();
+  ).toHaveAttribute('src', /\/uploads\/user-id\/stored-picture\.jpg$/);
 });
 
 test('Offers dragging a picture in only where it can be done', async ({
