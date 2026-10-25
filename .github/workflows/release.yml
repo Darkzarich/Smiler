@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      push:
+        description: Push the images to Docker Hub (otherwise only build them)
+        type: boolean
+        default: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  PUSH: ${{ github.event_name == 'release' || inputs.push }}
+
+jobs:
+  images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - id: version
+        run: echo "tag=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v4
+      - if: env.PUSH == 'true'
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # Both targets share the `build` stage, so the second build reuses it
+      # from the same builder
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: backend
+          platforms: linux/amd64
+          push: ${{ env.PUSH == 'true' }}
+          tags: |
+            darkzarich/smiler-backend:${{ steps.version.outputs.tag }}
+            darkzarich/smiler-backend:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ steps.version.outputs.tag }}
+          # A cache that cannot be written must not fail a release
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,scope=backend,mode=max,ignore-error=true
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: frontend
+          platforms: linux/amd64
+          push: ${{ env.PUSH == 'true' }}
+          tags: |
+            darkzarich/smiler-frontend:${{ steps.version.outputs.tag }}
+            darkzarich/smiler-frontend:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ steps.version.outputs.tag }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,scope=frontend,mode=max,ignore-error=true
+      - if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE: ${{ github.event.release.tag_name }}
+          IMAGE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          notes=$(gh release view "$RELEASE" --repo "$GITHUB_REPOSITORY" --json body --jq .body)
+          if grep -qF '**Images:**' <<< "$notes"; then
+            exit 0
+          fi
+          images="**Images:** \`darkzarich/smiler-backend:$IMAGE_TAG\`, \`darkzarich/smiler-frontend:$IMAGE_TAG\`"
+          printf '%s\n\n%s\n' "$notes" "$images" > notes.md
+          gh release edit "$RELEASE" --repo "$GITHUB_REPOSITORY" --notes-file notes.md
