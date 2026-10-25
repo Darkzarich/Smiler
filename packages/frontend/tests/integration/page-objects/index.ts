@@ -41,6 +41,11 @@ export interface TestFixtures {
   ThemeToggle: ThemeToggle;
 }
 
+const TRANSPARENT_PIXEL = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  'base64',
+);
+
 // Extend base test by providing common page objects
 const test = base.extend<TestFixtures>({
   Api: async ({ page, context }, use) => {
@@ -51,6 +56,14 @@ const test = base.extend<TestFixtures>({
         csrfToken: 'test-csrf-token',
       },
     });
+
+    // No API serves /uploads here, and a picture that fails to load is swapped
+    // for a placeholder. Left unanswered, the request is refused at once on
+    // some machines (CI) and hangs on others, so whether the <img> is still
+    // there depended on the machine
+    await context.route(/\/uploads\//, (route) =>
+      route.fulfill({ contentType: 'image/png', body: TRANSPARENT_PIXEL }),
+    );
 
     await use(api);
   },

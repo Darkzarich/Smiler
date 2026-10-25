@@ -141,8 +141,11 @@ test.describe('Long offline indicator', () => {
     ProfilePage,
     Api,
   }) => {
+    // Not 90: the badge counts 30-day months and rounds down, and across a DST
+    // change between the runner's timezone and the browser's, 90 days shows as
+    // 89 days 23 hours, which is "2 months"
     const awayUser = createRandomProfile({
-      lastLoginAt: subDays(new Date(), 90).toISOString(),
+      lastLoginAt: subDays(new Date(), 100).toISOString(),
     });
 
     Api.routes.users.getUserProfile.mock({
