@@ -190,6 +190,24 @@ The split is deliberate: **linting at commit time, tests at push time**. Commits
 
 `--no-verify` skips the hooks; use it only for local scratch commits that get rewritten before pushing.
 
+## CI and releases
+
+- **`.github/workflows/ci.yml`** runs on every pull request to `master`: `pnpm lint`, and the
+  migrator, backend, frontend unit and Playwright suites as parallel jobs. It is what catches
+  changes merged on GitHub (dependency bumps), which never pass through the hooks.
+- The e2e tests mock the API, so CI starts no backend. Anything a page loads from it besides the
+  API (`/uploads` pictures) is answered by the `Api` fixture in
+  `tests/integration/page-objects/index.ts`. Left unanswered, `localhost:3000` is refused at
+  once on GitHub but hangs on WSL, so a test can pass locally and fail in CI; a server on :3000
+  answering 404 to everything reproduces CI's behavior.
+- **`.github/workflows/release.yml`** runs when a GitHub Release is published. Releases are named
+  `v<date>` (`v2026.10.25`, `.2` for a second one that day). It builds both Dockerfile targets
+  for `linux/amd64`, pushes them to Docker Hub as `:<7-character commit hash>` and `:latest`, and
+  adds the image tag to the release notes. Started by hand, it only builds unless `push` is
+  ticked. Pushing needs the `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` repository secrets.
+- Try a workflow change with [act](https://github.com/nektos/act) from a clean
+  `git worktree add --detach`: act copies the working tree as it is, untracked files included.
+
 ## Commit style
 
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) (the Angular convention), enforced by [commitlint](https://github.com/conventional-changelog/commitlint) with `@commitlint/config-conventional` in the `commit-msg` hook.
