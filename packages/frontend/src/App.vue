@@ -63,9 +63,14 @@ onMounted(() => {
      everything lines up with the post cards and a Post hangs its votes into it. */
   --post-votes-width: 0px;
 
+  /* A page title and a post title are the same step: each is its page's h1 */
+  --font-size-title: 1.25rem;
+  --font-size-heading: 1.125rem;
+
   @media (--tablet-portrait-up) {
     --page-gutter: 16px;
     --post-votes-width: 64px;
+    --font-size-title: 1.5rem;
   }
 
   @media (--tablet-landscape-up) {

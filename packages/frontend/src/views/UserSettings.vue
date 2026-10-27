@@ -1,10 +1,10 @@
 <template>
   <div class="user-settings u-widget">
     <div v-if="!isFetching" class="user-settings__data">
-      <h1 class="user-settings__title">Settings</h1>
+      <h1 class="u-page-title">Settings</h1>
 
       <div class="user-settings__block">
-        <h3 class="user-settings__block-title">Following</h3>
+        <h2 class="u-section-title">Following</h2>
         <template v-if="isFollowingAnything">
           <div v-if="usersFollowed.length" class="user-settings__following">
             <div class="user-settings__following-type">Authors:</div>
@@ -69,7 +69,7 @@
       </div>
 
       <div class="user-settings__block">
-        <h3 class="user-settings__block-title">About me</h3>
+        <h2 class="u-section-title">About me</h2>
 
         <BaseTextarea
           v-model="bioEditInput"
@@ -91,7 +91,7 @@
       </div>
 
       <div class="user-settings__block">
-        <h3 class="user-settings__block-title">Avatar</h3>
+        <h2 class="u-section-title">Avatar</h2>
 
         <div class="user-settings__current-avatar">
           <UserAvatar :src="currentAvatar" alt="current avatar" />
@@ -338,27 +338,12 @@ onBeforeMount(() => {
     justify-content: center;
   }
 
-  &__title {
-    margin-bottom: 12px;
-    color: var(--color-text-primary);
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: 500;
-  }
-
   &__block {
     padding: 16px 0;
 
     &:last-child {
       border-bottom: none;
     }
-  }
-
-  &__block-title {
-    margin-bottom: 16px;
-    color: var(--color-text-primary);
-    text-align: center;
-    font-weight: 400;
   }
 
   &__bio-edit {

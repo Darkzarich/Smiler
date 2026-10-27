@@ -1,6 +1,6 @@
 <template>
   <div class="search-form">
-    <h1 class="search-form__title">Search</h1>
+    <h1 class="u-page-title">Search</h1>
 
     <div class="search-form__title-field">
       <BaseInput
@@ -128,14 +128,6 @@ const applyFiltersToRoute = () => {
 
 <style>
 .search-form {
-  &__title {
-    margin-bottom: 12px;
-    color: var(--color-text-primary);
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: 500;
-  }
-
   &__title-field {
     margin-bottom: 12px;
   }

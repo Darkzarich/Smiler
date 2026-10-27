@@ -641,13 +641,9 @@ const searchByTag = (tag: string) => {
     align-items: flex-start;
     gap: 8px;
     margin-bottom: 1rem;
-    font-size: 1.5rem;
+    font-size: var(--font-size-title);
     font-weight: 600;
     line-height: 1.3;
-
-    @media (--phone-only) {
-      font-size: 1.25rem;
-    }
   }
 
   /* One title line tall, so the buttons center on the first line of a long title */
