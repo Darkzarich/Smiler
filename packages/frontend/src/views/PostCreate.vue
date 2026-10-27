@@ -95,21 +95,3 @@ onBeforeMount(async () => {
   }
 });
 </script>
-
-<style>
-.post-create {
-  @media (--phone-only) {
-    padding-right: 0;
-    padding-left: 0;
-    border: none;
-    border-radius: 0;
-  }
-
-  /* The card drops its padding on phones, which would put the title on the screen's edge */
-  &__header {
-    @media (--phone-only) {
-      padding-inline: 1rem;
-    }
-  }
-}
-</style>

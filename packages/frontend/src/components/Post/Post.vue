@@ -692,11 +692,6 @@ const searchByTag = (tag: string) => {
     flex: 1;
     min-width: 0;
     color: var(--color-text-primary);
-
-    @media (--phone-only) {
-      border: none;
-      border-radius: 0;
-    }
   }
 
   &__rate-mobile {

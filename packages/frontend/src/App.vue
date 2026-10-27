@@ -155,6 +155,14 @@ h6 {
       width: 100%;
       margin-right: 0;
     }
+
+    /* No gutter on phones: a card runs edge to edge, and round corners would
+       cut into the screen's edge. It keeps its padding. */
+    .u-widget {
+      @media (--phone-only) {
+        border-radius: 0;
+      }
+    }
   }
 
   &__sidebar {

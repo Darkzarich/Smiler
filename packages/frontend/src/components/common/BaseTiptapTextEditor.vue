@@ -600,11 +600,6 @@ watch(textEditorValue, (value) => {
   padding: 1rem;
   transition: border 200ms ease-out;
 
-  @media (--phone-only) {
-    padding-right: 0;
-    padding-left: 0;
-  }
-
   &__style-buttons {
     flex-wrap: wrap;
     gap: 8px;
@@ -613,10 +608,6 @@ watch(textEditorValue, (value) => {
     /* 32px buttons 12px apart, each with a 44px hit area: the areas meet but never overlap */
     @media (--pointer-coarse) {
       gap: 12px;
-    }
-
-    @media (--phone-only) {
-      margin-left: 1rem;
     }
   }
 
@@ -744,8 +735,6 @@ watch(textEditorValue, (value) => {
 
     @media (--phone-only) {
       min-height: 9rem;
-      border-right: none;
-      border-left: none;
     }
   }
 }

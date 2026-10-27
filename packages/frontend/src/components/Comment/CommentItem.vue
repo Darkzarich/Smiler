@@ -536,9 +536,18 @@ const downvote = async () => {
     background: var(--color-surface-secondary);
     margin-block: 1rem;
 
-    /* The reply editor shares the comment's card */
+    /* Runs to the screen's edge on phones, a reply from its indent */
+    @media (--phone-only) {
+      border-radius: 0;
+    }
+
+    /* The reply editor shares the comment's card, and on phones its padding too */
     .u-widget {
       box-shadow: none;
+
+      @media (--phone-only) {
+        padding-inline: 0;
+      }
     }
 
     &--created {

@@ -88,11 +88,6 @@ useInfiniteScroll(
   &__no-more,
   &__no-posts {
     text-align: center;
-
-    @media (--phone-only) {
-      border: none !important;
-      border-radius: 0 !important;
-    }
   }
 
   &__post {

@@ -255,6 +255,60 @@ test.describe('One card column on every page', () => {
   });
 });
 
+test.describe('Cards on a phone', () => {
+  const post = createRandomPost();
+
+  test.beforeEach(async ({ Api, isMobile }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(!isMobile, 'Cards run edge to edge on narrow screens only');
+
+    Api.routes.auth.getAuth.mock({
+      body: createRandomAuth({ isAuth: true }),
+    });
+
+    Api.routes.posts.getPostBySlug.mock({ body: post });
+
+    Api.routes.comments.getComments.mock({
+      body: { comments: [createRandomComment()], hasNextPage: false },
+    });
+  });
+
+  test('Keeps the post form off the screen edges', async ({
+    page,
+    PostCreatePage,
+  }) => {
+    await PostCreatePage.goto();
+
+    const { width } = page.viewportSize()!;
+
+    for (const control of [
+      PostCreatePage.postTitleInput,
+      PostCreatePage.postTagInput,
+      page.getByTestId('create-post-button'),
+      page.getByTestId('save-draft-button'),
+    ]) {
+      await expect(control).toBeVisible();
+
+      const box = (await control.boundingBox())!;
+
+      expect(box.x).toBeGreaterThanOrEqual(16);
+      expect(box.x + box.width).toBeLessThanOrEqual(width - 16);
+    }
+  });
+
+  test('Squares the corners of comments that run edge to edge', async ({
+    page,
+    SinglePostPage,
+  }) => {
+    await SinglePostPage.goto(post.slug);
+
+    const comment = page.locator('.comment-item__content').first();
+
+    await expect(comment).toBeVisible();
+    await expect(comment).toHaveCSS('border-radius', '0px');
+  });
+});
+
 test.describe('Mobile menu', () => {
   const auth = createRandomAuth({ isAuth: true });
 
