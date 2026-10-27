@@ -1,5 +1,6 @@
-import { useEventListener, watchDebounced } from '@vueuse/core';
-import { ref, toValue } from 'vue';
+import { useEventListener } from '@vueuse/core';
+import { debounce } from 'lodash-es';
+import { ref, toValue, watch } from 'vue';
 import type { MaybeRefOrGetter, Ref } from 'vue';
 import { postTypes } from '@/api/posts';
 import type { userTypes } from '@/api/users';
@@ -165,10 +166,9 @@ export function useLocalPostDraft({
     });
   };
 
-  watchDebounced([title, tags, sections], save, {
-    deep: true,
-    debounce: SAVE_DEBOUNCE_MS,
-  });
+  const saveSoon = debounce(save, SAVE_DEBOUNCE_MS);
+
+  watch([title, tags, sections], saveSoon, { deep: true });
 
   // A debounce can still be pending when the page goes away. localStorage is
   // synchronous, so the last edits can be written on the way out — `pagehide`
@@ -188,7 +188,11 @@ export function useLocalPostDraft({
 
       return id ? readLocalPostDraft(id) : null;
     },
+    /** Also drops a save still waiting on the debounce, which would otherwise
+     * write the draft straight back, e.g. after a Create pressed mid-typing. */
     clear: () => {
+      saveSoon.cancel();
+
       const id = toValue(userId);
 
       if (id) {

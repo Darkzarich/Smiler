@@ -624,3 +624,31 @@ test('Keeps an unsaved draft on the device and restores it after a reload', asyn
     'Restored the unsaved draft from this device',
   );
 });
+
+test('Opens an empty editor after a post published straight after typing', async ({
+  PostCreatePage,
+  SinglePostPage,
+  page: currentPage,
+  Api,
+}) => {
+  await PostCreatePage.goto();
+
+  await PostCreatePage.postTitleInput.fill(title);
+  await PostCreatePage.addTextSection();
+  await PostCreatePage.fillTextSection('test text');
+
+  await Api.routes.posts.createPost.waitForRequest({
+    preRequestAction: PostCreatePage.submitPost.bind(PostCreatePage),
+  });
+  await expect(currentPage).toHaveURL(
+    SinglePostPage.getUrlWithSlug(createdPost.slug),
+  );
+
+  // Past the draft's save debounce, so a save still pending at Create has landed
+  await currentPage.waitForTimeout(1000);
+
+  await PostCreatePage.goto();
+
+  await expect(PostCreatePage.postTitleInput).toHaveValue('');
+  await expect(PostCreatePage.getTextSectionInput()).toHaveCount(0);
+});
