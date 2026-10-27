@@ -739,31 +739,40 @@ const searchByTag = (tag: string) => {
   }
 
   &__footer {
+    container: post-footer / inline-size;
+
     @media (--phone-only) {
       margin-top: -1rem;
     }
   }
 
   &__meta-info {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
+    display: grid;
     align-items: center;
+    gap: 8px;
     margin: -1rem;
     margin-top: 1rem;
     padding: 0.75rem 1rem;
     border-top: 1px solid var(--color-border);
+    grid-template-columns: 1fr auto 1fr;
+
+    /* Narrower than three columns that each fit a 15-character login (the longest allowed) and
+       its avatar: each part takes its own width, and the login gives way last */
+    @container post-footer (width < 480px) {
+      display: flex;
+      justify-content: space-between;
+    }
   }
 
   &__date {
-    flex: 1;
+    white-space: nowrap;
   }
 
   &__comments-count {
-    flex: 1;
     color: var(--color-text-secondary);
     text-align: center;
     text-decoration: none;
+    white-space: nowrap;
 
     /* stylelint-disable-next-line no-descending-specificity */
     svg {
@@ -778,15 +787,18 @@ const searchByTag = (tag: string) => {
 
   &__author-container {
     display: flex;
-    flex: 1;
     justify-content: flex-end;
     align-items: center;
+    min-width: 0;
     color: var(--color-text-primary);
     text-decoration: none;
   }
 
   &__author-login {
     border-bottom: 1px solid transparent;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 
     &:hover {
       border-bottom: 1px solid var(--color-text-primary);
@@ -794,6 +806,7 @@ const searchByTag = (tag: string) => {
   }
 
   &__author-avatar {
+    flex: none;
     width: 1.5rem;
     height: 1.5rem;
     margin-left: 0.5rem;
