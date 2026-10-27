@@ -158,6 +158,40 @@ test('Fits the post footer on one line on a 320px phone', async ({
   expect(layout).toEqual({ dateLines: 1, pastEdge: [] });
 });
 
+test('Takes a post deleted from the list off the list', async ({
+  page,
+  Api,
+  Post,
+  PostsPage,
+  NotificationList,
+}) => {
+  const auth = createRandomAuth({ isAuth: true });
+  const ownPost = createRandomPost({
+    author: { _id: auth._id },
+    createdAt: new Date().toISOString(),
+  });
+
+  Api.routes.auth.getAuth.mock({ body: auth });
+  Api.routes.posts.getToday.mock({
+    body: { posts: [post1, ownPost, post2], hasNextPage: false },
+  });
+  Api.routes.posts.deletePostById.mock({ status: 200 });
+
+  await PostsPage.goto(PostsPage.urls.today);
+  await expect(Post.getTitleById(ownPost._id)).toBeVisible();
+
+  await Api.routes.posts.deletePostById.waitForRequest({
+    preRequestAction: Post.deletePost.bind(Post),
+  });
+
+  await expect(NotificationList.root).toHaveText(
+    'The post has been successfully deleted',
+  );
+  await expect(Post.getPostById(ownPost._id)).toHaveCount(0);
+  await expect(Post.getListedPosts()).toHaveCount(2);
+  await expect(page).toHaveURL(PostsPage.urls.today);
+});
+
 test.describe('Post groups', () => {
   test.beforeEach(async ({ context }) => {
     // playwright.config.js has Europe/Amsterdam (GMT+1) timezone set

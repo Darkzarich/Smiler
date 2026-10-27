@@ -278,11 +278,18 @@ interface Props {
   interactive?: boolean;
 }
 
+interface Emits {
+  /** The post is gone from the server; where it was shown decides what is left */
+  deleted: [id: string];
+}
+
 const props = withDefaults(defineProps<Props>(), {
   canEdit: false,
   collapsible: true,
   interactive: true,
 });
+
+const emit = defineEmits<Emits>();
 
 const post = defineModel<postTypes.Post>('post', {
   required: true,
@@ -518,7 +525,7 @@ const deletePost = async () => {
     message: 'The post has been successfully deleted',
   });
 
-  router.push({ name: 'Home' });
+  emit('deleted', post.value._id);
 };
 
 const openContextMenu = (ev: MouseEvent | KeyboardEvent, tag: string) => {
