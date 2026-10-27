@@ -20,8 +20,8 @@
     </template>
 
     <div ref="contentRef" class="auth-prompt">
-      <p class="auth-prompt__lead">
-        You need an account for that. Sign in, or create one in under a minute.
+      <p v-if="authPrompt.lead" class="auth-prompt__lead">
+        {{ authPrompt.lead }}
       </p>
 
       <!-- Keyed to start fresh, in the mode asked for, on every opening -->

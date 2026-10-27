@@ -78,6 +78,56 @@ test.describe('Header between phone and desktop widths', () => {
   }
 });
 
+test.describe('Sign in from the header', () => {
+  test.beforeEach(async ({ Api }) => {
+    Api.routes.posts.getToday.mock({
+      body: { posts: [], hasNextPage: false },
+    });
+  });
+
+  test('Opens the sign-in prompt from the phone header', async ({
+    page,
+    Api,
+    PostsPage,
+    AuthPrompt,
+    isMobile,
+  }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(!isMobile, 'From 600px up the sidebar has the sign-in form');
+
+    await Api.routes.auth.signIn.mock({
+      body: createRandomAuth({ isAuth: true }),
+    });
+
+    await PostsPage.goto(PostsPage.urls.today);
+
+    const header = page.locator('header');
+    const signInBtn = header.getByTestId('header-sign-in');
+
+    await signInBtn.click();
+
+    await expect(AuthPrompt.title).toHaveText('Welcome to Smiler');
+    await expect(AuthPrompt.panel).not.toContainText('You need an account');
+
+    await AuthPrompt.signIn();
+
+    await expect(AuthPrompt.panel).toBeHidden();
+    await expect(signInBtn).toBeHidden();
+    await expect(header.getByRole('img', { name: 'avatar' })).toBeVisible();
+  });
+
+  test('Leaves signing in to the sidebar from 600px up', async ({
+    page,
+    PostsPage,
+  }) => {
+    await page.setViewportSize({ width: 600, height: 900 });
+    await PostsPage.goto(PostsPage.urls.today);
+
+    await expect(page.getByTestId('signin-form')).toBeVisible();
+    await expect(page.getByTestId('header-sign-in')).toBeHidden();
+  });
+});
+
 test.describe('Page gutter between phone and desktop widths', () => {
   test.beforeEach(async ({ Api }) => {
     Api.routes.posts.getToday.mock({
