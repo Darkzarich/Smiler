@@ -1,4 +1,6 @@
 import 'normalize.css';
+import '@fontsource-variable/roboto';
+import '@fontsource-variable/roboto/wght-italic.css';
 import { vOnClickOutside } from '@vueuse/components';
 import { createApp } from 'vue';
 import App from './App.vue';

@@ -74,7 +74,7 @@ onMounted(() => {
 }
 
 html {
-  font-family: Roboto, 'Open Sans', Helvetica, Arial, sans-serif;
+  font-family: 'Roboto Variable', Roboto, system-ui, sans-serif;
   box-sizing: border-box;
   overflow-y: scroll;
   scrollbar-gutter: stable;
