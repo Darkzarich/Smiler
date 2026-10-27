@@ -50,8 +50,17 @@ const toggleMode = () => {
     font-size: 13px;
     cursor: pointer;
 
-    &:hover {
-      border-bottom: 1px solid var(--color-primary-strong);
+    /* Keeps the label 16px under the form, as the box grows around it */
+    @media (--pointer-coarse) {
+      min-height: 44px;
+      margin-top: 2px;
+      padding: 0 16px;
+    }
+
+    @media (--hover) {
+      &:hover {
+        border-bottom: 1px solid var(--color-primary-strong);
+      }
     }
   }
 }

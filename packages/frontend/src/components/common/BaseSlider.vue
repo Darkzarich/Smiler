@@ -80,17 +80,24 @@ const handleInput = (event: Event) => {
       var(--color-primary) var(--slider-fill),
       var(--color-border-hover) var(--slider-fill)
     );
+    --slider-thumb: 18px;
 
     margin: 0 8px;
     border-radius: 4px;
     background: transparent;
     appearance: none;
 
+    @media (--pointer-coarse) {
+      --slider-thumb: 24px;
+
+      height: 44px;
+    }
+
     /* A ring on the card color: the thumb reads as a knob on the green fill and on the grey */
     &::-webkit-slider-thumb {
-      width: 18px;
-      height: 18px;
-      margin-top: -6px;
+      width: var(--slider-thumb);
+      height: var(--slider-thumb);
+      margin-top: calc((6px - var(--slider-thumb)) / 2);
       border: 2px solid var(--color-primary-strong);
       border-radius: 50%;
       box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
@@ -100,8 +107,8 @@ const handleInput = (event: Event) => {
     }
 
     &::-moz-range-thumb {
-      width: 18px;
-      height: 18px;
+      width: var(--slider-thumb);
+      height: var(--slider-thumb);
       border: 2px solid var(--color-primary-strong);
       border-radius: 50%;
       box-shadow: 0 1px 3px rgb(0 0 0 / 25%);

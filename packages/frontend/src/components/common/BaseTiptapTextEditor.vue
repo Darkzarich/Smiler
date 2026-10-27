@@ -610,6 +610,11 @@ watch(textEditorValue, (value) => {
     gap: 8px;
     margin-bottom: 1rem;
 
+    /* 32px buttons 12px apart, each with a 44px hit area: the areas meet but never overlap */
+    @media (--pointer-coarse) {
+      gap: 12px;
+    }
+
     @media (--phone-only) {
       margin-left: 1rem;
     }
@@ -626,6 +631,18 @@ watch(textEditorValue, (value) => {
     font-family: monospace;
     font-weight: bold;
     cursor: pointer;
+
+    @media (--pointer-coarse) {
+      position: relative;
+      min-width: 32px;
+      min-height: 32px;
+
+      &::before {
+        position: absolute;
+        content: '';
+        inset: -6px;
+      }
+    }
 
     &:hover,
     &--active {

@@ -127,8 +127,14 @@ defineExpose({ measure });
     font-size: 13px;
     cursor: pointer;
 
-    &:hover {
-      border-bottom-color: var(--color-primary-strong);
+    @media (--pointer-coarse) {
+      min-height: 44px;
+    }
+
+    @media (--hover) {
+      &:hover {
+        border-bottom-color: var(--color-primary-strong);
+      }
     }
   }
 }

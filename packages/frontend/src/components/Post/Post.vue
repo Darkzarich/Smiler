@@ -655,6 +655,13 @@ const searchByTag = (tag: string) => {
     font-weight: bold;
     user-select: none;
     cursor: pointer;
+
+    @media (--pointer-coarse) {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 0.5rem;
+    }
   }
 
   &__main {
