@@ -6,6 +6,7 @@
         :key="post._id"
         v-model:post="posts[index]"
         class="posts-container__post"
+        :data-post-id="post._id"
         :can-edit="checkCanEditPost(post, userStore.userId)"
       />
     </div>

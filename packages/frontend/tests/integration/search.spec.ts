@@ -294,3 +294,44 @@ test('Empty posts lists after search', async ({
   await expect(Post.postsList).toBeVisible();
   await expect(Post.getNoContentText()).toBeVisible();
 });
+
+test('Keeps the results and the place in them on Back from a post', async ({
+  page: currentPage,
+  SearchPage,
+  Post,
+  Api,
+}) => {
+  const results = Array.from({ length: 15 }, () => createRandomPost());
+  const opened = results[10]!;
+  const listRequests: string[] = [];
+
+  currentPage.on('request', (request) => {
+    if (Api.routes.posts.getPosts.getURLRegExp().test(request.url())) {
+      listRequests.push(request.url());
+    }
+  });
+
+  Api.routes.posts.getPosts.mock({
+    body: { posts: results, hasNextPage: false },
+  });
+  Api.routes.comments.getComments.mock({ body: { comments: [] } });
+
+  await SearchPage.goto('title=test');
+  await expect(Post.getListedPosts()).toHaveCount(15);
+  // Not before: its /posts/* would answer the page's own /posts/search
+  Api.routes.posts.getPostBySlug.mock({ body: opened });
+  await Post.scrollPostDownTo(opened._id, 200);
+
+  const top = await Post.getPostTopById(opened._id);
+
+  await Post.openPostById(opened._id);
+  await expect(currentPage).toHaveURL(new RegExp(opened.slug));
+  await currentPage.goBack();
+
+  await expect(Post.getListedPosts()).toHaveCount(15);
+  await expect(SearchPage.searchInput).toHaveValue('test');
+  await expect
+    .poll(async () => Math.abs((await Post.getPostTopById(opened._id))! - top!))
+    .toBeLessThanOrEqual(2);
+  expect(listRequests).toHaveLength(1);
+});

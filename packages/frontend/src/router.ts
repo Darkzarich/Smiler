@@ -6,6 +6,12 @@ import {
 } from 'vue-router';
 import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useUserStore } from '@/store/user';
+import {
+  getRestoredScrollTop,
+  isHistoryTraversal,
+  markPopState,
+  startNavigation,
+} from '@/utils/history-traversal';
 import { pinScroll } from '@/utils/pin-scroll';
 import { waitForElementById } from '@/utils/wait-for-element';
 
@@ -85,6 +91,18 @@ export const router = createRouter({
       );
       return false;
     }
+
+    if (savedPosition && isHistoryTraversal()) {
+      const restoredTop = getRestoredScrollTop();
+
+      pinScroll(
+        () => restoredTop?.() ?? savedPosition.top,
+        10_000,
+        hashScroll.signal,
+      );
+      return false;
+    }
+
     return { x: 0, top: 0 };
   },
   routes: [
@@ -210,9 +228,12 @@ export const router = createRouter({
   ],
 });
 
+router.options.history.listen(markPopState);
+
 router.beforeEach(() => {
   hashScroll.abort();
   hashScroll = new AbortController();
+  startNavigation();
 });
 
 router.beforeEach((to, from, next) => {

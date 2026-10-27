@@ -27,6 +27,7 @@ import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import { userTypes } from '@/api/users';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
+import { useRestorablePosts } from '@/composables/use-restorable-posts';
 import * as consts from '@/const';
 import UserProfile from '@components/User/UserProfile.vue';
 
@@ -41,6 +42,12 @@ const isLoading = ref(false);
 
 const nextCursor = ref<string | null>(null);
 const hasNextPage = ref(false);
+
+const { restore } = useRestorablePosts(posts, {
+  user,
+  nextCursor,
+  hasNextPage,
+});
 
 const handleFetchUser = async (login: string) => {
   try {
@@ -101,6 +108,13 @@ onBeforeRouteUpdate((to, from) => {
 });
 
 onBeforeMount(() => {
-  handleFetchAll(route.params.login as string);
+  const login = route.params.login as string;
+
+  if (restore()) {
+    // The profile keeps its own copy of a follow, so the saved one may be behind
+    void handleFetchUser(login);
+  } else {
+    handleFetchAll(login);
+  }
 });
 </script>

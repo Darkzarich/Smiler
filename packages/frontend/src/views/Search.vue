@@ -30,6 +30,7 @@ import { useRoute } from 'vue-router';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
+import { useRestorablePosts } from '@/composables/use-restorable-posts';
 import * as consts from '@/const';
 import SearchForm from '@components/SearchForm/SearchForm.vue';
 import type { SearchFilter } from '@components/SearchForm/types';
@@ -42,6 +43,8 @@ const posts = ref<postTypes.Post[]>([]);
 
 const currentPage = ref(0);
 const hasNextPage = ref(false);
+
+const { restore } = useRestorablePosts(posts, { currentPage, hasNextPage });
 
 const filter = ref<SearchFilter>({
   title: '',
@@ -124,7 +127,7 @@ onBeforeMount(() => {
     }
   });
 
-  if (isAnyFilterActive.value) {
+  if (isAnyFilterActive.value && !restore()) {
     fetchPosts({ filters: filter.value });
   }
 });
