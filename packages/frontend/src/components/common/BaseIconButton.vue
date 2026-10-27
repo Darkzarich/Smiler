@@ -1,6 +1,8 @@
 <template>
-  <button
-    :type="attrType"
+  <component
+    :is="to ? RouterLink : 'button'"
+    :to="to"
+    :type="to ? undefined : attrType"
     :data-testid="dataTestid"
     class="base-icon-button"
     :class="[
@@ -11,15 +13,17 @@
     :aria-label="label"
     :aria-pressed="pressed"
     :title="label"
-    :disabled="disabled"
+    :disabled="to ? undefined : disabled"
   >
     <span class="base-icon-button__face">
       <slot />
     </span>
-  </button>
+  </component>
 </template>
 
 <script setup lang="ts">
+import { type RouteLocationRaw, RouterLink } from 'vue-router';
+
 interface Props {
   /** The accessible name: an icon alone says nothing to a screen reader */
   label: string;
@@ -35,6 +39,8 @@ interface Props {
   /** Makes it a toggle. Undefined for a plain action, so no aria-pressed */
   pressed?: boolean;
   disabled?: boolean;
+  /** Makes it a link, for an icon-only control that opens another page */
+  to?: RouteLocationRaw;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -44,6 +50,7 @@ withDefaults(defineProps<Props>(), {
   tone: 'neutral',
   pressed: undefined,
   disabled: false,
+  to: undefined,
 });
 </script>
 

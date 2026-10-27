@@ -121,4 +121,24 @@ describe('ConfirmModal', () => {
       'Go back',
     );
   });
+
+  it('focuses Cancel when it opens, and the opener again once it closes', async () => {
+    const opener = document.createElement('button');
+
+    document.body.append(opener);
+    opener.focus();
+
+    activeWrapper = createWrapper();
+
+    await activeWrapper.setProps({ isOpen: true });
+    await nextTick();
+
+    expect(document.activeElement).toBe(
+      document.body.querySelector(testElements.cancel),
+    );
+
+    await activeWrapper.setProps({ isOpen: false });
+
+    expect(document.activeElement).toBe(opener);
+  });
 });

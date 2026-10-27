@@ -52,22 +52,24 @@
           {{ post.title }}
         </span>
 
-        <template v-if="canEdit">
-          <RouterLink
-            title="Edit post"
+        <div v-if="canEdit" class="post__actions">
+          <BaseIconButton
+            label="Edit post"
+            data-testid="post-edit-button"
             :to="{ name: 'PostEdit', params: { slug: post.slug } }"
           >
-            <IconEdit data-testid="post-edit-icon" />
-          </RouterLink>
+            <IconEdit />
+          </BaseIconButton>
 
           <BaseIconButton
             label="Delete post"
+            data-testid="post-delete-button"
             tone="danger"
-            @click="deletePost(post._id)"
+            @click="isDeleteConfirmOpen = true"
           >
-            <IconDelete data-testid="post-delete-icon" />
+            <IconDelete />
           </BaseIconButton>
-        </template>
+        </div>
       </div>
 
       <div v-if="post.tags?.length > 0" class="post__tags u-flex-row">
@@ -222,6 +224,17 @@
       :items="contextMenuOptions"
       @action="handleContextMenuAction"
     />
+
+    <ConfirmModal
+      v-if="canEdit"
+      data-testid="confirm-delete-post-modal"
+      :is-open="isDeleteConfirmOpen"
+      title="Delete this post?"
+      message="It will be gone for good, along with its votes. This can’t be undone."
+      confirm-label="Delete"
+      @confirm="deletePost"
+      @cancel="isDeleteConfirmOpen = false"
+    />
   </div>
 </template>
 
@@ -249,6 +262,7 @@ import BaseContextMenu from '@common/BaseContextMenu.vue';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import BaseImage from '@common/BaseImage.vue';
 import CollapsibleContent from '@common/CollapsibleContent.vue';
+import ConfirmModal from '@common/ConfirmModal.vue';
 import IconComments from '@icons/IconComments.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
@@ -491,9 +505,13 @@ async function voteAfterSignIn({ negative }: { negative: boolean }) {
   await (negative ? downvote : upvote)(post.value._id);
 }
 
-const deletePost = async (id: string) => {
+const isDeleteConfirmOpen = ref(false);
+
+const deletePost = async () => {
+  isDeleteConfirmOpen.value = false;
+
   await api.posts.deletePostById({
-    id,
+    id: post.value._id,
   });
 
   notificationsStore.showInfoNotification({
@@ -613,7 +631,7 @@ const searchByTag = (tag: string) => {
 
   &__title {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
     margin-bottom: 1rem;
     font-size: 1.5rem;
@@ -623,13 +641,16 @@ const searchByTag = (tag: string) => {
     @media (--phone-only) {
       font-size: 1.25rem;
     }
+  }
 
-    /* The edit link; the delete button styles its own icon */
-    a svg {
-      position: relative;
-      top: 3px;
-      fill: var(--color-text-secondary);
-    }
+  /* One title line tall, so the buttons center on the first line of a long title */
+  &__actions {
+    display: flex;
+    flex: none;
+    align-items: center;
+    height: 1.3em;
+    gap: 4px;
+    margin-left: auto;
   }
 
   &__title-link {
