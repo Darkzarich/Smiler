@@ -208,6 +208,18 @@ The split is deliberate: **linting at commit time, tests at push time**. Commits
 - Try a workflow change with [act](https://github.com/nektos/act) from a clean
   `git worktree add --detach`: act copies the working tree as it is, untracked files included.
 
+## Branches and pull requests
+
+`master` is protected: nothing is pushed to it directly. Every change, a one-line fix included,
+reaches it through a pull request that the CI workflow above has to pass. So before the first
+commit of a change, branch off an up-to-date `master`:
+
+- Name the branch `<type>/<kebab-slug>` with a commit type from below, as the history does
+  (`feat/migration-runner`, `refactor/redis-stores`, `ci/release-workflow`).
+- Push it with `git push -u origin <branch>` (the `pre-push` hook runs the test suites) and open
+  the pull request against `master`. Pull requests have been merged with a merge commit, so the
+  hashes on the branch are the ones `master` ends up with.
+
 ## Commit style
 
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) (the Angular convention), enforced by [commitlint](https://github.com/conventional-changelog/commitlint) with `@commitlint/config-conventional` in the `commit-msg` hook.
