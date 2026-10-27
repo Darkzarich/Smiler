@@ -1,7 +1,9 @@
 /* eslint-disable no-await-in-loop */
 
-import { expect } from '@playwright/test';
+import { type Page, expect } from '@playwright/test';
 import test from './page-objects';
+import type PostComponent from './page-objects/components/Post';
+import type PostsPageObject from './page-objects/pages/PostsPage';
 import mockDate from './utils/mock-date';
 import { postTypes } from '@api/posts';
 import createRandomAuth from '@factory/auth';
@@ -914,5 +916,195 @@ test.describe('Sections', () => {
     await expect(
       Post.getVideoSectionByHash(post._id, sections[2].hash),
     ).toHaveAttribute('src', sections[2].url);
+  });
+});
+
+test.describe('Back from a post', () => {
+  // A fresh object each: the factory fills in the overrides it is given
+  const createUnratedPost = () =>
+    createRandomPost({ rated: { isRated: false, negative: false } });
+  const firstPage = Array.from({ length: 15 }, createUnratedPost);
+  const secondPage = Array.from({ length: 15 }, createUnratedPost);
+  const opened = secondPage[3]!;
+
+  const latePictureUrl = 'https://placehold.co/600x1800';
+  const latePicture = createRandomSection(
+    postTypes.POST_SECTION_TYPES.PICTURE,
+    {
+      url: latePictureUrl,
+    },
+  );
+
+  secondPage[2]!.sections = [latePicture];
+
+  let listRequests: string[];
+
+  test.beforeEach(async ({ Api, context, page: currentPage }) => {
+    listRequests = [];
+
+    currentPage.on('request', (request) => {
+      if (Api.routes.posts.getToday.getURLRegExp().test(request.url())) {
+        listRequests.push(
+          new URL(request.url()).searchParams.get('offset') ?? '',
+        );
+      }
+    });
+
+    await context.route(
+      Api.routes.posts.getToday.getURLRegExp(),
+      async (route) => {
+        const offset = new URL(route.request().url()).searchParams.get(
+          'offset',
+        );
+
+        await route.fulfill({
+          json:
+            offset === '0'
+              ? { posts: firstPage, hasNextPage: true }
+              : { posts: secondPage, hasNextPage: false },
+        });
+      },
+    );
+
+    Api.routes.posts.getPostBySlug.mock({ body: opened });
+    Api.routes.comments.getComments.mock({ body: { comments: [] } });
+  });
+
+  async function openFromSecondPage({
+    PostsPage,
+    Post,
+    page: currentPage,
+  }: {
+    PostsPage: PostsPageObject;
+    Post: PostComponent;
+    page: Page;
+  }) {
+    await PostsPage.goto();
+    await expect(Post.getListedPosts()).toHaveCount(15);
+    await Post.scrollToListEnd();
+    await expect(Post.getListedPosts()).toHaveCount(30);
+
+    await Post.scrollPostDownTo(opened._id, 200);
+
+    const top = await Post.getPostTopById(opened._id);
+
+    await Post.openPostById(opened._id);
+    await expect(currentPage).toHaveURL(new RegExp(opened.slug));
+
+    return top;
+  }
+
+  test('Keeps the loaded pages and the place in the list', async ({
+    Post,
+    PostsPage,
+    page: currentPage,
+  }) => {
+    const top = await openFromSecondPage({
+      Post,
+      PostsPage,
+      page: currentPage,
+    });
+
+    await currentPage.goBack();
+
+    await expect(Post.getListedPosts()).toHaveCount(30);
+    await expect
+      .poll(async () =>
+        Math.abs((await Post.getPostTopById(opened._id))! - top!),
+      )
+      .toBeLessThanOrEqual(2);
+    expect(listRequests).toEqual(['0', '15']);
+  });
+
+  // The picture right above the post loads only after the reader has left, so
+  // after Back it grows the page above the post: the saved scrollY is stale
+  test('Keeps the place while a picture above it loads', async ({
+    Post,
+    PostsPage,
+    page: currentPage,
+  }) => {
+    let releasePicture = () => {};
+    const pictureReleased = new Promise<void>((resolve) => {
+      releasePicture = resolve;
+    });
+
+    await currentPage.route(latePictureUrl, async (route) => {
+      await pictureReleased;
+      // The first visit's request is gone with the page it was for
+      await route
+        .fulfill({
+          contentType: 'image/svg+xml',
+          body: '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1800"/>',
+        })
+        .catch(() => {});
+    });
+
+    const top = await openFromSecondPage({
+      Post,
+      PostsPage,
+      page: currentPage,
+    });
+
+    releasePicture();
+    await currentPage.goBack();
+
+    await expect
+      .poll(() =>
+        Post.getPicSectionByHash(secondPage[2]!._id, latePicture.hash).evaluate(
+          (img: HTMLImageElement) => img.naturalHeight,
+        ),
+      )
+      .toBe(1800);
+    await expect
+      .poll(async () =>
+        Math.abs((await Post.getPostTopById(opened._id))! - top!),
+      )
+      .toBeLessThanOrEqual(2);
+  });
+
+  test('Fetches page one again on a visit that is not Back', async ({
+    Post,
+    PostsPage,
+    Menu,
+    page: currentPage,
+  }) => {
+    await openFromSecondPage({ Post, PostsPage, page: currentPage });
+    await Menu.openIfMobile();
+    await PostsPage.selectPostGroup(PostsPage.groups.today);
+
+    await expect(Post.getListedPosts()).toHaveCount(15);
+    expect(listRequests).toEqual(['0', '15', '0']);
+    expect(await currentPage.evaluate(() => window.scrollY)).toBe(0);
+  });
+
+  test('Shows a vote cast on the post page', async ({
+    Api,
+    Post,
+    PostsPage,
+    page: currentPage,
+  }) => {
+    Api.routes.auth.getAuth.mock({ body: createRandomAuth({ isAuth: true }) });
+    Api.routes.posts.updateRateById.mock({
+      body: { ...opened, rating: opened.rating + 1 },
+    });
+    // After getPostBySlug, whose /posts/* also matches /posts/votes
+    Api.routes.posts.getMyVotes.mock({
+      body: { [opened._id]: { isRated: true, negative: false } },
+    });
+
+    await openFromSecondPage({ Post, PostsPage, page: currentPage });
+    await Post.upvotePostById(opened._id);
+    await expect(Post.getUpvoteBtnById(opened._id)).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+
+    await currentPage.goBack();
+
+    await expect(Post.getListedPosts()).toHaveCount(30);
+    await expect(Post.getUpvoteBtnById(opened._id)).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
   });
 });

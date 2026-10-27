@@ -411,3 +411,50 @@ test.describe('Follows and unfollow', () => {
     expect(followRequests).toEqual([]);
   });
 });
+
+test('Keeps the posts and the place in them on Back from a post', async ({
+  page: currentPage,
+  ProfilePage,
+  Post,
+  Api,
+}) => {
+  const authorPosts = Array.from({ length: 15 }, () => createRandomPost());
+  const opened = authorPosts[10]!;
+  const postRequests: string[] = [];
+  const profileRequests: string[] = [];
+
+  currentPage.on('request', (request) => {
+    if (Api.routes.posts.getPosts.getURLRegExp().test(request.url())) {
+      postRequests.push(request.url());
+    }
+
+    if (Api.routes.users.getUserProfile.getURLRegExp().test(request.url())) {
+      profileRequests.push(request.url());
+    }
+  });
+
+  Api.routes.posts.getPosts.mock({
+    body: { posts: authorPosts, hasNextPage: false },
+  });
+  Api.routes.posts.getPostBySlug.mock({ body: opened });
+  Api.routes.comments.getComments.mock({ body: { comments: [] } });
+
+  await ProfilePage.goto(testUser.login);
+  await expect(Post.getListedPosts()).toHaveCount(15);
+  await Post.scrollPostDownTo(opened._id, 200);
+
+  const top = await Post.getPostTopById(opened._id);
+
+  await Post.openPostById(opened._id);
+  await expect(currentPage).toHaveURL(new RegExp(opened.slug));
+  await currentPage.goBack();
+
+  await expect(Post.getListedPosts()).toHaveCount(15);
+  await expect(ProfilePage.login).toBeVisible();
+  await expect
+    .poll(async () => Math.abs((await Post.getPostTopById(opened._id))! - top!))
+    .toBeLessThanOrEqual(2);
+  expect(postRequests).toHaveLength(1);
+  // The profile is fetched again for a follow made on the way
+  await expect.poll(() => profileRequests.length).toBe(2);
+});

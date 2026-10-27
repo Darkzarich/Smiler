@@ -67,6 +67,12 @@ function lookUpOwnVote(target: VoteTarget, id: string) {
   });
 }
 
+export async function lookUpOwnVotes(target: VoteTarget, ids: string[]) {
+  const votes = await Promise.all(ids.map((id) => lookUpOwnVote(target, id)));
+
+  return new Map(ids.map((id, i) => [id, votes[i]]));
+}
+
 /** A post or comment carries the vote of whoever was signed in when it was
  * loaded. This keeps it in step as the user signs in or out afterwards. */
 export function useOwnVote<T extends Votable>(

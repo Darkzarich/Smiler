@@ -40,29 +40,24 @@ test.beforeEach(async ({ Api }) => {
   });
 });
 
-test.describe('Fetches a post by the slug of the post after clicking it in the list of posts', () => {
+test.describe('Opening a post from the list of posts', () => {
   test.beforeEach(async ({ PostsPage }) => {
     await PostsPage.goto();
   });
 
-  test('Mobile', async ({
+  test('Opens it in the same tab', async ({
     SinglePostPage,
     page: currentPage,
     Post,
-    isMobile,
     Api,
   }) => {
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    if (!isMobile) {
-      return;
-    }
-
     const postBySlugResponse =
       await Api.routes.posts.getPostBySlug.waitForRequest({
         preRequestAction: Post.openPostById.bind(Post, post._id),
       });
 
     expect(postBySlugResponse.url()).toContain(post.slug);
+    expect(currentPage.context().pages()).toHaveLength(1);
     await expect(currentPage).toHaveURL(
       SinglePostPage.getUrlWithSlug(post.slug),
     );
@@ -70,11 +65,16 @@ test.describe('Fetches a post by the slug of the post after clicking it in the l
     await expect(Post.getTitleById(post._id)).toHaveText(post.title);
   });
 
-  test('Desktop', async ({ Api, SinglePostPage, Post, isMobile }) => {
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    if (isMobile) {
-      return;
-    }
+  test('Opens it in a new tab on a middle click', async ({
+    Api,
+    SinglePostPage,
+    PostsPage,
+    page: currentPage,
+    Post,
+    isMobile,
+  }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(isMobile, 'A touch screen has no middle button');
 
     const newPage = await Post.openPostByIdInNewTab(post._id);
 
@@ -83,7 +83,8 @@ test.describe('Fetches a post by the slug of the post after clicking it in the l
         page: newPage,
       });
 
-    // Setting a new browser tab context
+    await expect(currentPage).toHaveURL(PostsPage.urls.today);
+
     Post.setPage(newPage);
 
     expect(postBySlugResponse.url()).toContain(post.slug);
@@ -164,6 +165,47 @@ test('Opens user profile after clicking on the author of the post', async ({
   await expect(currentPage).toHaveTitle(
     ProfilePage.getTitle(post.author.login),
   );
+});
+
+test('Comes back to the same place on the post on Back', async ({
+  SinglePostPage,
+  ProfilePage,
+  Post,
+  page: currentPage,
+  Api,
+}) => {
+  Api.routes.comments.getComments.mock({
+    body: {
+      comments: Array.from({ length: 12 }, () => createRandomComment()),
+    },
+  });
+  Api.routes.users.getUserProfile.mock({
+    body: createRandomProfile(),
+  });
+
+  await SinglePostPage.goto(post.slug);
+
+  const author = currentPage.getByTestId(`post-${post._id}-author`);
+
+  await expect(Post.getTitleById(post._id)).toBeVisible();
+  await author.evaluate((link) => {
+    link.scrollIntoView();
+    window.scrollBy(0, -150);
+  });
+
+  const scrollY = await currentPage.evaluate(() => window.scrollY);
+
+  expect(scrollY).toBeGreaterThan(0);
+
+  await author.click();
+  await expect(currentPage).toHaveURL(
+    ProfilePage.getUrlWithLogin(post.author.login),
+  );
+  await currentPage.goBack();
+
+  await expect
+    .poll(() => currentPage.evaluate(() => window.scrollY))
+    .toBe(scrollY);
 });
 
 test.describe('Sections', () => {
@@ -570,15 +612,8 @@ test.describe('Opens a post at its comments', () => {
     PostsPage,
     SinglePostPage,
     Post,
-    isMobile,
     page: currentPage,
   }) => {
-    // Desktop opens the post in a new tab, which is the next test's fresh load
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    if (!isMobile) {
-      return;
-    }
-
     await PostsPage.goto();
     await Post.getCommentsCountById(postWithPicture._id).click();
 

@@ -24,6 +24,7 @@ import { useRoute } from 'vue-router';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
+import { useRestorablePosts } from '@/composables/use-restorable-posts';
 import * as consts from '@/const';
 
 const route = useRoute();
@@ -35,6 +36,12 @@ const posts = ref<postTypes.Post[]>([]);
 const curPage = ref(0);
 const nextCursor = ref<string | null>(null);
 const hasNextPage = ref(false);
+
+const { restore } = useRestorablePosts(posts, {
+  curPage,
+  nextCursor,
+  hasNextPage,
+});
 
 /** Sorted by the date of creation, so they page by cursor: an offset would
  * repeat posts that new ones had pushed down between two pages. */
@@ -119,6 +126,8 @@ watch(
 );
 
 onBeforeMount(() => {
-  fetchPosts();
+  if (!restore()) {
+    fetchPosts();
+  }
 });
 </script>

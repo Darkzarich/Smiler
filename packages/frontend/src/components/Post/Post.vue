@@ -39,7 +39,6 @@
               slug: post.slug,
             },
           }"
-          :target="isPhone ? '' : '_blank'"
           :data-testid="`post-${post._id}-title`"
         >
           {{ post.title }}
@@ -181,7 +180,6 @@
           <RouterLink
             class="post__comments-count"
             :data-testid="`post-${post._id}-comments-count`"
-            :target="isPhone ? '' : '_blank'"
             :to="{
               name: 'Single',
               hash: '#comments',
@@ -240,7 +238,6 @@ import {
 } from './is-section-of-type';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
-import { useMediaQuery } from '@/composables/use-media-query';
 import { useOwnVote } from '@/composables/use-own-vote';
 import { POST_RATE_VALUE } from '@/const';
 import { useAuthPromptStore } from '@/store/auth-prompt';
@@ -280,8 +277,6 @@ const post = defineModel<postTypes.Post>('post', {
 const { whenOwnVoteShown } = useOwnVote('post', post);
 
 const router = useRouter();
-
-const isPhone = useMediaQuery('phone-only');
 
 const isRequesting = ref(false);
 

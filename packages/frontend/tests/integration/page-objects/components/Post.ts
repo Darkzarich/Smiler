@@ -31,6 +31,33 @@ export default class Post extends AbstractComponent {
     return this.page.getByTestId(`post-${id}-title`);
   }
 
+  getPostById(id: string) {
+    return this.page.locator(`[data-post-id="${id}"]`);
+  }
+
+  getListedPosts() {
+    return this.postsList.locator('[data-post-id]');
+  }
+
+  /** Leaves the post `offset` px below the top of the window, where a click
+   * on its title needs no scrolling first */
+  async scrollPostDownTo(id: string, offset: number) {
+    await this.getPostById(id).evaluate((post, by) => {
+      post.scrollIntoView();
+      window.scrollBy(0, -by);
+    }, offset);
+  }
+
+  async getPostTopById(id: string) {
+    return (await this.getPostById(id).boundingBox())?.y;
+  }
+
+  async scrollToListEnd() {
+    await this.page.evaluate(() =>
+      window.scrollTo(0, document.body.scrollHeight),
+    );
+  }
+
   getCommentsCountById(id = '') {
     return this.page.getByTestId(`post-${id}-comments-count`);
   }
@@ -132,12 +159,11 @@ export default class Post extends AbstractComponent {
     await this.getTitleById(id).click();
   }
 
-  /** On Desktop a post's page opens in a new browser tab.
-   * This method returns that new tab fixture after clicking on the title by post.id */
+  /** Returns the tab a middle click on the post's title opens */
   async openPostByIdInNewTab(postId: string) {
     const [newPage] = await Promise.all([
       this.context.waitForEvent('page'),
-      this.getTitleById(postId).click(),
+      this.getTitleById(postId).click({ button: 'middle' }),
     ]);
 
     return newPage;
