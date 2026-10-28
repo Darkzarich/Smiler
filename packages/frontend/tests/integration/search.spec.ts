@@ -147,6 +147,51 @@ test('Searches posts by ratingFrom and ratingTo', async ({
   expect(SearchPage.pageHasRatingQueryParams(ratings)).toBe(true);
 });
 
+test('Searches posts with a rating of 0', async ({
+  page: currentPage,
+  SearchPage,
+  Api,
+}) => {
+  await SearchPage.goto();
+
+  await SearchPage.ratingFrom.fill('0');
+
+  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+    preRequestAction: SearchPage.submitSearch.bind(SearchPage),
+  });
+
+  expect(postsResponse.url()).toContain('ratingFrom=0');
+  await expect(currentPage).toHaveURL(/[?&]ratingFrom=0(&|$)/);
+});
+
+test('Fits the search form on a 320px phone, labels above their fields', async ({
+  page,
+  SearchPage,
+}) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await SearchPage.goto(
+    'dateFrom=2026-01-02&dateTo=2026-10-06&ratingFrom=-1234&ratingTo=56789',
+  );
+
+  const form = await page.locator('.search-form').boundingBox();
+
+  for (const name of ['Date from', 'Date to', 'Rating from', 'Rating to']) {
+    const field = await page.getByLabel(name).boundingBox();
+    const label = await page.getByText(name, { exact: true }).boundingBox();
+
+    expect(label!.y + label!.height).toBeLessThanOrEqual(field!.y);
+    expect(label!.x).toBe(field!.x);
+    expect(field!.x).toBeGreaterThanOrEqual(form!.x);
+    expect(field!.x + field!.width).toBeLessThanOrEqual(form!.x + form!.width);
+  }
+
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
 test('Searches posts by tags', async ({
   page: currentPage,
   TagsList,

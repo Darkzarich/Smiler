@@ -54,7 +54,7 @@ interface Props {
   dataTestid?: string;
   disabled?: boolean;
   label?: string;
-  type?: 'text' | 'password';
+  type?: 'text' | 'password' | 'number' | 'date';
   name?: string;
   placeholder?: string;
   error?: string;
