@@ -162,13 +162,9 @@ onBeforeUnmount(removeAfterEach);
   top: 0;
   z-index: 2;
   width: 100%;
-  height: 56px;
+  height: var(--header-height);
   padding: 0.5rem max(0.5rem, var(--page-gutter));
   background-color: var(--color-surface-elevated);
-
-  @media (--phone-only) {
-    height: 46px;
-  }
 
   &__home-link {
     display: flex;

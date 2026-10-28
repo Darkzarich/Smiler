@@ -5,6 +5,7 @@
         v-for="notification in notifications"
         :key="notification.id"
         class="notification-list__item u-flex-row"
+        :role="notification.theme === 'error' ? 'alert' : 'status'"
         :class="{
           'notification-list__item--error': notification.theme === 'error',
           'notification-list__item--info': notification.theme === 'info',
@@ -42,42 +43,58 @@ const { notifications } = storeToRefs(notificationsStore);
 <style>
 .notification-list {
   position: fixed;
-  top: 0;
-  z-index: 999;
-  width: 100%;
+  top: var(--header-height);
+  right: 0;
+  left: 0;
+
+  /* Above BaseModal, so the error from a modal's own request (a wrong
+     password) is not dimmed by its backdrop */
+  z-index: 1001;
+  width: min(100% - 2 * var(--page-gutter), var(--page-max-width));
+
+  /* The header's bottom edge, so a bar slides out from behind the header */
+  overflow: clip;
+  margin-inline: auto;
+
+  @media (--tablet-portrait-up) {
+    border-radius: 0 0 8px 8px;
+  }
 
   &__item {
     justify-content: center;
     align-items: center;
     position: relative;
-    opacity: 1;
-    padding: 5px;
-    border-bottom: 1px solid var(--color-surface-primary);
-    background: var(--color-danger);
-    transition: opacity 0.2s 0s ease-in-out;
+    padding: 0.5rem;
+    color: var(--color-text-on-fill);
+
+    & + & {
+      border-top: 1px solid var(--color-surface-primary);
+    }
 
     &--info {
-      background: var(--color-primary-dark);
-      color: #fff;
+      background: var(--color-primary-fill);
     }
 
     &--error {
-      background: var(--color-danger);
-      color: #fff;
+      background: var(--color-danger-fill);
     }
 
+    /* Behind the bar above, so it slides out from under that one too */
     &-enter-active,
     &-leave-active {
-      transition: all 0.3s;
+      z-index: -1;
+      transition:
+        opacity 0.3s,
+        transform 0.3s;
     }
 
     &-enter-from,
     &-leave-to {
       opacity: 0;
-      transform: translateY(15px);
+      transform: translateY(-100%);
 
-      @media (--phone-only) {
-        transform: translateY(-15px);
+      @media (prefers-reduced-motion: reduce) {
+        transform: none;
       }
     }
   }
@@ -88,10 +105,18 @@ const { notifications } = storeToRefs(notificationsStore);
   }
 
   &__close {
+    display: flex;
     position: absolute;
     top: 50%;
     right: 4px;
     transform: translateY(-50%);
+
+    /* Inside the button: the list clips anything past the bar, and the green
+       ring would not show on the green info bar */
+    & :focus-visible {
+      outline-color: currentcolor;
+      outline-offset: -2px;
+    }
   }
 }
 </style>

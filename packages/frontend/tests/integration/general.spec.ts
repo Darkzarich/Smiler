@@ -387,3 +387,40 @@ test.describe('Mobile menu', () => {
     await expect(Menu.mobileMenuBtn).toBeFocused();
   });
 });
+
+test.describe('Notifications', () => {
+  test('Shows a notification under the header, leaving the header usable', async ({
+    page,
+    PostsPage,
+    Api,
+    isMobile,
+  }) => {
+    Api.routes.posts.getToday.mock({
+      status: 500,
+      body: { error: { message: 'Something went wrong' } },
+    });
+
+    await PostsPage.goto(PostsPage.urls.today);
+
+    const notification = page.getByRole('alert');
+
+    await expect(notification).toHaveText('Something went wrong');
+
+    const headerBottom = await page
+      .locator('header')
+      .evaluate((el) => el.getBoundingClientRect().bottom);
+
+    await expect(async () => {
+      const box = (await notification.boundingBox())!;
+
+      expect(box.y).toBe(headerBottom);
+    }).toPass();
+
+    for (const control of [
+      page.getByTestId(isMobile ? 'mobile-menu' : 'today-link'),
+      page.getByTestId('header-search-button'),
+    ]) {
+      await control.click({ trial: true, timeout: 2000 });
+    }
+  });
+});

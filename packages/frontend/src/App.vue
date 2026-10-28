@@ -58,6 +58,7 @@ onMounted(() => {
   --variable-widget-margin: 24px;
   --page-max-width: 1110px;
   --page-gutter: 0px;
+  --header-height: 46px;
 
   /* Wide enough for a five-digit rating. The page column is padded by it, so
      everything lines up with the post cards and a Post hangs its votes into it. */
@@ -69,6 +70,7 @@ onMounted(() => {
 
   @media (--tablet-portrait-up) {
     --page-gutter: 16px;
+    --header-height: 56px;
     --post-votes-width: 64px;
     --font-size-title: 1.5rem;
   }
