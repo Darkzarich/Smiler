@@ -12,7 +12,8 @@
     ]"
     :aria-label="label"
     :aria-pressed="pressed"
-    :title="label"
+    :aria-keyshortcuts="keys?.aria"
+    :title="keys ? `${label} (${keys.text})` : label"
     :disabled="to ? undefined : disabled"
   >
     <span class="base-icon-button__face">
@@ -22,7 +23,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { type RouteLocationRaw, RouterLink } from 'vue-router';
+import { describeShortcut } from '@/utils/describe-shortcut';
 
 interface Props {
   /** The accessible name: an icon alone says nothing to a screen reader */
@@ -41,9 +44,11 @@ interface Props {
   disabled?: boolean;
   /** Makes it a link, for an icon-only control that opens another page */
   to?: RouteLocationRaw;
+  /** The key that does the same, in tiptap's notation (`Mod-b`), shown in the tooltip */
+  shortcut?: string;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   dataTestid: undefined,
   attrType: 'button',
   size: 'small',
@@ -51,7 +56,12 @@ withDefaults(defineProps<Props>(), {
   pressed: undefined,
   disabled: false,
   to: undefined,
+  shortcut: undefined,
 });
+
+const keys = computed(() =>
+  props.shortcut ? describeShortcut(props.shortcut) : undefined,
+);
 </script>
 
 <style>

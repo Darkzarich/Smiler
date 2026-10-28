@@ -1,138 +1,30 @@
 <template>
   <div class="base-text-editor u-widget">
     <div
-      class="base-text-editor__style-buttons u-flex-row"
+      class="base-text-editor__toolbar"
+      role="group"
+      aria-label="Formatting"
       :data-testid="dataTestid"
     >
-      <button
-        class="base-text-editor__style-button"
-        :class="{ 'base-text-editor__style-button--active': isActive('bold') }"
-        type="button"
-        title="bold"
-        @pointerdown.prevent.stop="formatSelectionFromPointer('bold')"
-        @click.prevent.stop="formatSelectionFromClick('bold')"
+      <div
+        v-for="(group, index) in toolGroups"
+        :key="index"
+        class="base-text-editor__tool-group"
       >
-        B
-      </button>
-
-      <button
-        class="base-text-editor__style-button"
-        :class="{
-          'base-text-editor__style-button--active': isActive('italic'),
-        }"
-        type="button"
-        title="italic"
-        @pointerdown.prevent.stop="formatSelectionFromPointer('italic')"
-        @click.prevent.stop="formatSelectionFromClick('italic')"
-      >
-        I
-      </button>
-
-      <button
-        class="base-text-editor__style-button"
-        :class="{
-          'base-text-editor__style-button--active': isActive('strike'),
-        }"
-        type="button"
-        title="strike"
-        @pointerdown.prevent.stop="formatSelectionFromPointer('strike')"
-        @click.prevent.stop="formatSelectionFromClick('strike')"
-      >
-        S
-      </button>
-
-      <button
-        class="base-text-editor__style-button"
-        :class="{
-          'base-text-editor__style-button--active': isActive('underline'),
-        }"
-        type="button"
-        title="underline"
-        @pointerdown.prevent.stop="formatSelectionFromPointer('underline')"
-        @click.prevent.stop="formatSelectionFromClick('underline')"
-      >
-        U
-      </button>
-
-      <button
-        class="base-text-editor__style-button"
-        :class="{
-          'base-text-editor__style-button--active': isActive('blockquote'),
-        }"
-        type="button"
-        title="blockquote"
-        @pointerdown.prevent.stop="formatSelectionFromPointer('blockquote')"
-        @click.prevent.stop="formatSelectionFromClick('blockquote')"
-      >
-        Q
-      </button>
-
-      <button
-        class="base-text-editor__style-button"
-        :class="{ 'base-text-editor__style-button--active': isActive('code') }"
-        type="button"
-        title="code"
-        @pointerdown.prevent.stop="formatSelectionFromPointer('code')"
-        @click.prevent.stop="formatSelectionFromClick('code')"
-      >
-        Code
-      </button>
-
-      <template v-if="features === TextEditorFeatures.Post">
-        <button
-          v-for="level in headingLevels"
-          :key="level"
-          class="base-text-editor__style-button"
-          :class="{
-            'base-text-editor__style-button--active': isHeadingActive(level),
-          }"
-          type="button"
-          :title="`heading ${level}`"
-          @pointerdown.prevent.stop="
-            formatSelectionFromPointer(`heading-${level}`)
+        <BaseIconButton
+          v-for="tool in group"
+          :key="tool.format"
+          :label="tool.label"
+          :shortcut="tool.shortcut"
+          :pressed="
+            tool.format === 'horizontalRule' ? undefined : isActive(tool.format)
           "
-          @click.prevent.stop="formatSelectionFromClick(`heading-${level}`)"
+          @pointerdown.prevent.stop="formatSelectionFromPointer(tool.format)"
+          @click.prevent.stop="formatSelectionFromClick(tool.format)"
         >
-          H{{ level }}
-        </button>
-      </template>
-
-      <button
-        class="base-text-editor__style-button"
-        :class="{
-          'base-text-editor__style-button--active': isActive('bulletList'),
-        }"
-        type="button"
-        title="bullet list"
-        @pointerdown.prevent.stop="formatSelectionFromPointer('bulletList')"
-        @click.prevent.stop="formatSelectionFromClick('bulletList')"
-      >
-        UL
-      </button>
-
-      <button
-        class="base-text-editor__style-button"
-        :class="{
-          'base-text-editor__style-button--active': isActive('orderedList'),
-        }"
-        type="button"
-        title="ordered list"
-        @pointerdown.prevent.stop="formatSelectionFromPointer('orderedList')"
-        @click.prevent.stop="formatSelectionFromClick('orderedList')"
-      >
-        OL
-      </button>
-
-      <button
-        v-if="features === TextEditorFeatures.Post"
-        class="base-text-editor__style-button"
-        type="button"
-        title="horizontal rule"
-        @pointerdown.prevent.stop="formatSelectionFromPointer('horizontalRule')"
-        @click.prevent.stop="formatSelectionFromClick('horizontalRule')"
-      >
-        HR
-      </button>
+          <component :is="tool.icon" />
+        </BaseIconButton>
+      </div>
     </div>
 
     <EditorContent :editor="editor" />
@@ -161,7 +53,20 @@ import { Strike } from '@tiptap/extension-strike';
 import { Text } from '@tiptap/extension-text';
 import { Underline } from '@tiptap/extension-underline';
 import { EditorContent, useEditor } from '@tiptap/vue-3';
-import { watch } from 'vue';
+import { type Component, watch } from 'vue';
+import IconBold from '@icons/IconBold.vue';
+import IconBulletedList from '@icons/IconBulletedList.vue';
+import IconCode from '@icons/IconCode.vue';
+import IconHeading1 from '@icons/IconHeading1.vue';
+import IconHeading2 from '@icons/IconHeading2.vue';
+import IconHeading3 from '@icons/IconHeading3.vue';
+import IconHorizontalRule from '@icons/IconHorizontalRule.vue';
+import IconItalic from '@icons/IconItalic.vue';
+import IconNumberedList from '@icons/IconNumberedList.vue';
+import IconQuote from '@icons/IconQuote.vue';
+import IconStrikethrough from '@icons/IconStrikethrough.vue';
+import IconUnderline from '@icons/IconUnderline.vue';
+import BaseIconButton from './BaseIconButton.vue';
 import { TextEditorFeatures } from './text-editor-features';
 
 type InlineFormat = 'bold' | 'italic' | 'strike' | 'underline' | 'code';
@@ -172,7 +77,16 @@ type BlockFormat =
   | 'horizontalRule';
 type HeadingFormat = `heading-${Level}`;
 type Format = InlineFormat | BlockFormat | HeadingFormat;
-type ActiveFormat = InlineFormat | Exclude<BlockFormat, 'horizontalRule'>;
+type ActiveFormat = Exclude<Format, 'horizontalRule'>;
+
+interface Tool {
+  format: Format;
+  label: string;
+  icon: Component;
+  /** The extension's own key binding, in its notation */
+  shortcut?: string;
+}
+
 type AllowedTag =
   | 'a'
   | 'b'
@@ -217,6 +131,69 @@ let skipNextToolbarClick = false;
 let isUpdatingFromEditor = false;
 
 const headingLevels = [1, 2, 3, 4, 5, 6] as const;
+
+const markTools: Tool[] = [
+  { format: 'bold', label: 'Bold', icon: IconBold, shortcut: 'Mod-b' },
+  { format: 'italic', label: 'Italic', icon: IconItalic, shortcut: 'Mod-i' },
+  {
+    format: 'underline',
+    label: 'Underline',
+    icon: IconUnderline,
+    shortcut: 'Mod-u',
+  },
+  {
+    format: 'strike',
+    label: 'Strikethrough',
+    icon: IconStrikethrough,
+    shortcut: 'Mod-Shift-s',
+  },
+  { format: 'code', label: 'Inline code', icon: IconCode, shortcut: 'Mod-e' },
+];
+// h4–h6 are drawn like h3 (styles/rich-text.css), so they get no buttons. The schema keeps all six
+// levels, so a post that has them survives an edit and `#### ` still makes one.
+const headingTools: Tool[] = [IconHeading1, IconHeading2, IconHeading3].map(
+  (icon, index) => ({
+    format: `heading-${(index + 1) as Level}`,
+    label: `Heading ${index + 1}`,
+    icon,
+    shortcut: `Mod-Alt-${index + 1}`,
+  }),
+);
+const blockTools: Tool[] = [
+  {
+    format: 'blockquote',
+    label: 'Quote',
+    icon: IconQuote,
+    shortcut: 'Mod-Shift-b',
+  },
+  {
+    format: 'bulletList',
+    label: 'Bulleted list',
+    icon: IconBulletedList,
+    shortcut: 'Mod-Shift-8',
+  },
+  {
+    format: 'orderedList',
+    label: 'Numbered list',
+    icon: IconNumberedList,
+    shortcut: 'Mod-Shift-7',
+  },
+];
+const toolGroups: Tool[][] =
+  props.features === TextEditorFeatures.Post
+    ? [
+        markTools,
+        headingTools,
+        [
+          ...blockTools,
+          {
+            format: 'horizontalRule',
+            label: 'Divider',
+            icon: IconHorizontalRule,
+          },
+        ],
+      ]
+    : [markTools, blockTools];
 const commonAllowedTags: AllowedTag[] = [
   'a',
   'b',
@@ -504,11 +481,15 @@ const editor = useEditor({
   },
 });
 
-const isActive = (format: ActiveFormat) =>
-  editor.value?.isActive(format) ?? false;
+const isActive = (format: ActiveFormat) => {
+  if (format.startsWith('heading-')) {
+    const level = Number(format.replace('heading-', ''));
 
-const isHeadingActive = (level: Level) =>
-  editor.value?.isActive('heading', { level }) ?? false;
+    return editor.value?.isActive('heading', { level }) ?? false;
+  }
+
+  return editor.value?.isActive(format) ?? false;
+};
 
 const toggleFormat = (format: Format) => {
   const chain = editor.value?.chain().focus();
@@ -600,44 +581,35 @@ watch(textEditorValue, (value) => {
   padding: 1rem;
   transition: border 200ms ease-out;
 
-  &__style-buttons {
+  &__toolbar {
+    display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 1rem;
+    gap: 4px 16px;
+    margin-bottom: 0.75rem;
+    container: formatting-toolbar / inline-size;
 
-    /* 32px buttons 12px apart, each with a 44px hit area: the areas meet but never overlap */
+    /* 28px buttons with 44px touch areas 16px apart: the areas meet but never overlap */
     @media (--pointer-coarse) {
-      gap: 12px;
+      gap: 16px;
     }
   }
 
-  &__style-button {
-    min-width: 22px;
-    min-height: 22px;
-    outline: none;
-    border: 1px solid var(--color-primary);
-    border-radius: 3px;
-    background: var(--color-surface-primary);
-    color: var(--color-text-primary);
-    font-family: monospace;
-    font-weight: bold;
-    cursor: pointer;
+  &__tool-group {
+    display: flex;
+    gap: 2px;
 
     @media (--pointer-coarse) {
-      position: relative;
-      min-width: 32px;
-      min-height: 32px;
+      gap: 16px;
 
-      &::before {
-        position: absolute;
-        content: '';
-        inset: -6px;
+      /* A margin, not a wider gap, so that the groups can let go of it below */
+      &:not(:last-child) {
+        margin-inline-end: 16px;
       }
-    }
 
-    &:hover,
-    &--active {
-      background: var(--color-surface-secondary);
+      /* Too narrow for the post editor's groups to take two rows, so the buttons flow as one list */
+      @container formatting-toolbar (width < 308px) {
+        display: contents;
+      }
     }
   }
 

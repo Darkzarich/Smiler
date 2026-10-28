@@ -2,7 +2,11 @@ import { enableAutoUnmount, mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it } from 'vitest';
 import BaseIconButton from './BaseIconButton.vue';
 
-function createWrapper(props: { label: string; pressed?: boolean }) {
+function createWrapper(props: {
+  label: string;
+  pressed?: boolean;
+  shortcut?: string;
+}) {
   return mount(BaseIconButton, {
     props,
     slots: { default: '<svg />' },
@@ -40,5 +44,14 @@ describe('BaseIconButton', () => {
         'aria-pressed',
       ),
     ).toBe('true');
+  });
+
+  it('shows its shortcut in the tooltip and announces it, leaving the name alone', () => {
+    // jsdom's navigator is no Apple device's
+    const wrapper = createWrapper({ label: 'Bold', shortcut: 'Mod-b' });
+
+    expect(wrapper.attributes('aria-label')).toBe('Bold');
+    expect(wrapper.attributes('title')).toBe('Bold (Ctrl+B)');
+    expect(wrapper.attributes('aria-keyshortcuts')).toBe('Control+B');
   });
 });

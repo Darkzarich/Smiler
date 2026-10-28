@@ -64,6 +64,7 @@
     "predownload",
     "prepush",
     "printjson",
+    "prosemirror",
     "redirector",
     "rediss",
     "resave",

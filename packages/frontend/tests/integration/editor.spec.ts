@@ -399,7 +399,9 @@ test('Formatting buttons keep editor focus and do not start section D&D', async 
   expect(await PostCreatePage.getPostSectionsContainer().innerHTML()).toMatch(
     /text-section[\s\S]*pic-section/,
   );
-  const boldButtonBox = await page.getByTitle('bold').boundingBox();
+  const boldButtonBox = await page
+    .getByRole('button', { name: 'Bold', exact: true })
+    .boundingBox();
   const targetBox = await PostCreatePage.getPostSection(1).boundingBox();
 
   if (!boldButtonBox || !targetBox) {
@@ -421,6 +423,58 @@ test('Formatting buttons keep editor focus and do not start section D&D', async 
     /text-section[\s\S]*pic-section/,
   );
   await expect(page.getByTestId('text-section-input')).toBeFocused();
+});
+
+test('Names every formatting and add-section button', async ({
+  page,
+  PostCreatePage,
+}) => {
+  await PostCreatePage.goto();
+
+  for (const name of ['Add text', 'Add picture', 'Add video']) {
+    await expect(page.getByRole('button', { name, exact: true })).toBeVisible();
+  }
+
+  await PostCreatePage.addTextSection();
+
+  const toolbar = page.getByRole('group', { name: 'Formatting' });
+  const names = [
+    'Bold',
+    'Italic',
+    'Underline',
+    'Strikethrough',
+    'Inline code',
+    'Heading 1',
+    'Heading 2',
+    'Heading 3',
+    'Quote',
+    'Bulleted list',
+    'Numbered list',
+    'Divider',
+  ];
+
+  await expect(toolbar.getByRole('button')).toHaveCount(names.length);
+
+  for (const name of names) {
+    await expect(
+      toolbar.getByRole('button', { name, exact: true }),
+    ).toBeVisible();
+  }
+
+  const bold = toolbar.getByRole('button', { name: 'Bold', exact: true });
+
+  await expect(bold).toHaveAttribute('title', /^Bold \((Ctrl\+B|⌘B)\)$/);
+  await expect(bold).toHaveAttribute('aria-pressed', 'false');
+
+  await bold.click();
+  // tiptap moves the focus into the editor a frame after the click
+  await expect(page.getByTestId('text-section-input')).toBeFocused();
+  await page.keyboard.type('loud');
+
+  await expect(bold).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('text-section-input').locator('b')).toHaveText(
+    'loud',
+  );
 });
 
 test('Fetch and show draft template', async ({ Api, page, PostCreatePage }) => {
