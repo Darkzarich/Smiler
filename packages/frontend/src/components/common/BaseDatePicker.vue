@@ -54,6 +54,10 @@ const handleInput = (event: Event) => {
     background: var(--color-surface-primary);
     color: var(--color-text-primary);
 
+    @media (--pointer-coarse) {
+      min-height: 44px;
+    }
+
     &::-webkit-inner-spin-button {
       display: none;
     }

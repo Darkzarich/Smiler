@@ -23,7 +23,7 @@
         />
       </Transition>
 
-      <RouterLink class="header__home-link" :to="{ name: 'Home' }">
+      <RouterLink class="header__home-link u-touch-area" :to="{ name: 'Home' }">
         <SiteLogo />
       </RouterLink>
 
@@ -74,6 +74,7 @@
         <div v-if="user" class="header__avatar">
           <!-- TODO: Move everything like that to its own component AvatarLink or something -->
           <RouterLink
+            class="u-touch-area"
             :to="{
               name: 'UserPage',
               params: {
@@ -168,6 +169,15 @@ onBeforeUnmount(removeAfterEach);
 
   &__home-link {
     display: flex;
+    align-items: center;
+
+    /* Not grown with a touch phone's taller header: at 320px a bigger logo
+       would take the search field's width */
+    @media (--phone-only) {
+      .site-logo {
+        height: 30px;
+      }
+    }
   }
 
   &__container {

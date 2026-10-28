@@ -78,6 +78,11 @@ onMounted(() => {
   @media (--tablet-landscape-up) {
     --page-gutter: 24px;
   }
+
+  /* Room for 44px controls, which the 46px phone header has not */
+  @media (--pointer-coarse) {
+    --header-height: 56px;
+  }
 }
 
 html {
