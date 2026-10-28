@@ -1,6 +1,6 @@
 <template>
   <div class="search-form">
-    <h1 class="search-form__title">Search</h1>
+    <h1 class="u-page-title">Search</h1>
 
     <div class="search-form__title-field">
       <BaseInput
@@ -11,34 +11,35 @@
       />
     </div>
 
-    <div class="search-form__columns u-flex-row">
-      <div class="search-form__column u-flex-col">
-        <BaseDatePicker
-          v-model="filters.dateFrom"
-          class="search-form__date-picker-from"
-          data-testid="search-form-date-from"
-          :label="'Date from'"
-        />
-        <BaseDatePicker
-          v-model="filters.dateTo"
-          data-testid="search-form-date-to"
-          :label="'Date to'"
-        />
-      </div>
-
-      <div class="search-form__column u-flex-col">
-        <BaseSlider
-          v-model="filters.ratingFrom"
-          data-testid="search-form-rating-from"
-          class="search-form__slider-from"
-          :label="'Rating from'"
-        />
-        <BaseSlider
-          v-model="filters.ratingTo"
-          data-testid="search-form-rating-to"
-          :label="'Rating to'"
-        />
-      </div>
+    <div class="search-form__ranges">
+      <BaseInput
+        v-model="filters.dateFrom"
+        type="date"
+        label="Date from"
+        data-testid="search-form-date-from"
+      />
+      <BaseInput
+        v-model="filters.dateTo"
+        type="date"
+        label="Date to"
+        data-testid="search-form-date-to"
+      />
+      <BaseInput
+        v-model="ratingFrom"
+        type="number"
+        label="Rating from"
+        placeholder="Any"
+        data-testid="search-form-rating-from"
+        @keyup.enter="search"
+      />
+      <BaseInput
+        v-model="ratingTo"
+        type="number"
+        label="Rating to"
+        placeholder="Any"
+        data-testid="search-form-rating-to"
+        @keyup.enter="search"
+      />
     </div>
 
     <div class="search-form__tags">
@@ -71,13 +72,12 @@
 
 <script setup lang="ts">
 import { cloneDeep, omitBy } from 'lodash-es';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { isFilterSet } from './is-filter-set';
 import type { SearchFilter } from './types';
 import BaseButton from '@common/BaseButton.vue';
-import BaseDatePicker from '@common/BaseDatePicker.vue';
 import BaseInput from '@common/BaseInput.vue';
-import BaseSlider from '@common/BaseSlider.vue';
 import PostEditorTags from '@components/PostEditor/PostEditorTags.vue';
 
 const defaultFilters: SearchFilter = {
@@ -105,6 +105,17 @@ watch(
   { immediate: true },
 );
 
+const useRatingField = (key: 'ratingFrom' | 'ratingTo') =>
+  computed({
+    get: () => filters.value[key]?.toString() ?? '',
+    set: (value: string) => {
+      filters.value[key] = value === '' ? null : Number(value);
+    },
+  });
+
+const ratingFrom = useRatingField('ratingFrom');
+const ratingTo = useRatingField('ratingTo');
+
 const search = () => {
   modelValue.value = filters.value;
 
@@ -121,37 +132,34 @@ const clearFilters = () => {
 
 const applyFiltersToRoute = () => {
   router.push({
-    query: omitBy(filters.value, (value) => !value),
+    query: omitBy(filters.value, (value) => !isFilterSet(value)),
   });
 };
 </script>
 
 <style>
 .search-form {
-  &__title {
-    margin-bottom: 12px;
-    color: var(--color-text-primary);
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: 500;
-  }
-
   &__title-field {
     margin-bottom: 12px;
   }
 
-  &__columns {
-    justify-content: space-around;
+  /* The column gap matches the actions' so the second column lines up with Clear filters */
+  &__ranges {
+    display: grid;
+    gap: 12px 16px;
     margin-bottom: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  &__column {
-    justify-content: center;
-  }
+  &__tags {
+    .post-editor-tags__form,
+    .base-input {
+      flex: 1;
+    }
 
-  &__date-picker-from,
-  &__slider-from {
-    margin-bottom: 12px;
+    .post-editor-tags__form {
+      min-width: 12rem;
+    }
   }
 
   &__actions {

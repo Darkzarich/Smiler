@@ -2,6 +2,7 @@ import { expect, type Locator, type Page } from '@playwright/test';
 import AbstractComponent from './AbstractComponent';
 
 export default class ConfirmModal extends AbstractComponent {
+  readonly root: Locator;
   readonly panel: Locator;
   readonly confirmBtn: Locator;
   readonly cancelBtn: Locator;
@@ -9,13 +10,10 @@ export default class ConfirmModal extends AbstractComponent {
   constructor(page: Page, dataTestid = 'confirm-modal') {
     super(page);
 
+    this.root = page.getByTestId(dataTestid);
     this.panel = page.getByTestId(`${dataTestid}-panel`);
     this.confirmBtn = page.getByTestId(`${dataTestid}-confirm`);
     this.cancelBtn = page.getByTestId(`${dataTestid}-cancel`);
-  }
-
-  getRoot() {
-    return this.page.getByTestId('confirm-modal');
   }
 
   async confirm() {
@@ -31,6 +29,6 @@ export default class ConfirmModal extends AbstractComponent {
   }
 
   async expectHidden() {
-    await expect(this.getRoot()).toBeHidden();
+    await expect(this.root).toBeHidden();
   }
 }

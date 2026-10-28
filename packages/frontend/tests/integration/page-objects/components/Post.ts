@@ -1,5 +1,6 @@
 import { type BrowserContext, type Locator, type Page } from '@playwright/test';
 import AbstractComponent from './AbstractComponent';
+import ConfirmModal from './ConfirmModal';
 
 export default class Post extends AbstractComponent {
   readonly context: BrowserContext;
@@ -7,6 +8,7 @@ export default class Post extends AbstractComponent {
   readonly postsList: Locator;
   readonly editBtn: Locator;
   readonly deleteBtn: Locator;
+  readonly deleteConfirmModal: ConfirmModal;
 
   constructor(page: Page, isMobile: boolean) {
     super(page);
@@ -15,8 +17,12 @@ export default class Post extends AbstractComponent {
     this.isMobile = isMobile;
 
     this.postsList = page.getByTestId('posts-container');
-    this.editBtn = page.getByTestId('post-edit-icon');
-    this.deleteBtn = page.getByTestId('post-delete-icon');
+    this.editBtn = page.getByTestId('post-edit-button');
+    this.deleteBtn = page.getByTestId('post-delete-button');
+    this.deleteConfirmModal = new ConfirmModal(
+      page,
+      'confirm-delete-post-modal',
+    );
   }
 
   setPage(page: Page) {
@@ -179,6 +185,7 @@ export default class Post extends AbstractComponent {
 
   async deletePost() {
     await this.deleteBtn.click();
+    await this.deleteConfirmModal.confirm();
   }
 
   async upvotePostById(postId = '') {

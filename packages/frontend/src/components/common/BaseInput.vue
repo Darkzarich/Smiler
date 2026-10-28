@@ -54,7 +54,7 @@ interface Props {
   dataTestid?: string;
   disabled?: boolean;
   label?: string;
-  type?: 'text' | 'password';
+  type?: 'text' | 'password' | 'number' | 'date';
   name?: string;
   placeholder?: string;
   error?: string;
@@ -117,6 +117,10 @@ const setValue = (event: Event) => {
     color: var(--color-text-primary);
     transition: all 200ms ease-out;
 
+    @media (--pointer-coarse) {
+      min-height: 44px;
+    }
+
     &:focus {
       outline: none;
       border: 1px solid var(--color-primary-strong);
@@ -149,13 +153,18 @@ const setValue = (event: Event) => {
     font-size: 12px;
   }
 
-  /* Sized for a small BaseIconButton (28px), centered in the 36px field */
+  /* Sized for a small BaseIconButton (28px), centered in the 36px field
+     (44px on a touch screen) */
   &__icon {
     display: flex;
     align-items: center;
     position: absolute;
     top: 4px;
     right: 4px;
+
+    @media (--pointer-coarse) {
+      top: 8px;
+    }
   }
 }
 </style>

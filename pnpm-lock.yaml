@@ -197,6 +197,9 @@ importers:
 
   packages/frontend:
     dependencies:
+      '@fontsource-variable/roboto':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@tiptap/core':
         specifier: ^3.30.5
         version: 3.30.5(@tiptap/pm@3.30.5)
@@ -1862,6 +1865,10 @@ packages:
 
   /@floating-ui/utils@0.2.12:
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
+    dev: false
+
+  /@fontsource-variable/roboto@5.3.0:
+    resolution: {integrity: sha512-BoaaZiQf8fgtxv07KXkTwx1bKz/EoqIlTXq2OOKKXINxp6qXWdnlChqV+hSaDANS49yyUASFl3OVBMMDTCIHFA==}
     dev: false
 
   /@humanfs/core@0.19.2:

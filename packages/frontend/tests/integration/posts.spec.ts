@@ -112,6 +112,86 @@ test('Shows the end of the list only once the last page has loaded', async ({
   await expect(Post.getNoMoreContentText()).toBeVisible();
 });
 
+test('Fits the post footer on one line on a 320px phone', async ({
+  page,
+  Api,
+  PostsPage,
+}) => {
+  // The longest login allowed, in the widest letter
+  const longPost = createRandomPost({
+    author: { login: 'w'.repeat(15) },
+    commentCount: 10,
+    createdAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
+  });
+
+  Api.routes.posts.getToday.mock({
+    body: { posts: [longPost], hasNextPage: false },
+  });
+
+  await page.setViewportSize({ width: 320, height: 800 });
+  await PostsPage.goto(PostsPage.urls.today);
+
+  const footer = page.locator('.post__meta-info');
+
+  await expect(footer.locator('.post__date')).toHaveText('20 minutes ago');
+
+  const layout = await footer.evaluate((el) => {
+    const edge = el.getBoundingClientRect();
+    const range = document.createRange();
+
+    range.selectNodeContents(el.querySelector('.post__date')!);
+
+    return {
+      dateLines: new Set(
+        [...range.getClientRects()].map((rect) => Math.round(rect.top)),
+      ).size,
+      pastEdge: [...el.querySelectorAll('*')]
+        .filter((child) => {
+          const rect = child.getBoundingClientRect();
+
+          return rect.left < edge.left || rect.right > edge.right + 0.5;
+        })
+        .map((child) => child.outerHTML.slice(0, 60)),
+    };
+  });
+
+  expect(layout).toEqual({ dateLines: 1, pastEdge: [] });
+});
+
+test('Takes a post deleted from the list off the list', async ({
+  page,
+  Api,
+  Post,
+  PostsPage,
+  NotificationList,
+}) => {
+  const auth = createRandomAuth({ isAuth: true });
+  const ownPost = createRandomPost({
+    author: { _id: auth._id },
+    createdAt: new Date().toISOString(),
+  });
+
+  Api.routes.auth.getAuth.mock({ body: auth });
+  Api.routes.posts.getToday.mock({
+    body: { posts: [post1, ownPost, post2], hasNextPage: false },
+  });
+  Api.routes.posts.deletePostById.mock({ status: 200 });
+
+  await PostsPage.goto(PostsPage.urls.today);
+  await expect(Post.getTitleById(ownPost._id)).toBeVisible();
+
+  await Api.routes.posts.deletePostById.waitForRequest({
+    preRequestAction: Post.deletePost.bind(Post),
+  });
+
+  await expect(NotificationList.root).toHaveText(
+    'The post has been successfully deleted',
+  );
+  await expect(Post.getPostById(ownPost._id)).toHaveCount(0);
+  await expect(Post.getListedPosts()).toHaveCount(2);
+  await expect(page).toHaveURL(PostsPage.urls.today);
+});
+
 test.describe('Post groups', () => {
   test.beforeEach(async ({ context }) => {
     // playwright.config.js has Europe/Amsterdam (GMT+1) timezone set

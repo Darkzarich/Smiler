@@ -22,6 +22,22 @@
   }
 }
 
+.u-page-title {
+  margin-bottom: 1rem;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-title);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.u-section-title {
+  margin-bottom: 0.75rem;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-heading);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
 .u-scroll {
   &::-webkit-scrollbar {
     width: 10px;
@@ -35,5 +51,20 @@
 
   &::-webkit-scrollbar-track {
     background-color: var(--color-scrollbar-track);
+  }
+}
+
+/* Grows the tap area of a small control to 44px on a touch screen without
+   moving anything around it. Needs the room: a neighbor closer than the
+   growth would share taps with it. */
+.u-touch-area {
+  position: relative;
+
+  @media (--pointer-coarse) {
+    &::before {
+      position: absolute;
+      content: '';
+      inset: min(0px, calc((100% - 44px) / 2));
+    }
   }
 }

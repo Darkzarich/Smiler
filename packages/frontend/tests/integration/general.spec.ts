@@ -78,6 +78,56 @@ test.describe('Header between phone and desktop widths', () => {
   }
 });
 
+test.describe('Sign in from the header', () => {
+  test.beforeEach(async ({ Api }) => {
+    Api.routes.posts.getToday.mock({
+      body: { posts: [], hasNextPage: false },
+    });
+  });
+
+  test('Opens the sign-in prompt from the phone header', async ({
+    page,
+    Api,
+    PostsPage,
+    AuthPrompt,
+    isMobile,
+  }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(!isMobile, 'From 600px up the sidebar has the sign-in form');
+
+    await Api.routes.auth.signIn.mock({
+      body: createRandomAuth({ isAuth: true }),
+    });
+
+    await PostsPage.goto(PostsPage.urls.today);
+
+    const header = page.locator('header');
+    const signInBtn = header.getByTestId('header-sign-in');
+
+    await signInBtn.click();
+
+    await expect(AuthPrompt.title).toHaveText('Welcome to Smiler');
+    await expect(AuthPrompt.panel).not.toContainText('You need an account');
+
+    await AuthPrompt.signIn();
+
+    await expect(AuthPrompt.panel).toBeHidden();
+    await expect(signInBtn).toBeHidden();
+    await expect(header.getByRole('img', { name: 'avatar' })).toBeVisible();
+  });
+
+  test('Leaves signing in to the sidebar from 600px up', async ({
+    page,
+    PostsPage,
+  }) => {
+    await page.setViewportSize({ width: 600, height: 900 });
+    await PostsPage.goto(PostsPage.urls.today);
+
+    await expect(page.getByTestId('signin-form')).toBeVisible();
+    await expect(page.getByTestId('header-sign-in')).toBeHidden();
+  });
+});
+
 test.describe('Page gutter between phone and desktop widths', () => {
   test.beforeEach(async ({ Api }) => {
     Api.routes.posts.getToday.mock({
@@ -205,6 +255,60 @@ test.describe('One card column on every page', () => {
   });
 });
 
+test.describe('Cards on a phone', () => {
+  const post = createRandomPost();
+
+  test.beforeEach(async ({ Api, isMobile }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(!isMobile, 'Cards run edge to edge on narrow screens only');
+
+    Api.routes.auth.getAuth.mock({
+      body: createRandomAuth({ isAuth: true }),
+    });
+
+    Api.routes.posts.getPostBySlug.mock({ body: post });
+
+    Api.routes.comments.getComments.mock({
+      body: { comments: [createRandomComment()], hasNextPage: false },
+    });
+  });
+
+  test('Keeps the post form off the screen edges', async ({
+    page,
+    PostCreatePage,
+  }) => {
+    await PostCreatePage.goto();
+
+    const { width } = page.viewportSize()!;
+
+    for (const control of [
+      PostCreatePage.postTitleInput,
+      PostCreatePage.postTagInput,
+      page.getByTestId('create-post-button'),
+      page.getByTestId('save-draft-button'),
+    ]) {
+      await expect(control).toBeVisible();
+
+      const box = (await control.boundingBox())!;
+
+      expect(box.x).toBeGreaterThanOrEqual(16);
+      expect(box.x + box.width).toBeLessThanOrEqual(width - 16);
+    }
+  });
+
+  test('Squares the corners of comments that run edge to edge', async ({
+    page,
+    SinglePostPage,
+  }) => {
+    await SinglePostPage.goto(post.slug);
+
+    const comment = page.locator('.comment-item__content').first();
+
+    await expect(comment).toBeVisible();
+    await expect(comment).toHaveCSS('border-radius', '0px');
+  });
+});
+
 test.describe('Mobile menu', () => {
   const auth = createRandomAuth({ isAuth: true });
 
@@ -281,5 +385,42 @@ test.describe('Mobile menu', () => {
 
     await expect(Menu.mobileMenu).toBeHidden();
     await expect(Menu.mobileMenuBtn).toBeFocused();
+  });
+});
+
+test.describe('Notifications', () => {
+  test('Shows a notification under the header, leaving the header usable', async ({
+    page,
+    PostsPage,
+    Api,
+    isMobile,
+  }) => {
+    Api.routes.posts.getToday.mock({
+      status: 500,
+      body: { error: { message: 'Something went wrong' } },
+    });
+
+    await PostsPage.goto(PostsPage.urls.today);
+
+    const notification = page.getByRole('alert');
+
+    await expect(notification).toHaveText('Something went wrong');
+
+    const headerBottom = await page
+      .locator('header')
+      .evaluate((el) => el.getBoundingClientRect().bottom);
+
+    await expect(async () => {
+      const box = (await notification.boundingBox())!;
+
+      expect(box.y).toBe(headerBottom);
+    }).toPass();
+
+    for (const control of [
+      page.getByTestId(isMobile ? 'mobile-menu' : 'today-link'),
+      page.getByTestId('header-search-button'),
+    ]) {
+      await control.click({ trial: true, timeout: 2000 });
+    }
   });
 });

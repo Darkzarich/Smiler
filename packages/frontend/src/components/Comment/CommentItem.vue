@@ -134,7 +134,7 @@
         <button
           v-if="canReply"
           type="button"
-          class="comment-item__action"
+          class="comment-item__action u-touch-area"
           :data-testid="`comment-${comment._id}-toggle-reply`"
           @click="toggleReply()"
         >
@@ -144,7 +144,7 @@
         <button
           v-if="hasRepliesToggle"
           type="button"
-          class="comment-item__action"
+          class="comment-item__action u-touch-area"
           :aria-expanded="isChildrenExpanded"
           :data-testid="`comment-${comment._id}-replies-toggle`"
           @click="isChildrenExpanded = !isChildrenExpanded"
@@ -536,9 +536,18 @@ const downvote = async () => {
     background: var(--color-surface-secondary);
     margin-block: 1rem;
 
-    /* The reply editor shares the comment's card */
+    /* Runs to the screen's edge on phones, a reply from its indent */
+    @media (--phone-only) {
+      border-radius: 0;
+    }
+
+    /* The reply editor shares the comment's card, and on phones its padding too */
     .u-widget {
       box-shadow: none;
+
+      @media (--phone-only) {
+        padding-inline: 0;
+      }
     }
 
     &--created {
@@ -625,6 +634,12 @@ const downvote = async () => {
     flex-wrap: wrap;
     gap: 0 1rem;
     margin-top: 8px;
+
+    /* Clear of a link on the body's last line, which the actions' touch areas
+       would otherwise reach into */
+    @media (--pointer-coarse) {
+      margin-top: 14px;
+    }
   }
 
   &__action {

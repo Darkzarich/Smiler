@@ -23,7 +23,7 @@
         />
       </Transition>
 
-      <RouterLink class="header__home-link" :to="{ name: 'Home' }">
+      <RouterLink class="header__home-link u-touch-area" :to="{ name: 'Home' }">
         <SiteLogo />
       </RouterLink>
 
@@ -61,9 +61,20 @@
 
         <ThemeToggle v-if="!isPhone" />
 
+        <!-- From 600px up the sidebar has the sign-in form -->
+        <BaseButton
+          v-if="isPhone && !user"
+          data-testid="header-sign-in"
+          class="header__sign-in"
+          @click="openSignIn"
+        >
+          Sign in
+        </BaseButton>
+
         <div v-if="user" class="header__avatar">
           <!-- TODO: Move everything like that to its own component AvatarLink or something -->
           <RouterLink
+            class="u-touch-area"
             :to="{
               name: 'UserPage',
               params: {
@@ -86,7 +97,9 @@ import { useRoute, useRouter } from 'vue-router';
 import HeaderMobileMenu from './HeaderMobileMenu.vue';
 import SiteLogo from './SiteLogo.vue';
 import { useMediaQuery } from '@/composables/use-media-query';
+import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useUserStore } from '@/store/user';
+import BaseButton from '@common/BaseButton.vue';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import Navigation from '@components/Navigation/Navigation.vue';
@@ -100,6 +113,7 @@ const route = useRoute();
 const router = useRouter();
 
 const { user } = storeToRefs(useUserStore());
+const authPrompt = useAuthPromptStore();
 
 const isPhone = useMediaQuery('phone-only');
 // Below 900px the inline nav does not fit, so it moves into the menu
@@ -119,6 +133,10 @@ const search = () => {
   });
 
   searchInputValue.value = '';
+};
+
+const openSignIn = () => {
+  void authPrompt.open({ title: 'Welcome to Smiler', lead: null });
 };
 
 const toggleMobileMenu = () => {
@@ -145,16 +163,21 @@ onBeforeUnmount(removeAfterEach);
   top: 0;
   z-index: 2;
   width: 100%;
-  height: 56px;
+  height: var(--header-height);
   padding: 0.5rem max(0.5rem, var(--page-gutter));
   background-color: var(--color-surface-elevated);
 
-  @media (--phone-only) {
-    height: 46px;
-  }
-
   &__home-link {
     display: flex;
+    align-items: center;
+
+    /* Not grown with a touch phone's taller header: at 320px a bigger logo
+       would take the search field's width */
+    @media (--phone-only) {
+      .site-logo {
+        height: 30px;
+      }
+    }
   }
 
   &__container {
@@ -249,6 +272,11 @@ onBeforeUnmount(removeAfterEach);
       width: 100%;
       min-width: 0;
     }
+  }
+
+  &__sign-in {
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 
   &__avatar {

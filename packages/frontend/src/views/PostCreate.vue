@@ -1,6 +1,9 @@
 <template>
   <div v-if="isShow" class="post-create u-widget u-flex-col">
-    <h1 class="post-create__header" data-testid="post-create-header">
+    <h1
+      class="post-create__header u-page-title"
+      data-testid="post-create-header"
+    >
       {{ isEdit ? 'Edit' : 'Make' }} Post
     </h1>
     <PostEditor :key="key" :is-edit="isEdit" :post="post" />
@@ -92,22 +95,3 @@ onBeforeMount(async () => {
   }
 });
 </script>
-
-<style>
-.post-create {
-  @media (--phone-only) {
-    padding-right: 0;
-    padding-left: 0;
-    border: none;
-    border-radius: 0;
-  }
-
-  &__header {
-    margin-bottom: 16px;
-    color: var(--color-text-primary);
-    font-size: 1.5rem;
-    align-self: center;
-    font-weight: 500;
-  }
-}
-</style>

@@ -1,46 +1,28 @@
 <template>
   <div class="post-editor-add-section-buttons">
-    <button
-      type="button"
+    <BaseButton
+      v-for="button in buttons"
+      :key="button.type"
       class="post-editor-add-section-buttons__button"
-      data-testid="add-text-button"
-      tabindex="0"
-      @focus="preloadTextEditor"
-      @pointerenter="preloadTextEditor"
-      @click="$emit('add-section', postTypes.POST_SECTION_TYPES.TEXT)"
+      :data-testid="button.dataTestid"
+      :aria-label="button.name"
+      :title="button.name"
+      @focus="button.preload?.()"
+      @pointerenter="button.preload?.()"
+      @click="$emit('add-section', button.type)"
     >
-      <IconText />
-    </button>
-
-    <button
-      type="button"
-      class="post-editor-add-section-buttons__button"
-      data-testid="add-pic-button"
-      tabindex="0"
-      @click="$emit('add-section', postTypes.POST_SECTION_TYPES.PICTURE)"
-    >
-      <IconPicture />
-    </button>
-
-    <button
-      type="button"
-      class="post-editor-add-section-buttons__button"
-      data-testid="add-video-button"
-      tabindex="0"
-      @click="$emit('add-section', postTypes.POST_SECTION_TYPES.VIDEO)"
-    >
-      <IconVideo />
-    </button>
+      <component :is="sectionKinds[button.type].icon" />
+      {{ sectionKinds[button.type].label }}
+    </BaseButton>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import { sectionKinds } from './section-kinds';
 import { postTypes } from '@/api/posts';
+import BaseButton from '@common/BaseButton.vue';
 import { loadBaseTiptapTextEditor } from '@common/base-tiptap-text-editor-loader';
-import IconPicture from '@icons/IconPicture.vue';
-import IconText from '@icons/IconText.vue';
-import IconVideo from '@icons/IconVideo.vue';
 
 defineEmits<{
   'add-section': [postTypes.POST_SECTION_TYPES];
@@ -50,6 +32,25 @@ const preloadTextEditor = () => {
   void loadBaseTiptapTextEditor();
 };
 
+const buttons = [
+  {
+    type: postTypes.POST_SECTION_TYPES.TEXT,
+    dataTestid: 'add-text-button',
+    preload: preloadTextEditor,
+  },
+  {
+    type: postTypes.POST_SECTION_TYPES.PICTURE,
+    dataTestid: 'add-pic-button',
+  },
+  {
+    type: postTypes.POST_SECTION_TYPES.VIDEO,
+    dataTestid: 'add-video-button',
+  },
+].map((button) => ({
+  ...button,
+  name: `Add ${sectionKinds[button.type].label.toLowerCase()}`,
+}));
+
 onMounted(preloadTextEditor);
 </script>
 
@@ -57,27 +58,22 @@ onMounted(preloadTextEditor);
 .post-editor-add-section-buttons {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
 
   &__button {
-    padding: 16px;
-    border: 2px solid var(--color-text-secondary);
-    border-radius: 8px;
-    background: var(--color-surface-primary);
-    cursor: pointer;
-    transition: all 200ms ease-out;
+    gap: 8px;
+    padding-inline: 16px;
 
     svg {
-      transition: all 200ms ease-out;
+      flex: none;
+      width: 18px;
+      height: 18px;
       fill: var(--color-text-secondary);
     }
 
-    &:hover {
-      border: 2px solid var(--color-primary);
-
-      svg {
-        fill: var(--color-primary);
-      }
+    @media (--phone-only) {
+      flex: 1 1 0;
+      padding-inline: 8px;
     }
   }
 }

@@ -57,6 +57,7 @@ withDefaults(defineProps<Props>(), {
 .base-button {
   display: flex;
   justify-content: center;
+  align-items: center;
   padding: 8px;
   border: 2px solid transparent;
   border-radius: 8px;
@@ -135,6 +136,10 @@ withDefaults(defineProps<Props>(), {
   &--large {
     padding: 12px 24px;
     font-size: 16px;
+  }
+
+  @media (--pointer-coarse) {
+    min-height: 44px;
   }
 
   /* Also on hover, which would otherwise win and hide the chosen state */

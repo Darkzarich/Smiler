@@ -557,6 +557,49 @@ test.describe('Post edit', () => {
       'The post has been successfully deleted',
     );
   });
+
+  test('Asks before deleting a post, and deletes nothing on Cancel or Escape', async ({
+    SinglePostPage,
+    Post,
+    context,
+    page: currentPage,
+    Api,
+  }) => {
+    Api.routes.posts.deletePostById.mock({
+      status: 200,
+    });
+
+    await mockDate(context, nowISOString);
+
+    await SinglePostPage.goto(currentUserNewerPost.slug);
+
+    const deleteRequests: string[] = [];
+
+    currentPage.on('request', (req) => {
+      if (req.method() === 'DELETE') {
+        deleteRequests.push(req.url());
+      }
+    });
+
+    await Post.deleteBtn.click();
+    await Post.deleteConfirmModal.expectVisible();
+    await expect(Post.deleteConfirmModal.cancelBtn).toBeFocused();
+
+    await Post.deleteConfirmModal.cancel();
+    await Post.deleteConfirmModal.expectHidden();
+    await expect(Post.deleteBtn).toBeFocused();
+
+    await Post.deleteBtn.click();
+    await Post.deleteConfirmModal.expectVisible();
+    await currentPage.keyboard.press('Escape');
+    await Post.deleteConfirmModal.expectHidden();
+
+    await expect(Post.getTitleById(currentUserNewerPost._id)).toBeVisible();
+    await expect(currentPage).toHaveURL(
+      SinglePostPage.getUrlWithSlug(currentUserNewerPost.slug),
+    );
+    expect(deleteRequests).toEqual([]);
+  });
 });
 
 test.describe('Opens a post at its comments', () => {

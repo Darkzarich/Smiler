@@ -33,6 +33,7 @@ import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
 import { useRestorablePosts } from '@/composables/use-restorable-posts';
 import * as consts from '@/const';
 import SearchForm from '@components/SearchForm/SearchForm.vue';
+import { isFilterSet } from '@components/SearchForm/is-filter-set';
 import type { SearchFilter } from '@components/SearchForm/types';
 
 const route = useRoute();
@@ -91,28 +92,14 @@ const handleNextPage = () => {
   fetchPosts({ isCombine: true });
 };
 
+const isAnyFilterActive = computed(() =>
+  Object.values(filter.value).some(isFilterSet),
+);
+
 watch(filter, (newVal) => {
-  const isAnyFilterActive = Object.keys(newVal).some((filterKey) => {
-    if (filterKey === 'tags') {
-      return newVal.tags.length > 0;
-    }
-
-    return Boolean(newVal[filterKey as keyof SearchFilter]);
-  });
-
-  if (isAnyFilterActive) {
+  if (isAnyFilterActive.value) {
     fetchPosts({ filters: newVal });
   }
-});
-
-const isAnyFilterActive = computed(() => {
-  return Object.keys(filter.value).some((filterKey) => {
-    if (filterKey === 'tags') {
-      return filter.value.tags.length > 0;
-    }
-
-    return Boolean(filter.value[filterKey as keyof SearchFilter]);
-  });
 });
 
 onBeforeMount(() => {
@@ -137,10 +124,6 @@ onBeforeMount(() => {
 .search {
   &__form {
     margin-bottom: var(--variable-widget-margin);
-
-    @media (--phone-only) {
-      border: none;
-    }
   }
 }
 </style>

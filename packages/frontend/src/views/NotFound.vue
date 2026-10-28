@@ -1,8 +1,8 @@
 <template>
   <div class="not-found u-widget u-flex-col">
-    <div class="not-found__404">404</div>
+    <p class="not-found__code">404</p>
 
-    <div class="not-found__info">Not existing page</div>
+    <h1 class="u-page-title">Page not found</h1>
 
     <BaseButton class="not-found__go-home-btn" type="primary" @click="goHome">
       Go home
@@ -27,20 +27,12 @@ const goHome = () => {
 .not-found {
   align-items: center;
 
-  &__404 {
-    color: var(--color-text-primary);
-    font-size: 48px;
-    font-weight: bold;
-  }
-
-  &__info {
-    margin-bottom: 1rem;
-    color: var(--color-text-primary);
-    font-size: 48px;
-
-    @media (--phone-only) {
-      font-size: 32px;
-    }
+  &__code {
+    margin: 0 0 0.25rem;
+    color: var(--color-text-secondary);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
   }
 
   &__go-home-btn {

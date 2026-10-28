@@ -8,6 +8,7 @@
         class="posts-container__post"
         :data-post-id="post._id"
         :can-edit="checkCanEditPost(post, userStore.userId)"
+        @deleted="removePost"
       />
     </div>
 
@@ -60,6 +61,15 @@ const posts = defineModel<postTypes.Post[]>('posts', {
 
 const userStore = useUserStore();
 
+// In place, like each Post's v-model: the views pass the list one way
+const removePost = (id: string) => {
+  const index = posts.value.findIndex((post) => post._id === id);
+
+  if (index !== -1) {
+    posts.value.splice(index, 1);
+  }
+};
+
 useInfiniteScroll(
   typeof window !== 'undefined' ? window : undefined,
   () => emit('fetch-more'),
@@ -78,11 +88,6 @@ useInfiniteScroll(
   &__no-more,
   &__no-posts {
     text-align: center;
-
-    @media (--phone-only) {
-      border: none !important;
-      border-radius: 0 !important;
-    }
   }
 
   &__post {

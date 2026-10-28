@@ -1,8 +1,10 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { effectScope, nextTick, ref } from 'vue';
 import {
   clearLocalPostDraft,
   pickNewerDraft,
   readLocalPostDraft,
+  useLocalPostDraft,
   writeLocalPostDraft,
 } from './use-local-post-draft';
 import type { LocalPostDraft } from './use-local-post-draft';
@@ -96,6 +98,60 @@ describe('local post draft storage', () => {
 
     expect(readLocalPostDraft(USER_ID)).toBeNull();
     expect(readLocalPostDraft('user-2')).toMatchObject({ title: 'Theirs' });
+  });
+});
+
+describe('useLocalPostDraft', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  function startDraft() {
+    const fields = {
+      title: ref('A title'),
+      tags: ref<string[]>([]),
+      sections: ref<postTypes.PostSection[]>([]),
+    };
+    const scope = effectScope();
+    const draft = scope.run(() =>
+      useLocalPostDraft({ userId: USER_ID, ...fields }),
+    )!;
+
+    draft.start();
+
+    return { ...fields, draft, scope };
+  }
+
+  it('saves the editor once the typing pauses', async () => {
+    vi.useFakeTimers();
+
+    const { title, scope } = startDraft();
+
+    title.value = 'Typed';
+    await nextTick();
+
+    expect(readLocalPostDraft(USER_ID)).toBeNull();
+
+    vi.advanceTimersByTime(500);
+
+    expect(readLocalPostDraft(USER_ID)?.title).toBe('Typed');
+
+    scope.stop();
+  });
+
+  it('drops a save still pending when the draft is cleared', async () => {
+    vi.useFakeTimers();
+
+    const { title, draft, scope } = startDraft();
+
+    title.value = 'Published straight after typing';
+    await nextTick();
+    draft.clear();
+    vi.advanceTimersByTime(500);
+
+    expect(readLocalPostDraft(USER_ID)).toBeNull();
+
+    scope.stop();
   });
 });
 

@@ -58,23 +58,35 @@ onMounted(() => {
   --variable-widget-margin: 24px;
   --page-max-width: 1110px;
   --page-gutter: 0px;
+  --header-height: 46px;
 
   /* Wide enough for a five-digit rating. The page column is padded by it, so
      everything lines up with the post cards and a Post hangs its votes into it. */
   --post-votes-width: 0px;
 
+  /* A page title and a post title are the same step: each is its page's h1 */
+  --font-size-title: 1.25rem;
+  --font-size-heading: 1.125rem;
+
   @media (--tablet-portrait-up) {
     --page-gutter: 16px;
+    --header-height: 56px;
     --post-votes-width: 64px;
+    --font-size-title: 1.5rem;
   }
 
   @media (--tablet-landscape-up) {
     --page-gutter: 24px;
   }
+
+  /* Room for 44px controls, which the 46px phone header has not */
+  @media (--pointer-coarse) {
+    --header-height: 56px;
+  }
 }
 
 html {
-  font-family: Roboto, 'Open Sans', Helvetica, Arial, sans-serif;
+  font-family: 'Roboto Variable', Roboto, system-ui, sans-serif;
   box-sizing: border-box;
   overflow-y: scroll;
   scrollbar-gutter: stable;
@@ -149,6 +161,14 @@ h6 {
     @media (--phone-only) {
       width: 100%;
       margin-right: 0;
+    }
+
+    /* No gutter on phones: a card runs edge to edge, and round corners would
+       cut into the screen's edge. It keeps its padding. */
+    .u-widget {
+      @media (--phone-only) {
+        border-radius: 0;
+      }
     }
   }
 

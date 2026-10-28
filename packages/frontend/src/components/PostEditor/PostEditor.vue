@@ -222,15 +222,7 @@
 <script setup lang="ts">
 import { useEventListener } from '@vueuse/core';
 import { isEqual } from 'lodash-es';
-import {
-  type Component,
-  computed,
-  nextTick,
-  onMounted,
-  ref,
-  useTemplateRef,
-  watch,
-} from 'vue';
+import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Draggable from 'vuedraggable';
 import Post from '../Post/Post.vue';
@@ -244,6 +236,7 @@ import PostEditorAddSectionButtons from './PostEditorAddSectionButtons.vue';
 import PostEditorPicture from './PostEditorPicture.vue';
 import PostEditorTags from './PostEditorTags.vue';
 import PostEditorVideo from './PostEditorVideo.vue';
+import { sectionKinds } from './section-kinds';
 import { buildPreviewPost } from './build-preview-post';
 import { pickNewerDraft, useLocalPostDraft } from './use-local-post-draft';
 import { api } from '@/api';
@@ -262,22 +255,6 @@ import IconDelete from '@icons/IconDelete.vue';
 import IconDragHandle from '@icons/IconDragHandle.vue';
 import IconEye from '@icons/IconEye.vue';
 import IconEyeOff from '@icons/IconEyeOff.vue';
-import IconPicture from '@icons/IconPicture.vue';
-import IconText from '@icons/IconText.vue';
-import IconVideo from '@icons/IconVideo.vue';
-
-/** What each section's header calls it, with the icon its add button uses */
-const sectionKinds: Record<
-  postTypes.POST_SECTION_TYPES,
-  { label: string; icon: Component }
-> = {
-  [postTypes.POST_SECTION_TYPES.TEXT]: { label: 'Text', icon: IconText },
-  [postTypes.POST_SECTION_TYPES.PICTURE]: {
-    label: 'Picture',
-    icon: IconPicture,
-  },
-  [postTypes.POST_SECTION_TYPES.VIDEO]: { label: 'Video', icon: IconVideo },
-};
 
 const kindOf = (section: postTypes.PostSection) => sectionKinds[section.type];
 
@@ -645,6 +622,11 @@ const saveDraft = async () => {
   &__preview {
     margin-bottom: 32px;
     padding-left: var(--post-votes-width);
+
+    /* Out to the screen's edges, as the post will be in the feed */
+    @media (--phone-only) {
+      margin-inline: -1rem;
+    }
   }
 
   &__preview-empty {
@@ -667,12 +649,6 @@ const saveDraft = async () => {
     margin-bottom: 24px;
     border: 1px solid var(--color-text-secondary);
     border-radius: 8px;
-
-    @media (--phone-only) {
-      border-right: none;
-      border-left: none;
-      border-radius: 0;
-    }
 
     &:last-child {
       margin-bottom: 0;
@@ -818,10 +794,16 @@ const saveDraft = async () => {
 
   &__section-body {
     position: relative;
+
+    /* The section is the card. Squared on phones (MOB-3), the editor's own
+       fill would paint over the section's rounded bottom corners */
+    .base-text-editor {
+      background: transparent;
+    }
   }
 
   &__add-section-buttons {
-    margin: 32px;
+    margin: 32px 0;
   }
 
   &__submit-error {
