@@ -79,16 +79,18 @@
           :error="bioTooLongError"
         />
 
-        <BaseButton
-          class="user-settings__submit-btn"
-          data-testid="user-settings-bio-submit"
-          type="primary"
-          :loading="bioEditRequesting"
-          :disabled="Boolean(bioTooLongError)"
-          @click="editBio"
-        >
-          Save
-        </BaseButton>
+        <div class="user-settings__actions">
+          <BaseButton
+            class="user-settings__submit-btn"
+            data-testid="user-settings-bio-submit"
+            type="primary"
+            :loading="bioEditRequesting"
+            :disabled="Boolean(bioTooLongError)"
+            @click="editBio"
+          >
+            Save
+          </BaseButton>
+        </div>
       </div>
 
       <div class="user-settings__block">
@@ -113,29 +115,31 @@
           work once.
         </div>
 
-        <BaseButton
-          class="user-settings__submit-btn"
-          data-testid="user-settings-avatar-submit"
-          type="primary"
-          :loading="avatarEditRequesting"
-          @click="editAvatar"
-        >
-          Save
-        </BaseButton>
+        <div class="user-settings__actions">
+          <BaseButton
+            class="user-settings__submit-btn"
+            data-testid="user-settings-avatar-submit"
+            type="primary"
+            :loading="avatarEditRequesting"
+            @click="editAvatar"
+          >
+            Save
+          </BaseButton>
 
-        <BaseButton
-          v-if="currentAvatar"
-          class="user-settings__submit-btn"
-          data-testid="user-settings-avatar-remove"
-          :loading="avatarRemoveRequesting"
-          @click="removeAvatar"
-        >
-          Remove
-        </BaseButton>
+          <BaseButton
+            v-if="currentAvatar"
+            class="user-settings__submit-btn"
+            data-testid="user-settings-avatar-remove"
+            :loading="avatarRemoveRequesting"
+            @click="removeAvatar"
+          >
+            Remove
+          </BaseButton>
+        </div>
       </div>
     </div>
 
-    <div v-else class="user-settings__isFetching">
+    <div v-else class="user-settings__loading">
       <CircularLoader />
     </div>
   </div>
@@ -336,41 +340,22 @@ onBeforeMount(() => {
 
   &__block {
     padding: 16px 0;
-
-    &:last-child {
-      border-bottom: none;
-    }
   }
 
-  &__bio-edit {
-    @media (--phone-only) {
-      margin-left: 0;
-    }
+  &__bio-edit,
+  &__avatar-edit {
+    max-width: 32rem;
+  }
 
-    textarea {
-      width: 50%;
-      height: 5rem;
-      resize: none;
-
-      @media (--phone-only) {
-        width: 100%;
-      }
-    }
+  &__bio-edit textarea {
+    height: 5rem;
+    resize: none;
   }
 
   &__avatar-hint {
     margin-top: 8px;
     color: var(--color-text-secondary);
     font-size: 12px;
-  }
-
-  &__avatar-edit {
-    width: 60%;
-
-    @media (--phone-only) {
-      width: 80%;
-      margin-left: 0;
-    }
   }
 
   &__current-avatar {
@@ -387,6 +372,12 @@ onBeforeMount(() => {
 
   &__submit-btn {
     width: 140px;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-top: 16px;
   }
 
@@ -400,11 +391,6 @@ onBeforeMount(() => {
     align-items: baseline;
     gap: 12px;
     margin-bottom: 16px;
-    padding-left: 16px;
-
-    @media (--phone-only) {
-      padding-left: 0;
-    }
   }
 
   &__following-type {
