@@ -189,7 +189,7 @@
           :loading="isSaving"
           @click="saveEdited"
         >
-          Save Edited
+          Save changes
         </BaseButton>
       </template>
 

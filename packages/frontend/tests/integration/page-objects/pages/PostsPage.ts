@@ -5,7 +5,7 @@ export default class PostsPage extends AbstractPage {
   readonly titles = {
     today: AbstractPage.formatTitle('Today'),
     all: AbstractPage.formatTitle('All Posts'),
-    blowing: AbstractPage.formatTitle('Blowing'),
+    trending: AbstractPage.formatTitle('Trending'),
     topThisWeek: AbstractPage.formatTitle('Top This Week'),
     new: AbstractPage.formatTitle('Recent'),
     feed: AbstractPage.formatTitle('My Feed'),
@@ -14,7 +14,7 @@ export default class PostsPage extends AbstractPage {
   readonly urls = {
     today: '/',
     all: '/posts/all',
-    blowing: '/posts/blowing',
+    trending: '/posts/trending',
     topThisWeek: '/posts/top-this-week',
     new: '/posts/new',
     feed: '/posts/feed',
@@ -23,7 +23,7 @@ export default class PostsPage extends AbstractPage {
   readonly groups = {
     today: 'today-link',
     all: 'all-link',
-    blowing: 'blowing-link',
+    trending: 'trending-link',
     topThisWeek: 'top-this-week-link',
     new: 'new-link',
     feed: 'feed-link',

@@ -4,7 +4,7 @@
       class="post-create__header u-page-title"
       data-testid="post-create-header"
     >
-      {{ isEdit ? 'Edit' : 'Make' }} Post
+      {{ isEdit ? 'Edit post' : 'New post' }}
     </h1>
     <PostEditor :key="key" :is-edit="isEdit" :post="post" />
   </div>

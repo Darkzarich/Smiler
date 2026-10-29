@@ -51,11 +51,11 @@ const links: readonly NavLink[] = Object.freeze([
     dataTestId: 'all-link',
   },
   {
-    label: 'Blowing',
+    label: 'Trending',
     route: {
-      name: 'Blowing',
+      name: 'Trending',
     },
-    dataTestId: 'blowing-link',
+    dataTestId: 'trending-link',
   },
   {
     label: 'Top this week',

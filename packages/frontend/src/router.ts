@@ -126,12 +126,17 @@ export const router = createRouter({
       },
     },
     {
-      path: '/posts/blowing',
+      path: '/posts/trending',
       component: PostsCategory,
-      name: 'Blowing',
+      name: 'Trending',
       meta: {
-        title: 'Blowing',
+        title: 'Trending',
       },
+    },
+    // The category's old name, so shared links keep working
+    {
+      path: '/posts/blowing',
+      redirect: { name: 'Trending' },
     },
     {
       path: '/posts/top-this-week',
@@ -183,7 +188,7 @@ export const router = createRouter({
       component: PostCreate,
       beforeEnter: authGuard,
       meta: {
-        title: 'Make New Post',
+        title: 'New Post',
         authPromptTitle: 'Sign in to write a post',
       },
     },

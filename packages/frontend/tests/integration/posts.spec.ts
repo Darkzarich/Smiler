@@ -234,7 +234,7 @@ test.describe('Post groups', () => {
       }
     });
 
-    test('Fetches "blowing" posts', async ({
+    test('Fetches "trending" posts', async ({
       page: currentPage,
       PostsPage,
       Post,
@@ -250,16 +250,36 @@ test.describe('Post groups', () => {
       await Api.routes.posts.getBlowing.waitForRequest({
         preRequestAction: PostsPage.selectPostGroup.bind(
           PostsPage,
-          PostsPage.groups.blowing,
+          PostsPage.groups.trending,
         ),
       });
 
-      await expect(currentPage).toHaveURL(PostsPage.urls.blowing);
-      await expect(currentPage).toHaveTitle(PostsPage.titles.blowing);
+      await expect(currentPage).toHaveURL(PostsPage.urls.trending);
+      await expect(currentPage).toHaveTitle(PostsPage.titles.trending);
       await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
         await expect(Post.getTitleById(post._id)).toContainText(post.title);
       }
+    });
+
+    test('Sends a link to the old "blowing" page to "trending"', async ({
+      page: currentPage,
+      PostsPage,
+      Api,
+    }) => {
+      Api.routes.posts.getBlowing.mock({
+        body: {
+          posts,
+          hasNextPage: false,
+        },
+      });
+
+      await Api.routes.posts.getBlowing.waitForRequest({
+        preRequestAction: () => currentPage.goto('/posts/blowing'),
+      });
+
+      await expect(currentPage).toHaveURL(PostsPage.urls.trending);
+      await expect(currentPage).toHaveTitle(PostsPage.titles.trending);
     });
 
     test('Fetches "top this week" posts', async ({

@@ -94,7 +94,7 @@ This project is built on the MEVN stack (MongoDB, Express, Vue.js, Node.js), wri
 
 - **Posts**:
 
-  - **Multiple Post Pages**: Includes _Today_, _All_, _Blowing_, _Top This Week_, and _New_, each with unique sorting and filtering.
+  - **Multiple Post Pages**: Includes _Today_, _All_, _Trending_, _Top This Week_, and _New_, each with unique sorting and filtering.
   - **Post Editor**: A [Tiptap](https://tiptap.dev/)-based rich text editor for creating and editing posts, with drag-and-drop reordering of sections.
   - **Preloader**: Smooth loading animations for better UX.
   - **Infinite Scroll**: Loads more posts as you scroll.

@@ -64,7 +64,7 @@
       type="primary"
       :loading="isLoading"
     >
-      Finish
+      Create account
     </BaseButton>
   </form>
 </template>
