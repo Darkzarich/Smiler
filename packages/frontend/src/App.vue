@@ -107,12 +107,12 @@ body {
   }
 
   &::-webkit-scrollbar-track {
-    background: var(--color-surface-primary);
+    background: var(--color-scrollbar-track);
   }
 
   &::-webkit-scrollbar-thumb {
     border-radius: 20px;
-    background-color: var(--color-text-secondary);
+    background-color: var(--color-scrollbar-thumb);
   }
 }
 
