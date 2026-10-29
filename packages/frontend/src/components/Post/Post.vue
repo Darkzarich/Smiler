@@ -79,9 +79,13 @@
           :data-testid="`post-${post._id}-tag-${tag}`"
           class="post__tags-item"
           :class="{ 'post__tags-item--inert': !interactive }"
+          :aria-haspopup="interactive ? 'menu' : undefined"
+          :aria-expanded="interactive ? isTagMenuOpen(tag) : undefined"
+          :aria-controls="isTagMenuOpen(tag) ? tagMenuId : undefined"
           @click.prevent.stop="openContextMenu($event, tag)"
           @keydown.enter.prevent.stop="openContextMenu($event, tag)"
           @keydown.space.prevent.stop="openContextMenu($event, tag)"
+          @keydown.down.prevent.stop="openContextMenu($event, tag)"
         >
           {{ tag }}
         </button>
@@ -218,11 +222,14 @@
     </div>
 
     <BaseContextMenu
+      :id="tagMenuId"
       v-on-click-outside="closeContextMenu"
+      :aria-label="`Tag ${contextMenuData.target}`"
       :show="contextMenuData.show"
       :anchor="contextMenuData.anchor"
       :items="contextMenuOptions"
       @action="handleContextMenuAction"
+      @close="closeContextMenu"
     />
 
     <ConfirmModal
@@ -241,7 +248,7 @@
 <script setup lang="ts">
 import { cloneDeep } from 'lodash-es';
 import { storeToRefs } from 'pinia';
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, useId } from 'vue';
 import { useRouter } from 'vue-router';
 import PostSectionSpoiler from './PostSectionSpoiler.vue';
 import {
@@ -326,6 +333,11 @@ const contextMenuData = reactive<ContextMenuData>({
   anchor: null,
   target: null,
 });
+
+const tagMenuId = useId();
+
+const isTagMenuOpen = (tag: string) =>
+  contextMenuData.show && contextMenuData.target === tag;
 
 const contextMenuOptions = computed(() => {
   const options = [];

@@ -15,6 +15,6 @@ export default class AbstractComponent {
   findContextMenuOption(text = '') {
     return this.page
       .getByTestId('base-context-menu')
-      .getByRole('button', { name: text, exact: true });
+      .getByRole('menuitem', { name: text, exact: true });
   }
 }
