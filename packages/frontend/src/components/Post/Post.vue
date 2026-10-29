@@ -1,6 +1,6 @@
 <template>
   <div class="post" :class="{ 'post--inert': !interactive }">
-    <div class="post__left" :inert="!interactive || undefined">
+    <DefineVotes>
       <BaseIconButton
         label="Upvote"
         :data-testid="`post-${post._id}-upvote`"
@@ -26,9 +26,48 @@
       >
         <IconMinus />
       </BaseIconButton>
+    </DefineVotes>
+
+    <DefineAuthor>
+      <RouterLink
+        v-if="post.author"
+        :to="{
+          name: 'UserPage',
+          params: {
+            login: post.author.login,
+          },
+        }"
+        :data-testid="`post-${post._id}-author`"
+        class="post__author-container"
+      >
+        <span class="post__author-login">
+          {{ post.author.login }}
+        </span>
+        <UserAvatar class="post__author-avatar" :src="post.author.avatar" />
+      </RouterLink>
+      <span v-else class="post__author-container">
+        <span> Anonymous </span>
+        <UserAvatar class="post__author-avatar" src="" />
+      </span>
+    </DefineAuthor>
+
+    <div v-if="!isPhone" class="post__left" :inert="!interactive || undefined">
+      <ReuseVotes />
     </div>
 
     <div class="post__main u-widget">
+      <div
+        v-if="isPhone"
+        class="post__byline"
+        :inert="!interactive || undefined"
+      >
+        <ReuseAuthor />
+        <span aria-hidden="true">·</span>
+        <span class="post__date">
+          {{ formatFromNow(post.createdAt) }}
+        </span>
+      </div>
+
       <div class="post__title">
         <RouterLink
           v-if="interactive"
@@ -148,42 +187,21 @@
         </div>
       </CollapsibleContent>
 
-      <!-- for mobile -->
-      <div class="post__rate-mobile" :inert="!interactive || undefined">
-        <BaseIconButton
-          label="Upvote"
-          :data-testid="`m-post-${post._id}-upvote`"
-          size="medium"
-          tone="primary"
-          :pressed="isUpvoted"
-          @click="upvote(post._id)"
-        >
-          <IconPlus />
-        </BaseIconButton>
-        <div class="post__rating">
-          {{ post.rating }}
-        </div>
-        <BaseIconButton
-          label="Downvote"
-          :data-testid="`m-post-${post._id}-downvote`"
-          size="medium"
-          tone="danger"
-          :pressed="isDownvoted"
-          @click="downvote(post._id)"
-        >
-          <IconMinus />
-        </BaseIconButton>
-      </div>
-
-      <!-- for mobile -->
       <div class="post__footer">
-        <div class="post__meta-info" :inert="!interactive || undefined">
-          <span class="post__date">
+        <div
+          class="post__meta-info"
+          :class="{ 'post__meta-info--actions': isPhone }"
+          :inert="!interactive || undefined"
+        >
+          <div v-if="isPhone" class="post__votes">
+            <ReuseVotes />
+          </div>
+          <span v-else class="post__date">
             {{ formatFromNow(post.createdAt) }}
           </span>
 
           <RouterLink
-            class="post__comments-count"
+            class="post__comments-count u-touch-area"
             :data-testid="`post-${post._id}-comments-count`"
             :to="{
               name: 'Single',
@@ -196,26 +214,7 @@
             <IconComments /> {{ post.commentCount }}
           </RouterLink>
 
-          <RouterLink
-            v-if="post.author"
-            :to="{
-              name: 'UserPage',
-              params: {
-                login: post.author.login,
-              },
-            }"
-            :data-testid="`post-${post._id}-author`"
-            class="post__author-container"
-          >
-            <span class="post__author-login">
-              {{ post.author.login }}
-            </span>
-            <UserAvatar class="post__author-avatar" :src="post.author.avatar" />
-          </RouterLink>
-          <span v-else class="post__author-container">
-            <span> Anonymous </span>
-            <UserAvatar class="post__author-avatar" src="" />
-          </span>
+          <ReuseAuthor v-if="!isPhone" />
         </div>
       </div>
     </div>
@@ -248,6 +247,7 @@
 import { cloneDeep } from 'lodash-es';
 import { storeToRefs } from 'pinia';
 import { computed, reactive, ref, useId } from 'vue';
+import { createReusableTemplate } from '@vueuse/core';
 import { useRouter } from 'vue-router';
 import PostSectionSpoiler from './PostSectionSpoiler.vue';
 import {
@@ -257,6 +257,7 @@ import {
 } from './is-section-of-type';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
+import { useMediaQuery } from '@/composables/use-media-query';
 import { useOwnVote } from '@/composables/use-own-vote';
 import { POST_RATE_VALUE } from '@/const';
 import { useAuthPromptStore } from '@/store/auth-prompt';
@@ -303,6 +304,12 @@ const post = defineModel<postTypes.Post>('post', {
 });
 
 const { whenOwnVoteShown } = useOwnVote('post', post);
+
+// A phone's footer row has no room for the votes beside the author, so there
+// the votes join the footer and the author moves above the title
+const isPhone = useMediaQuery('phone-only');
+const [DefineVotes, ReuseVotes] = createReusableTemplate();
+const [DefineAuthor, ReuseAuthor] = createReusableTemplate();
 
 const router = useRouter();
 
@@ -637,10 +644,6 @@ const searchByTag = (tag: string) => {
     width: var(--post-votes-width);
     gap: 4px;
     margin-left: calc(-1 * var(--post-votes-width));
-
-    @media (--phone-only) {
-      display: none;
-    }
   }
 
   &__rating {
@@ -685,14 +688,17 @@ const searchByTag = (tag: string) => {
     color: var(--color-text-primary);
   }
 
-  &__rate-mobile {
-    display: none;
+  /* A button's 36px box is invisible at rest, so the group moves left until
+     the 22px arrow, not the box, starts on the text's edge */
+  &__votes {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: -7px;
 
-    @media (--phone-only) {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
+    .post__rating {
+      font-size: 1rem;
+      font-weight: 500;
     }
   }
 
@@ -750,10 +756,6 @@ const searchByTag = (tag: string) => {
 
   &__footer {
     container: post-footer / inline-size;
-
-    @media (--phone-only) {
-      margin-top: -1rem;
-    }
   }
 
   &__meta-info {
@@ -771,6 +773,12 @@ const searchByTag = (tag: string) => {
     @container post-footer (width < 480px) {
       display: flex;
       justify-content: space-between;
+    }
+
+    &--actions {
+      display: flex;
+      justify-content: space-between;
+      padding-block: 0.5rem;
     }
   }
 
@@ -800,6 +808,7 @@ const searchByTag = (tag: string) => {
     justify-content: flex-end;
     align-items: center;
     min-width: 0;
+    gap: 0.5rem;
     color: var(--color-text-primary);
     text-decoration: none;
   }
@@ -821,14 +830,31 @@ const searchByTag = (tag: string) => {
     flex: none;
     width: 1.5rem;
     height: 1.5rem;
-    margin-left: 0.5rem;
     border-radius: 50%;
+  }
+
+  &__byline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+
+    .post__author-container {
+      flex-direction: row-reverse;
+    }
+
+    .post__author-avatar {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
   }
 
   /* Keeps the layout honest while showing nothing here is clickable yet */
   &--inert {
     .post__left,
-    .post__rate-mobile,
+    .post__byline,
     .post__meta-info {
       opacity: 0.5;
       cursor: default;
