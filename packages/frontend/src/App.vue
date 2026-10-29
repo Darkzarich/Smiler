@@ -58,7 +58,18 @@ onMounted(() => {
   --variable-widget-margin: 24px;
   --page-max-width: 1110px;
   --page-gutter: 0px;
-  --header-height: 46px;
+  --header-bar-height: 46px;
+
+  /* viewport-fit=cover lets the page run under a notch and the home indicator.
+     Whatever sits at an edge keeps clear of them with these. */
+  --header-height: calc(
+    var(--header-bar-height) + env(safe-area-inset-top, 0px)
+  );
+  --page-gutter-left: calc(var(--page-gutter) + env(safe-area-inset-left, 0px));
+  --page-gutter-right: calc(
+    var(--page-gutter) + env(safe-area-inset-right, 0px)
+  );
+  --content-top: calc(72px + env(safe-area-inset-top, 0px));
 
   /* Wide enough for a five-digit rating. The page column is padded by it, so
      everything lines up with the post cards and a Post hangs its votes into it. */
@@ -70,7 +81,7 @@ onMounted(() => {
 
   @media (--tablet-portrait-up) {
     --page-gutter: 16px;
-    --header-height: 56px;
+    --header-bar-height: 56px;
     --post-votes-width: 64px;
     --font-size-title: 1.5rem;
   }
@@ -81,7 +92,7 @@ onMounted(() => {
 
   /* Room for 44px controls, which the 46px phone header has not */
   @media (--pointer-coarse) {
-    --header-height: 56px;
+    --header-bar-height: 56px;
   }
 }
 
@@ -147,11 +158,14 @@ h6 {
   flex-grow: 1;
   flex-flow: row nowrap;
   width: 100%;
-  max-width: calc(var(--page-max-width) + 2 * var(--page-gutter));
-  margin-top: 72px;
+  max-width: calc(
+    var(--page-max-width) + var(--page-gutter-left) + var(--page-gutter-right)
+  );
+  margin-top: var(--content-top);
   margin-right: auto;
   margin-left: auto;
-  padding-inline: var(--page-gutter);
+  padding-right: var(--page-gutter-right);
+  padding-left: var(--page-gutter-left);
 
   &__main {
     flex: 1;
@@ -177,7 +191,7 @@ h6 {
 
     @media (--sidebar-fits) {
       position: sticky;
-      top: 72px;
+      top: var(--content-top);
       align-self: flex-start;
     }
   }

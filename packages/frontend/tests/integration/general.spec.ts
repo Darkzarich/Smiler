@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 
-import { expect, type Locator } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import test from './page-objects';
 import createRandomAuth from '@factory/auth';
 import createRandomComment from '@factory/comment';
@@ -306,6 +306,112 @@ test.describe('Cards on a phone', () => {
 
     await expect(comment).toBeVisible();
     await expect(comment).toHaveCSS('border-radius', '0px');
+  });
+});
+
+test.describe('A notch and the home indicator', () => {
+  type Insets = { top: number; bottom: number; left: number; right: number };
+
+  // An iPhone's safe areas, which only Chromium can emulate
+  const setSafeAreaInsets = async (page: Page, insets: Insets) => {
+    const cdp = await page.context().newCDPSession(page);
+
+    await cdp.send('Emulation.setSafeAreaInsetsOverride', { insets });
+  };
+
+  test.beforeEach(async ({ Api, isMobile }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(!isMobile, 'Only phones have a notch');
+
+    Api.routes.posts.getToday.mock({
+      body: { posts: [], hasNextPage: false },
+    });
+  });
+
+  test('Keeps the header, the bottom sheet and the footer clear of them in portrait', async ({
+    page,
+    PostsPage,
+    AuthPrompt,
+  }) => {
+    const insets = { top: 47, bottom: 34, left: 0, right: 0 };
+
+    await setSafeAreaInsets(page, insets);
+    await PostsPage.goto(PostsPage.urls.today);
+
+    const { height } = page.viewportSize()!;
+    const signInBtn = page.getByTestId('header-sign-in');
+
+    await expect(signInBtn).toBeVisible();
+    expect((await signInBtn.boundingBox())!.y).toBeGreaterThanOrEqual(
+      insets.top,
+    );
+
+    const gitHubLink = page.getByRole('link', { name: 'GitHub' });
+
+    await gitHubLink.scrollIntoViewIfNeeded();
+    await page.evaluate(() =>
+      window.scrollTo(0, document.documentElement.scrollHeight),
+    );
+
+    const gitHubBox = (await gitHubLink.boundingBox())!;
+
+    expect(gitHubBox.y + gitHubBox.height).toBeLessThanOrEqual(
+      height - insets.bottom,
+    );
+
+    await signInBtn.click();
+    await expect(AuthPrompt.panel).toBeVisible();
+
+    const lastButton = AuthPrompt.panel.getByRole('button').last();
+
+    await expect(async () => {
+      const box = (await lastButton.boundingBox())!;
+
+      expect(box.y + box.height).toBeLessThanOrEqual(height - insets.bottom);
+    }).toPass();
+  });
+
+  test('Keeps the header and the menu clear of them in landscape', async ({
+    page,
+    PostsPage,
+  }) => {
+    const insets = { top: 0, bottom: 21, left: 47, right: 47 };
+
+    await page.setViewportSize({ width: 851, height: 393 });
+    await setSafeAreaInsets(page, insets);
+    await PostsPage.goto(PostsPage.urls.today);
+
+    const { width } = page.viewportSize()!;
+    const menuBtn = page.getByTestId('mobile-menu');
+
+    await expect(menuBtn).toBeVisible();
+    expect((await menuBtn.boundingBox())!.x).toBeGreaterThanOrEqual(
+      insets.left,
+    );
+
+    await menuBtn.click();
+
+    const menu = page.getByTestId('mobile-menu-dialog');
+
+    await expect(menu).toBeVisible();
+
+    // A menu row spans the screen, so it is the row's content that must clear them
+    for (const control of [
+      menu.getByRole('link').first(),
+      menu.getByRole('button', { name: 'Close menu' }),
+      menu.getByRole('link', { name: 'Today' }),
+    ]) {
+      const { left, right } = await control.evaluate((el) => {
+        const range = document.createRange();
+
+        range.selectNodeContents(el);
+
+        return range.getBoundingClientRect();
+      });
+
+      expect(left).toBeGreaterThanOrEqual(insets.left);
+      expect(right).toBeLessThanOrEqual(width - insets.right);
+    }
   });
 });
 

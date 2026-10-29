@@ -100,6 +100,7 @@ useFocusTrap(useTemplateRef('menu'), {
   z-index: 1000;
   width: 100%;
   height: 100%;
+  padding-bottom: env(safe-area-inset-bottom, 0);
   background: var(--color-surface-secondary);
   overflow-y: scroll;
 
@@ -112,7 +113,9 @@ useFocusTrap(useTemplateRef('menu'), {
     top: 0;
     z-index: 1;
     height: var(--header-height);
-    padding: 0.5rem max(0.5rem, var(--page-gutter));
+    padding: calc(0.5rem + env(safe-area-inset-top, 0px))
+      max(0.5rem, var(--page-gutter-right)) 0.5rem
+      max(0.5rem, var(--page-gutter-left));
     border-bottom: 1px solid var(--color-border);
     background: var(--color-surface-secondary);
   }
@@ -138,7 +141,8 @@ useFocusTrap(useTemplateRef('menu'), {
     align-items: center;
     width: 100%;
     min-height: 48px;
-    padding: 0 1rem;
+    padding: 0 max(1rem, var(--page-gutter-right)) 0
+      max(1rem, var(--page-gutter-left));
     border-bottom: 1px solid var(--color-border);
   }
 

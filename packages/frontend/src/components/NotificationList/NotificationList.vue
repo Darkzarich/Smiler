@@ -50,7 +50,10 @@ const { notifications } = storeToRefs(notificationsStore);
   /* Above BaseModal, so the error from a modal's own request (a wrong
      password) is not dimmed by its backdrop */
   z-index: 1001;
-  width: min(100% - 2 * var(--page-gutter), var(--page-max-width));
+  width: min(
+    100% - var(--page-gutter-left) - var(--page-gutter-right),
+    var(--page-max-width)
+  );
 
   /* The header's bottom edge, so a bar slides out from behind the header */
   overflow: clip;
