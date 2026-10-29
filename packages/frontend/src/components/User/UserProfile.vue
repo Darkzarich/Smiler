@@ -11,7 +11,18 @@
         :type="isFollowed ? 'secondary' : 'primary'"
         @click="handleFollow"
       >
-        {{ isFollowed ? 'Unfollow' : 'Follow' }}
+        <span v-if="isFollowed" class="user-profile__follow-labels">
+          <span class="user-profile__following-label">
+            <IconCheck aria-hidden="true" />
+            Following
+          </span>
+
+          <span class="user-profile__unfollow-label" aria-hidden="true">
+            Unfollow
+          </span>
+        </span>
+
+        <template v-else>Follow</template>
       </BaseButton>
     </DefineFollowButton>
 
@@ -68,6 +79,7 @@ import { useUserStore } from '@/store/user';
 import { formatFromNow } from '@/utils/format-from-now';
 import BaseButton from '@common/BaseButton.vue';
 import UserAvatar from '@components/User/UserAvatar.vue';
+import IconCheck from '@icons/IconCheck.vue';
 import IconSmiley from '@icons/IconSmiley.vue';
 import UserOfflineBadge from '@components/User/UserOfflineBadge.vue';
 import UserStats from '@components/User/UserStats.vue';
@@ -260,13 +272,58 @@ async function handleFollow() {
 
   &__follow-btn {
     z-index: 1;
-    width: 100px;
+    min-width: 100px;
     font-size: 13px;
 
     @media (--phone-only) {
-      width: auto;
       margin-top: 1rem;
       grid-column: 1 / -1;
+    }
+  }
+
+  /* Both labels share one cell, so the button keeps the wider one's width when
+     they swap. Opacity, not visibility: a hidden "Following" would leave the
+     button with no accessible name */
+  &__follow-labels {
+    display: grid;
+
+    > * {
+      grid-area: 1 / 1;
+      justify-self: center;
+    }
+  }
+
+  &__following-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      fill: currentcolor;
+    }
+  }
+
+  &__unfollow-label {
+    opacity: 0;
+  }
+
+  &__follow-btn:focus-visible &__following-label {
+    opacity: 0;
+  }
+
+  &__follow-btn:focus-visible &__unfollow-label {
+    opacity: 1;
+  }
+
+  @media (--hover) {
+    &__follow-btn:hover &__following-label {
+      opacity: 0;
+    }
+
+    &__follow-btn:hover &__unfollow-label {
+      opacity: 1;
     }
   }
 
