@@ -150,8 +150,10 @@ const handleInput = (event: Event) => {
 
     /* A file cannot be dragged onto this without hovering it, and the hover
        affordance would otherwise outrank the drag state and keep its border. */
-    &:hover:not(.base-upload-form__label--dragging) {
-      border-color: var(--color-border-hover);
+    @media (--hover) {
+      &:hover:not(.base-upload-form__label--dragging) {
+        border-color: var(--color-border-hover);
+      }
     }
 
     &--dragging {

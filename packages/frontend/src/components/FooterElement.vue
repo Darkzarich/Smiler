@@ -48,8 +48,10 @@ footer {
     color: var(--color-text-secondary);
     cursor: pointer;
 
-    &:hover {
-      color: var(--color-text-primary);
+    @media (--hover) {
+      &:hover {
+        color: var(--color-text-primary);
+      }
     }
 
     svg {

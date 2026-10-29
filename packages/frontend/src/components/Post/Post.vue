@@ -831,8 +831,10 @@ const searchByTag = (tag: string) => {
     overflow: hidden;
     white-space: nowrap;
 
-    &:hover {
-      border-bottom: 1px solid var(--color-text-primary);
+    @media (--hover) {
+      &:hover {
+        border-bottom: 1px solid var(--color-text-primary);
+      }
     }
   }
 

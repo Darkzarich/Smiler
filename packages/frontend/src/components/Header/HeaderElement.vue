@@ -228,8 +228,10 @@ onBeforeUnmount(removeAfterEach);
     white-space: nowrap;
     transition: all 200ms ease-out;
 
-    &:hover {
-      color: var(--color-primary-strong);
+    @media (--hover) {
+      &:hover {
+        color: var(--color-primary-strong);
+      }
     }
 
     &.router-link-exact-active {

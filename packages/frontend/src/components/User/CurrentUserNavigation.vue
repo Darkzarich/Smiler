@@ -92,12 +92,14 @@ const logout = async () => {
       border-bottom: none;
     }
 
-    &:hover {
-      border-left: 2px solid var(--color-primary-strong);
-      color: var(--color-primary-strong);
+    @media (--hover) {
+      &:hover {
+        border-left: 2px solid var(--color-primary-strong);
+        color: var(--color-primary-strong);
 
-      .current-user-navigation__item-icon {
-        fill: var(--color-primary-strong);
+        .current-user-navigation__item-icon {
+          fill: var(--color-primary-strong);
+        }
       }
     }
   }

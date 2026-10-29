@@ -198,13 +198,16 @@ watch(
     cursor: pointer;
     transition: all 200ms ease-out;
 
-    &:hover,
-    &:focus-visible {
-      background: var(--color-surface-primary);
+    @media (--hover) {
+      &:hover {
+        background: var(--color-surface-primary);
+      }
     }
 
-    /* Inside the item, where the menu's edge and its neighbors can't cover it */
     &:focus-visible {
+      background: var(--color-surface-primary);
+
+      /* Inside the item, where the menu's edge and its neighbors can't cover it */
       outline-offset: -2px;
     }
 
