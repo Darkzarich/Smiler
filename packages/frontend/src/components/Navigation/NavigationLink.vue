@@ -18,6 +18,7 @@ defineProps<Props>();
 .nav-link {
   color: var(--color-text-primary);
   text-decoration: none;
+  text-transform: uppercase;
   font-weight: bold;
 
   &.router-link-exact-active {

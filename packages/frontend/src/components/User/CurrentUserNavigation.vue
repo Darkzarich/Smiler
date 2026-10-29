@@ -1,34 +1,37 @@
 <template>
   <ul class="current-user-navigation">
-    <RouterLink
-      class="current-user-navigation__item"
-      data-testid="create-post-btn"
-      :to="{
-        name: 'PostCreate',
-      }"
-    >
-      <IconAdd class="current-user-navigation__item-icon" /> New Post
-    </RouterLink>
+    <li>
+      <RouterLink
+        class="current-user-navigation__item"
+        data-testid="create-post-btn"
+        :to="{
+          name: 'PostCreate',
+        }"
+      >
+        <IconAdd class="current-user-navigation__item-icon" /> New Post
+      </RouterLink>
+    </li>
 
-    <RouterLink
-      class="current-user-navigation__item"
-      :to="{
-        name: 'UserSettings',
-      }"
-    >
-      <IconSettings class="current-user-navigation__item-icon" /> Settings
-    </RouterLink>
+    <li>
+      <RouterLink
+        class="current-user-navigation__item"
+        :to="{
+          name: 'UserSettings',
+        }"
+      >
+        <IconSettings class="current-user-navigation__item-icon" /> Settings
+      </RouterLink>
+    </li>
 
-    <li
-      class="current-user-navigation__item"
-      data-testid="logout-btn"
-      role="button"
-      tabindex="0"
-      @click="logout()"
-      @keydown.enter="logout()"
-      @keydown.space.prevent="logout()"
-    >
-      <IconExit class="current-user-navigation__item-icon" /> Logout
+    <li>
+      <button
+        type="button"
+        class="current-user-navigation__item"
+        data-testid="logout-btn"
+        @click="logout()"
+      >
+        <IconExit class="current-user-navigation__item-icon" /> Logout
+      </button>
     </li>
   </ul>
 </template>
@@ -62,15 +65,15 @@ const logout = async () => {
 
 <style>
 .current-user-navigation {
-  margin-left: 0;
-  text-align: center;
-  padding-inline-start: 0;
-  margin-block: 0;
+  margin: 0;
+  padding: 0;
   list-style: none;
 
   &__item-icon {
-    width: 2rem;
-    margin-right: 0.5rem;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
     fill: var(--color-text-primary);
     transition: all 200ms ease-out;
   }
@@ -79,25 +82,27 @@ const logout = async () => {
     display: flex;
     flex-direction: row;
     align-items: center;
+    width: 100%;
     padding: 1rem;
+    border: none;
     border-left: 2px solid transparent;
+    background: none;
     color: var(--color-text-primary);
     text-decoration: none;
+    font: inherit;
     cursor: pointer;
     font-weight: 500;
     line-height: 24px;
     transition: all 200ms ease-out;
 
-    &:last-child {
-      border-bottom: none;
-    }
+    @media (--hover) {
+      &:hover {
+        border-left: 2px solid var(--color-primary-strong);
+        color: var(--color-primary-strong);
 
-    &:hover {
-      border-left: 2px solid var(--color-primary-strong);
-      color: var(--color-primary-strong);
-
-      .current-user-navigation__item-icon {
-        fill: var(--color-primary-strong);
+        .current-user-navigation__item-icon {
+          fill: var(--color-primary-strong);
+        }
       }
     }
   }

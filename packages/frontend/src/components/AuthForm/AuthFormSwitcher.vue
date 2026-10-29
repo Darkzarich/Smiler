@@ -8,7 +8,7 @@
       class="auth-form-switcher__mode-toggler"
       @click="toggleMode()"
     >
-      {{ isSignIn ? 'SIGN UP' : 'SIGN IN' }}
+      {{ isSignIn ? 'Sign up' : 'Sign in' }}
     </button>
   </div>
 </template>
@@ -47,6 +47,7 @@ const toggleMode = () => {
     border-bottom: 1px solid transparent;
     background: none;
     color: var(--color-primary-strong);
+    text-transform: uppercase;
     font-size: 13px;
     cursor: pointer;
 

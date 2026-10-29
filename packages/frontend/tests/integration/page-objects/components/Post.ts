@@ -4,17 +4,15 @@ import ConfirmModal from './ConfirmModal';
 
 export default class Post extends AbstractComponent {
   readonly context: BrowserContext;
-  readonly isMobile: boolean;
   readonly postsList: Locator;
   readonly editBtn: Locator;
   readonly deleteBtn: Locator;
   readonly deleteConfirmModal: ConfirmModal;
 
-  constructor(page: Page, isMobile: boolean) {
+  constructor(page: Page) {
     super(page);
 
     this.context = page.context();
-    this.isMobile = isMobile;
 
     this.postsList = page.getByTestId('posts-container');
     this.editBtn = page.getByTestId('post-edit-button');
@@ -69,19 +67,11 @@ export default class Post extends AbstractComponent {
   }
 
   getUpvoteBtnById(postId = '') {
-    const selector = this.isMobile
-      ? `m-post-${postId}-upvote`
-      : `post-${postId}-upvote`;
-
-    return this.page.getByTestId(selector);
+    return this.page.getByTestId(`post-${postId}-upvote`);
   }
 
   getDownvoteBtnById(postId = '') {
-    const selector = this.isMobile
-      ? `m-post-${postId}-downvote`
-      : `post-${postId}-downvote`;
-
-    return this.page.getByTestId(selector);
+    return this.page.getByTestId(`post-${postId}-downvote`);
   }
 
   getFollowTagBtn() {

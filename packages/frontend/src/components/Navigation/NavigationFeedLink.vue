@@ -1,6 +1,6 @@
 <template>
   <NavigationLink :to="{ name: 'Feed' }" data-testid="feed-link">
-    MY FEED
+    My feed
   </NavigationLink>
 </template>
 

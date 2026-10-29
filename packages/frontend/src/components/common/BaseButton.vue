@@ -142,12 +142,19 @@ withDefaults(defineProps<Props>(), {
     min-height: 44px;
   }
 
-  /* Also on hover, which would otherwise win and hide the chosen state */
-  &--active,
-  &--active:hover {
+  &--active {
     border-color: var(--color-primary);
     background: var(--color-accent-transparent);
     color: var(--color-primary-strong);
+
+    /* The variants' hover would otherwise win and hide the chosen state */
+    @media (--hover) {
+      &:hover {
+        border-color: var(--color-primary);
+        background: var(--color-accent-transparent);
+        color: var(--color-primary-strong);
+      }
+    }
   }
 
   &--loading {

@@ -139,7 +139,7 @@ const handleInput = (event: Event) => {
     gap: 4px;
     padding: 1rem;
     border: 2px dashed var(--color-border);
-    border-radius: 3px;
+    border-radius: 8px;
     background: var(--color-surface-primary);
     color: var(--color-text-primary);
     text-align: center;
@@ -150,8 +150,10 @@ const handleInput = (event: Event) => {
 
     /* A file cannot be dragged onto this without hovering it, and the hover
        affordance would otherwise outrank the drag state and keep its border. */
-    &:hover:not(.base-upload-form__label--dragging) {
-      border-color: var(--color-border-hover);
+    @media (--hover) {
+      &:hover:not(.base-upload-form__label--dragging) {
+        border-color: var(--color-border-hover);
+      }
     }
 
     &--dragging {
@@ -177,7 +179,7 @@ const handleInput = (event: Event) => {
     /* Touch keeps the solid button it has always had — there is nothing to drag. */
     @media (--pointer-coarse) {
       border-style: solid;
-      border-color: var(--color-text-secondary);
+      border-color: var(--color-border-hover);
     }
   }
 

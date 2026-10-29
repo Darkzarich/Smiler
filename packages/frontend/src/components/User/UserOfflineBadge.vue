@@ -2,17 +2,18 @@
   <div
     v-if="isLongOffline"
     class="user-offline-badge"
-    :title="`Last signed in on ${signedInOn}`"
     data-testid="user-profile-offline-badge"
   >
     <span class="user-offline-badge__dot" />
 
-    <span>Away · last seen {{ lastSeen }}</span>
+    <span>
+      Away · last seen <time :datetime="lastLoginAt">{{ lastSeen }}</time>
+    </span>
   </div>
 </template>
 
 <script setup lang="ts">
-import { differenceInDays, format } from 'date-fns';
+import { differenceInDays } from 'date-fns';
 import { computed } from 'vue';
 import * as consts from '@/const';
 import { formatFromNow } from '@/utils/format-from-now';
@@ -39,10 +40,6 @@ const isLongOffline = computed(() => {
 });
 
 const lastSeen = computed(() => formatFromNow(props.lastLoginAt ?? ''));
-
-const signedInOn = computed(() =>
-  props.lastLoginAt ? format(new Date(props.lastLoginAt), 'PPP') : '',
-);
 </script>
 
 <style>

@@ -189,7 +189,7 @@
           :loading="isSaving"
           @click="saveEdited"
         >
-          Save Edited
+          Save changes
         </BaseButton>
       </template>
 
@@ -668,22 +668,26 @@ const saveDraft = async () => {
 
       /* Shows the author what a reader sees, and lifts as soon as the section
          is reached so it never stands in the way of editing. The header stays
-         sharp: it says what is hidden and holds the toggle. */
-      .post-editor__section-body::after {
-        position: absolute;
-        opacity: 1;
-        z-index: 1;
-        border-radius: 0 0 8px 8px;
-        inset: 0;
-        content: '';
-        pointer-events: none;
-        transition: opacity 250ms ease-out;
-        backdrop-filter: blur(8px);
-      }
+         sharp: it says what is hidden and holds the toggle. Without hover
+         nothing would lift it before a tap lands on a field, so touch screens
+         get the border and the header's Spoiler pill alone. */
+      @media (--hover) {
+        .post-editor__section-body::after {
+          position: absolute;
+          opacity: 1;
+          z-index: 1;
+          border-radius: 0 0 8px 8px;
+          inset: 0;
+          content: '';
+          pointer-events: none;
+          transition: opacity 250ms ease-out;
+          backdrop-filter: blur(8px);
+        }
 
-      &:hover .post-editor__section-body::after,
-      &:focus-within .post-editor__section-body::after {
-        opacity: 0;
+        &:hover .post-editor__section-body::after,
+        &:focus-within .post-editor__section-body::after {
+          opacity: 0;
+        }
       }
     }
 

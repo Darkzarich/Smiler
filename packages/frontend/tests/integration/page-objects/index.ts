@@ -91,8 +91,8 @@ const test = base.extend<TestFixtures>({
   NotFoundPage: async ({ page }, use) => {
     await use(new NotFoundPage(page));
   },
-  Post: async ({ page, isMobile }, use) => {
-    await use(new Post(page, isMobile));
+  Post: async ({ page }, use) => {
+    await use(new Post(page));
   },
   Comments: async ({ page }, use) => {
     await use(new Comments(page));

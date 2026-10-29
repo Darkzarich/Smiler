@@ -37,6 +37,6 @@
   --color-spoiler-veil: rgb(226 232 240 / 55%);
   --color-spoiler-veil-hover: rgb(226 232 240 / 40%);
   --color-spoiler-veil-solid: #e2e8f0;
-  --color-scrollbar-track: #f1f5f9;
-  --color-scrollbar-thumb: #cbd5e1;
+  --color-scrollbar-track: var(--color-surface-primary);
+  --color-scrollbar-thumb: var(--color-text-secondary);
 }

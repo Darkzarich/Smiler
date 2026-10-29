@@ -29,7 +29,7 @@
         />
 
         <div v-else-if="!isFetchingComments" class="comments__no-comments">
-          "It’s quiet here — be the first to leave a comment!"
+          It’s quiet here — be the first to leave a comment!
         </div>
 
         <div v-else class="comments__loading">

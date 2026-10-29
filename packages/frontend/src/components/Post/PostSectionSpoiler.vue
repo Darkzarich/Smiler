@@ -79,13 +79,15 @@ const isHidden = computed(() => props.isSpoiler && !isRevealed.value);
     transition: background 300ms ease-out;
     backdrop-filter: blur(14px) saturate(60%);
 
-    &:hover,
-    &:focus-visible {
-      background: var(--color-spoiler-veil-hover);
+    @media (--hover) {
+      &:hover {
+        background: var(--color-spoiler-veil-hover);
+      }
     }
 
     &:focus-visible {
       outline: 2px solid var(--color-primary-strong);
+      background: var(--color-spoiler-veil-hover);
       outline-offset: -2px;
     }
 
@@ -132,8 +134,10 @@ const isHidden = computed(() => props.isSpoiler && !isRevealed.value);
     transform: scale(1.15);
   }
 
-  &__veil:hover &__badge {
-    transform: translateY(-2px);
+  @media (--hover) {
+    &__veil:hover &__badge {
+      transform: translateY(-2px);
+    }
   }
 
   &__badge-text {

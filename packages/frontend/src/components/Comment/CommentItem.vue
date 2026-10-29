@@ -44,6 +44,7 @@
                 login: comment.author.login,
               },
             }"
+            :data-testid="`comment-${comment._id}-author`"
           >
             <div class="comment-item__author">
               {{ comment.author.login }}

@@ -55,7 +55,7 @@ const cursorPagedRequests = {
 const offsetPagedRequests = {
   Home: api.posts.getToday,
   All: api.posts.getAll,
-  Blowing: api.posts.getBlowing,
+  Trending: api.posts.getBlowing,
   TopThisWeek: api.posts.getTopThisWeek,
 };
 

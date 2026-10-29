@@ -22,13 +22,14 @@ import IconGitHub from '@icons/IconGitHub.vue';
 footer {
   align-items: center;
   width: 100%;
-  height: 4rem;
+  height: calc(4rem + env(safe-area-inset-bottom, 0px));
   margin-top: 1.5rem;
+  padding: 0 var(--page-gutter-right) env(safe-area-inset-bottom, 0)
+    var(--page-gutter-left);
   background: var(--color-surface-elevated);
-  padding-inline: var(--page-gutter);
 
   @media (--phone-only) {
-    height: 2rem;
+    height: calc(2rem + env(safe-area-inset-bottom, 0px));
   }
 
   .footer-content {
@@ -48,8 +49,10 @@ footer {
     color: var(--color-text-secondary);
     cursor: pointer;
 
-    &:hover {
-      color: var(--color-text-primary);
+    @media (--hover) {
+      &:hover {
+        color: var(--color-text-primary);
+      }
     }
 
     svg {

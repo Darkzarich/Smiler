@@ -37,23 +37,24 @@
             data-testid="user-settings-tags"
           >
             <div class="user-settings__following-type">Tags:</div>
-            <div
+            <BaseTag
               v-for="tag in tagsFollowed"
               :key="tag"
               :data-testid="`user-settings-tags-${tag}`"
-              class="user-settings__following-item user-settings__tag"
             >
               {{ tag }}
-              <BaseIconButton
-                :label="`Unfollow tag ${tag}`"
-                :data-testid="`user-settings-tag-${tag}-unfollow`"
-                size="xsmall"
-                tone="danger"
-                @click="handleUnfollowTag(tag)"
-              >
-                <IconClose />
-              </BaseIconButton>
-            </div>
+              <template #action>
+                <BaseIconButton
+                  :label="`Unfollow tag ${tag}`"
+                  :data-testid="`user-settings-tag-${tag}-unfollow`"
+                  size="xsmall"
+                  tone="danger"
+                  @click="handleUnfollowTag(tag)"
+                >
+                  <IconClose />
+                </BaseIconButton>
+              </template>
+            </BaseTag>
           </div>
         </template>
 
@@ -78,16 +79,18 @@
           :error="bioTooLongError"
         />
 
-        <BaseButton
-          class="user-settings__submit-btn"
-          data-testid="user-settings-bio-submit"
-          type="primary"
-          :loading="bioEditRequesting"
-          :disabled="Boolean(bioTooLongError)"
-          @click="editBio"
-        >
-          Save
-        </BaseButton>
+        <div class="user-settings__actions">
+          <BaseButton
+            class="user-settings__submit-btn"
+            data-testid="user-settings-bio-submit"
+            type="primary"
+            :loading="bioEditRequesting"
+            :disabled="Boolean(bioTooLongError)"
+            @click="editBio"
+          >
+            Save
+          </BaseButton>
+        </div>
       </div>
 
       <div class="user-settings__block">
@@ -112,29 +115,31 @@
           work once.
         </div>
 
-        <BaseButton
-          class="user-settings__submit-btn"
-          data-testid="user-settings-avatar-submit"
-          type="primary"
-          :loading="avatarEditRequesting"
-          @click="editAvatar"
-        >
-          Save
-        </BaseButton>
+        <div class="user-settings__actions">
+          <BaseButton
+            class="user-settings__submit-btn"
+            data-testid="user-settings-avatar-submit"
+            type="primary"
+            :loading="avatarEditRequesting"
+            @click="editAvatar"
+          >
+            Save
+          </BaseButton>
 
-        <BaseButton
-          v-if="currentAvatar"
-          class="user-settings__submit-btn"
-          data-testid="user-settings-avatar-remove"
-          :loading="avatarRemoveRequesting"
-          @click="removeAvatar"
-        >
-          Remove
-        </BaseButton>
+          <BaseButton
+            v-if="currentAvatar"
+            class="user-settings__submit-btn"
+            data-testid="user-settings-avatar-remove"
+            :loading="avatarRemoveRequesting"
+            @click="removeAvatar"
+          >
+            Remove
+          </BaseButton>
+        </div>
       </div>
     </div>
 
-    <div v-else class="user-settings__isFetching">
+    <div v-else class="user-settings__loading">
       <CircularLoader />
     </div>
   </div>
@@ -150,6 +155,7 @@ import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import BaseInput from '@common/BaseInput.vue';
+import BaseTag from '@common/BaseTag.vue';
 import BaseTextarea from '@common/BaseTextarea.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 import IconClose from '@icons/IconClose.vue';
@@ -334,41 +340,22 @@ onBeforeMount(() => {
 
   &__block {
     padding: 16px 0;
-
-    &:last-child {
-      border-bottom: none;
-    }
   }
 
-  &__bio-edit {
-    @media (--phone-only) {
-      margin-left: 0;
-    }
+  &__bio-edit,
+  &__avatar-edit {
+    max-width: 32rem;
+  }
 
-    textarea {
-      width: 50%;
-      height: 5rem;
-      resize: none;
-
-      @media (--phone-only) {
-        width: 100%;
-      }
-    }
+  &__bio-edit textarea {
+    height: 5rem;
+    resize: none;
   }
 
   &__avatar-hint {
     margin-top: 8px;
     color: var(--color-text-secondary);
     font-size: 12px;
-  }
-
-  &__avatar-edit {
-    width: 60%;
-
-    @media (--phone-only) {
-      width: 80%;
-      margin-left: 0;
-    }
   }
 
   &__current-avatar {
@@ -385,6 +372,12 @@ onBeforeMount(() => {
 
   &__submit-btn {
     width: 140px;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-top: 16px;
   }
 
@@ -395,13 +388,9 @@ onBeforeMount(() => {
   &__following {
     display: flex;
     flex-wrap: wrap;
+    align-items: baseline;
     gap: 12px;
     margin-bottom: 16px;
-    padding-left: 16px;
-
-    @media (--phone-only) {
-      padding-left: 0;
-    }
   }
 
   &__following-type {
@@ -421,18 +410,6 @@ onBeforeMount(() => {
     height: 16px;
     border: 1px solid var(--color-text-secondary);
     border-radius: 50%;
-  }
-
-  &__tag {
-    padding: 0.1rem;
-    border: 1px solid var(--color-primary);
-    border-radius: 5px;
-    background: transparent;
-    color: var(--color-primary-strong);
-    font-family: monospace;
-    font-size: 0.8rem;
-    font-weight: bold;
-    user-select: none;
   }
 }
 </style>

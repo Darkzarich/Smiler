@@ -64,7 +64,7 @@
       type="primary"
       :loading="isLoading"
     >
-      FINISH
+      Create account
     </BaseButton>
   </form>
 </template>
@@ -216,6 +216,7 @@ async function signUp() {
 
   &__submit {
     margin-top: 8px;
+    text-transform: uppercase;
   }
 }
 </style>

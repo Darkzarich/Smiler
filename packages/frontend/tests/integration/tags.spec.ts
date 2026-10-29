@@ -202,3 +202,75 @@ test('Opens the tag menu in place, not sliding over from its last tag', async ({
 
   expect(positions).toHaveLength(1);
 });
+
+test('Moves through the tag menu with the keyboard, and Escape returns to the tag', async ({
+  SinglePostPage,
+  Post,
+  page,
+}) => {
+  await SinglePostPage.goto(post.slug);
+
+  const tag = Post.getTag(post._id, tagToClick);
+
+  await expect(tag).toHaveAttribute('aria-haspopup', 'menu');
+  await expect(tag).toHaveAttribute('aria-expanded', 'false');
+
+  await tag.focus();
+  await page.keyboard.press('Enter');
+
+  await expect(tag).toHaveAttribute('aria-expanded', 'true');
+  await expect(Post.getSearchTagBtn()).toBeFocused();
+
+  await page.keyboard.press('ArrowDown');
+  await expect(Post.getFollowTagBtn()).toBeFocused();
+
+  await page.keyboard.press('ArrowDown');
+  await expect(Post.getSearchTagBtn()).toBeFocused();
+
+  await page.keyboard.press('Escape');
+
+  await expect(Post.getContextMenu()).toBeHidden();
+  await expect(tag).toBeFocused();
+  await expect(tag).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('Closes the tag menu on Tab, moving on from its tag', async ({
+  SinglePostPage,
+  Post,
+  page,
+}) => {
+  await SinglePostPage.goto(post.slug);
+
+  await Post.getTag(post._id, tagToClick).focus();
+  await page.keyboard.press('Enter');
+  await expect(Post.getSearchTagBtn()).toBeFocused();
+
+  await page.keyboard.press('Tab');
+
+  await expect(Post.getContextMenu()).toBeHidden();
+  await expect(Post.getTag(post._id, tags[1])).toBeFocused();
+});
+
+test('Follows a tag from the keyboard, then returns to the tag', async ({
+  SinglePostPage,
+  Post,
+  Api,
+  page,
+}) => {
+  await SinglePostPage.goto(post.slug);
+
+  const tag = Post.getTag(post._id, tagToClick);
+
+  await tag.focus();
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('ArrowDown');
+  await expect(Post.getFollowTagBtn()).toBeFocused();
+
+  const followRequest = await Api.routes.tags.follow.waitForRequest({
+    preRequestAction: () => page.keyboard.press('Enter'),
+  });
+
+  expect(followRequest.url()).toContain(tagToClick);
+  await expect(Post.getContextMenu()).toBeHidden();
+  await expect(tag).toBeFocused();
+});

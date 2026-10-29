@@ -284,6 +284,64 @@ test.describe('Follows and unfollow', () => {
     );
   });
 
+  test('Reads Following for a followed user, and Unfollow on keyboard focus', async ({
+    ProfilePage,
+    Api,
+  }) => {
+    const followedUser = createRandomProfile({
+      isFollowed: true,
+    });
+
+    Api.routes.users.getUserProfile.mock({
+      body: followedUser,
+    });
+
+    await ProfilePage.goto(followedUser.login);
+
+    const following = ProfilePage.unfollowBtn.getByText('Following');
+    const unfollow = ProfilePage.unfollowBtn.getByText('Unfollow');
+
+    await expect(ProfilePage.unfollowBtn).toHaveAccessibleName('Following');
+    await expect(following).toHaveCSS('opacity', '1');
+    await expect(unfollow).toHaveCSS('opacity', '0');
+
+    await ProfilePage.unfollowBtn.focus();
+    await expect(following).toHaveCSS('opacity', '0');
+    await expect(unfollow).toHaveCSS('opacity', '1');
+    await expect(ProfilePage.unfollowBtn).toHaveAccessibleName('Following');
+  });
+
+  test('Reads Unfollow on the Following button under the mouse', async ({
+    page,
+    ProfilePage,
+    Api,
+    isMobile,
+  }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(isMobile, 'A touch screen has no hover to show it on');
+
+    const followedUser = createRandomProfile({
+      isFollowed: true,
+    });
+
+    Api.routes.users.getUserProfile.mock({
+      body: followedUser,
+    });
+
+    await ProfilePage.goto(followedUser.login);
+
+    const following = ProfilePage.unfollowBtn.getByText('Following');
+    const unfollow = ProfilePage.unfollowBtn.getByText('Unfollow');
+
+    await ProfilePage.unfollowBtn.hover();
+    await expect(following).toHaveCSS('opacity', '0');
+    await expect(unfollow).toHaveCSS('opacity', '1');
+
+    await page.mouse.move(0, 0);
+    await expect(following).toHaveCSS('opacity', '1');
+    await expect(unfollow).toHaveCSS('opacity', '0');
+  });
+
   test('Cannot follow or unfollow yourself', async ({ ProfilePage, Api }) => {
     const auth = createRandomAuth({
       isAuth: true,

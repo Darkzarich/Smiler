@@ -112,7 +112,7 @@ test('Shows the end of the list only once the last page has loaded', async ({
   await expect(Post.getNoMoreContentText()).toBeVisible();
 });
 
-test('Fits the post footer on one line on a 320px phone', async ({
+test('Fits the post byline and footer on a 320px phone', async ({
   page,
   Api,
   PostsPage,
@@ -121,6 +121,7 @@ test('Fits the post footer on one line on a 320px phone', async ({
   const longPost = createRandomPost({
     author: { login: 'w'.repeat(15) },
     commentCount: 10,
+    rating: 12345,
     createdAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
   });
 
@@ -131,11 +132,11 @@ test('Fits the post footer on one line on a 320px phone', async ({
   await page.setViewportSize({ width: 320, height: 800 });
   await PostsPage.goto(PostsPage.urls.today);
 
-  const footer = page.locator('.post__meta-info');
+  const card = page.locator('.post__main');
 
-  await expect(footer.locator('.post__date')).toHaveText('20 minutes ago');
+  await expect(card.locator('.post__date')).toHaveText('20 minutes ago');
 
-  const layout = await footer.evaluate((el) => {
+  const layout = await card.evaluate((el) => {
     const edge = el.getBoundingClientRect();
     const range = document.createRange();
 
@@ -156,6 +157,51 @@ test('Fits the post footer on one line on a 320px phone', async ({
   });
 
   expect(layout).toEqual({ dateLines: 1, pastEdge: [] });
+});
+
+test('Puts the votes in the footer row and the author above the title on a phone', async ({
+  page,
+  Api,
+  Post,
+  PostsPage,
+}) => {
+  const post = createRandomPost({ commentCount: 10, rating: 12345 });
+
+  Api.routes.posts.getToday.mock({
+    body: { posts: [post], hasNextPage: false },
+  });
+
+  await page.setViewportSize({ width: 390, height: 800 });
+  await PostsPage.goto(PostsPage.urls.today);
+
+  const footer = page.locator('.post__meta-info');
+  const commentsCount = Post.getCommentsCountById(post._id);
+
+  await expect(footer.locator(commentsCount)).toBeVisible();
+
+  const middleOf = async (locator: typeof commentsCount) => {
+    const box = (await locator.boundingBox())!;
+
+    return Math.round(box.y + box.height / 2);
+  };
+
+  const row = await middleOf(commentsCount);
+
+  for (const control of [
+    Post.getUpvoteBtnById(post._id),
+    Post.getRatingById(post._id),
+    Post.getDownvoteBtnById(post._id),
+  ]) {
+    await expect(footer.locator(control)).toBeVisible();
+    expect(await middleOf(control)).toBe(row);
+  }
+
+  const author = (await page
+    .getByTestId(`post-${post._id}-author`)
+    .boundingBox())!;
+  const title = (await Post.getTitleById(post._id).boundingBox())!;
+
+  expect(author.y + author.height).toBeLessThanOrEqual(title.y);
 });
 
 test('Takes a post deleted from the list off the list', async ({
@@ -234,7 +280,7 @@ test.describe('Post groups', () => {
       }
     });
 
-    test('Fetches "blowing" posts', async ({
+    test('Fetches "trending" posts', async ({
       page: currentPage,
       PostsPage,
       Post,
@@ -250,16 +296,36 @@ test.describe('Post groups', () => {
       await Api.routes.posts.getBlowing.waitForRequest({
         preRequestAction: PostsPage.selectPostGroup.bind(
           PostsPage,
-          PostsPage.groups.blowing,
+          PostsPage.groups.trending,
         ),
       });
 
-      await expect(currentPage).toHaveURL(PostsPage.urls.blowing);
-      await expect(currentPage).toHaveTitle(PostsPage.titles.blowing);
+      await expect(currentPage).toHaveURL(PostsPage.urls.trending);
+      await expect(currentPage).toHaveTitle(PostsPage.titles.trending);
       await expect(Post.postsList).toBeVisible();
       for (const post of posts) {
         await expect(Post.getTitleById(post._id)).toContainText(post.title);
       }
+    });
+
+    test('Sends a link to the old "blowing" page to "trending"', async ({
+      page: currentPage,
+      PostsPage,
+      Api,
+    }) => {
+      Api.routes.posts.getBlowing.mock({
+        body: {
+          posts,
+          hasNextPage: false,
+        },
+      });
+
+      await Api.routes.posts.getBlowing.waitForRequest({
+        preRequestAction: () => currentPage.goto('/posts/blowing'),
+      });
+
+      await expect(currentPage).toHaveURL(PostsPage.urls.trending);
+      await expect(currentPage).toHaveTitle(PostsPage.titles.trending);
     });
 
     test('Fetches "top this week" posts', async ({

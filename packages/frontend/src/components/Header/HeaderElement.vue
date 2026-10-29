@@ -164,7 +164,9 @@ onBeforeUnmount(removeAfterEach);
   z-index: 2;
   width: 100%;
   height: var(--header-height);
-  padding: 0.5rem max(0.5rem, var(--page-gutter));
+  padding: calc(0.5rem + env(safe-area-inset-top, 0px))
+    max(0.5rem, var(--page-gutter-right)) 0.5rem
+    max(0.5rem, var(--page-gutter-left));
   background-color: var(--color-surface-elevated);
 
   &__home-link {
@@ -228,8 +230,10 @@ onBeforeUnmount(removeAfterEach);
     white-space: nowrap;
     transition: all 200ms ease-out;
 
-    &:hover {
-      color: var(--color-primary-strong);
+    @media (--hover) {
+      &:hover {
+        color: var(--color-primary-strong);
+      }
     }
 
     &.router-link-exact-active {

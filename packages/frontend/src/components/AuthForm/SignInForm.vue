@@ -37,7 +37,7 @@
       type="primary"
       :loading="isLoading"
     >
-      SIGN IN
+      Sign in
     </BaseButton>
   </form>
 </template>
@@ -146,6 +146,7 @@ async function signIn() {
 
   &__submit {
     margin-top: 8px;
+    text-transform: uppercase;
   }
 }
 </style>

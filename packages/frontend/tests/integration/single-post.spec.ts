@@ -174,10 +174,13 @@ test('Comes back to the same place on the post on Back', async ({
   page: currentPage,
   Api,
 }) => {
+  const comments = Array.from({ length: 12 }, () => createRandomComment());
+  // Far enough down to scroll to on a phone too, where the post's own author
+  // link sits above its title
+  const comment = comments[6];
+
   Api.routes.comments.getComments.mock({
-    body: {
-      comments: Array.from({ length: 12 }, () => createRandomComment()),
-    },
+    body: { comments },
   });
   Api.routes.users.getUserProfile.mock({
     body: createRandomProfile(),
@@ -185,7 +188,7 @@ test('Comes back to the same place on the post on Back', async ({
 
   await SinglePostPage.goto(post.slug);
 
-  const author = currentPage.getByTestId(`post-${post._id}-author`);
+  const author = currentPage.getByTestId(`comment-${comment._id}-author`);
 
   await expect(Post.getTitleById(post._id)).toBeVisible();
   await author.evaluate((link) => {
@@ -199,7 +202,7 @@ test('Comes back to the same place on the post on Back', async ({
 
   await author.click();
   await expect(currentPage).toHaveURL(
-    ProfilePage.getUrlWithLogin(post.author.login),
+    ProfilePage.getUrlWithLogin(comment.author.login),
   );
   await currentPage.goBack();
 

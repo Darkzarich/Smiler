@@ -177,6 +177,7 @@ onBeforeUnmount(() => {
       left: 0;
       width: 100%;
       max-width: 100%;
+      padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
       border-radius: 16px 16px 0 0;
       transform: none;
     }

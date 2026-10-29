@@ -45,9 +45,14 @@ watch(
 </script>
 
 <style>
+/* An upload is any shape: crop it to the square the avatar is drawn in */
+.user-avatar {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
 /* Drawn inline so it takes the theme's logo color */
 .user-avatar--default {
   color: var(--color-logo);
-  aspect-ratio: 1;
 }
 </style>

@@ -37,35 +37,35 @@ withDefaults(defineProps<Props>(), {
 
 const links: readonly NavLink[] = Object.freeze([
   {
-    label: 'TODAY',
+    label: 'Today',
     route: {
       name: 'Home',
     },
     dataTestId: 'today-link',
   },
   {
-    label: 'ALL',
+    label: 'All',
     route: {
       name: 'All',
     },
     dataTestId: 'all-link',
   },
   {
-    label: 'BLOWING',
+    label: 'Trending',
     route: {
-      name: 'Blowing',
+      name: 'Trending',
     },
-    dataTestId: 'blowing-link',
+    dataTestId: 'trending-link',
   },
   {
-    label: 'TOP THIS WEEK',
+    label: 'Top this week',
     route: {
       name: 'TopThisWeek',
     },
     dataTestId: 'top-this-week-link',
   },
   {
-    label: 'NEW',
+    label: 'New',
     route: {
       name: 'New',
     },
