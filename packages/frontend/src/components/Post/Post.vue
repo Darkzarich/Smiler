@@ -73,12 +73,11 @@
       </div>
 
       <div v-if="post.tags?.length > 0" class="post__tags u-flex-row">
-        <button
+        <BaseTag
           v-for="tag in post.tags"
           :key="tag"
           :data-testid="`post-${post._id}-tag-${tag}`"
-          class="post__tags-item"
-          :class="{ 'post__tags-item--inert': !interactive }"
+          :interactive="interactive"
           :aria-haspopup="interactive ? 'menu' : undefined"
           :aria-expanded="interactive ? isTagMenuOpen(tag) : undefined"
           :aria-controls="isTagMenuOpen(tag) ? tagMenuId : undefined"
@@ -88,7 +87,7 @@
           @keydown.down.prevent.stop="openContextMenu($event, tag)"
         >
           {{ tag }}
-        </button>
+        </BaseTag>
       </div>
 
       <CollapsibleContent :max-height="400" :disabled="!collapsible">
@@ -268,6 +267,7 @@ import { resolveImage } from '@/utils/resolve-image';
 import BaseContextMenu from '@common/BaseContextMenu.vue';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import BaseImage from '@common/BaseImage.vue';
+import BaseTag from '@common/BaseTag.vue';
 import CollapsibleContent from '@common/CollapsibleContent.vue';
 import ConfirmModal from '@common/ConfirmModal.vue';
 import IconComments from '@icons/IconComments.vue';
@@ -675,29 +675,8 @@ const searchByTag = (tag: string) => {
 
   &__tags {
     flex-wrap: wrap;
-    margin-bottom: 1rem;
-  }
-
-  &__tags-item {
-    margin-top: 0.5rem;
-    margin-right: 0.5rem;
-    padding: 0.1rem;
-    border: 1px solid var(--color-primary);
-    border-radius: 5px;
-    background: transparent;
-    color: var(--color-primary-strong);
-    font-family: monospace;
-    font-size: 0.8rem;
-    font-weight: bold;
-    user-select: none;
-    cursor: pointer;
-
-    @media (--pointer-coarse) {
-      display: inline-flex;
-      align-items: center;
-      min-height: 32px;
-      padding: 0 0.5rem;
-    }
+    gap: 0.5rem;
+    margin: 0.5rem 0 1rem;
   }
 
   &__main {
@@ -854,10 +833,6 @@ const searchByTag = (tag: string) => {
       opacity: 0.5;
       cursor: default;
     }
-  }
-
-  &__tags-item--inert {
-    cursor: default;
   }
 }
 </style>

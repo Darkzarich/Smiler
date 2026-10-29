@@ -5,18 +5,20 @@
       class="post-editor-tags__list"
       data-testid="post-tags-list"
     >
-      <div v-for="tag in tags" :key="tag" class="post-editor-tags__item">
+      <BaseTag v-for="tag in tags" :key="tag">
         {{ tag }}
-        <BaseIconButton
-          :label="`Remove tag ${tag}`"
-          :data-testid="`remove-tag-button-${tag}`"
-          size="xsmall"
-          tone="danger"
-          @click="removeTag(tag)"
-        >
-          <IconClose />
-        </BaseIconButton>
-      </div>
+        <template #action>
+          <BaseIconButton
+            :label="`Remove tag ${tag}`"
+            :data-testid="`remove-tag-button-${tag}`"
+            size="xsmall"
+            tone="danger"
+            @click="removeTag(tag)"
+          >
+            <IconClose />
+          </BaseIconButton>
+        </template>
+      </BaseTag>
     </div>
 
     <div
@@ -50,6 +52,7 @@ import { computed, ref } from 'vue';
 import * as consts from '@/const';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import BaseInput from '@common/BaseInput.vue';
+import BaseTag from '@common/BaseTag.vue';
 import IconAdd from '@icons/IconAdd.vue';
 import IconClose from '@icons/IconClose.vue';
 
@@ -108,22 +111,6 @@ const removeTag = (tag: string) => {
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-  }
-
-  &__item {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2px;
-    padding: 2px 2px 2px 6px;
-    border: 1px solid var(--color-primary);
-    border-radius: 5px;
-    background: transparent;
-    color: var(--color-primary-strong);
-    font-family: monospace;
-    font-size: 0.8rem;
-    font-weight: bold;
-    user-select: none;
   }
 
   &__form {
