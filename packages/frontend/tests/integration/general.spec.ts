@@ -373,13 +373,19 @@ test.describe('Mobile menu', () => {
 
     await expect(closeBtn).toBeFocused();
 
+    const homeLink = Menu.mobileMenu.getByRole('link', { name: 'Home' });
+
+    await page.keyboard.press('Shift+Tab');
+    await expect(homeLink).toBeFocused();
+
     // Shift+Tab from the first control wraps to the last, never behind the menu
     await page.keyboard.press('Shift+Tab');
     await expect(Menu.mobileMenu.locator(':focus')).toHaveCount(1);
+    await expect(homeLink).not.toBeFocused();
     await expect(closeBtn).not.toBeFocused();
 
     await page.keyboard.press('Tab');
-    await expect(closeBtn).toBeFocused();
+    await expect(homeLink).toBeFocused();
 
     await page.keyboard.press('Escape');
 

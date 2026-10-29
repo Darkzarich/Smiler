@@ -7,8 +7,20 @@
     aria-label="Menu"
     data-testid="mobile-menu-dialog"
   >
-    <div class="mobile-menu__close">
-      <BaseIconButton label="Close menu" size="medium" @click="closeMenu()">
+    <div class="mobile-menu__header">
+      <RouterLink
+        class="mobile-menu__home-link u-touch-area"
+        :to="{ name: 'Home' }"
+      >
+        <SiteLogo />
+      </RouterLink>
+
+      <BaseIconButton
+        ref="closeButton"
+        label="Close menu"
+        size="medium"
+        @click="closeMenu()"
+      >
         <IconClose />
       </BaseIconButton>
     </div>
@@ -26,7 +38,7 @@
 
       <template v-if="isPhone" #after>
         <div class="mobile-menu__nav-link mobile-menu__theme-item">
-          <ThemeToggle />
+          <ThemeToggle labeled />
         </div>
       </template>
     </Navigation>
@@ -36,6 +48,7 @@
 <script setup lang="ts">
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 import { useTemplateRef } from 'vue';
+import SiteLogo from './SiteLogo.vue';
 import { useMediaQuery } from '@/composables/use-media-query';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import Navigation from '@components/Navigation/Navigation.vue';
@@ -58,6 +71,8 @@ const emit = defineEmits<Emits>();
 
 const isPhone = useMediaQuery('phone-only');
 
+const closeButton = useTemplateRef('closeButton');
+
 const closeMenu = () => {
   emit('close');
 };
@@ -66,6 +81,7 @@ const closeMenu = () => {
 // button and goes back to the hamburger when the menu unmounts
 useFocusTrap(useTemplateRef('menu'), {
   immediate: true,
+  initialFocus: () => closeButton.value?.$el,
   setReturnFocus: (previous) => props.returnFocusTo ?? previous,
   // Leave the trap to the unmount, so the parent decides when the menu closes
   escapeDeactivates: () => {
@@ -87,16 +103,30 @@ useFocusTrap(useTemplateRef('menu'), {
   background: var(--color-surface-secondary);
   overflow-y: scroll;
 
-  /* No user card to sit beside, so the close button gets a row of its own */
-  @media (--tablet-portrait-up) {
-    padding-top: 3rem;
+  /* The page header's height and gutter, so the logo stays where it was */
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    height: var(--header-height);
+    padding: 0.5rem max(0.5rem, var(--page-gutter));
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface-secondary);
   }
 
-  &__close {
-    position: absolute;
-    top: 0.25rem;
-    right: 0.5rem;
-    z-index: 1;
+  &__home-link {
+    display: flex;
+    align-items: center;
+    height: 100%;
+
+    @media (--phone-only) {
+      .site-logo {
+        height: 30px;
+      }
+    }
   }
 
   &__navigation {
@@ -104,23 +134,31 @@ useFocusTrap(useTemplateRef('menu'), {
   }
 
   &__nav-link {
-    width: 100%;
-    padding: 1rem;
-    border-bottom: 1px solid var(--color-border);
-
-    &:first-child {
-      border-top: 1px solid var(--color-border);
-    }
-  }
-
-  &__theme-item {
     display: flex;
-    justify-content: center;
     align-items: center;
+    width: 100%;
+    min-height: 48px;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--color-border);
   }
 
-  &__user {
-    border: none;
+  /* Over .nav-link's bold, whichever of the two stylesheets loads last */
+  &__navigation &__nav-link {
+    font-weight: 500;
+  }
+
+  /* The button inside is the row, so all of it takes the tap */
+  &__theme-item {
+    align-items: stretch;
+    padding: 0;
+  }
+
+  /* Flat inside the menu, where a card's corners and ring would sit against
+     the header row. Doubled up to win over .u-widget, which loads later */
+  &__user.u-widget {
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+    box-shadow: none;
   }
 }
 </style>
