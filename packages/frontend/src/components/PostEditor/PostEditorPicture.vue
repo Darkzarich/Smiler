@@ -19,7 +19,7 @@
         @select="uploadFile"
       />
 
-      <div class="post-editor-picture__or">OR</div>
+      <div class="post-editor-picture__or">or</div>
 
       <div class="post-editor-picture__input-url">
         <BaseInput
@@ -167,6 +167,7 @@ const createSectionWithAttachment = async (
     margin-bottom: 12px;
     color: var(--color-text-secondary);
     text-align: center;
+    text-transform: uppercase;
     font-weight: bold;
   }
 
