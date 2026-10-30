@@ -1021,6 +1021,67 @@ test.describe('Sections', () => {
     ).toHaveAttribute('src', section.url);
   });
 
+  test('Plays a YouTube section in a player frame', async ({
+    Post,
+    PostsPage,
+    Api,
+  }) => {
+    // How the editor used to store a YouTube link, which a <video> never played
+    const section = createRandomSection(postTypes.POST_SECTION_TYPES.VIDEO, {
+      url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    });
+    const post = createRandomPost({ sections: [section] });
+
+    Api.routes.posts.getToday.mock({
+      body: { posts: [post], hasNextPage: false },
+    });
+
+    await PostsPage.goto(PostsPage.urls.today);
+
+    const player = Post.getVideoSectionByHash(post._id, section.hash);
+
+    await expect(player).toBeVisible();
+    await expect(player).toHaveJSProperty('tagName', 'IFRAME');
+    await expect(player).toHaveAttribute(
+      'src',
+      'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    );
+    await expect(player).toHaveAttribute('title', 'YouTube video');
+  });
+
+  test('Says when a video cannot be played and links to it', async ({
+    Post,
+    PostsPage,
+    Api,
+    page,
+  }) => {
+    const missing = createRandomSection(postTypes.POST_SECTION_TYPES.VIDEO, {
+      url: 'https://example.com/videos/missing.webm',
+    });
+    const broken = createRandomSection(postTypes.POST_SECTION_TYPES.VIDEO, {
+      url: 'error',
+    });
+    const post = createRandomPost({ sections: [missing, broken] });
+
+    await page.route(missing.url, (route) => route.fulfill({ status: 404 }));
+
+    Api.routes.posts.getToday.mock({
+      body: { posts: [post], hasNextPage: false },
+    });
+
+    await PostsPage.goto(PostsPage.urls.today);
+
+    const missingNote = Post.getVideoSectionByHash(post._id, missing.hash);
+    const brokenNote = Post.getVideoSectionByHash(post._id, broken.hash);
+
+    await expect(missingNote).toContainText('This video can’t be played here.');
+    await expect(
+      missingNote.getByRole('link', { name: 'Open the link' }),
+    ).toHaveAttribute('href', missing.url);
+    await expect(brokenNote).toContainText('This video can’t be played here.');
+    await expect(brokenNote.getByRole('link')).toHaveCount(0);
+  });
+
   test('Shows multiple sections', async ({ Post, PostsPage, Api }) => {
     const sections = [
       createRandomSection(postTypes.POST_SECTION_TYPES.PICTURE),

@@ -170,7 +170,9 @@ const videoSectionSchema = z.object({
   type: z.literal(POST_SECTION_TYPES.VIDEO),
   url: z
     .string({ error: ERRORS.POST_VIDEO_SECTION_URL_REQUIRED })
-    .refine(isValidVideoUrl, ERRORS.POST_VIDEO_SECTION_URL_REQUIRED),
+    .trim()
+    .min(1, ERRORS.POST_VIDEO_SECTION_URL_REQUIRED)
+    .refine(isValidVideoUrl, ERRORS.POST_VIDEO_SECTION_URL_INVALID),
   ...sectionBaseShape,
 });
 

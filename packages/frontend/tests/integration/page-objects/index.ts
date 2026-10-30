@@ -46,6 +46,11 @@ const TRANSPARENT_PIXEL = Buffer.from(
   'base64',
 );
 
+const WIDE_WEBM = Buffer.from(
+  'GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQJChYECGFOAZwEAAAAAAAIEEU2bdLpNu4tTq4QVSalmU6yBoU27i1OrhBZUrmtTrIHYTbuMU6uEElTDZ1OsggEiTbuMU6uEHFO7a1OsggHu7AEAAAAAAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVSalmsirXsYMPQkBNgI1MYXZmNTguNzYuMTAwV0GNTGF2ZjU4Ljc2LjEwMESJiEBZAAAAAAAAFlSua8WuAQAAAAAAADzXgQFzxYh4N/qr/xEBjpyBACK1nIN1bmSGhVZfVlA4g4EBI+ODhAX14QDgAQAAAAAAAAmwgSC6gRKagQISVMNnQJpzcwEAAAAAAAAnY8CAZ8gBAAAAAAAAGkWjh0VOQ09ERVJEh41MYXZmNTguNzYuMTAwc3MBAAAAAAAAX2PAi2PFiHg3+qv/EQGOZ8gBAAAAAAAAIkWjh0VOQ09ERVJEh5VMYXZjNTguMTM0LjEwMCBsaWJ2cHhnyKJFo4hEVVJBVElPTkSHlDAwOjAwOjAwLjEwMDAwMDAwMAAAH0O2dafngQCjooEAAIAwAgCdASogABIAAEcIhYWIhYSIAgIAB5Eo2WD+aAAcU7trkbuPs4EAt4r3gQHxggHC8IED',
+  'base64',
+);
+
 // Extend base test by providing common page objects
 const test = base.extend<TestFixtures>({
   Api: async ({ page, context }, use) => {
@@ -63,6 +68,16 @@ const test = base.extend<TestFixtures>({
     // there depended on the machine
     await context.route(/\/uploads\//, (route) =>
       route.fulfill({ contentType: 'image/png', body: TRANSPARENT_PIXEL }),
+    );
+
+    // Same for the video sites a post frames and the files it plays: a video
+    // that fails to load is swapped for a note
+    await context.route(
+      /^https:\/\/([\w-]+\.)*(youtube\.com|vimeo\.com|twitch\.tv|streamable\.com|rutube\.ru|vkvideo\.ru)\//,
+      (route) => route.fulfill({ contentType: 'text/html', body: '' }),
+    );
+    await context.route(/\.webm$/, (route) =>
+      route.fulfill({ contentType: 'video/webm', body: WIDE_WEBM }),
     );
 
     await use(api);

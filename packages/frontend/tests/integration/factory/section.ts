@@ -22,7 +22,7 @@ function createVideoSection(): postTypes.PostVideoSection {
   return {
     type: postTypes.POST_SECTION_TYPES.VIDEO,
     hash: faker.string.uuid(),
-    url: faker.image.url(),
+    url: `https://example.com/videos/${faker.string.alphanumeric(8)}.webm`,
   };
 }
 
