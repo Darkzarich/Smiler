@@ -189,6 +189,7 @@ Smiler has been in development since 2019 and has been through several full-stac
 - **Oct 2026 - comments** - Comment threads load with **one `$graphLookup`** instead of being populated level by level: deep threads are 5–8× faster and no longer lose replies past level 20. Past the depth a screen fits, replies continue as one list naming the comment each answers, and comment scores lose their halves.
 - **Oct 2026 - migrations** - The `mongosh` scripts that were run by hand against the database give way to **`@smiler/mongodb-migrator`**, a workspace package any service can use to apply, revert and record its MongoDB migrations with its own credentials, by hand and with the service stopped, locally or through `docker compose run`. A migration the new code cannot run without is marked **critical** and keeps the backend from starting until it has run. A new database - a fork, a fresh setup, a seed - is recorded as already migrated at boot instead of being migrated, since the current code wrote it in the newest shape to begin with.
 - **Oct 2026 - CI & releases** - Every pull request now runs the full lint and test suite on **GitHub Actions**: dependency bumps merged on GitHub had been skipping the git hooks and reaching production untested, and the first runs turned up e2e tests that passed on one machine only. Publishing a GitHub Release builds both Docker images in CI and pushes them to Docker Hub tagged with their commit, in place of building and pushing them by hand.
+- **Nov 2026** - **Node.js upgraded 24 → 26 LTS** across the dev environment, CI, the `engines` fields and the Docker images, with `@types/node` moved to the matching major. The Vitest workers run with Node's built-in Web Storage off, since its `localStorage` shadows jsdom's working one.
 
 </details>
 
@@ -198,7 +199,7 @@ This project can be run in multiple ways, depending on your preferences and setu
 
 ### Prerequisites
 
-- **Node.js** (>=24.0.0 - see `.nvmrc` for the exact version used in development)
+- **Node.js** (>=26.0.0 - see `.nvmrc` for the exact version used in development)
 - **[pnpm](https://pnpm.io/)** (>=8.6.0)
 - **Docker** and **Docker Compose** (optional, for containerized setups)
 - **[k6](https://github.com/grafana/k6)** (optional, for the load benchmarks in `scripts/benchmarks/`)
