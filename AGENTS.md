@@ -274,7 +274,7 @@ How to add one:
 
 ## Gotchas
 
-- **Node version**: >=v24.0.0. `.nvmrc` says `v24.20.0`.
+- **Node version**: >=v26.0.0. `.nvmrc` says `v26.13.0`.
 - **pnpm version**: >=8.6.0.
 - Backend uses `module: "NodeNext"` / `moduleResolution: "nodenext"` — use proper file extensions in imports where required.
 - Backend Jest config uses `module.exports` in a `.ts` file — this is intentional. It also carries a

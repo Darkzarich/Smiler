@@ -11,6 +11,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    // Node 25+ puts its own `localStorage` on globalThis, undefined without
+    // --localstorage-file, and Vitest then leaves jsdom's working one out.
+    execArgv: ['--no-experimental-webstorage'],
     // Vitest blanks out CSS imports, which would empty the `?raw` breakpoint
     // source the media query composable parses.
     css: { include: [/media\.css/] },
