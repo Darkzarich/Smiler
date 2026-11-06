@@ -20,7 +20,7 @@ const storedPicSection = createRandomSection(
   postTypes.POST_SECTION_TYPES.PICTURE,
   { url: '/uploads/user-id/stored-picture.jpg', isFile: true },
 );
-const vidCode = 'dQw4w9WgXcQ';
+const videoUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 const asParagraph = (text: string) => `<p>${text}</p>`;
 
 const createdPost = createRandomPost();
@@ -107,7 +107,7 @@ test('Creates a post with title, tags and content', async ({
   });
 
   await PostCreatePage.addVideoSection();
-  await PostCreatePage.uploadVideoWithUrl(vidCode);
+  await PostCreatePage.addVideoWithUrl(videoUrl);
 
   const createPostResponse = await Api.routes.posts.createPost.waitForRequest({
     preRequestAction: PostCreatePage.submitPost.bind(PostCreatePage),
@@ -136,10 +136,48 @@ test('Creates a post with title, tags and content', async ({
       },
       {
         type: 'vid',
-        url: `https://www.youtube.com/embed/${vidCode}`,
+        url: videoUrl,
       },
     ],
   });
+});
+
+test('Previews a YouTube link in a player frame', async ({
+  PostCreatePage,
+}) => {
+  await PostCreatePage.goto();
+  await PostCreatePage.addVideoSection();
+  await PostCreatePage.addVideoWithUrl('https://youtu.be/dQw4w9WgXcQ?t=90');
+
+  await expect(PostCreatePage.getVideoPreview()).toHaveAttribute(
+    'src',
+    'https://www.youtube.com/embed/dQw4w9WgXcQ?start=90',
+  );
+  await expect(PostCreatePage.getVideoPreview()).toHaveJSProperty(
+    'tagName',
+    'IFRAME',
+  );
+});
+
+test('Refuses a video link it cannot play and says why', async ({
+  PostCreatePage,
+}) => {
+  await PostCreatePage.goto();
+  await PostCreatePage.addVideoSection();
+
+  await PostCreatePage.addVideoWithUrl('https://example.com/watch/123');
+
+  await expect(PostCreatePage.getVideoUrlError()).toHaveText(
+    'This link isn’t a video we can play. Check it against the list below.',
+  );
+  await expect(PostCreatePage.getVideoPreview()).toBeHidden();
+
+  await PostCreatePage.addVideoWithUrl('https://example.com/clip.avi');
+
+  await expect(PostCreatePage.getVideoUrlError()).toHaveText(
+    'Browsers can’t play .avi files. Link to an .mp4 or .webm version instead.',
+  );
+  await expect(PostCreatePage.getVideoPreview()).toBeHidden();
 });
 
 test('Shows what is missing instead of sending an empty post', async ({
@@ -489,7 +527,7 @@ test('Fetch and show draft template', async ({ Api, page, PostCreatePage }) => {
       hash: '2',
     }),
     createRandomSection(postTypes.POST_SECTION_TYPES.VIDEO, {
-      url: `https://www.youtube.com/embed/${vidCode}`,
+      url: videoUrl,
       hash: '3',
     }),
   ] as const;
@@ -554,7 +592,7 @@ test('Saves draft template', async ({
   });
 
   await PostCreatePage.addVideoSection();
-  await PostCreatePage.uploadVideoWithUrl(vidCode);
+  await PostCreatePage.addVideoWithUrl(videoUrl);
 
   const updateMyTemplateResponse =
     await Api.routes.users.updateMyTemplate.waitForRequest({
@@ -578,7 +616,7 @@ test('Saves draft template', async ({
       },
       {
         type: 'vid',
-        url: `https://www.youtube.com/embed/${vidCode}`,
+        url: videoUrl,
       },
     ],
   });

@@ -143,11 +143,17 @@ export default class PostCreatePage extends AbstractPage {
       .dispatchEvent('drop', { dataTransfer });
   }
 
-  async uploadVideoWithUrl(vidCode: string) {
-    await this.page
-      .getByTestId('video-url-input')
-      .fill(`https://www.youtube.com/watch?v=${vidCode}`);
+  async addVideoWithUrl(url: string) {
+    await this.page.getByTestId('video-url-input').fill(url);
     await this.page.getByTestId('video-upload-button').click();
+  }
+
+  getVideoUrlError() {
+    return this.page.getByTestId('video-url-input-error');
+  }
+
+  getVideoPreview() {
+    return this.page.getByTestId('video-preview');
   }
 
   async submitPost() {
