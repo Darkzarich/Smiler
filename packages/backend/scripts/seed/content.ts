@@ -187,10 +187,12 @@ export const REPLIES = [
   'Counterpoint: no.',
 ];
 
-/** Long-lived, public videos on a host the frontend embeds */
+/** Long-lived, public videos: on sites the frontend embeds, and files it plays */
 export const VIDEO_URLS = [
   'https://www.youtube.com/watch?v=jNQXAC9IVRw',
   'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
   'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   'https://www.youtube.com/watch?v=9bZkp7q19f0',
+  'https://vimeo.com/76979871',
+  'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm',
 ];
