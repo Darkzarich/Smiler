@@ -289,6 +289,7 @@ function buildSections(
   random: Random,
   authorId: string,
   pictures: Promise<void>[],
+  nextVideoUrl: () => string,
 ) {
   const sections: PostSection[] = [
     {
@@ -311,7 +312,7 @@ function buildSections(
     if (type === POST_SECTION_TYPES.TEXT) {
       sections.push({ type, content: textContent(random), hash, ...spoiler });
     } else if (type === POST_SECTION_TYPES.VIDEO) {
-      sections.push({ type, url: random.pick(VIDEO_URLS), hash, ...spoiler });
+      sections.push({ type, url: nextVideoUrl(), hash, ...spoiler });
     } else {
       const section: PostPictureSection = {
         type,
@@ -337,6 +338,15 @@ async function buildPosts(random: Random, users: SeedUser[], now: Date) {
   const demoUser = users[0];
   const pictures: Promise<void>[] = [];
   let index = 0;
+  let videoCount = 0;
+
+  const nextVideoUrl = () => {
+    const url = VIDEO_URLS[videoCount % VIDEO_URLS.length];
+
+    videoCount += 1;
+
+    return url;
+  };
 
   const posts = POST_AGE_BUCKETS.flatMap((bucket) =>
     Array.from({ length: bucket.count }, (): SeedPost => {
@@ -354,7 +364,12 @@ async function buildPosts(random: Random, users: SeedUser[], now: Date) {
         title,
         slug: `${slugLib(title)}-${nanoid(3)}`,
         author: author._id,
-        sections: buildSections(random, author._id.toString(), pictures),
+        sections: buildSections(
+          random,
+          author._id.toString(),
+          pictures,
+          nextVideoUrl,
+        ),
         tags: random.sample(TAGS, random.int(1, 4)),
         rating: 0,
         commentCount: 0,

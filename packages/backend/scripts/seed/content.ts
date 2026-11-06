@@ -187,12 +187,22 @@ export const REPLIES = [
   'Counterpoint: no.',
 ];
 
-/** Long-lived, public videos: on sites the frontend embeds, and files it plays */
+/**
+ * Long-lived, public videos: one or more on every site the frontend embeds,
+ * and files it plays. The seed goes through them in turn, so each one shows up.
+ */
 export const VIDEO_URLS = [
   'https://www.youtube.com/watch?v=jNQXAC9IVRw',
-  'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+  'https://vimeo.com/76979871',
+  'https://streamable.com/moo',
+  'https://www.twitch.tv/stableronaldo/clip/ModernEasyLapwingBCWarrior-FZTCQ5rmbrQmpVZC',
+  'https://rutube.ru/video/d07af4321b54d2e8a46b4fe015081314/',
+  'https://vkvideo.ru/video-205153628_456239044',
+  'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+  'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm',
+  'https://youtu.be/aqz-KE-bpKQ?t=30',
   'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   'https://www.youtube.com/watch?v=9bZkp7q19f0',
-  'https://vimeo.com/76979871',
-  'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm',
+  // Missing on purpose, so the feed also shows a video that cannot be played
+  'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/missing.mp4',
 ];
