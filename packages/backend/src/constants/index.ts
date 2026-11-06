@@ -11,21 +11,35 @@ export const ALLOWED_PICTURE_EXTENSIONS = [
   'webp',
   'avif',
 ];
-export const ALLOWED_VIDEO_EXTENSIONS = ['mp4', 'webm', 'mov', 'ogg', 'm4v'];
+/** What browsers play in a <video> element. The frontend's
+ * `VIDEO_FILE_EXTENSIONS` (utils/parse-video-url.ts) is the same list. */
+export const ALLOWED_VIDEO_EXTENSIONS = [
+  'mp4',
+  'm4v',
+  'webm',
+  'ogv',
+  'ogg',
+  'mov',
+];
 
+/** The hosts of the video sites the frontend builds a player for, without
+ * `www.` or `m.`. The frontend's providers in utils/parse-video-url.ts list the
+ * same hosts; a host added on one side only is a link that either cannot be
+ * posted or cannot be played. */
 export const ALLOWED_VIDEO_EMBEDS = [
   'youtube.com',
-  'www.youtube.com',
+  'youtube-nocookie.com',
   'youtu.be',
   'vimeo.com',
-  'www.vimeo.com',
-  'dailymotion.com',
-  'www.dailymotion.com',
+  'player.vimeo.com',
   'twitch.tv',
-  'www.twitch.tv',
+  'clips.twitch.tv',
   'player.twitch.tv',
-  'youtube-nocookie.com',
-  'www.youtube-nocookie.com',
+  'streamable.com',
+  'rutube.ru',
+  'vk.com',
+  'vk.ru',
+  'vkvideo.ru',
 ];
 
 export const POST_TIME_TO_UPDATE = minutesToMilliseconds(10);

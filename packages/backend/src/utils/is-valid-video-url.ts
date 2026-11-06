@@ -21,13 +21,16 @@ export function isValidVideoUrl(urlString: string): boolean {
       return false;
     }
 
-    const extension = url.pathname.split('.').pop()?.toLowerCase();
-
-    if (extension && ALLOWED_VIDEO_EXTENSIONS.includes(extension)) {
+    if (ALLOWED_VIDEO_EMBEDS.includes(url.hostname.replace(/^(www|m)\./, ''))) {
       return true;
     }
 
-    return ALLOWED_VIDEO_EMBEDS.includes(url.hostname);
+    const fileName = url.pathname.split('/').pop() ?? '';
+    const extension = fileName.includes('.')
+      ? fileName.split('.').pop()!.toLowerCase()
+      : '';
+
+    return ALLOWED_VIDEO_EXTENSIONS.includes(extension);
   } catch {
     return false;
   }

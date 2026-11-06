@@ -173,14 +173,10 @@
                 v-if="isVideoSection(section)"
                 class="post__section-attachment post__section-attachment--video"
               >
-                <video
-                  class="post__section-video"
-                  controls
-                  :src="section.url"
+                <PostVideo
+                  :url="section.url"
                   :data-testid="`post-${post._id}-vid-${section.hash}`"
-                >
-                  <track kind="captions" />
-                </video>
+                />
               </div>
             </PostSectionSpoiler>
           </div>
@@ -250,6 +246,7 @@ import { computed, reactive, ref, useId } from 'vue';
 import { createReusableTemplate } from '@vueuse/core';
 import { useRouter } from 'vue-router';
 import PostSectionSpoiler from './PostSectionSpoiler.vue';
+import PostVideo from './PostVideo.vue';
 import {
   isTextSection,
   isPictureSection,
@@ -737,21 +734,10 @@ const searchByTag = (tag: string) => {
   }
 
   &__section-image {
+    display: block;
     width: 100%;
     max-height: min(720px, 80svh);
     object-fit: contain;
-  }
-
-  &__section-video {
-    width: 100%;
-    height: auto;
-    max-height: 80svh;
-    object-fit: contain;
-  }
-
-  &__section-image,
-  &__section-video {
-    display: block;
   }
 
   &__footer {

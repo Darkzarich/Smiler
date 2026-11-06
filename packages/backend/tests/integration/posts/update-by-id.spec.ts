@@ -414,7 +414,7 @@ describe('PUT /posts/:id', () => {
       });
 
     expect(response.body.error.message).toBe(
-      ERRORS.POST_VIDEO_SECTION_URL_REQUIRED,
+      ERRORS.POST_VIDEO_SECTION_URL_INVALID,
     );
     expect(response.status).toBe(422);
   });
