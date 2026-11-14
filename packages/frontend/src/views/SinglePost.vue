@@ -1,6 +1,8 @@
 <template>
   <div>
-    <template v-if="post">
+    <NotFound v-if="isNotFound" />
+
+    <template v-else-if="post">
       <div class="post-container">
         <Post
           v-model:post="post"
@@ -75,6 +77,7 @@ import CommentList from '@/components/Comment/CommentList.vue';
 import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
 import { checkCanEditPost } from '@/utils/check-can-edit-post';
+import NotFound from '@/views/NotFound.vue';
 import NewCommentForm from '@components/Comment/NewCommentForm.vue';
 import Post from '@components/Post/Post.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
@@ -85,6 +88,8 @@ const router = useRouter();
 const userStore = useUserStore();
 
 const post = ref<postTypes.Post | null>(null);
+
+const isNotFound = ref(false);
 
 const comments = ref<commentTypes.Comment[]>([]);
 
@@ -138,9 +143,8 @@ const fetchPostBySlug = async () => {
     // e.g. save in store seen comments and then check if each comment is in there
     fetchComments();
   } catch {
-    router.push({
-      name: 'NotFound',
-    });
+    // In place: a push would leave the bad address behind it, which Back returns to
+    isNotFound.value = true;
   }
 };
 

@@ -31,7 +31,7 @@ test.beforeEach(async ({ Api }) => {
   });
 });
 
-test('Goes to 404 if user does not exist', async ({
+test('Shows 404 at the address of a user that does not exist', async ({
   ProfilePage,
   NotFoundPage,
   page: currentPage,
@@ -49,7 +49,10 @@ test('Goes to 404 if user does not exist', async ({
 
   await ProfilePage.goto('non-existing-user');
 
-  await NotFoundPage.waitForNotFoundPage();
+  await expect(NotFoundPage.root).toBeVisible();
+  await expect(currentPage).toHaveURL(
+    ProfilePage.getUrlWithLogin('non-existing-user'),
+  );
   await expect(currentPage).toHaveTitle(NotFoundPage.title);
   await expect(NotificationList.root).toContainText('User was not found');
 });

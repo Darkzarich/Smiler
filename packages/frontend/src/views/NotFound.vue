@@ -1,5 +1,5 @@
 <template>
-  <div class="not-found u-widget u-flex-col">
+  <div class="not-found u-widget u-flex-col" data-testid="not-found">
     <p class="not-found__code">404</p>
 
     <h1 class="u-page-title">Page not found</h1>
@@ -11,10 +11,16 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import BaseButton from '@common/BaseButton.vue';
 
 const router = useRouter();
+
+// Also shown in place by the post, profile and edit pages, whose routes carry another title
+onMounted(() => {
+  window.document.title = 'Not Found | Smiler';
+});
 
 const goHome = () => {
   router.push({

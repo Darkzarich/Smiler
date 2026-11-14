@@ -1,42 +1,48 @@
 <template>
   <div>
-    <!-- TODO: Skeleton? -->
-    <UserProfile v-if="user" :user="user" />
+    <NotFound v-if="isNotFound" />
 
-    <PostsContainer
-      v-model:posts="posts"
-      :is-loading="isLoading"
-      :has-next-page="hasNextPage"
-      @fetch-more="handleNextPage"
-    >
-      <template #no-content>
-        This author has not posted anything yet.
-      </template>
+    <template v-else>
+      <!-- TODO: Skeleton? -->
+      <UserProfile v-if="user" :user="user" />
 
-      <template #no-more-content>
-        You've read all the posts this author has posted!
-      </template>
-    </PostsContainer>
+      <PostsContainer
+        v-model:posts="posts"
+        :is-loading="isLoading"
+        :has-next-page="hasNextPage"
+        @fetch-more="handleNextPage"
+      >
+        <template #no-content>
+          This author has not posted anything yet.
+        </template>
+
+        <template #no-more-content>
+          You've read all the posts this author has posted!
+        </template>
+      </PostsContainer>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue';
-import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import { userTypes } from '@/api/users';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
 import { useRestorablePosts } from '@/composables/use-restorable-posts';
 import * as consts from '@/const';
+import NotFound from '@/views/NotFound.vue';
 import UserProfile from '@components/User/UserProfile.vue';
 
 const route = useRoute();
-const router = useRouter();
 
 const posts = ref<postTypes.Post[]>([]);
 
 const user = ref<userTypes.GetUserProfileResponse | null>(null);
+
+const isNotFound = ref(false);
 
 const isLoading = ref(false);
 
@@ -54,10 +60,9 @@ const handleFetchUser = async (login: string) => {
     const fetchedUser = await api.users.getUserProfile(login);
 
     user.value = fetchedUser;
+    isNotFound.value = false;
   } catch {
-    router.push({
-      name: 'NotFound',
-    });
+    isNotFound.value = true;
   }
 };
 

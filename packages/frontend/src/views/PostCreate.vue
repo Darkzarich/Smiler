@@ -1,5 +1,7 @@
 <template>
-  <div v-if="isShow" class="post-create u-widget u-flex-col">
+  <NotFound v-if="isNotFound" />
+
+  <div v-else-if="isShow" class="post-create u-widget u-flex-col">
     <h1
       class="post-create__header u-page-title"
       data-testid="post-create-header"
@@ -19,6 +21,7 @@ import { postTypes } from '@/api/posts';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { checkCanEditPost } from '@/utils/check-can-edit-post';
+import NotFound from '@/views/NotFound.vue';
 import PostEditor from '@components/PostEditor/PostEditor.vue';
 
 const route = useRoute();
@@ -34,6 +37,8 @@ const key = ref('');
 const isShow = ref(false);
 
 const isEdit = ref(false);
+
+const isNotFound = ref(false);
 
 const post = ref<postTypes.Post | null>(null);
 
@@ -55,7 +60,7 @@ const handleSetPost = (fetchedPost: postTypes.Post) => {
       message: "Only post's author can edit this post",
     });
 
-    return router.push({
+    return router.replace({
       name: 'Home',
     });
   }
@@ -66,7 +71,7 @@ const handleSetPost = (fetchedPost: postTypes.Post) => {
         'You cannot edit this post anymore. The time allowed to edit has expired',
     });
 
-    return router.push({
+    return router.replace({
       name: 'Home',
     });
   }
@@ -86,9 +91,7 @@ onBeforeMount(async () => {
 
       handleSetPost(data);
     } catch {
-      router.push({
-        name: 'NotFound',
-      });
+      isNotFound.value = true;
     }
   } else {
     showEditor();

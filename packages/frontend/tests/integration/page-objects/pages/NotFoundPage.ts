@@ -1,3 +1,4 @@
+import type { Locator, Page } from '@playwright/test';
 import AbstractPage from './AbstractPage';
 
 export default class NotFoundPage extends AbstractPage {
@@ -5,7 +6,11 @@ export default class NotFoundPage extends AbstractPage {
 
   readonly url = '/error/404';
 
-  async waitForNotFoundPage() {
-    await this.page.waitForURL(this.url);
+  readonly root: Locator;
+
+  constructor(page: Page) {
+    super(page);
+
+    this.root = page.getByTestId('not-found');
   }
 }
