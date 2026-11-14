@@ -47,7 +47,6 @@ const toggleMode = () => {
     border-bottom: 1px solid transparent;
     background: none;
     color: var(--color-primary-strong);
-    text-transform: uppercase;
     font-size: 13px;
     cursor: pointer;
 

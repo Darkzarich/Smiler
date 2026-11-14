@@ -8,7 +8,7 @@
           name: 'PostCreate',
         }"
       >
-        <IconAdd class="current-user-navigation__item-icon" /> New Post
+        <IconAdd class="current-user-navigation__item-icon" /> New post
       </RouterLink>
     </li>
 

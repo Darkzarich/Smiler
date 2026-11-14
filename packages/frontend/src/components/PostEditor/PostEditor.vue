@@ -215,7 +215,7 @@
           :loading="isSending"
           @click="createPost"
         >
-          Create Post
+          Create post
         </BaseButton>
         <BaseButton
           stretched
@@ -225,7 +225,7 @@
           :disabled="!isDirty"
           @click="saveDraft"
         >
-          Save Draft
+          Save draft
         </BaseButton>
       </template>
     </div>
@@ -415,7 +415,7 @@ watch(
   { deep: true },
 );
 
-// The draft lives in two places: the account, written by the Save Draft button
+// The draft lives in two places: the account, written by the Save draft button
 // so it can be picked up on another device, and this device's storage, written
 // as the writing happens so a closed tab costs nothing. Only the account's copy
 // is shared, so only that one counts as saved - which is what `isDirty` means

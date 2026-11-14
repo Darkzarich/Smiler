@@ -9,7 +9,7 @@
       class="signin-form__header"
       data-testid="signin-form-header"
     >
-      Sign In
+      Sign in
     </div>
 
     <div class="signin-form__input">
@@ -163,7 +163,6 @@ async function signIn() {
 
   &__submit {
     margin-top: 8px;
-    text-transform: uppercase;
   }
 }
 </style>

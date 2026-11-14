@@ -138,7 +138,7 @@ test.describe('Sign in from the header', () => {
     await PostsPage.goto(PostsPage.urls.today);
 
     await expect(page.getByTestId('signin-form')).toBeVisible();
-    await expect(page.getByTestId('signin-form-header')).toHaveText('Sign In');
+    await expect(page.getByTestId('signin-form-header')).toHaveText('Sign in');
     await expect(page.getByTestId('header-sign-in')).toBeHidden();
   });
 });
