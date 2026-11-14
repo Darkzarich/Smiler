@@ -20,4 +20,7 @@ export interface CursorPaginationResponse extends PaginationResponse {
 
 export interface RequestOptions {
   signal?: AbortSignal;
+  /** `false` when the caller shows the failure itself, in place of the
+   * notification every other failed request pops up */
+  notifyOnError?: boolean;
 }

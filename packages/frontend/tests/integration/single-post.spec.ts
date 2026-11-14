@@ -125,7 +125,32 @@ test('Shows 404 at the address of a post that is not found', async ({
   await expect(NotFoundPage.root).toBeVisible();
   await expect(currentPage).toHaveURL(SinglePostPage.getUrlWithSlug(post.slug));
   await expect(currentPage).toHaveTitle(NotFoundPage.title);
-  await expect(NotificationList.root).toContainText("Post doesn't exist");
+  await expect(NotificationList.root).not.toContainText("Post doesn't exist");
+});
+
+test('Offers Try again in place of a post that fails to load', async ({
+  SinglePostPage,
+  NotFoundPage,
+  LoadError,
+  NotificationList,
+  Post,
+  page: currentPage,
+  Api,
+}) => {
+  await Api.routes.posts.getPostBySlug.mock({ status: 500, body: {} });
+
+  await SinglePostPage.goto(post.slug);
+
+  await expect(LoadError.root).toBeVisible();
+  await expect(NotFoundPage.root).toBeHidden();
+  await expect(currentPage).toHaveURL(SinglePostPage.getUrlWithSlug(post.slug));
+  await expect(NotificationList.root).not.toContainText('Something went wrong');
+
+  await Api.routes.posts.getPostBySlug.mock({ body: post });
+  await LoadError.retryButton.click();
+
+  await expect(Post.getTitleById(post._id)).toContainText(post.title);
+  await expect(LoadError.root).toBeHidden();
 });
 
 test('Goes back to the list from a post that is not found', async ({
@@ -531,6 +556,38 @@ test.describe('Post edit', () => {
     await expect(currentPage).toHaveURL(
       SinglePostPage.getUrlWithSlug(post.slug),
     );
+  });
+
+  test('Offers Try again in place of a post to edit that fails to load', async ({
+    SinglePostPage,
+    PostEditPage,
+    LoadError,
+    NotificationList,
+    page: currentPage,
+    PostEditor,
+    Api,
+    context,
+  }) => {
+    await mockDate(context, nowISOString);
+    await Api.routes.posts.getPostBySlug.mock({ status: 500, body: {} });
+
+    await SinglePostPage.gotoEditPage(currentUserNewerPost.slug);
+
+    await expect(LoadError.root).toBeVisible();
+    await expect(currentPage).toHaveURL(
+      PostEditPage.getUrlWithSlug(currentUserNewerPost.slug),
+    );
+    await expect(NotificationList.root).not.toContainText(
+      'Something went wrong',
+    );
+
+    await Api.routes.posts.getPostBySlug.mock({ body: currentUserNewerPost });
+    await LoadError.retryButton.click();
+
+    await expect(PostEditor.textSectionInput).toHaveText(
+      currentUserNewerPost.sections[0].content,
+    );
+    await expect(LoadError.root).toBeHidden();
   });
 
   test('Opens post edit page if the post is not older than 10 mins', async ({

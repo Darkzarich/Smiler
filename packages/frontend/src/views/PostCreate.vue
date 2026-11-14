@@ -1,5 +1,12 @@
 <template>
-  <NotFound v-if="isNotFound" />
+  <NotFound v-if="loadFailure === 'not-found'" />
+
+  <LoadError
+    v-else-if="loadFailure === 'failed'"
+    title="This post could not be loaded"
+    :loading="isFetchingPost"
+    @retry="fetchPostToEdit()"
+  />
 
   <div v-else-if="isShow" class="post-create u-widget u-flex-col">
     <h1
@@ -17,7 +24,9 @@
 import { onBeforeMount, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '@/api';
+import { isNotFoundError } from '@/api/ApiClient';
 import { postTypes } from '@/api/posts';
+import LoadError from '@/components/LoadError.vue';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { checkCanEditPost } from '@/utils/check-can-edit-post';
@@ -38,7 +47,9 @@ const isShow = ref(false);
 
 const isEdit = ref(false);
 
-const isNotFound = ref(false);
+const loadFailure = ref<'not-found' | 'failed' | null>(null);
+
+const isFetchingPost = ref(false);
 
 const post = ref<postTypes.Post | null>(null);
 
@@ -81,18 +92,28 @@ const handleSetPost = (fetchedPost: postTypes.Post) => {
   isShow.value = true;
 };
 
+const fetchPostToEdit = async () => {
+  try {
+    isFetchingPost.value = true;
+
+    const data = await api.posts.getPostBySlug(
+      { slug: route.params.slug as string },
+      { notifyOnError: false },
+    );
+
+    loadFailure.value = null;
+    handleSetPost(data);
+  } catch (error) {
+    loadFailure.value = isNotFoundError(error) ? 'not-found' : 'failed';
+  } finally {
+    isFetchingPost.value = false;
+  }
+};
+
 onBeforeMount(async () => {
   // TODO: ??? was that the only way?
   if (route.meta.mode === 'edit') {
-    try {
-      const data = await api.posts.getPostBySlug({
-        slug: route.params.slug as string,
-      });
-
-      handleSetPost(data);
-    } catch {
-      isNotFound.value = true;
-    }
+    fetchPostToEdit();
   } else {
     showEditor();
   }

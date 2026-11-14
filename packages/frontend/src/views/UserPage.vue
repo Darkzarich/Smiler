@@ -1,6 +1,13 @@
 <template>
   <div>
-    <NotFound v-if="isNotFound" />
+    <NotFound v-if="loadFailure === 'not-found'" />
+
+    <LoadError
+      v-else-if="loadFailure === 'failed'"
+      title="This profile could not be loaded"
+      :loading="isFetchingUser"
+      @retry="handleFetchAll(route.params.login as string)"
+    />
 
     <template v-else>
       <!-- TODO: Skeleton? -->
@@ -28,8 +35,10 @@
 import { onBeforeMount, ref } from 'vue';
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import { api } from '@/api';
+import { isNotFoundError } from '@/api/ApiClient';
 import { postTypes } from '@/api/posts';
 import { userTypes } from '@/api/users';
+import LoadError from '@/components/LoadError.vue';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
 import { useLatestRequest } from '@/composables/use-latest-request';
 import { useRestorablePosts } from '@/composables/use-restorable-posts';
@@ -43,9 +52,9 @@ const posts = ref<postTypes.Post[]>([]);
 
 const user = ref<userTypes.GetUserProfileResponse | null>(null);
 
-const isNotFound = ref(false);
+const loadFailure = ref<'not-found' | 'failed' | null>(null);
 
-const { run: fetchLatestUser } = useLatestRequest();
+const { run: fetchLatestUser, isPending: isFetchingUser } = useLatestRequest();
 const { run: fetchLatestPosts, isPending: isLoading } = useLatestRequest();
 
 const nextCursor = ref<string | null>(null);
@@ -57,11 +66,11 @@ const { restore } = useRestorablePosts(posts, {
   hasNextPage,
 });
 
-/** Resolves to `false` when another profile was asked for in the meantime */
+/** Resolves to `false` when the profile failed or another one was asked for in the meantime */
 const handleFetchUser = async (login: string) => {
   try {
     const fetchedUser = await fetchLatestUser((signal) =>
-      api.users.getUserProfile(login, { signal }),
+      api.users.getUserProfile(login, { signal, notifyOnError: false }),
     );
 
     if (!fetchedUser) {
@@ -69,12 +78,14 @@ const handleFetchUser = async (login: string) => {
     }
 
     user.value = fetchedUser;
-    isNotFound.value = false;
-  } catch {
-    isNotFound.value = true;
-  }
+    loadFailure.value = null;
 
-  return true;
+    return true;
+  } catch (error) {
+    loadFailure.value = isNotFoundError(error) ? 'not-found' : 'failed';
+
+    return false;
+  }
 };
 
 /**

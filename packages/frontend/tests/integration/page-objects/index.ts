@@ -4,6 +4,7 @@ import AuthForm from './components/AuthForm';
 import AuthPrompt from './components/AuthPrompt';
 import Comments from './components/Comments';
 import CurrentUser from './components/CurrentUser';
+import LoadError from './components/LoadError';
 import Menu from './components/Menu';
 import NotificationList from './components/NotificationList';
 import Post from './components/Post';
@@ -29,6 +30,7 @@ export interface TestFixtures {
   ProfilePage: ProfilePage;
   SearchPage: SearchPage;
   NotFoundPage: NotFoundPage;
+  LoadError: LoadError;
   Post: Post;
   Comments: Comments;
   AuthForm: AuthForm;
@@ -105,6 +107,9 @@ const test = base.extend<TestFixtures>({
   },
   NotFoundPage: async ({ page }, use) => {
     await use(new NotFoundPage(page));
+  },
+  LoadError: async ({ page }, use) => {
+    await use(new LoadError(page));
   },
   Post: async ({ page }, use) => {
     await use(new Post(page));

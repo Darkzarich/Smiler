@@ -92,9 +92,14 @@ export default {
       data,
     );
   },
-  getPostBySlug(params: postTypes.GetPostBySlugRequest) {
+  getPostBySlug(
+    params: postTypes.GetPostBySlugRequest,
+    options?: RequestOptions,
+  ) {
     return apiClient.get<postTypes.GetPostBySlugResponse>(
       `${CONTROLLER_URL}/${params.slug}`,
+      undefined,
+      options,
     );
   },
   updatePostById(id: string, data: postTypes.UpdatePostByIdRequest) {

@@ -1,6 +1,13 @@
 <template>
   <div>
-    <NotFound v-if="isNotFound" />
+    <NotFound v-if="loadFailure === 'not-found'" />
+
+    <LoadError
+      v-else-if="loadFailure === 'failed'"
+      title="This post could not be loaded"
+      :loading="isFetchingPost"
+      @retry="fetchPostBySlug()"
+    />
 
     <template v-else-if="post">
       <div class="post-container">
@@ -72,9 +79,11 @@
 import { nextTick, onBeforeMount, ref, useTemplateRef } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '@/api';
+import { isNotFoundError } from '@/api/ApiClient';
 import { commentTypes } from '@/api/comments';
 import { postTypes } from '@/api/posts';
 import CommentList from '@/components/Comment/CommentList.vue';
+import LoadError from '@/components/LoadError.vue';
 import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
 import { checkCanEditPost } from '@/utils/check-can-edit-post';
@@ -91,7 +100,9 @@ const userStore = useUserStore();
 
 const post = ref<postTypes.Post | null>(null);
 
-const isNotFound = ref(false);
+const loadFailure = ref<'not-found' | 'failed' | null>(null);
+
+const isFetchingPost = ref(false);
 
 const comments = ref<commentTypes.Comment[]>([]);
 
@@ -165,20 +176,26 @@ const fetchMoreComments = async () => {
 
 const fetchPostBySlug = async () => {
   try {
-    const fetchedPost = await api.posts.getPostBySlug({
-      slug: route.params.slug as string,
-    });
+    isFetchingPost.value = true;
+
+    const fetchedPost = await api.posts.getPostBySlug(
+      { slug: route.params.slug as string },
+      { notifyOnError: false },
+    );
 
     post.value = fetchedPost;
+    loadFailure.value = null;
 
     window.document.title = `${post.value?.title} | Smiler`;
 
     // TODO: Come up with a way to track new comments user didn't see yet
     // e.g. save in store seen comments and then check if each comment is in there
     fetchComments();
-  } catch {
+  } catch (error) {
     // In place: a push would leave the bad address behind it, which Back returns to
-    isNotFound.value = true;
+    loadFailure.value = isNotFoundError(error) ? 'not-found' : 'failed';
+  } finally {
+    isFetchingPost.value = false;
   }
 };
 
