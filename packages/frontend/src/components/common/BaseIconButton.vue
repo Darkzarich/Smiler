@@ -13,8 +13,10 @@
     :aria-label="label"
     :aria-pressed="pressed"
     :aria-keyshortcuts="keys?.aria"
-    :title="keys ? `${label} (${keys.text})` : label"
+    :aria-disabled="unavailableReason ? 'true' : undefined"
+    :title="tooltip"
     :disabled="to ? undefined : disabled"
+    @click="onClick"
   >
     <span class="base-icon-button__face">
       <slot />
@@ -42,6 +44,12 @@ interface Props {
   /** Makes it a toggle. Undefined for a plain action, so no aria-pressed */
   pressed?: boolean;
   disabled?: boolean;
+  /**
+   * Why the button can't be used here. Unlike `disabled` it keeps focus and
+   * hover, so the reason shows as its tooltip and is read out with it; a press
+   * does nothing. Not for a link
+   */
+  unavailableReason?: string;
   /** Makes it a link, for an icon-only control that opens another page */
   to?: RouteLocationRaw;
   /** The key that does the same, in tiptap's notation (`Mod-b`), shown in the tooltip */
@@ -55,13 +63,32 @@ const props = withDefaults(defineProps<Props>(), {
   tone: 'neutral',
   pressed: undefined,
   disabled: false,
+  unavailableReason: undefined,
   to: undefined,
   shortcut: undefined,
 });
 
+const emit = defineEmits<{
+  click: [event: MouseEvent];
+}>();
+
 const keys = computed(() =>
   props.shortcut ? describeShortcut(props.shortcut) : undefined,
 );
+
+const tooltip = computed(() => {
+  if (props.unavailableReason) {
+    return props.unavailableReason;
+  }
+
+  return keys.value ? `${props.label} (${keys.value.text})` : props.label;
+});
+
+function onClick(event: MouseEvent) {
+  if (!props.unavailableReason) {
+    emit('click', event);
+  }
+}
 </script>
 
 <style>
@@ -170,6 +197,12 @@ const keys = computed(() =>
   &[disabled] {
     color: var(--color-text-disabled);
     pointer-events: none;
+  }
+
+  &[aria-disabled='true'] {
+    background: transparent;
+    color: var(--color-text-disabled);
+    cursor: default;
   }
 }
 </style>

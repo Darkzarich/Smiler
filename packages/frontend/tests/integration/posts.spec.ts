@@ -600,6 +600,52 @@ test.describe('Post votes', () => {
     expect(voteRequests).toEqual([]);
   });
 
+  test("Doesn't send a vote on the account's own post", async ({
+    page: currentPage,
+    Api,
+    Post,
+    PostsPage,
+    NotificationList,
+  }) => {
+    Api.routes.auth.getAuth.mock({
+      body: createRandomAuth({ isAuth: true, _id: post1.author._id }),
+    });
+
+    const voteRequests: string[] = [];
+
+    currentPage.on('request', (request) => {
+      if (request.url().includes('/vote') && request.method() !== 'GET') {
+        voteRequests.push(request.url());
+      }
+    });
+
+    await PostsPage.goto(PostsPage.urls.today);
+
+    for (const button of [
+      Post.getUpvoteBtnById(post1._id),
+      Post.getDownvoteBtnById(post1._id),
+    ]) {
+      await expect(button).toHaveAttribute('aria-disabled', 'true');
+      await expect(button).toHaveAttribute(
+        'title',
+        'You can’t vote on your own post',
+      );
+      // Playwright won't click an aria-disabled button, though a person can
+      await button.dispatchEvent('click');
+    }
+
+    await expect(Post.getUpvoteBtnById(post2._id)).not.toHaveAttribute(
+      'aria-disabled',
+    );
+    await expect(Post.getRatingById(post1._id)).toHaveText(
+      String(post1.rating),
+    );
+    await expect(
+      NotificationList.root.locator('.notification-list__item'),
+    ).toHaveCount(0);
+    expect(voteRequests).toEqual([]);
+  });
+
   test("Shows the account's votes on the posts on screen once a visitor signs in", async ({
     Api,
     Post,

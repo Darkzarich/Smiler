@@ -14,6 +14,7 @@
               :data-testid="`comment-${comment._id}-upvote`"
               tone="primary"
               :pressed="comment.rated.isRated && !comment.rated.negative"
+              :unavailable-reason="ownVoteReason"
               @click="upvote()"
             >
               <IconPlus />
@@ -31,6 +32,7 @@
               :data-testid="`comment-${comment._id}-downvote`"
               tone="danger"
               :pressed="comment.rated.isRated && comment.rated.negative"
+              :unavailable-reason="ownVoteReason"
               @click="downvote()"
             >
               <IconMinus />
@@ -258,6 +260,15 @@ const root = useTemplateRef('root');
 
 const { whenOwnVoteShown } = useOwnVote('comment', comment);
 
+const isOwnComment = computed(
+  () =>
+    Boolean(userStore.userId) && comment.value.author._id === userStore.userId,
+);
+
+const ownVoteReason = computed(() =>
+  isOwnComment.value ? 'You can’t vote on your own comment' : undefined,
+);
+
 const isRequesting = ref(false);
 
 const isChildrenExpanded = ref(props.level <= COMMENT_AUTO_HIDE_LEVEL);
@@ -482,11 +493,10 @@ async function voteAfterSignIn({ negative }: { negative: boolean }) {
 
   await whenOwnVoteShown();
 
-  const { rated, author } = comment.value;
-  const isOwnComment = author._id === userStore.userId;
+  const { rated } = comment.value;
   const isVotedSo = rated.isRated && Boolean(rated.negative) === negative;
 
-  if (!userStore.user || isOwnComment || isVotedSo) {
+  if (!userStore.user || isOwnComment.value || isVotedSo) {
     return;
   }
 

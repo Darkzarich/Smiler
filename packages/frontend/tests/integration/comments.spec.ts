@@ -520,6 +520,60 @@ test.describe('Votes', () => {
     expect(voteRequests).toEqual([]);
   });
 
+  test("Doesn't send a vote on the account's own comment", async ({
+    page: currentPage,
+    SinglePostPage,
+    Comments,
+    NotificationList,
+    Api,
+  }) => {
+    const ownComment = createRandomComment({
+      author: { _id: auth._id },
+      rated: { isRated: false, negative: false },
+    });
+
+    Api.routes.comments.getComments.mock({
+      body: {
+        comments: [ownComment, notRatedComment],
+        hasNextPage: false,
+      },
+    });
+
+    const voteRequests: string[] = [];
+
+    currentPage.on('request', (request) => {
+      if (request.url().includes('/vote') && request.method() !== 'GET') {
+        voteRequests.push(request.url());
+      }
+    });
+
+    await SinglePostPage.goto(post.slug);
+
+    for (const button of [
+      Comments.getUpvoteBtnById(ownComment._id),
+      Comments.getDownvoteBtnById(ownComment._id),
+    ]) {
+      await expect(button).toHaveAttribute('aria-disabled', 'true');
+      await expect(button).toHaveAttribute(
+        'title',
+        'You can’t vote on your own comment',
+      );
+      // Playwright won't click an aria-disabled button, though a person can
+      await button.dispatchEvent('click');
+    }
+
+    await expect(
+      Comments.getUpvoteBtnById(notRatedComment._id),
+    ).not.toHaveAttribute('aria-disabled');
+    await expect(Comments.getCommentRatingById(ownComment._id)).toHaveText(
+      String(ownComment.rating),
+    );
+    await expect(
+      NotificationList.root.locator('.notification-list__item'),
+    ).toHaveCount(0);
+    expect(voteRequests).toEqual([]);
+  });
+
   test("Shows the account's votes on the comments on screen once a visitor signs in", async ({
     SinglePostPage,
     Comments,
