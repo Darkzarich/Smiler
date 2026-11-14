@@ -51,7 +51,9 @@ export interface UpdateCommentRequest {
 export type UpdateCommentResponse = Omit<Comment, 'children'>;
 
 /** The emptied comment when it had replies, which keeps its place */
-export type DeleteCommentResponse = { ok: true } | Comment;
+export type DeleteCommentResponse =
+  | { ok: true }
+  | (Pick<Comment, '_id' | 'parent' | 'createdAt'> & { deleted: true });
 
 export interface UpdateRateByIdRequest {
   negative: boolean;

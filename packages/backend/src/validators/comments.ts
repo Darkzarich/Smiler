@@ -123,6 +123,9 @@ export const writtenCommentSchema = apiSchema(
     author: z
       .union([z.string(), authorSchema])
       .describe('An id when written, the author expanded when edited'),
+    // Stored only once a comment is deleted, which one just written or edited
+    // never is
+    deleted: z.boolean().optional(),
     updatedAt: isoDateTime(),
   }),
 );
@@ -147,11 +150,22 @@ export const storedCommentSchema = apiSchema(
   }),
 );
 
+/** What is left of a comment deleted while somebody had replied to it. */
+const emptiedCommentSchema = apiSchema(
+  'EmptiedComment',
+  z.object({
+    _id: z.string(),
+    deleted: z.literal(true),
+    parent: z.string().optional(),
+    createdAt: isoDateTime(),
+  }),
+);
+
 /** Deleting a comment with replies empties it instead of removing it, and the
  * emptied comment comes back so the client can redraw the tree. */
 export const commentDeleteResultSchema = apiSchema(
   'CommentDeleteResult',
-  z.union([okResponseSchema, commentSchema]),
+  z.union([okResponseSchema, emptiedCommentSchema]),
 );
 
 export const commentListSchema = apiSchema(

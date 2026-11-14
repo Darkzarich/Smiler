@@ -1,9 +1,14 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { UserModel } from '@models/User';
 import { sendSuccess } from '@utils/response-utils';
+import type { ApiResponse } from '@libs/api-router';
+import type { okResponseSchema } from '@validators/common';
 import type { TagParams } from '@validators/tags';
 
-export async function follow(req: Request<TagParams>, res: Response) {
+export async function follow(
+  req: Request<TagParams>,
+  res: ApiResponse<typeof okResponseSchema>,
+) {
   const { tag } = req.params;
   const { userId } = req.session;
 

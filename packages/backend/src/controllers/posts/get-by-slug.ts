@@ -1,15 +1,14 @@
-import type { Request, Response } from 'express';
-import { PostModel, postToResponse, PostResponse } from '@models/Post';
+import type { Request } from 'express';
+import { PostModel, postToResponse } from '@models/Post';
 import { RateModel, RateTargetModel } from '@models/Rate';
 import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-import type { PostSlugParams } from '@validators/posts';
-
-type GetBySlugResponse = PostResponse;
+import type { ApiResponse } from '@libs/api-router';
+import type { postSchema, PostSlugParams } from '@validators/posts';
 
 export async function getBySlug(
   req: Request<PostSlugParams>,
-  res: Response<GetBySlugResponse>,
+  res: ApiResponse<typeof postSchema>,
 ) {
   const { userId } = req.session;
 

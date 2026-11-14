@@ -1,21 +1,23 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { UserModel } from '@models/User';
 import { RateModel, RateTargetModel } from '@models/Rate';
-import { CommentModel, Comment } from '@models/Comment';
+import { CommentModel } from '@models/Comment';
 import {
   COMMENT_AUTHOR_RATING_SHARE,
   COMMENT_RATE_VALUE,
 } from '@constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
+import type { ApiResponse } from '@libs/api-router';
+import type {
+  storedCommentSchema,
+  CommentIdParams,
+} from '@validators/comments';
 import type { VoteBody } from '@validators/common';
-import type { CommentIdParams } from '@validators/comments';
-
-type VoteByIdResponse = Comment;
 
 export async function voteById(
   req: Request<CommentIdParams, unknown, VoteBody>,
-  res: Response<VoteByIdResponse>,
+  res: ApiResponse<typeof storedCommentSchema>,
 ) {
   const { userId } = req.session;
   const { id: commentId } = req.params;
@@ -74,5 +76,5 @@ export async function voteById(
     ),
   ]);
 
-  sendSuccess(res, updatedComment! as Comment);
+  sendSuccess(res, updatedComment!);
 }

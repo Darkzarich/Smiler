@@ -1,16 +1,21 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { BASE_UPLOAD_FOLDER } from '@constants/index';
 import { NotFoundError, ERRORS } from '@errors';
 import { UserModel } from '@models/User';
 import { removeFileByPath } from '@utils/remove-file-by-path';
 import { sendSuccess } from '@utils/response-utils';
+import type { ApiResponse } from '@libs/api-router';
+import type { okResponseSchema } from '@validators/common';
 
 /** Clears the current user's avatar, falling back to the default one.
  *
  * Setting an avatar stores a file, so there has to be a way to get rid of it
  * that does not require uploading another picture first.
  */
-export async function deleteMyAvatar(req: Request, res: Response) {
+export async function deleteMyAvatar(
+  req: Request,
+  res: ApiResponse<typeof okResponseSchema>,
+) {
   const { userId } = req.session!;
 
   const user = await UserModel.findById(userId).select('avatar').lean();

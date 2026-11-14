@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
 import { CommentModel } from '@models/Comment';
 import { PostModel } from '@models/Post';
@@ -8,11 +8,18 @@ import {
 } from '@constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-import type { CommentIdParams } from '@validators/comments';
 import { UserModel } from '@models/User';
 import { RateModel } from '@models/Rate';
+import type { ApiResponse } from '@libs/api-router';
+import type {
+  commentDeleteResultSchema,
+  CommentIdParams,
+} from '@validators/comments';
 
-export async function deleteById(req: Request<CommentIdParams>, res: Response) {
+export async function deleteById(
+  req: Request<CommentIdParams>,
+  res: ApiResponse<typeof commentDeleteResultSchema>,
+) {
   const { userId } = req.session;
   const { id } = req.params;
 
@@ -36,10 +43,8 @@ export async function deleteById(req: Request<CommentIdParams>, res: Response) {
   // If comment has replies we cannot delete it completely
   // instead we mark it as deleted with a flag
   if (await CommentModel.hasReplies(comment._id)) {
-    const [updateComment] = await Promise.all([
-      CommentModel.findByIdAndUpdate(comment._id, {
-        deleted: true,
-      }).lean({ autopopulate: true }),
+    await Promise.all([
+      CommentModel.updateOne({ _id: comment._id }, { deleted: true }),
       UserModel.updateOne(
         { _id: comment.author },
         { $inc: { rating: -comment.rating * COMMENT_AUTHOR_RATING_SHARE } },
@@ -47,7 +52,12 @@ export async function deleteById(req: Request<CommentIdParams>, res: Response) {
       RateModel.deleteMany({ target: id }),
     ]);
 
-    return sendSuccess(res, updateComment ?? null);
+    return sendSuccess(res, {
+      _id: comment._id,
+      deleted: true,
+      parent: comment.parent?.toString(),
+      createdAt: comment.createdAt,
+    });
   }
 
   await Promise.all([

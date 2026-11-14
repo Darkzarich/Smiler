@@ -1,24 +1,14 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { Types } from 'mongoose';
-import { UserModel, User, isUserFollowed } from '@models/User';
+import { UserModel, isUserFollowed } from '@models/User';
 import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-import type { UserLoginParams } from '@validators/users';
-
-type GetByLoginResponse = Pick<
-  User,
-  | 'login'
-  | 'rating'
-  | 'bio'
-  | 'avatar'
-  | 'createdAt'
-  | 'followersAmount'
-  | 'lastLoginAt'
-> & { _id: Types.ObjectId; isFollowed?: boolean };
+import type { ApiResponse } from '@libs/api-router';
+import type { userProfileSchema, UserLoginParams } from '@validators/users';
 
 export async function getByLogin(
   req: Request<UserLoginParams>,
-  res: Response<GetByLoginResponse>,
+  res: ApiResponse<typeof userProfileSchema>,
 ) {
   const { login } = req.params;
   const { userId: currentUserId } = req.session;

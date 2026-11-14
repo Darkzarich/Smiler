@@ -1,20 +1,22 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { UserModel } from '@models/User';
 import { RateModel, RateTargetModel } from '@models/Rate';
-import { Comment, CommentModel } from '@models/Comment';
+import { CommentModel } from '@models/Comment';
 import {
   COMMENT_AUTHOR_RATING_SHARE,
   COMMENT_RATE_VALUE,
 } from '@constants/index';
 import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-import type { CommentIdParams } from '@validators/comments';
-
-type UnvoteByIdResponse = Comment;
+import type { ApiResponse } from '@libs/api-router';
+import type {
+  storedCommentSchema,
+  CommentIdParams,
+} from '@validators/comments';
 
 export async function unvoteById(
   req: Request<CommentIdParams>,
-  res: Response<UnvoteByIdResponse>,
+  res: ApiResponse<typeof storedCommentSchema>,
 ) {
   const { userId } = req.session;
   const { id: commentId } = req.params;

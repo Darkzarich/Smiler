@@ -11,14 +11,17 @@ export function generateRandomPost(overrides: Partial<Post> = {}) {
       {
         type: 'text',
         content: 'My text section',
+        hash: 'txt1',
       },
       {
         type: 'pic',
         url: 'https://fastly.picsum.photos/id/4/200/300.jpg?hmac=y6_DgDO4ccUuOHUJcEWirdjxlpPwMcEZo7fz1MpuaWg',
+        hash: 'pic1',
       },
       {
         type: 'vid',
         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        hash: 'vid1',
       },
     ],
     commentCount: Math.floor(Math.random() * 100),

@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { nanoid } from 'nanoid';
 import {
   POST_SECTIONS_MAX,
@@ -8,12 +8,14 @@ import {
 import { ContentTooLargeError, NotFoundError, ERRORS } from '@errors';
 import { fetchExternalImage } from '@libs/fetch-external-image';
 import { saveUserImage } from '@libs/save-user-image';
-import { POST_SECTION_TYPES, PostPictureSection } from '@models/Post';
+import { POST_SECTION_TYPES } from '@models/Post';
 import { UserModel } from '@models/User';
 import { sendSuccess } from '@utils/response-utils';
-import type { ExternalImageBody } from '@validators/posts';
-
-type UploadByUrlResponse = PostPictureSection;
+import type { ApiResponse } from '@libs/api-router';
+import type {
+  postPictureSectionSchema,
+  ExternalImageBody,
+} from '@validators/posts';
 
 /** Adds a picture to the user's post template from a url instead of a file.
  *
@@ -23,7 +25,7 @@ type UploadByUrlResponse = PostPictureSection;
  */
 export async function uploadByUrl(
   req: Request<unknown, unknown, ExternalImageBody>,
-  res: Response<UploadByUrlResponse>,
+  res: ApiResponse<typeof postPictureSectionSchema>,
 ) {
   const { userId } = req.session;
   const { url } = req.body;
@@ -49,11 +51,11 @@ export async function uploadByUrl(
   });
 
   const newSection = {
-    type: POST_SECTION_TYPES.PICTURE as const,
+    type: POST_SECTION_TYPES.PICTURE,
     url: storedUrl,
     hash: nanoid(4),
     isFile: true,
-  };
+  } as const;
 
   await UserModel.updateOne(
     { _id: userId },

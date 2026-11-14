@@ -1,14 +1,12 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { subHours } from 'date-fns';
-import type { PostFeedQuery } from '@validators/posts';
-import {
-  respondWithPostList,
-  PostListResponse,
-} from '../respond-with-post-list';
+import { respondWithPostList } from '../respond-with-post-list';
+import type { ApiResponse } from '@libs/api-router';
+import type { cursorPostListSchema, PostFeedQuery } from '@validators/posts';
 
 export async function recent(
   req: Request<unknown, unknown, unknown, PostFeedQuery>,
-  res: Response<PostListResponse>,
+  res: ApiResponse<typeof cursorPostListSchema>,
 ) {
   await respondWithPostList(req, res, {
     query: {

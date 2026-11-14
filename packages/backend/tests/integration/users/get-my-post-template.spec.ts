@@ -21,8 +21,9 @@ describe('GET /users/me/template', () => {
       tags: ['test-tag'],
       sections: [
         {
-          title: 'test-section-title',
+          type: 'text',
           content: 'test-section-content',
+          hash: 'abcd',
         },
       ],
     };

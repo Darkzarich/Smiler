@@ -307,7 +307,7 @@ function buildSections(
       POST_SECTION_TYPES.VIDEO,
     ]);
     const hash = nanoid(SECTION_HASH_LENGTH);
-    const spoiler = random.chance(0.1) ? { isSpoiler: true } : {};
+    const spoiler = random.chance(0.1) ? { isSpoiler: true as const } : {};
 
     if (type === POST_SECTION_TYPES.TEXT) {
       sections.push({ type, content: textContent(random), hash, ...spoiler });

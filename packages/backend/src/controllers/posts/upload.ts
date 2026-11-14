@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, NextFunction } from 'express';
 import multer from 'multer';
 import Sharp from 'sharp';
 import { randomUUID } from 'crypto';
@@ -6,7 +6,7 @@ import { join } from 'path';
 import { mkdir } from 'fs/promises';
 import DiskStorage from '@libs/DiskStorage';
 import { UserModel } from '@models/User';
-import { POST_SECTION_TYPES, PostPictureSection } from '@models/Post';
+import { POST_SECTION_TYPES } from '@models/Post';
 import {
   POST_SECTIONS_MAX,
   POST_MAX_UPLOAD_IMAGE_SIZE,
@@ -24,8 +24,8 @@ import {
 } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
 import { nanoid } from 'nanoid';
-
-type UploadResponse = PostPictureSection;
+import type { ApiResponse } from '@libs/api-router';
+import type { postPictureSectionSchema } from '@validators/posts';
 
 const ALLOWED_UPLOAD_MIME_TYPES = new Set([
   'image/jpeg',
@@ -103,7 +103,7 @@ const postMulter = multer({
 
 export async function upload(
   req: Request,
-  res: Response<UploadResponse>,
+  res: ApiResponse<typeof postPictureSectionSchema>,
   next: NextFunction,
 ) {
   const { userId } = req.session;
@@ -152,11 +152,11 @@ export async function upload(
     const fileRelativePath = req.file.path.replace(process.cwd(), '');
 
     const newSection = {
-      type: POST_SECTION_TYPES.PICTURE as const,
+      type: POST_SECTION_TYPES.PICTURE,
       url: fileRelativePath,
       hash: nanoid(4),
       isFile: true,
-    };
+    } as const;
 
     await UserModel.updateOne(
       { _id: userId },

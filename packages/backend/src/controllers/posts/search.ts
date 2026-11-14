@@ -1,15 +1,13 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { RootFilterQuery } from 'mongoose';
 import { Post } from '@models/Post';
-import type { PostIndexQuery } from '@validators/posts';
-import {
-  respondWithPostList,
-  PostListResponse,
-} from './respond-with-post-list';
+import { respondWithPostList } from './respond-with-post-list';
+import type { ApiResponse } from '@libs/api-router';
+import type { cursorPostListSchema, PostIndexQuery } from '@validators/posts';
 
 export async function search(
   req: Request<unknown, unknown, unknown, PostIndexQuery>,
-  res: Response<PostListResponse>,
+  res: ApiResponse<typeof cursorPostListSchema>,
 ) {
   const { title, dateFrom, dateTo, ratingFrom, ratingTo } = req.query;
   const tags = req.query['tags[]'];

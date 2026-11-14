@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { UserModel } from '@models/User';
 import { ConflictError, ERRORS } from '@errors';
 import {
@@ -7,13 +7,13 @@ import {
 } from '@utils/check-mongo-db-error';
 import { hashPassword } from '@utils/password';
 import { sendSuccess } from '@utils/response-utils';
-import type { SignUpBody } from '@validators/auth';
-import { CurrentUserResponse } from './current';
 import { authenticateSession } from './session';
+import type { ApiResponse } from '@libs/api-router';
+import type { authStateSchema, SignUpBody } from '@validators/auth';
 
 export async function signUp(
   req: Request<unknown, unknown, SignUpBody>,
-  res: Response<CurrentUserResponse>,
+  res: ApiResponse<typeof authStateSchema>,
 ) {
   const { login, email, password } = req.body;
 

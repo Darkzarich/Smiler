@@ -1,18 +1,13 @@
-import type { Request, Response } from 'express';
-import { User, UserModel } from '@models/User';
+import type { Request } from 'express';
+import { UserModel, type PopulatedAuthor } from '@models/User';
 import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-
-interface GetSettingsResponse {
-  authors: User[];
-  tags: string[];
-  bio: string;
-  avatar: string;
-}
+import type { ApiResponse } from '@libs/api-router';
+import type { userSettingsSchema } from '@validators/users';
 
 export async function getSettings(
   req: Request,
-  res: Response<GetSettingsResponse>,
+  res: ApiResponse<typeof userSettingsSchema>,
 ) {
   const { userId } = req.session;
 
@@ -25,7 +20,7 @@ export async function getSettings(
   }
 
   sendSuccess(res, {
-    authors: user.usersFollowed as User[],
+    authors: user.usersFollowed as PopulatedAuthor[],
     tags: user.tagsFollowed,
     bio: user.bio,
     avatar: user.avatar,

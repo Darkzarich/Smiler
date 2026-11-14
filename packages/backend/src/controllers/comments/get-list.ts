@@ -1,22 +1,17 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import type { Types } from 'mongoose';
-import {
-  CommentModel,
-  LeanComment,
-  commentToResponse,
-  CommentResponse,
-} from '@models/Comment';
+import { CommentModel, LeanComment, commentToResponse } from '@models/Comment';
 import { UserModel, type PopulatedAuthor } from '@models/User';
 import { RateModel, RateTargetModel, type RatedTargets } from '@models/Rate';
 import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-import { PaginationResponse } from '@type/pagination';
 import { PAGE_LOOKAHEAD, toPage } from '@utils/pagination';
-import type { CommentListQuery } from '@validators/comments';
-
-interface GetListResponse extends PaginationResponse {
-  comments: CommentResponse[];
-}
+import type { ApiResponse, ResponseBody } from '@libs/api-router';
+import type {
+  commentListSchema,
+  commentSchema,
+  CommentListQuery,
+} from '@validators/comments';
 
 /** One round trip however deep the threads go: populating replies level by level
  * took two queries per level, and stopped at 20 levels. */
@@ -69,7 +64,7 @@ function buildTree({
   authors: Map<string, PopulatedAuthor>;
   ratedTargets?: RatedTargets;
 }) {
-  const nodes = new Map<string, CommentResponse>();
+  const nodes = new Map<string, ResponseBody<typeof commentSchema>>();
 
   for (const comment of [...roots, ...replies]) {
     nodes.set(comment._id.toString(), {
@@ -108,7 +103,7 @@ function buildTree({
 
 export async function getList(
   req: Request<unknown, unknown, unknown, CommentListQuery>,
-  res: Response<GetListResponse>,
+  res: ApiResponse<typeof commentListSchema>,
 ) {
   const { userId } = req.session;
   const { post, author, limit, offset } = req.query;

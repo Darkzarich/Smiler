@@ -1,22 +1,17 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import type { RootFilterQuery, SortOrder } from 'mongoose';
-import { Post, PostModel, postToResponse, PostResponse } from '@models/Post';
+import { Post, PostModel, postToResponse } from '@models/Post';
 import { RateModel, RateTargetModel } from '@models/Rate';
 import { sendSuccess } from '@utils/response-utils';
-import { CursorPaginationQuery, PaginationResponse } from '@type/pagination';
+import { CursorPaginationQuery } from '@type/pagination';
 import {
   PAGE_LOOKAHEAD,
   toPage,
   toCursorFilter,
   toNextCursor,
 } from '@utils/pagination';
-
-export interface PostListResponse extends PaginationResponse {
-  posts: PostResponse[];
-  /** Only lists served with `supportsCursor` carry one — `null` on the last
-   * page. */
-  nextCursor?: string | null;
-}
+import type { ApiResponse } from '@libs/api-router';
+import type { cursorPostListSchema } from '@validators/posts';
 
 interface PostListOptions {
   query?: RootFilterQuery<Post>;
@@ -32,7 +27,7 @@ interface PostListOptions {
  * has rated and responds with them. */
 export async function respondWithPostList<Query extends CursorPaginationQuery>(
   req: Request<unknown, unknown, unknown, Query>,
-  res: Response<PostListResponse>,
+  res: ApiResponse<typeof cursorPostListSchema>,
   { query = {}, sort, supportsCursor = false }: PostListOptions,
 ) {
   const { limit, offset, cursor } = req.query;

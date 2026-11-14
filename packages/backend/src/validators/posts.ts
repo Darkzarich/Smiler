@@ -200,7 +200,7 @@ function normalizeSection(section: ParsedSection): PostSection {
     section.hash?.length === SECTION_HASH_LENGTH
       ? section.hash
       : nanoid(SECTION_HASH_LENGTH);
-  const spoiler = section.isSpoiler ? { isSpoiler: true } : {};
+  const spoiler = section.isSpoiler ? { isSpoiler: true as const } : {};
 
   if (section.type === POST_SECTION_TYPES.TEXT) {
     return { type: section.type, content: section.content, hash, ...spoiler };

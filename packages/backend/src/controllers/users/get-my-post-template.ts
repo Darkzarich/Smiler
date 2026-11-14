@@ -1,13 +1,13 @@
-import type { Request, Response } from 'express';
-import { UserModel, UserTemplate } from '@models/User';
+import type { Request } from 'express';
+import { UserModel } from '@models/User';
 import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-
-type GetMyPostTemplateResponse = UserTemplate;
+import type { ApiResponse } from '@libs/api-router';
+import type { postTemplateSchema } from '@validators/users';
 
 export async function getMyPostTemplate(
   req: Request,
-  res: Response<GetMyPostTemplateResponse>,
+  res: ApiResponse<typeof postTemplateSchema>,
 ) {
   const template = await UserModel.findById(req.session.userId)
     .select('template')
