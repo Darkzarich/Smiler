@@ -1,9 +1,11 @@
 /* eslint-disable no-await-in-loop */
-import { expect } from '@playwright/test';
+import { type BrowserContext, expect } from '@playwright/test';
 import { subMinutes } from 'date-fns';
 import { omit } from 'lodash';
 import test from './page-objects';
+import type Api from './page-objects/api';
 import mockDate from './utils/mock-date';
+import type { commentTypes } from '@api/comments';
 import createRandomAuth from '@factory/auth';
 import createRandomComment from '@factory/comment';
 import createRandomPost from '@factory/post';
@@ -156,6 +158,101 @@ test('Offers a visitor sign in or sign up in place of the comment form', async (
   await Comments.newCommentForm.getByTestId('new-comment-form-signup').click();
 
   await expect(AuthPrompt.SignUpForm).toBeVisible();
+});
+
+test.describe('Show more comments', () => {
+  const firstPage = [
+    comment,
+    ...Array.from({ length: 9 }, () => createRandomComment()),
+  ];
+
+  /** Answers the first page at once and holds the next one until released */
+  async function mockPages(
+    context: BrowserContext,
+    Api: Api,
+    nextPage: commentTypes.Comment[],
+  ) {
+    let releaseNextPage = () => {};
+    const nextPageReleased = new Promise<void>((resolve) => {
+      releaseNextPage = resolve;
+    });
+
+    await context.route(
+      Api.routes.comments.getComments.getURLRegExp(),
+      async (route) => {
+        const offset = new URL(route.request().url()).searchParams.get(
+          'offset',
+        );
+
+        if (offset === '0') {
+          await route.fulfill({
+            json: { comments: firstPage, hasNextPage: true },
+          });
+
+          return;
+        }
+
+        await nextPageReleased;
+        await route.fulfill({
+          json: { comments: nextPage, hasNextPage: false },
+        });
+      },
+    );
+
+    return releaseNextPage;
+  }
+
+  test('Keeps the comments in place while the next page loads', async ({
+    SinglePostPage,
+    Comments,
+    Api,
+    context,
+    page,
+  }) => {
+    const nextPage = [
+      firstPage[9],
+      createRandomComment(),
+      createRandomComment(),
+    ];
+    const releaseNextPage = await mockPages(context, Api, nextPage);
+
+    await SinglePostPage.goto(post.slug);
+
+    await Comments.toggleRepliesById(comment._id);
+    await Comments.showMore();
+
+    await expect(Comments.showMoreButton).toHaveClass(/base-button--loading/);
+    await expect(Comments.getCommentById(firstPage[9]._id)).toBeVisible();
+
+    releaseNextPage();
+
+    await expect(Comments.getCommentById(nextPage[2]._id)).toBeVisible();
+    await expect(Comments.getCommentById(firstPage[9]._id)).toHaveCount(1);
+    await expect(Comments.getRepliesToggleById(comment._id)).toHaveText(
+      /^Show /,
+    );
+    await expect(Comments.showMoreButton).toBeHidden();
+    await expect(Comments.getCommentCardById(nextPage[1]._id)).toBeFocused();
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  });
+
+  test('Focuses the last comment when the last page brings nothing new', async ({
+    SinglePostPage,
+    Comments,
+    Api,
+    context,
+  }) => {
+    const releaseNextPage = await mockPages(context, Api, [firstPage[9]]);
+
+    await SinglePostPage.goto(post.slug);
+
+    await Comments.showMoreButton.focus();
+    await SinglePostPage.page.keyboard.press('Enter');
+    releaseNextPage();
+
+    await expect(Comments.showMoreButton).toBeHidden();
+    await expect(Comments.getCommentCardById(firstPage[9]._id)).toBeFocused();
+  });
 });
 
 test.describe('Replies', () => {

@@ -5,6 +5,7 @@ export default class Comments extends AbstractComponent {
   readonly newCommentForm: Locator;
   readonly newCommentFormEditor: Locator;
   readonly newCommentFormInput: Locator;
+  readonly showMoreButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -14,6 +15,7 @@ export default class Comments extends AbstractComponent {
     this.newCommentFormInput = page.getByTestId(
       'new-comment-form-editor-input',
     );
+    this.showMoreButton = page.getByTestId('comments-show-more');
   }
 
   getCommentRatingById(commentId = '') {
@@ -22,6 +24,13 @@ export default class Comments extends AbstractComponent {
 
   getCommentById(commentId = '') {
     return this.page.getByTestId(`comment-${commentId}-body`);
+  }
+
+  /** The comment itself, without its replies */
+  getCommentCardById(commentId = '') {
+    return this.page.locator('.comment-item__content', {
+      has: this.getCommentById(commentId),
+    });
   }
 
   getCommentDateById(commentId = '') {
@@ -93,6 +102,10 @@ export default class Comments extends AbstractComponent {
     while ((await collapsed.count()) > 0) {
       await collapsed.first().click();
     }
+  }
+
+  async showMore() {
+    await this.showMoreButton.click();
   }
 
   async submitNewComment() {
