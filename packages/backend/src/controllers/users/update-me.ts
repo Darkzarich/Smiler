@@ -1,20 +1,16 @@
-import type { Request, Response } from 'express';
-import { User, UserModel } from '@models/User';
+import type { Request } from 'express';
+import { UserModel } from '@models/User';
 import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-import type { UserUpdateBody } from '@validators/users';
-
-interface UpdateMeResponse
-  extends Pick<
-    User,
-    'login' | 'rating' | 'bio' | 'avatar' | 'createdAt' | 'followersAmount'
-  > {
-  _id: string;
-}
+import type { ApiResponse } from '@libs/api-router';
+import type {
+  userUpdateResponseSchema,
+  UserUpdateBody,
+} from '@validators/users';
 
 export async function updateMe(
   req: Request<unknown, unknown, UserUpdateBody>,
-  res: Response<UpdateMeResponse>,
+  res: ApiResponse<typeof userUpdateResponseSchema>,
 ) {
   const { userId } = req.session!;
   // Named rather than passed through, so that adding a field to the schema

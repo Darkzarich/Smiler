@@ -1,26 +1,21 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
-import {
-  PostModel,
-  POST_SECTION_TYPES,
-  postToResponse,
-  PostResponse,
-} from '@models/Post';
+import { PostModel, POST_SECTION_TYPES, postToResponse } from '@models/Post';
 import { POST_TIME_TO_UPDATE } from '@constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '@errors';
 import { removeFileByPath } from '@utils/remove-file-by-path';
 import { sendSuccess } from '@utils/response-utils';
+import type { ApiResponse } from '@libs/api-router';
 import {
+  type postSchema,
   assertOwnUploadedPictures,
   type PostIdParams,
   type PostUpdateBody,
 } from '@validators/posts';
 
-type UpdateByIdResponse = PostResponse;
-
 export async function updateById(
   req: Request<PostIdParams, unknown, PostUpdateBody>,
-  res: Response<UpdateByIdResponse>,
+  res: ApiResponse<typeof postSchema>,
 ) {
   const { userId } = req.session;
   const { id: postId } = req.params;

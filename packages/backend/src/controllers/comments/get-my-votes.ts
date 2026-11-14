@@ -1,11 +1,12 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { RateModel, RateTargetModel, toVotes } from '@models/Rate';
 import { sendSuccess } from '@utils/response-utils';
-import type { VoteLookupQuery, Votes } from '@validators/common';
+import type { ApiResponse } from '@libs/api-router';
+import type { votesSchema, VoteLookupQuery } from '@validators/common';
 
 export async function getMyVotes(
   req: Request<unknown, unknown, unknown, VoteLookupQuery>,
-  res: Response<Votes>,
+  res: ApiResponse<typeof votesSchema>,
 ) {
   const { ids } = req.query;
 

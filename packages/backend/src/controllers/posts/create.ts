@@ -1,19 +1,19 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import slugLib from 'slug';
 import { nanoid } from 'nanoid';
 import { UserModel } from '@models/User';
-import { PostModel, postToResponse, PostResponse } from '@models/Post';
+import { PostModel, postToResponse } from '@models/Post';
 import { sendSuccess } from '@utils/response-utils';
+import type { ApiResponse } from '@libs/api-router';
 import {
+  type postSchema,
   assertOwnUploadedPictures,
   type PostCreateBody,
 } from '@validators/posts';
 
-type CreateResponse = PostResponse;
-
 export async function create(
   req: Request<unknown, unknown, PostCreateBody>,
-  res: Response<CreateResponse>,
+  res: ApiResponse<typeof postSchema>,
 ) {
   const { userId } = req.session;
   const { title, sections, tags } = req.body;

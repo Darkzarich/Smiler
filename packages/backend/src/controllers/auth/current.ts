@@ -1,26 +1,13 @@
-import type { Request, Response } from 'express';
-import { UserModel, User } from '@models/User';
+import type { Request } from 'express';
+import { UserModel } from '@models/User';
 import { sendSuccess } from '@utils/response-utils';
 import { NotFoundError } from '@errors';
-
-interface CurrentUser
-  extends Pick<
-    User,
-    'login' | 'rating' | 'followersAmount' | 'tagsFollowed' | 'avatar' | 'email'
-  > {
-  _id: string;
-  isAuth: boolean;
-}
-
-interface NotLoggedInUser {
-  isAuth: false;
-}
-
-export type CurrentUserResponse = CurrentUser | NotLoggedInUser;
+import type { ApiResponse } from '@libs/api-router';
+import type { authStateSchema } from '@validators/auth';
 
 export async function current(
   req: Request,
-  res: Response<CurrentUserResponse>,
+  res: ApiResponse<typeof authStateSchema>,
 ) {
   const { userId } = req.session;
 

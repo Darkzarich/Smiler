@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { USER_AVATAR_SIZE, BASE_UPLOAD_FOLDER } from '@constants/index';
 import { NotFoundError, ERRORS } from '@errors';
 import { fetchExternalImage } from '@libs/fetch-external-image';
@@ -6,11 +6,8 @@ import { saveUserImage } from '@libs/save-user-image';
 import { UserModel } from '@models/User';
 import { removeFileByPath } from '@utils/remove-file-by-path';
 import { sendSuccess } from '@utils/response-utils';
-import type { AvatarBody } from '@validators/users';
-
-interface UpdateMyAvatarResponse {
-  avatar: string;
-}
+import type { ApiResponse } from '@libs/api-router';
+import type { avatarResponseSchema, AvatarBody } from '@validators/users';
 
 /** Replaces the current user's avatar with a picture downloaded from a url.
  *
@@ -21,7 +18,7 @@ interface UpdateMyAvatarResponse {
  */
 export async function updateMyAvatar(
   req: Request<unknown, unknown, AvatarBody>,
-  res: Response<UpdateMyAvatarResponse>,
+  res: ApiResponse<typeof avatarResponseSchema>,
 ) {
   const { userId } = req.session!;
   const { url } = req.body;

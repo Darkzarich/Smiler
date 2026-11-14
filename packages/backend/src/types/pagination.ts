@@ -12,7 +12,3 @@ interface PaginationQuery {
 export interface CursorPaginationQuery extends PaginationQuery {
   cursor?: PageCursor;
 }
-
-export interface PaginationResponse {
-  hasNextPage: boolean;
-}

@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
 import {
   PostModel,
@@ -9,11 +9,16 @@ import { POST_TIME_TO_UPDATE } from '@constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '@errors';
 import { removeFileByPath } from '@utils/remove-file-by-path';
 import { sendSuccess } from '@utils/response-utils';
-import type { PostIdParams } from '@validators/posts';
 import { UserModel } from '@models/User';
 import { RateModel } from '@models/Rate';
+import type { ApiResponse } from '@libs/api-router';
+import type { okResponseSchema } from '@validators/common';
+import type { PostIdParams } from '@validators/posts';
 
-export async function deleteById(req: Request<PostIdParams>, res: Response) {
+export async function deleteById(
+  req: Request<PostIdParams>,
+  res: ApiResponse<typeof okResponseSchema>,
+) {
   const { userId } = req.session;
   const { id } = req.params;
 

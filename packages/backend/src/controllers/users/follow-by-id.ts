@@ -1,10 +1,15 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { UserModel } from '@models/User';
 import { ForbiddenError, NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
+import type { ApiResponse } from '@libs/api-router';
+import type { okResponseSchema } from '@validators/common';
 import type { UserIdParams } from '@validators/users';
 
-export async function followById(req: Request<UserIdParams>, res: Response) {
+export async function followById(
+  req: Request<UserIdParams>,
+  res: ApiResponse<typeof okResponseSchema>,
+) {
   const { id } = req.params;
   const { userId } = req.session!;
 

@@ -140,9 +140,4 @@ export interface ReplyTo {
   login: string | null;
 }
 
-export type CommentResponse = ReturnType<typeof commentToResponse> & {
-  children: CommentResponse[];
-  replyTo?: ReplyTo;
-};
-
 export const CommentModel = getModelForClass(Comment);

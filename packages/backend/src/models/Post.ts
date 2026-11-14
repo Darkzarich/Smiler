@@ -21,7 +21,8 @@ export enum POST_SECTION_TYPES {
 
 interface PostSectionBase {
   hash: string;
-  isSpoiler?: boolean;
+  /** Absent rather than `false` — see `normalizeSection`. */
+  isSpoiler?: true;
 }
 
 export interface PostPictureSection extends PostSectionBase {
@@ -147,7 +148,5 @@ export function postToResponse(post: LeanPost, ratedTargets?: RatedTargets) {
     },
   };
 }
-
-export type PostResponse = ReturnType<typeof postToResponse>;
 
 export const PostModel = getModelForClass(Post);

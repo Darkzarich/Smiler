@@ -1,17 +1,16 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { UserModel } from '@models/User';
-import { PostModel, Post } from '@models/Post';
+import { PostModel } from '@models/Post';
 import { RateModel, RateTargetModel } from '@models/Rate';
 import { POST_RATE_VALUE } from '@constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-import type { PostIdParams } from '@validators/posts';
-
-type UnvoteByIdResponse = Post;
+import type { ApiResponse } from '@libs/api-router';
+import type { storedPostSchema, PostIdParams } from '@validators/posts';
 
 export async function unvoteById(
   req: Request<PostIdParams>,
-  res: Response<UnvoteByIdResponse>,
+  res: ApiResponse<typeof storedPostSchema>,
 ) {
   const { userId } = req.session;
   const { id: postId } = req.params;

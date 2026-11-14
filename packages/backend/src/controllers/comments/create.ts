@@ -1,11 +1,15 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { Types } from 'mongoose';
 import { CommentModel } from '@models/Comment';
 import { PostModel } from '@models/Post';
 import { COMMENT_MAX_DEPTH } from '@constants/index';
 import { NotFoundError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-import type { CommentCreateBody } from '@validators/comments';
+import type { ApiResponse } from '@libs/api-router';
+import type {
+  writtenCommentSchema,
+  CommentCreateBody,
+} from '@validators/comments';
 
 async function findWithAncestors(commentId: string, postId: string) {
   const [comment] = await CommentModel.aggregate<{
@@ -52,7 +56,7 @@ function placeReply(repliedTo: Awaited<ReturnType<typeof findWithAncestors>>) {
 
 export async function create(
   req: Request<unknown, unknown, CommentCreateBody>,
-  res: Response,
+  res: ApiResponse<typeof writtenCommentSchema>,
 ) {
   const { userId } = req.session;
   const { body, parent, post: postId } = req.body;
@@ -73,7 +77,11 @@ export async function create(
       PostModel.increaseCommentCount(postId),
     ]);
 
-    sendSuccess(res, comment.toObject({ versionKey: false }));
+    // `replyTo` is stored as an id but sent as the comment it answers, and a
+    // top level comment answers nobody.
+    const { replyTo: _, ...written } = comment.toObject({ versionKey: false });
+
+    sendSuccess(res, written);
 
     return;
   }
@@ -98,8 +106,9 @@ export async function create(
     PostModel.increaseCommentCount(postId),
   ]);
 
-  sendSuccess(res, {
-    ...comment.toObject({ versionKey: false }),
-    ...(replyTo && { replyTo }),
+  const { replyTo: _, ...written } = comment.toObject({
+    versionKey: false,
   });
+
+  sendSuccess(res, { ...written, ...(replyTo && { replyTo }) });
 }

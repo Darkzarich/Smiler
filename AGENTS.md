@@ -90,6 +90,13 @@ pnpm bench:stores           # what the session and rate limiter stores cost per 
   - An empty query parameter (`?limit=`) is treated as absent, so schemas do not repeat that.
   - `401`, `403`, `422`, `429` and `500` are added to the document from how the route is wired, so
     a route declares only its success response and the failures peculiar to it.
+  - The 200 schema holds the controller to it too. A controller types its response as
+    `res: ApiResponse<typeof postSchema>` (never a bare `Response` or a hand-written interface), and
+    the router types `res` from the route's 200 schema, so a controller whose schema differs from
+    the documented one does not compile. `ApiResponse` accepts a `Date` or an `ObjectId` wherever
+    the schema has a string, since that is what they serialize to. Under Jest every 200 body is also
+    parsed against its schema (`src/middlewares/check-response.ts`) and a mismatch is a 500, which
+    catches what the types cannot see: casts and the `any`s Mongoose hands back.
 - Swagger UI at `/api-docs/`, and the document itself at `/api-docs/openapi.json` (**OpenAPI
   3.1**, generated from the registered routes at boot). Both are off in production and under Jest.
 

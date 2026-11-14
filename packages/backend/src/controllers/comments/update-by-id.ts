@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { differenceInMilliseconds } from 'date-fns';
 import type { Types } from 'mongoose';
 import { CommentModel } from '@models/Comment';
@@ -10,11 +10,16 @@ import {
   ERRORS,
 } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
-import type { CommentIdParams, CommentUpdateBody } from '@validators/comments';
+import type { ApiResponse } from '@libs/api-router';
+import type {
+  writtenCommentSchema,
+  CommentIdParams,
+  CommentUpdateBody,
+} from '@validators/comments';
 
 export async function updateById(
   req: Request<CommentIdParams, unknown, CommentUpdateBody>,
-  res: Response,
+  res: ApiResponse<typeof writtenCommentSchema>,
 ) {
   const { userId } = req.session;
   const { id } = req.params;
@@ -62,12 +67,13 @@ export async function updateById(
     throw new NotFoundError(ERRORS.COMMENT_NOT_FOUND);
   }
 
+  // Stored as an id, sent as the comment it answers
+  const { replyTo, ...written } = updatedComment;
+
   sendSuccess(res, {
-    ...updatedComment,
-    ...(updatedComment.replyTo && {
-      replyTo: await CommentModel.findReplyTo(
-        updatedComment.replyTo as Types.ObjectId,
-      ),
+    ...written,
+    ...(replyTo && {
+      replyTo: await CommentModel.findReplyTo(replyTo as Types.ObjectId),
     }),
   });
 }

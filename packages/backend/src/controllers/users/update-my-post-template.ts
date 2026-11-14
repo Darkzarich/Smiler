@@ -1,18 +1,18 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { isUndefined, omitBy } from 'lodash';
-import { UserModel, UserTemplate } from '@models/User';
+import { UserModel } from '@models/User';
 import { ValidationError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
+import type { ApiResponse } from '@libs/api-router';
+import type { postTemplateSchema } from '@validators/users';
 import {
   assertOwnUploadedPictures,
   type PostTemplateBody,
 } from '@validators/posts';
 
-type UpdateMyPostTemplateResponse = UserTemplate;
-
 export async function updateMyPostTemplate(
   req: Request<unknown, unknown, PostTemplateBody>,
-  res: Response<UpdateMyPostTemplateResponse>,
+  res: ApiResponse<typeof postTemplateSchema>,
 ) {
   const { userId } = req.session;
   const { title, sections, tags } = req.body;

@@ -1,18 +1,17 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { UserModel } from '@models/User';
-import { Post, PostModel } from '@models/Post';
+import { PostModel } from '@models/Post';
 import { RateModel, RateTargetModel } from '@models/Rate';
 import { POST_RATE_VALUE } from '@constants/index';
 import { NotFoundError, ForbiddenError, ERRORS } from '@errors';
 import { sendSuccess } from '@utils/response-utils';
+import type { ApiResponse } from '@libs/api-router';
+import type { storedPostSchema, PostIdParams } from '@validators/posts';
 import type { VoteBody } from '@validators/common';
-import type { PostIdParams } from '@validators/posts';
-
-type VoteByIdResponse = Post;
 
 export async function voteById(
   req: Request<PostIdParams, unknown, VoteBody>,
-  res: Response<VoteByIdResponse>,
+  res: ApiResponse<typeof storedPostSchema>,
 ) {
   const { userId } = req.session;
   const { id: postId } = req.params;
@@ -64,5 +63,5 @@ export async function voteById(
     ),
   ]);
 
-  sendSuccess(res, updatedPost! as Post);
+  sendSuccess(res, updatedPost!);
 }

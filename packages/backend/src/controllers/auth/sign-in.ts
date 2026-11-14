@@ -1,13 +1,13 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import type { Types } from 'mongoose';
 import { UserModel } from '@models/User';
 import { UnauthorizedError, ERRORS } from '@errors';
 import { logger } from '@libs/logger';
 import { hashPassword, needsRehash, verifyPassword } from '@utils/password';
 import { sendSuccess } from '@utils/response-utils';
-import type { SignInBody } from '@validators/auth';
-import { CurrentUserResponse } from './current';
 import { authenticateSession } from './session';
+import type { ApiResponse } from '@libs/api-router';
+import type { authStateSchema, SignInBody } from '@validators/auth';
 
 /**
  * Move a password hashed with outdated parameters onto the current ones. Runs
@@ -50,7 +50,7 @@ async function recordLogin(userId: Types.ObjectId) {
 
 export async function signIn(
   req: Request<unknown, unknown, SignInBody>,
-  res: Response<CurrentUserResponse>,
+  res: ApiResponse<typeof authStateSchema>,
 ) {
   const { email, password } = req.body;
 
