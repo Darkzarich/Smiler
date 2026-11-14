@@ -1,5 +1,5 @@
 import { toRaw, watch, type Ref } from 'vue';
-import { onBeforeRouteLeave, useRoute } from 'vue-router';
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute } from 'vue-router';
 import { postTypes } from '@/api/posts';
 import { lookUpOwnVotes } from '@/composables/use-own-vote';
 import { useUserStore } from '@/store/user';
@@ -67,8 +67,7 @@ export function useRestorablePosts(
     },
   );
 
-  // Not on unmount: by then a feed has already emptied its list for the new route
-  onBeforeRouteLeave(() => {
+  function save() {
     snapshots.delete(key);
     snapshots.set(key, {
       posts: toRaw(posts.value),
@@ -81,7 +80,12 @@ export function useRestorablePosts(
     if (snapshots.size > MAX_SNAPSHOTS) {
       snapshots.delete(snapshots.keys().next().value!);
     }
-  });
+  }
+
+  // Not on unmount: by then a feed has already emptied its list for the new route
+  onBeforeRouteLeave(save);
+  // A new search's address keeps the component, and Back returns to the last one
+  onBeforeRouteUpdate(save);
 
   /** Votes cast on a post's own page, or a sign in or out since, are not in
    * the saved copy */

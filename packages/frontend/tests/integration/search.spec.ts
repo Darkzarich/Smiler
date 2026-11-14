@@ -504,3 +504,71 @@ test('Keeps a page of the previous search that answers late out of the results',
   await expect(Post.getTitleById(found._id)).toBeVisible();
   await NotificationList.waitForNoNotifications();
 });
+
+test('Shows the search the address names on Back and Forward', async ({
+  page: currentPage,
+  SearchPage,
+  Post,
+  Api,
+}) => {
+  const moonPost = createRandomPost();
+  const pixelPost = createRandomPost();
+  const requestedTitles: (string | null)[] = [];
+
+  await currentPage.route(
+    Api.routes.posts.getPosts.getURLRegExp(),
+    async (route) => {
+      const title = new URL(route.request().url()).searchParams.get('title');
+
+      requestedTitles.push(title);
+
+      await route.fulfill({
+        json: {
+          posts: [title === 'moon' ? moonPost : pixelPost],
+          hasNextPage: false,
+        },
+      });
+    },
+  );
+
+  await SearchPage.goto();
+
+  await SearchPage.searchInput.fill('moon');
+  await SearchPage.submitSearch();
+  await expect(Post.getTitleById(moonPost._id)).toBeVisible();
+
+  await SearchPage.searchInput.fill('pixel');
+  await SearchPage.submitSearch();
+  await expect(Post.getTitleById(pixelPost._id)).toBeVisible();
+
+  await currentPage.goBack();
+
+  expect(SearchPage.pageHasTitleQueryParam('moon')).toBe(true);
+  await expect(SearchPage.searchInput).toHaveValue('moon');
+  await expect(Post.getListedPosts()).toHaveCount(1);
+  await expect(Post.getTitleById(moonPost._id)).toBeVisible();
+
+  await currentPage.goForward();
+
+  expect(SearchPage.pageHasTitleQueryParam('pixel')).toBe(true);
+  await expect(SearchPage.searchInput).toHaveValue('pixel');
+  await expect(Post.getListedPosts()).toHaveCount(1);
+  await expect(Post.getTitleById(pixelPost._id)).toBeVisible();
+
+  // Both came back from the copies kept on their history entries
+  expect(requestedTitles).toEqual(['moon', 'pixel']);
+});
+
+test('Searches again on Submit with the same filters', async ({
+  SearchPage,
+  Api,
+}) => {
+  await SearchPage.goto('title=moon');
+
+  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+    preRequestAction: SearchPage.submitSearch.bind(SearchPage),
+  });
+
+  expect(postsResponse.url()).toContain('title=moon');
+  expect(postsResponse.url()).toContain('offset=0');
+});
