@@ -197,12 +197,22 @@
       <template v-if="isEdit">
         <BaseButton
           class="post-editor__submit-form-btn"
+          stretched
           data-testid="finish-edit-post-button"
           type="primary"
           :loading="isSaving"
           @click="saveEdited"
         >
           Save changes
+        </BaseButton>
+        <BaseButton
+          class="post-editor__submit-form-btn"
+          stretched
+          data-testid="cancel-edit-post-button"
+          :disabled="isSaving"
+          @click="cancelEdit"
+        >
+          Cancel
         </BaseButton>
       </template>
 
@@ -662,6 +672,19 @@ const saveEdited = async () => {
   } finally {
     isSaving.value = false;
   }
+};
+
+const cancelEdit = () => {
+  if (!props.post) {
+    return;
+  }
+
+  router.push({
+    name: 'Single',
+    params: {
+      slug: props.post.slug,
+    },
+  });
 };
 
 const saveDraft = async () => {
