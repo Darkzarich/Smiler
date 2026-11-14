@@ -175,33 +175,38 @@ test('Puts the votes in the footer row and the author above the title on a phone
   await PostsPage.goto(PostsPage.urls.today);
 
   const footer = page.locator('.post__meta-info');
-  const commentsCount = Post.getCommentsCountById(post._id);
-
-  await expect(footer.locator(commentsCount)).toBeVisible();
-
-  const middleOf = async (locator: typeof commentsCount) => {
-    const box = (await locator.boundingBox())!;
-
-    return Math.round(box.y + box.height / 2);
-  };
-
-  const row = await middleOf(commentsCount);
 
   for (const control of [
+    Post.getCommentsCountById(post._id),
     Post.getUpvoteBtnById(post._id),
     Post.getRatingById(post._id),
     Post.getDownvoteBtnById(post._id),
   ]) {
     await expect(footer.locator(control)).toBeVisible();
-    expect(await middleOf(control)).toBe(row);
   }
 
-  const author = (await page
-    .getByTestId(`post-${post._id}-author`)
-    .boundingBox())!;
-  const title = (await Post.getTitleById(post._id).boundingBox())!;
+  // Measured in one go: the post's picture and video resize the card as they
+  // load, so positions read one call apart can come from two layouts.
+  const layout = await page.evaluate((id) => {
+    const rectOf = (name: string) =>
+      document
+        .querySelector(`[data-testid="post-${id}-${name}"]`)!
+        .getBoundingClientRect();
+    const middleOf = (name: string) => {
+      const rect = rectOf(name);
 
-  expect(author.y + author.height).toBeLessThanOrEqual(title.y);
+      return Math.round(rect.top + rect.height / 2);
+    };
+
+    return {
+      footerRows: new Set(
+        ['comments-count', 'upvote', 'rating', 'downvote'].map(middleOf),
+      ).size,
+      authorAboveTitle: rectOf('author').bottom <= rectOf('title').top,
+    };
+  }, post._id);
+
+  expect(layout).toEqual({ footerRows: 1, authorAboveTitle: true });
 });
 
 test('Takes a post deleted from the list off the list', async ({
