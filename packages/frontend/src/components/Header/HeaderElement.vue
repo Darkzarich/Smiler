@@ -15,7 +15,7 @@
       </div>
 
       <!-- TODO: Should be moved to App.vue -->
-      <Transition name="header__mobile-menu">
+      <Transition name="mobile-menu">
         <HeaderMobileMenu
           v-if="isMobileMenuOpen"
           :return-focus-to="menuButton?.$el"
@@ -195,21 +195,6 @@ onBeforeUnmount(removeAfterEach);
     @media (--tablet-portrait-down) {
       display: flex;
       align-items: center;
-    }
-
-    &-enter-active,
-    &-leave-active {
-      transition: all 0.2s;
-    }
-
-    &-enter-from,
-    &-leave-to {
-      opacity: 0;
-      transform: translateY(15px);
-
-      @media (--phone-only) {
-        transform: translateY(-15px);
-      }
     }
   }
 

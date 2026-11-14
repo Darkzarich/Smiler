@@ -410,23 +410,26 @@ test.describe('A notch and the home indicator', () => {
 
     await expect(menu).toBeVisible();
 
-    // A menu row spans the screen, so it is the row's content that must clear them
-    for (const control of [
-      menu.getByRole('link').first(),
-      menu.getByRole('button', { name: 'Close menu' }),
-      menu.getByRole('link', { name: 'Today' }),
-    ]) {
-      const { left, right } = await control.evaluate((el) => {
-        const range = document.createRange();
+    // A menu row spans the drawer, so it is the row's content that must clear
+    // them. Retried, as the drawer slides in from the left
+    await expect(async () => {
+      for (const control of [
+        menu.getByRole('link').first(),
+        menu.getByRole('button', { name: 'Close menu' }),
+        menu.getByRole('link', { name: 'Today' }),
+      ]) {
+        const { left, right } = await control.evaluate((el) => {
+          const range = document.createRange();
 
-        range.selectNodeContents(el);
+          range.selectNodeContents(el);
 
-        return range.getBoundingClientRect();
-      });
+          return range.getBoundingClientRect();
+        });
 
-      expect(left).toBeGreaterThanOrEqual(insets.left);
-      expect(right).toBeLessThanOrEqual(width - insets.right);
-    }
+        expect(left).toBeGreaterThanOrEqual(insets.left);
+        expect(right).toBeLessThanOrEqual(width - insets.right);
+      }
+    }).toPass();
   });
 });
 
@@ -509,6 +512,41 @@ test.describe('Mobile menu', () => {
     await expect(homeLink).toBeFocused();
 
     await page.keyboard.press('Escape');
+
+    await expect(Menu.mobileMenu).toBeHidden();
+    await expect(Menu.mobileMenuBtn).toBeFocused();
+  });
+
+  test('Opens as a drawer from 600px, listing the links in the header order', async ({
+    page,
+    PostsPage,
+    Menu,
+  }) => {
+    await page.setViewportSize({ width: 820, height: 1180 });
+    await PostsPage.goto(PostsPage.urls.today);
+    await Menu.openIfMobile();
+
+    await expect(async () => {
+      const box = (await Menu.mobileMenu.boundingBox())!;
+
+      expect(box.x).toBe(0);
+      expect(box.width).toBeLessThanOrEqual(400);
+    }).toPass();
+
+    await expect(
+      Menu.mobileMenu.getByRole('navigation').getByRole('link'),
+    ).toHaveText([
+      'Today',
+      'All',
+      'Trending',
+      'Top this week',
+      'New',
+      'My feed',
+    ]);
+
+    await page
+      .getByTestId('mobile-menu-backdrop')
+      .click({ position: { x: 700, y: 600 } });
 
     await expect(Menu.mobileMenu).toBeHidden();
     await expect(Menu.mobileMenuBtn).toBeFocused();
