@@ -167,6 +167,28 @@ describe('POST api/auth/signup', () => {
 
     expect(response.status).toBe(409);
     expect(response.body.error.message).toBe(ERRORS.AUTH_EMAIL_ALREADY_EXISTS);
+    expect(response.body.error.details).toEqual([
+      { path: 'email', message: ERRORS.AUTH_EMAIL_ALREADY_EXISTS },
+    ]);
+  });
+
+  it('Returns status 409 naming the login field if only the login is taken', async () => {
+    await UserModel.syncIndexes();
+
+    const credentials = generateSignUpCredentials();
+
+    await signUp(credentials);
+
+    const response = await signUp({
+      ...credentials,
+      email: 'another-user@test.com',
+    });
+
+    expect(response.status).toBe(409);
+    expect(response.body.error.message).toBe(ERRORS.AUTH_LOGIN_ALREADY_EXISTS);
+    expect(response.body.error.details).toEqual([
+      { path: 'login', message: ERRORS.AUTH_LOGIN_ALREADY_EXISTS },
+    ]);
   });
 
   it('Returns status 200 and isAuth=true with the user data after successful sign up', async () => {
