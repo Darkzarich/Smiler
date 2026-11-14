@@ -38,8 +38,12 @@
       >
         <template #item="{ element: section }">
           <div
+            :ref="(el) => trackSectionElement(section.hash, el)"
             class="post-editor__section"
-            :class="{ 'post-editor__section--spoiler': section.isSpoiler }"
+            :class="{
+              'post-editor__section--spoiler': section.isSpoiler,
+              'post-editor__section--invalid': sectionErrorOf(section),
+            }"
             data-testid="post-section"
           >
             <div class="post-editor__section-header">
@@ -130,6 +134,15 @@
                 />
               </template>
             </div>
+
+            <!-- Outside the body, so a spoiler's blur doesn't cover it -->
+            <p
+              v-if="sectionErrorOf(section)"
+              class="post-editor__section-error"
+              :data-testid="`section-error-${section.hash}`"
+            >
+              {{ sectionErrorOf(section) }}
+            </p>
           </div>
         </template>
       </Draggable>
@@ -222,7 +235,15 @@
 <script setup lang="ts">
 import { useEventListener } from '@vueuse/core';
 import { isEqual } from 'lodash-es';
-import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
+import {
+  type ComponentPublicInstance,
+  computed,
+  nextTick,
+  onMounted,
+  ref,
+  useTemplateRef,
+  watch,
+} from 'vue';
 import { useRouter } from 'vue-router';
 import Draggable from 'vuedraggable';
 import Post from '../Post/Post.vue';
@@ -329,10 +350,20 @@ const mode = computed({
   },
 });
 
+const emptySectionErrors: Partial<
+  Record<postTypes.POST_SECTION_TYPES, string>
+> = {
+  [postTypes.POST_SECTION_TYPES.PICTURE]:
+    'Add a picture or remove this section',
+  [postTypes.POST_SECTION_TYPES.VIDEO]: 'Add a video or remove this section',
+};
+
 const validation = computed(() => {
   const validation = {
     title: '',
     sections: '',
+    /** By section hash */
+    emptySections: {} as Record<string, string>,
   };
 
   // title
@@ -349,8 +380,32 @@ const validation = computed(() => {
     validation.sections = 'You should add at least one section';
   }
 
+  for (const section of sections.value) {
+    const error = emptySectionErrors[section.type];
+
+    if (error && !hasSectionContent(section)) {
+      validation.emptySections[section.hash] = error;
+    }
+  }
+
   return validation;
 });
+
+const sectionErrorOf = (section: postTypes.PostSection) =>
+  isSubmitted.value ? validation.value.emptySections[section.hash] : undefined;
+
+const sectionElements = new Map<string, HTMLElement>();
+
+const trackSectionElement = (
+  hash: string,
+  el: Element | ComponentPublicInstance | null,
+) => {
+  if (el instanceof HTMLElement) {
+    sectionElements.set(hash, el);
+  } else {
+    sectionElements.delete(hash);
+  }
+};
 
 watch(
   [title, tags, sections],
@@ -385,7 +440,11 @@ useEventListener(window, 'beforeunload', (event: BeforeUnloadEvent) => {
 });
 
 const isInvalid = computed(() => {
-  return Boolean(validation.value.title || validation.value.sections);
+  return Boolean(
+    validation.value.title ||
+      validation.value.sections ||
+      Object.keys(validation.value.emptySections).length,
+  );
 });
 
 const validateBeforeSend = async () => {
@@ -396,9 +455,25 @@ const validateBeforeSend = async () => {
   isSubmitted.value = true;
   isPreview.value = false;
 
+  await nextTick();
+
   if (validation.value.title) {
-    await nextTick();
     titleInput.value?.focus();
+
+    return false;
+  }
+
+  const firstEmpty = sections.value.find(
+    (section) => validation.value.emptySections[section.hash],
+  );
+  const card = firstEmpty && sectionElements.get(firstEmpty.hash);
+
+  if (card) {
+    // The file input for a picture, the link field for a video
+    card
+      .querySelector<HTMLElement>('.post-editor__section-body input')
+      ?.focus({ preventScroll: true });
+    card.scrollIntoView({ block: 'center' });
   }
 
   return false;
@@ -551,6 +626,8 @@ const createPost = async () => {
         slug: data.slug,
       },
     });
+  } catch {
+    // The api client has already shown the backend's reason
   } finally {
     isSending.value = false;
   }
@@ -561,22 +638,30 @@ const saveEdited = async () => {
     return;
   }
 
-  await api.posts.updatePostById(props.post._id, {
-    title: title.value,
-    sections: sections.value,
-    tags: tags.value,
-  });
+  try {
+    isSaving.value = true;
 
-  notificationsStore.showInfoNotification({
-    message: 'Post has been saved successfully',
-  });
+    await api.posts.updatePostById(props.post._id, {
+      title: title.value,
+      sections: sections.value,
+      tags: tags.value,
+    });
 
-  router.push({
-    name: 'Single',
-    params: {
-      slug: props.post.slug,
-    },
-  });
+    notificationsStore.showInfoNotification({
+      message: 'Post has been saved successfully',
+    });
+
+    router.push({
+      name: 'Single',
+      params: {
+        slug: props.post.slug,
+      },
+    });
+  } catch {
+    // The api client has already shown the backend's reason
+  } finally {
+    isSaving.value = false;
+  }
 };
 
 const saveDraft = async () => {
@@ -604,6 +689,8 @@ const saveDraft = async () => {
     nextTick(() => {
       isDirty.value = false;
     });
+  } catch {
+    // The api client has already shown the backend's reason
   } finally {
     isSaving.value = false;
   }
@@ -689,6 +776,11 @@ const saveDraft = async () => {
           opacity: 0;
         }
       }
+    }
+
+    /* After --spoiler, which keeps its dashed style */
+    &--invalid {
+      border-color: var(--color-danger-strong);
     }
 
     &-enter-active,
@@ -804,6 +896,12 @@ const saveDraft = async () => {
     .base-text-editor {
       background: transparent;
     }
+  }
+
+  &__section-error {
+    margin: -4px 16px 12px;
+    color: var(--color-danger-strong);
+    font-size: 12px;
   }
 
   &__add-section-buttons {

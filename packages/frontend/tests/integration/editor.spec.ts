@@ -200,6 +200,29 @@ test('Shows what is missing instead of sending an empty post', async ({
   expect(wasPostSent()).toBe(false);
 });
 
+test('Marks empty picture and video sections instead of sending the post', async ({
+  Api,
+  PostCreatePage,
+  page: currentPage,
+}) => {
+  const wasPostSent = Api.routes.posts.createPost.watchIfRequestWasCalled();
+
+  await PostCreatePage.goto();
+
+  await PostCreatePage.postTitleInput.fill(title);
+  await PostCreatePage.addPictureSection();
+  await PostCreatePage.addVideoSection();
+
+  await PostCreatePage.submitPost();
+
+  await expect(PostCreatePage.getSectionErrors()).toHaveText([
+    'Add a picture or remove this section',
+    'Add a video or remove this section',
+  ]);
+  await expect(currentPage.getByLabel('Upload image')).toBeFocused();
+  expect(wasPostSent()).toBe(false);
+});
+
 test('Uploads a picture in the picture section', async ({
   PostCreatePage,
   Api,
@@ -351,6 +374,11 @@ test('D&D post sections to change order of sections', async ({
   await PostCreatePage.dragFirstSectionAfterSecond({ touch: isMobile });
 
   await assertNewOrderOfSections();
+
+  await Api.routes.posts.uploadAttachmentByUrl.waitForRequest({
+    preRequestAction: () =>
+      PostCreatePage.uploadPictureWithUrl(pastedPictureUrl),
+  });
 
   const createPostResponse = await Api.routes.posts.createPost.waitForRequest({
     preRequestAction: PostCreatePage.submitPost.bind(PostCreatePage),

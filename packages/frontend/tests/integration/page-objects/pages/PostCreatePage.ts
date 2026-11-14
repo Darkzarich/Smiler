@@ -152,6 +152,10 @@ export default class PostCreatePage extends AbstractPage {
     return this.page.getByTestId('video-url-input-error');
   }
 
+  getSectionErrors() {
+    return this.page.getByTestId(/^section-error-/);
+  }
+
   getVideoPreview() {
     return this.page.getByTestId('video-preview');
   }
