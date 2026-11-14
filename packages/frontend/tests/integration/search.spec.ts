@@ -380,3 +380,55 @@ test('Keeps the results and the place in them on Back from a post', async ({
     .toBeLessThanOrEqual(2);
   expect(listRequests).toHaveLength(1);
 });
+
+test('Starts a new search from the first page after scrolling', async ({
+  page: currentPage,
+  SearchPage,
+  Post,
+  Api,
+}) => {
+  const firstPage = Array.from({ length: 15 }, () => createRandomPost());
+  const secondPage = Array.from({ length: 15 }, () => createRandomPost());
+  const found = createRandomPost();
+  const requests: URLSearchParams[] = [];
+
+  await currentPage.route(
+    Api.routes.posts.getPosts.getURLRegExp(),
+    async (route) => {
+      const params = new URL(route.request().url()).searchParams;
+
+      requests.push(params);
+
+      if (params.get('title') === 'moon') {
+        await route.fulfill({
+          json: {
+            posts: params.get('offset') === '0' ? [found] : [],
+            hasNextPage: false,
+          },
+        });
+
+        return;
+      }
+
+      await route.fulfill({
+        json:
+          params.get('offset') === '0'
+            ? { posts: firstPage, hasNextPage: true }
+            : { posts: secondPage, hasNextPage: false },
+      });
+    },
+  );
+
+  await SearchPage.goto('title=test');
+  await expect(Post.getListedPosts()).toHaveCount(15);
+  await Post.scrollToListEnd();
+  await expect(Post.getListedPosts()).toHaveCount(30);
+
+  await SearchPage.searchInput.fill('moon');
+  await SearchPage.submitSearch();
+
+  await expect(Post.getListedPosts()).toHaveCount(1);
+  await expect(Post.getTitleById(found._id)).toBeVisible();
+  expect(requests.at(-1)?.get('title')).toBe('moon');
+  expect(requests.at(-1)?.get('offset')).toBe('0');
+});

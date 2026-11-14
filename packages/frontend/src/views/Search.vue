@@ -97,6 +97,8 @@ const isAnyFilterActive = computed(() =>
 );
 
 watch(filter, (newVal) => {
+  currentPage.value = 0;
+
   if (isAnyFilterActive.value) {
     fetchPosts({ filters: newVal });
   }
