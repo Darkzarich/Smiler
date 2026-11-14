@@ -1,6 +1,16 @@
 <template>
-  <form class="signin-form u-flex-col" @submit.prevent="signIn">
-    <div class="signin-form__header" data-testid="signin-form">Sign In</div>
+  <form
+    class="signin-form u-flex-col"
+    data-testid="signin-form"
+    @submit.prevent="signIn"
+  >
+    <div
+      v-if="!hideHeader"
+      class="signin-form__header"
+      data-testid="signin-form-header"
+    >
+      Sign in
+    </div>
 
     <div class="signin-form__input">
       <BaseInput
@@ -49,6 +59,13 @@ import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
+
+interface Props {
+  /** For a dialog whose own title already says what the form is for */
+  hideHeader?: boolean;
+}
+
+defineProps<Props>();
 
 const userStore = useUserStore();
 
@@ -146,7 +163,6 @@ async function signIn() {
 
   &__submit {
     margin-top: 8px;
-    text-transform: uppercase;
   }
 }
 </style>

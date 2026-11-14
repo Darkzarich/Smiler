@@ -110,6 +110,8 @@
           v-model="editBody"
           class="comment-item__comment-form"
           :loading="isRequesting"
+          submit-label="Save"
+          close-label="Cancel"
           data-testid="comment-edit"
           @submit="handleEdit()"
           @close="toggleEdit"

@@ -4,8 +4,11 @@ import { useUserStore } from './user';
 export type AuthPromptMode = 'signin' | 'signup';
 
 interface AuthPromptOptions {
-  /** Usually what the visitor was trying to do, e.g. "Sign in to vote" */
-  title: string;
+  /**
+   * Usually what the visitor was trying to do, e.g. "Sign in to vote". Left
+   * out, the title names the form shown and follows its mode switch
+   */
+  title?: string;
   mode?: AuthPromptMode;
   /** `null` leaves the line out, for a prompt the visitor asked for themselves */
   lead?: string | null;
@@ -13,7 +16,7 @@ interface AuthPromptOptions {
 
 interface State {
   isOpen: boolean;
-  title: string;
+  title: string | null;
   mode: AuthPromptMode;
   lead: string | null;
 }
@@ -26,7 +29,7 @@ let resolveOpenPrompt: ((isSignedIn: boolean) => void) | null = null;
 export const useAuthPromptStore = defineStore('auth-prompt', {
   state: (): State => ({
     isOpen: false,
-    title: '',
+    title: null,
     mode: 'signin',
     lead: DEFAULT_LEAD,
   }),
@@ -36,7 +39,7 @@ export const useAuthPromptStore = defineStore('auth-prompt', {
       // A prompt replaced by another one was dismissed
       resolveOpenPrompt?.(false);
 
-      this.title = options.title;
+      this.title = options.title ?? null;
       this.mode = options.mode ?? 'signin';
       this.lead = options.lead === undefined ? DEFAULT_LEAD : options.lead;
       this.isOpen = true;

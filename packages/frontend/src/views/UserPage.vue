@@ -14,7 +14,7 @@
       </template>
 
       <template #no-more-content>
-        You've read all the posts this author had posted!
+        You've read all the posts this author has posted!
       </template>
     </PostsContainer>
   </div>

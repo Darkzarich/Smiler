@@ -531,6 +531,33 @@ test.describe('Post edit', () => {
     );
   });
 
+  test('Leaves the edit page through Cancel without saving the edits', async ({
+    page: currentPage,
+    SinglePostPage,
+    PostEditor,
+    context,
+  }) => {
+    await mockDate(context, nowISOString);
+
+    const writes: string[] = [];
+
+    currentPage.on('request', (request) => {
+      if (request.method() !== 'GET' && request.url().includes('/api/')) {
+        writes.push(`${request.method()} ${request.url()}`);
+      }
+    });
+
+    await SinglePostPage.gotoEditPage(currentUserNewerPost.slug);
+
+    await PostEditor.typeInTextSection('edited');
+    await currentPage.getByTestId('cancel-edit-post-button').click();
+
+    await expect(currentPage).toHaveURL(
+      SinglePostPage.getUrlWithSlug(currentUserNewerPost.slug),
+    );
+    expect(writes).toEqual([]);
+  });
+
   test('Deletes a post, sends delete request', async ({
     SinglePostPage,
     Post,

@@ -13,7 +13,7 @@
           type="primary"
           @click="$emit('submit')"
         >
-          Send
+          {{ submitLabel }}
         </BaseButton>
 
         <BaseButton
@@ -21,7 +21,7 @@
           :data-testid="`${dataTestid}-close-btn`"
           @click="$emit('close')"
         >
-          Close
+          {{ closeLabel }}
         </BaseButton>
       </div>
     </BaseTextEditor>
@@ -40,11 +40,15 @@ defineEmits<{
 interface Props {
   dataTestid?: string;
   loading?: boolean;
+  submitLabel?: string;
+  closeLabel?: string;
 }
 
 withDefaults(defineProps<Props>(), {
   dataTestid: '',
   loading: false,
+  submitLabel: 'Send',
+  closeLabel: 'Close',
 });
 
 const modelValue = defineModel<string>({

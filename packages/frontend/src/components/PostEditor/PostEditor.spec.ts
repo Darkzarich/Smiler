@@ -1,6 +1,15 @@
 import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import { nextTick } from 'vue';
 import Post from '../Post/Post.vue';
 import PostEditor from './PostEditor.vue';
@@ -42,7 +51,14 @@ const testElements = {
   writeArea: '.post-editor__write',
   preview: '[datatestid="post-preview"]',
   previewEmpty: '[data-testid="post-preview-empty"]',
+  finishEditButton: '[datatestid="finish-edit-post-button"]',
+  picSectionError: '[data-testid="section-error-pic-1"]',
+  videoSectionError: '[data-testid="section-error-vid-1"]',
+  invalidSection: '.post-editor__section--invalid',
 };
+
+// A rejection in a click handler reaches Vue's error handler
+const errorHandler = vi.fn();
 
 async function setMode(
   wrapper: ReturnType<typeof createWrapper>,
@@ -116,6 +132,7 @@ function createWrapper(
     },
     global: {
       plugins: [pinia],
+      config: { errorHandler },
       stubs: {
         // The section controls are clicked by their data-testid
         BaseIconButton: false,
@@ -144,6 +161,86 @@ enableAutoUnmount(afterEach);
 
 beforeEach(() => {
   vi.clearAllMocks();
+});
+
+afterEach(() => {
+  expect(errorHandler).not.toHaveBeenCalled();
+});
+
+describe('PostEditor submit', () => {
+  // jsdom has no scrolling
+  const scrollIntoView = vi.fn();
+
+  beforeAll(() => {
+    Element.prototype.scrollIntoView = scrollIntoView;
+  });
+
+  afterAll(() => {
+    // @ts-expect-error - jsdom never had one
+    delete Element.prototype.scrollIntoView;
+  });
+
+  it('marks empty picture and video sections instead of sending the post', async () => {
+    const wrapper = createWrapper(
+      [textSection('Some content'), pictureSection(''), videoSection('')],
+      false,
+      { title: 'A title' },
+    );
+
+    await flushPromises();
+
+    expect(wrapper.find(testElements.picSectionError).exists()).toBe(false);
+
+    await wrapper.find(testElements.createPostButton).trigger('click');
+    await flushPromises();
+
+    expect(api.posts.createPost).not.toHaveBeenCalled();
+    expect(wrapper.findAll(testElements.invalidSection)).toHaveLength(2);
+    expect(wrapper.find(testElements.picSectionError).text()).toBe(
+      'Add a picture or remove this section',
+    );
+    expect(wrapper.find(testElements.videoSectionError).text()).toBe(
+      'Add a video or remove this section',
+    );
+    expect(scrollIntoView.mock.contexts).toEqual([
+      wrapper.find(testElements.invalidSection).element,
+    ]);
+  });
+
+  it('stays on the editor when the server refuses the post', async () => {
+    const wrapper = createWrapper([textSection('Some content')], false, {
+      title: 'A title',
+    });
+
+    vi.mocked(api.posts.createPost).mockRejectedValue(new Error('422'));
+
+    await flushPromises();
+
+    await wrapper.find(testElements.createPostButton).trigger('click');
+    await flushPromises();
+
+    expect(api.posts.createPost).toHaveBeenCalled();
+    expect(errorHandler).not.toHaveBeenCalled();
+  });
+
+  it('stays on the editor when the server refuses the edited post', async () => {
+    const wrapper = createWrapper([textSection('Some content')], true, {
+      title: 'A title',
+    });
+
+    vi.mocked(api.posts.updatePostById).mockRejectedValue(new Error('422'));
+
+    await flushPromises();
+    await wrapper.setProps({
+      post: { _id: 'post-1', slug: 'a-title' } as postTypes.Post,
+    });
+
+    await wrapper.find(testElements.finishEditButton).trigger('click');
+    await flushPromises();
+
+    expect(api.posts.updatePostById).toHaveBeenCalled();
+    expect(errorHandler).not.toHaveBeenCalled();
+  });
 });
 
 describe('PostEditor delete section flow', () => {

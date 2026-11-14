@@ -703,6 +703,10 @@ const searchByTag = (tag: string) => {
     line-height: 1.5rem;
   }
 
+  &__sections + &__sections {
+    margin-top: 1rem;
+  }
+
   &__section-attachment {
     display: flex;
     flex-flow: row nowrap;

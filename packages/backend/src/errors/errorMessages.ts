@@ -81,11 +81,11 @@ export const ERRORS = {
   POST_TEXT_SECTION_CONTENT_REQUIRED: 'Text section content is required',
   POST_TEXT_SECTIONS_CONTENT_MAX_LENGTH_EXCEEDED:
     'Exceeded max length of text sections content',
-  POST_PIC_SECTION_URL_REQUIRED: 'Image section url is required',
-  POST_PIC_SECTION_URL_INVALID: 'Invalid image section url',
-  POST_VIDEO_SECTION_URL_REQUIRED: 'Video section url is required',
+  POST_PIC_SECTION_URL_REQUIRED: 'Picture URL is required',
+  POST_PIC_SECTION_URL_INVALID: 'Invalid picture URL',
+  POST_VIDEO_SECTION_URL_REQUIRED: 'Video link is required',
   POST_VIDEO_SECTION_URL_INVALID:
-    'Video section url must link to a supported video site or to an .mp4, .webm, .mov or .ogv file',
+    'Video link must point to a supported video site or to an .mp4, .webm, .mov or .ogv file',
   POST_MAX_UPLOAD_IMAGE_SIZE_EXCEEDED: `Uploaded image is too large. Max allowed size is ${POST_MAX_UPLOAD_IMAGE_SIZE / 1024 / 1024}MB`,
   PAGINATION_INVALID_LIMIT: 'Limit must be a positive integer',
   PAGINATION_INVALID_OFFSET: 'Offset must be a non-negative integer',
