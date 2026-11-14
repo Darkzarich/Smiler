@@ -20,7 +20,7 @@ async function findReplies(rootIds: Types.ObjectId[]) {
     return [];
   }
 
-  const replies = await CommentModel.aggregate<LeanComment>([
+  return CommentModel.aggregate<LeanComment>([
     { $match: { _id: { $in: rootIds } } },
     {
       $graphLookup: {
@@ -33,12 +33,10 @@ async function findReplies(rootIds: Types.ObjectId[]) {
     },
     { $unwind: '$reply' },
     { $replaceRoot: { newRoot: '$reply' } },
+    // Not by _id alone: its time counts whole seconds, and within one second the order falls to a
+    // part that differs per cluster worker
+    { $sort: { createdAt: 1, _id: 1 } },
   ]);
-
-  // Oldest first: an id starts with its creation time
-  return replies.sort((a, b) =>
-    a._id.toString().localeCompare(b._id.toString()),
-  );
 }
 
 async function findAuthors(comments: LeanComment[]) {

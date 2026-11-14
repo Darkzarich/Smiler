@@ -432,6 +432,51 @@ describe('GET /comments', () => {
     ).toEqual(replies.map((reply) => reply._id.toString()));
   });
 
+  it('Should list replies written in the same second by two workers oldest first', async () => {
+    const post = await PostModel.create(generateRandomPost());
+
+    const comment = await CommentModel.create(
+      generateRandomComment({ post: post.id }),
+    );
+
+    const createdAt = new Date();
+    const second = Math.floor(createdAt.getTime() / 1000)
+      .toString(16)
+      .padStart(8, '0');
+
+    // An ObjectId is the second, a per-process value, then a counter: the older reply comes from
+    // the worker whose value sorts last
+    const replies = await CommentModel.insertMany([
+      {
+        _id: new Types.ObjectId(`${second}ffffffffff000001`),
+        ...generateRandomComment({
+          post: post.id,
+          parent: comment._id,
+          createdAt,
+        }),
+      },
+      {
+        _id: new Types.ObjectId(`${second}0000000000000002`),
+        ...generateRandomComment({
+          post: post.id,
+          parent: comment._id,
+          createdAt: new Date(createdAt.getTime() + 10),
+        }),
+      },
+    ]);
+
+    const response = await request(global.app).get(
+      `/api/comments?post=${post.id}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(
+      response.body.comments[0].children.map(
+        (reply: { _id: string }) => reply._id,
+      ),
+    ).toEqual(replies.map((reply) => reply._id.toString()));
+  });
+
   it('Should sort comments by rating descending', async () => {
     const post = await PostModel.create(generateRandomPost());
 
