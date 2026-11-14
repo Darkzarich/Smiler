@@ -28,7 +28,10 @@
           @reply-created="incrementCommentCount(1)"
         />
 
-        <div v-else-if="!isFetchingComments" class="comments__no-comments">
+        <div
+          v-else-if="!isFetchingComments"
+          class="comments__no-comments u-widget"
+        >
           It’s quiet here — be the first to leave a comment!
         </div>
 
@@ -183,7 +186,7 @@ onBeforeMount(async () => {
   }
 
   &__no-comments {
-    margin-top: 0.5rem;
+    margin-top: 1rem;
 
     /* TODO: Set this text for <body> and remove everywhere else */
     color: var(--color-text-primary);
