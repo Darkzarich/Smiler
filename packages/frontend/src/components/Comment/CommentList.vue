@@ -16,6 +16,7 @@ import { provide, toRef, useTemplateRef } from 'vue';
 import CommentItem from './CommentItem.vue';
 import { commentThreadKey, insertReply, removeComment } from './thread';
 import type { Comment } from './types';
+import { focusTemporarily } from '@/utils/focus-temporarily';
 
 interface Props {
   data: Comment[];
@@ -62,16 +63,9 @@ defineExpose({
       `[data-comment-id="${id}"] > .comment-item > .comment-item__content`,
     );
 
-    if (!card) {
-      return;
+    if (card) {
+      focusTemporarily(card);
     }
-
-    // Only while focused: a lasting tabindex would focus the card on every click in it
-    card.tabIndex = -1;
-    card.addEventListener('blur', () => card.removeAttribute('tabindex'), {
-      once: true,
-    });
-    card.focus();
   },
 });
 </script>

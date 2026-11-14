@@ -948,6 +948,7 @@ test.describe('Editing or deleting a comment', () => {
     SinglePostPage,
     Comments,
     Post,
+    NotificationList,
     context,
     Api,
   }) => {
@@ -968,10 +969,89 @@ test.describe('Editing or deleting a comment', () => {
     });
 
     await expect(Comments.getCommentById(currentUserComment._id)).toBeHidden();
+    await expect(NotificationList.root).toHaveText(
+      'The comment has been deleted',
+    );
 
     await expect(Post.getCommentsCountById(post._id)).toHaveText(
       String(post.commentCount - 1),
     );
+  });
+
+  test('Asks before deleting a comment, and deletes nothing on Cancel or Escape', async ({
+    SinglePostPage,
+    Comments,
+    context,
+    page,
+  }) => {
+    const modal = Comments.getDeleteConfirmModalById(currentUserComment._id);
+    const deleteBtn = Comments.getDeleteBtnById(currentUserComment._id);
+    const deleteRequests: string[] = [];
+
+    page.on('request', (req) => {
+      if (req.method() === 'DELETE') {
+        deleteRequests.push(req.url());
+      }
+    });
+
+    await mockDate(context, currentUserComment.createdAt);
+
+    await SinglePostPage.goto(post.slug);
+
+    await deleteBtn.click();
+    await modal.expectVisible();
+    await expect(modal.root).toContainText('Delete this comment?');
+    await expect(modal.cancelBtn).toBeFocused();
+
+    await modal.cancel();
+    await modal.expectHidden();
+    await expect(deleteBtn).toBeFocused();
+
+    await deleteBtn.click();
+    await modal.expectVisible();
+    await page.keyboard.press('Escape');
+    await modal.expectHidden();
+
+    await expect(Comments.getCommentById(currentUserComment._id)).toBeVisible();
+    expect(deleteRequests).toEqual([]);
+  });
+
+  test('Moves focus to the next comment, or else to the one answered, once a comment is deleted', async ({
+    SinglePostPage,
+    Comments,
+    context,
+    Api,
+  }) => {
+    const ownReply = createRandomComment({
+      author: { _id: auth._id },
+      createdAt: currentUserComment.createdAt,
+    });
+    const otherComment = createRandomComment({ children: [ownReply] });
+
+    Api.routes.comments.getComments.mock({
+      body: {
+        comments: [currentUserComment, otherComment],
+        hasNextPage: false,
+      },
+    });
+    Api.routes.comments.deleteComment.mock({
+      status: 200,
+      body: { ok: true },
+    });
+
+    await mockDate(context, currentUserComment.createdAt);
+
+    await SinglePostPage.goto(post.slug);
+
+    await Comments.deleteCommentById(currentUserComment._id);
+
+    await expect(Comments.getCommentById(currentUserComment._id)).toBeHidden();
+    await expect(Comments.getCommentCardById(otherComment._id)).toBeFocused();
+
+    await Comments.deleteCommentById(ownReply._id);
+
+    await expect(Comments.getCommentById(ownReply._id)).toBeHidden();
+    await expect(Comments.getCommentCardById(otherComment._id)).toBeFocused();
   });
 
   test('The current user edits a comment that is not older than 10 mins, sends the edit request', async ({
@@ -1052,6 +1132,9 @@ test.describe('Editing or deleting a comment', () => {
     await expect(
       Comments.getCommentById(currentUserCommentWithReplies._id),
     ).toContainText('This comment has been deleted');
+    await expect(
+      Comments.getCommentCardById(currentUserCommentWithReplies._id),
+    ).toBeFocused();
 
     await expect(Post.getCommentsCountById(post._id)).toHaveText(
       String(post.commentCount),

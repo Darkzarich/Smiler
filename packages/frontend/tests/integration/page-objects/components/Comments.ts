@@ -1,5 +1,6 @@
 import { type Locator, type Page } from '@playwright/test';
 import AbstractComponent from './AbstractComponent';
+import ConfirmModal from './ConfirmModal';
 
 export default class Comments extends AbstractComponent {
   readonly newCommentForm: Locator;
@@ -55,6 +56,13 @@ export default class Comments extends AbstractComponent {
 
   getDeleteBtnById(commentId = '') {
     return this.page.getByTestId(`comment-${commentId}-delete`);
+  }
+
+  getDeleteConfirmModalById(commentId = '') {
+    return new ConfirmModal(
+      this.page,
+      `confirm-delete-comment-${commentId}-modal`,
+    );
   }
 
   getCommentReplyInput() {
@@ -140,8 +148,10 @@ export default class Comments extends AbstractComponent {
     await this.getDownvoteBtnById(commentId).click();
   }
 
+  /** Presses the bin and confirms in the dialog it opens */
   async deleteCommentById(commentId = '') {
     await this.getDeleteBtnById(commentId).click();
+    await this.getDeleteConfirmModalById(commentId).confirm();
   }
 
   async toggleCommentEditById(commentId = '') {
