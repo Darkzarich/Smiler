@@ -21,7 +21,15 @@ interface RequestError {
   error?: {
     code?: string;
     message?: string;
+    details?: RequestErrorDetail[];
   };
+}
+
+/** A field the API named in a failure: every field that failed validation,
+ * or the one a conflict is about (a taken login) */
+export interface RequestErrorDetail {
+  path: string;
+  message: string;
 }
 
 interface CsrfResponse {
@@ -205,6 +213,18 @@ export function getRequestErrorMessage(error: unknown) {
   }
 
   return error.response?.data?.error?.message;
+}
+
+export function getRequestErrorDetails(error: unknown): RequestErrorDetail[] {
+  if (!axios.isAxiosError<RequestError>(error)) {
+    return [];
+  }
+
+  return error.response?.data?.error?.details ?? [];
+}
+
+export function isUnauthorizedError(error: unknown) {
+  return axios.isAxiosError(error) && error.response?.status === 401;
 }
 
 export function isNotFoundError(error: unknown) {
