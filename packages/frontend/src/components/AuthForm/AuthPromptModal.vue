@@ -6,7 +6,7 @@
   >
     <template #header>
       <div class="auth-prompt__header">
-        <span data-testid="auth-prompt-title">{{ authPrompt.title }}</span>
+        <span data-testid="auth-prompt-title">{{ title }}</span>
 
         <BaseIconButton
           label="Close"
@@ -25,14 +25,18 @@
       </p>
 
       <!-- Keyed to start fresh, in the mode asked for, on every opening -->
-      <AuthFormSwitcher :key="openCount" :initial-mode="authPrompt.mode" />
+      <AuthFormSwitcher
+        :key="openCount"
+        v-model:mode="authPrompt.mode"
+        hide-headers
+      />
     </div>
   </BaseModal>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { nextTick, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import AuthFormSwitcher from './AuthFormSwitcher.vue';
 import { useMediaQuery } from '@/composables/use-media-query';
 import { useAuthPromptStore } from '@/store/auth-prompt';
@@ -45,6 +49,12 @@ const authPrompt = useAuthPromptStore();
 const { user } = storeToRefs(useUserStore());
 
 const isTouch = useMediaQuery('pointer-coarse');
+
+const title = computed(
+  () =>
+    authPrompt.title ??
+    (authPrompt.mode === 'signin' ? 'Sign in' : 'Create an account'),
+);
 
 const contentRef = ref<HTMLElement | null>(null);
 const openCount = ref(0);

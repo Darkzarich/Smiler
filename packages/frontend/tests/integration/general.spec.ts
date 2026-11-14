@@ -106,8 +106,22 @@ test.describe('Sign in from the header', () => {
 
     await signInBtn.click();
 
-    await expect(AuthPrompt.title).toHaveText('Welcome to Smiler');
+    await expect(AuthPrompt.title).toHaveText('Sign in');
     await expect(AuthPrompt.panel).not.toContainText('You need an account');
+    await expect(AuthPrompt.SignInForm).toBeVisible();
+    await expect(
+      AuthPrompt.panel.getByTestId('signin-form-header'),
+    ).toBeHidden();
+
+    await AuthPrompt.panel.getByTestId('user-form-mode-toggler').click();
+
+    await expect(AuthPrompt.title).toHaveText('Create an account');
+    await expect(AuthPrompt.SignUpForm).toBeVisible();
+    await expect(
+      AuthPrompt.panel.getByTestId('signup-form-header'),
+    ).toBeHidden();
+
+    await AuthPrompt.panel.getByTestId('user-form-mode-toggler').click();
 
     await AuthPrompt.signIn();
 
@@ -124,6 +138,7 @@ test.describe('Sign in from the header', () => {
     await PostsPage.goto(PostsPage.urls.today);
 
     await expect(page.getByTestId('signin-form')).toBeVisible();
+    await expect(page.getByTestId('signin-form-header')).toHaveText('Sign In');
     await expect(page.getByTestId('header-sign-in')).toBeHidden();
   });
 });

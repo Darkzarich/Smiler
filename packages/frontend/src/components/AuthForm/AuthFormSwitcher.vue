@@ -1,7 +1,7 @@
 <template>
   <div class="auth-form-switcher">
-    <SignInForm v-if="isSignIn" />
-    <SignUpForm v-else />
+    <SignInForm v-if="isSignIn" :hide-header="hideHeaders" />
+    <SignUpForm v-else :hide-header="hideHeaders" />
 
     <button
       data-testid="user-form-mode-toggler"
@@ -14,23 +14,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed } from 'vue';
 import SignInForm from './SignInForm.vue';
 import SignUpForm from './SignUpForm.vue';
 import type { AuthPromptMode } from '@/store/auth-prompt';
 
 interface Props {
-  initialMode?: AuthPromptMode;
+  hideHeaders?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  initialMode: 'signin',
-});
+defineProps<Props>();
 
-const isSignIn = ref(props.initialMode === 'signin');
+const mode = defineModel<AuthPromptMode>('mode', { default: 'signin' });
+
+const isSignIn = computed(() => mode.value === 'signin');
 
 const toggleMode = () => {
-  isSignIn.value = !isSignIn.value;
+  mode.value = isSignIn.value ? 'signup' : 'signin';
 };
 </script>
 

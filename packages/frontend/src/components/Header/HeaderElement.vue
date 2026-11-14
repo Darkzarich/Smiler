@@ -136,7 +136,7 @@ const search = () => {
 };
 
 const openSignIn = () => {
-  void authPrompt.open({ title: 'Welcome to Smiler', lead: null });
+  void authPrompt.open({ lead: null });
 };
 
 const toggleMobileMenu = () => {
