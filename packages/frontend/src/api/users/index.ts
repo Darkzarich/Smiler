@@ -1,12 +1,15 @@
 import { apiClient } from '../ApiClient';
+import type { RequestOptions } from '../types';
 import * as userTypes from './types';
 
 const CONTROLLER_URL = 'users';
 
 export default {
-  getUserProfile(login: string) {
+  getUserProfile(login: string, options?: RequestOptions) {
     return apiClient.get<userTypes.GetUserProfileResponse>(
       `${CONTROLLER_URL}/${login}`,
+      undefined,
+      options,
     );
   },
   updateUserProfile(data: userTypes.UpdateUserProfileRequest) {

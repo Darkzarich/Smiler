@@ -101,6 +101,11 @@ class ApiClient {
 
       return res.data;
     } catch (error) {
+      // The caller aborted it and wants no answer, so there is nothing to report
+      if (axios.isCancel(error)) {
+        throw error;
+      }
+
       let requestError = error;
 
       if (this.isCsrfError(requestError)) {

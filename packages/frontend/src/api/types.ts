@@ -17,3 +17,7 @@ export interface PaginationResponse {
 export interface CursorPaginationResponse extends PaginationResponse {
   nextCursor: string | null;
 }
+
+export interface RequestOptions {
+  signal?: AbortSignal;
+}

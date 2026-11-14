@@ -407,6 +407,75 @@ test.describe('Post groups', () => {
       }
     });
 
+    test('Shows the last tab clicked when an earlier one answers after it', async ({
+      page: currentPage,
+      PostsPage,
+      Post,
+      Menu,
+      Api,
+      NotificationList,
+    }) => {
+      const allPost = createRandomPost();
+      const newPost = createRandomPost();
+
+      let releaseAll = () => {};
+      const allReleased = new Promise<void>((resolve) => {
+        releaseAll = resolve;
+      });
+      let markAllHandled = () => {};
+      const allHandled = new Promise<void>((resolve) => {
+        markAllHandled = resolve;
+      });
+
+      await currentPage.route(
+        Api.routes.posts.getAll.getURLRegExp(),
+        async (route) => {
+          await allReleased;
+          // The page may have aborted it, leaving nothing to answer
+          await route
+            .fulfill({ json: { posts: [allPost], hasNextPage: false } })
+            .catch(() => {});
+          markAllHandled();
+        },
+      );
+
+      Api.routes.posts.getRecent.mock({
+        body: { posts: [newPost], hasNextPage: false },
+      });
+
+      await Api.routes.posts.getAll.waitForRequest({
+        preRequestAction: PostsPage.selectPostGroup.bind(
+          PostsPage,
+          PostsPage.groups.all,
+        ),
+      });
+      await Menu.openIfMobile();
+      await Api.routes.posts.getRecent.waitForRequest({
+        preRequestAction: PostsPage.selectPostGroup.bind(
+          PostsPage,
+          PostsPage.groups.new,
+        ),
+      });
+
+      await expect(Post.getTitleById(newPost._id)).toBeVisible();
+
+      releaseAll();
+      await allHandled;
+      // Give a late answer the time to reach the list
+      await currentPage.evaluate(
+        () =>
+          new Promise((resolve) => {
+            requestAnimationFrame(() => requestAnimationFrame(resolve));
+          }),
+      );
+
+      await expect(currentPage).toHaveURL(PostsPage.urls.new);
+      await expect(Post.getListedPosts()).toHaveCount(1);
+      await expect(Post.getTitleById(newPost._id)).toBeVisible();
+      await expect(Post.getTitleById(allPost._id)).toBeHidden();
+      await NotificationList.waitForNoNotifications();
+    });
+
     test('Asks a visitor to sign in before opening the feed, then opens it', async ({
       page: currentPage,
       PostsPage,

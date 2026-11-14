@@ -30,6 +30,7 @@ import { useRoute } from 'vue-router';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
+import { useLatestRequest } from '@/composables/use-latest-request';
 import { useRestorablePosts } from '@/composables/use-restorable-posts';
 import * as consts from '@/const';
 import SearchForm from '@components/SearchForm/SearchForm.vue';
@@ -38,7 +39,11 @@ import type { SearchFilter } from '@components/SearchForm/types';
 
 const route = useRoute();
 
-const isLoading = ref(false);
+const {
+  run: fetchLatest,
+  cancel: cancelFetch,
+  isPending: isLoading,
+} = useLatestRequest();
 
 const posts = ref<postTypes.Post[]>([]);
 
@@ -66,24 +71,27 @@ const fetchPosts = async ({
   isCombine = false,
   filters = filter.value,
 }: { isCombine?: boolean; filters?: SearchFilter } = {}) => {
-  try {
-    isLoading.value = true;
+  const data = await fetchLatest((signal) =>
+    api.posts.search(
+      {
+        limit: consts.POSTS_INITIAL_COUNT,
+        offset: currentPage.value * consts.POSTS_INITIAL_COUNT,
+        ...filters,
+      },
+      { signal },
+    ),
+  );
 
-    const data = await api.posts.search({
-      limit: consts.POSTS_INITIAL_COUNT,
-      offset: currentPage.value * consts.POSTS_INITIAL_COUNT,
-      ...filters,
-    });
+  if (!data) {
+    return;
+  }
 
-    hasNextPage.value = data.hasNextPage;
+  hasNextPage.value = data.hasNextPage;
 
-    if (isCombine) {
-      posts.value = posts.value.concat(data.posts);
-    } else {
-      posts.value = data.posts;
-    }
-  } finally {
-    isLoading.value = false;
+  if (isCombine) {
+    posts.value = posts.value.concat(data.posts);
+  } else {
+    posts.value = data.posts;
   }
 };
 
@@ -101,6 +109,8 @@ watch(filter, (newVal) => {
 
   if (isAnyFilterActive.value) {
     fetchPosts({ filters: newVal });
+  } else {
+    cancelFetch();
   }
 });
 

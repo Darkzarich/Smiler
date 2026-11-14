@@ -31,6 +31,7 @@ import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import { userTypes } from '@/api/users';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
+import { useLatestRequest } from '@/composables/use-latest-request';
 import { useRestorablePosts } from '@/composables/use-restorable-posts';
 import * as consts from '@/const';
 import NotFound from '@/views/NotFound.vue';
@@ -44,7 +45,8 @@ const user = ref<userTypes.GetUserProfileResponse | null>(null);
 
 const isNotFound = ref(false);
 
-const isLoading = ref(false);
+const { run: fetchLatestUser } = useLatestRequest();
+const { run: fetchLatestPosts, isPending: isLoading } = useLatestRequest();
 
 const nextCursor = ref<string | null>(null);
 const hasNextPage = ref(false);
@@ -55,15 +57,24 @@ const { restore } = useRestorablePosts(posts, {
   hasNextPage,
 });
 
+/** Resolves to `false` when another profile was asked for in the meantime */
 const handleFetchUser = async (login: string) => {
   try {
-    const fetchedUser = await api.users.getUserProfile(login);
+    const fetchedUser = await fetchLatestUser((signal) =>
+      api.users.getUserProfile(login, { signal }),
+    );
+
+    if (!fetchedUser) {
+      return false;
+    }
 
     user.value = fetchedUser;
     isNotFound.value = false;
   } catch {
     isNotFound.value = true;
   }
+
+  return true;
 };
 
 /**
@@ -72,27 +83,30 @@ const handleFetchUser = async (login: string) => {
  * @param isCombine - if true, posts are concatenated to the existing array
  */
 const handleFetchPosts = async ({ isCombine = false } = {}) => {
-  try {
-    isLoading.value = true;
+  const cursor = isCombine ? nextCursor.value : null;
 
-    const cursor = isCombine ? nextCursor.value : null;
+  const data = await fetchLatestPosts((signal) =>
+    api.posts.getPostsByAuthor(
+      {
+        author: user.value?.login || (route.params.login as string),
+        limit: consts.POSTS_INITIAL_COUNT,
+        ...(cursor && { cursor }),
+      },
+      { signal },
+    ),
+  );
 
-    const data = await api.posts.getPostsByAuthor({
-      author: user.value?.login || (route.params.login as string),
-      limit: consts.POSTS_INITIAL_COUNT,
-      ...(cursor && { cursor }),
-    });
+  if (!data) {
+    return;
+  }
 
-    nextCursor.value = data.nextCursor;
-    hasNextPage.value = data.hasNextPage;
+  nextCursor.value = data.nextCursor;
+  hasNextPage.value = data.hasNextPage;
 
-    if (isCombine) {
-      posts.value = posts.value.concat(data.posts);
-    } else {
-      posts.value = data.posts;
-    }
-  } finally {
-    isLoading.value = false;
+  if (isCombine) {
+    posts.value = posts.value.concat(data.posts);
+  } else {
+    posts.value = data.posts;
   }
 };
 
@@ -101,8 +115,9 @@ const handleNextPage = () => {
 };
 
 const handleFetchAll = async (login: string) => {
-  await handleFetchUser(login);
-  await handleFetchPosts();
+  if (await handleFetchUser(login)) {
+    await handleFetchPosts();
+  }
 };
 
 // `route` still holds the old login here: the update has not happened yet

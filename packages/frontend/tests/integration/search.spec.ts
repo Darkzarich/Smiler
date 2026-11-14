@@ -432,3 +432,75 @@ test('Starts a new search from the first page after scrolling', async ({
   expect(requests.at(-1)?.get('title')).toBe('moon');
   expect(requests.at(-1)?.get('offset')).toBe('0');
 });
+
+test('Keeps a page of the previous search that answers late out of the results', async ({
+  page: currentPage,
+  SearchPage,
+  Post,
+  Api,
+  NotificationList,
+}) => {
+  const firstPage = Array.from({ length: 15 }, () => createRandomPost());
+  const latePage = Array.from({ length: 15 }, () => createRandomPost());
+  const found = createRandomPost();
+
+  let releaseLatePage = () => {};
+  const latePageReleased = new Promise<void>((resolve) => {
+    releaseLatePage = resolve;
+  });
+  let markLatePageHandled = () => {};
+  const latePageHandled = new Promise<void>((resolve) => {
+    markLatePageHandled = resolve;
+  });
+
+  await currentPage.route(
+    Api.routes.posts.getPosts.getURLRegExp(),
+    async (route) => {
+      const params = new URL(route.request().url()).searchParams;
+
+      if (params.get('title') === 'moon') {
+        await route.fulfill({ json: { posts: [found], hasNextPage: false } });
+
+        return;
+      }
+
+      if (params.get('offset') === '0') {
+        await route.fulfill({ json: { posts: firstPage, hasNextPage: true } });
+
+        return;
+      }
+
+      await latePageReleased;
+      // The page may have aborted it, leaving nothing to answer
+      await route
+        .fulfill({ json: { posts: latePage, hasNextPage: false } })
+        .catch(() => {});
+      markLatePageHandled();
+    },
+  );
+
+  await SearchPage.goto('title=test');
+  await expect(Post.getListedPosts()).toHaveCount(15);
+
+  await Api.routes.posts.getPosts.waitForRequest({
+    preRequestAction: Post.scrollToListEnd.bind(Post),
+  });
+
+  await SearchPage.searchInput.fill('moon');
+  await SearchPage.submitSearch();
+  await expect(Post.getTitleById(found._id)).toBeVisible();
+
+  releaseLatePage();
+  await latePageHandled;
+  // Give a late answer the time to reach the list
+  await currentPage.evaluate(
+    () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve));
+      }),
+  );
+
+  await expect(Post.getListedPosts()).toHaveCount(1);
+  await expect(Post.getTitleById(found._id)).toBeVisible();
+  await NotificationList.waitForNoNotifications();
+});
