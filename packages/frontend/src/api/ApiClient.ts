@@ -2,6 +2,7 @@ import axios, { type AxiosRequestConfig } from 'axios';
 import config from '@/config/config';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
+import type { RequestOptions } from './types';
 
 // Matches the backend error code, which is stable unlike the error message
 const CSRF_ERROR_CODE = 'CSRF_INVALID';
@@ -20,12 +21,22 @@ interface RequestError {
   error?: {
     code?: string;
     message?: string;
+    details?: RequestErrorDetail[];
   };
+}
+
+/** A field the API named in a failure: every field that failed validation,
+ * or the one a conflict is about (a taken login) */
+export interface RequestErrorDetail {
+  path: string;
+  message: string;
 }
 
 interface CsrfResponse {
   csrfToken: string;
 }
+
+type RequestConfig = AxiosRequestConfig & Pick<RequestOptions, 'notifyOnError'>;
 
 class ApiClient {
   private axiosClient = axios.create({
@@ -88,9 +99,10 @@ class ApiClient {
     this.csrfToken = undefined;
   }
 
-  private async request<Response = OkResponse>(
-    requestData: AxiosRequestConfig,
-  ) {
+  private async request<Response = OkResponse>({
+    notifyOnError = true,
+    ...requestData
+  }: RequestConfig) {
     const notificationsStore = useNotificationsStore();
     const userStore = useUserStore();
 
@@ -101,6 +113,11 @@ class ApiClient {
 
       return res.data;
     } catch (error) {
+      // The caller aborted it and wants no answer, so there is nothing to report
+      if (axios.isCancel(error)) {
+        throw error;
+      }
+
       let requestError = error;
 
       if (this.isCsrfError(requestError)) {
@@ -118,10 +135,12 @@ class ApiClient {
       }
 
       if (axios.isAxiosError<RequestError>(requestError)) {
-        notificationsStore.showErrorNotification({
-          message:
-            getRequestErrorMessage(requestError) ?? GENERIC_ERROR_MESSAGE,
-        });
+        if (notifyOnError) {
+          notificationsStore.showErrorNotification({
+            message:
+              getRequestErrorMessage(requestError) ?? GENERIC_ERROR_MESSAGE,
+          });
+        }
 
         if (requestError.response?.status === 401) {
           userStore.clearUser();
@@ -135,7 +154,7 @@ class ApiClient {
   public async post<Response = OkResponse, Data = unknown>(
     url: string,
     data?: Data,
-    options?: AxiosRequestConfig,
+    options?: RequestConfig,
   ) {
     return await this.request<Response>({
       url,
@@ -148,7 +167,7 @@ class ApiClient {
   public async put<Response = OkResponse, Data = unknown>(
     url: string,
     data?: Data,
-    options?: AxiosRequestConfig,
+    options?: RequestConfig,
   ) {
     return await this.request<Response>({
       url,
@@ -160,7 +179,7 @@ class ApiClient {
 
   public async delete<Response = OkResponse>(
     url: string,
-    options?: AxiosRequestConfig,
+    options?: RequestConfig,
   ) {
     return await this.request<Response>({
       url,
@@ -172,7 +191,7 @@ class ApiClient {
   public async get<Response = OkResponse, Params = unknown>(
     url: string,
     params?: Params,
-    options?: AxiosRequestConfig,
+    options?: RequestConfig,
   ) {
     return await this.request<Response>({
       url,
@@ -194,4 +213,20 @@ export function getRequestErrorMessage(error: unknown) {
   }
 
   return error.response?.data?.error?.message;
+}
+
+export function getRequestErrorDetails(error: unknown): RequestErrorDetail[] {
+  if (!axios.isAxiosError<RequestError>(error)) {
+    return [];
+  }
+
+  return error.response?.data?.error?.details ?? [];
+}
+
+export function isUnauthorizedError(error: unknown) {
+  return axios.isAxiosError(error) && error.response?.status === 401;
+}
+
+export function isNotFoundError(error: unknown) {
+  return axios.isAxiosError(error) && error.response?.status === 404;
 }

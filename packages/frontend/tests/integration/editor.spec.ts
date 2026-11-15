@@ -699,6 +699,73 @@ test.describe('Tags', () => {
 
     await expect(PostCreatePage.postTagInput).toBeHidden();
   });
+
+  test('Adds a tag in the spelling the post gets, and only once', async ({
+    page,
+    PostCreatePage,
+  }) => {
+    await PostCreatePage.addTag('Cats');
+    await PostCreatePage.addTag(' #cats ');
+
+    await expect(page.getByTestId('post-tag-input-error')).toHaveText(
+      '“cats” is already added',
+    );
+    await expect(PostCreatePage.postTagInput).toHaveValue(' #cats ');
+
+    await PostCreatePage.addTag('Two   Words');
+
+    await expect(page.getByTestId(/^remove-tag-button-/)).toHaveCount(2);
+    await expect(page.getByTestId('remove-tag-button-cats')).toBeVisible();
+    await expect(page.getByTestId('remove-tag-button-two words')).toBeVisible();
+  });
+
+  test('Adds a tag on a comma', async ({ page, PostCreatePage }) => {
+    await PostCreatePage.postTagInput.fill('dogs');
+    await PostCreatePage.postTagInput.press(',');
+
+    await expect(page.getByTestId('remove-tag-button-dogs')).toBeVisible();
+    await expect(PostCreatePage.postTagInput).toHaveValue('');
+  });
+
+  test('Sends the tag still in the field with the post', async ({
+    Api,
+    PostCreatePage,
+  }) => {
+    await PostCreatePage.postTitleInput.fill(title);
+    await PostCreatePage.addTextSection();
+    await PostCreatePage.fillTextSection('test text');
+    await PostCreatePage.addTag('dogs');
+    await PostCreatePage.postTagInput.fill('Cats');
+
+    const createPostRequest = await Api.routes.posts.createPost.waitForRequest({
+      preRequestAction: PostCreatePage.submitPost.bind(PostCreatePage),
+    });
+
+    expect(createPostRequest.postDataJSON()).toMatchObject({
+      tags: ['dogs', 'cats'],
+    });
+  });
+
+  test("Doesn't send a post while the tag field holds no tag", async ({
+    Api,
+    page,
+    PostCreatePage,
+  }) => {
+    const wasPostSent = Api.routes.posts.createPost.watchIfRequestWasCalled();
+
+    await PostCreatePage.postTitleInput.fill(title);
+    await PostCreatePage.addTextSection();
+    await PostCreatePage.fillTextSection('test text');
+    await PostCreatePage.postTagInput.fill('#!?');
+
+    await PostCreatePage.submitPost();
+
+    await expect(page.getByTestId('post-tag-input-error')).toHaveText(
+      'Tags are made of letters and numbers',
+    );
+    await expect(PostCreatePage.postTagInput).toBeFocused();
+    expect(wasPostSent()).toBe(false);
+  });
 });
 
 test('Asks a visitor to sign in instead of opening the editor', async ({

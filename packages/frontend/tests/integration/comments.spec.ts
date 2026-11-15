@@ -1,9 +1,11 @@
 /* eslint-disable no-await-in-loop */
-import { expect } from '@playwright/test';
+import { type BrowserContext, expect } from '@playwright/test';
 import { subMinutes } from 'date-fns';
 import { omit } from 'lodash';
 import test from './page-objects';
+import type Api from './page-objects/api';
 import mockDate from './utils/mock-date';
+import type { commentTypes } from '@api/comments';
 import createRandomAuth from '@factory/auth';
 import createRandomComment from '@factory/comment';
 import createRandomPost from '@factory/post';
@@ -156,6 +158,101 @@ test('Offers a visitor sign in or sign up in place of the comment form', async (
   await Comments.newCommentForm.getByTestId('new-comment-form-signup').click();
 
   await expect(AuthPrompt.SignUpForm).toBeVisible();
+});
+
+test.describe('Show more comments', () => {
+  const firstPage = [
+    comment,
+    ...Array.from({ length: 9 }, () => createRandomComment()),
+  ];
+
+  /** Answers the first page at once and holds the next one until released */
+  async function mockPages(
+    context: BrowserContext,
+    Api: Api,
+    nextPage: commentTypes.Comment[],
+  ) {
+    let releaseNextPage = () => {};
+    const nextPageReleased = new Promise<void>((resolve) => {
+      releaseNextPage = resolve;
+    });
+
+    await context.route(
+      Api.routes.comments.getComments.getURLRegExp(),
+      async (route) => {
+        const offset = new URL(route.request().url()).searchParams.get(
+          'offset',
+        );
+
+        if (offset === '0') {
+          await route.fulfill({
+            json: { comments: firstPage, hasNextPage: true },
+          });
+
+          return;
+        }
+
+        await nextPageReleased;
+        await route.fulfill({
+          json: { comments: nextPage, hasNextPage: false },
+        });
+      },
+    );
+
+    return releaseNextPage;
+  }
+
+  test('Keeps the comments in place while the next page loads', async ({
+    SinglePostPage,
+    Comments,
+    Api,
+    context,
+    page,
+  }) => {
+    const nextPage = [
+      firstPage[9],
+      createRandomComment(),
+      createRandomComment(),
+    ];
+    const releaseNextPage = await mockPages(context, Api, nextPage);
+
+    await SinglePostPage.goto(post.slug);
+
+    await Comments.toggleRepliesById(comment._id);
+    await Comments.showMore();
+
+    await expect(Comments.showMoreButton).toHaveClass(/base-button--loading/);
+    await expect(Comments.getCommentById(firstPage[9]._id)).toBeVisible();
+
+    releaseNextPage();
+
+    await expect(Comments.getCommentById(nextPage[2]._id)).toBeVisible();
+    await expect(Comments.getCommentById(firstPage[9]._id)).toHaveCount(1);
+    await expect(Comments.getRepliesToggleById(comment._id)).toHaveText(
+      /^Show /,
+    );
+    await expect(Comments.showMoreButton).toBeHidden();
+    await expect(Comments.getCommentCardById(nextPage[1]._id)).toBeFocused();
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  });
+
+  test('Focuses the last comment when the last page brings nothing new', async ({
+    SinglePostPage,
+    Comments,
+    Api,
+    context,
+  }) => {
+    const releaseNextPage = await mockPages(context, Api, [firstPage[9]]);
+
+    await SinglePostPage.goto(post.slug);
+
+    await Comments.showMoreButton.focus();
+    await SinglePostPage.page.keyboard.press('Enter');
+    releaseNextPage();
+
+    await expect(Comments.showMoreButton).toBeHidden();
+    await expect(Comments.getCommentCardById(firstPage[9]._id)).toBeFocused();
+  });
 });
 
 test.describe('Replies', () => {
@@ -420,6 +517,60 @@ test.describe('Votes', () => {
     expect(await Comments.getIsCommentByIdUpvoted(notRatedComment._id)).toBe(
       false,
     );
+    expect(voteRequests).toEqual([]);
+  });
+
+  test("Doesn't send a vote on the account's own comment", async ({
+    page: currentPage,
+    SinglePostPage,
+    Comments,
+    NotificationList,
+    Api,
+  }) => {
+    const ownComment = createRandomComment({
+      author: { _id: auth._id },
+      rated: { isRated: false, negative: false },
+    });
+
+    Api.routes.comments.getComments.mock({
+      body: {
+        comments: [ownComment, notRatedComment],
+        hasNextPage: false,
+      },
+    });
+
+    const voteRequests: string[] = [];
+
+    currentPage.on('request', (request) => {
+      if (request.url().includes('/vote') && request.method() !== 'GET') {
+        voteRequests.push(request.url());
+      }
+    });
+
+    await SinglePostPage.goto(post.slug);
+
+    for (const button of [
+      Comments.getUpvoteBtnById(ownComment._id),
+      Comments.getDownvoteBtnById(ownComment._id),
+    ]) {
+      await expect(button).toHaveAttribute('aria-disabled', 'true');
+      await expect(button).toHaveAttribute(
+        'title',
+        'You can’t vote on your own comment',
+      );
+      // Playwright won't click an aria-disabled button, though a person can
+      await button.dispatchEvent('click');
+    }
+
+    await expect(
+      Comments.getUpvoteBtnById(notRatedComment._id),
+    ).not.toHaveAttribute('aria-disabled');
+    await expect(Comments.getCommentRatingById(ownComment._id)).toHaveText(
+      String(ownComment.rating),
+    );
+    await expect(
+      NotificationList.root.locator('.notification-list__item'),
+    ).toHaveCount(0);
     expect(voteRequests).toEqual([]);
   });
 
@@ -851,6 +1002,7 @@ test.describe('Editing or deleting a comment', () => {
     SinglePostPage,
     Comments,
     Post,
+    NotificationList,
     context,
     Api,
   }) => {
@@ -871,10 +1023,89 @@ test.describe('Editing or deleting a comment', () => {
     });
 
     await expect(Comments.getCommentById(currentUserComment._id)).toBeHidden();
+    await expect(NotificationList.root).toHaveText(
+      'The comment has been deleted',
+    );
 
     await expect(Post.getCommentsCountById(post._id)).toHaveText(
       String(post.commentCount - 1),
     );
+  });
+
+  test('Asks before deleting a comment, and deletes nothing on Cancel or Escape', async ({
+    SinglePostPage,
+    Comments,
+    context,
+    page,
+  }) => {
+    const modal = Comments.getDeleteConfirmModalById(currentUserComment._id);
+    const deleteBtn = Comments.getDeleteBtnById(currentUserComment._id);
+    const deleteRequests: string[] = [];
+
+    page.on('request', (req) => {
+      if (req.method() === 'DELETE') {
+        deleteRequests.push(req.url());
+      }
+    });
+
+    await mockDate(context, currentUserComment.createdAt);
+
+    await SinglePostPage.goto(post.slug);
+
+    await deleteBtn.click();
+    await modal.expectVisible();
+    await expect(modal.root).toContainText('Delete this comment?');
+    await expect(modal.cancelBtn).toBeFocused();
+
+    await modal.cancel();
+    await modal.expectHidden();
+    await expect(deleteBtn).toBeFocused();
+
+    await deleteBtn.click();
+    await modal.expectVisible();
+    await page.keyboard.press('Escape');
+    await modal.expectHidden();
+
+    await expect(Comments.getCommentById(currentUserComment._id)).toBeVisible();
+    expect(deleteRequests).toEqual([]);
+  });
+
+  test('Moves focus to the next comment, or else to the one answered, once a comment is deleted', async ({
+    SinglePostPage,
+    Comments,
+    context,
+    Api,
+  }) => {
+    const ownReply = createRandomComment({
+      author: { _id: auth._id },
+      createdAt: currentUserComment.createdAt,
+    });
+    const otherComment = createRandomComment({ children: [ownReply] });
+
+    Api.routes.comments.getComments.mock({
+      body: {
+        comments: [currentUserComment, otherComment],
+        hasNextPage: false,
+      },
+    });
+    Api.routes.comments.deleteComment.mock({
+      status: 200,
+      body: { ok: true },
+    });
+
+    await mockDate(context, currentUserComment.createdAt);
+
+    await SinglePostPage.goto(post.slug);
+
+    await Comments.deleteCommentById(currentUserComment._id);
+
+    await expect(Comments.getCommentById(currentUserComment._id)).toBeHidden();
+    await expect(Comments.getCommentCardById(otherComment._id)).toBeFocused();
+
+    await Comments.deleteCommentById(ownReply._id);
+
+    await expect(Comments.getCommentById(ownReply._id)).toBeHidden();
+    await expect(Comments.getCommentCardById(otherComment._id)).toBeFocused();
   });
 
   test('The current user edits a comment that is not older than 10 mins, sends the edit request', async ({
@@ -955,6 +1186,9 @@ test.describe('Editing or deleting a comment', () => {
     await expect(
       Comments.getCommentById(currentUserCommentWithReplies._id),
     ).toContainText('This comment has been deleted');
+    await expect(
+      Comments.getCommentCardById(currentUserCommentWithReplies._id),
+    ).toBeFocused();
 
     await expect(Post.getCommentsCountById(post._id)).toHaveText(
       String(post.commentCount),

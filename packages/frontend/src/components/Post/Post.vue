@@ -7,6 +7,7 @@
         size="medium"
         tone="primary"
         :pressed="isUpvoted"
+        :unavailable-reason="ownVoteReason"
         @click="upvote(post._id)"
       >
         <IconPlus />
@@ -22,6 +23,7 @@
         size="medium"
         tone="danger"
         :pressed="isDownvoted"
+        :unavailable-reason="ownVoteReason"
         @click="downvote(post._id)"
       >
         <IconMinus />
@@ -322,6 +324,14 @@ const isDownvoted = computed(
 const userStore = useUserStore();
 const { user, isTagFollowed } = storeToRefs(userStore);
 
+const isOwnPost = computed(
+  () => Boolean(user.value) && post.value.author?._id === user.value?._id,
+);
+
+const ownVoteReason = computed(() =>
+  isOwnPost.value ? 'You can’t vote on your own post' : undefined,
+);
+
 const notificationsStore = useNotificationsStore();
 
 const authPrompt = useAuthPromptStore();
@@ -518,10 +528,9 @@ async function voteAfterSignIn({ negative }: { negative: boolean }) {
 
   await whenOwnVoteShown();
 
-  const isOwnPost = post.value.author._id === user.value?._id;
   const isVotedSo = negative ? isDownvoted.value : isUpvoted.value;
 
-  if (!user.value || isOwnPost || isVotedSo) {
+  if (!user.value || isOwnPost.value || isVotedSo) {
     return;
   }
 

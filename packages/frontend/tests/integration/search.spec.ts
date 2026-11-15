@@ -380,3 +380,195 @@ test('Keeps the results and the place in them on Back from a post', async ({
     .toBeLessThanOrEqual(2);
   expect(listRequests).toHaveLength(1);
 });
+
+test('Starts a new search from the first page after scrolling', async ({
+  page: currentPage,
+  SearchPage,
+  Post,
+  Api,
+}) => {
+  const firstPage = Array.from({ length: 15 }, () => createRandomPost());
+  const secondPage = Array.from({ length: 15 }, () => createRandomPost());
+  const found = createRandomPost();
+  const requests: URLSearchParams[] = [];
+
+  await currentPage.route(
+    Api.routes.posts.getPosts.getURLRegExp(),
+    async (route) => {
+      const params = new URL(route.request().url()).searchParams;
+
+      requests.push(params);
+
+      if (params.get('title') === 'moon') {
+        await route.fulfill({
+          json: {
+            posts: params.get('offset') === '0' ? [found] : [],
+            hasNextPage: false,
+          },
+        });
+
+        return;
+      }
+
+      await route.fulfill({
+        json:
+          params.get('offset') === '0'
+            ? { posts: firstPage, hasNextPage: true }
+            : { posts: secondPage, hasNextPage: false },
+      });
+    },
+  );
+
+  await SearchPage.goto('title=test');
+  await expect(Post.getListedPosts()).toHaveCount(15);
+  await Post.scrollToListEnd();
+  await expect(Post.getListedPosts()).toHaveCount(30);
+
+  await SearchPage.searchInput.fill('moon');
+  await SearchPage.submitSearch();
+
+  await expect(Post.getListedPosts()).toHaveCount(1);
+  await expect(Post.getTitleById(found._id)).toBeVisible();
+  expect(requests.at(-1)?.get('title')).toBe('moon');
+  expect(requests.at(-1)?.get('offset')).toBe('0');
+});
+
+test('Keeps a page of the previous search that answers late out of the results', async ({
+  page: currentPage,
+  SearchPage,
+  Post,
+  Api,
+  NotificationList,
+}) => {
+  const firstPage = Array.from({ length: 15 }, () => createRandomPost());
+  const latePage = Array.from({ length: 15 }, () => createRandomPost());
+  const found = createRandomPost();
+
+  let releaseLatePage = () => {};
+  const latePageReleased = new Promise<void>((resolve) => {
+    releaseLatePage = resolve;
+  });
+  let markLatePageHandled = () => {};
+  const latePageHandled = new Promise<void>((resolve) => {
+    markLatePageHandled = resolve;
+  });
+
+  await currentPage.route(
+    Api.routes.posts.getPosts.getURLRegExp(),
+    async (route) => {
+      const params = new URL(route.request().url()).searchParams;
+
+      if (params.get('title') === 'moon') {
+        await route.fulfill({ json: { posts: [found], hasNextPage: false } });
+
+        return;
+      }
+
+      if (params.get('offset') === '0') {
+        await route.fulfill({ json: { posts: firstPage, hasNextPage: true } });
+
+        return;
+      }
+
+      await latePageReleased;
+      // The page may have aborted it, leaving nothing to answer
+      await route
+        .fulfill({ json: { posts: latePage, hasNextPage: false } })
+        .catch(() => {});
+      markLatePageHandled();
+    },
+  );
+
+  await SearchPage.goto('title=test');
+  await expect(Post.getListedPosts()).toHaveCount(15);
+
+  await Api.routes.posts.getPosts.waitForRequest({
+    preRequestAction: Post.scrollToListEnd.bind(Post),
+  });
+
+  await SearchPage.searchInput.fill('moon');
+  await SearchPage.submitSearch();
+  await expect(Post.getTitleById(found._id)).toBeVisible();
+
+  releaseLatePage();
+  await latePageHandled;
+  // Give a late answer the time to reach the list
+  await currentPage.evaluate(
+    () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve));
+      }),
+  );
+
+  await expect(Post.getListedPosts()).toHaveCount(1);
+  await expect(Post.getTitleById(found._id)).toBeVisible();
+  await NotificationList.waitForNoNotifications();
+});
+
+test('Shows the search the address names on Back and Forward', async ({
+  page: currentPage,
+  SearchPage,
+  Post,
+  Api,
+}) => {
+  const moonPost = createRandomPost();
+  const pixelPost = createRandomPost();
+  const requestedTitles: (string | null)[] = [];
+
+  await currentPage.route(
+    Api.routes.posts.getPosts.getURLRegExp(),
+    async (route) => {
+      const title = new URL(route.request().url()).searchParams.get('title');
+
+      requestedTitles.push(title);
+
+      await route.fulfill({
+        json: {
+          posts: [title === 'moon' ? moonPost : pixelPost],
+          hasNextPage: false,
+        },
+      });
+    },
+  );
+
+  await SearchPage.goto();
+
+  await SearchPage.searchInput.fill('moon');
+  await SearchPage.submitSearch();
+  await expect(Post.getTitleById(moonPost._id)).toBeVisible();
+
+  await SearchPage.searchInput.fill('pixel');
+  await SearchPage.submitSearch();
+  await expect(Post.getTitleById(pixelPost._id)).toBeVisible();
+
+  await currentPage.goBack();
+
+  expect(SearchPage.pageHasTitleQueryParam('moon')).toBe(true);
+  await expect(SearchPage.searchInput).toHaveValue('moon');
+  await expect(Post.getListedPosts()).toHaveCount(1);
+  await expect(Post.getTitleById(moonPost._id)).toBeVisible();
+
+  await currentPage.goForward();
+
+  expect(SearchPage.pageHasTitleQueryParam('pixel')).toBe(true);
+  await expect(SearchPage.searchInput).toHaveValue('pixel');
+  await expect(Post.getListedPosts()).toHaveCount(1);
+  await expect(Post.getTitleById(pixelPost._id)).toBeVisible();
+
+  // Both came back from the copies kept on their history entries
+  expect(requestedTitles).toEqual(['moon', 'pixel']);
+});
+
+test('Searches again on Submit with the same filters', async ({
+  SearchPage,
+  Api,
+}) => {
+  await SearchPage.goto('title=moon');
+
+  const postsResponse = await Api.routes.posts.getPosts.waitForRequest({
+    preRequestAction: SearchPage.submitSearch.bind(SearchPage),
+  });
+
+  expect(postsResponse.url()).toContain('title=moon');
+  expect(postsResponse.url()).toContain('offset=0');
+});

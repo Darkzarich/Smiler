@@ -24,14 +24,15 @@ import { useRoute } from 'vue-router';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
+import { useLatestRequest } from '@/composables/use-latest-request';
 import { useRestorablePosts } from '@/composables/use-restorable-posts';
 import * as consts from '@/const';
 
 const route = useRoute();
 
-const isFetching = ref(false);
-
 const posts = ref<postTypes.Post[]>([]);
+
+const { run: fetchLatest, isPending: isFetching } = useLatestRequest();
 
 const curPage = ref(0);
 const nextCursor = ref<string | null>(null);
@@ -76,35 +77,44 @@ const isOffsetPagedRoute = (name: string): name is OffsetPagedRoute =>
 const fetchPosts = async ({ isCombine = false } = {}) => {
   const routeName = String(route.name ?? '');
 
-  try {
-    isFetching.value = true;
+  if (isCursorPagedRoute(routeName)) {
+    const cursor = isCombine ? nextCursor.value : null;
 
-    if (isCursorPagedRoute(routeName)) {
-      const cursor = isCombine ? nextCursor.value : null;
+    const data = await fetchLatest((signal) =>
+      cursorPagedRequests[routeName](
+        { limit: consts.POSTS_INITIAL_COUNT, ...(cursor && { cursor }) },
+        { signal },
+      ),
+    );
 
-      const data = await cursorPagedRequests[routeName]({
-        limit: consts.POSTS_INITIAL_COUNT,
-        ...(cursor && { cursor }),
-      });
-
-      nextCursor.value = data.nextCursor;
-      hasNextPage.value = data.hasNextPage;
-      posts.value = isCombine ? posts.value.concat(data.posts) : data.posts;
-
+    if (!data) {
       return;
     }
 
-    if (isOffsetPagedRoute(routeName)) {
-      const data = await offsetPagedRequests[routeName]({
-        limit: consts.POSTS_INITIAL_COUNT,
-        offset: curPage.value * consts.POSTS_INITIAL_COUNT,
-      });
+    nextCursor.value = data.nextCursor;
+    hasNextPage.value = data.hasNextPage;
+    posts.value = isCombine ? posts.value.concat(data.posts) : data.posts;
 
-      hasNextPage.value = data.hasNextPage;
-      posts.value = isCombine ? posts.value.concat(data.posts) : data.posts;
+    return;
+  }
+
+  if (isOffsetPagedRoute(routeName)) {
+    const data = await fetchLatest((signal) =>
+      offsetPagedRequests[routeName](
+        {
+          limit: consts.POSTS_INITIAL_COUNT,
+          offset: curPage.value * consts.POSTS_INITIAL_COUNT,
+        },
+        { signal },
+      ),
+    );
+
+    if (!data) {
+      return;
     }
-  } finally {
-    isFetching.value = false;
+
+    hasNextPage.value = data.hasNextPage;
+    posts.value = isCombine ? posts.value.concat(data.posts) : data.posts;
   }
 };
 
@@ -117,7 +127,6 @@ watch(
   () => route.name,
   () => {
     posts.value = [];
-    isFetching.value = false;
     curPage.value = 0;
     nextCursor.value = null;
     hasNextPage.value = false;

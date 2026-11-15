@@ -407,6 +407,75 @@ test.describe('Post groups', () => {
       }
     });
 
+    test('Shows the last tab clicked when an earlier one answers after it', async ({
+      page: currentPage,
+      PostsPage,
+      Post,
+      Menu,
+      Api,
+      NotificationList,
+    }) => {
+      const allPost = createRandomPost();
+      const newPost = createRandomPost();
+
+      let releaseAll = () => {};
+      const allReleased = new Promise<void>((resolve) => {
+        releaseAll = resolve;
+      });
+      let markAllHandled = () => {};
+      const allHandled = new Promise<void>((resolve) => {
+        markAllHandled = resolve;
+      });
+
+      await currentPage.route(
+        Api.routes.posts.getAll.getURLRegExp(),
+        async (route) => {
+          await allReleased;
+          // The page may have aborted it, leaving nothing to answer
+          await route
+            .fulfill({ json: { posts: [allPost], hasNextPage: false } })
+            .catch(() => {});
+          markAllHandled();
+        },
+      );
+
+      Api.routes.posts.getRecent.mock({
+        body: { posts: [newPost], hasNextPage: false },
+      });
+
+      await Api.routes.posts.getAll.waitForRequest({
+        preRequestAction: PostsPage.selectPostGroup.bind(
+          PostsPage,
+          PostsPage.groups.all,
+        ),
+      });
+      await Menu.openIfMobile();
+      await Api.routes.posts.getRecent.waitForRequest({
+        preRequestAction: PostsPage.selectPostGroup.bind(
+          PostsPage,
+          PostsPage.groups.new,
+        ),
+      });
+
+      await expect(Post.getTitleById(newPost._id)).toBeVisible();
+
+      releaseAll();
+      await allHandled;
+      // Give a late answer the time to reach the list
+      await currentPage.evaluate(
+        () =>
+          new Promise((resolve) => {
+            requestAnimationFrame(() => requestAnimationFrame(resolve));
+          }),
+      );
+
+      await expect(currentPage).toHaveURL(PostsPage.urls.new);
+      await expect(Post.getListedPosts()).toHaveCount(1);
+      await expect(Post.getTitleById(newPost._id)).toBeVisible();
+      await expect(Post.getTitleById(allPost._id)).toBeHidden();
+      await NotificationList.waitForNoNotifications();
+    });
+
     test('Asks a visitor to sign in before opening the feed, then opens it', async ({
       page: currentPage,
       PostsPage,
@@ -528,6 +597,52 @@ test.describe('Post votes', () => {
     await Post.downvotePostById(post1._id);
 
     await expect(AuthPrompt.title).toHaveText('Sign in to vote');
+    expect(voteRequests).toEqual([]);
+  });
+
+  test("Doesn't send a vote on the account's own post", async ({
+    page: currentPage,
+    Api,
+    Post,
+    PostsPage,
+    NotificationList,
+  }) => {
+    Api.routes.auth.getAuth.mock({
+      body: createRandomAuth({ isAuth: true, _id: post1.author._id }),
+    });
+
+    const voteRequests: string[] = [];
+
+    currentPage.on('request', (request) => {
+      if (request.url().includes('/vote') && request.method() !== 'GET') {
+        voteRequests.push(request.url());
+      }
+    });
+
+    await PostsPage.goto(PostsPage.urls.today);
+
+    for (const button of [
+      Post.getUpvoteBtnById(post1._id),
+      Post.getDownvoteBtnById(post1._id),
+    ]) {
+      await expect(button).toHaveAttribute('aria-disabled', 'true');
+      await expect(button).toHaveAttribute(
+        'title',
+        'You can’t vote on your own post',
+      );
+      // Playwright won't click an aria-disabled button, though a person can
+      await button.dispatchEvent('click');
+    }
+
+    await expect(Post.getUpvoteBtnById(post2._id)).not.toHaveAttribute(
+      'aria-disabled',
+    );
+    await expect(Post.getRatingById(post1._id)).toHaveText(
+      String(post1.rating),
+    );
+    await expect(
+      NotificationList.root.locator('.notification-list__item'),
+    ).toHaveCount(0);
     expect(voteRequests).toEqual([]);
   });
 

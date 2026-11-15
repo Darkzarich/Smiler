@@ -1,18 +1,27 @@
 import { apiClient } from '../ApiClient';
+import type { RequestOptions } from '../types';
 import * as postTypes from './types';
 
 const CONTROLLER_URL = 'posts';
 
 export default {
-  search(params: postTypes.PostsSearchRequest) {
-    return apiClient.get<postTypes.PostsSearchResponse>(CONTROLLER_URL, params);
+  search(params: postTypes.PostsSearchRequest, options?: RequestOptions) {
+    return apiClient.get<postTypes.PostsSearchResponse>(
+      CONTROLLER_URL,
+      params,
+      options,
+    );
   },
   /** Same endpoint as `search`, but filtering by author switches the backend to
    * a list sorted by the date of creation, which pages by cursor. */
-  getPostsByAuthor(params: postTypes.GetPostsByAuthorRequest) {
+  getPostsByAuthor(
+    params: postTypes.GetPostsByAuthorRequest,
+    options?: RequestOptions,
+  ) {
     return apiClient.get<postTypes.GetPostsByAuthorResponse>(
       CONTROLLER_URL,
       params,
+      options,
     );
   },
   getMyVotes(ids: string[]) {
@@ -21,40 +30,49 @@ export default {
       { ids: ids.join(',') },
     );
   },
-  getAll(params: postTypes.GetAllRequest) {
+  getAll(params: postTypes.GetAllRequest, options?: RequestOptions) {
     return apiClient.get<postTypes.GetAllResponse>(
       `${CONTROLLER_URL}/categories/all`,
       params,
+      options,
     );
   },
-  getToday(params: postTypes.GetTodayRequest) {
+  getToday(params: postTypes.GetTodayRequest, options?: RequestOptions) {
     return apiClient.get<postTypes.GetTodayResponse>(
       `${CONTROLLER_URL}/categories/today`,
       params,
+      options,
     );
   },
-  getBlowing(params: postTypes.GetBlowingRequest) {
+  getBlowing(params: postTypes.GetBlowingRequest, options?: RequestOptions) {
     return apiClient.get<postTypes.GetBlowingResponse>(
       `${CONTROLLER_URL}/categories/blowing`,
       params,
+      options,
     );
   },
-  getRecent(params: postTypes.GetRecentRequest) {
+  getRecent(params: postTypes.GetRecentRequest, options?: RequestOptions) {
     return apiClient.get<postTypes.GetRecentResponse>(
       `${CONTROLLER_URL}/categories/recent`,
       params,
+      options,
     );
   },
-  getTopThisWeek(params: postTypes.GetTopThisWeekRequest) {
+  getTopThisWeek(
+    params: postTypes.GetTopThisWeekRequest,
+    options?: RequestOptions,
+  ) {
     return apiClient.get<postTypes.GetTopThisWeekResponse>(
       `${CONTROLLER_URL}/categories/top-this-week`,
       params,
+      options,
     );
   },
-  getFeed(params: postTypes.GetFeedRequest) {
+  getFeed(params: postTypes.GetFeedRequest, options?: RequestOptions) {
     return apiClient.get<postTypes.GetFeedResponse>(
       `${CONTROLLER_URL}/feed`,
       params,
+      options,
     );
   },
   createPost(data: postTypes.CreatePostRequest) {
@@ -74,9 +92,14 @@ export default {
       data,
     );
   },
-  getPostBySlug(params: postTypes.GetPostBySlugRequest) {
+  getPostBySlug(
+    params: postTypes.GetPostBySlugRequest,
+    options?: RequestOptions,
+  ) {
     return apiClient.get<postTypes.GetPostBySlugResponse>(
       `${CONTROLLER_URL}/${params.slug}`,
+      undefined,
+      options,
     );
   },
   updatePostById(id: string, data: postTypes.UpdatePostByIdRequest) {

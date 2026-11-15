@@ -423,3 +423,113 @@ test.describe('Sign Up validation', () => {
     );
   });
 });
+
+test.describe('Refused by the server', () => {
+  test.beforeEach(async ({ PostsPage, Menu }) => {
+    await PostsPage.goto();
+    await Menu.openIfMobile();
+  });
+
+  test('Keeps the email after a wrong password and says why under the password', async ({
+    Api,
+    AuthForm,
+    NotificationList,
+  }) => {
+    Api.routes.auth.signIn.mock({
+      status: 401,
+      body: {
+        error: { code: 'Unauthorized', message: 'Invalid email or password' },
+      },
+    });
+
+    await AuthForm.signInEmail.fill('test@gmail.com');
+    await AuthForm.signInPassword.fill('wrong-password');
+
+    await Api.routes.auth.signIn.waitForRequest({
+      preRequestAction: AuthForm.clickSignInBtn.bind(AuthForm),
+    });
+
+    await expect(AuthForm.signInPasswordError).toHaveText(
+      'Invalid email or password',
+    );
+    await expect(AuthForm.signInEmail).toHaveValue('test@gmail.com');
+    await expect(AuthForm.signInEmailError).toBeHidden();
+    await expect(AuthForm.signInPassword).toHaveValue('');
+    await expect(AuthForm.signInPassword).toBeFocused();
+    await expect(NotificationList.root).not.toContainText(
+      'Invalid email or password',
+    );
+  });
+
+  test('Keeps every field after a taken login, says so under the login until it changes', async ({
+    Api,
+    AuthForm,
+    NotificationList,
+  }) => {
+    const message = 'This login is already taken';
+
+    Api.routes.auth.signUp.mock({
+      status: 409,
+      body: {
+        error: {
+          code: 'Conflict',
+          message,
+          details: [{ path: 'login', message }],
+        },
+      },
+    });
+
+    await AuthForm.toggleAuthFormMode();
+
+    await AuthForm.signUpEmail.fill('test@gmail.com');
+    await AuthForm.signUpLogin.fill('taken');
+    await AuthForm.signUpPassword.fill('123456');
+    await AuthForm.signUpConfirm.fill('123456');
+
+    await Api.routes.auth.signUp.waitForRequest({
+      preRequestAction: AuthForm.clickSignUpBtn.bind(AuthForm),
+    });
+
+    await expect(AuthForm.signUpLoginError).toHaveText(message);
+    await expect(AuthForm.signUpLogin).toBeFocused();
+    await expect(AuthForm.signUpEmail).toHaveValue('test@gmail.com');
+    await expect(AuthForm.signUpLogin).toHaveValue('taken');
+    await expect(AuthForm.signUpPassword).toHaveValue('123456');
+    await expect(AuthForm.signUpConfirm).toHaveValue('123456');
+    await expect(AuthForm.signUpEmailError).toBeHidden();
+    await expect(AuthForm.signUpPasswordError).toBeHidden();
+    await expect(AuthForm.signUpConfirmError).toBeHidden();
+    await expect(NotificationList.root).not.toContainText(message);
+
+    await AuthForm.signUpLogin.fill('taken2');
+
+    await expect(AuthForm.signUpLoginError).toBeHidden();
+  });
+
+  test('Keeps the form and shows a failure that names no field above the button', async ({
+    Api,
+    AuthForm,
+    NotificationList,
+  }) => {
+    Api.routes.auth.signIn.mock({
+      status: 500,
+      body: { error: { message: 'Something went wrong' } },
+    });
+
+    await AuthForm.signInEmail.fill('test@gmail.com');
+    await AuthForm.signInPassword.fill('123456');
+
+    await Api.routes.auth.signIn.waitForRequest({
+      preRequestAction: AuthForm.clickSignInBtn.bind(AuthForm),
+    });
+
+    await expect(AuthForm.signInFormError).toHaveText('Something went wrong');
+    await expect(AuthForm.signInEmail).toHaveValue('test@gmail.com');
+    await expect(AuthForm.signInPassword).toHaveValue('123456');
+    await expect(AuthForm.signInEmailError).toBeHidden();
+    await expect(AuthForm.signInPasswordError).toBeHidden();
+    await expect(NotificationList.root).not.toContainText(
+      'Something went wrong',
+    );
+  });
+});

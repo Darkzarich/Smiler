@@ -136,6 +136,8 @@ function createWrapper(
       stubs: {
         // The section controls are clicked by their data-testid
         BaseIconButton: false,
+        // A send asks it for the tag still in its field
+        PostEditorTags: false,
         Draggable: {
           name: 'Draggable',
           props: ['list', 'itemKey'],

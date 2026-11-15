@@ -1,4 +1,5 @@
 import { apiClient } from '../ApiClient';
+import type { RequestOptions } from '../types';
 import * as authTypes from './types';
 
 const CONTROLLER_URL = 'auth';
@@ -9,16 +10,18 @@ export default {
       `${CONTROLLER_URL}/current`,
     );
   },
-  signIn(data: authTypes.SignInRequest) {
+  signIn(data: authTypes.SignInRequest, options?: RequestOptions) {
     return apiClient.post<authTypes.SignInResponse>(
       `${CONTROLLER_URL}/signin`,
       data,
+      options,
     );
   },
-  signUp(data: authTypes.SignUpRequest) {
+  signUp(data: authTypes.SignUpRequest, options?: RequestOptions) {
     return apiClient.post<authTypes.SignUpResponse>(
       `${CONTROLLER_URL}/signup`,
       data,
+      options,
     );
   },
   async logout() {

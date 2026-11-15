@@ -104,7 +104,7 @@ test('Opens a post by its link', async ({ SinglePostPage, Post, Api }) => {
   await expect(Post.getTitleById(post._id)).toContainText(post.title);
 });
 
-test('Redirect to 404 if the post is not found', async ({
+test('Shows 404 at the address of a post that is not found', async ({
   SinglePostPage,
   NotFoundPage,
   NotificationList,
@@ -122,9 +122,89 @@ test('Redirect to 404 if the post is not found', async ({
 
   await SinglePostPage.goto(post.slug);
 
-  await NotFoundPage.waitForNotFoundPage();
+  await expect(NotFoundPage.root).toBeVisible();
+  await expect(currentPage).toHaveURL(SinglePostPage.getUrlWithSlug(post.slug));
   await expect(currentPage).toHaveTitle(NotFoundPage.title);
-  await expect(NotificationList.root).toContainText("Post doesn't exist");
+  await expect(NotificationList.root).not.toContainText("Post doesn't exist");
+});
+
+test('Offers Try again in place of a post that fails to load', async ({
+  SinglePostPage,
+  NotFoundPage,
+  LoadError,
+  NotificationList,
+  Post,
+  page: currentPage,
+  Api,
+}) => {
+  await Api.routes.posts.getPostBySlug.mock({ status: 500, body: {} });
+
+  await SinglePostPage.goto(post.slug);
+
+  await expect(LoadError.root).toBeVisible();
+  await expect(NotFoundPage.root).toBeHidden();
+  await expect(currentPage).toHaveURL(SinglePostPage.getUrlWithSlug(post.slug));
+  await expect(NotificationList.root).not.toContainText('Something went wrong');
+
+  await Api.routes.posts.getPostBySlug.mock({ body: post });
+  await LoadError.retryButton.click();
+
+  await expect(Post.getTitleById(post._id)).toContainText(post.title);
+  await expect(LoadError.root).toBeHidden();
+});
+
+test('Goes back to the list from a post that is not found', async ({
+  PostsPage,
+  SinglePostPage,
+  NotFoundPage,
+  Post,
+  page: currentPage,
+  Api,
+}) => {
+  Api.routes.posts.getPostBySlug.mock({
+    status: 404,
+    body: {
+      error: {
+        message: "Post doesn't exist",
+      },
+    },
+  });
+
+  await PostsPage.goto();
+  await Post.openPostById(post._id);
+
+  await expect(NotFoundPage.root).toBeVisible();
+  await expect(currentPage).toHaveURL(SinglePostPage.getUrlWithSlug(post.slug));
+
+  await currentPage.goBack();
+
+  await expect(currentPage).toHaveURL(PostsPage.urls.today);
+  await expect(Post.getTitleById(post._id)).toBeVisible();
+  await expect(NotFoundPage.root).toBeHidden();
+});
+
+test('Shows 404 at the address of an edit page for a post that is not found', async ({
+  SinglePostPage,
+  NotFoundPage,
+  page: currentPage,
+  Api,
+}) => {
+  Api.routes.posts.getPostBySlug.mock({
+    status: 404,
+    body: {
+      error: {
+        message: "Post doesn't exist",
+      },
+    },
+  });
+
+  await SinglePostPage.gotoEditPage(post.slug);
+
+  await expect(NotFoundPage.root).toBeVisible();
+  await expect(currentPage).toHaveURL(
+    `${SinglePostPage.getUrlWithSlug(post.slug)}/edit`,
+  );
+  await expect(currentPage).toHaveTitle(NotFoundPage.title);
 });
 
 test('Fetches post comments by post id', async ({ SinglePostPage, Api }) => {
@@ -425,12 +505,19 @@ test.describe('Post edit', () => {
       body: oldPost,
     });
 
+    await SinglePostPage.goto(oldPost.slug);
     await SinglePostPage.gotoEditPage(oldPost.slug);
 
     await expect(currentPage).toHaveURL(PostsPage.urls.today);
     await expect(currentPage).toHaveTitle(PostsPage.titles.today);
     await expect(NotificationList.root).toContainText(
       'You cannot edit this post anymore. The time allowed to edit has expired',
+    );
+
+    await currentPage.goBack();
+
+    await expect(currentPage).toHaveURL(
+      SinglePostPage.getUrlWithSlug(oldPost.slug),
     );
   });
 
@@ -455,6 +542,7 @@ test.describe('Post edit', () => {
       body: notCurrentUserPost,
     });
 
+    await SinglePostPage.goto(post.slug);
     await SinglePostPage.gotoEditPage(post.slug);
 
     await expect(currentPage).toHaveURL('/');
@@ -462,6 +550,44 @@ test.describe('Post edit', () => {
     await expect(NotificationList.root).toContainText(
       "Only post's author can edit this post",
     );
+
+    await currentPage.goBack();
+
+    await expect(currentPage).toHaveURL(
+      SinglePostPage.getUrlWithSlug(post.slug),
+    );
+  });
+
+  test('Offers Try again in place of a post to edit that fails to load', async ({
+    SinglePostPage,
+    PostEditPage,
+    LoadError,
+    NotificationList,
+    page: currentPage,
+    PostEditor,
+    Api,
+    context,
+  }) => {
+    await mockDate(context, nowISOString);
+    await Api.routes.posts.getPostBySlug.mock({ status: 500, body: {} });
+
+    await SinglePostPage.gotoEditPage(currentUserNewerPost.slug);
+
+    await expect(LoadError.root).toBeVisible();
+    await expect(currentPage).toHaveURL(
+      PostEditPage.getUrlWithSlug(currentUserNewerPost.slug),
+    );
+    await expect(NotificationList.root).not.toContainText(
+      'Something went wrong',
+    );
+
+    await Api.routes.posts.getPostBySlug.mock({ body: currentUserNewerPost });
+    await LoadError.retryButton.click();
+
+    await expect(PostEditor.textSectionInput).toHaveText(
+      currentUserNewerPost.sections[0].content,
+    );
+    await expect(LoadError.root).toBeHidden();
   });
 
   test('Opens post edit page if the post is not older than 10 mins', async ({

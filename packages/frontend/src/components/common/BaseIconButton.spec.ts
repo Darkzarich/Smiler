@@ -6,6 +6,7 @@ function createWrapper(props: {
   label: string;
   pressed?: boolean;
   shortcut?: string;
+  unavailableReason?: string;
 }) {
   return mount(BaseIconButton, {
     props,
@@ -53,5 +54,30 @@ describe('BaseIconButton', () => {
     expect(wrapper.attributes('aria-label')).toBe('Bold');
     expect(wrapper.attributes('title')).toBe('Bold (Ctrl+B)');
     expect(wrapper.attributes('aria-keyshortcuts')).toBe('Control+B');
+  });
+
+  it('stays focusable when unavailable, says why in its tooltip and does nothing when pressed', async () => {
+    const wrapper = createWrapper({
+      label: 'Upvote',
+      pressed: false,
+      unavailableReason: 'You can’t vote on your own post',
+    });
+
+    await wrapper.trigger('click');
+
+    expect(wrapper.attributes('disabled')).toBeUndefined();
+    expect(wrapper.attributes('aria-disabled')).toBe('true');
+    expect(wrapper.attributes('aria-label')).toBe('Upvote');
+    expect(wrapper.attributes('title')).toBe('You can’t vote on your own post');
+    expect(wrapper.emitted('click')).toBeUndefined();
+  });
+
+  it('passes a press on', async () => {
+    const wrapper = createWrapper({ label: 'Upvote' });
+
+    await wrapper.trigger('click');
+
+    expect(wrapper.attributes('aria-disabled')).toBeUndefined();
+    expect(wrapper.emitted('click')).toHaveLength(1);
   });
 });

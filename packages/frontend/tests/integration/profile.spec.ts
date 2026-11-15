@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-shadow */
 
-import { expect } from '@playwright/test';
+import { type Page, expect } from '@playwright/test';
 import { subDays } from 'date-fns';
 import test from './page-objects';
 import createRandomAuth from '@factory/auth';
@@ -31,7 +31,21 @@ test.beforeEach(async ({ Api }) => {
   });
 });
 
-test('Goes to 404 if user does not exist', async ({
+/** Requests arrive in order, so once the posts of a profile that did load
+ * have been asked for, any sent for the one that failed are counted too */
+const watchAuthorPostsRequests = (currentPage: Page) => {
+  const urls: string[] = [];
+
+  currentPage.on('request', (request) => {
+    if (/\/api\/posts\?.*author=/.test(request.url())) {
+      urls.push(request.url());
+    }
+  });
+
+  return () => urls.length;
+};
+
+test('Shows 404 at the address of a user that does not exist', async ({
   ProfilePage,
   NotFoundPage,
   page: currentPage,
@@ -47,11 +61,54 @@ test('Goes to 404 if user does not exist', async ({
     },
   });
 
+  const getAuthorPostsRequests = watchAuthorPostsRequests(currentPage);
+
   await ProfilePage.goto('non-existing-user');
 
-  await NotFoundPage.waitForNotFoundPage();
+  await expect(NotFoundPage.root).toBeVisible();
+  await expect(currentPage).toHaveURL(
+    ProfilePage.getUrlWithLogin('non-existing-user'),
+  );
   await expect(currentPage).toHaveTitle(NotFoundPage.title);
-  await expect(NotificationList.root).toContainText('User was not found');
+  await expect(NotificationList.root).not.toContainText('User was not found');
+
+  await Api.routes.users.getUserProfile.mock({ body: testUser });
+  await Api.routes.posts.getPosts.waitForRequest({
+    preRequestAction: () => ProfilePage.goto(testUser.login),
+  });
+
+  expect(getAuthorPostsRequests()).toBe(1);
+});
+
+test('Offers Try again in place of a profile that fails to load', async ({
+  ProfilePage,
+  NotFoundPage,
+  LoadError,
+  page: currentPage,
+  NotificationList,
+  Api,
+}) => {
+  await Api.routes.users.getUserProfile.mock({ status: 500, body: {} });
+
+  const getAuthorPostsRequests = watchAuthorPostsRequests(currentPage);
+
+  await ProfilePage.goto(testUser.login);
+
+  await expect(LoadError.root).toBeVisible();
+  await expect(NotFoundPage.root).toBeHidden();
+  await expect(currentPage).toHaveURL(
+    ProfilePage.getUrlWithLogin(testUser.login),
+  );
+  await expect(NotificationList.root).not.toContainText('Something went wrong');
+
+  await Api.routes.users.getUserProfile.mock({ body: testUser });
+  await Api.routes.posts.getPosts.waitForRequest({
+    preRequestAction: () => LoadError.retryButton.click(),
+  });
+
+  expect(getAuthorPostsRequests()).toBe(1);
+  await expect(ProfilePage.login).toContainText(testUser.login);
+  await expect(LoadError.root).toBeHidden();
 });
 
 test('Fetches and shows user profile', async ({ ProfilePage, Api }) => {

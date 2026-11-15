@@ -39,6 +39,15 @@
       />
     </div>
 
+    <p
+      v-if="formError"
+      class="signin-form__error"
+      role="alert"
+      data-testid="signin-form-error"
+    >
+      {{ formError }}
+    </p>
+
     <BaseButton
       attr-type="submit"
       class="signin-form__submit"
@@ -53,12 +62,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 import { api, getRequestErrorMessage } from '@/api';
+import { isUnauthorizedError } from '@/api/ApiClient';
 import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
+import { useRefusedFields } from './use-refused-fields';
 
 interface Props {
   /** For a dialog whose own title already says what the form is for */
@@ -75,10 +86,14 @@ const passwordInput =
 
 const isLoading = ref(false);
 const isSubmitted = ref(false);
-const requestError = ref('');
 
 const email = ref('');
 const password = ref('');
+
+const { formError, refusalOf, refuseField, refuse, reset } = useRefusedFields({
+  email,
+  password,
+});
 
 const validation = computed(() => {
   const validation = {
@@ -86,21 +101,20 @@ const validation = computed(() => {
     password: '',
   };
 
-  if (requestError.value && !(password.value || email.value)) {
-    validation.email = requestError.value;
-    validation.password = requestError.value;
-  } else {
-    if (email.value.length === 0) {
-      validation.email = "Email can't be empty";
-    } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(email.value)) {
-      validation.email = 'Email is not valid';
-    }
+  if (email.value.length === 0) {
+    validation.email = "Email can't be empty";
+  } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(email.value)) {
+    validation.email = 'Email is not valid';
+  }
 
-    if (password.value.length === 0) {
-      validation.password = "Password can't be empty";
-    } else if (password.value.length < consts.PASSWORD_MIN_LENGTH) {
-      validation.password = `Password length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
-    }
+  if (password.value.length === 0) {
+    validation.password = "Password can't be empty";
+  } else if (password.value.length < consts.PASSWORD_MIN_LENGTH) {
+    validation.password = `Password length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
+  }
+
+  for (const field of Object.keys(validation) as (keyof typeof validation)[]) {
+    validation[field] = refusalOf(field) || validation[field];
   }
 
   return validation;
@@ -110,14 +124,12 @@ const isInvalid = computed(
   () => !!(validation.value.email || validation.value.password),
 );
 
-watch([email, password], () => {
-  requestError.value = '';
-});
-
 async function signIn() {
   if (isLoading.value) {
     return;
   }
+
+  reset();
 
   if (isInvalid.value) {
     isSubmitted.value = true;
@@ -129,17 +141,36 @@ async function signIn() {
   try {
     isLoading.value = true;
 
-    const data = await api.auth.signIn({
-      email: email.value,
-      password: password.value,
-    });
+    const data = await api.auth.signIn(
+      {
+        email: email.value,
+        password: password.value,
+      },
+      { notifyOnError: false },
+    );
 
     userStore.setUser(data);
   } catch (error) {
-    email.value = '';
-    password.value = '';
-    requestError.value =
-      getRequestErrorMessage(error) ?? 'Could not sign in. Please try again.';
+    isSubmitted.value = true;
+
+    // The API does not say which of the two was wrong, so the email stays for
+    // another try and only the password is typed again
+    if (isUnauthorizedError(error)) {
+      password.value = '';
+      refuseField(
+        'password',
+        getRequestErrorMessage(error) ?? 'Invalid email or password',
+      );
+      passwordInput.value?.focus();
+
+      return;
+    }
+
+    const field = refuse(error, 'Could not sign in. Please try again.');
+
+    if (field) {
+      (field === 'email' ? emailInput : passwordInput).value?.focus();
+    }
   } finally {
     isLoading.value = false;
   }
@@ -159,6 +190,13 @@ async function signIn() {
   &__input {
     width: 100%;
     margin-bottom: 16px;
+  }
+
+  &__error {
+    width: 100%;
+    margin: 0;
+    color: var(--color-danger-strong);
+    font-size: 13px;
   }
 
   &__submit {

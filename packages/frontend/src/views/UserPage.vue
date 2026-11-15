@@ -1,44 +1,61 @@
 <template>
   <div>
-    <!-- TODO: Skeleton? -->
-    <UserProfile v-if="user" :user="user" />
+    <NotFound v-if="loadFailure === 'not-found'" />
 
-    <PostsContainer
-      v-model:posts="posts"
-      :is-loading="isLoading"
-      :has-next-page="hasNextPage"
-      @fetch-more="handleNextPage"
-    >
-      <template #no-content>
-        This author has not posted anything yet.
-      </template>
+    <LoadError
+      v-else-if="loadFailure === 'failed'"
+      title="This profile could not be loaded"
+      :loading="isFetchingUser"
+      @retry="handleFetchAll(route.params.login as string)"
+    />
 
-      <template #no-more-content>
-        You've read all the posts this author has posted!
-      </template>
-    </PostsContainer>
+    <template v-else>
+      <!-- TODO: Skeleton? -->
+      <UserProfile v-if="user" :user="user" />
+
+      <PostsContainer
+        v-model:posts="posts"
+        :is-loading="isLoading"
+        :has-next-page="hasNextPage"
+        @fetch-more="handleNextPage"
+      >
+        <template #no-content>
+          This author has not posted anything yet.
+        </template>
+
+        <template #no-more-content>
+          You've read all the posts this author has posted!
+        </template>
+      </PostsContainer>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue';
-import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import { api } from '@/api';
+import { isNotFoundError } from '@/api/ApiClient';
 import { postTypes } from '@/api/posts';
 import { userTypes } from '@/api/users';
+import LoadError from '@/components/LoadError.vue';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
+import { useLatestRequest } from '@/composables/use-latest-request';
 import { useRestorablePosts } from '@/composables/use-restorable-posts';
 import * as consts from '@/const';
+import NotFound from '@/views/NotFound.vue';
 import UserProfile from '@components/User/UserProfile.vue';
 
 const route = useRoute();
-const router = useRouter();
 
 const posts = ref<postTypes.Post[]>([]);
 
 const user = ref<userTypes.GetUserProfileResponse | null>(null);
 
-const isLoading = ref(false);
+const loadFailure = ref<'not-found' | 'failed' | null>(null);
+
+const { run: fetchLatestUser, isPending: isFetchingUser } = useLatestRequest();
+const { run: fetchLatestPosts, isPending: isLoading } = useLatestRequest();
 
 const nextCursor = ref<string | null>(null);
 const hasNextPage = ref(false);
@@ -49,15 +66,25 @@ const { restore } = useRestorablePosts(posts, {
   hasNextPage,
 });
 
+/** Resolves to `false` when the profile failed or another one was asked for in the meantime */
 const handleFetchUser = async (login: string) => {
   try {
-    const fetchedUser = await api.users.getUserProfile(login);
+    const fetchedUser = await fetchLatestUser((signal) =>
+      api.users.getUserProfile(login, { signal, notifyOnError: false }),
+    );
+
+    if (!fetchedUser) {
+      return false;
+    }
 
     user.value = fetchedUser;
-  } catch {
-    router.push({
-      name: 'NotFound',
-    });
+    loadFailure.value = null;
+
+    return true;
+  } catch (error) {
+    loadFailure.value = isNotFoundError(error) ? 'not-found' : 'failed';
+
+    return false;
   }
 };
 
@@ -67,27 +94,30 @@ const handleFetchUser = async (login: string) => {
  * @param isCombine - if true, posts are concatenated to the existing array
  */
 const handleFetchPosts = async ({ isCombine = false } = {}) => {
-  try {
-    isLoading.value = true;
+  const cursor = isCombine ? nextCursor.value : null;
 
-    const cursor = isCombine ? nextCursor.value : null;
+  const data = await fetchLatestPosts((signal) =>
+    api.posts.getPostsByAuthor(
+      {
+        author: user.value?.login || (route.params.login as string),
+        limit: consts.POSTS_INITIAL_COUNT,
+        ...(cursor && { cursor }),
+      },
+      { signal },
+    ),
+  );
 
-    const data = await api.posts.getPostsByAuthor({
-      author: user.value?.login || (route.params.login as string),
-      limit: consts.POSTS_INITIAL_COUNT,
-      ...(cursor && { cursor }),
-    });
+  if (!data) {
+    return;
+  }
 
-    nextCursor.value = data.nextCursor;
-    hasNextPage.value = data.hasNextPage;
+  nextCursor.value = data.nextCursor;
+  hasNextPage.value = data.hasNextPage;
 
-    if (isCombine) {
-      posts.value = posts.value.concat(data.posts);
-    } else {
-      posts.value = data.posts;
-    }
-  } finally {
-    isLoading.value = false;
+  if (isCombine) {
+    posts.value = posts.value.concat(data.posts);
+  } else {
+    posts.value = data.posts;
   }
 };
 
@@ -96,8 +126,9 @@ const handleNextPage = () => {
 };
 
 const handleFetchAll = async (login: string) => {
-  await handleFetchUser(login);
-  await handleFetchPosts();
+  if (await handleFetchUser(login)) {
+    await handleFetchPosts();
+  }
 };
 
 // `route` still holds the old login here: the update has not happened yet

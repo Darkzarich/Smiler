@@ -46,11 +46,15 @@ export async function signUp(
       const duplicateField = getDuplicateKeyField(error);
 
       if (duplicateField === 'email') {
-        throw new ConflictError(ERRORS.AUTH_EMAIL_ALREADY_EXISTS);
+        throw new ConflictError(ERRORS.AUTH_EMAIL_ALREADY_EXISTS, [
+          { path: 'email', message: ERRORS.AUTH_EMAIL_ALREADY_EXISTS },
+        ]);
       }
 
       if (duplicateField === 'login') {
-        throw new ConflictError(ERRORS.AUTH_LOGIN_ALREADY_EXISTS);
+        throw new ConflictError(ERRORS.AUTH_LOGIN_ALREADY_EXISTS, [
+          { path: 'login', message: ERRORS.AUTH_LOGIN_ALREADY_EXISTS },
+        ]);
       }
 
       throw new ConflictError(ERRORS.AUTH_CONFLICT);

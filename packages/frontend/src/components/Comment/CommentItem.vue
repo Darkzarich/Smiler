@@ -1,5 +1,5 @@
 <template>
-  <div class="comment-item">
+  <div ref="root" class="comment-item">
     <div
       class="comment-item__content"
       :class="{
@@ -14,6 +14,7 @@
               :data-testid="`comment-${comment._id}-upvote`"
               tone="primary"
               :pressed="comment.rated.isRated && !comment.rated.negative"
+              :unavailable-reason="ownVoteReason"
               @click="upvote()"
             >
               <IconPlus />
@@ -31,6 +32,7 @@
               :data-testid="`comment-${comment._id}-downvote`"
               tone="danger"
               :pressed="comment.rated.isRated && comment.rated.negative"
+              :unavailable-reason="ownVoteReason"
               @click="downvote()"
             >
               <IconMinus />
@@ -81,10 +83,24 @@
               label="Delete comment"
               :data-testid="`comment-${comment._id}-delete`"
               tone="danger"
-              @click="handleDeleteComment()"
+              @click="isDeleteConfirmOpen = true"
             >
               <IconDelete />
             </BaseIconButton>
+
+            <ConfirmModal
+              :data-testid="`confirm-delete-comment-${comment._id}-modal`"
+              :is-open="isDeleteConfirmOpen"
+              title="Delete this comment?"
+              :message="
+                replyCount > 0
+                  ? 'Its text will be gone for good, and the replies to it will stay. This can’t be undone.'
+                  : 'It will be gone for good, along with its votes. This can’t be undone.'
+              "
+              confirm-label="Delete"
+              @confirm="handleDeleteComment()"
+              @cancel="isDeleteConfirmOpen = false"
+            />
           </div>
         </template>
 
@@ -190,7 +206,7 @@
 
 <script setup lang="ts">
 import { cloneDeep } from 'lodash-es';
-import { computed, inject, ref } from 'vue';
+import { computed, inject, nextTick, ref, useTemplateRef } from 'vue';
 import CommentForm from './CommentForm.vue';
 import { commentThreadKey, countReplies, flattenReplies } from './thread';
 import type { Comment } from './types';
@@ -202,8 +218,10 @@ import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { checkCanEditComment } from '@/utils/check-can-edit-comment';
+import { focusTemporarily } from '@/utils/focus-temporarily';
 import { formatFromNow } from '@/utils/format-from-now';
 import BaseIconButton from '@common/BaseIconButton.vue';
+import ConfirmModal from '@common/ConfirmModal.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';
@@ -238,7 +256,18 @@ const authPrompt = useAuthPromptStore();
 
 const comment = ref(props.comment);
 
+const root = useTemplateRef('root');
+
 const { whenOwnVoteShown } = useOwnVote('comment', comment);
+
+const isOwnComment = computed(
+  () =>
+    Boolean(userStore.userId) && comment.value.author._id === userStore.userId,
+);
+
+const ownVoteReason = computed(() =>
+  isOwnComment.value ? 'You can’t vote on your own comment' : undefined,
+);
 
 const isRequesting = ref(false);
 
@@ -348,7 +377,37 @@ const handleEdit = async () => {
   }
 };
 
+const isDeleteConfirmOpen = ref(false);
+
+const ownCard = (item: Element | null | undefined) =>
+  item?.querySelector<HTMLElement>(':scope > .comment-item__content') ?? null;
+
+/** Where focus goes once this comment is removed, so it doesn't fall back to
+ * the page: the next comment, or else the previous one, or else the comment
+ * this one answered */
+function findFocusAfterRemoval() {
+  const item = root.value;
+  const parent = item?.parentElement;
+
+  if (!item || !parent) {
+    return null;
+  }
+
+  // A top-level comment sits in a wrapper of its own
+  const box = parent.classList.contains('comment-list__comment')
+    ? parent
+    : item;
+  const neighbor = box.nextElementSibling ?? box.previousElementSibling;
+  const neighborItem = neighbor?.matches('.comment-item')
+    ? neighbor
+    : neighbor?.querySelector(':scope > .comment-item');
+
+  return ownCard(neighborItem) ?? ownCard(parent.closest('.comment-item'));
+}
+
 const handleDeleteComment = async () => {
+  isDeleteConfirmOpen.value = false;
+
   if (isRequesting.value) {
     return;
   }
@@ -360,15 +419,33 @@ const handleDeleteComment = async () => {
 
     const result = await api.comments.deleteComment(_id);
 
+    notificationsStore.showInfoNotification({
+      message: 'The comment has been deleted',
+    });
+
     // The server decides: a comment answered from deeper down, through
     // `replyTo`, has no children here but is still only emptied
     if ('_id' in result) {
       comment.value.deleted = true;
+      await nextTick();
+
+      const card = ownCard(root.value);
+
+      if (card) {
+        focusTemporarily(card);
+      }
 
       return;
     }
 
+    const focusTarget = findFocusAfterRemoval();
+
     thread.remove(_id);
+
+    if (focusTarget) {
+      await nextTick();
+      focusTemporarily(focusTarget);
+    }
   } finally {
     isRequesting.value = false;
   }
@@ -416,11 +493,10 @@ async function voteAfterSignIn({ negative }: { negative: boolean }) {
 
   await whenOwnVoteShown();
 
-  const { rated, author } = comment.value;
-  const isOwnComment = author._id === userStore.userId;
+  const { rated } = comment.value;
   const isVotedSo = rated.isRated && Boolean(rated.negative) === negative;
 
-  if (!userStore.user || isOwnComment || isVotedSo) {
+  if (!userStore.user || isOwnComment.value || isVotedSo) {
     return;
   }
 

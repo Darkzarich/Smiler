@@ -11,6 +11,7 @@ export default class AuthForm extends AbstractComponent {
   readonly signInEmail: Locator;
   readonly signInEmailError: Locator;
   readonly signInSubmitBtn: Locator;
+  readonly signInFormError: Locator;
 
   readonly signUpEmail: Locator;
   readonly signUpEmailError: Locator;
@@ -21,6 +22,7 @@ export default class AuthForm extends AbstractComponent {
   readonly signUpConfirm: Locator;
   readonly signUpConfirmError: Locator;
   readonly signUpSubmitBtn: Locator;
+  readonly signUpFormError: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -34,6 +36,7 @@ export default class AuthForm extends AbstractComponent {
     this.signInEmail = page.getByTestId('signin-form-email');
     this.signInEmailError = page.getByTestId('signin-form-email-error');
     this.signInSubmitBtn = page.getByTestId('signin-form-submit');
+    this.signInFormError = page.getByTestId('signin-form-error');
 
     this.signUpEmail = page.getByTestId('signup-form-email');
     this.signUpEmailError = page.getByTestId('signup-form-email-error');
@@ -44,6 +47,7 @@ export default class AuthForm extends AbstractComponent {
     this.signUpConfirm = page.getByTestId('signup-form-confirm');
     this.signUpConfirmError = page.getByTestId('signup-form-confirm-error');
     this.signUpSubmitBtn = page.getByTestId('signup-form-submit');
+    this.signUpFormError = page.getByTestId('signup-form-error');
   }
 
   async clickSignInBtn() {

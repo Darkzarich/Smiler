@@ -1,10 +1,12 @@
 import { type Locator, type Page } from '@playwright/test';
 import AbstractComponent from './AbstractComponent';
+import ConfirmModal from './ConfirmModal';
 
 export default class Comments extends AbstractComponent {
   readonly newCommentForm: Locator;
   readonly newCommentFormEditor: Locator;
   readonly newCommentFormInput: Locator;
+  readonly showMoreButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -14,6 +16,7 @@ export default class Comments extends AbstractComponent {
     this.newCommentFormInput = page.getByTestId(
       'new-comment-form-editor-input',
     );
+    this.showMoreButton = page.getByTestId('comments-show-more');
   }
 
   getCommentRatingById(commentId = '') {
@@ -22,6 +25,13 @@ export default class Comments extends AbstractComponent {
 
   getCommentById(commentId = '') {
     return this.page.getByTestId(`comment-${commentId}-body`);
+  }
+
+  /** The comment itself, without its replies */
+  getCommentCardById(commentId = '') {
+    return this.page.locator('.comment-item__content', {
+      has: this.getCommentById(commentId),
+    });
   }
 
   getCommentDateById(commentId = '') {
@@ -46,6 +56,13 @@ export default class Comments extends AbstractComponent {
 
   getDeleteBtnById(commentId = '') {
     return this.page.getByTestId(`comment-${commentId}-delete`);
+  }
+
+  getDeleteConfirmModalById(commentId = '') {
+    return new ConfirmModal(
+      this.page,
+      `confirm-delete-comment-${commentId}-modal`,
+    );
   }
 
   getCommentReplyInput() {
@@ -95,6 +112,10 @@ export default class Comments extends AbstractComponent {
     }
   }
 
+  async showMore() {
+    await this.showMoreButton.click();
+  }
+
   async submitNewComment() {
     await this.page.getByTestId('new-comment-button').click();
   }
@@ -127,8 +148,10 @@ export default class Comments extends AbstractComponent {
     await this.getDownvoteBtnById(commentId).click();
   }
 
+  /** Presses the bin and confirms in the dialog it opens */
   async deleteCommentById(commentId = '') {
     await this.getDeleteBtnById(commentId).click();
+    await this.getDeleteConfirmModalById(commentId).confirm();
   }
 
   async toggleCommentEditById(commentId = '') {

@@ -66,6 +66,15 @@
       />
     </div>
 
+    <p
+      v-if="formError"
+      class="signup-form__error"
+      role="alert"
+      data-testid="signup-form-error"
+    >
+      {{ formError }}
+    </p>
+
     <BaseButton
       attr-type="submit"
       class="signup-form__submit"
@@ -80,12 +89,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from 'vue';
-import { api, getRequestErrorMessage } from '@/api';
+import { computed, ref, useTemplateRef } from 'vue';
+import { api } from '@/api';
 import * as consts from '@/const';
 import { useUserStore } from '@/store/user';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
+import { useRefusedFields } from './use-refused-fields';
 
 interface Props {
   /** For a dialog whose own title already says what the form is for */
@@ -110,7 +120,13 @@ const inputs = {
   password: useTemplateRef<InstanceType<typeof BaseInput>>('passwordInput'),
   confirm: useTemplateRef<InstanceType<typeof BaseInput>>('confirmInput'),
 };
-const requestError = ref('');
+
+const { formError, refusalOf, refuse, reset } = useRefusedFields({
+  email,
+  login,
+  password,
+  confirm,
+});
 
 const validation = computed(() => {
   const validation = {
@@ -120,41 +136,40 @@ const validation = computed(() => {
     password: '',
   };
 
-  if (requestError.value && !(password.value || email.value)) {
-    validation.email = requestError.value;
-    validation.login = requestError.value;
-  } else {
-    if (email.value.length === 0) {
-      validation.email = "Email can't be empty";
-    } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(email.value)) {
-      validation.email = 'Email is not valid';
-    }
+  if (email.value.length === 0) {
+    validation.email = "Email can't be empty";
+  } else if (!/^[^@]+@[^@]+\.[^@]+$/gm.test(email.value)) {
+    validation.email = 'Email is not valid';
+  }
 
-    // login
-    if (login.value.length === 0) {
-      validation.login = "Login can't be empty";
-    } else if (
-      login.value.length < consts.LOGIN_MIN_LENGTH ||
-      login.value.length > consts.LOGIN_MAX_LENGTH
-    ) {
-      validation.login = `Login length must be ${consts.LOGIN_MIN_LENGTH}-${consts.LOGIN_MAX_LENGTH}`;
-    }
+  // login
+  if (login.value.length === 0) {
+    validation.login = "Login can't be empty";
+  } else if (
+    login.value.length < consts.LOGIN_MIN_LENGTH ||
+    login.value.length > consts.LOGIN_MAX_LENGTH
+  ) {
+    validation.login = `Login length must be ${consts.LOGIN_MIN_LENGTH}-${consts.LOGIN_MAX_LENGTH}`;
+  }
 
-    // password
-    if (password.value.length === 0) {
-      validation.password = "Password can't be empty";
-    } else if (password.value.length < consts.PASSWORD_MIN_LENGTH) {
-      validation.password = `Password length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
-    }
+  // password
+  if (password.value.length === 0) {
+    validation.password = "Password can't be empty";
+  } else if (password.value.length < consts.PASSWORD_MIN_LENGTH) {
+    validation.password = `Password length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
+  }
 
-    // confirm
-    if (confirm.value.length === 0) {
-      validation.confirm = "Password confirm can't be empty";
-    } else if (confirm.value.length < consts.PASSWORD_MIN_LENGTH) {
-      validation.confirm = `Password confirm length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
-    } else if (confirm.value !== password.value) {
-      validation.confirm = 'Password and password confirm must be equal';
-    }
+  // confirm
+  if (confirm.value.length === 0) {
+    validation.confirm = "Password confirm can't be empty";
+  } else if (confirm.value.length < consts.PASSWORD_MIN_LENGTH) {
+    validation.confirm = `Password confirm length must be minimum ${consts.PASSWORD_MIN_LENGTH}`;
+  } else if (confirm.value !== password.value) {
+    validation.confirm = 'Password and password confirm must be equal';
+  }
+
+  for (const field of Object.keys(validation) as (keyof typeof validation)[]) {
+    validation[field] = refusalOf(field) || validation[field];
   }
 
   return validation;
@@ -169,14 +184,12 @@ const isInvalid = computed(() => {
   );
 });
 
-watch([email, login, password, confirm], () => {
-  requestError.value = '';
-});
-
 async function signUp() {
   if (isLoading.value) {
     return;
   }
+
+  reset();
 
   if (isInvalid.value) {
     isSubmitted.value = true;
@@ -195,21 +208,25 @@ async function signUp() {
   try {
     isLoading.value = true;
 
-    const data = await api.auth.signUp({
-      email: email.value,
-      password: password.value,
-      login: login.value,
-      confirm: confirm.value,
-    });
+    const data = await api.auth.signUp(
+      {
+        email: email.value,
+        password: password.value,
+        login: login.value,
+        confirm: confirm.value,
+      },
+      { notifyOnError: false },
+    );
 
     userStore.setUser(data);
   } catch (error) {
-    email.value = '';
-    password.value = '';
-    confirm.value = '';
-    login.value = '';
-    requestError.value =
-      getRequestErrorMessage(error) ?? 'Could not sign up. Please try again.';
+    isSubmitted.value = true;
+
+    const field = refuse(error, 'Could not sign up. Please try again.');
+
+    if (field) {
+      inputs[field].value?.focus();
+    }
   } finally {
     isLoading.value = false;
   }
@@ -229,6 +246,13 @@ async function signUp() {
   &__input {
     width: 100%;
     margin-bottom: 16px;
+  }
+
+  &__error {
+    width: 100%;
+    margin: 0;
+    color: var(--color-danger-strong);
+    font-size: 13px;
   }
 
   &__submit {

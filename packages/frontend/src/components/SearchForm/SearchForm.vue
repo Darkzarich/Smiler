@@ -71,38 +71,30 @@
 </template>
 
 <script setup lang="ts">
-import { cloneDeep, omitBy } from 'lodash-es';
+import { cloneDeep } from 'lodash-es';
 import { computed, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
-import { isFilterSet } from './is-filter-set';
+import { filterFromQuery } from './query';
 import type { SearchFilter } from './types';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import PostEditorTags from '@components/PostEditor/PostEditorTags.vue';
 
-const defaultFilters: SearchFilter = {
-  title: '',
-  tags: [],
-  dateFrom: '',
-  dateTo: '',
-  ratingFrom: null,
-  ratingTo: null,
-};
+const props = defineProps<{
+  /** The search the page shows; the fields are a draft of the next one */
+  filter: SearchFilter;
+}>();
 
-const router = useRouter();
+const emit = defineEmits<{
+  submit: [filter: SearchFilter];
+}>();
 
-const modelValue = defineModel<SearchFilter>();
-
-const filters = ref<SearchFilter>(cloneDeep(defaultFilters));
+const filters = ref<SearchFilter>(cloneDeep(props.filter));
 
 watch(
-  modelValue,
+  () => props.filter,
   (newVal) => {
-    if (newVal) {
-      filters.value = cloneDeep(newVal);
-    }
+    filters.value = cloneDeep(newVal);
   },
-  { immediate: true },
 );
 
 const useRatingField = (key: 'ratingFrom' | 'ratingTo') =>
@@ -117,23 +109,13 @@ const ratingFrom = useRatingField('ratingFrom');
 const ratingTo = useRatingField('ratingTo');
 
 const search = () => {
-  modelValue.value = filters.value;
-
-  applyFiltersToRoute();
+  emit('submit', cloneDeep(filters.value));
 };
 
 const clearFilters = () => {
-  filters.value = cloneDeep(defaultFilters);
+  filters.value = filterFromQuery({});
 
-  modelValue.value = filters.value;
-
-  applyFiltersToRoute();
-};
-
-const applyFiltersToRoute = () => {
-  router.push({
-    query: omitBy(filters.value, (value) => !isFilterSet(value)),
-  });
+  search();
 };
 </script>
 

@@ -23,7 +23,9 @@ export const errorResponseSchema = apiSchema(
           }),
         )
         .optional()
-        .describe('Present on validation errors: every field that failed'),
+        .describe(
+          'Present on validation errors (every field that failed) and on a conflict over one field',
+        ),
     }),
   }),
 );
