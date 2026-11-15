@@ -26,11 +26,13 @@
       class="post-editor-tags__form"
     >
       <BaseInput
+        ref="input"
         v-model="tagInput"
         data-testid="post-tag-input"
         placeholder="Input up to 8 tags"
-        :error="tagInputValidation"
+        :error="tagInputError"
         @keyup.enter="addTag"
+        @keydown="addTagOnComma"
       />
 
       <BaseIconButton
@@ -48,13 +50,14 @@
 
 <script setup lang="ts">
 // TODO: This can be a BasicElements
-import { computed, ref } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import * as consts from '@/const';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseTag from '@common/BaseTag.vue';
 import IconAdd from '@icons/IconAdd.vue';
 import IconClose from '@icons/IconClose.vue';
+import { normalizeTag } from '@utils/normalize-tag';
 
 interface Props {
   dataTestid?: string;
@@ -66,27 +69,71 @@ const tags = defineModel<string[]>('tags', {
   required: true,
 });
 
+const input = useTemplateRef<InstanceType<typeof BaseInput>>('input');
+
 const tagInput = ref('');
 
-const tagInputValidation = computed(() => {
-  if (tagInput.value.length > consts.POST_MAX_TAG_LEN) {
+const pendingTag = computed(() => normalizeTag(tagInput.value));
+
+const isPendingTaken = computed(() =>
+  tags.value.some((tag) => normalizeTag(tag) === pendingTag.value),
+);
+
+const isAddAttempted = ref(false);
+
+watch(tagInput, () => {
+  isAddAttempted.value = false;
+});
+
+const tagInputError = computed(() => {
+  if (pendingTag.value.length > consts.POST_MAX_TAG_LEN) {
     return `Tag can't be longer than ${consts.POST_MAX_TAG_LEN}`;
+  }
+
+  // Only once it was offered as a tag: a "#" on its way to "#hash" is not a
+  // mistake yet
+  if (!isAddAttempted.value || !tagInput.value.trim()) {
+    return '';
+  }
+
+  if (!pendingTag.value) {
+    return 'Tags are made of letters and numbers';
+  }
+
+  if (isPendingTaken.value) {
+    return `“${pendingTag.value}” is already added`;
   }
 
   return '';
 });
 
+/** False when the text in the field can't become a tag; it stays there with the reason */
 const addTag = () => {
-  if (!tagInput.value.length) {
+  if (!tagInput.value.trim()) {
+    tagInput.value = '';
+
+    return true;
+  }
+
+  isAddAttempted.value = true;
+
+  if (tagInputError.value) {
+    return false;
+  }
+
+  tags.value.push(pendingTag.value);
+  tagInput.value = '';
+
+  return true;
+};
+
+const addTagOnComma = (event: KeyboardEvent) => {
+  if (event.key !== ',') {
     return;
   }
 
-  const checkDouble = tags.value.find((el) => el === tagInput.value);
-
-  if (!checkDouble && !tagInputValidation.value) {
-    tags.value.push(tagInput.value);
-    tagInput.value = '';
-  }
+  event.preventDefault();
+  addTag();
 };
 
 const removeTag = (tag: string) => {
@@ -98,6 +145,21 @@ const removeTag = (tag: string) => {
 
   tags.value.splice(tagIndex, 1);
 };
+
+defineExpose({
+  /** For a form being sent: takes in what is still in the field. A tag that is
+   * already there is dropped, since the post has it anyway. */
+  addPendingTag: () => {
+    if (isPendingTaken.value) {
+      tagInput.value = '';
+
+      return true;
+    }
+
+    return addTag();
+  },
+  focus: () => input.value?.focus(),
+});
 </script>
 
 <style>

@@ -19,7 +19,11 @@
         :show-error="isSubmitted"
       />
 
-      <PostEditorTags v-model:tags="tags" class="post-editor__tags" />
+      <PostEditorTags
+        ref="tagsEditor"
+        v-model:tags="tags"
+        class="post-editor__tags"
+      />
 
       <Draggable
         :list="sections"
@@ -321,6 +325,9 @@ const isSubmitted = ref(false);
 
 const titleInput = useTemplateRef<InstanceType<typeof BaseInput>>('titleInput');
 
+const tagsEditor =
+  useTemplateRef<InstanceType<typeof PostEditorTags>>('tagsEditor');
+
 const modeOptions = [
   { value: 'write', label: 'Write', dataTestid: 'write-mode-button' },
   { value: 'preview', label: 'Preview', dataTestid: 'preview-mode-button' },
@@ -458,7 +465,9 @@ const isInvalid = computed(() => {
 });
 
 const validateBeforeSend = async () => {
-  if (!isInvalid.value) {
+  const isPendingTagAdded = tagsEditor.value?.addPendingTag() ?? true;
+
+  if (!isInvalid.value && isPendingTagAdded) {
     return true;
   }
 
@@ -469,6 +478,12 @@ const validateBeforeSend = async () => {
 
   if (validation.value.title) {
     titleInput.value?.focus();
+
+    return false;
+  }
+
+  if (!isPendingTagAdded) {
+    tagsEditor.value?.focus();
 
     return false;
   }
@@ -688,6 +703,9 @@ const cancelEdit = () => {
 };
 
 const saveDraft = async () => {
+  // One that can't be a tag stays in the field with its reason
+  tagsEditor.value?.addPendingTag();
+
   try {
     isSaving.value = true;
 
