@@ -8,3 +8,4 @@ export { unfollowById } from './unfollow-by-id';
 export { updateMe } from './update-me';
 export { updateMyAvatar } from './update-my-avatar';
 export { updateMyPostTemplate } from './update-my-post-template';
+export { uploadMyAvatar } from './upload-my-avatar';
