@@ -260,6 +260,36 @@ test('Opens a followed author’s profile from Settings', async ({
   await expect(currentPage).toHaveURL(`/user/@${author1.login}`);
 });
 
+test('Uploads an avatar file, and shows the copy the backend stored', async ({
+  Api,
+  SettingsPage,
+  NotificationList,
+}) => {
+  Api.routes.users.uploadMyAvatar.mock({
+    body: { avatar: '/uploads/user-id/uploaded-avatar.jpg' },
+  });
+
+  await SettingsPage.goto();
+
+  const uploadRequest = await Api.routes.users.uploadMyAvatar.waitForRequest({
+    preRequestAction: SettingsPage.uploadAvatarFile.bind(SettingsPage),
+  });
+
+  expect(uploadRequest.method()).toBe('POST');
+  expect(uploadRequest.headers()['content-type']).toContain(
+    'multipart/form-data',
+  );
+  await expect(NotificationList.root).toHaveText(
+    'Your avatar has been successfully updated!',
+  );
+  await expect(SettingsPage.avatarPreview).toHaveAttribute(
+    'src',
+    /\/uploads\/user-id\/uploaded-avatar\.jpg$/,
+  );
+  // The link field stays the way in for a pasted url, and is not what was used
+  await expect(SettingsPage.avatarInput).toHaveValue('');
+});
+
 test("Removes current user's avatar", async ({
   Api,
   SettingsPage,

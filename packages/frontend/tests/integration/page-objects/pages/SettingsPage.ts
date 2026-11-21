@@ -5,6 +5,7 @@ export default class SettingsPage extends AbstractPage {
   readonly url = '/user/settings';
 
   readonly avatarInput: Locator;
+  readonly avatarUploadInput: Locator;
   readonly avatarError: Locator;
   readonly avatarSubmitBtn: Locator;
   readonly avatarRemoveBtn: Locator;
@@ -22,6 +23,7 @@ export default class SettingsPage extends AbstractPage {
     super(page);
 
     this.avatarInput = page.getByTestId('user-settings-avatar-input');
+    this.avatarUploadInput = page.getByLabel('Upload image');
     this.avatarError = page.getByTestId('user-settings-avatar-input-error');
     this.avatarSubmitBtn = page.getByTestId('user-settings-avatar-submit');
     this.avatarRemoveBtn = page.getByTestId('user-settings-avatar-remove');
@@ -65,6 +67,16 @@ export default class SettingsPage extends AbstractPage {
 
   async submitAvatar() {
     await this.avatarSubmitBtn.click();
+  }
+
+  /** Choosing a file uploads it straight away — the Upload button is for a
+   * pasted link only. */
+  async uploadAvatarFile() {
+    await this.avatarUploadInput.setInputFiles({
+      name: 'avatar.png',
+      buffer: Buffer.from('test', 'utf-8'),
+      mimeType: 'image/png',
+    });
   }
 
   async removeAvatar() {

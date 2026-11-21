@@ -35,6 +35,7 @@ export const routes = {
     getUserProfile: new Route('/users/*', Method.GET),
     updateUserProfile: new Route('/users/me', Method.PUT),
     updateMyAvatar: new Route('/users/me/avatar', Method.PUT),
+    uploadMyAvatar: new Route('/users/me/avatar', Method.POST),
     deleteMyAvatar: new Route('/users/me/avatar', Method.DELETE),
     removeFilePicSection: new Route('/users/me/template/*', Method.DELETE),
     getMyTemplate: new Route('/users/me/template', Method.GET),
