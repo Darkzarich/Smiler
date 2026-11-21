@@ -231,6 +231,32 @@ test('Fits the post byline and footer on a 320px phone', async ({
   expect(layout).toEqual({ dateLines: 1, pastEdge: [] });
 });
 
+test('Shows the exact moment behind the relative post date', async ({
+  page,
+  Api,
+  PostsPage,
+}) => {
+  const createdAt = new Date(Date.now() - 20 * 60 * 1000);
+
+  Api.routes.posts.getToday.mock({
+    body: {
+      posts: [createRandomPost({ createdAt: createdAt.toISOString() })],
+      hasNextPage: false,
+    },
+  });
+
+  await PostsPage.goto(PostsPage.urls.today);
+
+  const date = page.locator('.post__main .post__date');
+
+  await expect(date).toHaveText('20 minutes ago');
+  await expect(date).toHaveAttribute('datetime', createdAt.toISOString());
+  await expect(date).toHaveAttribute(
+    'title',
+    /^[A-Z][a-z]{2} \d{1,2}, \d{4}, \d{1,2}:\d{2} (AM|PM)$/,
+  );
+});
+
 test('Puts the votes in the footer row and the author above the title on a phone', async ({
   page,
   Api,

@@ -108,7 +108,7 @@
           class="comment-item__created-at"
           :data-testid="`comment-${comment._id}-date`"
         >
-          {{ formatFromNow(comment.createdAt) }}
+          <RelativeTime :date="comment.createdAt" />
         </div>
       </div>
 
@@ -219,9 +219,9 @@ import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { checkCanEditComment } from '@/utils/check-can-edit-comment';
 import { focusTemporarily } from '@/utils/focus-temporarily';
-import { formatFromNow } from '@/utils/format-from-now';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import ConfirmModal from '@common/ConfirmModal.vue';
+import RelativeTime from '@common/RelativeTime.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';

@@ -1270,6 +1270,9 @@ test('Formate different dates with relation to the current time correctly', asyn
   await expect(Comments.getCommentDateById(comments[0]._id)).toContainText(
     '7 seconds ago',
   );
+  await expect(
+    Comments.getCommentDateById(comments[0]._id).locator('time'),
+  ).toHaveAttribute('datetime', '2024-06-02T23:59:53.000Z');
   await expect(Comments.getCommentDateById(comments[1]._id)).toContainText(
     '35 minutes ago',
   );
