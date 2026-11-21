@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isShow" id="app">
+  <div id="app">
     <NotificationList />
 
     <HeaderElement />
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 import { useMediaQuery } from '@/composables/use-media-query';
 import { useThemeStore } from '@/store/theme';
 import { useUserStore } from '@/store/user';
@@ -36,15 +36,10 @@ const themeStore = useThemeStore();
 
 const isPhone = useMediaQuery('phone-only');
 
-const isShow = ref(false);
-
-onBeforeMount(async () => {
-  await userStore.userFetchAuthState();
-  isShow.value = true;
-});
-
 onMounted(() => {
   themeStore.initTheme();
+  // Not awaited: the header and page frame paint before the session check answers
+  void userStore.userFetchAuthState();
 });
 </script>
 

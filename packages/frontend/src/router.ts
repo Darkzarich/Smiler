@@ -196,6 +196,9 @@ export const router = createRouter({
       path: '/post/:slug',
       name: 'Single',
       component: SinglePost,
+      meta: {
+        title: 'Post',
+      },
     },
     {
       path: '/post/:slug/edit',
@@ -251,6 +254,8 @@ router.beforeEach((to, from, next) => {
     window.document.title = titleTo + ending;
   } else if (titleParams) {
     window.document.title = to.params[titleParams] + ending;
+  } else {
+    window.document.title = 'Smiler';
   }
 
   next();
