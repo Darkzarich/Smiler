@@ -338,6 +338,28 @@ test('Empty posts lists after search', async ({
 
   await expect(Post.postsList).toBeVisible();
   await expect(Post.getNoContentText()).toBeVisible();
+  await expect(Post.getNoContentText()).toContainText(
+    'No posts match these filters',
+  );
+});
+
+test('Ends a search with the line that everything was shown', async ({
+  Api,
+  Post,
+  SearchPage,
+}) => {
+  Api.routes.posts.getPosts.mock({
+    body: {
+      posts: [post],
+      hasNextPage: false,
+    },
+  });
+
+  await SearchPage.goto('title=test');
+
+  await expect(Post.getNoMoreContentText()).toContainText(
+    "That's every match.",
+  );
 });
 
 test('Keeps the results and the place in them on Back from a post', async ({

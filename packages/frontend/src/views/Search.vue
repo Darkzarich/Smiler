@@ -12,14 +12,13 @@
       @fetch-more="handleNextPage"
     >
       <template #no-content>
-        It looks like we couldn't find any posts that match your filters. <br />
-        Please try adjusting your search criteria!
+        <EmptyState
+          title="No posts match these filters"
+          line="Try changing a filter, or use Clear filters above."
+        />
       </template>
 
-      <template #no-more-content>
-        Thank you for exploring all available content. <br />
-        Please check back later for more updates.
-      </template>
+      <template #no-more-content> That's every match. </template>
     </PostsContainer>
   </div>
 </template>
@@ -35,6 +34,7 @@ import {
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
+import EmptyState from '@/components/PostsContainer/EmptyState.vue';
 import { useLatestRequest } from '@/composables/use-latest-request';
 import { useRestorablePosts } from '@/composables/use-restorable-posts';
 import * as consts from '@/const';
