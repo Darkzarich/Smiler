@@ -14,11 +14,18 @@
               :data-testid="`user-settings-author-${author._id}`"
               class="user-settings__following-item"
             >
-              <UserAvatar
-                class="user-settings__following-avatar"
-                :src="author.avatar"
-              />
-              {{ author.login }}
+              <RouterLink
+                class="user-settings__following-link"
+                :data-testid="`user-settings-author-${author._id}-link`"
+                :to="{ name: 'UserPage', params: { login: author.login } }"
+              >
+                <UserAvatar
+                  class="user-settings__following-avatar"
+                  :src="author.avatar"
+                />
+                {{ author.login }}
+              </RouterLink>
+
               <BaseIconButton
                 :label="`Unfollow ${author.login}`"
                 :data-testid="`user-settings-author-${author._id}-unfollow`"
@@ -147,6 +154,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeMount, ref, useTemplateRef } from 'vue';
+import { RouterLink } from 'vue-router';
 import { api } from '@/api';
 import { userTypes } from '@/api/users';
 import * as consts from '@/const';
@@ -403,6 +411,21 @@ onBeforeMount(() => {
     align-items: center;
     gap: 4px;
     color: var(--color-text-primary);
+  }
+
+  &__following-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-text-primary);
+    text-decoration: none;
+
+    @media (--hover) {
+      &:hover {
+        color: var(--color-primary-strong);
+        text-decoration: underline;
+      }
+    }
   }
 
   &__following-avatar {

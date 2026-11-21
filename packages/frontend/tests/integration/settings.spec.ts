@@ -238,6 +238,28 @@ test('Asks for a link instead of sending an empty one', async ({
   expect(wasAvatarSent()).toBe(false);
 });
 
+test('Opens a followed author’s profile from Settings', async ({
+  Api,
+  SettingsPage,
+  page: currentPage,
+}) => {
+  Api.routes.users.getUserProfile.mock({ body: author1 });
+  Api.routes.posts.getPosts.mock({
+    body: { posts: [], hasNextPage: false },
+  });
+
+  await SettingsPage.goto();
+
+  await expect(SettingsPage.getAuthorLinkById(author1._id)).toHaveAttribute(
+    'href',
+    `/user/@${author1.login}`,
+  );
+
+  await SettingsPage.getAuthorLinkById(author1._id).click();
+
+  await expect(currentPage).toHaveURL(`/user/@${author1.login}`);
+});
+
 test("Removes current user's avatar", async ({
   Api,
   SettingsPage,

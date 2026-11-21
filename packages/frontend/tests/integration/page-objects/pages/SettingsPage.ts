@@ -43,6 +43,10 @@ export default class SettingsPage extends AbstractPage {
     return this.page.getByTestId(`user-settings-author-${id}`);
   }
 
+  getAuthorLinkById(id = '') {
+    return this.page.getByTestId(`user-settings-author-${id}-link`);
+  }
+
   getTagByText(tag = '') {
     return this.page.getByTestId(`user-settings-tags-${tag}`);
   }
