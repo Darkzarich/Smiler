@@ -1,7 +1,7 @@
 <template>
   <div class="search">
     <div class="search__form u-widget">
-      <SearchForm :filter="filter" @submit="search" />
+      <SearchForm ref="searchForm" :filter="filter" @submit="search" />
     </div>
 
     <PostsContainer
@@ -24,7 +24,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, ref, watch } from 'vue';
+import {
+  computed,
+  onBeforeMount,
+  onMounted,
+  ref,
+  useTemplateRef,
+  watch,
+} from 'vue';
 import {
   isNavigationFailure,
   NavigationFailureType,
@@ -119,7 +126,7 @@ const search = async (newFilter: SearchFilter) => {
   const failure = await router.push({ query: filterToQuery(newFilter) });
 
   // The same search again: there is no new address to follow, but a fresh
-  // first page is what Submit is expected to bring
+  // first page is what Search is expected to bring
   if (
     isNavigationFailure(failure, NavigationFailureType.duplicated) &&
     isAnyFilterActive.value
@@ -141,6 +148,17 @@ watch(
 onBeforeMount(() => {
   if (isAnyFilterActive.value && !restore()) {
     fetchFirstPage();
+  }
+});
+
+const searchForm =
+  useTemplateRef<InstanceType<typeof SearchForm>>('searchForm');
+
+onMounted(() => {
+  // An empty search page has nothing to read, so the field to type in takes
+  // the focus; a search from the address leaves it where the reader is
+  if (!isAnyFilterActive.value) {
+    searchForm.value?.focusTitle();
   }
 });
 </script>

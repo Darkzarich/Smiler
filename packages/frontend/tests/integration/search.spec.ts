@@ -60,6 +60,41 @@ test('Searches posts using the search button in the header', async ({
   expect(SearchPage.pageHasTitleQueryParam('test')).toBe(true);
 });
 
+test('Opens the search page ready to type when the header search is empty', async ({
+  page: currentPage,
+  PostsPage,
+  SearchPage,
+  Menu,
+}) => {
+  const searchRequests: string[] = [];
+
+  currentPage.on('request', (request) => {
+    // The search endpoint itself: the vote lookup at /posts/votes is another
+    if (/\/api\/posts\?/.test(request.url())) {
+      searchRequests.push(request.url());
+    }
+  });
+
+  await PostsPage.goto();
+
+  await Menu.clickSearchButton();
+
+  await expect(currentPage).toHaveURL(SearchPage.url);
+  expect(searchRequests).toEqual([]);
+  await expect(SearchPage.searchInput).toBeFocused();
+  await expect(
+    currentPage.getByText('Search by title, date, rating or tag.'),
+  ).toBeVisible();
+
+  await SearchPage.searchInput.fill('test');
+  await SearchPage.submitSearch();
+
+  await expect(currentPage).toHaveURL(/[?&]title=test(&|$)/);
+  await expect(
+    currentPage.getByText('Search by title, date, rating or tag.'),
+  ).toBeHidden();
+});
+
 test("Doesn't send posts request when just opened the search page", async ({
   page: currentPage,
   SearchPage,
@@ -175,7 +210,14 @@ test('Fits the search form on a 320px phone, labels above their fields', async (
 
   const form = await page.locator('.search-form').boundingBox();
 
-  for (const name of ['Date from', 'Date to', 'Rating from', 'Rating to']) {
+  for (const name of [
+    'Title',
+    'Date from',
+    'Date to',
+    'Rating from',
+    'Rating to',
+    'Tags',
+  ]) {
     const field = await page.getByLabel(name).boundingBox();
     const label = await page.getByText(name, { exact: true }).boundingBox();
 
@@ -581,10 +623,7 @@ test('Shows the search the address names on Back and Forward', async ({
   expect(requestedTitles).toEqual(['moon', 'pixel']);
 });
 
-test('Searches again on Submit with the same filters', async ({
-  SearchPage,
-  Api,
-}) => {
+test('Searches again with the same filters', async ({ SearchPage, Api }) => {
   await SearchPage.goto('title=moon');
 
   const postsResponse = await Api.routes.posts.getPosts.waitForRequest({

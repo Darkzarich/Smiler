@@ -4,8 +4,10 @@
 
     <div class="search-form__title-field">
       <BaseInput
+        ref="titleField"
         v-model="filters.title"
-        placeholder="Title"
+        label="Title"
+        placeholder="Any"
         data-testid="search-form-input"
         @keyup.enter="search"
       />
@@ -45,6 +47,8 @@
     <div class="search-form__tags">
       <PostEditorTags
         v-model:tags="filters.tags"
+        label="Tags"
+        placeholder="Filter by tags"
         data-testid="search-form-tags"
       />
     </div>
@@ -56,7 +60,7 @@
         stretched
         @click="search"
       >
-        Submit
+        Search
       </BaseButton>
 
       <BaseButton
@@ -67,13 +71,18 @@
         Clear filters
       </BaseButton>
     </div>
+
+    <p v-if="!isSearchActive" class="search-form__hint">
+      Search by title, date, rating or tag.
+    </p>
   </div>
 </template>
 
 <script setup lang="ts">
 import { cloneDeep } from 'lodash-es';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import { filterFromQuery } from './query';
+import { isFilterSet } from './is-filter-set';
 import type { SearchFilter } from './types';
 import BaseButton from '@common/BaseButton.vue';
 import BaseInput from '@common/BaseInput.vue';
@@ -117,6 +126,16 @@ const clearFilters = () => {
 
   search();
 };
+
+const isSearchActive = computed(() =>
+  Object.values(props.filter).some(isFilterSet),
+);
+
+const titleField = useTemplateRef<InstanceType<typeof BaseInput>>('titleField');
+
+defineExpose({
+  focusTitle: () => titleField.value?.focus(),
+});
 </script>
 
 <style>
@@ -147,6 +166,12 @@ const clearFilters = () => {
   &__actions {
     gap: 16px;
     margin-top: 24px;
+  }
+
+  &__hint {
+    margin-top: 16px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
   }
 }
 </style>
