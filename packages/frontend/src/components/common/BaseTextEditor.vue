@@ -4,6 +4,8 @@
     v-model="textEditorValue"
     :data-testid="dataTestid"
     :features="features"
+    :placeholder="placeholder"
+    :focus-on-mount="focusOnMount"
   >
     <slot />
   </AsyncTextEditor>
@@ -18,12 +20,16 @@ interface Props {
   dataTestid?: string;
   features?: TextEditorFeatures;
   id?: string;
+  placeholder?: string;
+  focusOnMount?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
   dataTestid: 'input',
   features: TextEditorFeatures.Comment,
   id: undefined,
+  placeholder: '',
+  focusOnMount: false,
 });
 
 const textEditorValue = defineModel<string>({

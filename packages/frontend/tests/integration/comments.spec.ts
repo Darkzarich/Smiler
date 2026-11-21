@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import { type BrowserContext, expect } from '@playwright/test';
+import { type BrowserContext, expect, type Locator } from '@playwright/test';
 import { subMinutes } from 'date-fns';
 import { omit } from 'lodash';
 import test from './page-objects';
@@ -16,6 +16,13 @@ const auth = createRandomAuth({
 const post = createRandomPost();
 const comment = createRandomComment({}, true);
 const asParagraph = (text: string) => `<p>${text}</p>`;
+/** What the empty editor paints: the placeholder is its `::before` */
+const getPlaceholder = (locator: Locator) =>
+  locator.evaluate(
+    (el) =>
+      getComputedStyle(el.closest('.base-text-editor__editor')!, '::before')
+        .content,
+  );
 
 test.beforeEach(async ({ Api }) => {
   Api.routes.auth.getAuth.mock({
@@ -341,6 +348,88 @@ test.describe('Replies', () => {
     await Comments.closeCommentReplyForm();
 
     await expect(Comments.getCommentReplyInput()).toBeHidden();
+  });
+
+  test('Takes the caret into the reply editor when Reply opens it', async ({
+    SinglePostPage,
+    Comments,
+    isMobile,
+  }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
+      isMobile,
+      'A phone keeps the keyboard down until the form is tapped',
+    );
+
+    await SinglePostPage.goto(post.slug);
+
+    await Comments.clickCommentReplyTogglerById(comment._id);
+
+    await expect(Comments.getCommentReplyInput()).toBeFocused();
+  });
+
+  test('Leaves the caret out of a reply opened on a phone', async ({
+    SinglePostPage,
+    Comments,
+    isMobile,
+  }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(!isMobile, 'A mouse has no keyboard to cover the comment with');
+
+    await SinglePostPage.goto(post.slug);
+
+    await Comments.clickCommentReplyTogglerById(comment._id);
+
+    await expect(Comments.getCommentReplyInput()).toBeVisible();
+    await expect(Comments.getCommentReplyInput()).not.toBeFocused();
+
+    await Comments.getCommentReplyInput().tap();
+    await expect(Comments.getCommentReplyInput()).toBeFocused();
+  });
+
+  test('Sends a reply with Ctrl+Enter', async ({
+    SinglePostPage,
+    Comments,
+    Api,
+  }) => {
+    await SinglePostPage.goto(post.slug);
+
+    await Comments.clickCommentReplyTogglerById(comment._id);
+    await Comments.fillCommentReplyInput(newReplyText);
+
+    const replyResponse =
+      await Api.routes.comments.createComment.waitForRequest({
+        preRequestAction: () =>
+          Comments.getCommentReplyInput().press('Control+Enter'),
+      });
+
+    expect(replyResponse.postDataJSON()).toEqual({
+      post: post._id,
+      parent: comment._id,
+      body: asParagraph(newReplyText),
+    });
+    await expect(Comments.getCommentById(newReplyId)).toContainText(
+      newReplyText,
+    );
+  });
+
+  test('Says what an empty comment editor is for', async ({
+    SinglePostPage,
+    Comments,
+  }) => {
+    await SinglePostPage.goto(post.slug);
+
+    expect(await getPlaceholder(Comments.newCommentFormInput)).toBe(
+      '"Write a comment…"',
+    );
+
+    await Comments.clickCommentReplyTogglerById(comment._id);
+    expect(await getPlaceholder(Comments.getCommentReplyInput())).toBe(
+      `"Reply to @${comment.author.login}…"`,
+    );
+
+    await Comments.fillCommentReplyInput(newReplyText);
+    expect(await getPlaceholder(Comments.getCommentReplyInput())).toBe('none');
   });
 
   // TODO: Make it work this way
@@ -1108,11 +1197,33 @@ test.describe('Editing or deleting a comment', () => {
     await expect(Comments.getCommentCardById(otherComment._id)).toBeFocused();
   });
 
+  test('Takes the caret into the comment editor an edit opens', async ({
+    SinglePostPage,
+    Comments,
+    context,
+    isMobile,
+  }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
+      isMobile,
+      'A phone keeps the keyboard down until the form is tapped',
+    );
+
+    await mockDate(context, currentUserComment.createdAt);
+
+    await SinglePostPage.goto(post.slug);
+
+    await Comments.toggleCommentEditById(currentUserComment._id);
+
+    await expect(Comments.getCommentEditInput()).toBeFocused();
+  });
+
   test('The current user edits a comment that is not older than 10 mins, sends the edit request', async ({
     SinglePostPage,
     Comments,
     context,
     Api,
+    isMobile,
   }) => {
     const editCommentText = 'edited comment';
 
@@ -1129,6 +1240,15 @@ test.describe('Editing or deleting a comment', () => {
     await SinglePostPage.goto(post.slug);
 
     await Comments.toggleCommentEditById(currentUserComment._id);
+
+    // A mouse puts the caret in the editor a frame after it opens; typing
+    // before that lands after the old body instead of over it
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (!isMobile) {
+      // eslint-disable-next-line playwright/no-conditional-expect
+      await expect(Comments.getCommentEditInput()).toBeFocused();
+    }
+
     await Comments.getCommentEditInput().fill(editCommentText);
 
     const editCommentResponse =

@@ -27,4 +27,15 @@ describe('describeShortcut', () => {
       aria: 'Meta+Shift+8',
     });
   });
+
+  it('keeps the spelling of a named key', () => {
+    expect(describeShortcut('Mod-Enter', false)).toEqual({
+      text: 'Ctrl+Enter',
+      aria: 'Control+Enter',
+    });
+    expect(describeShortcut('Mod-Enter', true)).toEqual({
+      text: '⌘Enter',
+      aria: 'Meta+Enter',
+    });
+  });
 });

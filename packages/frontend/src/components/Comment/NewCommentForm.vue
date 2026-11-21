@@ -10,11 +10,15 @@
         v-model="commentBody"
         data-testid="new-comment-form-editor"
         class="new-comment-form__editor"
+        placeholder="Write a comment…"
+        @keydown.capture="submitOnModEnter"
       >
         <BaseButton
           class="new-comment-form__submit-btn"
           :loading="isLoading"
           data-testid="new-comment-button"
+          :title="submitHint"
+          :aria-keyshortcuts="submitShortcut.aria"
           type="primary"
           @click="createComment"
         >
@@ -59,6 +63,7 @@ import { api } from '@/api';
 import { type AuthPromptMode, useAuthPromptStore } from '@/store/auth-prompt';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
+import { describeShortcut } from '@/utils/describe-shortcut';
 import BaseButton from '@common/BaseButton.vue';
 import BaseTextEditor from '@common/BaseTextEditor.vue';
 
@@ -87,6 +92,10 @@ const promptAuth = (mode: AuthPromptMode) => {
 const commentBody = ref('');
 
 const isLoading = ref(false);
+
+const submitShortcut = describeShortcut('Mod-Enter');
+
+const submitHint = `Send (${submitShortcut.text})`;
 
 const createComment = async () => {
   const user = userStore.user;
@@ -128,6 +137,19 @@ const createComment = async () => {
   } finally {
     isLoading.value = false;
   }
+};
+
+const submitOnModEnter = (event: KeyboardEvent) => {
+  if (
+    isLoading.value ||
+    event.key !== 'Enter' ||
+    !(event.ctrlKey || event.metaKey)
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+  void createComment();
 };
 </script>
 
