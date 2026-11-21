@@ -46,6 +46,8 @@
             class="post-editor__section"
             :class="{
               'post-editor__section--spoiler': section.isSpoiler,
+              'post-editor__section--spoiler-filled':
+                section.isSpoiler && hasSectionContent(section),
               'post-editor__section--invalid': sectionErrorOf(section),
             }"
             data-testid="post-section"
@@ -793,12 +795,15 @@ const saveDraft = async () => {
     &--spoiler {
       border-style: dashed;
       border-color: var(--color-warning);
+    }
 
-      /* Shows the author what a reader sees, and lifts as soon as the section
-         is reached so it never stands in the way of editing. The header stays
-         sharp: it says what is hidden and holds the toggle. Without hover
-         nothing would lift it before a tap lands on a field, so touch screens
-         get the border and the header's Spoiler pill alone. */
+    /* Shows the author what a reader sees, and lifts as soon as the section is
+       reached so it never stands in the way of editing. Only a section with
+       something in it is covered: an empty one still has the form that fills
+       it. The header stays sharp: it says what is hidden and holds the toggle.
+       Without hover nothing would lift it before a tap lands on a field, so
+       touch screens get the border and the header's Spoiler pill alone. */
+    &--spoiler-filled {
       @media (--hover) {
         .post-editor__section-body::after {
           position: absolute;
