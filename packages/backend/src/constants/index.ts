@@ -11,6 +11,15 @@ export const ALLOWED_PICTURE_EXTENSIONS = [
   'webp',
   'avif',
 ];
+/** What the upload endpoints accept from a browser, which labels a file with
+ * its type; the bytes are checked again when the picture is re-encoded. */
+export const ALLOWED_PICTURE_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/avif',
+];
 /** What browsers play in a <video> element. The frontend's
  * `VIDEO_FILE_EXTENSIONS` (utils/parse-video-url.ts) is the same list. */
 export const ALLOWED_VIDEO_EXTENSIONS = [

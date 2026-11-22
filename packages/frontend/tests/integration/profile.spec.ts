@@ -160,6 +160,40 @@ test('Shows the new profile after a link from one profile to another', async ({
   await expect(ProfilePage.login).toContainText(me.login);
 });
 
+test('Offers Edit profile on the account’s own profile, and links to Settings', async ({
+  page,
+  ProfilePage,
+  Api,
+}) => {
+  const me = createRandomAuth({ isAuth: true });
+
+  Api.routes.auth.getAuth.mock({ body: me });
+  Api.routes.users.getUserProfile.mock({
+    body: createRandomProfile({ _id: me._id, login: me.login }),
+  });
+  Api.routes.users.getCurrentUserSettings.mock({
+    body: { authors: [], tags: [], bio: '', avatar: '' },
+  });
+
+  await ProfilePage.goto(me.login);
+
+  await expect(ProfilePage.editProfileBtn).toBeVisible();
+  await expect(ProfilePage.followBtn).toHaveCount(0);
+
+  await ProfilePage.editProfileBtn.click();
+
+  await expect(page).toHaveURL('/user/settings');
+});
+
+test('Offers Follow, not Edit profile, on somebody else’s profile', async ({
+  ProfilePage,
+}) => {
+  await ProfilePage.goto(testUser.login);
+
+  await expect(ProfilePage.followBtn).toBeVisible();
+  await expect(ProfilePage.editProfileBtn).toHaveCount(0);
+});
+
 test('Fits the profile header on a 320px phone', async ({
   page,
   ProfilePage,

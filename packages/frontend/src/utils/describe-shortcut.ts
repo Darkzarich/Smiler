@@ -25,7 +25,10 @@ const appleOrder = ['Control', 'Alt', 'Shift', 'Meta'];
  */
 export function describeShortcut(shortcut: string, apple = isApple) {
   const parts = shortcut.split('-');
-  const key = parts.pop()!.toUpperCase();
+  const rawKey = parts.pop()!;
+  // A one-character key reads as a name in caps (S); a named one keeps its
+  // spelling and its case (Enter)
+  const key = rawKey.length === 1 ? rawKey.toUpperCase() : rawKey;
   const modifiers = parts.map((part) =>
     part === 'Mod' ? (apple ? 'Meta' : 'Control') : part,
   );

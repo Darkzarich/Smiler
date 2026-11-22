@@ -6,24 +6,48 @@
     @fetch-more="handleNextPage"
   >
     <template #no-content>
-      No content found at the moment. <br />
-      Please check back later for updates. <br />
-      Thank you.
+      <EmptyState
+        v-if="route.name === 'Feed'"
+        title="Your feed is empty"
+        line="Posts from the authors and tags you follow show up here. Follow an author on their profile, or a tag on any post."
+      >
+        <template #actions>
+          <BaseButton :to="{ name: 'All' }">Browse all posts</BaseButton>
+        </template>
+      </EmptyState>
+
+      <EmptyState
+        v-else-if="route.name === 'Home'"
+        title="Nothing new today yet"
+        line="See what people liked most this week, or browse all posts."
+      >
+        <template #actions>
+          <BaseButton :to="{ name: 'TopThisWeek' }">Top this week</BaseButton>
+          <BaseButton :to="{ name: 'All' }">All posts</BaseButton>
+        </template>
+      </EmptyState>
+
+      <EmptyState
+        v-else
+        :title="categoryEmpty.title"
+        :line="categoryEmpty.line"
+      />
     </template>
 
     <template #no-more-content>
-      Thank you for exploring all available content in this category. <br />
-      Please check back later for more updates.
+      {{ endLine }}
     </template>
   </PostsContainer>
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref, watch } from 'vue';
+import { computed, onBeforeMount, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
-import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
+import EmptyState from '@components/PostsContainer/EmptyState.vue';
+import PostsContainer from '@components/PostsContainer/PostsContainer.vue';
+import BaseButton from '@common/BaseButton.vue';
 import { useLatestRequest } from '@/composables/use-latest-request';
 import { useRestorablePosts } from '@/composables/use-restorable-posts';
 import * as consts from '@/const';
@@ -31,6 +55,37 @@ import * as consts from '@/const';
 const route = useRoute();
 
 const posts = ref<postTypes.Post[]>([]);
+
+const categoryEmpty = computed(() => {
+  switch (route.name) {
+    case 'Trending':
+      return {
+        title: 'Nothing is trending yet',
+        line: 'This list fills as posts collect votes.',
+      };
+    case 'TopThisWeek':
+      return {
+        title: 'No posts this week yet',
+        line: 'The best rated posts of the last seven days show up here.',
+      };
+    case 'New':
+      return {
+        title: 'No posts yet',
+        line: 'New posts show up here as they are written.',
+      };
+    default:
+      return {
+        title: 'No posts yet',
+        line: 'Every post on Smiler shows up here.',
+      };
+  }
+});
+
+const endLine = computed(() =>
+  route.name === 'Feed'
+    ? "That's every post from the authors and tags you follow."
+    : "That's every post in this category.",
+);
 
 const { run: fetchLatest, isPending: isFetching } = useLatestRequest();
 

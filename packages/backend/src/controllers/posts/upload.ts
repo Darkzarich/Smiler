@@ -14,6 +14,7 @@ import {
   POST_MAX_IMAGE_WIDTH,
   BASE_UPLOAD_FOLDER,
   ALLOWED_PICTURE_EXTENSIONS,
+  ALLOWED_PICTURE_MIME_TYPES,
 } from '@constants/index';
 import {
   ContentTooLargeError,
@@ -27,13 +28,7 @@ import { nanoid } from 'nanoid';
 import type { ApiResponse } from '@libs/api-router';
 import type { postPictureSectionSchema } from '@validators/posts';
 
-const ALLOWED_UPLOAD_MIME_TYPES = new Set([
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-  'image/avif',
-]);
+const ALLOWED_UPLOAD_MIME_TYPES = new Set(ALLOWED_PICTURE_MIME_TYPES);
 
 const postMulter = multer({
   storage: new DiskStorage({

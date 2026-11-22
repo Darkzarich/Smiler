@@ -8,6 +8,7 @@ export default class ProfilePage extends AbstractPage {
   readonly bio: Locator;
   readonly unfollowBtn: Locator;
   readonly followBtn: Locator;
+  readonly editProfileBtn: Locator;
   readonly offlineBadge: Locator;
 
   constructor(page: Page) {
@@ -21,6 +22,7 @@ export default class ProfilePage extends AbstractPage {
     this.bio = page.getByTestId('user-profile-bio');
     this.unfollowBtn = page.getByTestId('user-profile-unfollow-btn');
     this.followBtn = page.getByTestId('user-profile-follow-btn');
+    this.editProfileBtn = page.getByTestId('user-profile-edit-btn');
     this.offlineBadge = page.getByTestId('user-profile-offline-badge');
   }
 

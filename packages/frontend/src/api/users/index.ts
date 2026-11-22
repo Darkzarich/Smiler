@@ -26,6 +26,14 @@ export default {
       data,
     );
   },
+  /** Sets the avatar from a file the browser sends: the backend re-encodes it
+   * to the same stored square jpeg the url above ends at. */
+  uploadMyAvatar(formData: FormData) {
+    return apiClient.post<userTypes.UpdateMyAvatarResponse>(
+      `${CONTROLLER_URL}/me/avatar`,
+      formData,
+    );
+  },
   deleteMyAvatar() {
     return apiClient.delete(`${CONTROLLER_URL}/me/avatar`);
   },

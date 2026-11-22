@@ -238,6 +238,58 @@ test('Asks for a link instead of sending an empty one', async ({
   expect(wasAvatarSent()).toBe(false);
 });
 
+test('Opens a followed author’s profile from Settings', async ({
+  Api,
+  SettingsPage,
+  page: currentPage,
+}) => {
+  Api.routes.users.getUserProfile.mock({ body: author1 });
+  Api.routes.posts.getPosts.mock({
+    body: { posts: [], hasNextPage: false },
+  });
+
+  await SettingsPage.goto();
+
+  await expect(SettingsPage.getAuthorLinkById(author1._id)).toHaveAttribute(
+    'href',
+    `/user/@${author1.login}`,
+  );
+
+  await SettingsPage.getAuthorLinkById(author1._id).click();
+
+  await expect(currentPage).toHaveURL(`/user/@${author1.login}`);
+});
+
+test('Uploads an avatar file, and shows the copy the backend stored', async ({
+  Api,
+  SettingsPage,
+  NotificationList,
+}) => {
+  Api.routes.users.uploadMyAvatar.mock({
+    body: { avatar: '/uploads/user-id/uploaded-avatar.jpg' },
+  });
+
+  await SettingsPage.goto();
+
+  const uploadRequest = await Api.routes.users.uploadMyAvatar.waitForRequest({
+    preRequestAction: SettingsPage.uploadAvatarFile.bind(SettingsPage),
+  });
+
+  expect(uploadRequest.method()).toBe('POST');
+  expect(uploadRequest.headers()['content-type']).toContain(
+    'multipart/form-data',
+  );
+  await expect(NotificationList.root).toHaveText(
+    'Your avatar has been successfully updated!',
+  );
+  await expect(SettingsPage.avatarPreview).toHaveAttribute(
+    'src',
+    /\/uploads\/user-id\/uploaded-avatar\.jpg$/,
+  );
+  // The link field stays the way in for a pasted url, and is not what was used
+  await expect(SettingsPage.avatarInput).toHaveValue('');
+});
+
 test("Removes current user's avatar", async ({
   Api,
   SettingsPage,

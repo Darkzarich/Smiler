@@ -1,6 +1,8 @@
 <template>
-  <button
-    :type="attrType"
+  <component
+    :is="to ? RouterLink : 'button'"
+    :to="to"
+    :type="to ? undefined : attrType"
     :data-testid="dataTestid"
     class="base-button"
     :class="{
@@ -10,17 +12,18 @@
       'base-button--loading': loading,
       'base-button--active': active,
     }"
-    :disabled="disabled"
+    :disabled="to ? undefined : disabled"
   >
     <template v-if="!loading">
       <slot />
     </template>
 
     <CircularLoader v-else class="base-button__loader" />
-  </button>
+  </component>
 </template>
 
 <script setup lang="ts">
+import { type RouteLocationRaw, RouterLink } from 'vue-router';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 
 interface Props {
@@ -39,6 +42,8 @@ interface Props {
   stretched?: boolean;
   /** Renders the button as the currently chosen one, for toggles and switches */
   active?: boolean;
+  /** Makes it a link, for an action that opens another page */
+  to?: RouteLocationRaw;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -50,6 +55,7 @@ withDefaults(defineProps<Props>(), {
   loading: false,
   stretched: false,
   active: false,
+  to: undefined,
 });
 </script>
 
@@ -61,6 +67,7 @@ withDefaults(defineProps<Props>(), {
   padding: 8px;
   border: 2px solid transparent;
   border-radius: 8px;
+  text-decoration: none;
   font-size: 13px;
   font-weight: bold;
   cursor: pointer;

@@ -301,6 +301,33 @@ test('Offers dragging a picture in only where it can be done', async ({
   );
 });
 
+test('Leaves the form of an empty spoiler section out of the blur', async ({
+  PostCreatePage,
+  isMobile,
+}) => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(isMobile, 'A touch screen is shown spoilers without the blur');
+
+  await PostCreatePage.goto();
+  await PostCreatePage.addPictureSection();
+
+  const section = PostCreatePage.getPostSection(0);
+  const body = section.locator('.post-editor__section-body');
+  const blurOf = () =>
+    body.evaluate(
+      (element) => getComputedStyle(element, '::after').backdropFilter,
+    );
+
+  await section.getByTestId(/^toggle-spoiler-/).click();
+
+  await expect(section).toContainText('Spoiler');
+  await expect.poll(blurOf).toBe('none');
+
+  await PostCreatePage.uploadPictureWithUrl(pastedPictureUrl);
+
+  await expect.poll(blurOf).toBe('blur(8px)');
+});
+
 test('Deletes sections in a post', async ({ PostCreatePage }) => {
   await PostCreatePage.goto();
 

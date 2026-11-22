@@ -108,7 +108,7 @@
           class="comment-item__created-at"
           :data-testid="`comment-${comment._id}-date`"
         >
-          {{ formatFromNow(comment.createdAt) }}
+          <RelativeTime :date="comment.createdAt" />
         </div>
       </div>
 
@@ -126,6 +126,8 @@
           v-model="editBody"
           class="comment-item__comment-form"
           :loading="isRequesting"
+          :focus-on-mount="focusEditorOnOpen"
+          placeholder="Edit your comment…"
           submit-label="Save"
           close-label="Cancel"
           data-testid="comment-edit"
@@ -142,6 +144,8 @@
             v-model="replyBody"
             class="comment-item__comment-form"
             :loading="isRequesting"
+            :focus-on-mount="focusEditorOnOpen"
+            :placeholder="`Reply to @${comment.author.login}…`"
             data-testid="comment-reply"
             @submit="handleReply()"
             @close="toggleReply"
@@ -212,6 +216,7 @@ import { commentThreadKey, countReplies, flattenReplies } from './thread';
 import type { Comment } from './types';
 import { useVisibleDepth } from './use-visible-depth';
 import { api } from '@/api';
+import { useMediaQuery } from '@/composables/use-media-query';
 import { useOwnVote } from '@/composables/use-own-vote';
 import { COMMENT_RATE_VALUE, COMMENT_AUTO_HIDE_LEVEL } from '@/const';
 import { useAuthPromptStore } from '@/store/auth-prompt';
@@ -219,9 +224,9 @@ import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
 import { checkCanEditComment } from '@/utils/check-can-edit-comment';
 import { focusTemporarily } from '@/utils/focus-temporarily';
-import { formatFromNow } from '@/utils/format-from-now';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import ConfirmModal from '@common/ConfirmModal.vue';
+import RelativeTime from '@common/RelativeTime.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';
 import IconMinus from '@icons/IconMinus.vue';
@@ -289,6 +294,10 @@ const hasRepliesToggle = computed(
 );
 
 // replyBody and editBody potentially can be optimized by using a single one of them
+
+// On a touch screen the keyboard would cover the comment being answered
+const isCoarsePointer = useMediaQuery('pointer-coarse');
+const focusEditorOnOpen = computed(() => !isCoarsePointer.value);
 
 const replyBody = ref('');
 const isReplyToggled = ref(false);

@@ -8,6 +8,8 @@
     "**/app.log",
     "**/playwright-report",
     "**/test-results/**",
+    "design-audit/**",
+    "HANDOFF-*.md",
     "package.json",
     "**/.oxlintrc.json",
     "package-lock.json",

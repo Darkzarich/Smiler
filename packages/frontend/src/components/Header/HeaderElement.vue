@@ -125,11 +125,12 @@ const isMobileMenuOpen = ref(false);
 const searchInputValue = ref('');
 
 const search = () => {
+  const title = searchInputValue.value;
+
   router.push({
     name: 'Search',
-    query: {
-      title: searchInputValue.value,
-    },
+    // An empty field is no filter: ?title= would make the address look used
+    query: title ? { title } : {},
   });
 
   searchInputValue.value = '';

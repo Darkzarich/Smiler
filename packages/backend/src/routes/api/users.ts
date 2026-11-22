@@ -9,6 +9,7 @@ import {
   updateMe,
   updateMyAvatar,
   updateMyPostTemplate,
+  uploadMyAvatar,
 } from '@controllers/users';
 import { createApiRouter } from '@libs/api-router';
 import { apiRateLimiter, uploadRateLimiter } from '@middlewares/rate-limiter';
@@ -81,6 +82,43 @@ api.put({
     413: { description: 'The picture is larger than the limit' },
   },
   handler: updateMyAvatar,
+});
+
+api.post({
+  path: '/me/avatar',
+  summary: "Set the current user's avatar from an uploaded file",
+  description:
+    'Re-encodes the picture to a square jpeg and stores it on this server, replacing and deleting the avatar it had. The response holds the stored path.',
+  auth: true,
+  rateLimiter: uploadRateLimiter,
+  requestBody: {
+    required: true,
+    content: {
+      'multipart/form-data': {
+        schema: {
+          type: 'object',
+          required: ['picture'],
+          properties: {
+            picture: {
+              type: 'string',
+              format: 'binary',
+              description: 'A jpg, jpeg, png, gif, webp or avif picture',
+            },
+          },
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Where the avatar now lives',
+      schema: avatarResponseSchema,
+    },
+    404: { description: 'The session points at a user that no longer exists' },
+    413: { description: 'The picture is larger than the limit' },
+    422: { description: 'The file is not a picture of a supported type' },
+  },
+  handler: uploadMyAvatar,
 });
 
 api.delete({

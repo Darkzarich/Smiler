@@ -8,6 +8,14 @@
     @retry="fetchPostToEdit()"
   />
 
+  <div
+    v-else-if="isFetchingPost"
+    class="u-widget u-loading"
+    data-testid="editor-loading"
+  >
+    <CircularLoader />
+  </div>
+
   <div v-else-if="isShow" class="post-create u-widget u-flex-col">
     <h1
       class="post-create__header u-page-title"
@@ -32,6 +40,7 @@ import { useUserStore } from '@/store/user';
 import { checkCanEditPost } from '@/utils/check-can-edit-post';
 import NotFound from '@/views/NotFound.vue';
 import PostEditor from '@components/PostEditor/PostEditor.vue';
+import CircularLoader from '@icons/animation/CircularLoader.vue';
 
 const route = useRoute();
 const router = useRouter();

@@ -1,9 +1,18 @@
 <template>
   <div class="user-profile">
-    <DefineFollowButton>
+    <DefineProfileAction>
       <BaseButton
-        v-if="!isSameUser"
-        class="user-profile__follow-btn"
+        v-if="isSameUser"
+        class="user-profile__action-btn"
+        data-testid="user-profile-edit-btn"
+        :to="{ name: 'UserSettings' }"
+      >
+        Edit profile
+      </BaseButton>
+
+      <BaseButton
+        v-else
+        class="user-profile__action-btn"
         :data-testid="
           isFollowed ? 'user-profile-unfollow-btn' : 'user-profile-follow-btn'
         "
@@ -24,7 +33,7 @@
 
         <template v-else>Follow</template>
       </BaseButton>
-    </DefineFollowButton>
+    </DefineProfileAction>
 
     <div class="user-profile__avatar">
       <UserAvatar :src="profileUser.avatar" />
@@ -37,7 +46,7 @@
       >
         {{ profileUser.login }}
 
-        <ReuseFollowButton v-if="!isPhone" />
+        <ReuseProfileAction v-if="!isPhone" />
       </div>
 
       <div class="user-profile__date">
@@ -57,7 +66,7 @@
       <UserStats :stats="profileUser" />
     </div>
 
-    <ReuseFollowButton v-if="isPhone" />
+    <ReuseProfileAction v-if="isPhone" />
 
     <IconSmiley
       class="user-profile__watermark"
@@ -90,7 +99,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const [DefineFollowButton, ReuseFollowButton] = createReusableTemplate();
+const [DefineProfileAction, ReuseProfileAction] = createReusableTemplate();
 
 // Beside the login a long login leaves the button a sliver of a phone screen
 const isPhone = useMediaQuery('phone-only');
@@ -270,7 +279,7 @@ async function handleFollow() {
     overflow-wrap: anywhere;
   }
 
-  &__follow-btn {
+  &__action-btn {
     z-index: 1;
     min-width: 100px;
     font-size: 13px;
@@ -309,20 +318,20 @@ async function handleFollow() {
     opacity: 0;
   }
 
-  &__follow-btn:focus-visible &__following-label {
+  &__action-btn:focus-visible &__following-label {
     opacity: 0;
   }
 
-  &__follow-btn:focus-visible &__unfollow-label {
+  &__action-btn:focus-visible &__unfollow-label {
     opacity: 1;
   }
 
   @media (--hover) {
-    &__follow-btn:hover &__following-label {
+    &__action-btn:hover &__following-label {
       opacity: 0;
     }
 
-    &__follow-btn:hover &__unfollow-label {
+    &__action-btn:hover &__unfollow-label {
       opacity: 1;
     }
   }

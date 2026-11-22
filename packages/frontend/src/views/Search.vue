@@ -1,7 +1,7 @@
 <template>
   <div class="search">
     <div class="search__form u-widget">
-      <SearchForm :filter="filter" @submit="search" />
+      <SearchForm ref="searchForm" :filter="filter" @submit="search" />
     </div>
 
     <PostsContainer
@@ -12,20 +12,26 @@
       @fetch-more="handleNextPage"
     >
       <template #no-content>
-        It looks like we couldn't find any posts that match your filters. <br />
-        Please try adjusting your search criteria!
+        <EmptyState
+          title="No posts match these filters"
+          line="Try changing a filter, or use Clear filters above."
+        />
       </template>
 
-      <template #no-more-content>
-        Thank you for exploring all available content. <br />
-        Please check back later for more updates.
-      </template>
+      <template #no-more-content> That's every match. </template>
     </PostsContainer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, ref, watch } from 'vue';
+import {
+  computed,
+  onBeforeMount,
+  onMounted,
+  ref,
+  useTemplateRef,
+  watch,
+} from 'vue';
 import {
   isNavigationFailure,
   NavigationFailureType,
@@ -35,6 +41,7 @@ import {
 import { api } from '@/api';
 import { postTypes } from '@/api/posts';
 import PostsContainer from '@/components/PostsContainer/PostsContainer.vue';
+import EmptyState from '@/components/PostsContainer/EmptyState.vue';
 import { useLatestRequest } from '@/composables/use-latest-request';
 import { useRestorablePosts } from '@/composables/use-restorable-posts';
 import * as consts from '@/const';
@@ -119,7 +126,7 @@ const search = async (newFilter: SearchFilter) => {
   const failure = await router.push({ query: filterToQuery(newFilter) });
 
   // The same search again: there is no new address to follow, but a fresh
-  // first page is what Submit is expected to bring
+  // first page is what Search is expected to bring
   if (
     isNavigationFailure(failure, NavigationFailureType.duplicated) &&
     isAnyFilterActive.value
@@ -141,6 +148,17 @@ watch(
 onBeforeMount(() => {
   if (isAnyFilterActive.value && !restore()) {
     fetchFirstPage();
+  }
+});
+
+const searchForm =
+  useTemplateRef<InstanceType<typeof SearchForm>>('searchForm');
+
+onMounted(() => {
+  // An empty search page has nothing to read, so the field to type in takes
+  // the focus; a search from the address leaves it where the reader is
+  if (!isAnyFilterActive.value) {
+    searchForm.value?.focusTitle();
   }
 });
 </script>

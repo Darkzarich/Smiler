@@ -10,6 +10,12 @@
   flex-flow: column nowrap;
 }
 
+.u-loading {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
 .u-widget {
   padding: 1rem;
   border-radius: 8px;

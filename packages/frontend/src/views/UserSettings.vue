@@ -14,11 +14,18 @@
               :data-testid="`user-settings-author-${author._id}`"
               class="user-settings__following-item"
             >
-              <UserAvatar
-                class="user-settings__following-avatar"
-                :src="author.avatar"
-              />
-              {{ author.login }}
+              <RouterLink
+                class="user-settings__following-link"
+                :data-testid="`user-settings-author-${author._id}-link`"
+                :to="{ name: 'UserPage', params: { login: author.login } }"
+              >
+                <UserAvatar
+                  class="user-settings__following-avatar"
+                  :src="author.avatar"
+                />
+                {{ author.login }}
+              </RouterLink>
+
               <BaseIconButton
                 :label="`Unfollow ${author.login}`"
                 :data-testid="`user-settings-author-${author._id}-unfollow`"
@@ -100,6 +107,15 @@
           <UserAvatar :src="currentAvatar" alt="current avatar" />
         </div>
 
+        <BaseUploadForm
+          class="user-settings__avatar-upload"
+          :accept="POST_PICTURE_ALLOWED_MIME_TYPES"
+          :disabled="avatarUploading"
+          @select="uploadAvatarFile"
+        />
+
+        <div class="user-settings__or">or</div>
+
         <BaseInput
           ref="avatarInput"
           v-model.lazy.trim="avatarUrlInput"
@@ -111,8 +127,8 @@
         />
 
         <div class="user-settings__avatar-hint">
-          The picture is downloaded and stored here, so the link only has to
-          work once.
+          An uploaded or linked picture is re-encoded and stored here, so a link
+          only has to work once.
         </div>
 
         <div class="user-settings__actions">
@@ -123,7 +139,7 @@
             :loading="avatarEditRequesting"
             @click="editAvatar"
           >
-            Save
+            Upload
           </BaseButton>
 
           <BaseButton
@@ -147,23 +163,27 @@
 
 <script setup lang="ts">
 import { computed, onBeforeMount, ref, useTemplateRef } from 'vue';
+import { RouterLink } from 'vue-router';
 import { api } from '@/api';
 import { userTypes } from '@/api/users';
 import * as consts from '@/const';
+import { POST_PICTURE_ALLOWED_MIME_TYPES } from '@/const';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
+import { validatePictureFile } from '@/utils/validate-picture-file';
 import BaseButton from '@common/BaseButton.vue';
 import BaseIconButton from '@common/BaseIconButton.vue';
 import BaseInput from '@common/BaseInput.vue';
 import BaseTag from '@common/BaseTag.vue';
 import BaseTextarea from '@common/BaseTextarea.vue';
+import BaseUploadForm from '@common/BaseUploadForm.vue';
 import CircularLoader from '@icons/animation/CircularLoader.vue';
 import IconClose from '@icons/IconClose.vue';
 import UserAvatar from '@components/User/UserAvatar.vue';
 
 const { unfollowTag, setAvatar } = useUserStore();
 
-const { showInfoNotification } = useNotificationsStore();
+const { showInfoNotification, showErrorNotification } = useNotificationsStore();
 
 const isFetching = ref(true);
 const isUpdating = ref(false);
@@ -260,11 +280,22 @@ const editBio = async () => {
 const currentAvatar = ref('');
 const avatarUrlInput = ref('');
 const avatarEditRequesting = ref(false);
+const avatarUploading = ref(false);
 const avatarRemoveRequesting = ref(false);
 const isAvatarSubmitted = ref(false);
 
 const avatarInput =
   useTemplateRef<InstanceType<typeof BaseInput>>('avatarInput');
+
+const applyAvatar = (avatar: string) => {
+  currentAvatar.value = avatar;
+
+  setAvatar(avatar);
+
+  showInfoNotification({
+    message: 'Your avatar has been successfully updated!',
+  });
+};
 
 const editAvatar = async () => {
   if (!avatarUrlInput.value) {
@@ -279,17 +310,36 @@ const editAvatar = async () => {
 
     const data = await api.users.updateMyAvatar({ url: avatarUrlInput.value });
 
-    currentAvatar.value = data.avatar;
     avatarUrlInput.value = '';
     isAvatarSubmitted.value = false;
 
-    setAvatar(data.avatar);
-
-    showInfoNotification({
-      message: 'Your avatar has been successfully updated!',
-    });
+    applyAvatar(data.avatar);
   } finally {
     avatarEditRequesting.value = false;
+  }
+};
+
+const uploadAvatarFile = async (file: File) => {
+  const error = validatePictureFile(file);
+
+  if (error) {
+    showErrorNotification({ message: error });
+
+    return;
+  }
+
+  const formData = new FormData();
+
+  formData.append('picture', file);
+
+  try {
+    avatarUploading.value = true;
+
+    const data = await api.users.uploadMyAvatar(formData);
+
+    applyAvatar(data.avatar);
+  } finally {
+    avatarUploading.value = false;
   }
 };
 
@@ -345,6 +395,19 @@ onBeforeMount(() => {
   &__bio-edit,
   &__avatar-edit {
     max-width: 32rem;
+  }
+
+  &__avatar-upload {
+    max-width: 32rem;
+  }
+
+  &__or {
+    max-width: 32rem;
+    margin: 12px 0;
+    color: var(--color-text-secondary);
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
   }
 
   &__bio-edit textarea {
@@ -403,6 +466,21 @@ onBeforeMount(() => {
     align-items: center;
     gap: 4px;
     color: var(--color-text-primary);
+  }
+
+  &__following-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-text-primary);
+    text-decoration: none;
+
+    @media (--hover) {
+      &:hover {
+        color: var(--color-primary-strong);
+        text-decoration: underline;
+      }
+    }
   }
 
   &__following-avatar {

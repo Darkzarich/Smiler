@@ -68,6 +68,78 @@ test('Empty posts lists', async ({ Api, Post, PostsPage }) => {
   await expect(Post.getNoMoreContentText()).toBeHidden();
 });
 
+test('Tells a visitor what fills an empty My Feed and links to all posts', async ({
+  Api,
+  Post,
+  PostsPage,
+  Menu,
+  page,
+}) => {
+  Api.routes.auth.getAuth.mock({ body: createRandomAuth({ isAuth: true }) });
+  Api.routes.posts.getFeed.mock({
+    body: {
+      posts: [],
+      hasNextPage: false,
+      nextCursor: null,
+    },
+  });
+  Api.routes.posts.getAll.mock({
+    body: {
+      posts: [],
+      hasNextPage: false,
+    },
+  });
+
+  // Opened from the list: a page load of /posts/feed would be answered by the
+  // feed's own mock, whose pattern also matches the address
+  await PostsPage.goto(PostsPage.urls.all);
+  await Menu.openIfMobile();
+  await PostsPage.getFeedLink().click();
+  await expect(page).toHaveURL(new RegExp(`${PostsPage.urls.feed}$`));
+
+  const empty = Post.getNoContentText();
+
+  await expect(empty).toContainText('Your feed is empty');
+  await expect(empty).toContainText('authors and tags you follow');
+
+  await empty.getByRole('link', { name: 'Browse all posts' }).click();
+
+  await expect(page).toHaveURL(new RegExp(`${PostsPage.urls.all}$`));
+});
+
+test('Points an empty Today at the other tabs', async ({
+  Api,
+  Post,
+  PostsPage,
+  page,
+}) => {
+  Api.routes.posts.getToday.mock({
+    body: {
+      posts: [],
+      hasNextPage: false,
+    },
+  });
+  Api.routes.posts.getAll.mock({
+    body: {
+      posts: [],
+      hasNextPage: false,
+    },
+  });
+
+  await PostsPage.goto(PostsPage.urls.today);
+
+  const empty = Post.getNoContentText();
+
+  await expect(empty).toContainText('Nothing new today yet');
+  await expect(
+    empty.getByRole('link', { name: 'Top this week' }),
+  ).toHaveAttribute('href', PostsPage.urls.topThisWeek);
+
+  await empty.getByRole('link', { name: 'All posts' }).click();
+
+  await expect(page).toHaveURL(new RegExp(`${PostsPage.urls.all}$`));
+});
+
 test('Shows the end of the list only once the last page has loaded', async ({
   Api,
   Post,
@@ -157,6 +229,32 @@ test('Fits the post byline and footer on a 320px phone', async ({
   });
 
   expect(layout).toEqual({ dateLines: 1, pastEdge: [] });
+});
+
+test('Shows the exact moment behind the relative post date', async ({
+  page,
+  Api,
+  PostsPage,
+}) => {
+  const createdAt = new Date(Date.now() - 20 * 60 * 1000);
+
+  Api.routes.posts.getToday.mock({
+    body: {
+      posts: [createRandomPost({ createdAt: createdAt.toISOString() })],
+      hasNextPage: false,
+    },
+  });
+
+  await PostsPage.goto(PostsPage.urls.today);
+
+  const date = page.locator('.post__main .post__date');
+
+  await expect(date).toHaveText('20 minutes ago');
+  await expect(date).toHaveAttribute('datetime', createdAt.toISOString());
+  await expect(date).toHaveAttribute(
+    'title',
+    /^[A-Z][a-z]{2} \d{1,2}, \d{4}, \d{1,2}:\d{2} (AM|PM)$/,
+  );
 });
 
 test('Puts the votes in the footer row and the author above the title on a phone', async ({

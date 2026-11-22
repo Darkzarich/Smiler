@@ -10,23 +10,32 @@
     />
 
     <template v-else>
-      <!-- TODO: Skeleton? -->
-      <UserProfile v-if="user" :user="user" />
-
-      <PostsContainer
-        v-model:posts="posts"
-        :is-loading="isLoading"
-        :has-next-page="hasNextPage"
-        @fetch-more="handleNextPage"
+      <div
+        v-if="isFetchingUser && !user"
+        class="u-widget u-loading"
+        data-testid="profile-loading"
       >
-        <template #no-content>
-          This author has not posted anything yet.
-        </template>
+        <CircularLoader />
+      </div>
 
-        <template #no-more-content>
-          You've read all the posts this author has posted!
-        </template>
-      </PostsContainer>
+      <template v-else>
+        <UserProfile v-if="user" :user="user" />
+
+        <PostsContainer
+          v-model:posts="posts"
+          :is-loading="isLoading"
+          :has-next-page="hasNextPage"
+          @fetch-more="handleNextPage"
+        >
+          <template #no-content>
+            This author has not posted anything yet.
+          </template>
+
+          <template #no-more-content>
+            You've read all the posts this author has posted!
+          </template>
+        </PostsContainer>
+      </template>
     </template>
   </div>
 </template>
@@ -45,6 +54,7 @@ import { useRestorablePosts } from '@/composables/use-restorable-posts';
 import * as consts from '@/const';
 import NotFound from '@/views/NotFound.vue';
 import UserProfile from '@components/User/UserProfile.vue';
+import CircularLoader from '@icons/animation/CircularLoader.vue';
 
 const route = useRoute();
 

@@ -9,6 +9,16 @@
       @retry="fetchPostBySlug()"
     />
 
+    <div
+      v-else-if="isFetchingPost"
+      class="post-container"
+      data-testid="post-loading"
+    >
+      <div class="u-widget u-loading">
+        <CircularLoader />
+      </div>
+    </div>
+
     <template v-else-if="post">
       <div class="post-container">
         <Post

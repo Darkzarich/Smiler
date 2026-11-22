@@ -65,9 +65,7 @@
       >
         <ReuseAuthor />
         <span aria-hidden="true">·</span>
-        <span class="post__date">
-          {{ formatFromNow(post.createdAt) }}
-        </span>
+        <RelativeTime class="post__date" :date="post.createdAt" />
       </div>
 
       <div class="post__title">
@@ -194,9 +192,7 @@
           <div v-if="isPhone" class="post__votes">
             <ReuseVotes />
           </div>
-          <span v-else class="post__date">
-            {{ formatFromNow(post.createdAt) }}
-          </span>
+          <RelativeTime v-else class="post__date" :date="post.createdAt" />
 
           <RouterLink
             class="post__comments-count u-touch-area"
@@ -262,7 +258,6 @@ import { POST_RATE_VALUE } from '@/const';
 import { useAuthPromptStore } from '@/store/auth-prompt';
 import { useNotificationsStore } from '@/store/notifications';
 import { useUserStore } from '@/store/user';
-import { formatFromNow } from '@/utils/format-from-now';
 import { resolveImage } from '@/utils/resolve-image';
 import BaseContextMenu from '@common/BaseContextMenu.vue';
 import BaseIconButton from '@common/BaseIconButton.vue';
@@ -270,6 +265,7 @@ import BaseImage from '@common/BaseImage.vue';
 import BaseTag from '@common/BaseTag.vue';
 import CollapsibleContent from '@common/CollapsibleContent.vue';
 import ConfirmModal from '@common/ConfirmModal.vue';
+import RelativeTime from '@common/RelativeTime.vue';
 import IconComments from '@icons/IconComments.vue';
 import IconDelete from '@icons/IconDelete.vue';
 import IconEdit from '@icons/IconEdit.vue';

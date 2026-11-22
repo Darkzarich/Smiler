@@ -27,7 +27,12 @@
       </div>
     </div>
 
-    <EditorContent :editor="editor" />
+    <div
+      class="base-text-editor__editor"
+      :data-placeholder="isPlaceholderShown ? placeholder : undefined"
+    >
+      <EditorContent :editor="editor" />
+    </div>
 
     <!-- TODO: Add button name for this slot it's not obvious when its "default" -->
     <slot />
@@ -53,7 +58,7 @@ import { Strike } from '@tiptap/extension-strike';
 import { Text } from '@tiptap/extension-text';
 import { Underline } from '@tiptap/extension-underline';
 import { EditorContent, useEditor } from '@tiptap/vue-3';
-import { type Component, watch } from 'vue';
+import { type Component, computed, onMounted, watch } from 'vue';
 import IconBold from '@icons/IconBold.vue';
 import IconBulletedList from '@icons/IconBulletedList.vue';
 import IconCode from '@icons/IconCode.vue';
@@ -113,12 +118,18 @@ interface Props {
   dataTestid?: string;
   features?: TextEditorFeatures;
   id?: string;
+  /** Shown in the empty field, so a bare box says what it is for */
+  placeholder?: string;
+  /** Takes the caret once the editor is on screen, for one the reader just opened */
+  focusOnMount?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   dataTestid: 'input',
   features: TextEditorFeatures.Comment,
   id: undefined,
+  placeholder: '',
+  focusOnMount: false,
 });
 
 const textEditorValue = defineModel<string>({
@@ -420,6 +431,12 @@ const sanitizeEditorHtml = (html: string) => {
   return hasMeaningfulHtml(sanitizedHtml) ? sanitizedHtml : '';
 };
 
+// The model is '' whenever nothing readable is in the editor, so it answers
+// "is the placeholder due" without reading the document
+const isPlaceholderShown = computed(
+  () => Boolean(props.placeholder) && !hasMeaningfulHtml(textEditorValue.value),
+);
+
 const updateModelValue = (html: string) => {
   const sanitizedHtml = sanitizeEditorHtml(html);
 
@@ -479,6 +496,13 @@ const editor = useEditor({
   onUpdate: ({ editor }) => {
     updateModelValue(editor.getHTML());
   },
+});
+
+// `useEditor` builds the editor in an onMounted of its own, which runs first
+onMounted(() => {
+  if (props.focusOnMount) {
+    editor.value?.commands.focus('end');
+  }
 });
 
 const isActive = (format: ActiveFormat) => {
@@ -577,9 +601,29 @@ watch(textEditorValue, (value) => {
 
 <style>
 .base-text-editor {
+  --editor-field-padding: 16px;
+  --editor-field-border: 1px;
+
   width: 100%;
   padding: 1rem;
   transition: border 200ms ease-out;
+
+  &__editor {
+    position: relative;
+  }
+
+  /* Padded to the field's own text edge, so the line sits where the caret will.
+     Above the field: ProseMirror's element is positioned and would paint over it */
+  &__editor[data-placeholder]::before {
+    position: absolute;
+    z-index: 1;
+    padding: calc(var(--editor-field-border) + var(--editor-field-padding));
+    color: var(--color-text-secondary);
+    overflow: hidden;
+    inset: 0;
+    content: attr(data-placeholder);
+    pointer-events: none;
+  }
 
   &__toolbar {
     display: flex;
@@ -617,13 +661,18 @@ watch(textEditorValue, (value) => {
     width: 100%;
     height: 100%;
     min-height: 240px;
-    padding: 16px;
-    outline: var(--color-primary);
-    border: 1px solid var(--color-text-secondary);
+    padding: var(--editor-field-padding);
+    border: var(--editor-field-border) solid var(--color-text-secondary);
     border-radius: 8px;
     background: var(--color-surface-primary);
     color: var(--color-text-primary);
     cursor: text;
+
+    /* The field's own focus state, as BaseInput has: the global ring would sit
+       outside a box this size */
+    &:focus {
+      border-color: var(--color-primary-strong);
+    }
 
     p,
     blockquote,

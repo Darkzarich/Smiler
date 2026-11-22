@@ -28,8 +28,9 @@
       <BaseInput
         ref="input"
         v-model="tagInput"
+        :label="label"
+        :placeholder="placeholder"
         data-testid="post-tag-input"
-        placeholder="Input up to 8 tags"
         :error="tagInputError"
         @keyup.enter="addTag"
         @keydown="addTagOnComma"
@@ -60,10 +61,14 @@ import IconClose from '@icons/IconClose.vue';
 import { normalizeTag } from '@utils/normalize-tag';
 
 interface Props {
-  dataTestid?: string;
+  label?: string;
+  placeholder?: string;
 }
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), {
+  label: '',
+  placeholder: 'Input up to 8 tags',
+});
 
 const tags = defineModel<string[]>('tags', {
   required: true,
